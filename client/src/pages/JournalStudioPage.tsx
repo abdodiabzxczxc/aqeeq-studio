@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { JOURNAL_READING_OPTIONS, normalizeJournalReadingMode } from "@/lib/journalReading";
 import { DEFAULT_JOURNAL_SEASON_LABEL, normalizeJournalSeasonLabel } from "@/lib/journalSeasonLabel";
 import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
+import { AiStoryWriterModal, AiStoryGeneratedResult } from "@/components/AiStoryWriterModal";
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
@@ -91,6 +92,7 @@ export default function JournalStudioPage() {
   const [watermarkOpacity, setWatermarkOpacity] = useState(12);
   const [watermarkPosition, setWatermarkPosition] = useState<"center" | "top-right" | "bottom-left" | "bottom-right">("center");
   const [watermarkTint, setWatermarkTint] = useState("#f8ca14");
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   const refresh = () => {
     void utils.schoolNews.list.invalidate();
@@ -340,6 +342,24 @@ export default function JournalStudioPage() {
             >
               <FilePlus2 className="ml-2" size={16} />
               عدد جديد
+            </Button>
+
+            <Button
+              type="button"
+              onClick={() => setAiModalOpen(true)}
+              className="bg-gradient-to-r from-amber-500 to-amber-300 text-slate-950 font-black hover:from-amber-400 hover:to-amber-200 shadow-md text-xs"
+            >
+              <Sparkles className="ml-1.5" size={14} />
+              صياغة بالـ AI ✨
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/admin/analytics")}
+              className="border-white/15 text-xs font-black hover:bg-white/10"
+            >
+              التحليلات والرادار 📊
             </Button>
 
             {issue ? (
@@ -930,6 +950,19 @@ export default function JournalStudioPage() {
         onClose={() => setTarget(null)}
         accept={target === "audio" ? "audio" : "image"}
         onSelect={chooseMedia}
+      />
+
+      <AiStoryWriterModal
+        open={aiModalOpen}
+        onOpenChange={setAiModalOpen}
+        defaultTopic={title}
+        dark={dark}
+        mode="magazine"
+        onApply={(res) => {
+          setTitle(res.headline);
+          setDescription(res.body);
+          if (res.kicker) setSeasonLabel(res.kicker);
+        }}
       />
     </main>
   );

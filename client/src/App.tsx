@@ -44,7 +44,9 @@ import { PublishedHomepageProvider, usePublishedHomepage } from "./contexts/Publ
 
 
 import AqeeqAdminDashboardPage from "./pages/AqeeqAdminDashboardPage";
+import AqeeqAnalyticsDashboardPage from "./pages/AqeeqAnalyticsDashboardPage";
 import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
+import { PwaInstallBanner } from "./components/PwaInstallBanner";
 
 function Router() {
   const [location] = useLocation();
@@ -70,6 +72,8 @@ function Router() {
       <Route path="/albums" component={AqeeqAlbumsPage} />
       <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
       <Route path="/offers" component={AqeeqShowcasePage} />
+      <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
+      <Route path="/analytics" component={AqeeqAnalyticsDashboardPage} />
       <Route path="/dashboard" component={AqeeqAdminDashboardPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
@@ -129,6 +133,7 @@ function StudioAppShell() {
         <AqeeqBroadcastBanner />
         <Router />
         <VisualGlobalSections />
+        <PwaInstallBanner />
       </div>
     </div>
   );

@@ -6,13 +6,14 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
+import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqAlbumSpreadWatermark } from "@/lib/aqeeqAlbumReaderTheme";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, Moon, Printer, RotateCcw, Settings2, Share2, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
+import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, Moon, Printer, RotateCcw, Settings2, Share2, Sparkles, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -53,6 +54,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   const [mode, setMode] = useState<AlbumMode>("spread");
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const [index, setIndex] = useState(0);
+  const [faceSearchOpen, setFaceSearchOpen] = useState(false);
 
   useEffect(() => {
     if (!album) return;
@@ -345,6 +347,19 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             trackTitle={album.title}
             dark={dark}
           />
+          <button
+            type="button"
+            onClick={() => setFaceSearchOpen(true)}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1 text-xs font-black transition active:scale-95 touch-manipulation ${
+              dark
+                ? "border-amber-400/40 bg-amber-400/15 text-amber-200 hover:bg-amber-400/25"
+                : "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 shadow-sm"
+            }`}
+            title="ابحث عن صورك أو صور ابنك في هذا الألبوم بالذكاء الاصطناعي"
+          >
+            <Sparkles size={13} className="text-amber-400" />
+            <span className="hidden sm:inline">ابحث عن صوري 🔍</span>
+          </button>
           <VisualEditable id="album-reader-theme-action" tag="button" label="زر مظهر قارئ الألبوم" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-theme-icon" label="أيقونة مظهر قارئ الألبوم" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
           <VisualEditable id="album-reader-archive-action" tag="button" label="زر كل الألبومات" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-archive-icon" label="أيقونة أرشيف الألبومات" icon="archive" size={16} /></VisualEditable>
           {isAdmin ? <VisualEditable id="album-reader-manage-action" tag="button" label="زر إدارة الألبوم" defaultText="إدارة الألبوم" as="button" onAction={() => navigate(`/albums/manage?album=${album.slug}`)} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-manage-icon" label="أيقونة إدارة الألبوم" icon="settings" size={16} /></VisualEditable> : null}
@@ -695,6 +710,21 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         <VisualEditable id="album-rail-theme-action" tag="button" label="أيقونة مظهر الألبوم الجانبية" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-theme-icon" label="أيقونة مظهر الألبوم الجانبية" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
         <VisualEditable id="album-rail-fullscreen-action" tag="button" label="أيقونة ملء الشاشة للألبوم" defaultText="ملء الشاشة" as="button" onAction={() => void toggleReaderFullscreen()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-fullscreen-icon" label="أيقونة ملء الشاشة الجانبية" icon="fullscreen" size={16} /></VisualEditable>
       </aside>
+
+      {album ? (
+        <AqeeqFaceSearchModal
+          open={faceSearchOpen}
+          onOpenChange={setFaceSearchOpen}
+          albumTitle={album.title}
+          photos={album.media.map((m) => ({
+            id: m.id,
+            imageUrl: getAqeeqAlbumImageSource(m),
+            caption: m.caption,
+            fileName: m.fileName,
+          }))}
+          dark={dark}
+        />
+      ) : null}
     </div>
   </main>;
 }

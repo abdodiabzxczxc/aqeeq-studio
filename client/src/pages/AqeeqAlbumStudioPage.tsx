@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
+import { AiStoryWriterModal } from "@/components/AiStoryWriterModal";
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
@@ -89,6 +90,7 @@ export default function AqeeqAlbumStudioPage() {
   const [watermarkPosition, setWatermarkPosition] = useState<(typeof watermarkPositions)[number]>("center");
   const [watermarkTint, setWatermarkTint] = useState("#f8ca14");
   const [readingMode, setReadingMode] = useState<AlbumMode>("spread");
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   const refresh = () => {
     void utils.aqeeqAlbums.list.invalidate();
@@ -332,6 +334,24 @@ export default function AqeeqAlbumStudioPage() {
             >
               <FilePlus2 className="ml-2" size={16} />
               ألبوم جديد
+            </Button>
+
+            <Button
+              type="button"
+              onClick={() => setAiModalOpen(true)}
+              className="bg-gradient-to-r from-amber-500 to-amber-300 text-slate-950 font-black hover:from-amber-400 hover:to-amber-200 shadow-md text-xs"
+            >
+              <Sparkles className="ml-1.5" size={14} />
+              صياغة بالـ AI ✨
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/admin/analytics")}
+              className="border-white/15 text-xs font-black hover:bg-white/10"
+            >
+              التحليلات والرادار 📊
             </Button>
 
             {album ? (
@@ -908,6 +928,18 @@ export default function AqeeqAlbumStudioPage() {
         onClose={() => setAlbumMediaLibraryOpen(false)}
         accept="image"
         onSelect={addImageFromLibrary}
+      />
+
+      <AiStoryWriterModal
+        open={aiModalOpen}
+        onOpenChange={setAiModalOpen}
+        defaultTopic={title}
+        dark={dark}
+        mode="album"
+        onApply={(res) => {
+          setTitle(res.headline);
+          setDescription(res.body);
+        }}
       />
     </main>
   );

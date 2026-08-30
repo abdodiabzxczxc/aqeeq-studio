@@ -102,7 +102,9 @@ import {
   setSiteOrchestration,
   hideSiteStory,
   unhideSiteStory,
+  getAqeeqAnalyticsSummary,
 } from "./db";
+import { generateAiNewsStory, generateAiAlbumDescription } from "./aiStoryService";
 import { readGoogleDriveAlbum, getDrivePdfFileId } from "./googleDriveAlbum";
 import { invitationRouter } from "./routers/invitation";
 import { settingsRouter } from "./routers/settings";
@@ -558,6 +560,19 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.publish", details: JSON.stringify({ issueId: input.id }) });
       return issue;
     }),
+    generateAiStory: adminProcedure
+      .input(
+        z.object({
+          topic: z.string().optional(),
+          prompt: z.string().optional(),
+          keyPoints: z.string().optional(),
+          tone: z.enum(["royal", "celebration", "educational", "urgent"]).optional(),
+          schoolName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return generateAiNewsStory(input);
+      }),
   }),
 
   aqeeqAlbums: router({
@@ -615,6 +630,16 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_album.delete", details: JSON.stringify({ id: input.id }) });
       return result;
     }),
+    generateAiStory: adminProcedure
+      .input(
+        z.object({
+          title: z.string(),
+          tone: z.enum(["royal", "celebration", "educational", "urgent"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return generateAiAlbumDescription(input);
+      }),
   }),
 
   aqeeqShowcases: router({
@@ -1104,11 +1129,16 @@ export const appRouter = router({
   // ==================== Invitations ====================
   invitation: invitationRouter,
 
-  // ==================== Settings ====================
+  // ==================== Settings & Analytics ====================
   settings: settingsRouter,
   controlCenter: controlCenterRouter,
   visualEditor: visualEditorRouter,
   homepage: homepageRouter,
+  analytics: router({
+    getLiveDashboard: adminProcedure.query(async () => {
+      return getAqeeqAnalyticsSummary();
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

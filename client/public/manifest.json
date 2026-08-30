@@ -1,0 +1,23 @@
+{
+  "short_name": "مدارس العقيق",
+  "name": "استوديو ومجلة مدارس العقيق الأهلية والدولية",
+  "icons": [
+    {
+      "src": "/alaqeeq-logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/alaqeeq-logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#080b12",
+  "theme_color": "#080b12",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl"
+}
