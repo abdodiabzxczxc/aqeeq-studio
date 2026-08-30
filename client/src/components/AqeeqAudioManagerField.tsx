@@ -49,6 +49,16 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
     },
   });
 
+  const deleteMutation = trpc.visualEditor.media.delete.useMutation({
+    onSuccess: () => {
+      void utils.visualEditor.media.list.invalidate();
+      toast.success("تم حذف الملف الصوتي من السحابة بنجاح");
+    },
+    onError: (err) => {
+      toast.error(err.message || "تعذر حذف الملف الصوتي");
+    },
+  });
+
   const togglePreview = () => {
     if (!value) return;
     if (!audioRef.current) {
@@ -104,6 +114,23 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
       audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
     }
     toast.success(`تم اختيار: ${title || "المقطع الصوتي"}`);
+  };
+
+  const handleDeleteUploadedFile = (id: number, fileName: string, fileUrl: string) => {
+    if (window.confirm(`هل أنت متأكد من حذف الملف الصوتي "${fileName}" من السحابة؟`)) {
+      if (audioRef.current && audioRef.current.src === fileUrl) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+      if (value === fileUrl) {
+        onChange(null);
+      }
+      if (defaultAudio === fileUrl) {
+        setAqeeqDefaultBackgroundAudio(null);
+        setDefaultAudio(null);
+      }
+      deleteMutation.mutate({ id });
+    }
   };
 
   const handleSetAsDefault = () => {
@@ -213,7 +240,7 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
         </button>
       </div>
 
-      {/* Tab 1: Uploaded Audio Library (Previous uploads) */}
+      {/* Tab 1: Uploaded Audio Library (Previous uploads with delete buttons) */}
       {activeTab === "uploaded" ? (
         <div className="mt-3 space-y-2">
           {uploadedAudioList.length === 0 ? (
@@ -234,16 +261,14 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-48 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-56 overflow-y-auto pr-1">
               {uploadedAudioList.map((item) => {
                 const isSelected = value === item.url;
                 const isDefault = defaultAudio === item.url;
                 return (
-                  <button
+                  <div
                     key={item.id}
-                    type="button"
-                    onClick={() => selectAudio(item.url, item.fileName)}
-                    className={`flex items-center justify-between rounded-xl border p-2.5 text-right transition ${
+                    className={`group flex items-center justify-between gap-2 rounded-xl border p-2.5 transition ${
                       isSelected
                         ? "border-amber-400 bg-amber-400/15 text-amber-200 ring-1 ring-amber-400/40"
                         : dark
@@ -251,7 +276,11 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
                           : "border-slate-900/10 bg-white text-slate-700 hover:border-slate-300"
                     }`}
                   >
-                    <div className="min-w-0 pr-1">
+                    <button
+                      type="button"
+                      onClick={() => selectAudio(item.url, item.fileName)}
+                      className="min-w-0 flex-1 text-right"
+                    >
                       <div className="flex items-center gap-1.5">
                         <p className="truncate text-xs font-black">{item.fileName}</p>
                         {isDefault ? <Star size={11} className="fill-amber-400 text-amber-400 shrink-0" /> : null}
@@ -259,15 +288,30 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
                       <p className={`text-[10px] ${dark ? "text-slate-400" : "text-slate-500"}`}>
                         مرفوع على الموقع · {item.fileSize ? `${Math.round(item.fileSize / 1024)} KB` : "صوت"}
                       </p>
+                    </button>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isSelected ? (
+                        <span className="grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-slate-950">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                      ) : null}
+                      
+                      {/* Delete File Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteUploadedFile(item.id, item.fileName, item.url);
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="grid h-6 w-6 place-items-center rounded-lg border border-transparent text-slate-500 transition hover:border-rose-400/40 hover:bg-rose-500/20 hover:text-rose-300"
+                        title="حذف هذا الملف نهائياً من السحابة"
+                      >
+                        <Trash2 size={12} />
+                      </button>
                     </div>
-                    {isSelected ? (
-                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400 text-slate-950">
-                        <Check size={12} strokeWidth={3} />
-                      </span>
-                    ) : (
-                      <Music2 size={14} className="shrink-0 text-slate-500" />
-                    )}
-                  </button>
+                  </div>
                 );
               })}
             </div>
