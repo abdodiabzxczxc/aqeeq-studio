@@ -72,6 +72,22 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     void audio.play().then(() => setSoundEnabled(true)).catch(() => setSoundEnabled(false));
   }, [album?.id, album?.backgroundAudioUrl]);
 
+  // Keyboard navigation for album photos (ArrowLeft = next, ArrowRight = previous)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (mode === "spread") {
+        if (e.key === "ArrowLeft") {
+          const items = album?.media || [];
+          setIndex((prev) => Math.min(items.length - 1, prev + 1));
+        } else if (e.key === "ArrowRight") {
+          setIndex((prev) => Math.max(0, prev - 1));
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [mode, album?.media]);
+
   const brandLogo = album?.headerLogoUrl || journalIssues[0]?.headerLogoUrl || snapshot?.settings.school_logo || null;
   const watermark = album?.watermarkUrl || brandLogo;
   const active = album?.media[index] as AlbumItem | undefined;
@@ -143,12 +159,154 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
       {album.backgroundAudioUrl ? <audio ref={audioRef} src={album.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
       <section className={`relative mt-5 overflow-hidden rounded-[1.9rem] border ${dark ? "border-amber-300/20 bg-[#0d111b]" : "border-amber-700/15 bg-white"}`}>
         {watermark ? <VisualImage id="album-reader-watermark" label="العلامة المائية للألبوم" src={watermark} alt="" className={`pointer-events-none absolute z-0 ${watermarkPlacement} ${dark ? "brightness-0 invert" : ""}`} style={watermarkStyle} /> : null}
-        {mode === "gallery" ? <div className="relative z-10 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{(album.media as AlbumItem[]).map((item, mediaIndex) => <div id={`aq-album-media-${mediaIndex}`} key={item.id} className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border text-right ${index === mediaIndex ? "ring-2 ring-amber-300/35" : ""} ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-slate-100"}`}><button type="button" onClick={() => { setIndex(mediaIndex); setMode(item.mediaType === "video" ? "scroll" : "spread"); }} className="block h-full w-full">{item.mediaType === "video" ? <><VisualImage id={`album-gallery-poster-${item.id}`} label="صورة معاينة فيديو الألبوم" src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover transition group-hover:scale-105" /><span className="absolute inset-0 grid place-items-center bg-black/20"><Video className="text-white drop-shadow" /></span></> : <VisualImage id={`album-gallery-image-${item.id}`} label="صورة معرض الألبوم" src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover transition group-hover:scale-105" />}<span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-[10px] font-bold text-white">{item.caption || item.fileName}</span></button><button type="button" onClick={() => download(item.id)} className="absolute left-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button></div>)}</div> : null}
-        {mode === "scroll" ? <div className="relative z-10 mx-auto max-w-4xl space-y-5 p-4 md:p-8">{(album.media as AlbumItem[]).map((item, mediaIndex) => <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.2rem] border ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-white"}`}><button type="button" onClick={() => download(item.id)} className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button><div className={item.mediaType === "video" ? "aspect-video w-full bg-black" : "max-h-[88vh] bg-black"}><AlbumMedia item={item} /></div>{item.caption ? <figcaption className={`px-4 py-3 text-xs ${dark ? "text-slate-300" : "text-slate-600"}`}>{item.caption}</figcaption> : null}</figure>)}</div> : null}
-        {mode === "spread" ? <div className="relative z-10 p-2 md:p-4">{active?.mediaType === "video" ? <div className="mx-auto max-w-5xl overflow-hidden rounded-[1.4rem] border border-amber-300/25 bg-black"><div className="aspect-video w-full"><AlbumMedia item={active} /></div><div className="flex items-center justify-between gap-3 p-3"><button onClick={() => moveThroughAlbum("previous")} disabled={index === 0} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-amber-100 disabled:opacity-30">السابق</button><span className="text-xs font-black text-amber-100">{active.caption || active.fileName}</span><button onClick={() => moveThroughAlbum("next")} disabled={index >= album.media.length - 1} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-amber-100 disabled:opacity-30">التالي</button></div></div> : <SchoolNewsFlipbook compact collectionLabel="ألبوم العقيق" archiveLabel="كل الألبومات" downloadLabel="تحميل كل الصور ZIP" onDownloadAll={() => download()} onDownloadPage={(page) => download(page.id)} title={album.title} kicker={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`} pages={(album.media as AlbumItem[]).map((item) => ({ id: item.id, imageUrl: getAqeeqAlbumImageSource(item), caption: item.caption || item.fileName }))} watermark={spreadWatermark} shareUrl={isPreview ? undefined : `${window.location.origin}/albums/${album.slug}`} onArchive={() => navigate("/albums")} />}</div> : null}
-        {mode === "spread" && album.media.length > 1 ? <div className={`relative z-10 mx-auto flex max-w-5xl gap-2 overflow-x-auto px-3 pb-4 pt-1 ${dark ? "bg-black/10" : "bg-slate-50/50"}`}>{(album.media as AlbumItem[]).map((item, mediaIndex) => <button key={item.id} type="button" onClick={() => setIndex(mediaIndex)} className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border transition ${index === mediaIndex ? "border-amber-300 ring-2 ring-amber-300/35" : dark ? "border-white/15 opacity-70 hover:opacity-100" : "border-slate-900/10 opacity-75 hover:opacity-100"}`} title={item.caption || item.fileName}>{item.mediaType === "video" ? <><img src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover" /><span className="absolute inset-0 grid place-items-center bg-black/25"><Video size={15} className="text-white" /></span></> : <img src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover" />}</button>)}</div> : null}
+
+        {mode === "gallery" ? (
+          <div className="relative z-10 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {(album.media as AlbumItem[]).map((item, mediaIndex) => (
+              <div id={`aq-album-media-${mediaIndex}`} key={item.id} className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border text-right ${index === mediaIndex ? "ring-2 ring-amber-300/35" : ""} ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-slate-100"}`}>
+                <button type="button" onClick={() => { setIndex(mediaIndex); setMode(item.mediaType === "video" ? "scroll" : "spread"); }} className="block h-full w-full">
+                  {item.mediaType === "video" ? (
+                    <>
+                      <VisualImage id={`album-gallery-poster-${item.id}`} label="صورة معاينة فيديو الألبوم" src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover transition group-hover:scale-105" />
+                      <span className="absolute inset-0 grid place-items-center bg-black/20"><Video className="text-white drop-shadow" /></span>
+                    </>
+                  ) : (
+                    <VisualImage id={`album-gallery-image-${item.id}`} label="صورة معرض الألبوم" src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  )}
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-[10px] font-bold text-white">{item.caption || item.fileName}</span>
+                </button>
+                <button type="button" onClick={() => download(item.id)} className="absolute left-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {mode === "scroll" ? (
+          <div className="relative z-10 mx-auto max-w-4xl space-y-5 p-4 md:p-8">
+            {(album.media as AlbumItem[]).map((item, mediaIndex) => (
+              <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.2rem] border ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-white"}`}>
+                <button type="button" onClick={() => download(item.id)} className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button>
+                <div className={item.mediaType === "video" ? "aspect-video w-full bg-black" : "max-h-[88vh] bg-black"}>
+                  <AlbumMedia item={item} />
+                </div>
+                {item.caption ? <figcaption className={`px-4 py-3 text-xs ${dark ? "text-slate-300" : "text-slate-600"}`}>{item.caption}</figcaption> : null}
+              </figure>
+            ))}
+          </div>
+        ) : null}
+
+        {mode === "spread" ? (
+          <div className="relative z-10 p-2 sm:p-4 space-y-3">
+            {/* Cinematic Album Stage (Zero dead space) */}
+            <div className={`relative mx-auto flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl border shadow-2xl min-h-[260px] max-h-[72vh] ${
+              dark ? "bg-black/50 border-white/10" : "bg-white/80 border-slate-900/10 shadow-slate-300/40"
+            }`}>
+              {active?.mediaType === "video" ? (
+                <div className="aspect-video w-full">
+                  <AlbumMedia item={active} />
+                </div>
+              ) : active ? (
+                <div className="relative flex h-full max-h-[72vh] w-full items-center justify-center p-2 sm:p-4">
+                  <img
+                    src={getAqeeqAlbumImageSource(active)}
+                    alt={active.caption || active.fileName}
+                    className="max-h-[68vh] w-auto max-w-full rounded-xl object-contain drop-shadow-2xl transition duration-300 select-none"
+                  />
+                  {/* Download button on photo */}
+                  <button
+                    type="button"
+                    onClick={() => download(active.id)}
+                    className="absolute left-3 top-3 sm:left-4 sm:top-4 z-20 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-white/25 bg-black/60 text-white shadow-xl backdrop-blur-md transition hover:border-amber-300 hover:bg-amber-300 hover:text-black active:scale-95"
+                    title="تحميل هذه الصورة"
+                    aria-label="تحميل الصورة"
+                  >
+                    <Download size={17} />
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Previous Photo Button */}
+              <button
+                type="button"
+                onClick={() => moveThroughAlbum("previous")}
+                disabled={index === 0}
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/40 bg-black/80 text-amber-300 shadow-2xl backdrop-blur-md transition hover:scale-110 hover:bg-amber-300 hover:text-black disabled:opacity-0 disabled:pointer-events-none active:scale-95"
+                aria-label="الصورة السابقة"
+              >
+                <ChevronRight size={24} />
+              </button>
+
+              {/* Next Photo Button */}
+              <button
+                type="button"
+                onClick={() => moveThroughAlbum("next")}
+                disabled={index >= (album.media.length - 1)}
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/40 bg-black/80 text-amber-300 shadow-2xl backdrop-blur-md transition hover:scale-110 hover:bg-amber-300 hover:text-black disabled:opacity-0 disabled:pointer-events-none active:scale-95"
+                aria-label="الصورة التالية"
+              >
+                <ChevronLeft size={24} />
+              </button>
+
+              {/* Counter Badge */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 rounded-full border border-white/15 bg-black/75 px-3.5 py-1 text-xs font-mono font-bold text-amber-300 backdrop-blur-md shadow-lg">
+                {String(index + 1).padStart(2, "0")} / {String(album.media.length).padStart(2, "0")}
+              </div>
+            </div>
+
+            {/* Caption */}
+            {active?.caption ? (
+              <div className={`mx-auto max-w-2xl text-center text-xs sm:text-sm font-bold ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                {active.caption}
+              </div>
+            ) : null}
+
+            {/* Seamless Thumbnails Strip Directly Below with Zero Gap */}
+            {album.media.length > 1 ? (
+              <div className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
+                dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
+              }`}>
+                {(album.media as AlbumItem[]).map((item, mediaIndex) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setIndex(mediaIndex)}
+                    className={`relative h-14 w-20 sm:h-16 sm:w-24 shrink-0 overflow-hidden rounded-xl border-2 transition active:scale-95 ${
+                      index === mediaIndex
+                        ? "border-amber-300 ring-2 ring-amber-300/40 scale-105 z-10"
+                        : dark ? "border-transparent opacity-60 hover:opacity-100" : "border-transparent opacity-60 hover:opacity-100"
+                    }`}
+                    title={item.caption || item.fileName}
+                  >
+                    {item.mediaType === "video" ? (
+                      <>
+                        <img src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover" />
+                        <span className="absolute inset-0 grid place-items-center bg-black/30">
+                          <Video size={15} className="text-white" />
+                        </span>
+                      </>
+                    ) : (
+                      <img src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
-      {mode !== "spread" || active?.mediaType === "video" ? <aside className="aq-dark-reader-rail" aria-label="أدوات ألبوم العقيق"><VisualEditable id="album-rail-archive-action" tag="button" label="أيقونة كل الألبومات الجانبية" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-archive-icon" label="أيقونة أرشيف الألبوم الجانبية" icon="archive" size={17} /></VisualEditable><VisualEditable id="album-rail-previous-action" tag="button" label="أيقونة السابق الجانبية" defaultText="السابق" as="button" onAction={() => moveThroughAlbum("previous")} className="aq-dark-reader-rail-button" ><VisualIcon id="album-rail-previous-icon" label="أيقونة السابق في الألبوم" icon="previous" size={18} /></VisualEditable><VisualEditable id="album-rail-next-action" tag="button" label="أيقونة التالي الجانبية" defaultText="التالي" as="button" onAction={() => moveThroughAlbum("next")} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-next-icon" label="أيقونة التالي في الألبوم" icon="next" size={18} /></VisualEditable>{!isPreview ? <VisualEditable id="album-rail-share-action" tag="button" label="أيقونة مشاركة الألبوم" defaultText="مشاركة الألبوم" as="button" onAction={() => void shareAlbum()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-share-icon" label="أيقونة مشاركة الألبوم الجانبية" icon="share" size={16} /></VisualEditable> : null}<VisualEditable id="album-rail-download-action" tag="button" label="أيقونة تحميل صور الألبوم" defaultText="تحميل كل الصور" as="button" onAction={() => download()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-download-icon" label="أيقونة تحميل الألبوم الجانبية" icon="download" size={16} /></VisualEditable><VisualEditable id="album-rail-print-action" tag="button" label="أيقونة طباعة الألبوم" defaultText="طباعة الألبوم" as="button" onAction={() => window.print()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-print-icon" label="أيقونة طباعة الألبوم الجانبية" icon="print" size={16} /></VisualEditable><VisualEditable id="album-rail-theme-action" tag="button" label="أيقونة مظهر الألبوم الجانبية" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-theme-icon" label="أيقونة مظهر الألبوم الجانبية" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>{album.backgroundAudioUrl ? <VisualEditable id="album-rail-sound-action" tag="button" label="أيقونة موسيقى الألبوم الجانبية" defaultText={soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"} as="button" onAction={() => void toggleSound()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-sound-icon" label="أيقونة موسيقى الألبوم الجانبية" icon="sound" size={16} /></VisualEditable> : null}<VisualEditable id="album-rail-fullscreen-action" tag="button" label="أيقونة ملء الشاشة للألبوم" defaultText="ملء الشاشة" as="button" onAction={() => void toggleReaderFullscreen()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-fullscreen-icon" label="أيقونة ملء الشاشة الجانبية" icon="fullscreen" size={16} /></VisualEditable></aside> : null}
+
+      {/* Side Tool Rail */}
+      <aside className="aq-dark-reader-rail" aria-label="أدوات ألبوم العقيق">
+        <VisualEditable id="album-rail-archive-action" tag="button" label="أيقونة كل الألبومات الجانبية" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-archive-icon" label="أيقونة أرشيف الألبوم الجانبية" icon="archive" size={17} /></VisualEditable>
+        <VisualEditable id="album-rail-previous-action" tag="button" label="أيقونة السابق الجانبية" defaultText="السابق" as="button" onAction={() => moveThroughAlbum("previous")} className="aq-dark-reader-rail-button" ><VisualIcon id="album-rail-previous-icon" label="أيقونة السابق في الألبوم" icon="previous" size={18} /></VisualEditable>
+        <VisualEditable id="album-rail-next-action" tag="button" label="أيقونة التالي الجانبية" defaultText="التالي" as="button" onAction={() => moveThroughAlbum("next")} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-next-icon" label="أيقونة التالي في الألبوم" icon="next" size={18} /></VisualEditable>
+        {!isPreview ? <VisualEditable id="album-rail-share-action" tag="button" label="أيقونة مشاركة الألبوم" defaultText="مشاركة الألبوم" as="button" onAction={() => void shareAlbum()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-share-icon" label="أيقونة مشاركة الألبوم الجانبية" icon="share" size={16} /></VisualEditable> : null}
+        <VisualEditable id="album-rail-download-action" tag="button" label="أيقونة تحميل صور الألبوم" defaultText="تحميل كل الصور" as="button" onAction={() => download()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-download-icon" label="أيقونة تحميل الألبوم الجانبية" icon="download" size={16} /></VisualEditable>
+        <VisualEditable id="album-rail-print-action" tag="button" label="أيقونة طباعة الألبوم" defaultText="طباعة الألبوم" as="button" onAction={() => window.print()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-print-icon" label="أيقونة طباعة الألبوم الجانبية" icon="print" size={16} /></VisualEditable>
+        <VisualEditable id="album-rail-theme-action" tag="button" label="أيقونة مظهر الألبوم الجانبية" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-theme-icon" label="أيقونة مظهر الألبوم الجانبية" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
+        {album.backgroundAudioUrl ? <VisualEditable id="album-rail-sound-action" tag="button" label="أيقونة موسيقى الألبوم الجانبية" defaultText={soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"} as="button" onAction={() => void toggleSound()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-sound-icon" label="أيقونة موسيقى الألبوم الجانبية" icon="sound" size={16} /></VisualEditable> : null}
+        <VisualEditable id="album-rail-fullscreen-action" tag="button" label="أيقونة ملء الشاشة للألبوم" defaultText="ملء الشاشة" as="button" onAction={() => void toggleReaderFullscreen()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-fullscreen-icon" label="أيقونة ملء الشاشة الجانبية" icon="fullscreen" size={16} /></VisualEditable>
+      </aside>
     </div>
   </main>;
 }
