@@ -725,29 +725,59 @@ export default function AlaqeeqStudioPublicPage() {
       {/* ========================================================================= */}
 
       {/* 🌟 2. لوحة «بينتو إنجازات وأحداث الأسبوع» (Weekly Bento Grid Highlights) */}
-      <section className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]")}>
+      <VisualEditable
+        id="studio-bento-section"
+        tag="section"
+        label="قسم إنجازات وأحداث الأسبوع"
+        as="section"
+        className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]")}
+      >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-8">
-            <span className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
-              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-            )}>
-              <Trophy size={11} />
-              WEEKLY HIGHLIGHTS · SPOTLIGHT
-            </span>
-            <h2 className={"mt-1 text-2xl font-black sm:text-3xl " + (dark ? "text-white" : "text-black")}>
-              أبرز أحداث وإنجازات الأسبوع
-            </h2>
+            <VisualEditable
+              id="studio-bento-kicker"
+              tag="text"
+              label="شارة إنجازات الأسبوع"
+              defaultText="WEEKLY HIGHLIGHTS · SPOTLIGHT"
+              as="span"
+              className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              )}
+            >
+              {(text) => (
+                <>
+                  <Trophy size={11} />
+                  {text}
+                </>
+              )}
+            </VisualEditable>
+            <VisualEditable
+              id="studio-bento-title"
+              tag="text"
+              label="عنوان إنجازات وأحداث الأسبوع"
+              defaultText="أبرز أحداث وإنجازات الأسبوع"
+              as="h2"
+              className={"mt-1 text-2xl font-black sm:text-3xl " + (dark ? "text-white" : "text-black")}
+            />
           </div>
 
           <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-4">
             {/* Bento Card 1: الحدث الرئيسي الأبرز (Spans 2 columns) */}
-            <div className={"group relative overflow-hidden rounded-[2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition duration-300 " + (
-              dark
-                ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
-                : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
-            )}>
+            <VisualEditable
+              id="studio-bento-card1"
+              tag="section"
+              label="بطاقة الحدث التعليمي الأبرز"
+              as="div"
+              className={"group relative overflow-hidden rounded-[2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition duration-300 " + (
+                dark
+                  ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
+                  : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
+              )}
+            >
               <div className="relative h-48 sm:h-56 overflow-hidden rounded-2xl mb-6">
-                <img
+                <VisualImage
+                  id="studio-bento-card1-image"
+                  label="صورة الحدث التعليمي الأبرز"
                   src={
                     (featuredEventPost ? (directDriveImage(featuredEventPost.thumbnailUrl) || featuredEventPost.thumbnailUrl || featuredEventPost.mediaUrl) : null) ||
                     showcaseCovers.front || albumCovers.front || "/alaqeeq-hero-dark.png"
@@ -755,88 +785,158 @@ export default function AlaqeeqStudioPublicPage() {
                   alt="تغطية الأسبوع"
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
-                <span className={"absolute top-3 right-3 rounded-full border px-3 py-1 text-[10px] font-black backdrop-blur-md " + (
-                  dark ? "border-[#f8ca14]/40 bg-black/80 text-[#f8ca14]" : "border-[#08467d]/20 bg-white/90 text-[#08467d]"
-                )}>
-                  🌟 {orchestration?.weeklyBento?.customTag || "تغطية الأسبوع الكبرى"}
-                </span>
+                <VisualEditable
+                  id="studio-bento-card1-tag"
+                  tag="text"
+                  label="شارة وسم الأسبوع"
+                  defaultText={orchestration?.weeklyBento?.customTag || "🌟 تغطية الأسبوع الكبرى"}
+                  as="span"
+                  className={"absolute top-3 right-3 rounded-full border px-3 py-1 text-[10px] font-black backdrop-blur-md " + (
+                    dark ? "border-[#f8ca14]/40 bg-black/80 text-[#f8ca14]" : "border-[#08467d]/20 bg-white/90 text-[#08467d]"
+                  )}
+                />
               </div>
               <div>
-                <span className={"text-xs font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                  الحدث التعليمي الأبرز
-                </span>
-                <h3 className={"mt-2 text-xl sm:text-2xl font-black leading-snug " + (dark ? "text-white" : "text-black")}>
-                  {orchestration?.weeklyBento?.customTitle || featuredEventPost?.title || "انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان"}
-                </h3>
-                <p className={"mt-2 text-xs sm:text-sm leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}>
-                  {orchestration?.weeklyBento?.customDescription || "تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز في ساحات ومختبرات مدارس العقيق."}
-                </p>
+                <VisualEditable
+                  id="studio-bento-card1-category"
+                  tag="text"
+                  label="تصنيف الحدث الأبرز"
+                  defaultText="الحدث التعليمي الأبرز"
+                  as="span"
+                  className={"text-xs font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                />
+                <VisualEditable
+                  id="studio-bento-card1-title"
+                  tag="text"
+                  label="عنوان الحدث الأبرز"
+                  defaultText={orchestration?.weeklyBento?.customTitle || featuredEventPost?.title || "انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان"}
+                  as="h3"
+                  className={"mt-2 text-xl sm:text-2xl font-black leading-snug " + (dark ? "text-white" : "text-black")}
+                />
+                <VisualEditable
+                  id="studio-bento-card1-desc"
+                  tag="text"
+                  label="وصف الحدث الأبرز"
+                  defaultText={orchestration?.weeklyBento?.customDescription || "تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز في ساحات ومختبرات مدارس العقيق."}
+                  as="p"
+                  className={"mt-2 text-xs sm:text-sm leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}
+                />
               </div>
               <div className={"mt-6 pt-4 border-t flex items-center justify-between " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
-                <button
-                  type="button"
-                  onClick={() => navigate("/offers")}
+                <VisualEditable
+                  id="studio-bento-card1-action"
+                  tag="button"
+                  label="زر مشاهدة التغطية"
+                  defaultText="مشاهدة التغطية بالكامل"
+                  as="button"
+                  onAction={() => navigate("/offers")}
                   className={"inline-flex items-center gap-2 text-xs font-black transition " + (
                     dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
                   )}
                 >
-                  مشاهدة التغطية بالكامل <ArrowUpLeft size={15} />
-                </button>
+                  {(text) => (
+                    <>
+                      {text} <ArrowUpLeft size={15} />
+                    </>
+                  )}
+                </VisualEditable>
               </div>
-            </div>
+            </VisualEditable>
 
             {/* Bento Card 2: وسام وإنجاز الأسبوع */}
-            <div className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
-              dark
-                ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
-                : "border-[#08467d]/20 bg-white shadow-md"
-            )}>
+            <VisualEditable
+              id="studio-bento-card2"
+              tag="section"
+              label="بطاقة وسام التميز الأكاديمي"
+              as="div"
+              className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
+                dark
+                  ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
+                  : "border-[#08467d]/20 bg-white shadow-md"
+              )}
+            >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
                   dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                 )}>
                   <Award size={24} />
                 </div>
-                <span className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                  {orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
-                </span>
-                <h4 className={"mt-2 text-lg font-black " + (dark ? "text-white" : "text-black")}>
-                  {orchestration?.weeklyBento?.academicBadgeWeek || "فخر مدارس العقيق"}
-                </h4>
-                <p className={"mt-2 text-xs leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}>
-                  {orchestration?.weeklyBento?.academicBadgeDesc || "تحقيق المركز الأول في مسابقات الموهبة والابتكار على مستوى المنطقة وتكريم الطلاب المشاركين."}
-                </p>
+                <VisualEditable
+                  id="studio-bento-card2-label"
+                  tag="text"
+                  label="شارة وسام التميز"
+                  defaultText={orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
+                  as="span"
+                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                />
+                <VisualEditable
+                  id="studio-bento-card2-title"
+                  tag="text"
+                  label="عنوان وسام التميز"
+                  defaultText={orchestration?.weeklyBento?.academicBadgeWeek || "فخر مدارس العقيق"}
+                  as="h4"
+                  className={"mt-2 text-lg font-black " + (dark ? "text-white" : "text-black")}
+                />
+                <VisualEditable
+                  id="studio-bento-card2-desc"
+                  tag="text"
+                  label="وصف وسام التميز"
+                  defaultText={orchestration?.weeklyBento?.academicBadgeDesc || "تحقيق المركز الأول في مسابقات الموهبة والابتكار على مستوى المنطقة وتكريم الطلاب المشاركين."}
+                  as="p"
+                  className={"mt-2 text-xs leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}
+                />
               </div>
               <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
-                <span className={"inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black " + (
-                  dark ? "bg-white/[0.05] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"
-                )}>
-                  🥇 تكريم مستحق
-                </span>
+                <VisualEditable
+                  id="studio-bento-card2-tag"
+                  tag="text"
+                  label="وسم تكريم مستحق"
+                  defaultText="🥇 تكريم مستحق"
+                  as="span"
+                  className={"inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black " + (
+                    dark ? "bg-white/[0.05] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"
+                  )}
+                />
               </div>
-            </div>
+            </VisualEditable>
 
             {/* Bento Card 3: مقياس نبض التفاعل الأسبوعي */}
-            <div className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
-              dark
-                ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
-                : "border-black/[0.08] bg-white shadow-md"
-            )}>
+            <VisualEditable
+              id="studio-bento-card3"
+              tag="section"
+              label="بطاقة نبض التفاعل"
+              as="div"
+              className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
+                dark
+                  ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
+                  : "border-black/[0.08] bg-white shadow-md"
+              )}
+            >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
                   dark ? "bg-[#de191e]/15 text-[#de191e]" : "bg-[#de191e]/10 text-[#de191e]"
                 )}>
                   <Flame size={24} />
                 </div>
-                <span className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                  نبض وتفاعل أولياء الأمور
-                </span>
+                <VisualEditable
+                  id="studio-bento-card3-title"
+                  tag="text"
+                  label="عنوان نبض أولياء الأمور"
+                  defaultText="نبض وتفاعل أولياء الأمور"
+                  as="span"
+                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                />
                 <p className={"mt-3 text-3xl sm:text-4xl font-black " + (dark ? "text-white" : "text-black")}>
                   +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
                 </p>
-                <p className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}>
-                  إعجاب وتشجيع لطلاب وأنشطة هذا الأسبوع
-                </p>
+                <VisualEditable
+                  id="studio-bento-card3-desc"
+                  tag="text"
+                  label="وصف نبض أولياء الأمور"
+                  defaultText="إعجاب وتشجيع لطلاب وأنشطة هذا الأسبوع"
+                  as="p"
+                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}
+                />
               </div>
 
               <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
@@ -853,21 +953,38 @@ export default function AlaqeeqStudioPublicPage() {
                   {hasLiked ? "أنت معجب بهذا! ❤️" : "شجّع الطلاب الآن"}
                 </button>
               </div>
-            </div>
+            </VisualEditable>
           </div>
         </div>
-      </section>
+      </VisualEditable>
 
       {/* 🌟 3. لوحة «صوت العقيق» التحريرية (Editorial Spotlight & Quote) */}
-      <section className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]")}>
+      <VisualEditable
+        id="studio-editorial-section"
+        tag="section"
+        label="قسم صوت العقيق والكلمة التوجيهية"
+        as="section"
+        className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]")}
+      >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-6">
-            <span className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
-              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-            )}>
-              <Quote size={11} />
-              EDITORIAL · LEADERSHIP MESSAGE
-            </span>
+            <VisualEditable
+              id="studio-editorial-kicker"
+              tag="text"
+              label="شارة صوت العقيق"
+              defaultText="EDITORIAL · LEADERSHIP MESSAGE"
+              as="span"
+              className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              )}
+            >
+              {(text) => (
+                <>
+                  <Quote size={11} />
+                  {text}
+                </>
+              )}
+            </VisualEditable>
           </div>
 
           <div className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
@@ -878,12 +995,22 @@ export default function AlaqeeqStudioPublicPage() {
             <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-8 items-center">
               <div>
                 <Quote size={40} className={dark ? "text-[#f8ca14]/30" : "text-[#08467d]/25"} />
-                <h3 className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : "text-black")}>
-                  «{orchestration?.editorialVoice?.quoteText || "في مدارس العقيق، لا نعلّم للعلم فحسب، بل نصنع قيادات المستقبل بوعي وطموح لا ينضب."}»
-                </h3>
-                <p className={"mt-4 text-sm font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                  {(orchestration?.editorialVoice?.authorName ? `${orchestration.editorialVoice.authorName} · ` : "") + (orchestration?.editorialVoice?.authorTitle || "المشرف العام على مدارس العقيق الأهلية")}
-                </p>
+                <VisualEditable
+                  id="studio-editorial-quote"
+                  tag="text"
+                  label="نص اقتباس صوت العقيق"
+                  defaultText={`«${orchestration?.editorialVoice?.quoteText || "في مدارس العقيق، لا نعلّم للعلم فحسب، بل نصنع قيادات المستقبل بوعي وطموح لا ينضب."}»`}
+                  as="h3"
+                  className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : "text-black")}
+                />
+                <VisualEditable
+                  id="studio-editorial-author"
+                  tag="text"
+                  label="اسم ووصف صاحب الاقتباس"
+                  defaultText={(orchestration?.editorialVoice?.authorName ? `${orchestration.editorialVoice.authorName} · ` : "") + (orchestration?.editorialVoice?.authorTitle || "المشرف العام على مدارس العقيق الأهلية")}
+                  as="p"
+                  className={"mt-4 text-sm font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                />
               </div>
 
               <div className={"flex flex-col items-center justify-center p-6 rounded-2xl border text-center " + (
@@ -894,12 +1021,22 @@ export default function AlaqeeqStudioPublicPage() {
                 )}>
                   <Radio size={28} className={isPlayingQuoteAudio ? "animate-pulse text-[#de191e]" : ""} />
                 </div>
-                <h4 className={"font-black text-sm " + (dark ? "text-white" : "text-black")}>
-                  الكلمة التوجيهية الأسبوعية
-                </h4>
-                <p className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}>
-                  رسالة الإدارة لفرسان وأولياء أمور المدارس
-                </p>
+                <VisualEditable
+                  id="studio-editorial-audio-title"
+                  tag="text"
+                  label="عنوان الكلمة التوجيهية"
+                  defaultText="الكلمة التوجيهية الأسبوعية"
+                  as="h4"
+                  className={"font-black text-sm " + (dark ? "text-white" : "text-black")}
+                />
+                <VisualEditable
+                  id="studio-editorial-audio-desc"
+                  tag="text"
+                  label="وصف الكلمة التوجيهية"
+                  defaultText="رسالة الإدارة لفرسان وأولياء أمور المدارس"
+                  as="p"
+                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}
+                />
                 <button
                   type="button"
                   onClick={() => {
@@ -919,7 +1056,7 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
           </div>
         </div>
-      </section>
+      </VisualEditable>
 
       {/* 7. قسم ذاكرة العقيق المفتوحة (Memory Wall) */}
       <VisualEditable
@@ -940,9 +1077,14 @@ export default function AlaqeeqStudioPublicPage() {
                 as="p"
                 className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
               />
-              <h2 className={"mt-1 text-3xl font-black md:text-4xl " + (dark ? "text-white" : "text-black")}>
-                ذاكرة العقيق الحية.
-              </h2>
+              <VisualEditable
+                id="studio-memory-title"
+                tag="text"
+                label="عنوان قسم ذاكرة العقيق"
+                defaultText="ذاكرة العقيق الحية."
+                as="h2"
+                className={"mt-1 text-3xl font-black md:text-4xl " + (dark ? "text-white" : "text-black")}
+              />
               <VisualEditable
                 id="studio-memory-body"
                 tag="text"
@@ -1100,7 +1242,11 @@ export default function AlaqeeqStudioPublicPage() {
       </VisualEditable>
 
       {/* 9. فوتر استوديو العقيق الفاخر المنمق والأنيق */}
-      <footer
+      <VisualEditable
+        id="studio-footer-section"
+        tag="section"
+        label="تذييل الصفحة (الفوتر)"
+        as="footer"
         className={`border-t transition ${
           dark ? "border-white/[0.08] bg-[#000000] text-white" : "border-black/[0.06] bg-[#fafafa] text-slate-900"
         }`}
@@ -1109,14 +1255,21 @@ export default function AlaqeeqStudioPublicPage() {
           <div className="flex flex-col items-center justify-between gap-5 sm:flex-row">
             {/* Brand Logo & Name */}
             <div className="flex items-center gap-3">
-              <img
+              <VisualImage
+                id="studio-footer-logo"
+                label="شعار الفوتر"
                 src={logoUrl || "/alaqeeq-logo.png"}
                 alt="مدارس العقيق"
                 className={`h-9 w-auto object-contain transition ${dark ? "brightness-0 invert opacity-90" : "opacity-90"}`}
               />
-              <span className={`text-xs font-black tracking-wide ${dark ? "text-slate-300" : "text-slate-700"}`}>
-                استوديو العقيق الرقمي
-              </span>
+              <VisualEditable
+                id="studio-footer-title"
+                tag="text"
+                label="اسم الاستوديو في الفوتر"
+                defaultText="استوديو العقيق الرقمي"
+                as="span"
+                className={`text-xs font-black tracking-wide ${dark ? "text-slate-300" : "text-slate-700"}`}
+              />
             </div>
 
             {/* Location Tag (فكرة 5: وسم المدينة المنورة) */}
@@ -1133,7 +1286,13 @@ export default function AlaqeeqStudioPublicPage() {
                 title="موقع مدارس العقيق على خرائط Google"
               >
                 <MapPin size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                <span>{orchestration?.location?.text || "المدينة المنورة · المملكة العربية السعودية"}</span>
+                <VisualEditable
+                  id="studio-footer-location"
+                  tag="text"
+                  label="موقع المدارس في الفوتر"
+                  defaultText={orchestration?.location?.text || "المدينة المنورة · المملكة العربية السعودية"}
+                  as="span"
+                />
               </a>
             )}
 
@@ -1237,9 +1396,13 @@ export default function AlaqeeqStudioPublicPage() {
           <div className={`mt-6 border-t pt-4 flex items-center justify-between gap-4 text-[11px] font-bold ${
             dark ? "border-white/[0.06] text-slate-500" : "border-black/[0.06] text-slate-400"
           }`}>
-            <p>
-              {orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}
-            </p>
+            <VisualEditable
+              id="studio-footer-copyright"
+              tag="text"
+              label="حقوق النشر في الفوتر"
+              defaultText={orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}
+              as="p"
+            />
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -1255,7 +1418,7 @@ export default function AlaqeeqStudioPublicPage() {
             </button>
           </div>
         </div>
-      </footer>
+      </VisualEditable>
 
 
 
