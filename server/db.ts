@@ -252,6 +252,17 @@ export async function deleteUserById(id: number) {
   return { success: true };
 }
 
+export type SiteBroadcastItem = {
+  id: string;
+  enabled: boolean;
+  message: string;
+  type: "urgent" | "celebration" | "info";
+  link?: string;
+  linkText?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SiteBroadcast = {
   enabled: boolean;
   message: string;
@@ -259,33 +270,198 @@ export type SiteBroadcast = {
   link?: string;
   linkText?: string;
   updatedAt?: string;
+  id?: string;
 };
 
-export async function getSiteBroadcast(): Promise<SiteBroadcast> {
+export async function listSiteBroadcastItems(): Promise<SiteBroadcastItem[]> {
+  const db = await getDb();
+  let rawJson: string | undefined;
+  if (!db) {
+    rawJson = localSettings.get("site_broadcast_items");
+  } else {
+    try {
+      const row = await db.select().from(settings).where(eq(settings.key, "site_broadcast_items")).limit(1);
+      if (row.length > 0 && row[0].value) rawJson = row[0].value;
+    } catch (err) {
+      console.warn("Failed to get site_broadcast_items:", err);
+    }
+  }
+
+  if (rawJson) {
+    try {
+      const parsed = JSON.parse(rawJson);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+  }
+
+  // Fallback to legacy single broadcast if items list is empty
+  const single = await getSiteBroadcast();
+  if (single && single.message) {
+    return [
+      {
+        id: single.id || "legacy-1",
+        enabled: single.enabled,
+        message: single.message,
+        type: single.type,
+        link: single.link,
+        linkText: single.linkText,
+        createdAt: single.updatedAt || new Date().toISOString(),
+        updatedAt: single.updatedAt || new Date().toISOString(),
+      },
+    ];
+  }
+  return [];
+}
+
+export async function saveSiteBroadcastItem(item: Omit<SiteBroadcastItem, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<SiteBroadcastItem> {
+  const list = await listSiteBroadcastItems();
+  const now = new Date().toISOString();
+  const id = item.id || `broadcast-${Date.now()}`;
+  
+  const newItem: SiteBroadcastItem = {
+    id,
+    enabled: item.enabled ?? true,
+    message: item.message,
+    type: item.type,
+    link: item.link,
+    linkText: item.linkText,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const existingIdx = list.findIndex((b) => b.id === id);
+  if (existingIdx >= 0) {
+    newItem.createdAt = list[existingIdx].createdAt;
+    list[existingIdx] = newItem;
+  } else {
+    // If the new item is enabled, we can keep it active
+    list.unshift(newItem);
+  }
+
+  // If this item is enabled, optionally make other items disabled or keep multi
+  if (newItem.enabled) {
+    for (const other of list) {
+      if (other.id !== id) other.enabled = false;
+    }
+  }
+
+  const json = JSON.stringify(list);
   const db = await getDb();
   if (!db) {
-    return { enabled: false, message: "", type: "info" };
-  }
-  try {
-    const row = await db.select().from(settings).where(eq(settings.key, "site_broadcast")).limit(1);
-    if (row.length > 0 && row[0].value) {
-      return JSON.parse(row[0].value) as SiteBroadcast;
+    localSettings.set("site_broadcast_items", json);
+    localSettings.set("site_broadcast", JSON.stringify(newItem));
+  } else {
+    try {
+      await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
+      await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(newItem) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(newItem), updatedAt: new Date() } });
+    } catch (e) {
+      console.warn("Failed to persist broadcast to db, saving to localSettings:", e);
+      localSettings.set("site_broadcast_items", json);
+      localSettings.set("site_broadcast", JSON.stringify(newItem));
     }
-  } catch (err) {
-    console.warn("Failed to get site broadcast setting:", err);
   }
+
+  return newItem;
+}
+
+export async function deleteSiteBroadcastItem(id: string): Promise<boolean> {
+  let list = await listSiteBroadcastItems();
+  list = list.filter((b) => b.id !== id);
+  const json = JSON.stringify(list);
+  const db = await getDb();
+  if (!db) {
+    localSettings.set("site_broadcast_items", json);
+    const active = list.find((b) => b.enabled) || { enabled: false, message: "", type: "info" };
+    localSettings.set("site_broadcast", JSON.stringify(active));
+  } else {
+    try {
+      await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
+      const active = list.find((b) => b.enabled) || { enabled: false, message: "", type: "info" };
+      await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(active) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(active), updatedAt: new Date() } });
+    } catch (e) {
+      console.warn("Failed to delete broadcast from db:", e);
+      localSettings.set("site_broadcast_items", json);
+    }
+  }
+  return true;
+}
+
+export async function toggleSiteBroadcastItem(id: string, enabled: boolean): Promise<SiteBroadcastItem | undefined> {
+  const list = await listSiteBroadcastItems();
+  const item = list.find((b) => b.id === id);
+  if (!item) return undefined;
+
+  item.enabled = enabled;
+  item.updatedAt = new Date().toISOString();
+
+  if (enabled) {
+    for (const other of list) {
+      if (other.id !== id) other.enabled = false;
+    }
+  }
+
+  const json = JSON.stringify(list);
+  const db = await getDb();
+  if (!db) {
+    localSettings.set("site_broadcast_items", json);
+    localSettings.set("site_broadcast", JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }));
+  } else {
+    try {
+      await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
+      await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }), updatedAt: new Date() } });
+    } catch (e) {
+      console.warn("Failed to toggle broadcast in db:", e);
+      localSettings.set("site_broadcast_items", json);
+    }
+  }
+
+  return item;
+}
+
+export async function getSiteBroadcast(): Promise<SiteBroadcast> {
+  const list = await listSiteBroadcastItems();
+  const active = list.find((b) => b.enabled);
+  if (active) {
+    return {
+      id: active.id,
+      enabled: active.enabled,
+      message: active.message,
+      type: active.type,
+      link: active.link,
+      linkText: active.linkText,
+      updatedAt: active.updatedAt,
+    };
+  }
+
+  const db = await getDb();
+  let raw: string | undefined;
+  if (!db) {
+    raw = localSettings.get("site_broadcast");
+  } else {
+    try {
+      const row = await db.select().from(settings).where(eq(settings.key, "site_broadcast")).limit(1);
+      if (row.length > 0 && row[0].value) raw = row[0].value;
+    } catch {}
+  }
+
+  if (raw) {
+    try {
+      return JSON.parse(raw) as SiteBroadcast;
+    } catch {}
+  }
+
   return { enabled: false, message: "", type: "info" };
 }
 
 export async function setSiteBroadcast(data: SiteBroadcast): Promise<SiteBroadcast> {
-  const db = await getDb();
-  if (!db) throw new Error("DB not available");
-  const value = JSON.stringify({ ...data, updatedAt: new Date().toISOString() });
-  await db
-    .insert(settings)
-    .values({ key: "site_broadcast", value })
-    .onDuplicateKeyUpdate({ set: { value, updatedAt: new Date() } });
-  return data;
+  return saveSiteBroadcastItem({
+    id: data.id,
+    enabled: data.enabled,
+    message: data.message,
+    type: data.type,
+    link: data.link,
+    linkText: data.linkText,
+  });
 }
 
 export type SiteOrchestrationConfig = {

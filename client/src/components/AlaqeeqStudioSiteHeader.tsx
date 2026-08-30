@@ -73,11 +73,17 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           </button>
 
           {/* Desktop Nav */}
-          <nav dir="rtl" className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-7 whitespace-nowrap text-xs font-black md:flex">
+          <nav dir="rtl" className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 lg:gap-6 whitespace-nowrap text-xs font-black md:flex">
             <VisualEditable id="aqeeq-studio-nav-home" tag="button" label="اسم رابط الرئيسية" defaultText={orchestration?.nav?.homeLabel || "الرئيسية"} as="button" onAction={() => go("/")} className={`aq-studio-toplink ${active === "studio" ? "aq-studio-toplink--active" : ""}`} />
             <VisualEditable id="aqeeq-studio-nav-journal" tag="button" label="اسم رابط المجلة" defaultText={orchestration?.nav?.journalLabel || "مجلة العقيق"} as="button" onAction={() => go("/journal")} className={`aq-studio-toplink ${active === "journal" ? "aq-studio-toplink--active" : ""}`} />
             <VisualEditable id="aqeeq-studio-nav-albums" tag="button" label="اسم رابط الألبوم" defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"} as="button" onAction={() => go("/albums")} className={`aq-studio-toplink ${active === "albums" ? "aq-studio-toplink--active" : ""}`} />
             <VisualEditable id="aqeeq-studio-nav-showcase" tag="button" label="اسم رابط الأخبار والعروض" defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"} as="button" onAction={() => go("/offers")} className={`aq-studio-toplink ${active === "showcase" ? "aq-studio-toplink--active" : ""}`} />
+            <button type="button" onClick={() => go("/articles")} className="aq-studio-toplink hover:text-amber-300 transition">المقالات ✍️</button>
+            <button type="button" onClick={() => go("/podcast")} className="aq-studio-toplink hover:text-amber-300 transition">الإذاعة والبودكاست 🎙️</button>
+            <button type="button" onClick={() => go("/live")} className="aq-studio-toplink text-red-400 hover:text-red-300 transition flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
+              <span>مباشر</span>
+            </button>
           </nav>
 
           {/* Left Action Buttons (Compact & Zero Collision on Mobile) */}
@@ -245,6 +251,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <VisualEditable id="aqeeq-studio-mobile-nav-journal" tag="button" label="اسم رابط المجلة للهاتف" defaultText={orchestration?.nav?.journalLabel || "مجلة العقيق"} as="button" onAction={() => go("/journal")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${active === "journal" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-albums" tag="button" label="اسم رابط الألبوم للهاتف" defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"} as="button" onAction={() => go("/albums")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${active === "albums" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-showcase" tag="button" label="اسم رابط الأخبار للهاتف" defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"} as="button" onAction={() => go("/offers")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${active === "showcase" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
+                <button type="button" onClick={() => go("/articles")} className="aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 hover:bg-white/5">المقالات ✍️</button>
+                <button type="button" onClick={() => go("/podcast")} className="aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 hover:bg-white/5">الإذاعة والبودكاست 🎙️</button>
+                <button type="button" onClick={() => go("/live")} className="aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 text-red-400 hover:bg-white/5">
+                  <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
+                  <span>تغطية الفعاليات الحية 🔴</span>
+                </button>
               </div>
             </div>
           )}

@@ -9,6 +9,7 @@ function directDriveImage(url: string | null | undefined) {
   return match ? `/api/drive-proxy/${match[1]}` : url;
 }
 import { AqeeqUniversalMediaPickerModal, MediaPickerItem } from "@/components/AqeeqUniversalMediaPickerModal";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   LayoutDashboard,
@@ -72,7 +73,7 @@ function SnapchatIcon({ size = 14, className = "" }: { size?: number; className?
   );
 }
 
-type TabKey = "radar" | "orchestration" | "users" | "content" | "broadcast" | "whatsapp";
+type TabKey = "radar" | "orchestration" | "users" | "content" | "broadcast" | "articles" | "podcast" | "whatsapp";
 
 export default function AqeeqAdminDashboardPage() {
   const [, navigate] = useLocation();
@@ -278,11 +279,16 @@ const DEFAULT_ORCHESTRATION = {
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
 
   // Broadcast Banner State
+  const [editingBroadcastId, setEditingBroadcastId] = useState<string | null>(null);
   const [broadcastEnabled, setBroadcastEnabled] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState("");
   const [broadcastType, setBroadcastType] = useState<"urgent" | "celebration" | "info">("info");
   const [broadcastLink, setBroadcastLink] = useState("");
   const [broadcastLinkText, setBroadcastLinkText] = useState("");
+
+  const { data: broadcastList = [], refetch: refetchBroadcastList } = trpc.executiveAdmin.getBroadcastList.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
 
   // Sync broadcast state from server once loaded
   const [broadcastInitialized, setBroadcastInitialized] = useState(false);
@@ -292,6 +298,7 @@ const DEFAULT_ORCHESTRATION = {
     setBroadcastType(stats.broadcast.type || "info");
     setBroadcastLink(stats.broadcast.link || "");
     setBroadcastLinkText(stats.broadcast.linkText || "");
+    if (stats.broadcast.id) setEditingBroadcastId(stats.broadcast.id);
     setBroadcastInitialized(true);
   }
 
@@ -354,11 +361,37 @@ const DEFAULT_ORCHESTRATION = {
 
   const setBroadcastMutation = trpc.executiveAdmin.setBroadcast.useMutation({
     onSuccess: () => {
-      toast.success("تم تحديث شريط التنبيهات العاجل للموقع!");
+      toast.success("تم حفظ ونشر التنبيه العاجل بنجاح!");
+      void refetchBroadcastList();
       void refetchStats();
+      void utils.executiveAdmin.getBroadcast.invalidate();
     },
     onError: (err) => {
       toast.error(err.message || "تعذر حفظ إعدادات التنبيه");
+    },
+  });
+
+  const deleteBroadcastMutation = trpc.executiveAdmin.deleteBroadcast.useMutation({
+    onSuccess: () => {
+      toast.success("تم حذف التنبيه من السجل بنجاح!");
+      void refetchBroadcastList();
+      void refetchStats();
+      void utils.executiveAdmin.getBroadcast.invalidate();
+    },
+    onError: (err) => {
+      toast.error(err.message || "تعذر حذف التنبيه");
+    },
+  });
+
+  const toggleBroadcastMutation = trpc.executiveAdmin.toggleBroadcast.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث حالة التنبيه!");
+      void refetchBroadcastList();
+      void refetchStats();
+      void utils.executiveAdmin.getBroadcast.invalidate();
+    },
+    onError: (err) => {
+      toast.error(err.message || "تعذر تعديل حالة التنبيه");
     },
   });
 
@@ -383,6 +416,79 @@ const DEFAULT_ORCHESTRATION = {
       void utils.executiveAdmin.getSiteOrchestration.invalidate();
     },
     onError: (err) => toast.error(err.message || "تعذر استعادة القصة"),
+  });
+
+  // Articles Moderation State & Queries
+  const { data: allAdminArticles = [], refetch: refetchAdminArticles } = trpc.articles.listAllAdmin.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
+  const [articleFilterStatus, setArticleFilterStatus] = useState<"all" | "pending" | "published" | "rejected">("all");
+  const [selectedArticleForEdit, setSelectedArticleForEdit] = useState<any>(null);
+
+  const moderateArticleMutation = trpc.articles.moderate.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث حالة المقال بنجاح!");
+      setSelectedArticleForEdit(null);
+      void refetchAdminArticles();
+    },
+    onError: (err) => toast.error(err.message || "تعذر تحديث المقال"),
+  });
+
+  const deleteArticleMutation = trpc.articles.delete.useMutation({
+    onSuccess: () => {
+      toast.success("تم حذف المقال بنجاح!");
+      void refetchAdminArticles();
+    },
+    onError: (err) => toast.error(err.message || "تعذر حذف المقال"),
+  });
+
+  const aiPolishArticleMutation = trpc.articles.aiPolish.useMutation({
+    onSuccess: (data) => {
+      toast.success("✨ تم التدقيق والتحسين اللغوي بالذكاء الاصطناعي!");
+      if (selectedArticleForEdit) {
+        setSelectedArticleForEdit((prev: any) => ({
+          ...prev,
+          title: data.polishedTitle,
+          content: data.polishedContent,
+          excerpt: data.polishedExcerpt,
+        }));
+      }
+    },
+    onError: () => toast.error("تعذر التدقيق اللغوي بالذكاء الاصطناعي"),
+  });
+
+  // Podcasts Queries & Mutations
+  const { data: allAdminPodcasts = [], refetch: refetchAdminPodcasts } = trpc.podcasts.list.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
+  const [isAddPodcastOpen, setIsAddPodcastOpen] = useState(false);
+  const [newPodcastTitle, setNewPodcastTitle] = useState("");
+  const [newPodcastDesc, setNewPodcastDesc] = useState("");
+  const [newPodcastUrl, setNewPodcastUrl] = useState("");
+  const [newPodcastType, setNewPodcastType] = useState<"audio" | "video">("audio");
+  const [newPodcastSource, setNewPodcastSource] = useState<"drive" | "youtube" | "direct">("direct");
+  const [newPodcastCategory, setNewPodcastCategory] = useState<any>("بودكاست قيادات");
+  const [newPodcastHost, setNewPodcastHost] = useState("");
+  const [newPodcastDuration, setNewPodcastDuration] = useState("10:00");
+
+  const createPodcastMutation = trpc.podcasts.create.useMutation({
+    onSuccess: () => {
+      toast.success("تم نشر حلقة البودكاست بنجاح!");
+      setIsAddPodcastOpen(false);
+      setNewPodcastTitle("");
+      setNewPodcastDesc("");
+      setNewPodcastUrl("");
+      void refetchAdminPodcasts();
+    },
+    onError: (err) => toast.error(err.message || "تعذر إضافة الحلقة"),
+  });
+
+  const deletePodcastMutation = trpc.podcasts.delete.useMutation({
+    onSuccess: () => {
+      toast.success("تم حذف الحلقة بنجاح!");
+      void refetchAdminPodcasts();
+    },
+    onError: (err) => toast.error(err.message || "تعذر حذف الحلقة"),
   });
 
   // Filtered Master Content
@@ -534,6 +640,8 @@ const DEFAULT_ORCHESTRATION = {
             { key: "users", label: "إدارة المشرفين والصلاحيات", icon: Users, badge: usersList.length },
             { key: "content", label: "الجدول الموحد للمحتوى", icon: Layers, badge: masterContent.length },
             { key: "broadcast", label: "شريط التنبيهات العاجل", icon: Megaphone, alert: broadcastEnabled },
+            { key: "articles", label: "مراجعة المقالات ✍️", icon: BookOpen, badge: allAdminArticles.filter((a) => a.status === "pending").length || undefined },
+            { key: "podcast", label: "الإذاعة والبودكاست 🎙️", icon: Radio, badge: allAdminPodcasts.length },
             { key: "whatsapp", label: "مُولّد حملات الواتساب وQR", icon: Share2 },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -2561,24 +2669,70 @@ const DEFAULT_ORCHESTRATION = {
 
         {/* ==================== TAB 4: FLASH BROADCAST ==================== */}
         {activeTab === "broadcast" && (
-          <div className="max-w-3xl space-y-6 animate-in fade-in duration-300">
-            <div>
-              <h2 className="text-xl font-black">شريط التنبيهات والأخبار العاجلة الفوري</h2>
-              <p className="text-xs font-bold text-slate-400 mt-1">
-                بث شريط إعلاني فوري يظهر في قمة الموقع لجميع أولياء الأمور والطلاب والزوار
-              </p>
+          <div className="max-w-4xl space-y-8 animate-in fade-in duration-300">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black">شريط التنبيهات والأخبار العاجلة الفوري</h2>
+                <p className="text-xs font-bold text-slate-400 mt-1">
+                  بث شريط إعلاني فوري يظهر في قمة الموقع لجميع أولياء الأمور والطلاب والزوار مع سجل إدارة كامل
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-xs font-black text-amber-300">
+                  إجمالي التنبيهات: {broadcastList.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingBroadcastId(null);
+                    setBroadcastEnabled(true);
+                    setBroadcastMessage("");
+                    setBroadcastType("urgent");
+                    setBroadcastLink("");
+                    setBroadcastLinkText("");
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-3.5 py-1.5 text-xs font-black text-slate-950 hover:bg-amber-300 transition shadow"
+                >
+                  <Plus size={14} />
+                  <span>تنبيه جديد</span>
+                </button>
+              </div>
             </div>
 
+            {/* Broadcast Form Card */}
             <div
-              className={"rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md " + (
+              className={"rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md transition " + (
                 dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
               )}
             >
+              <div className="flex items-center justify-between border-b pb-4 border-current/10">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="text-amber-400" size={20} />
+                  <h4 className="text-sm font-black">
+                    {editingBroadcastId ? "تعديل التنبيه المحدد" : "إنشاء تنبيه عاجل جديد"}
+                  </h4>
+                </div>
+                {editingBroadcastId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingBroadcastId(null);
+                      setBroadcastMessage("");
+                      setBroadcastLink("");
+                      setBroadcastLinkText("");
+                    }}
+                    className="text-xs font-bold text-slate-400 hover:text-white underline"
+                  >
+                    إلغاء التعديل والبدء بجديد
+                  </button>
+                )}
+              </div>
+
               {/* Toggle Enable */}
               <div className="flex items-center justify-between border-b pb-6 border-current/10">
                 <div>
-                  <h4 className="text-sm font-black">تفعيل الشريط العاجل على الموقع</h4>
-                  <p className="text-xs font-bold text-slate-400">عند تفعيله، سيظهر الشريط أعلى الهيدر فوراً</p>
+                  <h4 className="text-sm font-black">تفعيل هذا التنبيه وعرضه على الموقع</h4>
+                  <p className="text-xs font-bold text-slate-400">عند تفعيله، سيظهر فوراً في قمة صفحات الموقع لجميع الزوار</p>
                 </div>
 
                 <label className="relative inline-flex cursor-pointer items-center">
@@ -2668,7 +2822,7 @@ const DEFAULT_ORCHESTRATION = {
               <div>
                 <label className="block text-xs font-black text-slate-400 mb-2">معاينة حية لشكل الشريط في الموقع</label>
                 <div
-                  className={"rounded-2xl p-4 text-xs font-black flex items-center justify-between gap-3 shadow-md " + (
+                  className={"rounded-2xl p-4 text-xs font-black flex items-center justify-between gap-3 shadow-md transition " + (
                     broadcastType === "urgent"
                       ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white"
                       : broadcastType === "celebration"
@@ -2691,10 +2845,30 @@ const DEFAULT_ORCHESTRATION = {
               </div>
 
               {/* Save Button */}
-              <div className="pt-4 border-t border-current/10 flex justify-end">
+              <div className="pt-4 border-t border-current/10 flex justify-end gap-3">
+                {editingBroadcastId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingBroadcastId(null);
+                      setBroadcastMessage("");
+                      setBroadcastLink("");
+                      setBroadcastLinkText("");
+                    }}
+                    className="rounded-2xl border border-white/10 px-5 py-3 text-xs font-black text-slate-300 hover:bg-white/5 transition"
+                  >
+                    إلغاء
+                  </button>
+                )}
                 <button
+                  type="button"
                   onClick={() => {
+                    if (!broadcastMessage.trim()) {
+                      toast.error("يرجى كتابة نص التنبيه أولاً");
+                      return;
+                    }
                     setBroadcastMutation.mutate({
+                      id: editingBroadcastId || undefined,
                       enabled: broadcastEnabled,
                       message: broadcastMessage.trim(),
                       type: broadcastType,
@@ -2706,10 +2880,582 @@ const DEFAULT_ORCHESTRATION = {
                   className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-6 py-3 text-xs font-black text-black transition hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20"
                 >
                   <CheckCircle2 size={16} />
-                  <span>{setBroadcastMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر التعديلات"}</span>
+                  <span>{setBroadcastMutation.isPending ? "جاري الحفظ..." : editingBroadcastId ? "حفظ وتحديث التنبيه" : "حفظ ونشر التنبيه"}</span>
                 </button>
               </div>
             </div>
+
+            {/* Broadcasts History List */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
+                  <Clock size={16} className="text-amber-400" />
+                  <span>سجل وقائمة التنبيهات المحفوظة ({broadcastList.length})</span>
+                </h3>
+              </div>
+
+              {broadcastList.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-white/10 p-8 text-center text-slate-400 text-xs font-bold">
+                  لا توجد تنبيهات محفوظة حتى الآن. أنشئ أول تنبيه أعلاه!
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {broadcastList.map((item) => {
+                    const isItemUrgent = item.type === "urgent";
+                    const isItemCelebration = item.type === "celebration";
+                    return (
+                      <div
+                        key={item.id}
+                        className={`rounded-2xl border p-4 sm:p-5 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                          item.enabled
+                            ? "border-emerald-500/50 bg-emerald-950/10 shadow-lg shadow-emerald-500/5"
+                            : dark
+                            ? "border-white/10 bg-[#12141a]"
+                            : "border-black/10 bg-slate-50"
+                        }`}
+                      >
+                        <div className="space-y-2 min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`rounded-lg px-2 py-0.5 text-[10px] font-black ${
+                                isItemUrgent
+                                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                                  : isItemCelebration
+                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                  : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                              }`}
+                            >
+                              {isItemUrgent ? "🚨 عاجل" : isItemCelebration ? "🏆 تهنئة" : "📢 إداري"}
+                            </span>
+
+                            {item.enabled ? (
+                              <span className="rounded-lg bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                معروض الآن على الموقع
+                              </span>
+                            ) : (
+                              <span className="rounded-lg bg-slate-700/30 px-2 py-0.5 text-[10px] font-bold text-slate-400">
+                                متوقف
+                              </span>
+                            )}
+
+                            <span className="text-[10px] text-slate-500 font-mono">
+                              {new Date(item.createdAt).toLocaleDateString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          </div>
+
+                          <p className="text-sm font-black text-slate-200 leading-6">{item.message}</p>
+
+                          {item.link && (
+                            <p className="text-xs text-amber-300/80 font-bold flex items-center gap-1">
+                              <ArrowUpLeft size={12} />
+                              <span>الرابط: {item.linkText || item.link}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                          {/* Toggle Active Button */}
+                          <button
+                            type="button"
+                            onClick={() => toggleBroadcastMutation.mutate({ id: item.id, enabled: !item.enabled })}
+                            className={`rounded-xl px-3 py-1.5 text-xs font-black transition border ${
+                              item.enabled
+                                ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+                                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                            }`}
+                            title={item.enabled ? "إيقاف العرض" : "تفعيل وعرض على الموقع"}
+                          >
+                            {item.enabled ? "إيقاف" : "تفعيل الآن"}
+                          </button>
+
+                          {/* Edit Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingBroadcastId(item.id);
+                              setBroadcastEnabled(item.enabled);
+                              setBroadcastMessage(item.message);
+                              setBroadcastType(item.type);
+                              setBroadcastLink(item.link || "");
+                              setBroadcastLinkText(item.linkText || "");
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            className="grid h-8 w-8 place-items-center rounded-xl border border-white/15 bg-black/40 text-slate-300 hover:text-amber-300 hover:border-amber-400 transition"
+                            title="تعديل هذا التنبيه"
+                          >
+                            <SlidersHorizontal size={14} />
+                          </button>
+
+                          {/* Delete Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm("هل أنت متأكد من رغبتك في حذف هذا التنبيه نهائياً من السجل؟")) {
+                                deleteBroadcastMutation.mutate({ id: item.id });
+                              }
+                            }}
+                            className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
+                            title="حذف التنبيه"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ==================== TAB 6: ARTICLES MODERATION ==================== */}
+        {activeTab === "articles" && (
+          <div className="max-w-5xl space-y-8 animate-in fade-in duration-300">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black">غرفة مراجعة واعتماد مقالات العقيق ✍️</h2>
+                <p className="text-xs font-bold text-slate-400 mt-1">
+                  مراجعة مقالات الطلاب والمعلمين وتدقيقها بالذكاء الاصطناعي وقبول نشرها فوراً
+                </p>
+              </div>
+
+              {/* Status Filters */}
+              <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-black/40 p-1">
+                {(["all", "pending", "published", "rejected"] as const).map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setArticleFilterStatus(st)}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-black transition ${
+                      articleFilterStatus === st
+                        ? "bg-amber-400 text-slate-950 shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {st === "all"
+                      ? `الكل (${allAdminArticles.length})`
+                      : st === "pending"
+                      ? `بانتظار المراجعة (${allAdminArticles.filter((a) => a.status === "pending").length}) ⏳`
+                      : st === "published"
+                      ? `المنشورة (${allAdminArticles.filter((a) => a.status === "published").length}) ✅`
+                      : `المرفوضة (${allAdminArticles.filter((a) => a.status === "rejected").length})`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Articles List */}
+            {allAdminArticles
+              .filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus))
+              .length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center text-slate-400 text-xs font-bold">
+                لا توجد مقالات في هذه القائمة حالياً.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {allAdminArticles
+                  .filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus))
+                  .map((art) => (
+                    <div
+                      key={art.id}
+                      className={`rounded-3xl border p-5 sm:p-6 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                        art.status === "pending"
+                          ? "border-amber-400/40 bg-amber-400/[0.03] shadow-lg shadow-amber-400/5"
+                          : art.status === "published"
+                          ? dark
+                            ? "border-white/10 bg-[#10131d]"
+                            : "border-black/10 bg-white"
+                          : "border-red-500/20 bg-red-950/10 opacity-70"
+                      }`}
+                    >
+                      <div className="space-y-2 min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black ${
+                              art.status === "pending"
+                                ? "bg-amber-400/20 text-amber-300 border border-amber-400/30 animate-pulse"
+                                : art.status === "published"
+                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                : "bg-red-500/20 text-red-300 border border-red-500/30"
+                            }`}
+                          >
+                            {art.status === "pending"
+                              ? "⏳ بانتظار المراجعة والاعتماد"
+                              : art.status === "published"
+                              ? "✅ منشور على المنصة"
+                              : "❌ مرفوض"}
+                          </span>
+
+                          <span className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-black text-amber-200">
+                            {art.category}
+                          </span>
+
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            {new Date(art.createdAt).toLocaleDateString("ar-SA")}
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-black text-white">{art.title}</h3>
+                        <p className="text-xs text-slate-300 line-clamp-2 leading-5 font-bold">
+                          {art.excerpt || art.content.slice(0, 150)}
+                        </p>
+
+                        <div className="flex items-center gap-3 text-xs text-slate-400 font-bold pt-1">
+                          <span>الكاتب: <b className="text-slate-200">{art.authorName}</b> ({art.authorRole})</span>
+                          <span>·</span>
+                          <span>👁️ {art.viewCount} قراءة</span>
+                          <span>·</span>
+                          <span>❤️ {art.likesCount} إعجاب</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                        <Button
+                          type="button"
+                          onClick={() => setSelectedArticleForEdit(art)}
+                          className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-9 px-4 rounded-xl shadow"
+                        >
+                          <BookOpen size={14} className="ml-1.5" />
+                          <span>مراجعة وتعديل المقال</span>
+                        </Button>
+
+                        {art.status === "pending" && (
+                          <Button
+                            type="button"
+                            onClick={() => moderateArticleMutation.mutate({ id: art.id, status: "published" })}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs h-9 px-3.5 rounded-xl shadow"
+                          >
+                            <CheckCircle2 size={14} className="ml-1" />
+                            <span>قبول ونشر</span>
+                          </Button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟")) {
+                              deleteArticleMutation.mutate({ id: art.id });
+                            }
+                          }}
+                          className="grid h-9 w-9 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
+                          title="حذف المقال"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            {/* Article Edit & AI Polish Modal */}
+            {selectedArticleForEdit && (
+              <Dialog open={Boolean(selectedArticleForEdit)} onOpenChange={() => setSelectedArticleForEdit(null)}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-amber-400/40 bg-[#090d16] p-6 sm:p-8 text-right text-white shadow-2xl" dir="rtl">
+                  <DialogHeader className="text-right border-b border-white/10 pb-4">
+                    <DialogTitle className="text-lg font-black text-white flex items-center justify-between">
+                      <span>مراجعة وتدقيق المقال: «{selectedArticleForEdit.title}»</span>
+                      <Button
+                        type="button"
+                        disabled={aiPolishArticleMutation.isPending}
+                        onClick={() =>
+                          aiPolishArticleMutation.mutate({
+                            title: selectedArticleForEdit.title,
+                            content: selectedArticleForEdit.content,
+                          })
+                        }
+                        className="bg-gradient-to-r from-amber-500 to-yellow-300 hover:from-amber-400 hover:to-yellow-200 text-slate-950 font-black text-xs h-9 px-3.5 rounded-xl shadow-lg flex items-center gap-1.5"
+                      >
+                        <Sparkles size={14} className={aiPolishArticleMutation.isPending ? "animate-spin" : ""} />
+                        <span>{aiPolishArticleMutation.isPending ? "جاري التدقيق..." : "تدقيق لغوي بالذكاء الاصطناعي ✨"}</span>
+                      </Button>
+                    </DialogTitle>
+                  </DialogHeader>
+
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">عنوان المقال</label>
+                      <input
+                        type="text"
+                        value={selectedArticleForEdit.title}
+                        onChange={(e) =>
+                          setSelectedArticleForEdit((prev: any) => ({ ...prev, title: e.target.value }))
+                        }
+                        className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">الموجز (Excerpt)</label>
+                      <input
+                        type="text"
+                        value={selectedArticleForEdit.excerpt || ""}
+                        onChange={(e) =>
+                          setSelectedArticleForEdit((prev: any) => ({ ...prev, excerpt: e.target.value }))
+                        }
+                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-bold outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">محتوى المقال الكامل</label>
+                      <textarea
+                        rows={8}
+                        value={selectedArticleForEdit.content}
+                        onChange={(e) =>
+                          setSelectedArticleForEdit((prev: any) => ({ ...prev, content: e.target.value }))
+                        }
+                        className="w-full rounded-2xl border border-white/15 bg-black/50 p-4 text-xs font-bold leading-6 outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            moderateArticleMutation.mutate({
+                              id: selectedArticleForEdit.id,
+                              status: "published",
+                              updates: {
+                                title: selectedArticleForEdit.title,
+                                content: selectedArticleForEdit.content,
+                                excerpt: selectedArticleForEdit.excerpt,
+                              },
+                            })
+                          }
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs h-10 px-5 rounded-xl shadow"
+                        >
+                          <CheckCircle2 size={15} className="ml-1" />
+                          <span>اعتماد ونشر المقال ✅</span>
+                        </Button>
+
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            moderateArticleMutation.mutate({
+                              id: selectedArticleForEdit.id,
+                              status: "rejected",
+                            })
+                          }
+                          variant="destructive"
+                          className="font-black text-xs h-10 px-4 rounded-xl"
+                        >
+                          رفض المقال ❌
+                        </Button>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setSelectedArticleForEdit(null)}
+                        className="text-xs text-slate-400"
+                      >
+                        إغلاق
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+        )}
+
+        {/* ==================== TAB 7: PODCAST & BROADCAST MANAGEMENT ==================== */}
+        {activeTab === "podcast" && (
+          <div className="max-w-5xl space-y-8 animate-in fade-in duration-300">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black">إدارة إذاعة وبودكاست العقيق 🎙️</h2>
+                <p className="text-xs font-bold text-slate-400 mt-1">
+                  إضافة وإدارة التسجيلات الإذاعية وحلقات البودكاست المرئية والصوتية
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => setIsAddPodcastOpen(true)}
+                className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-10 px-5 rounded-2xl shadow-lg flex items-center gap-2"
+              >
+                <Plus size={16} />
+                <span>+ إضافة حلقة جديدة</span>
+              </Button>
+            </div>
+
+            {/* Podcasts Grid */}
+            {allAdminPodcasts.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center text-slate-400 text-xs font-bold">
+                لا توجد حلقات بودكاست مسجلة حالياً.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {allAdminPodcasts.map((pod) => (
+                  <div
+                    key={pod.id}
+                    className="rounded-3xl border border-white/10 bg-[#0f121e] p-5 shadow-xl flex flex-col justify-between gap-4"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[10px] font-black text-amber-300">
+                          {pod.category}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {pod.mediaType === "video" ? "📹 فيديو" : "🎧 صوت"} · {pod.duration}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-black text-white">{pod.title}</h3>
+                      <p className="text-xs text-slate-400 line-clamp-2 mt-1 font-bold">{pod.description}</p>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                      <span className="text-xs text-slate-400 font-bold">المقدم: {pod.hostName || "مدارس العقيق"}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("هل أنت متأكد من رغبتك في حذف هذه الحلقة؟")) {
+                            deletePodcastMutation.mutate({ id: pod.id });
+                          }
+                        }}
+                        className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add Podcast Modal */}
+            <Dialog open={isAddPodcastOpen} onOpenChange={setIsAddPodcastOpen}>
+              <DialogContent className="max-w-lg rounded-3xl border border-amber-400/30 bg-[#0a0d16] p-6 text-right text-white shadow-2xl" dir="rtl">
+                <DialogHeader className="text-right border-b border-white/10 pb-3">
+                  <DialogTitle className="text-base font-black text-amber-300 flex items-center gap-2">
+                    <Radio size={18} />
+                    <span>إضافة حلقة جديدة إلى إذاعة وبودكاست العقيق 🎙️</span>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!newPodcastTitle.trim() || !newPodcastUrl.trim()) return;
+                    createPodcastMutation.mutate({
+                      title: newPodcastTitle.trim(),
+                      description: newPodcastDesc.trim(),
+                      mediaType: newPodcastType,
+                      sourceType: newPodcastSource,
+                      mediaUrl: newPodcastUrl.trim(),
+                      category: newPodcastCategory,
+                      hostName: newPodcastHost.trim() || undefined,
+                      duration: newPodcastDuration.trim() || "10:00",
+                    });
+                  }}
+                  className="mt-4 space-y-4"
+                >
+                  <div>
+                    <label className="block text-xs font-black text-amber-200 mb-1">عنوان الحلقة *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newPodcastTitle}
+                      onChange={(e) => setNewPodcastTitle(e.target.value)}
+                      placeholder="مثال: الإذاعة الصباحية - إشراقة أمل"
+                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">نوع المحتوى</label>
+                      <select
+                        value={newPodcastType}
+                        onChange={(e) => setNewPodcastType(e.target.value as any)}
+                        className="w-full rounded-xl border border-white/15 bg-[#141824] p-3 text-xs font-bold outline-none text-slate-200"
+                      >
+                        <option value="audio">🎧 صوتي (Audio)</option>
+                        <option value="video">📹 مرئي (Video)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">التصنيف</label>
+                      <select
+                        value={newPodcastCategory}
+                        onChange={(e) => setNewPodcastCategory(e.target.value as any)}
+                        className="w-full rounded-xl border border-white/15 bg-[#141824] p-3 text-xs font-bold outline-none text-slate-200"
+                      >
+                        <option value="إذاعة الصباح">🎙️ إذاعة الصباح</option>
+                        <option value="بودكاست قيادات">👑 بودكاست قيادات</option>
+                        <option value="تغطيات صوتية">📹 تغطيات مرئية وصوتية</option>
+                        <option value="حوارات الطلاب">🎤 حوارات الطلاب</option>
+                        <option value="نشرات إخبارية">📢 نشرات إخبارية</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-amber-200 mb-1">رابط الصوت أو الفيديو (درايف / يوتيوب / مباشر) *</label>
+                    <input
+                      type="url"
+                      required
+                      value={newPodcastUrl}
+                      onChange={(e) => setNewPodcastUrl(e.target.value)}
+                      placeholder="https://drive.google.com/... أو https://youtube.com/..."
+                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-mono outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">المقدم / الضيف</label>
+                      <input
+                        type="text"
+                        value={newPodcastHost}
+                        onChange={(e) => setNewPodcastHost(e.target.value)}
+                        placeholder="مثال: نادي الإذاعة المدرسية"
+                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-bold outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black text-amber-200 mb-1">المدة التقريبية</label>
+                      <input
+                        type="text"
+                        value={newPodcastDuration}
+                        onChange={(e) => setNewPodcastDuration(e.target.value)}
+                        placeholder="12:30"
+                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-mono outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-amber-200 mb-1">وصف الحلقة</label>
+                    <textarea
+                      rows={3}
+                      value={newPodcastDesc}
+                      onChange={(e) => setNewPodcastDesc(e.target.value)}
+                      placeholder="نبذة عن موضوع الحلقة..."
+                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+                    <Button type="button" variant="ghost" onClick={() => setIsAddPodcastOpen(false)} className="text-xs text-slate-400">
+                      إلغاء
+                    </Button>
+                    <Button type="submit" disabled={createPodcastMutation.isPending} className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-5 h-10 shadow-lg">
+                      {createPodcastMutation.isPending ? "جاري الحفظ..." : "نشر الحلقة 🎙️"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
 

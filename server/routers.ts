@@ -99,6 +99,10 @@ import {
   deleteUserById,
   getSiteBroadcast,
   setSiteBroadcast,
+  listSiteBroadcastItems,
+  saveSiteBroadcastItem,
+  deleteSiteBroadcastItem,
+  toggleSiteBroadcastItem,
   getSiteOrchestration,
   setSiteOrchestration,
   hideSiteStory,
@@ -113,6 +117,38 @@ import { controlCenterRouter } from "./routers/controlCenter";
 import { visualEditorRouter } from "./routers/visualEditor";
 import { homepageRouter } from "./routers/homepage";
 import { getAqeeqXPostEmbed } from "./xPostEmbed";
+import {
+  getPublishedArticles,
+  getArticleBySlug,
+  submitGuestArticle,
+  createAdminArticle,
+  listAllArticles,
+  moderateArticle,
+  deleteArticle,
+  likeArticle,
+  aiPolishArticle,
+} from "./articlesDb";
+import {
+  getPodcasts,
+  getPodcastBySlug,
+  createPodcast,
+  updatePodcast,
+  deletePodcast,
+  likePodcast,
+} from "./podcastDb";
+import { askSchoolAiAssistant } from "./schoolAiAssistant";
+import {
+  getLiveEvent,
+  listAllLiveEvents,
+  addEventMoment,
+  reactToEvent,
+  setEventStatus,
+} from "./liveEventsDb";
+import {
+  WALKIE_CHANNELS,
+  listWalkieMessages,
+  sendWalkieDispatch,
+} from "./walkieDb";
 
 // Middleware: Admin or Receptionist (staff)
 const staffProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -989,9 +1025,14 @@ export const appRouter = router({
       return getSiteBroadcast();
     }),
 
+    getBroadcastList: adminProcedure.query(async () => {
+      return listSiteBroadcastItems();
+    }),
+
     setBroadcast: adminProcedure
       .input(
         z.object({
+          id: z.string().optional(),
           enabled: z.boolean(),
           message: z.string(),
           type: z.enum(["urgent", "celebration", "info"]),
@@ -1000,7 +1041,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const updated = await setSiteBroadcast(input);
+        const updated = await saveSiteBroadcastItem(input);
         await logAudit({
           userId: ctx.user.id,
           userName: ctx.user.name,
@@ -1008,6 +1049,32 @@ export const appRouter = router({
           details: JSON.stringify(input),
         });
         return updated;
+      }),
+
+    deleteBroadcast: adminProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const res = await deleteSiteBroadcastItem(input.id);
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: "admin.delete_broadcast",
+          details: JSON.stringify(input),
+        });
+        return res;
+      }),
+
+    toggleBroadcast: adminProcedure
+      .input(z.object({ id: z.string(), enabled: z.boolean() }))
+      .mutation(async ({ input, ctx }) => {
+        const res = await toggleSiteBroadcastItem(input.id, input.enabled);
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: "admin.toggle_broadcast",
+          details: JSON.stringify(input),
+        });
+        return res;
       }),
 
     getMasterContent: adminProcedure.query(async () => {
@@ -1146,6 +1213,270 @@ export const appRouter = router({
     getLiveDashboard: adminProcedure.query(async () => {
       return getAqeeqAnalyticsSummary();
     }),
+  }),
+
+  // ==================== 1. Aqeeq Community Articles Platform ====================
+  articles: router({
+    listPublished: publicProcedure
+      .input(
+        z.object({
+          category: z.string().optional(),
+          search: z.string().optional(),
+        }).optional()
+      )
+      .query(async ({ input }) => {
+        return getPublishedArticles(input?.category, input?.search);
+      }),
+
+    getBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const article = await getArticleBySlug(input.slug);
+        if (!article) throw new TRPCError({ code: "NOT_FOUND", message: "المقال غير موجود" });
+        return article;
+      }),
+
+    like: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return likeArticle(input.id);
+      }),
+
+    submitGuest: publicProcedure
+      .input(
+        z.object({
+          title: z.string().min(3, "العنوان قصير جداً"),
+          content: z.string().min(10, "نص المقال قصير جداً"),
+          excerpt: z.string().optional(),
+          authorName: z.string().min(2, "يرجى كتابة اسم الكاتب"),
+          authorRole: z.string().optional(),
+          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]),
+          coverUrl: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return submitGuestArticle(input);
+      }),
+
+    listAllAdmin: adminProcedure.query(async () => {
+      return listAllArticles();
+    }),
+
+    createAdminArticle: adminProcedure
+      .input(
+        z.object({
+          title: z.string(),
+          content: z.string(),
+          excerpt: z.string().optional(),
+          authorName: z.string(),
+          authorRole: z.string().optional(),
+          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]),
+          coverUrl: z.string().optional(),
+          isPublished: z.boolean().default(true),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return createAdminArticle(input);
+      }),
+
+    moderate: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["published", "pending", "rejected"]),
+          updates: z
+            .object({
+              title: z.string().optional(),
+              content: z.string().optional(),
+              excerpt: z.string().optional(),
+              category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]).optional(),
+              coverUrl: z.string().nullable().optional(),
+            })
+            .optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return moderateArticle(input.id, input.status, input.updates);
+      }),
+
+    aiPolish: adminProcedure
+      .input(z.object({ title: z.string(), content: z.string() }))
+      .mutation(async ({ input }) => {
+        return aiPolishArticle(input.title, input.content);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return deleteArticle(input.id);
+      }),
+  }),
+
+  // ==================== 2. Aqeeq Broadcast & Podcast Hub ====================
+  podcasts: router({
+    list: publicProcedure
+      .input(
+        z.object({
+          category: z.string().optional(),
+          mediaType: z.enum(["audio", "video"]).optional(),
+          search: z.string().optional(),
+        }).optional()
+      )
+      .query(async ({ input }) => {
+        return getPodcasts(input?.category, input?.mediaType, input?.search);
+      }),
+
+    getBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const podcast = await getPodcastBySlug(input.slug);
+        if (!podcast) throw new TRPCError({ code: "NOT_FOUND", message: "الحلقة غير موجودة" });
+        return podcast;
+      }),
+
+    like: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return likePodcast(input.id);
+      }),
+
+    create: adminProcedure
+      .input(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+          mediaType: z.enum(["audio", "video"]),
+          sourceType: z.enum(["drive", "youtube", "direct"]),
+          mediaUrl: z.string(),
+          thumbnailUrl: z.string().optional(),
+          coverUrl: z.string().optional(),
+          duration: z.string().optional(),
+          category: z.enum(["إذاعة الصباح", "بودكاست قيادات", "تغطيات صوتية", "حوارات الطلاب", "نشرات إخبارية"]),
+          hostName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return createPodcast(input);
+      }),
+
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          data: z.record(z.string(), z.any()),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return updatePodcast(input.id, input.data);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return deletePodcast(input.id);
+      }),
+  }),
+
+  // ==================== 3. Al-Aqeeq School AI Assistant ====================
+  schoolAi: router({
+    ask: publicProcedure
+      .input(
+        z.object({
+          prompt: z.string().min(1, "يرجى كتابة سؤالك"),
+          history: z
+            .array(
+              z.object({
+                role: z.enum(["user", "assistant"]),
+                content: z.string(),
+              })
+            )
+            .optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return askSchoolAiAssistant(input.history || [], input.prompt);
+      }),
+  }),
+
+  // ==================== 4. Live Events & Moments Reactions ====================
+  liveEvents: router({
+    getCurrent: publicProcedure
+      .input(z.object({ slug: z.string().optional() }).optional())
+      .query(async ({ input }) => {
+        return getLiveEvent(input?.slug);
+      }),
+
+    list: publicProcedure.query(async () => {
+      return listAllLiveEvents();
+    }),
+
+    react: publicProcedure
+      .input(
+        z.object({
+          eventId: z.number(),
+          type: z.enum(["hearts", "claps", "stars", "fires"]),
+          momentId: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return reactToEvent(input.eventId, input.type, input.momentId);
+      }),
+
+    addMoment: adminProcedure
+      .input(
+        z.object({
+          eventId: z.number(),
+          title: z.string(),
+          content: z.string(),
+          mediaUrl: z.string().optional(),
+          mediaType: z.enum(["image", "video", "text"]).optional(),
+          minuteMarker: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return addEventMoment(input.eventId, input);
+      }),
+
+    setStatus: adminProcedure
+      .input(
+        z.object({
+          eventId: z.number(),
+          status: z.enum(["live", "ended", "scheduled"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return setEventStatus(input.eventId, input.status);
+      }),
+  }),
+
+  // ==================== 5. Staff Walkie Radar & Dispatch ====================
+  walkie: router({
+    getChannels: publicProcedure.query(async () => {
+      return WALKIE_CHANNELS;
+    }),
+
+    listMessages: publicProcedure
+      .input(z.object({ channelId: z.string().optional() }).optional())
+      .query(async ({ input }) => {
+        return listWalkieMessages(input?.channelId);
+      }),
+
+    dispatch: publicProcedure
+      .input(
+        z.object({
+          channelId: z.string(),
+          senderName: z.string(),
+          senderRole: z.string().optional(),
+          audioBase64: z.string().optional(),
+          audioUrl: z.string().optional(),
+          durationSec: z.number().optional(),
+          transcriptText: z.string().optional(),
+          isEmergency: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return sendWalkieDispatch(input);
+      }),
   }),
 });
 

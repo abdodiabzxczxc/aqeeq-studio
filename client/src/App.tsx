@@ -48,6 +48,13 @@ import AqeeqAnalyticsDashboardPage from "./pages/AqeeqAnalyticsDashboardPage";
 import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
 
+import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
+import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
+import AqeeqLiveTimelinePage from "./pages/AqeeqLiveTimelinePage";
+import { PodcastPlayerProvider } from "./components/AqeeqFloatingPodcastPlayer";
+import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
+import { AqeeqStaffWalkieCapsule } from "./components/AqeeqStaffWalkieCapsule";
+
 function Router() {
   const [location] = useLocation();
   return (
@@ -57,6 +64,12 @@ function Router() {
       <Route path="/studio" component={AlaqeeqStudioPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AqeeqAdminDashboardPage} />
+      <Route path="/articles" component={AqeeqArticlesPage} />
+      <Route path="/articles/:slug" component={AqeeqArticlesPage} />
+      <Route path="/podcast" component={AqeeqPodcastPage} />
+      <Route path="/broadcast" component={AqeeqPodcastPage} />
+      <Route path="/live" component={() => <AqeeqLiveTimelinePage />} />
+      <Route path="/live/:slug" component={({ params }) => <AqeeqLiveTimelinePage slug={(params as any)?.slug} />} />
       <Route path="/journal" component={SchoolNewsPage} />
       <Route path="/journal/archive" component={JournalArchivePage} />
       <Route path="/journal/manage" component={JournalStudioPage} />
@@ -128,14 +141,18 @@ function StudioAppShell() {
   } as React.CSSProperties;
 
   return (
-    <div style={brandStyle} className="aq-brand-shell">
-      <div className="min-h-screen">
-        <AqeeqBroadcastBanner />
-        <Router />
-        <VisualGlobalSections />
-        <PwaInstallBanner />
+    <PodcastPlayerProvider>
+      <div style={brandStyle} className="aq-brand-shell">
+        <div className="min-h-screen">
+          <AqeeqBroadcastBanner />
+          <Router />
+          <VisualGlobalSections />
+          <PwaInstallBanner />
+          <AqeeqAiAssistantWidget />
+          <AqeeqStaffWalkieCapsule />
+        </div>
       </div>
-    </div>
+    </PodcastPlayerProvider>
   );
 }
 
