@@ -114,20 +114,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={17} />
             </button>
 
-            {/* AI Face Recognition Trigger */}
-            <button
-              onClick={() => setFaceSearchOpen(true)}
-              className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
-                dark
-                  ? "border-amber-400/40 bg-amber-400/[0.12] text-amber-300 hover:bg-amber-400 hover:text-black ring-1 ring-amber-400/20 shadow-amber-400/10 shadow-lg"
-                  : "border-amber-500/30 bg-amber-50 text-amber-900 hover:bg-amber-400 hover:text-black shadow-sm"
-              }`}
-              title="البحث عن صوري بالذكاء الاصطناعي في كافة الألبومات (AI Face Recognition)"
-              aria-label="البحث عن صوري بالذكاء الاصطناعي"
-            >
-              <ScanFace size={18} />
-            </button>
-
             {/* Spotlight Search Trigger */}
             <button
               onClick={() => setSearchOpen(true)}

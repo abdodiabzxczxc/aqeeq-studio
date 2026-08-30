@@ -192,7 +192,7 @@ export function AlaqeeqSpotlightSearch({
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
-        {/* Search Header Input */}
+        {/* Search Header Input Bar (with embedded AI Face Recognition trigger) */}
         <div className={"flex items-center gap-3 border-b px-5 py-4 " + (
           dark ? "border-white/[0.08]" : "border-black/[0.08]"
         )}>
@@ -208,6 +208,7 @@ export function AlaqeeqSpotlightSearch({
             placeholder="ابحث في المجلات، الألبومات، والأخبار والعروض..."
             className="flex-1 bg-transparent text-base sm:text-lg font-bold outline-none placeholder:text-slate-400"
           />
+
           {query ? (
             <button
               onClick={() => setQuery("")}
@@ -216,6 +217,26 @@ export function AlaqeeqSpotlightSearch({
               <X size={15} />
             </button>
           ) : null}
+
+          {/* Embedded AI Face Search Lens Button inside Search Bar */}
+          <button
+            type="button"
+            onClick={() => {
+              onOpenChange(false);
+              setFaceSearchOpen(true);
+            }}
+            className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 shadow-sm ${
+              dark
+                ? "border-amber-400/40 bg-amber-400/15 text-amber-300 hover:bg-amber-400 hover:text-black ring-1 ring-amber-400/20"
+                : "border-amber-500/30 bg-amber-100 text-amber-950 hover:bg-amber-400 hover:text-black"
+            }`}
+            title="البحث عن صوري بالذكاء الاصطناعي (AI Face Recognition)"
+            aria-label="البحث عن صوري بالذكاء الاصطناعي"
+          >
+            <ScanFace size={16} className={dark ? "text-amber-400" : "text-amber-700"} />
+            <span className="hidden sm:inline">البحث بالوجه 🤳</span>
+          </button>
+
           <button
             onClick={() => onOpenChange(false)}
             className={"rounded-xl border px-2.5 py-1 text-[11px] font-black transition " + (
