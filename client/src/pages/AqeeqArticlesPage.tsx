@@ -14,20 +14,25 @@ import {
   BookOpen,
   ArrowUpLeft,
   X,
+  Clock,
+  User,
   Check,
   Bookmark,
+  ChevronDown,
+  Layers,
+  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 const CATEGORIES = [
-  { id: "all", label: "جميع المقالات", icon: "✨" },
-  { id: "إبداعات الطلاب", label: "إبداعات الطلاب", icon: "🌟" },
-  { id: "تربوي", label: "مقالات تربوية", icon: "📚" },
-  { id: "إرشاد أسري", label: "إرشاد وتوجيه أسري", icon: "👨‍👩‍👧‍👦" },
-  { id: "أنشطة وفعاليات", label: "أنشطة وفعاليات", icon: "🏆" },
-  { id: "تجارب ملهمة", label: "تجارب ملهمة وقصص نجاح", icon: "💡" },
+  { id: "all", label: "الكل" },
+  { id: "إبداعات الطلاب", label: "إبداعات الطلاب" },
+  { id: "تربوي", label: "مقالات تربوية" },
+  { id: "إرشاد أسري", label: "إرشاد وتوجيه أسري" },
+  { id: "أنشطة وفعاليات", label: "أنشطة وفعاليات" },
+  { id: "تجارب ملهمة", label: "تجارب ملهمة" },
 ];
 
 function directDriveImage(url: string | null | undefined) {
@@ -39,20 +44,212 @@ function directDriveImage(url: string | null | undefined) {
   return id ? `/api/drive-proxy/${id}` : url;
 }
 
+function ArticleCard({
+  article,
+  index,
+  onOpen,
+  onShare,
+  dark,
+}: {
+  article: any;
+  index: number;
+  onOpen: () => void;
+  onShare: (art: any, e: React.MouseEvent) => void;
+  dark: boolean;
+}) {
+  const cover = directDriveImage(article.coverUrl) || article.coverUrl;
+  return (
+    <article
+      className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
+        dark
+          ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
+          : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
+      }`}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
+      <div className="relative flex h-full flex-col gap-5 sm:flex-row">
+        {/* Visual Cover Preview Container */}
+        <button
+          onClick={onOpen}
+          className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+            dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
+          }`}
+          aria-label={`قراءة ${article.title}`}
+        >
+          {/* Background tilted page */}
+          <div
+            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 ${
+              dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
+            }`}
+            style={{ transform: "rotate(-7deg)" }}
+          >
+            {cover ? (
+              <img src={cover} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-amber-500/20 to-transparent p-3 text-[9px] font-bold text-slate-500">
+                مقال العقيق
+              </div>
+            )}
+          </div>
+
+          {/* Front cover */}
+          <div
+            className={`absolute bottom-[6%] right-[10%] top-[6%] w-[62%] overflow-hidden rounded-[1rem] border p-1.5 shadow-xl ${
+              dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
+            }`}
+            style={{ transform: "rotate(2deg)" }}
+          >
+            {cover ? (
+              <img src={cover} alt="" className="h-full w-full rounded-[0.7rem] object-cover" />
+            ) : (
+              <div
+                className={`flex h-full flex-col justify-between rounded-[0.7rem] p-3.5 text-right ${
+                  dark ? "bg-gradient-to-br from-[#1a1400] to-black text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"
+                }`}
+              >
+                <BookOpen size={24} />
+                <div>
+                  <span className="text-[9px] font-black uppercase tracking-wider">{article.category}</span>
+                  <p className="line-clamp-2 text-[11px] font-black leading-snug mt-1 text-white">{article.title}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </button>
+
+        {/* Info Column */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div
+              className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              }`}
+            >
+              <PenTool size={16} />
+            </div>
+            <span
+              className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black border ${
+                dark
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              }`}
+            >
+              {article.category}
+            </span>
+          </div>
+
+          <h3
+            onClick={onOpen}
+            className={`mt-3 text-lg font-black line-clamp-2 cursor-pointer transition leading-snug ${
+              dark ? "text-white group-hover:text-[#f8ca14]" : "text-black group-hover:text-[#08467d]"
+            }`}
+          >
+            {article.title}
+          </h3>
+
+          <p className={`mt-2 text-xs leading-6 line-clamp-2 font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
+            {article.excerpt}
+          </p>
+
+          {/* Author Badge */}
+          <div className="mt-3 flex items-center gap-2">
+            <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-[10px]">
+              {article.authorAvatar ? (
+                <img src={article.authorAvatar} alt="" className="h-full w-full rounded-lg object-cover" />
+              ) : (
+                article.authorName.charAt(0)
+              )}
+            </div>
+            <span className="text-[11px] font-black truncate">{article.authorName}</span>
+            <span className="text-[10px] text-slate-500 font-bold">· {article.authorRole}</span>
+          </div>
+
+          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-3.5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+            <div className="flex items-center gap-3 text-[10px] font-black text-slate-400">
+              <span className="flex items-center gap-1">
+                <Eye size={12} />
+                <span>{article.viewCount || 0}</span>
+              </span>
+              <span className="flex items-center gap-1 text-rose-400">
+                <Heart size={12} className="fill-rose-500/20" />
+                <span>{article.likesCount || 0}</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => onShare(article, e)}
+                className={`grid h-8 w-8 place-items-center rounded-xl border transition ${
+                  dark ? "border-white/10 hover:bg-emerald-600 hover:text-white text-slate-400" : "border-black/10 hover:bg-emerald-600 hover:text-white text-slate-600"
+                }`}
+                title="مشاركة"
+              >
+                <Share2 size={13} />
+              </button>
+              <button
+                onClick={onOpen}
+                className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+                  dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
+                }`}
+              >
+                اقرأ المقال <ArrowUpLeft size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function AqeeqArticlesPage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "views" | "likes">("newest");
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [readingArticle, setReadingArticle] = useState<any>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  const { data: articles = [], isLoading, refetch } = trpc.articles.listPublished.useQuery({
+  const { data: rawArticles = [], isLoading, refetch } = trpc.articles.listPublished.useQuery({
     category: selectedCategory,
     search: searchQuery,
   });
+
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  const articles = useMemo(() => {
+    const list = [...rawArticles];
+    if (sortBy === "views") {
+      list.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+    } else if (sortBy === "likes") {
+      list.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
+    }
+    return list;
+  }, [rawArticles, sortBy]);
+
+  const featuredArticle = useMemo(() => {
+    if (orchestration?.heroCovers?.articlesMode === "custom" && orchestration?.heroCovers?.customArticleId) {
+      const found = rawArticles.find((a) => a.id === orchestration.heroCovers.customArticleId);
+      if (found) return found;
+    }
+    return rawArticles[0] || null;
+  }, [rawArticles, orchestration?.heroCovers]);
+
+  const secondArticle = useMemo(() => {
+    if (!featuredArticle) return null;
+    if (orchestration?.heroCovers?.articlesSecondaryArticleId) {
+      const found = rawArticles.find((a) => a.id === orchestration.heroCovers.articlesSecondaryArticleId);
+      if (found) return found;
+    }
+    return rawArticles.find((a) => a.id !== featuredArticle.id) || null;
+  }, [rawArticles, featuredArticle, orchestration?.heroCovers?.articlesSecondaryArticleId]);
 
   const likeMutation = trpc.articles.like.useMutation({
     onSuccess: (newLikes) => {
@@ -80,243 +277,321 @@ export default function AqeeqArticlesPage() {
     setTimeout(() => setCopiedId(null), 2500);
   };
 
-  const featuredArticle = useMemo(() => {
-    return articles[0] || null;
-  }, [articles]);
-
   return (
-    <div
+    <main
       dir="rtl"
-      className={`min-h-screen font-[Tajawal,sans-serif] transition-colors duration-300 ${
-        dark ? "bg-[#080808] text-white" : "bg-[#f5f7fa] text-slate-900"
+      className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
+        dark ? "bg-black text-white" : "bg-white text-black"
       }`}
     >
-      {/* Site Header */}
+      {/* Top Header Bar */}
       <AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="studio" />
 
-      {/* Royal Studio Hero Header */}
-      <section className="relative overflow-hidden border-b border-white/[0.08] pt-12 pb-16 px-4 md:px-8">
-        {/* Ambient Glows */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(248,202,20,0.12),_transparent_65%)]" />
-        <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full bg-[#08467d]/20 blur-3xl" />
+      {/* Hero Section matching Journal & Albums */}
+      <section
+        className={`relative isolate overflow-hidden border-b ${
+          dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+        }`}
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
 
-        <div className="relative mx-auto max-w-6xl">
-          {/* Top Pill Badge */}
-          <div className="flex justify-center">
+        <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:px-8 md:py-16 lg:gap-16">
+          {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
+          <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
+            {secondArticle ? (
+              <button
+                onClick={() => setReadingArticle(secondArticle)}
+                className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
+                  dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                }`}
+                style={{ transform: "rotate(-7deg)" }}
+                aria-label={`المقال السابق: ${secondArticle.title}`}
+              >
+                {secondArticle.coverUrl ? (
+                  <img
+                    src={directDriveImage(secondArticle.coverUrl) || secondArticle.coverUrl}
+                    alt=""
+                    className="h-full w-full rounded-[1.2rem] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
+                    <BookOpen size={30} className="text-slate-400" />
+                    <div>
+                      <span className="text-[10px] font-black text-[#f8ca14]">{secondArticle.category}</span>
+                      <p className="line-clamp-2 text-xs font-black text-white">{secondArticle.title}</p>
+                    </div>
+                  </div>
+                )}
+              </button>
+            ) : null}
+
+            {featuredArticle ? (
+              <button
+                onClick={() => setReadingArticle(featuredArticle)}
+                className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
+                  dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                }`}
+                style={{ transform: "rotate(3deg)" }}
+                aria-label={`المقال الحالي: ${featuredArticle.title}`}
+              >
+                <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                  {featuredArticle.coverUrl ? (
+                    <img
+                      src={directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl}
+                      alt={`غلاف ${featuredArticle.title}`}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div
+                      className={`flex h-full flex-col justify-between p-6 text-right ${
+                        dark
+                          ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
+                          : "bg-slate-100 text-[#08467d]"
+                      }`}
+                    >
+                      <BookOpen size={42} />
+                      <div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
+                          <Sparkles size={11} /> مقال مميز
+                        </span>
+                        <h2 className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
+                          {featuredArticle.title}
+                        </h2>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
+                    <span className="text-[10px] font-black text-[#f8ca14]">
+                      {featuredArticle.category} · بقلم: {featuredArticle.authorName}
+                    </span>
+                    <h2 className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
+                      {featuredArticle.title}
+                    </h2>
+                  </div>
+                </div>
+              </button>
+            ) : null}
+          </div>
+
+          {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
+          <div className="order-1 md:order-2 text-right">
             <div
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md shadow-lg ${
+              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                 dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] shadow-[#f8ca14]/5"
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
-              <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-              <span>البوابة الثقافية والأدبية · مقالات وأقلام العقيق ✍️</span>
+              <Sparkles size={14} />
+              <span>{orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}</span>
             </div>
-          </div>
 
-          {/* Heading */}
-          <div className="mt-5 text-center space-y-3">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-              واحة الفكر والإبداع لأسرة{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f8ca14] via-[#ffd700] to-[#d4af37]">
-                مدارس العقيق
-              </span>
+            <h1
+              className={`mt-5 text-4xl font-black leading-[1.14] md:text-6xl ${
+                dark ? "text-white" : "text-black"
+              }`}
+            >
+              {orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
             </h1>
-            <p className="mx-auto max-w-2xl text-xs sm:text-sm font-bold text-slate-400 leading-7">
-              مساحة أدبية وتربوية تفاعلية نبرز فيها كتابات الطلاب الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة.
-            </p>
-          </div>
 
-          {/* Featured Article 3D Showcase (if available) */}
-          {featuredArticle && !searchQuery && selectedCategory === "all" && (
-            <div className="mt-10">
-              <div
-                onClick={() => setReadingArticle(featuredArticle)}
-                className={`group relative overflow-hidden rounded-[2.5rem] border p-6 sm:p-8 cursor-pointer transition duration-300 hover:-translate-y-1.5 shadow-2xl ${
-                  dark
-                    ? "border-[#f8ca14]/40 bg-gradient-to-br from-[#121212] via-[#0b0b0b] to-[#080808] shadow-[0_30px_70px_rgba(0,0,0,0.6)] hover:border-[#f8ca14]/70"
-                    : "border-[#08467d]/25 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:border-[#08467d]/60"
+            <p className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+              {orchestration?.heroCovers?.articlesCustomDesc ||
+                "رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."}
+            </p>
+
+            {/* Stats pills */}
+            <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
+              <span
+                className={`rounded-full border px-3 py-2 ${
+                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <div className="flex flex-col lg:flex-row items-center gap-8">
-                  {/* Visual 3D Cover Preview */}
-                  <div className="relative w-full lg:w-5/12 min-h-[260px] sm:min-h-[300px] flex items-center justify-center">
-                    {/* Background angled card */}
-                    <div
-                      className={`absolute w-10/12 h-5/6 rounded-[2rem] border opacity-40 shadow-lg ${
-                        dark ? "border-white/15 bg-[#1a1a1a]" : "border-black/10 bg-slate-200"
-                      }`}
-                      style={{ transform: "rotate(-6deg) scale(0.95)" }}
-                    />
-                    {/* Foreground Card */}
-                    <div
-                      className={`relative w-11/12 h-full min-h-[240px] sm:min-h-[280px] rounded-[2rem] border overflow-hidden p-2 shadow-2xl transition duration-300 group-hover:scale-105 ${
-                        dark ? "border-[#f8ca14]/60 bg-[#161616]" : "border-[#08467d]/40 bg-white"
-                      }`}
-                      style={{ transform: "rotate(2deg)" }}
-                    >
-                      {featuredArticle.coverUrl ? (
-                        <img
-                          src={directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl}
-                          alt={featuredArticle.title}
-                          className="h-full w-full rounded-[1.5rem] object-cover"
-                        />
-                      ) : (
-                        <div
-                          className={`h-full w-full rounded-[1.5rem] p-6 flex flex-col justify-between ${
-                            dark
-                              ? "bg-gradient-to-br from-[#1a1500] via-[#0e0e0e] to-black text-[#f8ca14]"
-                              : "bg-gradient-to-br from-[#08467d]/10 to-white text-[#08467d]"
-                          }`}
-                        >
-                          <BookOpen size={36} />
-                          <div>
-                            <span className="text-xs font-black tracking-widest uppercase">مقال مميز للأسبوع</span>
-                            <h3 className="text-lg font-black mt-1 line-clamp-2">{featuredArticle.title}</h3>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Content Details */}
-                  <div className="w-full lg:w-7/12 space-y-4 text-right">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-xl bg-[#f8ca14] px-3 py-1 text-xs font-black text-black">
-                        <Sparkles size={12} />
-                        <span>مقال الأسبوع المميز</span>
-                      </span>
-                      <span
-                        className={`rounded-xl border px-3 py-1 text-xs font-black ${
-                          dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/10 bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {featuredArticle.category}
-                      </span>
-                    </div>
-
-                    <h2 className="text-2xl sm:text-4xl font-black leading-snug group-hover:text-[#f8ca14] transition">
-                      {featuredArticle.title}
-                    </h2>
-
-                    <p className="text-xs sm:text-sm font-bold text-slate-400 line-clamp-3 leading-7">
-                      {featuredArticle.excerpt}
-                    </p>
-
-                    {/* Author & Footer Actions */}
-                    <div className="pt-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-sm">
-                          {featuredArticle.authorAvatar ? (
-                            <img src={featuredArticle.authorAvatar} alt="" className="h-full w-full rounded-2xl object-cover" />
-                          ) : (
-                            featuredArticle.authorName.charAt(0)
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-black">{featuredArticle.authorName}</p>
-                          <span className="text-xs font-bold text-[#f8ca14]">{featuredArticle.authorRole}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={(e) => handleShare(featuredArticle, e)}
-                          className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-emerald-600 hover:text-white transition"
-                          title="مشاركة عبر واتساب"
-                        >
-                          <Share2 size={16} />
-                        </button>
-                        <div className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-5 py-2.5 text-xs font-black text-black transition hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20">
-                          <span>قراءة المقال كامل</span>
-                          <ArrowUpLeft size={16} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                {rawArticles.length} مقال منشور
+              </span>
+              <span
+                className={`rounded-full border px-3 py-2 ${
+                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                }`}
+              >
+                <User className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                {new Set(rawArticles.map((a) => a.authorName)).size || 1} كاتب وقلم
+              </span>
+              <span
+                className={`rounded-full border px-3 py-2 ${
+                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                }`}
+              >
+                <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                إبداعات وتجارب
+              </span>
             </div>
-          )}
 
-          {/* Search, Filter & Action Bar */}
-          <div className="mt-10 space-y-4">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              {/* Search Bar */}
-              <div className="relative w-full">
-                <Search size={17} className="absolute top-3.5 right-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث في عناوين المقالات، المحتوى، وأسماء الكتاب..."
-                  className={`w-full rounded-2xl border pr-11 pl-10 py-3 text-xs sm:text-sm font-bold placeholder-slate-500 outline-none transition shadow-inner ${
+            {/* CTA Buttons */}
+            <div className="mt-7 flex flex-wrap gap-3">
+              {featuredArticle ? (
+                <button
+                  onClick={() => setReadingArticle(featuredArticle)}
+                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
                     dark
-                      ? "border-white/15 bg-black/60 text-white focus:border-[#f8ca14]"
-                      : "border-black/15 bg-white text-black focus:border-[#08467d]"
+                      ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                      : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
                   }`}
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute top-3.5 left-4 text-slate-400 hover:text-white"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
+                >
+                  <ArrowUpLeft size={16} />
+                  <span>اقرأ المقال المميز</span>
+                </button>
+              ) : null}
 
-              {/* Submit Article Action */}
               <button
                 type="button"
                 onClick={() => setIsSubmitOpen(true)}
-                className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#f8ca14] px-6 py-3 text-xs sm:text-sm font-black text-black hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20 transition"
+                className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                  dark
+                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                }`}
               >
                 <PenTool size={16} />
                 <span>شاركنا بمقالك ✍️</span>
               </button>
             </div>
-
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              {CATEGORIES.map((cat) => {
-                const active = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-black transition border ${
-                      active
-                        ? dark
-                          ? "border-[#f8ca14] bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
-                          : "border-[#08467d] bg-[#08467d] text-white shadow-md shadow-[#08467d]/20"
-                        : dark
-                        ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14]/50 hover:text-white"
-                        : "border-black/10 bg-white text-slate-700 hover:border-[#08467d]/50 hover:text-black"
-                    }`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content Grid */}
-      <main className="mx-auto max-w-6xl px-4 md:px-8 py-12">
+      {/* Articles Feed Section */}
+      <section className="mx-auto max-w-[1320px] px-5 py-12 md:px-8 md:py-16">
+        <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
+          dark ? "border-white/[0.08]" : "border-black/[0.08]"
+        }`}>
+          <div>
+            <p className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+              THE AQEEQ ARTICLES
+            </p>
+            <h2 className={`mt-2 text-2xl font-black ${dark ? "text-white" : "text-black"}`}>
+              مقالات وأقلام العقيق
+            </h2>
+          </div>
+          <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+            {articles.length} من {rawArticles.length} مقال
+          </span>
+        </div>
+
+        {/* Gold Bordered Find & Sort Bar */}
+        <div
+          className={`mb-8 rounded-2xl border p-4 transition ${
+            dark ? "border-[#f8ca14]/30 bg-black/60 shadow-lg shadow-[#f8ca14]/5" : "border-[#08467d]/20 bg-white shadow-sm"
+          }`}
+        >
+          <div className="text-[10px] font-black tracking-[.18em] uppercase text-amber-400 mb-2">
+            FIND & SORT · البحث وترتيب المقالات
+          </div>
+
+          <div className="flex flex-col lg:flex-row items-center gap-3">
+            {/* Search Input */}
+            <div className="relative w-full lg:flex-1">
+              <Search size={16} className="absolute top-3.5 right-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ابحث بالاسم أو المحتوى أو الكاتب..."
+                className={`w-full rounded-xl border pr-10 pl-4 py-2.5 text-xs font-bold outline-none transition ${
+                  dark ? "border-white/10 bg-black text-white focus:border-[#f8ca14]" : "border-black/10 bg-slate-50 text-black focus:border-[#08467d]"
+                }`}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute top-3 left-3 text-slate-400 hover:text-white"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Sort Switcher */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-xs font-bold text-slate-400">ترتيب:</span>
+              <button
+                type="button"
+                onClick={() => setSortBy("newest")}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  sortBy === "newest"
+                    ? dark
+                      ? "bg-[#f8ca14] text-black"
+                      : "bg-[#08467d] text-white"
+                    : "text-slate-400 hover:text-current"
+                }`}
+              >
+                الأحدث
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("views")}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  sortBy === "views"
+                    ? dark
+                      ? "bg-[#f8ca14] text-black"
+                      : "bg-[#08467d] text-white"
+                    : "text-slate-400 hover:text-current"
+                }`}
+              >
+                الأكثر قراءة
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("likes")}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  sortBy === "likes"
+                    ? dark
+                      ? "bg-[#f8ca14] text-black"
+                      : "bg-[#08467d] text-white"
+                    : "text-slate-400 hover:text-current"
+                }`}
+              >
+                الأعلى إعجاباً
+              </button>
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-bold text-slate-400 ml-2">التصنيف:</span>
+            {CATEGORIES.map((cat) => {
+              const active = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`rounded-xl px-3 py-1.5 text-xs font-bold transition border ${
+                    active
+                      ? dark
+                        ? "border-[#f8ca14] bg-[#f8ca14] text-black shadow-sm"
+                        : "border-[#08467d] bg-[#08467d] text-white shadow-sm"
+                      : dark
+                      ? "border-white/10 bg-black/40 text-slate-300 hover:border-white/30"
+                      : "border-black/10 bg-slate-50 text-slate-700 hover:border-black/30"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Articles Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className={`h-80 rounded-[2rem] border animate-pulse ${
+                className={`h-64 rounded-[2rem] border animate-pulse ${
                   dark ? "border-white/10 bg-white/5" : "border-black/10 bg-black/5"
                 }`}
               />
@@ -329,7 +604,7 @@ export default function AqeeqArticlesPage() {
             }`}
           >
             <BookOpen size={44} className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
-            <h3 className="text-lg font-black">لا توجد مقالات في هذا التصنيف حالياً</h3>
+            <h3 className="text-lg font-black">لا توجد مقالات مطابقة حالياً</h3>
             <p className="text-xs text-slate-400 font-bold leading-6">
               كن أول من ينشر مقالاً ويشارك أفكاره وإبداعاته مع مجتمع مدارس العقيق!
             </p>
@@ -343,78 +618,20 @@ export default function AqeeqArticlesPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((art) => (
-              <article
+          <div className="grid gap-6 lg:grid-cols-2">
+            {articles.map((art, idx) => (
+              <ArticleCard
                 key={art.id}
-                onClick={() => setReadingArticle(art)}
-                className={`group relative flex flex-col justify-between overflow-hidden rounded-[2rem] border p-6 transition duration-300 hover:-translate-y-1.5 cursor-pointer ${
-                  dark
-                    ? "border-[#f8ca14]/30 bg-[#0c0c0c] text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60 hover:shadow-[#f8ca14]/5"
-                    : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
-                }`}
-              >
-                <div>
-                  {/* Category & Date */}
-                  <div className="flex items-center justify-between gap-2 mb-3.5">
-                    <span
-                      className={`rounded-xl border px-3 py-1 text-[11px] font-black ${
-                        dark
-                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                          : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                      }`}
-                    >
-                      {art.category}
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                      <Calendar size={11} />
-                      {new Date(art.publishedAt || art.createdAt).toLocaleDateString("ar-SA")}
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-base sm:text-lg font-black line-clamp-2 leading-snug group-hover:text-[#f8ca14] transition">
-                    {art.title}
-                  </h3>
-
-                  {/* Excerpt */}
-                  <p className="mt-2.5 text-xs text-slate-400 line-clamp-3 leading-6 font-bold">
-                    {art.excerpt}
-                  </p>
-                </div>
-
-                {/* Author Info & Interaction Stats */}
-                <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-xs">
-                      {art.authorAvatar ? (
-                        <img src={art.authorAvatar} alt="" className="h-full w-full rounded-xl object-cover" />
-                      ) : (
-                        art.authorName.charAt(0)
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-xs font-black">{art.authorName}</p>
-                      <span className="truncate text-[10px] text-[#f8ca14] font-bold block">{art.authorRole}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 text-slate-400 text-xs font-bold">
-                    <span className="flex items-center gap-1">
-                      <Eye size={13} />
-                      <span>{art.viewCount}</span>
-                    </span>
-                    <span className="flex items-center gap-1 text-rose-400">
-                      <Heart size={13} className="fill-rose-500/20" />
-                      <span>{art.likesCount}</span>
-                    </span>
-                  </div>
-                </div>
-              </article>
+                article={art}
+                index={idx}
+                dark={dark}
+                onOpen={() => setReadingArticle(art)}
+                onShare={handleShare}
+              />
             ))}
           </div>
         )}
-      </main>
+      </section>
 
       {/* Royal Article Reading Lightbox Modal */}
       {readingArticle && (
@@ -428,7 +645,6 @@ export default function AqeeqArticlesPage() {
             dir="rtl"
           >
             <div className="space-y-6">
-              {/* Header Badge & Category */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <span className="rounded-xl border border-[#f8ca14]/40 bg-[#f8ca14]/10 px-3 py-1 text-xs font-black text-[#f8ca14]">
                   {readingArticle.category}
@@ -438,7 +654,6 @@ export default function AqeeqArticlesPage() {
                 </span>
               </div>
 
-              {/* Title */}
               <h1 className="text-2xl sm:text-4xl font-black leading-snug">
                 {readingArticle.title}
               </h1>
@@ -463,7 +678,6 @@ export default function AqeeqArticlesPage() {
                   </div>
                 </div>
 
-                {/* Quick Share Actions */}
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -488,7 +702,6 @@ export default function AqeeqArticlesPage() {
                 </div>
               </div>
 
-              {/* Optional Cover Image */}
               {readingArticle.coverUrl && (
                 <div className="aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
                   <img
@@ -499,12 +712,10 @@ export default function AqeeqArticlesPage() {
                 </div>
               )}
 
-              {/* Content Body with Amiri Elegant Font */}
               <div className="prose prose-invert max-w-none font-[Amiri,serif] text-lg sm:text-xl leading-9 font-normal whitespace-pre-wrap">
                 {readingArticle.content}
               </div>
 
-              {/* Reader Interaction Footer */}
               <div className="pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <button
@@ -538,6 +749,7 @@ export default function AqeeqArticlesPage() {
 
       {/* Guest Submit Modal */}
       <AqeeqArticleSubmitModal open={isSubmitOpen} onOpenChange={setIsSubmitOpen} />
-    </div>
+    </main>
   );
 }
+

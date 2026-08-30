@@ -146,6 +146,20 @@ const DEFAULT_ORCHESTRATION = {
     showcaseCustomSubtitle: "",
     showcaseCustomDesc: "",
     showcaseCustomTag: "",
+    articlesMode: "auto",
+    customArticleId: null,
+    articlesSecondaryArticleId: null,
+    articlesCustomTitle: "",
+    articlesCustomSubtitle: "",
+    articlesCustomDesc: "",
+    articlesCustomTag: "",
+    podcastsMode: "auto",
+    customPodcastId: null,
+    podcastsSecondaryPodcastId: null,
+    podcastsCustomTitle: "",
+    podcastsCustomSubtitle: "",
+    podcastsCustomDesc: "",
+    podcastsCustomTag: "",
   },
   weeklyBento: {
     enabled: true,
@@ -263,7 +277,7 @@ const DEFAULT_ORCHESTRATION = {
   });
 
   // Hero Covers Sub-tab State
-  const [heroActiveCoverTab, setHeroActiveCoverTab] = useState<"home" | "journal" | "albums" | "showcase">("home");
+  const [heroActiveCoverTab, setHeroActiveCoverTab] = useState<"home" | "journal" | "albums" | "showcase" | "articles" | "podcasts">("home");
 
   // User Management State
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -753,6 +767,8 @@ const DEFAULT_ORCHESTRATION = {
                       { key: "journal", label: "📖 المجلة" },
                       { key: "albums", label: "📸 الألبومات" },
                       { key: "showcase", label: "🎬 الأخبار" },
+                      { key: "articles", label: "✍️ المقالات" },
+                      { key: "podcasts", label: "🎙️ البودكاست" },
                     ].map((st) => (
                       <button
                         key={st.key}
@@ -788,6 +804,16 @@ const DEFAULT_ORCHESTRATION = {
                   const resolvedShowcaseCover = directDriveImage(resolvedPost?.thumbnailUrl) || resolvedPost?.thumbnailUrl || resolvedPost?.mediaUrl;
                   const resolvedPostSecond = showcaseData?.posts?.find((p) => p.id === orchestrationForm.heroCovers.showcaseSecondaryPostId) || showcaseData?.posts?.[1] || showcaseData?.posts?.[0];
                   const resolvedShowcaseSecondCover = directDriveImage(resolvedPostSecond?.thumbnailUrl) || resolvedPostSecond?.thumbnailUrl || resolvedPostSecond?.mediaUrl;
+
+                  const resolvedArt = allAdminArticles.find((a: any) => a.id === orchestrationForm.heroCovers.customArticleId) || allAdminArticles[0];
+                  const resolvedArticleCover = directDriveImage(resolvedArt?.coverUrl) || resolvedArt?.coverUrl;
+                  const resolvedArtSecond = allAdminArticles.find((a: any) => a.id === orchestrationForm.heroCovers.articlesSecondaryArticleId) || allAdminArticles[1] || allAdminArticles[0];
+                  const resolvedArticleSecondCover = directDriveImage(resolvedArtSecond?.coverUrl) || resolvedArtSecond?.coverUrl;
+
+                  const resolvedPod = allAdminPodcasts.find((p: any) => p.id === orchestrationForm.heroCovers.customPodcastId) || allAdminPodcasts[0];
+                  const resolvedPodcastCover = directDriveImage(resolvedPod?.coverUrl) || resolvedPod?.coverUrl;
+                  const resolvedPodSecond = allAdminPodcasts.find((p: any) => p.id === orchestrationForm.heroCovers.podcastsSecondaryPodcastId) || allAdminPodcasts[1] || allAdminPodcasts[0];
+                  const resolvedPodcastSecondCover = directDriveImage(resolvedPodSecond?.coverUrl) || resolvedPodSecond?.coverUrl;
 
                   return (
                     <div className="space-y-6">
@@ -1446,6 +1472,353 @@ const DEFAULT_ORCHESTRATION = {
                                 value={orchestrationForm.heroCovers.showcaseCustomDesc || ""}
                                 onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseCustomDesc: e.target.value } })}
                                 placeholder="رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق وعروضها..."
+                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {/* SUBTAB 5: ARTICLES PAGE COVER */}
+                      {heroActiveCoverTab === "articles" && (
+                        <div className="space-y-4">
+                          {/* Live 2-card Preview of /articles */}
+                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
+                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
+                          )}>
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-xs font-black text-amber-400">معاينة هيرو صفحة المقالات والأقلام (/articles)</span>
+                              <a href="/articles" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:underline">
+                                <span>معاينة الصفحة الحية</span>
+                                <ArrowUpLeft size={13} />
+                              </a>
+                            </div>
+
+                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
+                              {/* Secondary Tilted Card (Back) */}
+                              <div
+                                onClick={() => {
+                                  openMediaPicker("اختيار المقال الثانوي للهيرو (الخلفية)", resolvedArticleSecondCover, (item) => {
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      heroCovers: { ...orchestrationForm.heroCovers, articlesSecondaryArticleId: item.rawId },
+                                    });
+                                  });
+                                }}
+                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
+                                style={{ transform: "rotate(-7deg)" }}
+                                title="انقر لتغيير المقال الثانوي"
+                              >
+                                {resolvedArticleSecondCover ? (
+                                  <img src={resolvedArticleSecondCover} alt="" className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">المقال السابق</div>
+                                )}
+                              </div>
+
+                              {/* Primary Card (Front) */}
+                              <div
+                                onClick={() => {
+                                  openMediaPicker("اختيار مقال الهيرو الرئيسي", resolvedArticleCover, (item) => {
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom", customArticleId: item.rawId },
+                                    });
+                                  });
+                                }}
+                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
+                                style={{ transform: "rotate(3deg)" }}
+                                title="انقر لتغيير المقال المميز الرئيسي"
+                              >
+                                <div className="relative h-full w-full overflow-hidden rounded-xl">
+                                  {resolvedArticleCover ? (
+                                    <img src={resolvedArticleCover} alt="" className="h-full w-full object-cover" />
+                                  ) : (
+                                    <div className="grid h-full place-items-center text-[10px] text-amber-400 font-bold">المقال المميز</div>
+                                  )}
+                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
+                                    <p className="text-[10px] font-black text-white truncate">{resolvedArt?.title || "أحدث مقال أدبي"}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Controls */}
+                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف مقالات العقيق</label>
+                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
+                                <button
+                                  type="button"
+                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "auto" } })}
+                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.articlesMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
+                                >
+                                  تلقائي (الأحدث)
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom" } })}
+                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.articlesMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
+                                >
+                                  مخصص
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Pickers */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
+                                <label className="block text-[11px] font-black text-amber-400">المقال الرئيسي (الغلاف الأول)</label>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
+                                    {resolvedArticleCover ? <img src={resolvedArticleCover} alt="" className="h-full w-full object-cover" /> : null}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      openMediaPicker("اختيار مقال الهيرو الرئيسي", resolvedArticleCover, (item) => {
+                                        setOrchestrationForm({
+                                          ...orchestrationForm,
+                                          heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom", customArticleId: item.rawId },
+                                        });
+                                      });
+                                    }}
+                                    className="flex-1 truncate rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-400 hover:bg-amber-400 hover:text-black transition text-right"
+                                  >
+                                    {resolvedArt?.title || "اختر من المقالات..."}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
+                                <label className="block text-[11px] font-black text-slate-400">المقال الثانوي (الخلفية المائلة)</label>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
+                                    {resolvedArticleSecondCover ? <img src={resolvedArticleSecondCover} alt="" className="h-full w-full object-cover" /> : null}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      openMediaPicker("اختيار المقال الثانوي", resolvedArticleSecondCover, (item) => {
+                                        setOrchestrationForm({
+                                          ...orchestrationForm,
+                                          heroCovers: { ...orchestrationForm.heroCovers, articlesSecondaryArticleId: item.rawId },
+                                        });
+                                      });
+                                    }}
+                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
+                                  >
+                                    {resolvedArtSecond?.title || "اختر من المقالات..."}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Text customization */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
+                                <input
+                                  type="text"
+                                  value={orchestrationForm.heroCovers.articlesCustomTag || ""}
+                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomTag: e.target.value } })}
+                                  placeholder="موسم العقيق · مقالات وأقلام"
+                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
+                                <input
+                                  type="text"
+                                  value={orchestrationForm.heroCovers.articlesCustomTitle || ""}
+                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomTitle: e.target.value } })}
+                                  placeholder="أقلام تفيض فكراً وإبداعاً."
+                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة المقالات</label>
+                              <textarea
+                                rows={2}
+                                value={orchestrationForm.heroCovers.articlesCustomDesc || ""}
+                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomDesc: e.target.value } })}
+                                placeholder="رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق..."
+                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SUBTAB 6: PODCAST & BROADCAST PAGE COVER */}
+                      {heroActiveCoverTab === "podcasts" && (
+                        <div className="space-y-4">
+                          {/* Live 2-card Preview of /podcast */}
+                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
+                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
+                          )}>
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-xs font-black text-purple-400">معاينة هيرو صفحة الإذاعة والبودكاست (/podcast)</span>
+                              <a href="/podcast" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-400 hover:underline">
+                                <span>معاينة الصفحة الحية</span>
+                                <ArrowUpLeft size={13} />
+                              </a>
+                            </div>
+
+                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
+                              {/* Secondary Tilted Card (Back) */}
+                              <div
+                                onClick={() => {
+                                  openMediaPicker("اختيار الحلقة الثانوية للهيرو (الخلفية)", resolvedPodcastSecondCover, (item) => {
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      heroCovers: { ...orchestrationForm.heroCovers, podcastsSecondaryPodcastId: item.rawId },
+                                    });
+                                  });
+                                }}
+                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
+                                style={{ transform: "rotate(-7deg)" }}
+                                title="انقر لتغيير الحلقة الثانوية"
+                              >
+                                {resolvedPodcastSecondCover ? (
+                                  <img src={resolvedPodcastSecondCover} alt="" className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">الحلقة السابقة</div>
+                                )}
+                              </div>
+
+                              {/* Primary Card (Front) */}
+                              <div
+                                onClick={() => {
+                                  openMediaPicker("اختيار حلقة البودكاست الرئيسية", resolvedPodcastCover, (item) => {
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom", customPodcastId: item.rawId },
+                                    });
+                                  });
+                                }}
+                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-purple-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
+                                style={{ transform: "rotate(3deg)" }}
+                                title="انقر لتغيير حلقة البودكاست المميزة"
+                              >
+                                <div className="relative h-full w-full overflow-hidden rounded-xl">
+                                  {resolvedPodcastCover ? (
+                                    <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" />
+                                  ) : (
+                                    <div className="grid h-full place-items-center text-[10px] text-purple-400 font-bold">الحلقة المميزة</div>
+                                  )}
+                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
+                                    <p className="text-[10px] font-black text-white truncate">{resolvedPod?.title || "أحدث حلقة بودكاست"}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Controls */}
+                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف البودكاست والإذاعة</label>
+                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
+                                <button
+                                  type="button"
+                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "auto" } })}
+                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.podcastsMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
+                                >
+                                  تلقائي (الأحدث)
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom" } })}
+                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.podcastsMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
+                                >
+                                  مخصص
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Pickers */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
+                                <label className="block text-[11px] font-black text-purple-400">الحلقة الرئيسية (الغلاف الأول)</label>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
+                                    {resolvedPodcastCover ? <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" /> : null}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      openMediaPicker("اختيار حلقة البودكاست الرئيسية", resolvedPodcastCover, (item) => {
+                                        setOrchestrationForm({
+                                          ...orchestrationForm,
+                                          heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom", customPodcastId: item.rawId },
+                                        });
+                                      });
+                                    }}
+                                    className="flex-1 truncate rounded-xl border border-purple-400/30 bg-purple-400/10 px-3 py-2 text-xs font-black text-purple-400 hover:bg-purple-400 hover:text-black transition text-right"
+                                  >
+                                    {resolvedPod?.title || "اختر من الحلقات..."}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
+                                <label className="block text-[11px] font-black text-slate-400">الحلقة الثانوية (الخلفية المائلة)</label>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
+                                    {resolvedPodcastSecondCover ? <img src={resolvedPodcastSecondCover} alt="" className="h-full w-full object-cover" /> : null}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      openMediaPicker("اختيار الحلقة الثانوية", resolvedPodcastSecondCover, (item) => {
+                                        setOrchestrationForm({
+                                          ...orchestrationForm,
+                                          heroCovers: { ...orchestrationForm.heroCovers, podcastsSecondaryPodcastId: item.rawId },
+                                        });
+                                      });
+                                    }}
+                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
+                                  >
+                                    {resolvedPodSecond?.title || "اختر من الحلقات..."}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Text customization */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
+                                <input
+                                  type="text"
+                                  value={orchestrationForm.heroCovers.podcastsCustomTag || ""}
+                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomTag: e.target.value } })}
+                                  placeholder="أثير العقيق الرقمي · إذاعة وبودكاست"
+                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
+                                <input
+                                  type="text"
+                                  value={orchestrationForm.heroCovers.podcastsCustomTitle || ""}
+                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomTitle: e.target.value } })}
+                                  placeholder="صوت ينبض بالحياة والإبداع."
+                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة البودكاست</label>
+                              <textarea
+                                rows={2}
+                                value={orchestrationForm.heroCovers.podcastsCustomDesc || ""}
+                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomDesc: e.target.value } })}
+                                placeholder="استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية..."
                                 className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
                               />
                             </div>

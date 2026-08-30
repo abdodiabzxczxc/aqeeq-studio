@@ -1092,15 +1092,17 @@ export const appRouter = router({
       }),
 
     getMasterContent: adminProcedure.query(async () => {
-      const [issues, albums, showcase] = await Promise.all([
+      const [issues, albums, showcase, articles, podcastList] = await Promise.all([
         listSchoolNewsIssues().catch(() => []),
         listAqeeqAlbums().catch(() => []),
         getAqeeqShowcaseBySlug("news-offers").catch(() => null),
+        listAllArticles().catch(() => []),
+        getPodcasts().catch(() => []),
       ]);
 
       const unifiedList: Array<{
         id: string;
-        type: "journal" | "album" | "post";
+        type: "journal" | "album" | "post" | "article" | "podcast";
         typeLabel: string;
         title: string;
         slug: string;
@@ -1165,6 +1167,42 @@ export const appRouter = router({
           editUrl: `/offers/manage`,
           viewUrl: `/offers`,
           rawId: post.id,
+        });
+      }
+
+      for (const art of articles) {
+        unifiedList.push({
+          id: `article-${art.id}`,
+          type: "article",
+          typeLabel: "مقال أدبي",
+          title: art.title,
+          slug: art.slug,
+          coverUrl: art.coverUrl,
+          date: art.createdAt ? new Date(art.createdAt).toLocaleDateString("ar-SA") : null,
+          count: 1,
+          viewsCount: art.viewCount,
+          isPublished: art.status === "published",
+          editUrl: `/articles`,
+          viewUrl: `/articles`,
+          rawId: art.id,
+        });
+      }
+
+      for (const pod of podcastList) {
+        unifiedList.push({
+          id: `podcast-${pod.id}`,
+          type: "podcast",
+          typeLabel: pod.mediaType === "video" ? "فيديو بودكاست" : "إذاعة صوتية",
+          title: pod.title,
+          slug: pod.slug,
+          coverUrl: pod.coverUrl,
+          date: pod.createdAt ? new Date(pod.createdAt).toLocaleDateString("ar-SA") : null,
+          count: 1,
+          viewsCount: pod.viewCount,
+          isPublished: true,
+          editUrl: `/podcast`,
+          viewUrl: `/podcast`,
+          rawId: pod.id,
         });
       }
 

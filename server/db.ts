@@ -589,6 +589,22 @@ export type SiteOrchestrationConfig = {
     showcaseCustomSubtitle?: string | null;
     showcaseCustomDesc?: string | null;
     showcaseCustomTag?: string | null;
+
+    articlesMode?: "auto" | "custom";
+    customArticleId?: number | null;
+    articlesSecondaryArticleId?: number | null;
+    articlesCustomTitle?: string | null;
+    articlesCustomSubtitle?: string | null;
+    articlesCustomDesc?: string | null;
+    articlesCustomTag?: string | null;
+
+    podcastsMode?: "auto" | "custom";
+    customPodcastId?: number | null;
+    podcastsSecondaryPodcastId?: number | null;
+    podcastsCustomTitle?: string | null;
+    podcastsCustomSubtitle?: string | null;
+    podcastsCustomDesc?: string | null;
+    podcastsCustomTag?: string | null;
   };
   weeklyBento: {
     enabled: boolean;
@@ -659,6 +675,8 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     journalMode: "auto",
     albumsMode: "auto",
     showcaseMode: "auto",
+    articlesMode: "auto",
+    podcastsMode: "auto",
   },
   weeklyBento: {
     enabled: true,
