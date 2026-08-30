@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ import {
   ScanFace,
 } from "lucide-react";
 import { toast } from "sonner";
-import { matchSelfieAgainstPhotos } from "@/lib/aqeeqFaceRecognition";
+import { matchSelfieAgainstPhotos, loadFaceRecognitionModels } from "@/lib/aqeeqFaceRecognition";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 
@@ -92,8 +92,15 @@ export function AqeeqFaceSearchModal({
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<MatchedPhoto | null>(null);
 
+  // Preload face models in the background when modal is mounted/opened
+  useEffect(() => {
+    if (open) {
+      void loadFaceRecognitionModels();
+    }
+  }, [open]);
+
   // Fetch all public media across all albums if not provided
-  const { data: globalMedia = [] } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, {
+  const { data: globalMedia = [], isLoading: isGlobalLoading } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, {
     enabled: open && (!propPhotos || propPhotos.length === 0),
     refetchOnWindowFocus: false,
   });
@@ -118,8 +125,8 @@ export function AqeeqFaceSearchModal({
   };
 
   const runBiometricSearch = async (selfie: string | null, textQuery: string, tag: string) => {
-    if (!effectivePhotos.length) {
-      toast.error("لا توجد صور متاحة للبحث حالياً");
+    if (effectivePhotos.length === 0 && !isGlobalLoading && !selfie && !textQuery.trim()) {
+      toast.error("لا توجد صور متاحة للبحث حالياً في الألبومات");
       return;
     }
 
