@@ -5,7 +5,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
-import { Search, LayoutDashboard } from "lucide-react";
+import { Search, LayoutDashboard, PencilRuler } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 type Section = "studio" | "journal" | "albums" | "showcase";
@@ -126,6 +126,25 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <Search size={17} />
             </button>
 
+            {/* Desktop-only Visual Editor Button */}
+            {isAdmin ? (
+              <button
+                onClick={() => editor.toggleEditing()}
+                className={`hidden md:flex h-11 items-center gap-1.5 rounded-xl border px-3 text-xs font-black transition active:scale-95 shadow-sm ${
+                  editor.isEditing
+                    ? "border-rose-400 bg-rose-500/25 text-rose-100 ring-2 ring-rose-400/40 animate-pulse"
+                    : dark
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                }`}
+                title={editor.isEditing ? "إنهاء وضع التعديل البصري" : "المحرر البصري للموقع (Visual Editor)"}
+                aria-label="المحرر البصري"
+              >
+                <PencilRuler size={16} />
+                <span>{editor.isEditing ? "إغلاق التعديل" : "محرر الموقع 🎨"}</span>
+              </button>
+            ) : null}
+
             {/* Desktop-only Admin Button */}
             {isAdmin ? (
               <button
@@ -181,19 +200,42 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 </button>
               </div>
 
-              {/* Admin Command Center Quick Button (if admin) */}
+              {/* Admin Command Center & Visual Editor Quick Buttons (if admin) */}
               {isAdmin ? (
-                <button
-                  type="button"
-                  onClick={() => go("/admin")}
-                  className="w-full mb-3 flex items-center justify-between rounded-xl bg-gradient-to-r from-[#08467d] to-[#0c599c] p-3 text-xs font-black text-white shadow-lg shadow-[#08467d]/30 active:scale-95 transition"
-                >
-                  <span className="flex items-center gap-2">
-                    <LayoutDashboard size={16} className="text-[#f8ca14]" />
-                    غرفة القيادة والتحكم الإداري
-                  </span>
-                  <span className="rounded-lg bg-[#f8ca14] px-2 py-0.5 text-[10px] font-black text-black">ADMIN</span>
-                </button>
+                <div className="mb-3 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      editor.toggleEditing();
+                    }}
+                    className={`w-full flex items-center justify-between rounded-xl p-3 text-xs font-black transition active:scale-95 shadow-md ${
+                      editor.isEditing
+                        ? "border-rose-400 bg-rose-500/25 text-rose-100 ring-2 ring-rose-400/40 animate-pulse"
+                        : "border border-amber-400/40 bg-amber-400/15 text-amber-200"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <PencilRuler size={16} className="text-amber-300" />
+                      {editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري للموقع"}
+                    </span>
+                    <span className="rounded-lg bg-amber-400 px-2 py-0.5 text-[10px] font-black text-black">
+                      {editor.isEditing ? "مفتوح" : "محرر"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => go("/admin")}
+                    className="w-full flex items-center justify-between rounded-xl bg-gradient-to-r from-[#08467d] to-[#0c599c] p-3 text-xs font-black text-white shadow-lg shadow-[#08467d]/30 active:scale-95 transition"
+                  >
+                    <span className="flex items-center gap-2">
+                      <LayoutDashboard size={16} className="text-[#f8ca14]" />
+                      غرفة القيادة والتحكم الإداري
+                    </span>
+                    <span className="rounded-lg bg-[#f8ca14] px-2 py-0.5 text-[10px] font-black text-black">ADMIN</span>
+                  </button>
+                </div>
               ) : null}
 
               {/* Navigation Links */}
