@@ -1,10 +1,28 @@
-import { AQEEQ_AUDIO_PRESETS, AudioPreset, getAqeeqDefaultBackgroundAudio, setAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
+import {
+  AQEEQ_AUDIO_PRESETS,
+  getAqeeqDefaultBackgroundAudio,
+  setAqeeqDefaultBackgroundAudio,
+  parseGoogleDriveAudioUrl,
+} from "@/lib/aqeeqAudioPresets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Check, Cloud, Loader2, Music2, Pause, Play, Sparkles, Star, Trash2, Upload, Volume2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  Check,
+  Cloud,
+  FolderDown,
+  Loader2,
+  Music2,
+  Pause,
+  Play,
+  Sparkles,
+  Star,
+  Trash2,
+  Upload,
+  Zap,
+} from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -14,12 +32,18 @@ type Props = {
   label?: string;
 };
 
-export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "الموسيقى والخلفية الصوتية" }: Props) {
+export function AqeeqAudioManagerField({
+  value,
+  onChange,
+  dark = true,
+  label = "الموسيقى والخلفية الصوتية",
+}: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.4);
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"uploaded" | "presets" | "upload">("uploaded");
+  const [activeTab, setActiveTab] = useState<"uploaded" | "drive" | "presets" | "upload">("uploaded");
   const [defaultAudio, setDefaultAudio] = useState<string | null>(() => getAqeeqDefaultBackgroundAudio());
+  const [driveInputUrl, setDriveInputUrl] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -81,7 +105,12 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("audio/") && !file.name.endsWith(".mp3") && !file.name.endsWith(".wav") && !file.name.endsWith(".m4a")) {
+    if (
+      !file.type.startsWith("audio/") &&
+      !file.name.endsWith(".mp3") &&
+      !file.name.endsWith(".wav") &&
+      !file.name.endsWith(".m4a")
+    ) {
       toast.error("يرجى اختيار ملف صوتي بصيغة MP3 أو WAV أو M4A");
       return;
     }
@@ -116,6 +145,25 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
     toast.success(`تم اختيار: ${title || "المقطع الصوتي"}`);
   };
 
+  const handleImportDriveAudio = () => {
+    if (!driveInputUrl.trim()) {
+      toast.error("يرجى إدخال رابط ملف Google Drive أولاً");
+      return;
+    }
+    const proxyUrl = parseGoogleDriveAudioUrl(driveInputUrl);
+    if (!proxyUrl) {
+      toast.error("تعذر استخراج معرّف الملف من رابط Google Drive. تأكد أن الرابط عام وصحيح");
+      return;
+    }
+    onChange(proxyUrl);
+    if (audioRef.current) {
+      audioRef.current.src = proxyUrl;
+      audioRef.current.volume = volume;
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+    toast.success("✅ تم ربط وتشغيل مقطع Google Drive بنجاح (بث مباشر دون استهلاك مساحة الموقع)");
+  };
+
   const handleDeleteUploadedFile = (id: number, fileName: string, fileUrl: string) => {
     if (window.confirm(`هل أنت متأكد من حذف الملف الصوتي "${fileName}" من السحابة؟`)) {
       if (audioRef.current && audioRef.current.src === fileUrl) {
@@ -137,7 +185,7 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
     if (!value) return;
     setAqeeqDefaultBackgroundAudio(value);
     setDefaultAudio(value);
-    toast.success("⭐ تم تعيين هذا المقطع كالموسيقى الافتراضية لكل الألبومات والمجلات الجديدة");
+    toast.success("⭐ تم تعيين هذا المقطع كالموسيقى الافتراضية لكل الألبومات والمجلات");
   };
 
   const clearAudio = () => {
@@ -150,14 +198,18 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
   };
 
   return (
-    <div className={`rounded-2xl border p-4 transition-colors ${
-      dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-slate-50"
-    }`}>
+    <div
+      className={`rounded-2xl border p-4 transition-colors ${
+        dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-slate-50"
+      }`}
+    >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Music2 size={18} className="text-amber-400" />
-          <Label className={`text-xs font-black ${dark ? "text-amber-100" : "text-slate-900"}`}>{label}</Label>
+          <Label className={`text-xs font-black ${dark ? "text-amber-100" : "text-slate-900"}`}>
+            {label}
+          </Label>
         </div>
         {value ? (
           <div className="flex items-center gap-2">
@@ -169,10 +221,10 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
                   ? "border-amber-400 bg-amber-400 text-black font-black"
                   : "border-amber-300/40 bg-amber-300/10 text-amber-200 hover:bg-amber-300 hover:text-black"
               }`}
-              title="تعيين كموسيقى افتراضية لكل الألبومات والمجلات الجديدة"
+              title="تعيين كموسيقى افتراضية لكل الألبومات والمجلات"
             >
               <Star size={13} className={defaultAudio === value ? "fill-black" : ""} />
-              <span>{defaultAudio === value ? "الموسيقى الافتراضية ⭐" : "تعيين كافتراضية"}</span>
+              <span>{defaultAudio === value ? "الموسيقى الرئيسية ⭐" : "تعيين كرئيسية"}</span>
             </button>
             <button
               type="button"
@@ -195,7 +247,7 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
       </div>
 
       {/* Tabs */}
-      <div className="mt-3 flex gap-1.5 border-b border-white/10 pb-2">
+      <div className="mt-3 flex flex-wrap gap-1.5 border-b border-white/10 pb-2">
         <button
           type="button"
           onClick={() => setActiveTab("uploaded")}
@@ -208,8 +260,24 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
           }`}
         >
           <Cloud size={14} />
-          <span>مرفوعاتك السابقة ({uploadedAudioList.length})</span>
+          <span>مرفوعاتك ({uploadedAudioList.length})</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("drive")}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            activeTab === "drive"
+              ? "bg-amber-400 text-slate-950 font-black shadow-sm"
+              : dark
+                ? "text-slate-400 hover:text-amber-200 hover:bg-white/5"
+                : "text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          <FolderDown size={14} />
+          <span>من Google Drive 📁</span>
+        </button>
+
         <button
           type="button"
           onClick={() => setActiveTab("presets")}
@@ -222,8 +290,9 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
           }`}
         >
           <Sparkles size={14} />
-          <span>مقطوعات العقيق الملكية</span>
+          <span>نغمات العقيق الملكية</span>
         </button>
+
         <button
           type="button"
           onClick={() => setActiveTab("upload")}
@@ -236,11 +305,11 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
           }`}
         >
           <Upload size={14} />
-          <span>رفع مقطع جديد</span>
+          <span>رفع ملف جديد</span>
         </button>
       </div>
 
-      {/* Tab 1: Uploaded Audio Library (Previous uploads with delete buttons) */}
+      {/* Tab 1: Uploaded Audio Library */}
       {activeTab === "uploaded" ? (
         <div className="mt-3 space-y-2">
           {uploadedAudioList.length === 0 ? (
@@ -296,8 +365,7 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
                           <Check size={12} strokeWidth={3} />
                         </span>
                       ) : null}
-                      
-                      {/* Delete File Button */}
+
                       <button
                         type="button"
                         onClick={(e) => {
@@ -319,7 +387,69 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
         </div>
       ) : null}
 
-      {/* Tab 2: Built-in Royal Presets */}
+      {/* Tab 2: Google Drive Audio Stream (Zero Server Disk Space) */}
+      {activeTab === "drive" ? (
+        <div className="mt-3 space-y-3">
+          <div className="rounded-xl border border-amber-300/20 bg-amber-300/[.04] p-3">
+            <div className="flex items-center gap-2">
+              <Zap size={16} className="text-amber-400 shrink-0" />
+              <span className="text-xs font-black text-amber-200">
+                بث صوتي فائق السرعة عبر Google Drive (صفر مساحة على الموقع)
+              </span>
+            </div>
+            <p className={`mt-1 text-[11px] leading-5 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+              انسخ رابط ملف MP3 أو الصوت من حساب Google Drive الخاص بك والصقه هنا. سيتولى الموقع بث المقطع مباشرة للزوار بدون استهلاك مساحة السيرفر.
+            </p>
+          </div>
+
+          <div>
+            <Label className={`text-[11px] font-bold ${dark ? "text-slate-300" : "text-slate-700"}`}>
+              رابط ملف الصوت في Google Drive:
+            </Label>
+            <div className="mt-1.5 flex gap-2">
+              <Input
+                value={driveInputUrl}
+                onChange={(e) => setDriveInputUrl(e.target.value)}
+                placeholder="https://drive.google.com/file/d/1A2B3C.../view?usp=sharing"
+                dir="ltr"
+                className={`text-xs font-mono ${
+                  dark ? "border-white/10 bg-black/40 text-white placeholder:text-slate-600" : "border-slate-300 bg-white text-black"
+                }`}
+              />
+              <Button
+                type="button"
+                onClick={handleImportDriveAudio}
+                className="shrink-0 bg-amber-400 px-4 text-xs font-black text-slate-950 hover:bg-amber-300"
+              >
+                تطبيق وتشغيل 🎵
+              </Button>
+            </div>
+          </div>
+
+          {value && value.includes("/api/drive-audio-proxy/") ? (
+            <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5">
+              <div className="flex items-center gap-2">
+                <Check size={16} className="text-emerald-400" />
+                <span className="text-xs font-black text-emerald-200">
+                  تم ربط مقطع Google Drive بنجاح وهو فعال الآن
+                </span>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={togglePreview}
+                className="h-7 border-emerald-400/40 text-xs font-black text-emerald-200"
+              >
+                {isPlaying ? <Pause size={12} className="ml-1" /> : <Play size={12} className="ml-1" />}
+                {isPlaying ? "إيقاف" : "معاينة"}
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* Tab 3: Built-in Royal Presets */}
       {activeTab === "presets" ? (
         <div className="mt-3 space-y-2">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -360,7 +490,7 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
         </div>
       ) : null}
 
-      {/* Tab 3: Upload from Device or URL */}
+      {/* Tab 4: Upload from Device or Direct URL */}
       {activeTab === "upload" ? (
         <div className="mt-3 space-y-3">
           <input
@@ -390,13 +520,17 @@ export function AqeeqAudioManagerField({ value, onChange, dark = true, label = "
           </button>
 
           <div>
-            <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>أو ضع رابط ملف صوتي مباشر:</span>
+            <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
+              أو ضع رابط ملف صوتي مباشر:
+            </span>
             <Input
               value={value || ""}
               onChange={(e) => onChange(e.target.value || null)}
               placeholder="https://example.com/soundtrack.mp3"
               dir="ltr"
-              className={`mt-1 text-xs font-mono ${dark ? "border-white/10 bg-black/40 text-white" : "border-slate-300 bg-white text-black"}`}
+              className={`mt-1 text-xs font-mono ${
+                dark ? "border-white/10 bg-black/40 text-white" : "border-slate-300 bg-white text-black"
+              }`}
             />
           </div>
         </div>

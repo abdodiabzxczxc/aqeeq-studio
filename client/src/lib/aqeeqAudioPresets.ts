@@ -60,3 +60,19 @@ export function setAqeeqDefaultBackgroundAudio(url: string | null): void {
     // Ignore storage errors
   }
 }
+
+/**
+ * Extracts and converts a Google Drive file link into a zero-disk streaming URL.
+ */
+export function parseGoogleDriveAudioUrl(input: string): string | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  const idMatch =
+    trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+    trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+    trimmed.match(/^([a-zA-Z0-9_-]{20,})$/);
+  if (idMatch) {
+    return `/api/drive-audio-proxy/${idMatch[1]}`;
+  }
+  return null;
+}

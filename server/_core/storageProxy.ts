@@ -75,5 +75,67 @@ export function registerStorageProxy(app: Express) {
       return res.redirect(`https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`);
     }
   });
-}
 
+  // Zero-Disk-Space High-Speed Google Drive Audio Streamer with Range Support
+  app.get("/api/drive-audio-proxy/:fileId", async (req, res) => {
+    const { fileId } = req.params;
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      return res.status(400).send("Invalid file ID");
+    }
+
+    try {
+      const googleDownloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
+      const rangeHeader = req.headers.range;
+
+      const fetchHeaders: Record<string, string> = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      };
+      if (rangeHeader) {
+        fetchHeaders.Range = rangeHeader;
+      }
+
+      const driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders });
+
+      if (!driveRes.ok && driveRes.status !== 206) {
+        return res.status(driveRes.status).send("Failed to stream audio from Google Drive");
+      }
+
+      const contentType = driveRes.headers.get("content-type") || "audio/mpeg";
+      const contentLength = driveRes.headers.get("content-length");
+      const contentRange = driveRes.headers.get("content-range");
+      const acceptRanges = driveRes.headers.get("accept-ranges") || "bytes";
+
+      res.status(driveRes.status);
+      res.setHeader("Content-Type", contentType.includes("audio") ? contentType : "audio/mpeg");
+      res.setHeader("Accept-Ranges", acceptRanges);
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      if (contentLength) res.setHeader("Content-Length", contentLength);
+      if (contentRange) res.setHeader("Content-Range", contentRange);
+
+      if (driveRes.body) {
+        const reader = driveRes.body.getReader();
+        const pump = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                res.end();
+                break;
+              }
+              res.write(value);
+            }
+          } catch {
+            res.end();
+          }
+        };
+        await pump();
+      } else {
+        const buf = Buffer.from(await driveRes.arrayBuffer());
+        res.send(buf);
+      }
+    } catch (err) {
+      console.warn("[DriveAudioProxy] Audio streaming error:", err);
+      res.status(500).send("Error streaming audio");
+    }
+  });
+}
