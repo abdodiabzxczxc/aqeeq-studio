@@ -63,6 +63,32 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
     requestAnimationFrame(() => document.getElementById(`aq-scroll-page-${target}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
   };
 
+  // Touch Swipe for mobile book reading (Swipe left = next page, Swipe right = previous page)
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        flip("next");
+      } else {
+        flip("previous");
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (mode !== "flip") return;
@@ -90,8 +116,8 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
         <div className="flex items-center gap-1.5">{onArchive ? <button onClick={onArchive} className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 px-2.5 py-2 text-[11px] font-black text-slate-300 transition hover:border-amber-300 hover:text-amber-100"><Archive size={16} /><span className="hidden sm:inline">كل الأعداد</span></button> : null}<div className="hidden rounded-xl border border-white/10 bg-black/20 p-1 sm:flex"><button onClick={() => setMode("flip")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "flip" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><BookOpen size={14} />كتاب</button><button onClick={() => setMode("scroll")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "scroll" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><List size={14} />قراءة</button></div><button onClick={() => void share()} className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/30 bg-amber-300/[.07] px-2.5 py-2 text-amber-200 transition hover:bg-amber-300 hover:text-slate-950"><Share2 size={17} /><span className="hidden text-[11px] font-black md:inline">مشاركة</span></button><ToolButton label="تكبير" onClick={() => adjustZoom(.05)}><Plus size={16} /></ToolButton><ToolButton label="تصغير" onClick={() => adjustZoom(-.05)}><Minus size={16} /></ToolButton><ToolButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</ToolButton>{onClose ? <ToolButton label="إغلاق" onClick={onClose}><X size={17} /></ToolButton> : null}</div>
       </header>
 
-      {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0" style={watermarkStyle}>
-        <div className="relative w-full p-1 md:p-2"><div className="aq-reader-gold-frame aq-flipbook-book-frame p-1 md:p-2">{watermarkSource ? <span aria-hidden="true" className={`aq-dark-reader-watermark aq-dark-reader-watermark-${watermark?.position || "center"} ${watermark?.cropLeft ? "aq-dark-reader-watermark-crop-left" : ""} pointer-events-none absolute`} style={{ "--aq-watermark-image": `url("${watermarkSource}")` } as React.CSSProperties} /> : null}<div className="aq-stacked-reader relative mx-auto py-0" style={{ transform: `scale(${zoom})` }}>
+      {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0 touch-pan-y" style={watermarkStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="relative w-full p-1 md:p-2"><div className="aq-reader-gold-frame aq-flipbook-book-frame p-1 md:p-2">{watermarkSource ? <span aria-hidden="true" className={`aq-dark-reader-watermark aq-dark-reader-watermark-${watermark?.position || "center"} ${watermark?.cropLeft ? "aq-dark-reader-watermark-crop-left" : ""} pointer-events-none absolute`} style={{ "--aq-watermark-image": `url("${watermarkSource}")` } as React.CSSProperties} /> : null}<div className="aq-stacked-reader relative mx-auto py-0 cursor-grab active:cursor-grabbing select-none" style={{ transform: `scale(${zoom})` }}>
           <div className="aq-stacked-reader-zone aq-stacked-reader-zone-previous" aria-hidden="true">{previousPages.map((item, index) => <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(index + 1) } as React.CSSProperties}><img src={item.imageUrl} alt="" referrerPolicy="no-referrer" draggable={false} /></article>)}</div>
           <article key={current.id} className="aq-stacked-reader-front relative"><img src={current.imageUrl} alt={current.caption || `الصفحة ${page + 1} من ${title}`} referrerPolicy="no-referrer" draggable={false} />{onDownloadPage ? <button type="button" onClick={() => onDownloadPage(current)} className="absolute left-3 top-3 z-20 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة الحالية" aria-label="تحميل الصورة الحالية"><Download size={16} /></button> : null}<div className="aq-stacked-reader-number">{String(page + 1).padStart(2, "0")}</div></article>
           <div className="aq-stacked-reader-zone aq-stacked-reader-zone-next" aria-hidden="true">{nextPages.map((item, index) => <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(index + 1) } as React.CSSProperties}><img src={item.imageUrl} alt="" referrerPolicy="no-referrer" draggable={false} /></article>)}</div>

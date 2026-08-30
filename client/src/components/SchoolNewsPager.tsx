@@ -36,18 +36,44 @@ export default function SchoolNewsPager({ title, kicker, pages, onArchive, share
   const toggleFullscreen = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await readerRef.current?.requestFullscreen(); } catch { setFull((value) => !value); } };
   const downloadCurrent = async () => { try { toast.message("يتم تجهيز ملف PDF للعدد كاملًا…"); await downloadJournalPdf(title, pages); toast.success("تم تنزيل العدد كاملًا بصيغة PDF"); } catch { toast.error("تعذر إنشاء ملف PDF للعدد"); } };
   const printIssue = async () => { try { toast.message("يتم تجهيز PDF للطباعة…"); await openJournalPdfForPrint(title, pages); } catch { toast.error("تعذر فتح ملف PDF للطباعة"); } };
+  // Touch Swipe for mobile reader (Swipe left = next page, Swipe right = previous page)
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        changePage(index + step);
+      } else {
+        changePage(index - step);
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   const RailButton = ({ label, children, onClick, disabled = false }: { label: string; children: React.ReactNode; onClick: () => void; disabled?: boolean }) => <button onClick={onClick} disabled={disabled} aria-label={label} title={label} className="aq-dark-reader-rail-button">{children}</button>;
   const viewerShell = full ? "fixed inset-0 z-[500] overflow-y-auto bg-[#090b11] p-3 md:p-7" : "";
 
   return <div ref={readerRef} dir="rtl" className={viewerShell}><aside className="aq-dark-reader-rail" aria-label="أدوات قراءة العدد"><RailButton label="كل الأعداد" onClick={() => onArchive?.()} disabled={!onArchive}><Archive size={17} /></RailButton><RailButton label="الصفحة السابقة" onClick={() => view === "scroll" ? moveScrollReader(index - 1) : changePage(index - 1)} disabled={!index}><ChevronRight size={18} /></RailButton><RailButton label="الصفحة التالية" onClick={() => view === "scroll" ? moveScrollReader(index + 1) : changePage(index + 1)} disabled={index >= pages.length - 1}><ChevronLeft size={18} /></RailButton><RailButton label="مشاركة العدد" onClick={() => void share()}><Share2 size={16} /></RailButton><RailButton label="تنزيل العدد PDF" onClick={() => void downloadCurrent()}><Download size={16} /></RailButton><RailButton label="طباعة العدد PDF" onClick={() => void printIssue()}><Printer size={16} /></RailButton><RailButton label="تكبير القراءة" onClick={() => setScrollZoom((value) => Math.min(1.4, Number((value + .1).toFixed(1))))}><Plus size={18} /></RailButton><RailButton label="تصغير القراءة" onClick={() => setScrollZoom((value) => Math.max(.7, Number((value - .1).toFixed(1))))}><Minus size={18} /></RailButton><RailButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Expand size={17} />}</RailButton></aside>
     <div className="mx-auto max-w-[1400px]">
-      {view === "scroll" ? <section className="aq-reader-gold-frame mx-auto max-w-[1180px] overflow-auto p-3 pb-10 md:p-7"><div className="mx-auto space-y-8 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "820px" : undefined }}>{pages.map((item, itemIndex) => <article id={`aq-pager-scroll-page-${itemIndex}`} key={item.id} className="overflow-hidden rounded-sm bg-transparent shadow-[0_20px_60px_rgba(0,0,0,.35)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${itemIndex + 1}`} className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-reader-gold-frame px-3 py-7 md:px-16 md:py-12">
-        <div className="relative mx-auto flex min-h-[480px] max-w-[590px] items-center justify-center gap-1 md:min-h-[680px]">
+      {view === "scroll" ? <section className="aq-reader-gold-frame mx-auto max-w-[1180px] overflow-auto p-3 pb-10 md:p-7"><div className="mx-auto space-y-8 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "820px" : undefined }}>{pages.map((item, itemIndex) => <article id={`aq-pager-scroll-page-${itemIndex}`} key={item.id} className="overflow-hidden rounded-sm bg-transparent shadow-[0_20px_60px_rgba(0,0,0,.35)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${itemIndex + 1}`} className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-reader-gold-frame px-3 py-7 md:px-16 md:py-12 touch-pan-y" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="relative mx-auto flex min-h-[480px] max-w-[590px] items-center justify-center gap-1 md:min-h-[680px] cursor-grab active:cursor-grabbing select-none">
           <button onClick={() => changePage(index - step)} disabled={!index} className="absolute right-0 z-10 grid h-12 w-12 place-items-center rounded-full border border-amber-300/25 bg-[#10141e]/95 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-20 md:-right-16" aria-label="الصفحة السابقة"><ChevronRight size={22} /></button>
           <article className="relative w-full overflow-hidden rounded-md bg-transparent shadow-[0_28px_75px_rgba(0,0,0,.55)]"><img key={page.id} src={page.imageUrl} alt={page.caption || `صفحة ${index + 1}`} className="block h-auto w-full [animation:journal-in_.28s_cubic-bezier(.23,1,.32,1)]" /></article>
           <button onClick={() => changePage(index + step)} disabled={index >= pages.length - step} className="absolute left-0 z-10 grid h-12 w-12 place-items-center rounded-full border border-amber-300/25 bg-[#10141e]/95 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-20 md:-left-16" aria-label="الصفحة التالية"><ChevronLeft size={22} /></button>
         </div>
-        <div className="relative mx-auto mt-7 flex max-w-[950px] items-center justify-between gap-3 border-t border-white/[.08] pt-5"><div className="min-w-0"><div className="truncate text-xs font-bold text-slate-200">{page.caption || "نشرة مدارس العقيق"}</div><div className="mt-1 text-[10px] text-slate-600">استخدم الأسهم أو المصغرات للتنقل</div></div><div className="shrink-0 text-sm font-black text-amber-200">{String(index + 1).padStart(2, "0")} <span className="text-slate-600">/</span> {String(pages.length).padStart(2, "0")}</div></div>
+        <div className="relative mx-auto mt-7 flex max-w-[950px] items-center justify-between gap-3 border-t border-white/[.08] pt-5"><div className="min-w-0"><div className="truncate text-xs font-bold text-slate-200">{page.caption || "نشرة مدارس العقيق"}</div><div className="mt-1 text-[10px] text-slate-600">اسحب الشاشة أو استخدم الأسهم للتنقل</div></div><div className="shrink-0 text-sm font-black text-amber-200">{String(index + 1).padStart(2, "0")} <span className="text-slate-600">/</span> {String(pages.length).padStart(2, "0")}</div></div>
         <div className="relative mx-auto mt-5 flex max-w-[950px] gap-2 overflow-x-auto pb-2">{pages.map((item, itemIndex) => <button key={item.id} onClick={() => changePage(itemIndex)} className={`h-20 w-14 shrink-0 overflow-hidden rounded-sm border transition ${itemIndex === index ? "border-amber-300 ring-2 ring-amber-300/20" : "border-white/[.12] opacity-55 hover:opacity-100"}`}><img src={item.imageUrl} alt={`صفحة ${itemIndex + 1}`} className="h-full w-full object-cover" /></button>)}</div>
       </section>}
     </div>

@@ -88,6 +88,32 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [mode, album?.media]);
 
+  // Touch Swipe navigation for mobile (Swipe left = next, Swipe right = previous)
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        moveThroughAlbum("next");
+      } else {
+        moveThroughAlbum("previous");
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   const brandLogo = album?.headerLogoUrl || journalIssues[0]?.headerLogoUrl || snapshot?.settings.school_logo || null;
   const watermark = album?.watermarkUrl || brandLogo;
   const active = album?.media[index] as AlbumItem | undefined;
@@ -196,9 +222,13 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         ) : null}
 
         {mode === "spread" ? (
-          <div className="relative z-10 p-2 sm:p-4 space-y-3">
-            {/* Cinematic Album Stage (Zero dead space) */}
-            <div className={`relative mx-auto flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl border shadow-2xl min-h-[260px] max-h-[72vh] ${
+          <div
+            className="relative z-10 p-2 sm:p-4 space-y-3 touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Cinematic Album Stage with Touch Swipe */}
+            <div className={`relative mx-auto flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl border shadow-2xl min-h-[260px] max-h-[72vh] cursor-grab active:cursor-grabbing select-none ${
               dark ? "bg-black/50 border-white/10" : "bg-white/80 border-slate-900/10 shadow-slate-300/40"
             }`}>
               {active?.mediaType === "video" ? (
