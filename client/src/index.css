@@ -1321,7 +1321,7 @@ aside[data-aq-editor-properties]::before {
 @media (max-width: 760px) { .aq-dark-reader-shell > div > .mb-3 { margin-left: 6.5rem; } }
 .aq-dark-reader-stage { min-height: 100vh; background: radial-gradient(circle at 24% 44%, rgba(214,185,106,.13), transparent 24%), radial-gradient(circle at 75% 65%, rgba(26,66,100,.25), transparent 35%), linear-gradient(145deg, #050b12, #0b1723 54%, #05080d) !important; }
 .aq-dark-reader-stage.aq-reader-gold-frame { border: 1px solid rgba(214,185,106,.42) !important; border-radius: 2rem !important; }
-.aq-dark-reader-stage::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.18), transparent 25%, transparent 75%, rgba(0,0,0,.18)), repeating-linear-gradient(135deg, transparent 0 13px, rgba(255,255,255,.012) 14px 15px); pointer-events: none; }
+.aq-dark-reader-stage::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.15), transparent 25%, transparent 75%, rgba(0,0,0,.15)); pointer-events: none; }
 .aq-dark-reader-watermark { z-index: 1; width: var(--aq-watermark-scale); height: var(--aq-watermark-scale); opacity: var(--aq-watermark-opacity); background-image: var(--aq-watermark-image); background-position: center; background-size: contain; background-repeat: no-repeat; filter: grayscale(1) sepia(.34) saturate(.85) brightness(1.7) drop-shadow(0 0 22px color-mix(in srgb, var(--aq-watermark-tint), transparent 60%)); }
 .aq-dark-reader-watermark-center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .aq-dark-reader-watermark-top-right { top: 6%; right: 5%; }
@@ -1329,7 +1329,7 @@ aside[data-aq-editor-properties]::before {
 .aq-dark-reader-watermark-crop-left { top: 1px; bottom: 1px; left: -12%; width: 120%; height: calc(100% - 2px); transform: none; background-position: left center; background-size: auto 100%; }
 .aq-dark-reader-watermark-bottom-right { bottom: 5%; right: 5%; }
 
-/* مظهر القارئ الأبيض: تبقى العلامة المائية بألوان الشعار الأصلية، بعكس النسخة الداكنة البيضاء. */
+/* مظهر القارئ الأبيض: خلفية نقية فاخرة بدون خطوط مشتتة مع الحفاظ على ألوان الشعار الأصلية */
 .aq-journal-reader-theme { min-height: 100vh; background: #090b11; }
 .aq-journal-reader-theme-dark .aq-dark-reader-watermark { filter: brightness(0) invert(1) drop-shadow(0 0 22px rgba(255,255,255,.18)); }
 .aq-journal-reader-theme-dark .aq-unified-reader-logo img { filter: brightness(0) invert(1); }
@@ -1344,7 +1344,7 @@ aside[data-aq-editor-properties]::before {
 .aq-journal-reader-theme-light .aq-reader-gold-frame { background: radial-gradient(circle at 50% 25%, rgba(220,194,125,.28), transparent 42%), #fffdf7; box-shadow: 0 30px 100px rgba(79,56,19,.16), inset 0 0 0 1px rgba(119,88,30,.04); }
 .aq-journal-reader-theme-light .aq-flipbook-stage,
 .aq-journal-reader-theme-light .aq-dark-reader-stage { background-image: radial-gradient(circle at 24% 44%, rgba(181,137,38,.18), transparent 24%), linear-gradient(145deg, #f8f3e8, #fffdf8 54%, #ede4d2) !important; }
-.aq-journal-reader-theme-light .aq-dark-reader-stage::before { background: linear-gradient(90deg, rgba(120,88,34,.05), transparent 25%, transparent 75%, rgba(120,88,34,.05)), repeating-linear-gradient(135deg, transparent 0 13px, rgba(119,88,30,.035) 14px 15px); }
+.aq-journal-reader-theme-light .aq-dark-reader-stage::before { background: linear-gradient(90deg, rgba(120,88,34,.04), transparent 25%, transparent 75%, rgba(120,88,34,.04)); }
 .aq-journal-reader-theme-light .aq-dark-reader-watermark { filter: none; mix-blend-mode: normal; }
 .aq-journal-reader-theme-light .aq-unified-reader-logo img { filter: none; }
 .aq-journal-reader-theme-light .aq-dark-reader-rail { border-color: rgba(119,88,30,.22); background: rgba(255,253,247,.9); box-shadow: 0 1.5rem 3rem rgba(79,56,19,.16); }
@@ -1454,11 +1454,54 @@ aside[data-aq-editor-properties]::before {
   .aq-album-flipbook .aq-stacked-reader { --aq-page-width: min(33.5rem, 90vw); }
 }
 
+/* وضع ألبوم العقيق ثلاثي الأبعاد بهوية وتأثير كتاب المجلة الفخم وبدون أي فراغ مهدر */
+.aq-album-3d-book-stage {
+  position: relative;
+  width: 100%;
+  padding: clamp(.5rem, 1.5vw, 1.5rem);
+  border-radius: 1.5rem;
+}
+.aq-album-3d-book-stage .aq-stacked-reader {
+  --aq-page-width: min(52rem, 74vw);
+  display: grid;
+  direction: ltr;
+  grid-template-columns: minmax(0, 1fr) var(--aq-page-width) minmax(0, 1fr);
+  align-items: center;
+  margin: 0 auto;
+}
+.aq-album-3d-book-stage .aq-stacked-reader-front,
+.aq-album-3d-book-stage .aq-stacked-reader-shadow {
+  width: var(--aq-page-width);
+  border-radius: .95rem;
+  box-shadow: 0 1.8rem 4.5rem rgba(0,0,0,.52);
+}
+.aq-album-3d-book-stage .aq-stacked-reader-front img,
+.aq-album-3d-book-stage .aq-stacked-reader-shadow img {
+  display: block;
+  max-height: clamp(18rem, 64vh, 44rem);
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: .85rem;
+}
+@media (max-width: 768px) {
+  .aq-album-3d-book-stage .aq-stacked-reader {
+    --aq-page-width: min(22.5rem, 84vw);
+  }
+  .aq-album-3d-book-stage .aq-stacked-reader-front img,
+  .aq-album-3d-book-stage .aq-stacked-reader-shadow img {
+    max-height: clamp(14rem, 50vh, 26rem);
+  }
+  .aq-album-3d-book-stage .aq-reference-flip-previous { left: .25rem !important; }
+  .aq-album-3d-book-stage .aq-reference-flip-next { right: .25rem !important; }
+}
+
 /* قارئ الألبوم يرث هوية المجلة نفسها: سطح فاتح فعلي في وايت مود، والشعار أصلي/أبيض حسب المظهر. */
 .aq-album-reader-theme-light .aq-album-flipbook.aq-dark-reader-shell { min-height: 0; background: transparent; color: #1e293b; }
 .aq-album-reader-theme-light .aq-album-flipbook .aq-flipbook-stage,
 .aq-album-reader-theme-light .aq-album-flipbook .aq-dark-reader-stage { background-image: radial-gradient(circle at 24% 44%, rgba(181,137,38,.18), transparent 24%), linear-gradient(145deg, #f8f3e8, #fffdf8 54%, #ede4d2) !important; }
-.aq-album-reader-theme-light .aq-album-flipbook .aq-dark-reader-stage::before { background: linear-gradient(90deg, rgba(120,88,34,.05), transparent 25%, transparent 75%, rgba(120,88,34,.05)), repeating-linear-gradient(135deg, transparent 0 13px, rgba(119,88,30,.035) 14px 15px); }
+.aq-album-reader-theme-light .aq-album-flipbook .aq-dark-reader-stage::before { background: linear-gradient(90deg, rgba(120,88,34,.04), transparent 25%, transparent 75%, rgba(120,88,34,.04)); }
 .aq-album-reader-theme-light .aq-album-flipbook .aq-reader-gold-frame { border-color: rgba(119,88,30,.28); background: radial-gradient(circle at 50% 25%, rgba(220,194,125,.28), transparent 42%), #fffdf7; box-shadow: 0 30px 100px rgba(79,56,19,.16), inset 0 0 0 1px rgba(119,88,30,.04); }
 .aq-album-reader-theme-light .aq-album-flipbook .aq-dark-reader-watermark { filter: none; mix-blend-mode: normal; }
 .aq-album-reader-theme-dark .aq-album-flipbook .aq-dark-reader-watermark { filter: brightness(0) invert(1) drop-shadow(0 0 22px rgba(255,255,255,.18)); }

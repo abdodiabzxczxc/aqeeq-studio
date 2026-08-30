@@ -223,65 +223,99 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
 
         {mode === "spread" ? (
           <div
-            className="relative z-10 p-2 sm:p-4 space-y-3 touch-pan-y"
+            className="relative z-10 p-2 sm:p-4 space-y-4 touch-pan-y"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Cinematic Album Stage with Touch Swipe */}
-            <div className={`relative mx-auto flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl border shadow-2xl min-h-[260px] max-h-[72vh] cursor-grab active:cursor-grabbing select-none ${
-              dark ? "bg-black/50 border-white/10" : "bg-white/80 border-slate-900/10 shadow-slate-300/40"
-            }`}>
-              {active?.mediaType === "video" ? (
+            {active?.mediaType === "video" ? (
+              <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-amber-300/25 bg-black shadow-2xl">
                 <div className="aspect-video w-full">
                   <AlbumMedia item={active} />
                 </div>
-              ) : active ? (
-                <div className="relative flex h-full max-h-[72vh] w-full items-center justify-center p-2 sm:p-4">
-                  <img
-                    src={getAqeeqAlbumImageSource(active)}
-                    alt={active.caption || active.fileName}
-                    className="max-h-[68vh] w-auto max-w-full rounded-xl object-contain drop-shadow-2xl transition duration-300 select-none"
-                  />
-                  {/* Download button on photo */}
+              </div>
+            ) : (
+              <div className={`aq-album-3d-book-stage aq-reader-gold-frame overflow-hidden rounded-[1.8rem] border shadow-2xl transition-colors ${
+                dark ? "border-amber-300/30 bg-[#070a11]/90" : "border-amber-700/20 bg-white/90 shadow-slate-300/50"
+              }`}>
+                <div className="aq-stacked-reader relative mx-auto py-1 sm:py-3 cursor-grab active:cursor-grabbing select-none">
+                  {/* Previous 3D shadow stack (Left side) */}
+                  <div className="aq-stacked-reader-zone aq-stacked-reader-zone-previous" aria-hidden="true">
+                    {(album.media as AlbumItem[]).slice(Math.max(0, index - 1), index).reverse().map((item, pIndex) => (
+                      <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(pIndex + 1) } as React.CSSProperties}>
+                        <img
+                          src={getAqeeqAlbumImageSource(item)}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          draggable={false}
+                          className="rounded-xl object-contain"
+                        />
+                      </article>
+                    ))}
+                  </div>
+
+                  {/* Active front 3D page */}
+                  {active ? (
+                    <article key={active.id} className="aq-stacked-reader-front relative">
+                      <img
+                        src={getAqeeqAlbumImageSource(active)}
+                        alt={active.caption || active.fileName}
+                        referrerPolicy="no-referrer"
+                        draggable={false}
+                        className="rounded-xl object-contain shadow-2xl"
+                      />
+                      {/* Download button on photo */}
+                      <button
+                        type="button"
+                        onClick={() => download(active.id)}
+                        className="absolute left-3 top-3 sm:left-4 sm:top-4 z-20 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-white/25 bg-black/60 text-white shadow-xl backdrop-blur-md transition hover:border-amber-300 hover:bg-amber-300 hover:text-black active:scale-95"
+                        title="تحميل هذه الصورة"
+                        aria-label="تحميل الصورة"
+                      >
+                        <Download size={17} />
+                      </button>
+                      <div className={`aq-stacked-reader-number font-mono font-bold ${dark ? "text-amber-200" : "text-amber-900/80"}`}>
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+                    </article>
+                  ) : null}
+
+                  {/* Next 3D shadow stack (Right side) */}
+                  <div className="aq-stacked-reader-zone aq-stacked-reader-zone-next" aria-hidden="true">
+                    {(album.media as AlbumItem[]).slice(index + 1, index + 2).map((item, nIndex) => (
+                      <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(nIndex + 1) } as React.CSSProperties}>
+                        <img
+                          src={getAqeeqAlbumImageSource(item)}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          draggable={false}
+                          className="rounded-xl object-contain"
+                        />
+                      </article>
+                    ))}
+                  </div>
+
+                  {/* 3D Round Flip Buttons */}
                   <button
                     type="button"
-                    onClick={() => download(active.id)}
-                    className="absolute left-3 top-3 sm:left-4 sm:top-4 z-20 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-white/25 bg-black/60 text-white shadow-xl backdrop-blur-md transition hover:border-amber-300 hover:bg-amber-300 hover:text-black active:scale-95"
-                    title="تحميل هذه الصورة"
-                    aria-label="تحميل الصورة"
+                    onClick={() => moveThroughAlbum("previous")}
+                    disabled={index === 0}
+                    className="aq-reference-flip-previous absolute right-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-4"
+                    aria-label="الصورة السابقة"
                   >
-                    <Download size={17} />
+                    <ChevronRight size={24} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveThroughAlbum("next")}
+                    disabled={index >= album.media.length - 1}
+                    className="aq-reference-flip-next absolute left-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-4"
+                    aria-label="الصورة التالية"
+                  >
+                    <ChevronLeft size={24} />
                   </button>
                 </div>
-              ) : null}
-
-              {/* Previous Photo Button */}
-              <button
-                type="button"
-                onClick={() => moveThroughAlbum("previous")}
-                disabled={index === 0}
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/40 bg-black/80 text-amber-300 shadow-2xl backdrop-blur-md transition hover:scale-110 hover:bg-amber-300 hover:text-black disabled:opacity-0 disabled:pointer-events-none active:scale-95"
-                aria-label="الصورة السابقة"
-              >
-                <ChevronRight size={24} />
-              </button>
-
-              {/* Next Photo Button */}
-              <button
-                type="button"
-                onClick={() => moveThroughAlbum("next")}
-                disabled={index >= (album.media.length - 1)}
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/40 bg-black/80 text-amber-300 shadow-2xl backdrop-blur-md transition hover:scale-110 hover:bg-amber-300 hover:text-black disabled:opacity-0 disabled:pointer-events-none active:scale-95"
-                aria-label="الصورة التالية"
-              >
-                <ChevronLeft size={24} />
-              </button>
-
-              {/* Counter Badge */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 rounded-full border border-white/15 bg-black/75 px-3.5 py-1 text-xs font-mono font-bold text-amber-300 backdrop-blur-md shadow-lg">
-                {String(index + 1).padStart(2, "0")} / {String(album.media.length).padStart(2, "0")}
               </div>
-            </div>
+            )}
 
             {/* Caption */}
             {active?.caption ? (
@@ -290,7 +324,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </div>
             ) : null}
 
-            {/* Seamless Thumbnails Strip Directly Below with Zero Gap */}
+            {/* Seamless Thumbnails Ribbon Below */}
             {album.media.length > 1 ? (
               <div className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
                 dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
