@@ -560,9 +560,10 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.publish", details: JSON.stringify({ issueId: input.id }) });
       return issue;
     }),
-    generateAiStory: adminProcedure
+    generateAiStory: staffProcedure
       .input(
         z.object({
+          title: z.string().optional(),
           topic: z.string().optional(),
           prompt: z.string().optional(),
           keyPoints: z.string().optional(),
@@ -630,11 +631,14 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_album.delete", details: JSON.stringify({ id: input.id }) });
       return result;
     }),
-    generateAiStory: adminProcedure
+    generateAiStory: staffProcedure
       .input(
         z.object({
-          title: z.string(),
+          title: z.string().optional(),
+          topic: z.string().optional(),
+          prompt: z.string().optional(),
           tone: z.enum(["royal", "celebration", "educational", "urgent"]).optional(),
+          itemCount: z.number().optional(),
         })
       )
       .mutation(async ({ input }) => {

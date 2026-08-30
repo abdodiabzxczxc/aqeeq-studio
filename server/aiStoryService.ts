@@ -98,13 +98,15 @@ export async function generateAiNewsStory(input: GenerateStoryInput): Promise<Ge
 }
 
 export async function generateAiAlbumDescription(input: {
-  title: string;
+  title?: string;
+  topic?: string;
+  prompt?: string;
   tone?: StoryTone;
   itemCount?: number;
 }): Promise<{ description: string; captions: string[] }> {
   const tone = input.tone || "royal";
   const style = TONE_STYLES[tone];
-  const title = input.title || "ألبوم فعاليات العقيق";
+  const title = input.title?.trim() || input.topic?.trim() || input.prompt?.trim() || "ألبوم فعاليات العقيق";
 
   const description = `${style.prefix}، يوثق هذا الألبوم المصور أروع اللحظات والذكريات الخالدة في «${title}». جولة بصرية ممتعة تنقلكم إلى قلب الحدث لتعيشوا تفاصيل الإنجاز وفرحة المشاركين في مدارس العقيق الأهلية والدولية.`;
 
