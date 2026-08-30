@@ -10,7 +10,7 @@ import { getAqeeqAlbumSpreadWatermark } from "@/lib/aqeeqAlbumReaderTheme";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { Archive, ChevronLeft, ChevronRight, Download, ImageIcon, Loader2, Maximize2, Moon, Printer, Settings2, Share2, Sun, Video, Volume2 } from "lucide-react";
+import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, Moon, Printer, RotateCcw, Settings2, Share2, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -72,6 +72,42 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     void audio.play().then(() => setSoundEnabled(true)).catch(() => setSoundEnabled(false));
   }, [album?.id, album?.backgroundAudioUrl]);
 
+  // Interactive Zoom and Pan System (Pinch to zoom on mobile, double click on desktop)
+  const [zoom, setZoom] = useState<number>(1);
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isPanning = useRef<boolean>(false);
+  const panStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const initialPan = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastTouchDistance = useRef<number | null>(null);
+  const lastTapTime = useRef<number>(0);
+
+  // Mouse Drag and Touch Swipe navigation
+  const dragStartX = useRef<number | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const isDragging = useRef<boolean>(false);
+
+  const resetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const handleDoubleClick = (e?: React.MouseEvent) => {
+    if (zoom > 1.05) {
+      resetZoom();
+    } else {
+      setZoom(2.2);
+      setPan({ x: 0, y: 0 });
+    }
+  };
+
+  const adjustZoom = (delta: number) => {
+    setZoom((prev) => {
+      const nextZoom = Math.min(3.5, Math.max(1, Number((prev + delta).toFixed(2))));
+      if (nextZoom <= 1.05) setPan({ x: 0, y: 0 });
+      return nextZoom;
+    });
+  };
+
   // Keyboard navigation for album photos (ArrowRight = Next/Forward, ArrowLeft = Previous/Back)
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -79,8 +115,12 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         if (e.key === "ArrowRight") {
           const items = album?.media || [];
           setIndex((prev) => Math.min(items.length - 1, prev + 1));
+          resetZoom();
         } else if (e.key === "ArrowLeft") {
           setIndex((prev) => Math.max(0, prev - 1));
+          resetZoom();
+        } else if (e.key === "Escape") {
+          resetZoom();
         }
       }
     };
@@ -88,27 +128,121 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [mode, album?.media]);
 
-  // Mouse Drag and Touch Swipe navigation (Mouse drag / Touch swipe left = next, right = previous)
-  const dragStartX = useRef<number | null>(null);
-  const dragStartY = useRef<number | null>(null);
-  const isDragging = useRef<boolean>(false);
+  // Touch handlers for mobile Pinch to zoom and Swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lastTouchDistance.current = dist;
+    } else if (e.touches.length === 1) {
+      const now = Date.now();
+      if (now - lastTapTime.current < 300) {
+        handleDoubleClick();
+        lastTapTime.current = 0;
+        return;
+      }
+      lastTapTime.current = now;
 
+      if (zoom > 1.05) {
+        isPanning.current = true;
+        panStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        initialPan.current = { ...pan };
+      } else {
+        dragStartX.current = e.touches[0].clientX;
+        dragStartY.current = e.touches[0].clientY;
+        isDragging.current = true;
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && lastTouchDistance.current !== null) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = dist / lastTouchDistance.current;
+      setZoom((prev) => Math.min(3.5, Math.max(1, prev * factor)));
+      lastTouchDistance.current = dist;
+    } else if (e.touches.length === 1 && isPanning.current && zoom > 1.05) {
+      const dx = e.touches[0].clientX - panStart.current.x;
+      const dy = e.touches[0].clientY - panStart.current.y;
+      setPan({
+        x: initialPan.current.x + dx,
+        y: initialPan.current.y + dy,
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      lastTouchDistance.current = null;
+    }
+    if (e.touches.length === 0) {
+      if (isPanning.current) {
+        isPanning.current = false;
+      }
+      if (isDragging.current && dragStartX.current !== null && dragStartY.current !== null && zoom <= 1.05) {
+        const deltaX = (e.changedTouches[0]?.clientX || 0) - dragStartX.current;
+        const deltaY = (e.changedTouches[0]?.clientY || 0) - dragStartY.current;
+        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+          if (deltaX < 0) {
+            moveThroughAlbum("next");
+            resetZoom();
+          } else {
+            moveThroughAlbum("previous");
+            resetZoom();
+          }
+        }
+      }
+      isDragging.current = false;
+      dragStartX.current = null;
+      dragStartY.current = null;
+    }
+  };
+
+  // Pointer handlers for desktop mouse drag & pan
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (zoom > 1.05) {
+      isPanning.current = true;
+      panStart.current = { x: e.clientX, y: e.clientY };
+      initialPan.current = { ...pan };
+      return;
+    }
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
     isDragging.current = true;
   };
 
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (isPanning.current && zoom > 1.05) {
+      const dx = e.clientX - panStart.current.x;
+      const dy = e.clientY - panStart.current.y;
+      setPan({
+        x: initialPan.current.x + dx,
+        y: initialPan.current.y + dy,
+      });
+    }
+  };
+
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (isPanning.current) {
+      isPanning.current = false;
+      return;
+    }
     if (!isDragging.current || dragStartX.current === null || dragStartY.current === null) return;
     const deltaX = e.clientX - dragStartX.current;
     const deltaY = e.clientY - dragStartY.current;
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1 && zoom <= 1.05) {
       if (deltaX < 0) {
         moveThroughAlbum("next");
+        resetZoom();
       } else {
         moveThroughAlbum("previous");
+        resetZoom();
       }
     }
     isDragging.current = false;
@@ -117,6 +251,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   };
 
   const handlePointerCancel = () => {
+    isPanning.current = false;
     isDragging.current = false;
     dragStartX.current = null;
     dragStartY.current = null;
@@ -192,6 +327,32 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           <div className="min-w-0"><VisualEditable id="album-reader-kicker" tag="text" label="شارة قارئ الألبوم" defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`} as="div" className="text-[10px] font-black tracking-[.1em] text-amber-300" /><VisualEditable id="album-reader-title" tag="text" label="عنوان الألبوم في القارئ" defaultText={album.title} as="h1" className="truncate text-lg font-black md:text-2xl" /></div>
         </div>
         <div className="flex items-center gap-2 self-end md:self-auto">
+          {mode === "spread" ? (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => adjustZoom(0.3)}
+                aria-label="تكبير الصورة"
+                title="تكبير الصورة (+)"
+                className={`grid h-9 w-9 place-items-center rounded-xl border transition hover:border-amber-300 hover:text-amber-200 active:scale-95 ${
+                  dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-600"
+                }`}
+              >
+                <ZoomIn size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => adjustZoom(-0.3)}
+                aria-label="تصغير الصورة"
+                title="تصغير الصورة (-)"
+                className={`grid h-9 w-9 place-items-center rounded-xl border transition hover:border-amber-300 hover:text-amber-200 active:scale-95 ${
+                  dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-600"
+                }`}
+              >
+                <ZoomOut size={16} />
+              </button>
+            </div>
+          ) : null}
           <VisualEditable id="album-reader-theme-action" tag="button" label="زر مظهر قارئ الألبوم" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-theme-icon" label="أيقونة مظهر قارئ الألبوم" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
           <VisualEditable id="album-reader-archive-action" tag="button" label="زر كل الألبومات" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-archive-icon" label="أيقونة أرشيف الألبومات" icon="archive" size={16} /></VisualEditable>
           {isAdmin ? <VisualEditable id="album-reader-manage-action" tag="button" label="زر إدارة الألبوم" defaultText="إدارة الألبوم" as="button" onAction={() => navigate(`/albums/manage?album=${album.slug}`)} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-manage-icon" label="أيقونة إدارة الألبوم" icon="settings" size={16} /></VisualEditable> : null}
@@ -205,23 +366,106 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         {watermark ? <VisualImage id="album-reader-watermark" label="العلامة المائية للألبوم" src={watermark} alt="" className={`pointer-events-none absolute z-0 ${watermarkPlacement} ${dark ? "brightness-0 invert" : ""}`} style={watermarkStyle} /> : null}
 
         {mode === "gallery" ? (
-          <div className="relative z-10 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {(album.media as AlbumItem[]).map((item, mediaIndex) => (
-              <div id={`aq-album-media-${mediaIndex}`} key={item.id} className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border text-right ${index === mediaIndex ? "ring-2 ring-amber-300/35" : ""} ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-slate-100"}`}>
-                <button type="button" onClick={() => { setIndex(mediaIndex); setMode(item.mediaType === "video" ? "scroll" : "spread"); }} className="block h-full w-full">
-                  {item.mediaType === "video" ? (
-                    <>
-                      <VisualImage id={`album-gallery-poster-${item.id}`} label="صورة معاينة فيديو الألبوم" src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover transition group-hover:scale-105" />
-                      <span className="absolute inset-0 grid place-items-center bg-black/20"><Video className="text-white drop-shadow" /></span>
-                    </>
-                  ) : (
-                    <VisualImage id={`album-gallery-image-${item.id}`} label="صورة معرض الألبوم" src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  )}
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-[10px] font-bold text-white">{item.caption || item.fileName}</span>
-                </button>
-                <button type="button" onClick={() => download(item.id)} className="absolute left-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button>
+          <div className="relative z-10 space-y-4 p-4 md:p-6">
+            {/* Gallery Stats & Action Bar */}
+            <div className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 ${dark ? "border-white/10 bg-[#111522]/90" : "border-slate-900/10 bg-white/90 shadow-sm"}`}>
+              <div className="flex items-center gap-2">
+                <LayoutGrid size={18} className="text-amber-400" />
+                <span className={`text-xs font-black ${dark ? "text-amber-100" : "text-slate-900"}`}>معرض كل صور الألبوم</span>
+                <span className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[11px] font-bold text-amber-300">{album.media.length} عنصر</span>
               </div>
-            ))}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setIndex(0); setMode("spread"); }}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/40 bg-amber-300/[.08] px-3 py-1.5 text-xs font-black text-amber-200 transition hover:bg-amber-300 hover:text-black active:scale-95"
+                >
+                  <BookOpen size={14} />
+                  <span>فتح في الألبوم المجسم</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => download()}
+                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 ${
+                    dark ? "border-white/10 text-slate-300 hover:border-amber-300 hover:text-amber-200" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
+                  }`}
+                >
+                  <Download size={14} />
+                  <span className="hidden sm:inline">تحميل الكل</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Luxury Responsive Grid */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {(album.media as AlbumItem[]).map((item, mediaIndex) => (
+                <div
+                  id={`aq-album-media-${mediaIndex}`}
+                  key={item.id}
+                  className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border text-right transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
+                    index === mediaIndex
+                      ? "border-amber-300 ring-2 ring-amber-300/50 shadow-amber-300/20 shadow-lg"
+                      : dark
+                        ? "border-white/10 bg-[#0e121d] hover:border-amber-300/40"
+                        : "border-slate-900/10 bg-white hover:border-amber-500/40 shadow-sm"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIndex(mediaIndex);
+                      setMode(item.mediaType === "video" ? "scroll" : "spread");
+                      resetZoom();
+                    }}
+                    className="block h-full w-full"
+                  >
+                    {item.mediaType === "video" ? (
+                      <>
+                        <VisualImage
+                          id={`album-gallery-poster-${item.id}`}
+                          label="صورة معاينة فيديو الألبوم"
+                          src={getAqeeqAlbumImageSource(item)}
+                          alt=""
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-108"
+                        />
+                        <span className="absolute inset-0 grid place-items-center bg-black/30 backdrop-blur-[1px] transition group-hover:bg-black/15">
+                          <span className="grid h-12 w-12 place-items-center rounded-full border border-white/30 bg-black/60 text-white shadow-xl backdrop-blur-md transition group-hover:scale-110 group-hover:bg-amber-300 group-hover:text-black">
+                            <Video size={20} />
+                          </span>
+                        </span>
+                      </>
+                    ) : (
+                      <VisualImage
+                        id={`album-gallery-image-${item.id}`}
+                        label="صورة معرض الألبوم"
+                        src={getAqeeqAlbumImageSource(item)}
+                        alt={item.caption || item.fileName}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-108"
+                      />
+                    )}
+                    {/* Index Badge */}
+                    <span className="absolute right-2.5 top-2.5 z-10 rounded-lg border border-black/40 bg-black/65 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-200 backdrop-blur-sm">
+                      #{String(mediaIndex + 1).padStart(2, "0")}
+                    </span>
+                    {/* Caption Overlay */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 pt-8 text-[11px] font-bold text-white transition group-hover:from-black/95">
+                      <div className="truncate drop-shadow-sm">{item.caption || item.fileName}</div>
+                      <div className="mt-0.5 text-[9px] text-amber-300/90 font-medium">انقر للعرض في الألبوم</div>
+                    </div>
+                  </button>
+                  {/* Direct Download Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); download(item.id); }}
+                    className="absolute left-2.5 top-2.5 z-20 grid h-8 w-8 place-items-center rounded-xl border border-white/20 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:scale-110 hover:border-amber-300 hover:bg-amber-300 hover:text-black active:scale-95"
+                    title="تحميل هذه الصورة"
+                    aria-label="تحميل الصورة"
+                  >
+                    <Download size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
 
@@ -243,9 +487,13 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           <div
             className="relative z-10 p-2 sm:p-4 space-y-4 touch-pan-y select-none"
             onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onPointerLeave={handlePointerCancel}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {active?.mediaType === "video" ? (
               <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-amber-300/25 bg-black shadow-2xl">
@@ -254,7 +502,9 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                 </div>
               </div>
             ) : (
-              <div className={`aq-album-3d-book-stage aq-reader-gold-frame overflow-hidden rounded-[1.8rem] border shadow-2xl transition-colors cursor-grab active:cursor-grabbing ${
+              <div className={`aq-album-3d-book-stage aq-reader-gold-frame overflow-hidden rounded-[1.8rem] border shadow-2xl transition-colors ${
+                zoom > 1.05 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"
+              } ${
                 dark ? "border-amber-300/30 bg-[#070a11]/90" : "border-amber-700/20 bg-white/90 shadow-slate-300/50"
               }`}>
                 <div className="aq-stacked-reader relative mx-auto py-1 sm:py-3 select-none">
@@ -273,29 +523,51 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                     ))}
                   </div>
 
-                  {/* Active front 3D page */}
+                  {/* Active front 3D page with Pinch / Double-click Zoom */}
                   {active ? (
-                    <article key={active.id} className="aq-stacked-reader-front relative">
+                    <article
+                      key={active.id}
+                      className="aq-stacked-reader-front relative select-none"
+                      onDoubleClick={handleDoubleClick}
+                      style={{
+                        transform: zoom > 1.05 ? `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)` : undefined,
+                        transition: isPanning.current ? "none" : "transform 0.2s cubic-bezier(0.2, 0, 0, 1)",
+                        zIndex: zoom > 1.05 ? 60 : undefined,
+                      }}
+                    >
                       <img
                         src={getAqeeqAlbumImageSource(active)}
                         alt={active.caption || active.fileName}
                         referrerPolicy="no-referrer"
                         draggable={false}
-                        className="rounded-xl object-contain shadow-2xl"
+                        className="rounded-xl object-contain shadow-2xl pointer-events-none"
                       />
                       {/* Download button on photo */}
                       <button
                         type="button"
-                        onClick={() => download(active.id)}
+                        onClick={(e) => { e.stopPropagation(); download(active.id); }}
                         className="absolute left-3 top-3 sm:left-4 sm:top-4 z-20 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-white/25 bg-black/60 text-white shadow-xl backdrop-blur-md transition hover:border-amber-300 hover:bg-amber-300 hover:text-black active:scale-95"
                         title="تحميل هذه الصورة"
                         aria-label="تحميل الصورة"
                       >
                         <Download size={17} />
                       </button>
-                      <div className={`aq-stacked-reader-number font-mono font-bold ${dark ? "text-amber-200" : "text-amber-900/80"}`}>
-                        {String(index + 1).padStart(2, "0")}
-                      </div>
+                      {/* Floating Zoom Indicator & Reset Button */}
+                      {zoom > 1.05 ? (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); resetZoom(); }}
+                          className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-xl border border-amber-300/40 bg-black/75 px-2.5 py-1.5 text-xs font-black text-amber-200 shadow-xl backdrop-blur-md transition hover:bg-amber-300 hover:text-black"
+                          title="إعادة الحجم الطبيعي 1x"
+                        >
+                          <RotateCcw size={13} />
+                          <span>{Math.round(zoom * 100)}%</span>
+                        </button>
+                      ) : (
+                        <div className={`aq-stacked-reader-number font-mono font-bold ${dark ? "text-amber-200" : "text-amber-900/80"}`}>
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+                      )}
                     </article>
                   ) : null}
 
@@ -317,7 +589,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                   {/* 3D Round Flip Buttons (Right = Next, Left = Previous) */}
                   <button
                     type="button"
-                    onClick={() => moveThroughAlbum("previous")}
+                    onClick={() => { moveThroughAlbum("previous"); resetZoom(); }}
                     disabled={index === 0}
                     className="aq-reference-flip-previous absolute left-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-4"
                     aria-label="الصورة السابقة"
@@ -326,7 +598,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => moveThroughAlbum("next")}
+                    onClick={() => { moveThroughAlbum("next"); resetZoom(); }}
                     disabled={index >= album.media.length - 1}
                     className="aq-reference-flip-next absolute right-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-4"
                     aria-label="الصورة التالية"

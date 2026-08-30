@@ -1,5 +1,5 @@
 import HTMLFlipBook from "react-pageflip";
-import { Archive, BookOpen, ChevronLeft, ChevronRight, Clipboard, Download, FileText, List, Maximize2, Minimize2, Minus, Plus, Printer, Share2, X } from "lucide-react";
+import { Archive, BookOpen, ChevronLeft, ChevronRight, Clipboard, Download, FileText, List, Maximize2, Minimize2, Minus, Plus, Printer, RotateCcw, Share2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getFlipbookTarget, isFlipbookTargetAvailable } from "@/lib/journalFlipEngine";
@@ -63,27 +63,145 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
     requestAnimationFrame(() => document.getElementById(`aq-scroll-page-${target}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
   };
 
-  // Mouse Drag and Touch Swipe for book reading (Mouse drag / Touch swipe left = next page, right = previous page)
+  // Interactive Zoom, Pan, Drag and Touch Swipe system for book reading
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isPanning = useRef<boolean>(false);
+  const panStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const initialPan = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastTouchDistance = useRef<number | null>(null);
+  const lastTapTime = useRef<number>(0);
+
   const dragStartX = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
   const isDragging = useRef<boolean>(false);
 
+  const resetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const handleDoubleClick = () => {
+    if (zoom > 1.05) {
+      resetZoom();
+    } else {
+      setZoom(2.2);
+      setPan({ x: 0, y: 0 });
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lastTouchDistance.current = dist;
+    } else if (e.touches.length === 1) {
+      const now = Date.now();
+      if (now - lastTapTime.current < 300) {
+        handleDoubleClick();
+        lastTapTime.current = 0;
+        return;
+      }
+      lastTapTime.current = now;
+
+      if (zoom > 1.05) {
+        isPanning.current = true;
+        panStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        initialPan.current = { ...pan };
+      } else {
+        dragStartX.current = e.touches[0].clientX;
+        dragStartY.current = e.touches[0].clientY;
+        isDragging.current = true;
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && lastTouchDistance.current !== null) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = dist / lastTouchDistance.current;
+      setZoom((prev) => Math.min(3.5, Math.max(1, prev * factor)));
+      lastTouchDistance.current = dist;
+    } else if (e.touches.length === 1 && isPanning.current && zoom > 1.05) {
+      const dx = e.touches[0].clientX - panStart.current.x;
+      const dy = e.touches[0].clientY - panStart.current.y;
+      setPan({
+        x: initialPan.current.x + dx,
+        y: initialPan.current.y + dy,
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      lastTouchDistance.current = null;
+    }
+    if (e.touches.length === 0) {
+      if (isPanning.current) {
+        isPanning.current = false;
+      }
+      if (isDragging.current && dragStartX.current !== null && dragStartY.current !== null && zoom <= 1.05) {
+        const deltaX = (e.changedTouches[0]?.clientX || 0) - dragStartX.current;
+        const deltaY = (e.changedTouches[0]?.clientY || 0) - dragStartY.current;
+        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+          if (deltaX < 0) {
+            flip("next");
+            resetZoom();
+          } else {
+            flip("previous");
+            resetZoom();
+          }
+        }
+      }
+      isDragging.current = false;
+      dragStartX.current = null;
+      dragStartY.current = null;
+    }
+  };
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (zoom > 1.05) {
+      isPanning.current = true;
+      panStart.current = { x: e.clientX, y: e.clientY };
+      initialPan.current = { ...pan };
+      return;
+    }
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
     isDragging.current = true;
   };
 
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (isPanning.current && zoom > 1.05) {
+      const dx = e.clientX - panStart.current.x;
+      const dy = e.clientY - panStart.current.y;
+      setPan({
+        x: initialPan.current.x + dx,
+        y: initialPan.current.y + dy,
+      });
+    }
+  };
+
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (isPanning.current) {
+      isPanning.current = false;
+      return;
+    }
     if (!isDragging.current || dragStartX.current === null || dragStartY.current === null) return;
     const deltaX = e.clientX - dragStartX.current;
     const deltaY = e.clientY - dragStartY.current;
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1 && zoom <= 1.05) {
       if (deltaX < 0) {
         flip("next");
+        resetZoom();
       } else {
         flip("previous");
+        resetZoom();
       }
     }
     isDragging.current = false;
@@ -92,6 +210,7 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
   };
 
   const handlePointerCancel = () => {
+    isPanning.current = false;
     isDragging.current = false;
     dragStartX.current = null;
     dragStartY.current = null;
@@ -124,13 +243,38 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
         <div className="flex items-center gap-1.5">{onArchive ? <button onClick={onArchive} className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 px-2.5 py-2 text-[11px] font-black text-slate-300 transition hover:border-amber-300 hover:text-amber-100"><Archive size={16} /><span className="hidden sm:inline">كل الأعداد</span></button> : null}<div className="hidden rounded-xl border border-white/10 bg-black/20 p-1 sm:flex"><button onClick={() => setMode("flip")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "flip" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><BookOpen size={14} />كتاب</button><button onClick={() => setMode("scroll")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "scroll" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><List size={14} />قراءة</button></div><button onClick={() => void share()} className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/30 bg-amber-300/[.07] px-2.5 py-2 text-amber-200 transition hover:bg-amber-300 hover:text-slate-950"><Share2 size={17} /><span className="hidden text-[11px] font-black md:inline">مشاركة</span></button><ToolButton label="تكبير" onClick={() => adjustZoom(.05)}><Plus size={16} /></ToolButton><ToolButton label="تصغير" onClick={() => adjustZoom(-.05)}><Minus size={16} /></ToolButton><ToolButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</ToolButton>{onClose ? <ToolButton label="إغلاق" onClick={onClose}><X size={17} /></ToolButton> : null}</div>
       </header>
 
-      {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0 touch-pan-y select-none" style={watermarkStyle} onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} onPointerLeave={handlePointerCancel}>
-        <div className="relative w-full p-1 md:p-2"><div className="aq-reader-gold-frame aq-flipbook-book-frame p-1 md:p-2">{watermarkSource ? <span aria-hidden="true" className={`aq-dark-reader-watermark aq-dark-reader-watermark-${watermark?.position || "center"} ${watermark?.cropLeft ? "aq-dark-reader-watermark-crop-left" : ""} pointer-events-none absolute`} style={{ "--aq-watermark-image": `url("${watermarkSource}")` } as React.CSSProperties} /> : null}<div className="aq-stacked-reader relative mx-auto py-0 cursor-grab active:cursor-grabbing select-none" style={{ transform: `scale(${zoom})` }}>
+      {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0 touch-pan-y select-none" style={watermarkStyle} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} onPointerLeave={handlePointerCancel} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+        <div className="relative w-full p-1 md:p-2"><div className="aq-reader-gold-frame aq-flipbook-book-frame p-1 md:p-2">{watermarkSource ? <span aria-hidden="true" className={`aq-dark-reader-watermark aq-dark-reader-watermark-${watermark?.position || "center"} ${watermark?.cropLeft ? "aq-dark-reader-watermark-crop-left" : ""} pointer-events-none absolute`} style={{ "--aq-watermark-image": `url("${watermarkSource}")` } as React.CSSProperties} /> : null}<div className="aq-stacked-reader relative mx-auto py-0 select-none">
           <div className="aq-stacked-reader-zone aq-stacked-reader-zone-previous" aria-hidden="true">{previousPages.map((item, index) => <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(index + 1) } as React.CSSProperties}><img src={item.imageUrl} alt="" referrerPolicy="no-referrer" draggable={false} /></article>)}</div>
-          <article key={current.id} className="aq-stacked-reader-front relative"><img src={current.imageUrl} alt={current.caption || `الصفحة ${page + 1} من ${title}`} referrerPolicy="no-referrer" draggable={false} />{onDownloadPage ? <button type="button" onClick={() => onDownloadPage(current)} className="absolute left-3 top-3 z-20 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة الحالية" aria-label="تحميل الصورة الحالية"><Download size={16} /></button> : null}<div className="aq-stacked-reader-number">{String(page + 1).padStart(2, "0")}</div></article>
+          <article
+            key={current.id}
+            className={`aq-stacked-reader-front relative select-none ${zoom > 1.05 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"}`}
+            onDoubleClick={handleDoubleClick}
+            style={{
+              transform: zoom > 1.05 ? `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)` : undefined,
+              transition: isPanning.current ? "none" : "transform 0.2s cubic-bezier(0.2, 0, 0, 1)",
+              zIndex: zoom > 1.05 ? 60 : undefined,
+            }}
+          >
+            <img src={current.imageUrl} alt={current.caption || `الصفحة ${page + 1} من ${title}`} referrerPolicy="no-referrer" draggable={false} className="pointer-events-none" />
+            {onDownloadPage ? <button type="button" onClick={(e) => { e.stopPropagation(); onDownloadPage(current); }} className="absolute left-3 top-3 z-20 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة الحالية" aria-label="تحميل الصورة الحالية"><Download size={16} /></button> : null}
+            {zoom > 1.05 ? (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); resetZoom(); }}
+                className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-xl border border-amber-300/40 bg-black/75 px-2.5 py-1.5 text-xs font-black text-amber-200 shadow-xl backdrop-blur-md transition hover:bg-amber-300 hover:text-black"
+                title="إعادة الحجم الطبيعي 1x"
+              >
+                <RotateCcw size={13} />
+                <span>{Math.round(zoom * 100)}%</span>
+              </button>
+            ) : (
+              <div className="aq-stacked-reader-number">{String(page + 1).padStart(2, "0")}</div>
+            )}
+          </article>
           <div className="aq-stacked-reader-zone aq-stacked-reader-zone-next" aria-hidden="true">{nextPages.map((item, index) => <article key={item.id} className="aq-stacked-reader-shadow" style={{ "--aq-stack-order": String(index + 1) } as React.CSSProperties}><img src={item.imageUrl} alt="" referrerPolicy="no-referrer" draggable={false} /></article>)}</div>
-          <button onClick={() => flip("previous")} disabled={!canGoPrevious} className="aq-reference-flip-previous absolute left-2 z-30 grid h-12 w-12 place-items-center rounded-full border border-amber-300/30 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-5" aria-label="الصفحة السابقة"><ChevronLeft size={24} /></button>
-          <button onClick={() => flip("next")} disabled={!canGoNext} className="aq-reference-flip-next absolute right-2 z-30 grid h-12 w-12 place-items-center rounded-full border border-amber-300/30 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-5" aria-label="الصفحة التالية"><ChevronRight size={24} /></button>
+          <button onClick={() => { flip("previous"); resetZoom(); }} disabled={!canGoPrevious} className="aq-reference-flip-previous absolute left-2 z-30 grid h-12 w-12 place-items-center rounded-full border border-amber-300/30 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-5" aria-label="الصفحة السابقة"><ChevronLeft size={24} /></button>
+          <button onClick={() => { flip("next"); resetZoom(); }} disabled={!canGoNext} className="aq-reference-flip-next absolute right-2 z-30 grid h-12 w-12 place-items-center rounded-full border border-amber-300/30 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-5" aria-label="الصفحة التالية"><ChevronRight size={24} /></button>
         </div></div></div>
         <div className="aq-dark-reader-footer relative mx-auto mt-3 flex max-w-[1160px] flex-col gap-4 px-3 pt-3 md:flex-row md:items-center md:justify-between"><div className="min-w-0 text-center md:text-right"><div className="truncate text-xs font-bold text-slate-100">{current?.caption || "نشرة أخبار مدارس العقيق"}</div><div className="mt-1 text-[10px] text-slate-500">اسحب الحافة للتقليب أو استخدم الأسهم</div></div><div dir="ltr" className="flex items-center justify-center gap-2"><ToolButton label="الصفحة السابقة" onClick={() => flip("previous")} disabled={!canGoPrevious}><ChevronLeft size={19} /></ToolButton><span className="min-w-24 text-center text-xs font-black text-amber-200">{String(page + 1).padStart(2, "0")} <span className="text-slate-500">/</span> {String(pages.length).padStart(2, "0")}</span><ToolButton label="الصفحة التالية" onClick={() => flip("next")} disabled={!canGoNext}><ChevronRight size={19} /></ToolButton></div><div className="hidden text-left text-[10px] text-slate-500 md:block">قارئ العقيق</div></div>
         <div className="aq-dark-reader-thumbs relative mx-auto mt-3 flex max-w-[1160px] gap-2 overflow-x-auto px-3 pb-3">{pages.map((item, index) => <button key={item.id} onClick={() => choosePage(index)} className={`relative h-20 w-[58px] shrink-0 overflow-hidden rounded-md border transition ${index === page ? "border-amber-300 ring-2 ring-amber-300/20" : "border-white/10 opacity-55 hover:opacity-100"}`}><img src={item.imageUrl} alt={`صفحة ${index + 1}`} referrerPolicy="no-referrer" draggable={false} className="h-full w-full object-cover" /><span className="absolute inset-x-0 bottom-0 bg-black/70 py-1 text-[9px] font-black text-white">{index + 1}</span></button>)}</div>
