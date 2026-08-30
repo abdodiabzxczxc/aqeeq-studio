@@ -569,6 +569,7 @@ export const appRouter = router({
           keyPoints: z.string().optional(),
           tone: z.enum(["royal", "celebration", "educational", "urgent"]).optional(),
           schoolName: z.string().optional(),
+          apiKey: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -639,6 +640,7 @@ export const appRouter = router({
           prompt: z.string().optional(),
           tone: z.enum(["royal", "celebration", "educational", "urgent"]).optional(),
           itemCount: z.number().optional(),
+          apiKey: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {

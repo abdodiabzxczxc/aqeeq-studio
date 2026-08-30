@@ -204,8 +204,23 @@ export function AiStoryWriterModal({
   const [topic, setTopic] = useState(defaultTopic);
   const [keyPoints, setKeyPoints] = useState("");
   const [tone, setTone] = useState<"royal" | "celebration" | "educational" | "urgent">("royal");
+  const [apiKey, setApiKey] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("aqeeq_gemini_api_key") || "";
+    }
+    return "";
+  });
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [result, setResult] = useState<AiStoryGeneratedResult | null>(null);
   const [isLocalGenerating, setIsLocalGenerating] = useState(false);
+
+  const saveApiKey = (key: string) => {
+    setApiKey(key);
+    if (typeof window !== "undefined") {
+      if (key.trim()) localStorage.setItem("aqeeq_gemini_api_key", key.trim());
+      else localStorage.removeItem("aqeeq_gemini_api_key");
+    }
+  };
 
   const generateMagazineMutation = trpc.schoolNews.generateAiStory.useMutation({
     onSuccess: (data) => {
@@ -218,7 +233,7 @@ export function AiStoryWriterModal({
       const localData = generateClientStory(topic, keyPoints, tone);
       setResult(localData);
       setIsLocalGenerating(false);
-      toast.success("✨ تم توليد المقال والمانشيت الصحفي بنجاح بالذكاء الاصطناعي");
+      toast.success("✨ تم توليد المقال والمانشيت الصحفي بنجاح");
     },
   });
 
@@ -268,11 +283,13 @@ export function AiStoryWriterModal({
         topic,
         keyPoints,
         tone,
+        apiKey: apiKey.trim() || undefined,
       });
     } else {
       generateAlbumMutation.mutate({
         title: topic,
         tone,
+        apiKey: apiKey.trim() || undefined,
       });
     }
   };
@@ -301,22 +318,54 @@ export function AiStoryWriterModal({
         dir="rtl"
       >
         <DialogHeader className="border-b border-white/10 bg-amber-400/[.05] p-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30">
-              <Sparkles size={20} />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30">
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-black text-amber-200">
+                  استوديو الصياغة الصحفية الذكية (AI Writer)
+                </DialogTitle>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  صياغة مانشيتات ومقالات وبودكاست إعلامي بأسلوب لغوي فخم يليق بمدارس العقيق
+                </p>
+              </div>
             </div>
-            <div>
-              <DialogTitle className="text-lg font-black text-amber-200">
-                استوديو الصياغة الصحفية الذكية (AI Writer)
-              </DialogTitle>
-              <p className="mt-0.5 text-xs text-slate-400">
-                صياغة مانشيتات ومقالات وبودكاست إعلامي بأسلوب لغوي فخم يليق بمدارس العقيق
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowApiKeyInput((prev) => !prev)}
+              className="text-[11px] font-black text-amber-300/80 hover:text-amber-200 underline decoration-dotted transition"
+            >
+              {apiKey ? "🔑 Gemini AI مفعل" : "⚙️ مفتاح Gemini AI"}
+            </button>
           </div>
         </DialogHeader>
 
         <div className="max-h-[75vh] space-y-4 overflow-y-auto p-5">
+          {/* Optional Gemini API Key Banner */}
+          {showApiKeyInput ? (
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-400/[.06] p-3.5 space-y-2 animate-in fade-in">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-amber-200 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-300" />
+                  مفتاح Google Gemini API (اختياري لذكاء اصطناعي سحابي خارق):
+                </span>
+              </div>
+              <Input
+                type="password"
+                value={apiKey}
+                onChange={(e) => saveApiKey(e.target.value)}
+                placeholder="ألصق مفتاح AIzaSy... الخاص بـ Google Gemini هنا"
+                className={`text-xs font-mono ${
+                  dark ? "border-white/15 bg-black/60 text-white" : "border-slate-300 bg-white"
+                }`}
+              />
+              <p className="text-[10px] text-slate-400 leading-4">
+                مفتاح مجاني من Google AI Studio يربطك مباشرة بأقوى نموذج ذكاء اصطناعي في العالم (Gemini 2.5 Flash) لصياغة مقالات صحفية فريدة ومبهرة في ثوانٍ.
+              </p>
+            </div>
+          ) : null}
           {/* Quick Prompts */}
           <div>
             <span className="text-[11px] font-bold text-slate-400">اقتراحات سريعة للفعاليات:</span>
