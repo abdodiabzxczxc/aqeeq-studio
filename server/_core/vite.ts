@@ -127,7 +127,7 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store, must-revalidate" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -155,8 +155,8 @@ export function serveStatic(app: Express) {
   app.get("*", serveUniversalSiteSocialPreview);
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // fall through to index.html if the file doesn't exist (with no-cache so Chrome always loads fresh bundle)
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.set({ "Cache-Control": "no-cache, no-store, must-revalidate" }).sendFile(path.resolve(distPath, "index.html"));
   });
 }

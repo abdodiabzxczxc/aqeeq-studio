@@ -83,3 +83,12 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </trpc.Provider>
 );
+
+// Auto-heal and refresh ServiceWorker caches in background
+if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const reg of registrations) {
+      reg.update().catch(() => {});
+    }
+  }).catch(() => {});
+}
