@@ -252,7 +252,7 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end md:self-auto">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end w-full md:w-auto">
           {/* Zoom In & Zoom Out Buttons matching Album Reader */}
           <div className="flex items-center gap-1">
             <button

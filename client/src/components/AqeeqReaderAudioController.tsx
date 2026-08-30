@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX, SlidersHorizontal, Music } from "lucide-react";
+import { Volume2, VolumeX, SlidersHorizontal } from "lucide-react";
 
 type Props = {
   audioUrl?: string | null;
@@ -32,8 +32,8 @@ export function AqeeqReaderAudioController({
     audio.volume = isMuted ? 0 : volume;
     audio.muted = isMuted;
 
-    // Function to unlock audio on first touch/interaction on mobile
-    const startAudioPlayback = () => {
+    // Direct touch gesture handler to unlock mobile audio
+    const unlockAndPlay = () => {
       if (!audioRef.current || isMuted) return;
       audioRef.current
         .play()
@@ -46,7 +46,7 @@ export function AqeeqReaderAudioController({
         });
     };
 
-    // Attempt direct play first
+    // Attempt direct autoplay
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise
@@ -55,18 +55,18 @@ export function AqeeqReaderAudioController({
           setNeedsUserGesture(false);
         })
         .catch(() => {
-          // Mobile browser blocked autoplay: attach listeners to unlock on first gesture
+          // Mobile browser autoplay policy requires user gesture
           setIsPlaying(false);
           setNeedsUserGesture(true);
 
-          const gestureEvents = ["touchstart", "touchend", "pointerdown", "click", "keydown", "scroll"];
-          const handleFirstGesture = () => {
-            startAudioPlayback();
-            gestureEvents.forEach((evt) => window.removeEventListener(evt, handleFirstGesture));
+          const events = ["touchstart", "touchend", "pointerdown", "click", "scroll"];
+          const handleFirstInteraction = () => {
+            unlockAndPlay();
+            events.forEach((evt) => window.removeEventListener(evt, handleFirstInteraction));
           };
 
-          gestureEvents.forEach((evt) => {
-            window.addEventListener(evt, handleFirstGesture, { passive: true, once: true });
+          events.forEach((evt) => {
+            window.addEventListener(evt, handleFirstInteraction, { passive: true, once: true });
           });
         });
     }
@@ -91,7 +91,7 @@ export function AqeeqReaderAudioController({
           setIsPlaying(true);
         })
         .catch((err) => {
-          console.warn("Audio play failed:", err);
+          console.warn("Audio play failed on mobile:", err);
         });
     } else {
       setIsMuted(true);
@@ -126,8 +126,8 @@ export function AqeeqReaderAudioController({
   if (!audioUrl) return null;
 
   return (
-    <div className="relative inline-flex items-center">
-      {/* Real HTML5 Audio Element with Mobile Attributes */}
+    <div className="relative inline-flex items-center shrink-0">
+      {/* Real HTML5 Audio Element */}
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -142,23 +142,23 @@ export function AqeeqReaderAudioController({
         onEnded={() => setIsPlaying(false)}
       />
 
-      {/* Main Luxury Audio Pill */}
+      {/* Luxury Audio Pill */}
       <div
-        className={`flex h-9 items-center gap-2 rounded-xl border px-3 shadow-sm transition-all select-none ${
+        className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-xl border px-2 sm:px-3 shadow-sm transition-all select-none ${
           isPlaying && !isMuted
             ? "border-amber-300/50 bg-amber-300/15 text-amber-200 ring-1 ring-amber-300/20"
             : needsUserGesture
-              ? "border-amber-400/80 bg-amber-400/20 text-amber-300 ring-2 ring-amber-400/40 animate-pulse"
+              ? "border-amber-400/90 bg-amber-400/25 text-amber-300 ring-2 ring-amber-400/50 animate-pulse"
               : dark
                 ? "border-white/10 bg-black/40 text-slate-400 hover:border-white/20"
                 : "border-slate-900/10 bg-white text-slate-600 hover:border-slate-300 shadow-sm"
         }`}
       >
-        {/* Clickable / Tappable Play & Mute Button */}
+        {/* Click / Tap to Play or Mute */}
         <button
           type="button"
           onClick={toggleMuteOrPlay}
-          className="flex items-center gap-2 text-xs font-black transition active:scale-95 touch-manipulation"
+          className="flex items-center gap-1.5 sm:gap-2 text-xs font-black transition active:scale-95 touch-manipulation"
           title={isPlaying && !isMuted ? "كتم الموسيقى" : "تشغيل الموسيقى"}
           aria-label={isPlaying && !isMuted ? "كتم الموسيقى" : "تشغيل الموسيقى"}
         >
@@ -174,22 +174,23 @@ export function AqeeqReaderAudioController({
             <span className="aq-equalizer-bar" />
           </div>
 
-          <span className="truncate max-w-[110px] sm:max-w-none">
+          {/* Text visible on desktop, compact on mobile */}
+          <span className="hidden sm:inline">
             {isPlaying && !isMuted
               ? "موسيقى نشطة"
               : needsUserGesture
-                ? "انقر لتشغيل الموسيقى 🎵"
-                : "موسيقى (مكتومة)"}
+                ? "تشغيل 🎵"
+                : "مكتومة"}
           </span>
 
           {isPlaying && !isMuted ? (
-            <Volume2 size={15} className="text-amber-300 shrink-0" />
+            <Volume2 size={14} className="text-amber-300 shrink-0" />
           ) : (
-            <VolumeX size={15} className="text-slate-400 shrink-0" />
+            <VolumeX size={14} className="text-slate-400 shrink-0" />
           )}
         </button>
 
-        {/* Toggle Volume Slider Expander */}
+        {/* Volume Slider Expander Toggle */}
         <button
           type="button"
           onClick={(e) => {
@@ -202,14 +203,14 @@ export function AqeeqReaderAudioController({
           title="التحكم في مستوى الصوت"
           aria-label="التحكم في مستوى الصوت"
         >
-          <SlidersHorizontal size={13} />
+          <SlidersHorizontal size={12} />
         </button>
 
         {/* Inline Smooth Volume Slider */}
         {showVolumeSlider ? (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-2 border-r border-white/15 pr-2 mr-1 animate-in fade-in zoom-in-95 duration-200"
+            className="flex items-center gap-1.5 sm:gap-2 border-r border-white/15 pr-1.5 sm:pr-2 mr-0.5 sm:mr-1 animate-in fade-in zoom-in-95 duration-200"
           >
             <input
               type="range"
@@ -218,10 +219,10 @@ export function AqeeqReaderAudioController({
               step="0.05"
               value={isMuted ? 0 : volume}
               onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="h-1.5 w-16 sm:w-24 cursor-pointer appearance-none rounded-lg bg-slate-700 accent-amber-300 touch-manipulation"
+              className="h-1.5 w-14 sm:w-20 cursor-pointer appearance-none rounded-lg bg-slate-700 accent-amber-300 touch-manipulation"
               title={`مستوى الصوت: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
             />
-            <span className="font-mono text-[10px] text-amber-200 min-w-7 text-center">
+            <span className="font-mono text-[9px] sm:text-[10px] text-amber-200 min-w-5 sm:min-w-6 text-center">
               {Math.round((isMuted ? 0 : volume) * 100)}%
             </span>
           </div>

@@ -312,7 +312,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         <div className="flex min-w-0 items-center gap-3">
           <div className="min-w-0"><VisualEditable id="album-reader-kicker" tag="text" label="شارة قارئ الألبوم" defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`} as="div" className="text-[10px] font-black tracking-[.1em] text-amber-300" /><VisualEditable id="album-reader-title" tag="text" label="عنوان الألبوم في القارئ" defaultText={album.title} as="h1" className="truncate text-lg font-black md:text-2xl" /></div>
         </div>
-        <div className="flex items-center gap-2 self-end md:self-auto">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end w-full md:w-auto">
           {mode === "spread" ? (
             <div className="flex items-center gap-1">
               <button
