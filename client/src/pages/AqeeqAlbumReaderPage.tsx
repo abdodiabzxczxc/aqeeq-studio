@@ -72,14 +72,14 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     void audio.play().then(() => setSoundEnabled(true)).catch(() => setSoundEnabled(false));
   }, [album?.id, album?.backgroundAudioUrl]);
 
-  // Keyboard navigation for album photos (ArrowLeft = next, ArrowRight = previous)
+  // Keyboard navigation for album photos (ArrowRight = Next/Forward, ArrowLeft = Previous/Back)
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (mode === "spread") {
-        if (e.key === "ArrowLeft") {
+        if (e.key === "ArrowRight") {
           const items = album?.media || [];
           setIndex((prev) => Math.min(items.length - 1, prev + 1));
-        } else if (e.key === "ArrowRight") {
+        } else if (e.key === "ArrowLeft") {
           setIndex((prev) => Math.max(0, prev - 1));
         }
       }
@@ -304,24 +304,24 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                     ))}
                   </div>
 
-                  {/* 3D Round Flip Buttons */}
+                  {/* 3D Round Flip Buttons (Right = Next, Left = Previous) */}
                   <button
                     type="button"
                     onClick={() => moveThroughAlbum("previous")}
                     disabled={index === 0}
-                    className="aq-reference-flip-previous absolute right-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-4"
+                    className="aq-reference-flip-previous absolute left-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-4"
                     aria-label="الصورة السابقة"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronLeft size={24} />
                   </button>
                   <button
                     type="button"
                     onClick={() => moveThroughAlbum("next")}
                     disabled={index >= album.media.length - 1}
-                    className="aq-reference-flip-next absolute left-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:left-4"
+                    className="aq-reference-flip-next absolute right-2 z-30 grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-full border border-amber-300/35 bg-[#0a0d14]/90 text-amber-100 shadow-xl transition hover:scale-110 hover:bg-amber-300 hover:text-slate-950 disabled:opacity-0 md:right-4"
                     aria-label="الصورة التالية"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronRight size={24} />
                   </button>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                     dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
                   }`}
                 >
-                  <ChevronRight size={19} />
+                  <ChevronLeft size={19} />
                 </button>
                 <span className={`min-w-24 text-center text-xs font-black font-mono ${dark ? "text-amber-200" : "text-amber-700"}`}>
                   {String(index + 1).padStart(2, "0")} <span className="text-slate-500">/</span> {String(album.media.length).padStart(2, "0")}
@@ -363,7 +363,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                     dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
                   }`}
                 >
-                  <ChevronLeft size={19} />
+                  <ChevronRight size={19} />
                 </button>
               </div>
               <div className={`hidden text-left text-[10px] font-bold md:block ${dark ? "text-slate-500" : "text-slate-400"}`}>
@@ -371,10 +371,10 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </div>
             </div>
 
-            {/* Seamless Thumbnails Ribbon with RTL Auto-Scroll */}
+            {/* Seamless Thumbnails Ribbon with LTR Movement Synchronization */}
             {album.media.length > 1 ? (
               <div
-                dir="rtl"
+                dir="ltr"
                 className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
                   dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
                 }`}
