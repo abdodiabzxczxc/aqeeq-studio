@@ -30,8 +30,6 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
   const isLoading = isPreview ? isDraftLoading || !isAuthenticated : isPublicLoading;
   const [readerMode, setReaderMode] = useState<JournalReadingMode>("spread");
   const { theme: readerTheme, toggleTheme } = useAqeeqStudioTheme();
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (issue) setReaderMode(normalizeJournalReadingMode(issue.readingMode));
@@ -41,13 +39,6 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
     if (!issue?.id || isPreview) return;
     void recordView.mutateAsync({ id: issue.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined);
   }, [issue?.id, isPreview]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !issue?.backgroundAudioUrl) return;
-    audio.volume = .38;
-    void audio.play().then(() => setSoundEnabled(true)).catch(() => setSoundEnabled(false));
-  }, [issue?.id, issue?.backgroundAudioUrl]);
 
   if (isLoading) return <div className="flex min-h-screen items-center justify-center bg-[#090b11]"><Loader2 className="animate-spin text-amber-300" /></div>;
   if (!issue) return <main dir="rtl" className="flex min-h-screen flex-col items-center justify-center bg-[#090b11] text-center text-slate-100"><Newspaper size={36} className="text-amber-300" /><h1 className="mt-4 text-2xl font-black text-amber-50">هذا العدد غير متاح</h1><p className="mt-2 text-sm text-slate-500">قد يكون مسودة لم تُنشر بعد أو أن رابط النشرة غير صحيح.</p></main>;
@@ -117,7 +108,6 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
               coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
               watermark={readerWatermark}
               shareUrl={shareUrl}
-              backgroundAudioUrl={issue.backgroundAudioUrl}
               onArchive={() => navigate("/journal")}
             />
           ) : (

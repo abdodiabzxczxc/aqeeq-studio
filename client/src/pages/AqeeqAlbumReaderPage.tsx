@@ -52,8 +52,6 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   const [mode, setMode] = useState<AlbumMode>("spread");
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const [index, setIndex] = useState(0);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (!album) return;
@@ -65,13 +63,6 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     if (!album?.id || isPreview) return;
     void recordView.mutateAsync({ id: album.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined);
   }, [album?.id, isPreview]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !album?.backgroundAudioUrl) return;
-    audio.volume = .38;
-    void audio.play().then(() => setSoundEnabled(true)).catch(() => setSoundEnabled(false));
-  }, [album?.id, album?.backgroundAudioUrl]);
 
   // Interactive Zoom and Pan System (Pinch to zoom on mobile, double click on desktop)
   const [zoom, setZoom] = useState<number>(1);
@@ -278,12 +269,6 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     opacity: (album?.watermarkOpacity || 12) / 100,
   }), [album?.watermarkOpacity, album?.watermarkScale]);
   const spreadWatermark = getAqeeqAlbumSpreadWatermark({ url: watermark, opacity: album?.watermarkOpacity, tint: album?.watermarkTint, theme });
-  const toggleSound = async () => {
-    const audio = audioRef.current;
-    if (!audio || !album?.backgroundAudioUrl) return;
-    if (audio.paused) { try { await audio.play(); setSoundEnabled(true); } catch { setSoundEnabled(false); } }
-    else { audio.pause(); setSoundEnabled(false); }
-  };
   const downloadPath = (mediaId?: number) => mediaId ? `/api/albums/${encodeURIComponent(album?.slug || slug)}/media/${mediaId}/download` : `/api/albums/${encodeURIComponent(album?.slug || slug)}/download.zip`;
   const download = (mediaId?: number) => {
     const external = mediaId ? (album?.media as AlbumItem[]).find((item) => item.id === mediaId) : undefined;
@@ -709,7 +694,6 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         <VisualEditable id="album-rail-download-action" tag="button" label="أيقونة تحميل صور الألبوم" defaultText="تحميل كل الصور" as="button" onAction={() => download()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-download-icon" label="أيقونة تحميل الألبوم الجانبية" icon="download" size={16} /></VisualEditable>
         <VisualEditable id="album-rail-print-action" tag="button" label="أيقونة طباعة الألبوم" defaultText="طباعة الألبوم" as="button" onAction={() => window.print()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-print-icon" label="أيقونة طباعة الألبوم الجانبية" icon="print" size={16} /></VisualEditable>
         <VisualEditable id="album-rail-theme-action" tag="button" label="أيقونة مظهر الألبوم الجانبية" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-theme-icon" label="أيقونة مظهر الألبوم الجانبية" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
-        {album.backgroundAudioUrl ? <VisualEditable id="album-rail-sound-action" tag="button" label="أيقونة موسيقى الألبوم الجانبية" defaultText={soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"} as="button" onAction={() => void toggleSound()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-sound-icon" label="أيقونة موسيقى الألبوم الجانبية" icon="sound" size={16} /></VisualEditable> : null}
         <VisualEditable id="album-rail-fullscreen-action" tag="button" label="أيقونة ملء الشاشة للألبوم" defaultText="ملء الشاشة" as="button" onAction={() => void toggleReaderFullscreen()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-fullscreen-icon" label="أيقونة ملء الشاشة الجانبية" icon="fullscreen" size={16} /></VisualEditable>
       </aside>
     </div>
