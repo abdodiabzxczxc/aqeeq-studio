@@ -1688,6 +1688,13 @@ export async function getAqeeqAlbumBySlug(slug: string, includeDraft = false) {
   return { ...album, media };
 }
 
+function toDriveProxyUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  if (url.startsWith("/api/drive-proxy/")) return url;
+  const match = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  return match ? `/api/drive-proxy/${match[1]}` : url;
+}
+
 export async function listAllPublicAlbumMedia() {
   const db = await getDb();
   if (!db) {
@@ -1707,13 +1714,14 @@ export async function listAllPublicAlbumMedia() {
       if (full?.media) {
         for (const m of full.media) {
           if (m.mediaType === "image") {
+            const cleanUrl = toDriveProxyUrl(m.thumbnailUrl || m.mediaUrl);
             allMedia.push({
               id: m.id,
               albumId: a.id,
               albumTitle: a.title,
               albumSlug: a.slug,
-              imageUrl: m.mediaUrl,
-              thumbnailUrl: m.thumbnailUrl,
+              imageUrl: cleanUrl,
+              thumbnailUrl: cleanUrl,
               caption: m.caption,
               fileName: m.fileName,
             });
@@ -1733,13 +1741,14 @@ export async function listAllPublicAlbumMedia() {
     .filter((m) => albumMap.has(m.albumId) && m.mediaType === "image")
     .map((m) => {
       const alb = albumMap.get(m.albumId)!;
+      const cleanUrl = toDriveProxyUrl(m.thumbnailUrl || m.mediaUrl);
       return {
         id: m.id,
         albumId: m.albumId,
         albumTitle: alb.title,
         albumSlug: alb.slug,
-        imageUrl: m.mediaUrl,
-        thumbnailUrl: m.thumbnailUrl,
+        imageUrl: cleanUrl,
+        thumbnailUrl: cleanUrl,
         caption: m.caption,
         fileName: m.fileName,
       };

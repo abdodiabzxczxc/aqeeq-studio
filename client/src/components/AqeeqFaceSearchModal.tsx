@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { matchSelfieAgainstPhotos, loadFaceRecognitionModels } from "@/lib/aqeeqFaceRecognition";
+import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 
@@ -553,6 +554,7 @@ export function AqeeqFaceSearchModal({
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {matchedList.map((photo) => {
                       const isSelected = selectedPhotoIds.has(photo.id);
+                      const photoSrc = getAqeeqAlbumImageSource({ mediaUrl: photo.imageUrl, thumbnailUrl: photo.thumbnailUrl ?? null }) || photo.imageUrl;
                       return (
                         <div
                           key={photo.id}
@@ -565,9 +567,16 @@ export function AqeeqFaceSearchModal({
                           {/* Image Container with Natural Aspect */}
                           <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/60">
                             <img
-                              src={photo.imageUrl}
-                              alt={photo.caption || "صورتك في الحفل"}
+                              src={photoSrc}
+                              alt={photo.caption || photo.fileName || "صورتك في الحفل"}
                               className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                              loading="lazy"
+                              onError={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                if (target.src !== photo.imageUrl) {
+                                  target.src = photo.imageUrl;
+                                }
+                              }}
                             />
 
                             {/* Biometric Confidence Holographic Badge */}
@@ -625,7 +634,7 @@ export function AqeeqFaceSearchModal({
                           <div className="p-3 bg-white/[0.02]">
                             <div className="flex items-center justify-between gap-1">
                               <p className="truncate text-xs font-black text-slate-100">
-                                {photo.caption || photo.fileName || "صورة من محفل التكريم"}
+                                {photo.caption || (photo.fileName ? <bdi dir="ltr">{photo.fileName}</bdi> : `صورة تكريم #${photo.id}`)}
                               </p>
                             </div>
                             <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
@@ -667,9 +676,15 @@ export function AqeeqFaceSearchModal({
           >
             <div className="relative aspect-[4/3] sm:aspect-video w-full bg-black flex items-center justify-center">
               <img
-                src={previewPhoto.imageUrl}
-                alt={previewPhoto.caption || ""}
+                src={getAqeeqAlbumImageSource({ mediaUrl: previewPhoto.imageUrl, thumbnailUrl: previewPhoto.thumbnailUrl ?? null }) || previewPhoto.imageUrl}
+                alt={previewPhoto.caption || previewPhoto.fileName || ""}
                 className="max-h-full max-w-full object-contain"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  if (target.src !== previewPhoto.imageUrl) {
+                    target.src = previewPhoto.imageUrl;
+                  }
+                }}
               />
               <button
                 type="button"
@@ -682,7 +697,7 @@ export function AqeeqFaceSearchModal({
             <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 bg-black/60 border-t border-white/10">
               <div>
                 <p className="text-sm font-black text-amber-200">
-                  {previewPhoto.caption || previewPhoto.fileName || "صورة من ألبوم العقيق"}
+                  {previewPhoto.caption || (previewPhoto.fileName ? <bdi dir="ltr">{previewPhoto.fileName}</bdi> : "صورة من ألبوم العقيق")}
                 </p>
                 <p className="mt-0.5 text-xs text-slate-400">
                   {previewPhoto.matchReason} {previewPhoto.albumTitle ? `· «${previewPhoto.albumTitle}»` : ""}
