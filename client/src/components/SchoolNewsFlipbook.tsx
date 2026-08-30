@@ -1,5 +1,5 @@
 import HTMLFlipBook from "react-pageflip";
-import { Archive, BookOpen, ChevronLeft, ChevronRight, Clipboard, Download, FileText, List, Maximize2, Minimize2, Minus, Plus, Printer, RotateCcw, Share2, X } from "lucide-react";
+import { Archive, BookOpen, ChevronLeft, ChevronRight, Clipboard, Download, FileText, List, Maximize2, Minimize2, Minus, Plus, Printer, RotateCcw, Share2, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
@@ -239,9 +239,63 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
   return <div ref={viewerRef} dir="rtl" className={`${shellClass} ${mode === "flip" ? "aq-dark-reader-shell" : ""} ${compact ? "aq-album-flipbook" : ""}`}>
     <div className={full ? "mx-auto max-w-[1500px]" : ""}>
       <aside className="aq-dark-reader-rail" aria-label="أدوات قراءة العدد"><RailButton label={archiveLabel} onClick={() => onArchive?.()} disabled={!onArchive}><Archive size={17} /></RailButton><RailButton label="الصفحة السابقة" onClick={() => mode === "flip" ? flip("previous") : moveScrollReader("previous")} disabled={!canGoPrevious}><ChevronRight size={18} /></RailButton><RailButton label="الصفحة التالية" onClick={() => mode === "flip" ? flip("next") : moveScrollReader("next")} disabled={!canGoNext}><ChevronLeft size={18} /></RailButton><RailButton label="مشاركة العدد" onClick={() => void share()}><Share2 size={16} /></RailButton><RailButton label={downloadLabel} onClick={() => onDownloadAll ? onDownloadAll() : void downloadCurrent()}><Download size={16} /></RailButton><RailButton label="طباعة العدد PDF" onClick={() => void printIssue()}><Printer size={16} /></RailButton><RailButton label="تكبير القراءة" onClick={() => adjustZoom(.05)}><Plus size={18} /></RailButton><RailButton label="تصغير القراءة" onClick={() => adjustZoom(-.05)}><Minus size={18} /></RailButton><RailButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</RailButton></aside>
-      <header className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[.08] bg-[#0d1019]/95 p-3 backdrop-blur-xl md:p-4 ${mode === "flip" ? "aq-dark-reader-chrome" : ""}`}>
-        <div className="flex min-w-0 items-center gap-3">{brandLogoUrl ? <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-amber-300/20 bg-black/20 p-1.5"><img src={brandLogoUrl} alt="شعار العقيق" className="h-full w-full object-contain" /></div> : null}<div className="min-w-0"><div className="truncate text-[10px] font-black tracking-[.12em] text-amber-300">{kicker}</div><h1 className="mt-1 truncate text-base font-black text-amber-50 md:text-xl">{title}</h1></div></div>
-        <div className="flex items-center gap-1.5">
+      <header className={`mb-4 flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 border-white/[.1] bg-[#10141f] shadow-sm ${mode === "flip" ? "aq-dark-reader-chrome" : ""}`}>
+        <div className="flex min-w-0 items-center gap-3">
+          {brandLogoUrl ? (
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-amber-300/20 bg-black/20 p-1.5">
+              <img src={brandLogoUrl} alt="شعار العقيق" className="h-full w-full object-contain" />
+            </div>
+          ) : null}
+          <div className="min-w-0">
+            <div className="truncate text-[10px] font-black tracking-[.12em] text-amber-300">{kicker}</div>
+            <h1 className="mt-0.5 truncate text-lg font-black text-amber-50 md:text-2xl">{title}</h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          {/* Zoom In & Zoom Out Buttons matching Album Reader */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => adjustZoom(0.3)}
+              aria-label="تكبير الصفحة"
+              title="تكبير الصفحة (+)"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:border-amber-300 hover:text-amber-200 active:scale-95"
+            >
+              <ZoomIn size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => adjustZoom(-0.3)}
+              aria-label="تصغير الصفحة"
+              title="تصغير الصفحة (-)"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:border-amber-300 hover:text-amber-200 active:scale-95"
+            >
+              <ZoomOut size={16} />
+            </button>
+          </div>
+
+          {/* Reading Mode Toggle (كتاب / قراءة) */}
+          <div className="hidden rounded-xl border border-white/10 bg-black/20 p-1 sm:flex">
+            <button
+              onClick={() => setMode("flip")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${
+                mode === "flip" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"
+              }`}
+            >
+              <BookOpen size={14} />كتاب
+            </button>
+            <button
+              onClick={() => setMode("scroll")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${
+                mode === "scroll" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"
+              }`}
+            >
+              <List size={14} />قراءة
+            </button>
+          </div>
+
+          {/* Audio Controller */}
           {backgroundAudioUrl ? (
             <AqeeqReaderAudioController
               audioUrl={backgroundAudioUrl}
@@ -249,7 +303,47 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
               dark={true}
             />
           ) : null}
-          {onArchive ? <button onClick={onArchive} className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 px-2.5 py-2 text-[11px] font-black text-slate-300 transition hover:border-amber-300 hover:text-amber-100"><Archive size={16} /><span className="hidden sm:inline">كل الأعداد</span></button> : null}<div className="hidden rounded-xl border border-white/10 bg-black/20 p-1 sm:flex"><button onClick={() => setMode("flip")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "flip" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><BookOpen size={14} />كتاب</button><button onClick={() => setMode("scroll")} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black transition ${mode === "scroll" ? "bg-amber-300 text-slate-950" : "text-slate-400 hover:text-amber-100"}`}><List size={14} />قراءة</button></div><button onClick={() => void share()} className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/30 bg-amber-300/[.07] px-2.5 py-2 text-amber-200 transition hover:bg-amber-300 hover:text-slate-950"><Share2 size={17} /><span className="hidden text-[11px] font-black md:inline">مشاركة</span></button><ToolButton label="تكبير" onClick={() => adjustZoom(.05)}><Plus size={16} /></ToolButton><ToolButton label="تصغير" onClick={() => adjustZoom(-.05)}><Minus size={16} /></ToolButton><ToolButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</ToolButton>{onClose ? <ToolButton label="إغلاق" onClick={onClose}><X size={17} /></ToolButton> : null}</div>
+
+          {/* Share Button */}
+          <button
+            onClick={() => void share()}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/30 bg-amber-300/[.07] px-2.5 py-2 text-amber-200 transition hover:bg-amber-300 hover:text-slate-950"
+          >
+            <Share2 size={16} />
+            <span className="hidden text-[11px] font-black md:inline">مشاركة</span>
+          </button>
+
+          {/* Fullscreen Button */}
+          <button
+            onClick={() => void toggleFullscreen()}
+            title={full ? "إلغاء ملء الشاشة" : "ملء الشاشة"}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:border-amber-300 hover:text-amber-200 active:scale-95"
+          >
+            {full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+
+          {/* Archive Button */}
+          {onArchive ? (
+            <button
+              onClick={onArchive}
+              title="كل الأعداد"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:border-amber-300 hover:text-amber-200 active:scale-95"
+            >
+              <Archive size={16} />
+            </button>
+          ) : null}
+
+          {/* Close Button */}
+          {onClose ? (
+            <button
+              onClick={onClose}
+              title="إغلاق"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:border-amber-300 hover:text-amber-200 active:scale-95"
+            >
+              <X size={16} />
+            </button>
+          ) : null}
+        </div>
       </header>
 
       {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0 touch-pan-y select-none" style={watermarkStyle} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} onPointerLeave={handlePointerCancel} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>

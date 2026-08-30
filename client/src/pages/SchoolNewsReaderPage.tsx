@@ -94,12 +94,6 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
         ) : null}
         <VisualEditable id="news-reader-shell" tag="section" label="إطار قارئ العدد" as="section" className="rounded-[2rem]">
           <VisualEditable id="news-reader-page-title" tag="text" label="عنوان العدد في القارئ" as="h1" defaultText={issue.title} className="sr-only" />
-          {unifiedHeader}
-          <nav className="aq-reader-mode-switch" aria-label="طريقة عرض العدد">
-            {JOURNAL_READING_OPTIONS.map((option) => (
-              <VisualEditable key={option.id} id={`news-reader-mode-${option.id}`} tag="button" label={`زر وضع قراءة ${option.title}`} defaultText={option.title} as="button" onAction={() => setReaderMode(option.id)} className={readerMode === option.id ? "is-active" : ""} />
-            ))}
-          </nav>
           {isFlipbook ? (
             <SchoolNewsFlipbook
               title={issue.title}
@@ -108,18 +102,27 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
               coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
               watermark={readerWatermark}
               shareUrl={shareUrl}
+              backgroundAudioUrl={issue.backgroundAudioUrl}
               onArchive={() => navigate("/journal")}
             />
           ) : (
-            <SchoolNewsPager
-              title={issue.title}
-              kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
-              pages={readerPages}
-              coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
-              shareUrl={shareUrl}
-              initialMode={readerMode}
-              onArchive={() => navigate("/journal")}
-            />
+            <>
+              {unifiedHeader}
+              <nav className="aq-reader-mode-switch" aria-label="طريقة عرض العدد">
+                {JOURNAL_READING_OPTIONS.map((option) => (
+                  <VisualEditable key={option.id} id={`news-reader-mode-${option.id}`} tag="button" label={`زر وضع قراءة ${option.title}`} defaultText={option.title} as="button" onAction={() => setReaderMode(option.id)} className={readerMode === option.id ? "is-active" : ""} />
+                ))}
+              </nav>
+              <SchoolNewsPager
+                title={issue.title}
+                kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
+                pages={readerPages}
+                coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
+                shareUrl={shareUrl}
+                initialMode={readerMode}
+                onArchive={() => navigate("/journal")}
+              />
+            </>
           )}
         </VisualEditable>
       </div>
