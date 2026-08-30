@@ -37,64 +37,159 @@ type Props = {
   mode?: "magazine" | "album";
 };
 
-const TONE_DATA = {
-  royal: {
-    prefix: "في محفلٍ بهيج يعكس مسيرة التميز والريادة",
-    closing: "وتستمر مدارس العقيق الأهلية والدولية في تسطير صفحات المجد وصناعة جيل الغد الواعد.",
-  },
-  celebration: {
-    prefix: "وسط أجواء غامرة بالفرح والاعتزاز والفخر",
-    closing: "مهنئين فرساننا وذويهم على هذا الإنجاز المستحق، وإلى مزيد من التألق والنجاحات.",
-  },
-  educational: {
-    prefix: "تجسيداً لقيم التميز الأكاديمي وبناء القدرات الوطنية",
-    closing: "مؤكدين التزامنا بتقديم تجربة تعليمية رائدة تلهم شغف التعلم والابتكار.",
-  },
-  urgent: {
-    prefix: "في تغطية حصرية ومباشرة لأبرز محطات الإنجاز",
-    closing: "كونوا بالقرب لمتابعة المزيد من المستجدات والتغطيات الحصرية لفعاليات مدارس العقيق.",
-  },
-};
+type TopicCategory = "tech" | "graduation" | "national" | "sports" | "quran" | "arts" | "general";
 
-function generateClientStory(topic: string, keyPoints: string, tone: "royal" | "celebration" | "educational" | "urgent"): AiStoryGeneratedResult {
-  const style = TONE_DATA[tone] || TONE_DATA.royal;
+function detectCategory(text: string): TopicCategory {
+  const t = text.toLowerCase();
+  if (t.includes("روبوت") || t.includes("ذكاء") || t.includes("برمج") || t.includes("تقني") || t.includes("علوم") || t.includes("ابتكار") || t.includes("فضاء") || t.includes("معمل") || t.includes("هندس")) {
+    return "tech";
+  }
+  if (t.includes("تخرج") || t.includes("تفوق") || t.includes("تكريم") || t.includes("اوائل") || t.includes("أوائل") || t.includes("درع") || t.includes("وسام") || t.includes("امتياز") || t.includes("حفل ختام")) {
+    return "graduation";
+  }
+  if (t.includes("وطن") || t.includes("تأسيس") || t.includes("علم") || t.includes("2030") || t.includes("سعودي") || t.includes("بيعة") || t.includes("تراث")) {
+    return "national";
+  }
+  if (t.includes("رياض") || t.includes("دوري") || t.includes("كرو") || t.includes("بطول") || t.includes("كأس") || t.includes("سباح") || t.includes("ماراثون") || t.includes("لياق")) {
+    return "sports";
+  }
+  if (t.includes("قرآن") || t.includes("سنة") || t.includes("تجويد") || t.includes("ضاد") || t.includes("فصحى") || t.includes("خطاب") || t.includes("شعر") || t.includes("لغ")) {
+    return "quran";
+  }
+  if (t.includes("مسرح") || t.includes("رسم") || t.includes("معرض") || t.includes("فن") || t.includes("تشكيل") || t.includes("تراث") || t.includes("موسيق")) {
+    return "arts";
+  }
+  return "general";
+}
+
+function generateClientStory(
+  topicInput: string,
+  keyPointsInput: string,
+  tone: "royal" | "celebration" | "educational" | "urgent" = "royal"
+): AiStoryGeneratedResult {
   const school = "مدارس العقيق الأهلية والدولية";
+  const topic = topicInput.trim() || "فعاليات وأنشطة مدارس العقيق";
+  const points = keyPointsInput.trim();
+  const category = detectCategory(`${topic} ${points}`);
 
-  const headline = topic.includes("تكريم") || topic.includes("تخرج")
-    ? `في عرسٍ بهيج وتتويجٍ للإبداع.. ${school} تحتفي بفرسان التميز والريادة`
-    : topic.includes("معرض") || topic.includes("علوم") || topic.includes("ابتكار")
-    ? `منارة الابتكار ومحفل الإبداع.. انطلاق فعاليات ${topic} في ${school}`
-    : topic.includes("وطني") || topic.includes("يوم")
-    ? `فخرٌ واعتزاز بالوطن الغالي.. ${school} تحتفل بـ ${topic} في مشهد يعزز الانتماء`
-    : `أصداء الإنجاز تتوالى.. ${school} تطلق فعاليات «${topic}»`;
+  let headline = "";
+  let kicker = "";
+  let subHeadline = "";
 
-  const subHeadline = "شهد المحفل حضوراً متميزاً وسط تفاعل واسع من الطلاب والكوادر التعليمية وأولياء الأمور الكرام";
+  switch (category) {
+    case "tech":
+      headline = `عقول واعدة تصنع المستقبل.. ${school} تبهر الحضور بابتكارات نوعية في «${topic}»`;
+      kicker = "منارة الابتكار والذكاء الاصطناعي";
+      subHeadline = "مشاريع تقنية متقدمة وروبوتات ذكية تعكس جاهزية فرسان العقيق لمهارات الثورة الصناعية الرابعة";
+      break;
 
-  const leadParagraph = `${style.prefix}، نظمت ${school} فعاليات «${topic}»، والتي تضمنت باقة من البرامج والأنشطة النوعية الهادفة إلى إبراز مواهب الطلاب وصقل قدراتهم في بيئة تربوية محفزة.`;
+    case "graduation":
+      headline = `عرس المجد وتتويج الحصاد.. ${school} تزف كوكبة فرسانها في محفل «${topic}»`;
+      kicker = "حصاد التميز والريادة 2026";
+      subHeadline = "مشاعر الفخر تعانق دموع الفرح وسط حضور رفيع المستوى لأولياء الأمور والقيادات التعليمية";
+      break;
 
-  const bodyParagraphs = [
-    leadParagraph,
-    keyPoints
-      ? `وقد تمحورت الفعالية حول عدة ركائز أساسية شملت: ${keyPoints}، حيث عكست هذه المحطات عمق الرؤية التعليمية والتكامل بين المنهاج النظري والتطبيق العملي الخلاق.`
-      : `وقد شهدت الفعالية إقبالاً كبيراً ومشاركة فاعلة من مختلف المراحل الدراسية، حيث تنوعت العروض والمشاركات بين الابتكارات العلمية، والمبادرات المجتمعية، والفقرات الثقافية التي لاقت إشادة واستحساناً واسعاً.`,
-    `من جهتهم، عبّر الحضور وأولياء الأمور عن بالغ فخرهم واعتزازهم بالمستوى المتقدم الذي أظهره الطلاب والطالبات، مؤكدين أن هذه البرامج تسهم بصورة جوهرية في تعزيز الثقة بالنفس واكتساب مهارات المستقبل.`,
-    style.closing,
+    case "national":
+      headline = `راية العز خفاقة.. ${school} تخلد قيم الولاء والانتماء في احتفالية مهيبة بـ «${topic}»`;
+      kicker = "وطن الشموخ ورؤية الطموح 2030";
+      subHeadline = "لوحات تراثية واستعراضات وطنية جسدت عمق الهوية السعودية والاعتزاز بمسيرة النماء";
+      break;
+
+    case "sports":
+      headline = `حماس لا يهدأ وروح رياضية رفيعة.. تتويج أبطال «${topic}» في ${school}`;
+      kicker = "المنافسات الرياضية وبناء الأبطال";
+      subHeadline = "مباريات مثيرة واستعراضات لياقة عالية توجت بحصد الكؤوس والميداليات الذهبية";
+      break;
+
+    case "quran":
+      headline = `تلاوات خاشعة وبيان عذب.. ${school} تحتفي بحفظة كتاب الله وفرسان الضاد في «${topic}»`;
+      kicker = "فرسان القرآن ونور المعرفة";
+      subHeadline = "أصوات ندية وإتقان بديع لأحكام التجويد وأصول البلاغة في محفل إيماني مهيب";
+      break;
+
+    case "arts":
+      headline = `أنامل مبدعة ولوحات تنبض بالحياة.. انطلاق فعاليات «${topic}» في ${school}`;
+      kicker = "أروقة الإبداع والذائقة الجمالية";
+      subHeadline = "أعمال فنية مسرحية وتشكيلية عكست الخيال الخصب والشغف الإبداعي لدى طلابنا";
+      break;
+
+    default:
+      headline = `أصداء النجاح تتوالى.. ${school} تسجل محطة ريادية جديدة في «${topic}»`;
+      kicker = "سجل الإنجاز والعطاء 2026";
+      subHeadline = "برامج نوعية ومشاركة واسعة تبرز تفوق البيئة التربوية وتكامل مسارات التعلم";
+      break;
+  }
+
+  let leadParagraph = "";
+  if (tone === "royal") {
+    leadParagraph = `في مشهدٍ تعليمي بهيج يعكس المكانة الريادية التي تتبوأها ${school}، شهدت أروقة المدارس انطلاق فعاليات «${topic}»، وسط حضور نخبة من القيادات التربوية، وأولياء الأمور الكرام، والكوادر التعليمية المتخصصة. وقد جاءت هذه الفعالية تجسيداً لرؤية طموحة تهدف إلى إطلاق الطاقات الكامنة وصقل القدرات الريادية لجيل المستقبل.`;
+  } else if (tone === "celebration") {
+    leadParagraph = `وسط أجواء عامرة بالبهجة والتصفيق الحار ومشاهد الفخر التي لا تُنسى، عاشت أسرة ${school} يوماً استثنائياً مع انطلاق فعاليات «${topic}»، حيث تلاقت طموحات الطلاب مع جهود الكوادر التعليمية في لوحة شرف بهيجة تعبر عن عمق العطاء وسمو الإنجاز.`;
+  } else if (tone === "educational") {
+    leadParagraph = `امتداداً لنهجها الأكاديمي المتقدم وتطبيقاً لأرقى المعايير التعليمية المبتكرة، نظمت ${school} برنامج «${topic}»، والذي ركّز على تعزيز مهارات التفكير النقدي وحل المشكلات وربط المفاهيم النظرية بالتطبيقات الحياتية المعاصرة.`;
+  } else {
+    leadParagraph = `في تغطية إخبارية خاصة، رصدت مجلة العقيق تفاصيل الحدث البارز «${topic}» الذي نظمته ${school}، مسلطة الضوء على النتائج الميدانية المتميزة والمخرجات النوعية التي تحققت خلال ساعات المحفل.`;
+  }
+
+  const bodyParts: string[] = [leadParagraph];
+
+  if (points) {
+    const formattedPoints = points
+      .split(/[\n,،.-]/)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 2);
+
+    if (formattedPoints.length > 0) {
+      bodyParts.push(
+        `وتضمن برنامج الحدث سلسلة من المحطات والمحاور الجوهرية التي أضفت على المناسبة طابعاً عملياً ومثمراً، كان من أبرزها: ${formattedPoints
+          .map((pt) => `محور «${pt}» الذي حظي بتفاعل واسع واستعراض متميز`)
+          .join("، بالإضافة إلى ")}. وقد برهن المشاركون على استيعاب عميق لهذه المفاهيم، مقدمين نماذج عملية أثبتت جدارتهم واحترافيتهم العالية.`
+      );
+    }
+  } else {
+    if (category === "tech") {
+      bodyParts.push(
+        `وقد شهد المعرض المصاحب عرضاً حياً لنماذج برمجية وروبوتات ذكية من ابتكار الطلاب، حيث تم توظيف خوارزميات الاستشعار والتحكم الذاتي لمعالجة تحديات بيئية وصناعية، في خطوة تعكس التحول العملي نحو بيئات التعلم الرقمي التفاعلي.`
+      );
+    } else if (category === "graduation") {
+      bodyParts.push(
+        `وتخلل الحفل مسيرة فخمة للخريجين والمكرمين الذين صعدوا منصة التتويج وسط هتافات الإشادة وتصفيق الحضور، حيث تسلموا شهادات التقدير والدروع التذكارية تتويجاً لسنوات من الجد والمثابرة في رحاب مدارس العقيق.`
+      );
+    } else if (category === "national") {
+      bodyParts.push(
+        `وتنوعت فقرات الاحتفال لتشمل العروض الفولكلورية الأصيلة، والأناشيد الوطنية الحماسية، ومسرحيات تجسد تاريخ الآباء والأجداد ونهضة المملكة التنموية في ظل القيادة الرشيدة -أيدها الله-، معززة في نفوس النشء الاعتزاز بالهوية والانتماء.`
+      );
+    } else {
+      bodyParts.push(
+        `وتنوعت فقرات البرنامج بين ورش العمل التفاعلية، والعروض التقديمية الحية، والمسابقات المحفزة التي ألهبت حماس الحضور وأظهرت التكامل بين الجوانب المعرفية والشخصية والمهارية للطلاب.`
+      );
+    }
+  }
+
+  bodyParts.push(
+    `وفي كلمتها بهذه المناسبة، أكدت إدارة المدارس: "إن ما نراه اليوم في «${topic}» ليس مجرد فعالية عابرة، بل هو ركيزة أساسية في استراتيجيتنا التعليمية التي تؤمن بأن الاستثمار الحقيقي يكمن في بناء الإنسان وتزويده بمهارات القرن الحادي والعشرين". من جانبهم، عبّر أولياء الأمور عن بالغ امتنانهم للرعاية الفائقة والبيئة المحفزة التي توفرها المدارس لأبنائهم.`
+  );
+
+  bodyParts.push(
+    `واختُتم المحفل بالتقاط الصور التذكارية وتكريم اللجان المنظمة والشركاء، في تأكيد متجدد على أن مسيرة التميز في ${school} لا تقف عند حد، بل تتواصل بثقة نحو آفاق أرحب من النجاح والإشعاع المعرفي.`
+  );
+
+  const suggestedCaptions = [
+    `جانب من انطلاق فعاليات «${topic}» وتفاعل الحضور مع الفقرات الافتتاحية.`,
+    `فرسان مدارس العقيق يستعرضون مشاريعهم وإنجازاتهم بثقة واحترافية.`,
+    `لحظة التتويج واستلام دروع التميز في المنصة الرئيسية للمحفل.`,
+    `مشاعر الفرح والاعتزاز ترتسم على وجوه أولياء الأمور والمعلمين.`,
+    `الصورة التذكارية الختامية التي توثق نجاح الفعالية وتألق المشاركين.`,
   ];
 
   return {
     headline,
     subHeadline,
-    kicker: "موسم العقيق 2026",
+    kicker,
     leadParagraph,
-    body: bodyParagraphs.join("\n\n"),
-    podcastScript: bodyParagraphs.join("\n\n"),
-    suggestedCaptions: [
-      `جانب من الحضور والتفاعل المميز خلال انطلاق فعاليات ${topic}.`,
-      `فرسان مدارس العقيق يسطرون الإنجاز بثقة وتألق.`,
-      `لقطة تذكارية توثق فرحة الإنجاز والتتويج المستحق.`,
-      `إشادة واسعة بالجهود المبذولة وتكامل بيئة التعلم.`,
-      `صورة ختامية تجمع المشاركين في لوحة فخر واعتزاز.`,
-    ],
+    body: bodyParts.join("\n\n"),
+    podcastScript: `أهلاً بكم في التغطية الصوتية لمجلة العقيق. نسلط الضوء اليوم على «${topic}». ${subHeadline}. ${leadParagraph}`,
+    suggestedCaptions,
   };
 }
 
@@ -352,40 +447,47 @@ export function AiStoryWriterModal({
 
               {/* Headline */}
               <div>
-                <span className="text-[10px] font-bold text-slate-400">المانشيت الصحفي:</span>
-                <p className="mt-0.5 text-sm font-black text-amber-100">{result.headline}</p>
+                <span className="text-[10px] font-bold text-amber-300">المانشيت الصحفي (قابل للتعديل):</span>
+                <Input
+                  value={result.headline}
+                  onChange={(e) => setResult({ ...result, headline: e.target.value })}
+                  className={`mt-1 font-black text-xs ${
+                    dark ? "border-amber-400/30 bg-black/60 text-amber-200" : "border-slate-300 bg-white"
+                  }`}
+                />
               </div>
 
               {/* Body */}
               <div>
-                <span className="text-[10px] font-bold text-slate-400">نص المقال المتكامل:</span>
-                <p className="mt-1 whitespace-pre-line text-xs leading-6 text-slate-300">
-                  {result.body}
-                </p>
+                <span className="text-[10px] font-bold text-amber-300">نص المقال المتكامل (قابل للتعديل المباشر):</span>
+                <Textarea
+                  value={result.body}
+                  onChange={(e) => setResult({ ...result, body: e.target.value })}
+                  rows={8}
+                  className={`mt-1 text-xs leading-6 ${
+                    dark ? "border-white/15 bg-black/60 text-slate-200" : "border-slate-300 bg-white"
+                  }`}
+                />
               </div>
-
-              {/* Podcast Script Preview */}
-              {result.podcastScript ? (
-                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-3">
-                  <div className="flex items-center gap-1.5 text-xs font-black text-purple-200">
-                    <Volume2 size={14} className="text-purple-300" />
-                    <span>نص البودكاست الإذاعي المخصص:</span>
-                  </div>
-                  <p className="mt-1 text-[11px] leading-5 text-purple-100">
-                    {result.podcastScript}
-                  </p>
-                </div>
-              ) : null}
 
               {/* Captions */}
               {result.suggestedCaptions?.length ? (
                 <div>
                   <span className="text-[10px] font-bold text-slate-400">تعليقات الصور المقترحة:</span>
-                  <ul className="mt-1 space-y-1">
+                  <ul className="mt-1 space-y-1.5">
                     {result.suggestedCaptions.slice(0, 3).map((cap, idx) => (
-                      <li key={idx} className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                        <span className="text-amber-400">•</span>
-                        <span>{cap}</span>
+                      <li key={idx} className="text-[11px] text-slate-300 flex items-center gap-1.5 bg-white/[0.03] p-1.5 rounded-lg border border-white/5">
+                        <span className="text-amber-400 font-bold">{idx + 1}.</span>
+                        <input
+                          type="text"
+                          value={cap}
+                          onChange={(e) => {
+                            const newCaps = [...result.suggestedCaptions];
+                            newCaps[idx] = e.target.value;
+                            setResult({ ...result, suggestedCaptions: newCaps });
+                          }}
+                          className="w-full bg-transparent text-xs text-slate-200 outline-none"
+                        />
                       </li>
                     ))}
                   </ul>
@@ -395,7 +497,7 @@ export function AiStoryWriterModal({
               <Button
                 type="button"
                 onClick={handleApply}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-4 mt-2"
+                className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-4 mt-2 shadow-lg"
               >
                 <Check size={16} className="ml-1.5" />
                 اعتماد وإدراج في العدد فوراً 👑
