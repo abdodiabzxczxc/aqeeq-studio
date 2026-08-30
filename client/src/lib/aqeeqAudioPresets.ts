@@ -12,35 +12,35 @@ export const AQEEQ_AUDIO_PRESETS: AudioPreset[] = [
     title: "أنغام العقيق الملكية",
     subtitle: "مقطوعة وتريات هادئة وفخمة",
     category: "royal",
-    url: "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3",
+    url: "/audio/aqeeq-royal.mp3",
   },
   {
     id: "celebration-fanfare",
     title: "حفل التخرج والاحتفاء",
     subtitle: "إيقاع احتفالي فخم ومبهج",
     category: "celebration",
-    url: "https://assets.mixkit.co/music/preview/mixkit-raising-me-higher-34.mp3",
+    url: "/audio/aqeeq-celebration.mp3",
   },
   {
     id: "ambient-piano",
     title: "بيانو هادئ وملهم",
     subtitle: "لحن بيانو دافئ ومريح للقراءة",
     category: "piano",
-    url: "https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3",
+    url: "/audio/aqeeq-piano.mp3",
   },
   {
     id: "luxury-glow",
     title: "أجواء العقيق العصرية",
-    subtitle: "أنغام إلكترونية محيطية ناعمة",
+    subtitle: "أنغام محيطية ناعمة",
     category: "ambient",
-    url: "https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-132.mp3",
+    url: "/audio/aqeeq-ambient.mp3",
   },
 ];
 
 const DEFAULT_AUDIO_STORAGE_KEY = "aqeeq_default_background_audio";
 
 export function getAqeeqDefaultBackgroundAudio(): string | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return "/audio/aqeeq-royal.mp3";
   try {
     return localStorage.getItem(DEFAULT_AUDIO_STORAGE_KEY) || AQEEQ_AUDIO_PRESETS[0].url;
   } catch {
