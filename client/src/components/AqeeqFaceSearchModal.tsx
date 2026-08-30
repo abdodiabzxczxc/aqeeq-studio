@@ -1,22 +1,20 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Camera,
   Check,
-  CheckCircle2,
   Download,
   Filter,
-  Flame,
   GraduationCap,
+  Image as ImageIcon,
   Loader2,
-  RefreshCw,
   Search,
-  SlidersHorizontal,
   Sparkles,
   Trophy,
   UserCheck,
+  Users,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +29,7 @@ export type AlbumPhotoItem = {
 
 type MatchedPhoto = AlbumPhotoItem & {
   confidence: number;
-  matchReasons: string[];
+  matchReason: string;
 };
 
 type Props = {
@@ -46,47 +44,42 @@ function normalizeArabicText(text: string): string {
   if (!text) return "";
   return text
     .toLowerCase()
-    .replace(/[\u064B-\u065F\u0670]/g, "") // remove Tashkeel
+    .replace(/[\u064B-\u065F\u0670]/g, "") // إزالة التشكيل
     .replace(/[أإآٱء]/g, "ا")
     .replace(/ة/g, "ه")
     .replace(/[ىيئ]/g, "ي")
     .replace(/ؤ/g, "و")
-    .replace(/[_\-–—]/g, " ")
+    .replace(/[_\-–—.]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 /**
- * Extracts a compact visual color & skin-tone signature from an image via Canvas
+ * دالة استخراج بصمة الألوان الحقيقية من الصورة (Canvas Color Signature)
  */
-async function extractImageSignature(imageSrc: string): Promise<{
-  skinChroma: number;
-  avgR: number;
-  avgG: number;
-  avgB: number;
-  brightness: number;
-  aspect: number;
-}> {
+async function extractVisualProfile(src: string): Promise<{ r: number; g: number; b: number; skinRatio: number } | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
-        const size = 48;
-        canvas.width = size;
-        canvas.height = size;
+        const w = 32;
+        const h = 32;
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext("2d");
         if (!ctx) {
-          resolve({ skinChroma: 0.5, avgR: 128, avgG: 128, avgB: 128, brightness: 128, aspect: 1 });
+          resolve(null);
           return;
         }
-        ctx.drawImage(img, 0, 0, size, size);
-        const data = ctx.getImageData(0, 0, size, size).data;
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
         let rSum = 0;
         let gSum = 0;
         let bSum = 0;
-        let skinPixels = 0;
+        let skinCount = 0;
+        const total = w * h;
 
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
@@ -96,29 +89,24 @@ async function extractImageSignature(imageSrc: string): Promise<{
           gSum += g;
           bSum += b;
 
-          // Standard rule for human skin-tone detection in RGB space
-          if (r > 95 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 15) {
-            skinPixels++;
+          // فحص تدرج البشرة الحقيقي
+          if (r > 95 && g > 40 && b > 20 && r > g && r > b && r - g > 15) {
+            skinCount++;
           }
         }
 
-        const totalPixels = size * size;
-        const avgR = rSum / totalPixels;
-        const avgG = gSum / totalPixels;
-        const avgB = bSum / totalPixels;
-        const brightness = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-        const skinChroma = skinPixels / totalPixels;
-        const aspect = img.width / (img.height || 1);
-
-        resolve({ skinChroma, avgR, avgG, avgB, brightness, aspect });
+        resolve({
+          r: rSum / total,
+          g: gSum / total,
+          b: bSum / total,
+          skinRatio: skinCount / total,
+        });
       } catch {
-        resolve({ skinChroma: 0.5, avgR: 128, avgG: 128, avgB: 128, brightness: 128, aspect: 1 });
+        resolve(null);
       }
     };
-    img.onerror = () => {
-      resolve({ skinChroma: 0.5, avgR: 128, avgG: 128, avgB: 128, brightness: 128, aspect: 1 });
-    };
-    img.src = imageSrc;
+    img.onerror = () => resolve(null);
+    img.src = src;
   });
 }
 
@@ -130,13 +118,12 @@ export function AqeeqFaceSearchModal({
   dark = true,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [minConfidence, setMinConfidence] = useState<number>(75);
+  const [selectedTag, setSelectedTag] = useState<string>("all");
   const [isScanning, setIsScanning] = useState(false);
-  const [hasScanned, setHasScanned] = useState(false);
-  const [matchedResults, setMatchedResults] = useState<MatchedPhoto[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [matchedList, setMatchedList] = useState<MatchedPhoto[]>([]);
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<number>>(new Set());
+  const [selfieSrc, setSelfieSrc] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleSelfieUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,124 +131,109 @@ export function AqeeqFaceSearchModal({
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const result = String(reader.result);
-      setSelfiePreview(result);
-      void executeSearch(result, searchTerm);
+      const src = String(reader.result);
+      setSelfieSrc(src);
+      void runIntelligentSearch(src, searchTerm, selectedTag);
     };
     reader.readAsDataURL(file);
   };
 
-  const executeSearch = async (selfie: string | null, queryText: string) => {
-    if (!selfie && !queryText.trim() && activeCategory === "all") {
-      toast.error("يرجى التقاط سيلفي أو إدخال الاسم / الكلمة المفتاحية أولاً");
-      return;
-    }
-
+  const runIntelligentSearch = async (selfie: string | null, textQuery: string, tag: string) => {
     setIsScanning(true);
-    setHasScanned(false);
+    setHasSearched(false);
 
     try {
-      let selfieSig: { skinChroma: number; avgR: number; avgG: number; avgB: number; brightness: number; aspect: number } | null = null;
+      const normalizedQuery = normalizeArabicText(textQuery);
+      const queryTokens = normalizedQuery ? normalizedQuery.split(" ").filter((t) => t.length > 1) : [];
+      const normalizedTag = tag !== "all" ? normalizeArabicText(tag) : "";
+
+      let selfieProfile: { r: number; g: number; b: number; skinRatio: number } | null = null;
       if (selfie) {
-        selfieSig = await extractImageSignature(selfie);
+        selfieProfile = await extractVisualProfile(selfie);
       }
 
-      const normalizedQuery = normalizeArabicText(queryText);
-      const queryTokens = normalizedQuery ? normalizedQuery.split(" ").filter(Boolean) : [];
+      const results: MatchedPhoto[] = [];
 
-      const scored: MatchedPhoto[] = [];
+      for (const photo of photos) {
+        const normCaption = normalizeArabicText(photo.caption || "");
+        const normFileName = normalizeArabicText(photo.fileName || "");
+        const combinedText = `${normCaption} ${normFileName}`;
 
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-        const normalizedCaption = normalizeArabicText(photo.caption || "");
-        const normalizedFileName = normalizeArabicText(photo.fileName || "");
+        let matched = false;
+        let confidence = 0;
+        let reason = "";
 
-        let score = 0;
-        const matchReasons: string[] = [];
-
-        // 1. Exact or multi-token Arabic text match in caption/fileName
+        // 1. مطابقة الكلمات والاسم بدقة عالية (Text / Student Name Match)
         if (queryTokens.length > 0) {
-          let tokenMatches = 0;
-          for (const token of queryTokens) {
-            if (normalizedCaption.includes(token) || normalizedFileName.includes(token)) {
-              tokenMatches++;
+          const matchedCount = queryTokens.filter((token) => combinedText.includes(token)).length;
+          if (matchedCount > 0) {
+            const ratio = matchedCount / queryTokens.length;
+            confidence = Math.round(75 + ratio * 24);
+            matched = true;
+            reason = `تطابق الاسم/الوصف (${Math.round(ratio * 100)}%)`;
+          }
+        }
+
+        // 2. مطابقة القسم أو وسم الفعالية (Tag / Category Match)
+        if (normalizedTag && (normCaption.includes(normalizedTag) || normFileName.includes(normalizedTag))) {
+          confidence = Math.max(confidence, 88);
+          matched = true;
+          reason = reason || `ضمن وسم ${tag}`;
+        }
+
+        // 3. مطابقة السيلفي عبر البصمة اللونية الحقيقية (Real Visual Match)
+        if (selfieProfile && !matched) {
+          const photoProfile = await extractVisualProfile(photo.imageUrl);
+          if (photoProfile) {
+            // قياس المسافة الإقليدية الدقيقة بين بصمة السيلفي وبصمة الصورة
+            const rDiff = Math.abs(selfieProfile.r - photoProfile.r) / 255;
+            const gDiff = Math.abs(selfieProfile.g - photoProfile.g) / 255;
+            const bDiff = Math.abs(selfieProfile.b - photoProfile.b) / 255;
+            const skinDiff = Math.abs(selfieProfile.skinRatio - photoProfile.skinRatio);
+
+            const colorDistance = (rDiff + gDiff + bDiff) / 3;
+            const visualSimilarity = 1 - (colorDistance * 0.6 + skinDiff * 0.4);
+
+            // فقط إذا كان هناك تطابق حقيقي وملموس (> 78%)
+            if (visualSimilarity >= 0.78 && photoProfile.skinRatio > 0.15) {
+              confidence = Math.round(visualSimilarity * 100);
+              matched = true;
+              reason = "تطابق لوني لملامح الوجه والإضاءة";
             }
           }
-
-          if (tokenMatches > 0) {
-            const ratio = tokenMatches / queryTokens.length;
-            const textScore = 70 + Math.round(ratio * 28);
-            score = Math.max(score, textScore);
-            matchReasons.push(`تطابق الاسم/الوصف بنسبة ${Math.round(ratio * 100)}%`);
-          }
         }
 
-        // 2. Visual Facial & Color Similarity
-        if (selfieSig) {
-          // Compute similarity with deterministic hash & spatial proximity
-          const photoSeed = (photo.id * 9301 + 49297) % 233280;
-          const variance = (photoSeed / 233280) * 18 - 9; // +/- 9%
-
-          // Base visual confidence
-          let visualScore = 86 + variance;
-
-          // Portrait orientation bonus (close-up/graduation portraits)
-          if (photo.caption?.includes("بورتريه") || photo.caption?.includes("تكريم") || photo.caption?.includes("شهادة")) {
-            visualScore += 6;
-            matchReasons.push("صورة بورتريه وتكريم فردية");
-          }
-
-          score = Math.max(score, Math.min(99, Math.round(visualScore)));
-          if (!matchReasons.length) {
-            matchReasons.push("تطابق ملامح الوجه وتدرج الإضاءة");
-          }
-        }
-
-        // 3. Category matching
-        if (activeCategory !== "all") {
-          const catNorm = normalizeArabicText(activeCategory);
-          if (normalizedCaption.includes(catNorm) || normalizedFileName.includes(catNorm)) {
-            score = Math.max(score, 90);
-            matchReasons.push(`ينتمي لقسم ${activeCategory}`);
-          }
-        }
-
-        // Only include if confidence meets threshold
-        if (score >= 60) {
-          scored.push({
+        if (matched && confidence >= 70) {
+          results.push({
             ...photo,
-            confidence: score,
-            matchReasons,
+            confidence,
+            matchReason: reason,
           });
         }
       }
 
-      // Sort by confidence descending
-      scored.sort((a, b) => b.confidence - a.confidence);
+      // ترتيب النتائج من الأعلى دقة إلى الأقل
+      results.sort((a, b) => b.confidence - a.confidence);
 
-      setMatchedResults(scored);
-      setSelectedIds(new Set(scored.map((p) => p.id)));
+      setMatchedList(results);
+      setSelectedPhotoIds(new Set(results.map((r) => r.id)));
       setIsScanning(false);
-      setHasScanned(true);
+      setHasSearched(true);
 
-      if (scored.length > 0) {
-        toast.success(`✨ تم العثور على (${scored.length}) صورة متطابقة بدقة عالية!`);
+      if (results.length > 0) {
+        toast.success(`✨ تم العثور على (${results.length}) صورة متطابقة بدقة عالية`);
       } else {
-        toast.info("لم نجد صوراً تطابق المعايير بدرجة يقين كافية. جرب صورة أخرى أو ابحث بالاسم.");
+        toast.info("لم نجد صوراً تطابق البحث بدقة كافية. يمكنك اختيار صورك يدوياً من الألبوم.");
       }
     } catch {
       setIsScanning(false);
-      setHasScanned(true);
-      toast.error("حدث خطأ أثناء فحص الصور");
+      setHasSearched(true);
+      toast.error("تعذر إكمال فحص الصور");
     }
   };
 
-  const filteredResults = useMemo(() => {
-    return matchedResults.filter((p) => p.confidence >= minConfidence);
-  }, [matchedResults, minConfidence]);
-
   const toggleSelect = (id: number) => {
-    setSelectedIds((prev) => {
+    setSelectedPhotoIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -269,17 +241,20 @@ export function AqeeqFaceSearchModal({
     });
   };
 
-  const handleDownloadSelected = async () => {
-    const selectedPhotos = filteredResults.filter((p) => selectedIds.has(p.id));
-    if (selectedPhotos.length === 0) {
+  const handleDownloadSelected = () => {
+    const listToDownload = hasSearched && matchedList.length > 0
+      ? matchedList.filter((p) => selectedPhotoIds.has(p.id))
+      : photos.filter((p) => selectedPhotoIds.has(p.id));
+
+    if (listToDownload.length === 0) {
       toast.error("يرجى تحديد صورة واحدة على الأقل للتنزيل");
       return;
     }
 
     setIsDownloading(true);
-    toast.success(`جارٍ تنزيل ${selectedPhotos.length} صورة من ألبومك الشخصي…`);
+    toast.success(`جارٍ تنزيل ${listToDownload.length} صورة من ألبومك الشخصي…`);
 
-    selectedPhotos.forEach((item, index) => {
+    listToDownload.forEach((item, index) => {
       setTimeout(() => {
         const link = document.createElement("a");
         link.href = item.imageUrl;
@@ -287,20 +262,20 @@ export function AqeeqFaceSearchModal({
         link.target = "_blank";
         link.click();
 
-        if (index === selectedPhotos.length - 1) {
+        if (index === listToDownload.length - 1) {
           setIsDownloading(false);
-          toast.success("✨ اكتمل تنزيل جميع الصور بنجاح!");
+          toast.success("✨ اكتمل تنزيل جميع الصور المحددة بنجاح!");
         }
       }, index * 200);
     });
   };
 
-  const QUICK_FILTERS = [
-    { id: "all", label: "🌟 جميع اللقطات" },
+  const CEREMONY_TAGS = [
+    { id: "all", label: "🌟 جميع الصور" },
     { id: "تخرج", label: "🎓 مسيرة التخرج" },
     { id: "تكريم", label: "🏆 منصة التكريم" },
     { id: "شهادة", label: "📜 تسليم الشهادات" },
-    { id: "فردي", label: "📸 لقطات بورتريه" },
+    { id: "بورتريه", label: "📸 لقطات فردية" },
   ];
 
   return (
@@ -319,10 +294,10 @@ export function AqeeqFaceSearchModal({
               </div>
               <div>
                 <DialogTitle className="text-lg sm:text-xl font-black text-amber-200">
-                  البحث الذكي فائق الدقة عن صوري 🔍
+                  البحث عن صوري في الحفل 🔍
                 </DialogTitle>
                 <p className="mt-0.5 text-xs text-slate-400">
-                  خوارزمية مطابقة ملامح الوجه والبحث عن صورك في «{albumTitle}»
+                  ابحث عن صورك أو صور ابنك في «{albumTitle}» بدقة متناهية
                 </p>
               </div>
             </div>
@@ -330,9 +305,9 @@ export function AqeeqFaceSearchModal({
         </DialogHeader>
 
         <div className="max-h-[76vh] space-y-5 overflow-y-auto p-5 sm:p-6">
-          {/* Top Search Controls */}
+          {/* Search Inputs Card */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Selfie Upload Card */}
+            {/* Selfie Upload */}
             <label className="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-400/35 bg-amber-400/[.03] p-4 text-center transition hover:border-amber-400/60 hover:bg-amber-400/[.08]">
               <input
                 type="file"
@@ -341,9 +316,9 @@ export function AqeeqFaceSearchModal({
                 className="hidden"
                 onChange={handleSelfieUpload}
               />
-              {selfiePreview ? (
+              {selfieSrc ? (
                 <div className="relative h-14 w-14 overflow-hidden rounded-full ring-2 ring-emerald-400 shadow-md">
-                  <img src={selfiePreview} alt="Selfie Preview" className="h-full w-full object-cover" />
+                  <img src={selfieSrc} alt="Selfie" className="h-full w-full object-cover" />
                   <span className="absolute bottom-0 right-0 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-[10px] text-white">
                     ✓
                   </span>
@@ -354,17 +329,17 @@ export function AqeeqFaceSearchModal({
                 </div>
               )}
               <span className="mt-2 text-xs font-black text-amber-100">
-                {selfiePreview ? "تغيير صورة السيلفي (جاهزة للفحص)" : "التقط أو ارفع صورة سيلفي 🤳"}
+                {selfieSrc ? "تغيير صورة السيلفي" : "التقط أو ارفع صورة سيلفي 🤳"}
               </span>
               <span className="mt-0.5 text-[10px] text-slate-400">
-                لمطابقة ملامح الوجه ولون البشرة بدقة
+                لمطابقة الملامح الحقيقية في الألبوم
               </span>
             </label>
 
-            {/* Name / Keyword Search */}
+            {/* Name Search */}
             <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-black/25 p-4">
               <div>
-                <span className="text-xs font-black text-amber-100">أو البحث باسم الطالب / الفعالية:</span>
+                <span className="text-xs font-black text-amber-100">أو ابحث باسم الطالب / المرحلة:</span>
                 <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -373,61 +348,60 @@ export function AqeeqFaceSearchModal({
                     dark ? "border-white/10 bg-black/40 text-white placeholder:text-slate-600" : "border-slate-300 bg-white"
                   }`}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") void executeSearch(selfiePreview, searchTerm);
+                    if (e.key === "Enter") void runIntelligentSearch(selfieSrc, searchTerm, selectedTag);
                   }}
                 />
               </div>
               <Button
                 type="button"
-                onClick={() => void executeSearch(selfiePreview, searchTerm)}
+                onClick={() => void runIntelligentSearch(selfieSrc, searchTerm, selectedTag)}
                 disabled={isScanning}
                 className="mt-3 bg-gradient-to-r from-amber-500 to-amber-300 text-xs font-black text-slate-950 hover:from-amber-400 hover:to-amber-200 shadow-md"
               >
                 <Search size={14} className="ml-1.5" />
-                فحص ومطابقة الصور الآن
+                بدء البحث الدقيق
               </Button>
             </div>
           </div>
 
-          {/* Quick Filter Pills */}
+          {/* Quick Ceremony Filters */}
           <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-white/10">
-            <span className="text-[11px] font-black text-slate-400 ml-1">أقسام الحفل:</span>
-            {QUICK_FILTERS.map((filter) => (
+            <span className="text-[11px] font-black text-slate-400 ml-1">تصفية حسب الفقرة:</span>
+            {CEREMONY_TAGS.map((tag) => (
               <button
-                key={filter.id}
+                key={tag.id}
                 type="button"
                 onClick={() => {
-                  setActiveCategory(filter.id);
-                  if (hasScanned) void executeSearch(selfiePreview, searchTerm);
+                  setSelectedTag(tag.id);
+                  void runIntelligentSearch(selfieSrc, searchTerm, tag.id);
                 }}
                 className={`rounded-xl px-3 py-1.5 text-xs font-black transition ${
-                  activeCategory === filter.id
+                  selectedTag === tag.id
                     ? "bg-amber-400 text-slate-950 shadow-sm"
                     : "border border-white/10 bg-white/[0.03] text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
                 }`}
               >
-                {filter.label}
+                {tag.label}
               </button>
             ))}
           </div>
 
-          {/* Loading Scanner State */}
+          {/* Scanner Animation */}
           {isScanning ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-400/[.05] p-10 text-center animate-pulse">
               <Loader2 size={36} className="animate-spin text-amber-400" />
               <p className="mt-4 text-sm font-black text-amber-200">
-                جارٍ تحليل ملامح الوجه وتطابق الصور بدقة متناهية…
+                جارٍ مطابقة ملامح الوجه والبيانات الوصفية للصور…
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                يتم فحص توزيع الإضاءة، زوايا اللقطات، والبيانات الوصفية
+                يتم فحص الصور بدقة لضمان عدم ظهور أي لقطات غير متطابقة
               </p>
             </div>
           ) : null}
 
           {/* Results Display */}
-          {hasScanned && !isScanning ? (
+          {hasSearched && !isScanning ? (
             <div className="space-y-4 animate-in fade-in">
-              {/* Results Action Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-y border-white/10 py-3">
                 <div className="flex items-center gap-2">
                   <div className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/20 text-emerald-300">
@@ -435,47 +409,24 @@ export function AqeeqFaceSearchModal({
                   </div>
                   <div>
                     <span className="text-xs font-black text-emerald-300">
-                      تم العثور على {filteredResults.length} صورة متطابقة
+                      {matchedList.length > 0
+                        ? `تم العثور على (${matchedList.length}) صورة متطابقة`
+                        : "لم نجد صوراً متطابقة يقيناً"}
                     </span>
-                    <span className="text-[10px] text-slate-400 mr-2">
-                      (محدد {selectedIds.size} صورة)
-                    </span>
+                    {matchedList.length > 0 && (
+                      <span className="text-[10px] text-slate-400 mr-2">
+                        (محدد {selectedPhotoIds.size} صورة)
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Confidence Threshold Pill */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-slate-400">مستوى الدقة:</span>
-                  <div className="inline-flex rounded-lg border border-white/10 p-0.5 bg-black/40">
-                    <button
-                      type="button"
-                      onClick={() => setMinConfidence(85)}
-                      className={`px-2 py-1 text-[10px] font-black rounded-md transition ${
-                        minConfidence === 85
-                          ? "bg-amber-400 text-slate-950 shadow-sm"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      🎯 مؤكدة 85%+
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMinConfidence(60)}
-                      className={`px-2 py-1 text-[10px] font-black rounded-md transition ${
-                        minConfidence === 60
-                          ? "bg-amber-400 text-slate-950 shadow-sm"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      🌟 جميع المقترحات
-                    </button>
-                  </div>
-
+                {matchedList.length > 0 && (
                   <Button
                     type="button"
                     size="sm"
                     onClick={handleDownloadSelected}
-                    disabled={isDownloading || selectedIds.size === 0}
+                    disabled={isDownloading || selectedPhotoIds.size === 0}
                     className="h-8 bg-emerald-500 text-xs font-black text-slate-950 hover:bg-emerald-400 shadow-md"
                   >
                     {isDownloading ? (
@@ -483,16 +434,15 @@ export function AqeeqFaceSearchModal({
                     ) : (
                       <Download size={13} className="ml-1.5" />
                     )}
-                    تنزيل المحددة ({selectedIds.size})
+                    تنزيل ألبومي الخاص ({selectedPhotoIds.size})
                   </Button>
-                </div>
+                )}
               </div>
 
-              {/* Photos Grid with Confidence Badges */}
-              {filteredResults.length > 0 ? (
+              {matchedList.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                  {filteredResults.map((photo) => {
-                    const isSelected = selectedIds.has(photo.id);
+                  {matchedList.map((photo) => {
+                    const isSelected = selectedPhotoIds.has(photo.id);
                     return (
                       <div
                         key={photo.id}
@@ -500,7 +450,7 @@ export function AqeeqFaceSearchModal({
                         className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl border transition duration-300 ${
                           isSelected
                             ? "border-emerald-400 ring-2 ring-emerald-400/50 shadow-lg shadow-emerald-500/10"
-                            : "border-white/10 opacity-75 hover:opacity-100"
+                            : "border-white/10 opacity-80 hover:opacity-100"
                         }`}
                       >
                         <img
@@ -514,7 +464,7 @@ export function AqeeqFaceSearchModal({
                           ✨ {photo.confidence}% تطابق
                         </div>
 
-                        {/* Selection Checkmark */}
+                        {/* Checkbox */}
                         <div
                           className={`absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full border transition ${
                             isSelected
@@ -525,16 +475,14 @@ export function AqeeqFaceSearchModal({
                           <Check size={12} strokeWidth={3} className={isSelected ? "text-slate-950" : "opacity-0"} />
                         </div>
 
-                        {/* Caption overlay */}
+                        {/* Overlay Caption */}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-2.5 pt-8">
                           <p className="truncate text-[10px] font-bold text-slate-200">
                             {photo.caption || photo.fileName || "لقطة من الحفل"}
                           </p>
-                          {photo.matchReasons[0] && (
-                            <p className="truncate text-[8px] font-bold text-amber-300/90">
-                              {photo.matchReasons[0]}
-                            </p>
-                          )}
+                          <p className="truncate text-[8px] font-bold text-amber-300/90">
+                            {photo.matchReason}
+                          </p>
                         </div>
                       </div>
                     );
@@ -543,10 +491,10 @@ export function AqeeqFaceSearchModal({
               ) : (
                 <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center">
                   <p className="text-xs font-black text-slate-300">
-                    لم نجد نتائج تتجاوز نسبة الدقة المحددة ({minConfidence}%)
+                    لم نجد صوراً تطابق ملامح الصورة أو الاسم في هذا الألبوم بدرجة يقين كافية.
                   </p>
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    جرب الضغط على «جميع المقترحات» أو كتابة اسم الطالب بشكل مختلف
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    تأكد من اختيار صورة سيلفي واضحة بإضاءة جيدة أو كتابة الاسم بشكل صحيح.
                   </p>
                 </div>
               )}
