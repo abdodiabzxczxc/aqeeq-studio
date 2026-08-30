@@ -88,30 +88,38 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [mode, album?.media]);
 
-  // Touch Swipe navigation for mobile (Swipe left = next, Swipe right = previous)
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  // Mouse Drag and Touch Swipe navigation (Mouse drag / Touch swipe left = next, right = previous)
+  const dragStartX = useRef<number | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const isDragging = useRef<boolean>(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 1) {
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
-    }
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragStartX.current = e.clientX;
+    dragStartY.current = e.clientY;
+    isDragging.current = true;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging.current || dragStartX.current === null || dragStartY.current === null) return;
+    const deltaX = e.clientX - dragStartX.current;
+    const deltaY = e.clientY - dragStartY.current;
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
       if (deltaX < 0) {
         moveThroughAlbum("next");
       } else {
         moveThroughAlbum("previous");
       }
     }
-    touchStartX.current = null;
-    touchStartY.current = null;
+    isDragging.current = false;
+    dragStartX.current = null;
+    dragStartY.current = null;
+  };
+
+  const handlePointerCancel = () => {
+    isDragging.current = false;
+    dragStartX.current = null;
+    dragStartY.current = null;
   };
 
   // Keep thumbnail strip synchronized with current image position
@@ -233,9 +241,11 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
 
         {mode === "spread" ? (
           <div
-            className="relative z-10 p-2 sm:p-4 space-y-4 touch-pan-y"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            className="relative z-10 p-2 sm:p-4 space-y-4 touch-pan-y select-none"
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onPointerLeave={handlePointerCancel}
           >
             {active?.mediaType === "video" ? (
               <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-amber-300/25 bg-black shadow-2xl">
@@ -244,10 +254,10 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                 </div>
               </div>
             ) : (
-              <div className={`aq-album-3d-book-stage aq-reader-gold-frame overflow-hidden rounded-[1.8rem] border shadow-2xl transition-colors ${
+              <div className={`aq-album-3d-book-stage aq-reader-gold-frame overflow-hidden rounded-[1.8rem] border shadow-2xl transition-colors cursor-grab active:cursor-grabbing ${
                 dark ? "border-amber-300/30 bg-[#070a11]/90" : "border-amber-700/20 bg-white/90 shadow-slate-300/50"
               }`}>
-                <div className="aq-stacked-reader relative mx-auto py-1 sm:py-3 cursor-grab active:cursor-grabbing select-none">
+                <div className="aq-stacked-reader relative mx-auto py-1 sm:py-3 select-none">
                   {/* Previous 3D shadow stack (Left side) */}
                   <div className="aq-stacked-reader-zone aq-stacked-reader-zone-previous" aria-hidden="true">
                     {(album.media as AlbumItem[]).slice(Math.max(0, index - 1), index).reverse().map((item, pIndex) => (
