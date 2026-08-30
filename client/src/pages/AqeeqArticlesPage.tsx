@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -206,6 +208,9 @@ function ArticleCard({
 export default function AqeeqArticlesPage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const { user, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
+  const isAdmin = isAuthenticated && user?.role === "admin";
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -456,6 +461,21 @@ export default function AqeeqArticlesPage() {
                 <PenTool size={16} />
                 <span>شاركنا بمقالك ✍️</span>
               </button>
+
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/articles/manage")}
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-black transition ${
+                    dark
+                      ? "border-purple-400/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
+                      : "border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                  }`}
+                >
+                  <Sparkles size={15} />
+                  <span>دخول استوديو المقالات ✍️</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

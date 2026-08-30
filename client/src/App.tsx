@@ -49,7 +49,9 @@ import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
 
 import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
+import AqeeqArticlesStudioPage from "./pages/AqeeqArticlesStudioPage";
 import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
+import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
 import { PodcastPlayerProvider } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
 import { AqeeqStaffWalkieCapsule } from "./components/AqeeqStaffWalkieCapsule";
@@ -63,8 +65,11 @@ function Router() {
       <Route path="/studio" component={AlaqeeqStudioPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AqeeqAdminDashboardPage} />
+      <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
       <Route path="/articles" component={AqeeqArticlesPage} />
       <Route path="/articles/:slug" component={AqeeqArticlesPage} />
+      <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
+      <Route path="/broadcast/manage" component={AqeeqPodcastStudioPage} />
       <Route path="/podcast" component={AqeeqPodcastPage} />
       <Route path="/broadcast" component={AqeeqPodcastPage} />
       <Route path="/journal" component={SchoolNewsPage} />
