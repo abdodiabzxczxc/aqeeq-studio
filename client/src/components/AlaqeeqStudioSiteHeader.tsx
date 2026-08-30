@@ -126,22 +126,21 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <Search size={17} />
             </button>
 
-            {/* Desktop-only Visual Editor Button */}
+            {/* Visual Editor Icon-only Button (Zero text to save space) */}
             {isAdmin ? (
               <button
                 onClick={() => editor.toggleEditing()}
-                className={`hidden md:flex h-11 items-center gap-1.5 rounded-xl border px-3 text-xs font-black transition active:scale-95 shadow-sm ${
+                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
                   editor.isEditing
-                    ? "border-rose-400 bg-rose-500/25 text-rose-100 ring-2 ring-rose-400/40 animate-pulse"
+                    ? "border-rose-400 bg-rose-500/30 text-rose-100 ring-2 ring-rose-400/50 animate-pulse shadow-lg"
                     : dark
-                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                      : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
-                title={editor.isEditing ? "إنهاء وضع التعديل البصري" : "المحرر البصري للموقع (Visual Editor)"}
+                title={editor.isEditing ? "إنهاء التعديل البصري (وضع التحرير نشط الآن)" : "تفعيل المحرر البصري لتعديل النصوص والصور والخلفيات"}
                 aria-label="المحرر البصري"
               >
-                <PencilRuler size={16} />
-                <span>{editor.isEditing ? "إغلاق التعديل" : "محرر الموقع 🎨"}</span>
+                <PencilRuler size={17} />
               </button>
             ) : null}
 
