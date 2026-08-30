@@ -6,6 +6,7 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
+import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqAlbumSpreadWatermark } from "@/lib/aqeeqAlbumReaderTheme";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -339,13 +340,11 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </button>
             </div>
           ) : null}
-          {album.backgroundAudioUrl ? (
-            <AqeeqReaderAudioController
-              audioUrl={album.backgroundAudioUrl}
-              trackTitle={album.title}
-              dark={dark}
-            />
-          ) : null}
+          <AqeeqReaderAudioController
+            audioUrl={album.backgroundAudioUrl || getAqeeqDefaultBackgroundAudio()}
+            trackTitle={album.title}
+            dark={dark}
+          />
           <VisualEditable id="album-reader-theme-action" tag="button" label="زر مظهر قارئ الألبوم" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-theme-icon" label="أيقونة مظهر قارئ الألبوم" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
           <VisualEditable id="album-reader-archive-action" tag="button" label="زر كل الألبومات" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-archive-icon" label="أيقونة أرشيف الألبومات" icon="archive" size={16} /></VisualEditable>
           {isAdmin ? <VisualEditable id="album-reader-manage-action" tag="button" label="زر إدارة الألبوم" defaultText="إدارة الألبوم" as="button" onAction={() => navigate(`/albums/manage?album=${album.slug}`)} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-manage-icon" label="أيقونة إدارة الألبوم" icon="settings" size={16} /></VisualEditable> : null}

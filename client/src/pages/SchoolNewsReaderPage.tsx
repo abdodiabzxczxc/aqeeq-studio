@@ -10,6 +10,7 @@ import { JOURNAL_READING_OPTIONS, JournalReadingMode, normalizeJournalReadingMod
 import { normalizeJournalWatermark } from "@/lib/journalWatermark";
 import { trpc } from "@/lib/trpc";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
+import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { Archive, Loader2, Newspaper, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -181,13 +182,11 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
             ) : null}
 
             {/* Audio Controller */}
-            {issue.backgroundAudioUrl ? (
-              <AqeeqReaderAudioController
-                audioUrl={issue.backgroundAudioUrl}
-                trackTitle={issue.title}
-                dark={dark}
-              />
-            ) : null}
+            <AqeeqReaderAudioController
+              audioUrl={issue.backgroundAudioUrl || getAqeeqDefaultBackgroundAudio()}
+              trackTitle={issue.title}
+              dark={dark}
+            />
 
             {/* Theme Toggle Button */}
             <VisualEditable
