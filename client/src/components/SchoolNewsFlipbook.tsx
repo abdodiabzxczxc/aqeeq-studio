@@ -8,11 +8,57 @@ import { downloadJournalPdf, openJournalPdfForPrint } from "@/lib/journalPdf";
 
 export type FlipbookPage = { id: number; imageUrl: string; caption?: string | null; issueTitle?: string; issueDate?: string };
 type ReadingMode = "flip" | "scroll";
-type FlipbookProps = { title: string; kicker: string; pages: FlipbookPage[]; onClose?: () => void; onArchive?: () => void; shareUrl?: string; coverImageUrl?: string | null; brandLogoUrl?: string | null; watermark?: { url?: string | null; scale?: number; opacity?: number; position?: string; tint?: string; cropLeft?: boolean }; compact?: boolean; collectionLabel?: string; archiveLabel?: string; downloadLabel?: string; backgroundAudioUrl?: string | null; onDownloadAll?: () => void; onDownloadPage?: (page: FlipbookPage) => void };
-export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onArchive, shareUrl, brandLogoUrl, watermark, compact = false, collectionLabel = "مجلة العقيق", archiveLabel = "كل الأعداد", downloadLabel = "تنزيل العدد PDF", backgroundAudioUrl, onDownloadAll, onDownloadPage }: FlipbookProps) {
+type FlipbookProps = {
+  title: string;
+  kicker: string;
+  pages: FlipbookPage[];
+  onClose?: () => void;
+  onArchive?: () => void;
+  shareUrl?: string;
+  coverImageUrl?: string | null;
+  brandLogoUrl?: string | null;
+  watermark?: { url?: string | null; scale?: number; opacity?: number; position?: string; tint?: string; cropLeft?: boolean };
+  compact?: boolean;
+  collectionLabel?: string;
+  archiveLabel?: string;
+  downloadLabel?: string;
+  backgroundAudioUrl?: string | null;
+  hideHeader?: boolean;
+  externalZoom?: number;
+  onZoomChange?: (newZoom: number) => void;
+  onDownloadAll?: () => void;
+  onDownloadPage?: (page: FlipbookPage) => void;
+};
+export default function SchoolNewsFlipbook({
+  title,
+  kicker,
+  pages,
+  onClose,
+  onArchive,
+  shareUrl,
+  brandLogoUrl,
+  watermark,
+  compact = false,
+  collectionLabel = "مجلة العقيق",
+  archiveLabel = "كل الأعداد",
+  downloadLabel = "تنزيل العدد PDF",
+  backgroundAudioUrl,
+  hideHeader = false,
+  externalZoom,
+  onZoomChange,
+  onDownloadAll,
+  onDownloadPage,
+}: FlipbookProps) {
   const [page, setPage] = useState(0);
   const [full, setFull] = useState(false);
-  const [zoom, setZoom] = useState(1);
+  const [internalZoom, setInternalZoom] = useState(1);
+  const zoom = externalZoom !== undefined ? externalZoom : internalZoom;
+  const setZoom = (valueOrFn: number | ((prev: number) => number)) => {
+    const nextVal = typeof valueOrFn === "function" ? valueOrFn(zoom) : valueOrFn;
+    const clamped = Math.max(1, Math.min(3.5, Number(nextVal.toFixed(2))));
+    if (onZoomChange) onZoomChange(clamped);
+    else setInternalZoom(clamped);
+  };
   const [scrollZoom, setScrollZoom] = useState(1);
   const [mode, setMode] = useState<ReadingMode>("flip");
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -53,9 +99,9 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
     catch { toast.error("تعذر فتح ملف PDF للطباعة"); }
   };
   const adjustZoom = (amount: number) => {
-    const updateZoom = (value: number) => Math.min(1.4, Math.max(.7, Number((value + amount).toFixed(2))));
-    if (mode === "flip") setZoom((value) => Math.min(1.15, Math.max(.85, updateZoom(value))));
-    else setScrollZoom(updateZoom);
+    const nextZoom = Math.min(3.5, Math.max(1, Number((zoom + amount).toFixed(2))));
+    if (onZoomChange) onZoomChange(nextZoom);
+    else setInternalZoom(nextZoom);
   };
   const moveScrollReader = (direction: "next" | "previous") => {
     const target = direction === "next" ? page + 1 : page - 1;
@@ -239,7 +285,8 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
   return <div ref={viewerRef} dir="rtl" className={`${shellClass} ${mode === "flip" ? "aq-dark-reader-shell" : ""} ${compact ? "aq-album-flipbook" : ""}`}>
     <div className={full ? "mx-auto max-w-[1500px]" : ""}>
       <aside className="aq-dark-reader-rail" aria-label="أدوات قراءة العدد"><RailButton label={archiveLabel} onClick={() => onArchive?.()} disabled={!onArchive}><Archive size={17} /></RailButton><RailButton label="الصفحة السابقة" onClick={() => mode === "flip" ? flip("previous") : moveScrollReader("previous")} disabled={!canGoPrevious}><ChevronRight size={18} /></RailButton><RailButton label="الصفحة التالية" onClick={() => mode === "flip" ? flip("next") : moveScrollReader("next")} disabled={!canGoNext}><ChevronLeft size={18} /></RailButton><RailButton label="مشاركة العدد" onClick={() => void share()}><Share2 size={16} /></RailButton><RailButton label={downloadLabel} onClick={() => onDownloadAll ? onDownloadAll() : void downloadCurrent()}><Download size={16} /></RailButton><RailButton label="طباعة العدد PDF" onClick={() => void printIssue()}><Printer size={16} /></RailButton><RailButton label="تكبير القراءة" onClick={() => adjustZoom(.05)}><Plus size={18} /></RailButton><RailButton label="تصغير القراءة" onClick={() => adjustZoom(-.05)}><Minus size={18} /></RailButton><RailButton label="ملء الشاشة" onClick={() => void toggleFullscreen()}>{full ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</RailButton></aside>
-      <header className={`mb-4 flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 border-white/[.1] bg-[#10141f] shadow-sm ${mode === "flip" ? "aq-dark-reader-chrome" : ""}`}>
+      {!hideHeader ? (
+        <header className={`mb-4 flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 border-white/[.1] bg-[#10141f] shadow-sm ${mode === "flip" ? "aq-dark-reader-chrome" : ""}`}>
         <div className="flex min-w-0 items-center gap-3">
           {brandLogoUrl ? (
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-amber-300/20 bg-black/20 p-1.5">
@@ -345,6 +392,7 @@ export default function SchoolNewsFlipbook({ title, kicker, pages, onClose, onAr
           ) : null}
         </div>
       </header>
+      ) : null}
 
       {mode === "scroll" ? <section className="aq-reader-gold-frame overflow-auto p-3 md:p-7"><div className="mx-auto max-w-[760px] space-y-5 transition-[width] duration-200" style={{ width: `${scrollZoom * 100}%`, minWidth: scrollZoom > 1 ? "760px" : undefined }}>{pages.map((item, index) => <article id={`aq-scroll-page-${index}`} key={item.id} className="overflow-hidden rounded-2xl bg-transparent shadow-[0_18px_45px_rgba(0,0,0,.28)]"><img src={item.imageUrl} alt={item.caption || `الصفحة ${index + 1} من ${title}`} referrerPolicy="no-referrer" className="block h-auto w-full" /></article>)}</div></section> : <section className="aq-flipbook-stage aq-dark-reader-stage p-0 touch-pan-y select-none" style={watermarkStyle} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} onPointerLeave={handlePointerCancel} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
         <div className="relative w-full p-1 md:p-2"><div className="aq-reader-gold-frame aq-flipbook-book-frame p-1 md:p-2">{watermarkSource ? <span aria-hidden="true" className={`aq-dark-reader-watermark aq-dark-reader-watermark-${watermark?.position || "center"} ${watermark?.cropLeft ? "aq-dark-reader-watermark-crop-left" : ""} pointer-events-none absolute`} style={{ "--aq-watermark-image": `url("${watermarkSource}")` } as React.CSSProperties} /> : null}<div className="aq-stacked-reader relative mx-auto py-0 select-none">
