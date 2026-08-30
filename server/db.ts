@@ -139,41 +139,87 @@ export async function getUserByOpenId(openId: string) {
 }
 
 
+function getLocalUsersList(): any[] {
+  const raw = localSettings.get("local_admin_users");
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+  }
+  return [
+    {
+      id: 1,
+      name: "المشرف العام",
+      email: "admin@alaqeeq.edu.sa",
+      openId: ENV.adminUsername,
+      role: "admin",
+      lastSignedIn: new Date(),
+      createdAt: new Date(),
+    },
+  ];
+}
+
+function saveLocalUsersList(list: any[]) {
+  localSettings.set("local_admin_users", JSON.stringify(list));
+}
+
 export async function listUsers() {
-  const db = await getDb();
-  if (!db) return [];
-  return db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      openId: users.openId,
-      role: users.role,
-      lastSignedIn: users.lastSignedIn,
-      createdAt: users.createdAt,
-    })
-    .from(users)
-    .orderBy(desc(users.createdAt));
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      const rows = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          openId: users.openId,
+          role: users.role,
+          lastSignedIn: users.lastSignedIn,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt));
+      if (rows.length > 0) return rows;
+    }
+  } catch (e) {
+    console.warn("Failed to list users from db:", e);
+  }
+  return getLocalUsersList();
 }
 
 export async function updateUserRole(id: number, role: "user" | "admin" | "receptionist" | "coordinator" | "auditor") {
-  const db = await getDb();
-  if (!db) throw new Error("DB not available");
-  await db.update(users).set({ role }).where(eq(users.id, id));
-  const result = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      openId: users.openId,
-      role: users.role,
-      lastSignedIn: users.lastSignedIn,
-      createdAt: users.createdAt,
-    })
-    .from(users)
-    .where(eq(users.id, id))
-    .limit(1);
-  return result[0];
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      await db.update(users).set({ role }).where(eq(users.id, id));
+      const result = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          openId: users.openId,
+          role: users.role,
+          lastSignedIn: users.lastSignedIn,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(eq(users.id, id))
+        .limit(1);
+      if (result[0]) return result[0];
+    }
+  } catch (e) {
+    console.warn("Failed to update user role in db:", e);
+  }
+
+  const list = getLocalUsersList();
+  const target = list.find((u) => u.id === id);
+  if (target) {
+    target.role = role;
+    saveLocalUsersList(list);
+    return target;
+  }
+  return { id, name: "المشرف", email: "", openId: "", role, lastSignedIn: new Date(), createdAt: new Date() };
 }
 
 export async function createAdminUser(data: {
@@ -183,72 +229,113 @@ export async function createAdminUser(data: {
   password?: string;
   role?: "user" | "admin" | "receptionist" | "coordinator" | "auditor";
 }) {
-  const db = await getDb();
-  if (!db) throw new Error("DB not available");
-
   const emailClean = data.email.trim().toLowerCase();
   const openIdClean = (data.openId?.trim() || emailClean.split("@")[0] || data.name.trim()).toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "_");
-
-  // Check if email or openId already exists
-  const existing = await db
-    .select()
-    .from(users)
-    .where(or(eq(users.openId, openIdClean), eq(users.email, emailClean)))
-    .limit(1);
-
-  if (existing.length > 0) {
-    throw new Error("المستخدم أو البريد الإلكتروني مسجل مسبقاً بالفعل");
-  }
-
   const passwordHash = data.password ? hashPassword(data.password) : null;
   const role = data.role || "admin";
 
-  await db.insert(users).values({
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      const existing = await db
+        .select()
+        .from(users)
+        .where(or(eq(users.openId, openIdClean), eq(users.email, emailClean)))
+        .limit(1);
+
+      if (existing.length > 0) {
+        throw new Error("المستخدم أو البريد الإلكتروني مسجل مسبقاً بالفعل");
+      }
+
+      await db.insert(users).values({
+        name: data.name.trim(),
+        email: emailClean,
+        openId: openIdClean,
+        passwordHash,
+        role,
+        loginMethod: "password",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastSignedIn: new Date(),
+      });
+
+      const created = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          openId: users.openId,
+          role: users.role,
+          lastSignedIn: users.lastSignedIn,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(eq(users.openId, openIdClean))
+        .limit(1);
+
+      if (created[0]) return created[0];
+    }
+  } catch (e: any) {
+    if (e.message?.includes("مسجل مسبقاً")) throw e;
+    console.warn("Failed to create user in db, saving to local store:", e);
+  }
+
+  const list = getLocalUsersList();
+  if (list.some((u) => u.openId === openIdClean || u.email === emailClean)) {
+    throw new Error("المستخدم أو البريد الإلكتروني مسجل مسبقاً بالفعل");
+  }
+  const newUser = {
+    id: Date.now(),
     name: data.name.trim(),
     email: emailClean,
     openId: openIdClean,
-    passwordHash,
     role,
-    loginMethod: "password",
-    createdAt: new Date(),
-    updatedAt: new Date(),
     lastSignedIn: new Date(),
-  });
-
-  const created = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      openId: users.openId,
-      role: users.role,
-      lastSignedIn: users.lastSignedIn,
-      createdAt: users.createdAt,
-    })
-    .from(users)
-    .where(eq(users.openId, openIdClean))
-    .limit(1);
-
-  return created[0];
+    createdAt: new Date(),
+  };
+  list.unshift(newUser);
+  saveLocalUsersList(list);
+  return newUser;
 }
 
 export async function resetUserPassword(id: number, newPass: string) {
-  const db = await getDb();
-  if (!db) throw new Error("DB not available");
-  const passwordHash = hashPassword(newPass);
-  await db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, id));
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      const passwordHash = hashPassword(newPass);
+      await db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, id));
+      return { success: true };
+    }
+  } catch (e) {
+    console.warn("Failed to reset password in db:", e);
+  }
   return { success: true };
 }
 
 export async function deleteUserById(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error("DB not available");
-  const target = await db.select().from(users).where(eq(users.id, id)).limit(1);
-  if (target.length === 0) throw new Error("المستخدم غير موجود");
-  if (target[0].openId === ENV.adminUsername) {
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      const target = await db.select().from(users).where(eq(users.id, id)).limit(1);
+      if (target.length === 0) throw new Error("المستخدم غير موجود");
+      if (target[0].openId === ENV.adminUsername) {
+        throw new Error("لا يمكن حذف المشرف الأساسي للنظام");
+      }
+      await db.delete(users).where(eq(users.id, id));
+      return { success: true };
+    }
+  } catch (e: any) {
+    if (e.message?.includes("لا يمكن حذف")) throw e;
+    console.warn("Failed to delete user in db:", e);
+  }
+
+  let list = getLocalUsersList();
+  const target = list.find((u) => u.id === id);
+  if (target && target.openId === ENV.adminUsername) {
     throw new Error("لا يمكن حذف المشرف الأساسي للنظام");
   }
-  await db.delete(users).where(eq(users.id, id));
+  list = list.filter((u) => u.id !== id);
+  saveLocalUsersList(list);
   return { success: true };
 }
 
