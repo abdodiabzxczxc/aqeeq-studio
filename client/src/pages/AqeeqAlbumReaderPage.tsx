@@ -396,13 +396,13 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </div>
             </div>
 
-            {/* Luxury Responsive Grid */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {/* Luxury Masonry Flow Grid (True Dimensions / Natural Aspect Ratio) */}
+            <div className="columns-1 gap-3.5 sm:columns-2 md:columns-3 lg:columns-4 [column-fill:_balance]">
               {(album.media as AlbumItem[]).map((item, mediaIndex) => (
                 <div
                   id={`aq-album-media-${mediaIndex}`}
                   key={item.id}
-                  className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border text-right transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
+                  className={`break-inside-avoid group relative mb-3.5 w-full overflow-hidden rounded-2xl border text-right transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
                     index === mediaIndex
                       ? "border-amber-300 ring-2 ring-amber-300/50 shadow-amber-300/20 shadow-lg"
                       : dark
@@ -417,38 +417,40 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                       setMode(item.mediaType === "video" ? "scroll" : "spread");
                       resetZoom();
                     }}
-                    className="block h-full w-full"
+                    className="block w-full text-right"
                   >
                     {item.mediaType === "video" ? (
-                      <>
+                      <div className="relative aspect-video w-full overflow-hidden bg-black">
                         <VisualImage
                           id={`album-gallery-poster-${item.id}`}
                           label="صورة معاينة فيديو الألبوم"
                           src={getAqeeqAlbumImageSource(item)}
                           alt=""
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-108"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                         <span className="absolute inset-0 grid place-items-center bg-black/30 backdrop-blur-[1px] transition group-hover:bg-black/15">
                           <span className="grid h-12 w-12 place-items-center rounded-full border border-white/30 bg-black/60 text-white shadow-xl backdrop-blur-md transition group-hover:scale-110 group-hover:bg-amber-300 group-hover:text-black">
                             <Video size={20} />
                           </span>
                         </span>
-                      </>
+                      </div>
                     ) : (
-                      <VisualImage
-                        id={`album-gallery-image-${item.id}`}
-                        label="صورة معرض الألبوم"
-                        src={getAqeeqAlbumImageSource(item)}
-                        alt={item.caption || item.fileName}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-108"
-                      />
+                      <div className="relative w-full overflow-hidden bg-black/[.02] dark:bg-black/30">
+                        <VisualImage
+                          id={`album-gallery-image-${item.id}`}
+                          label="صورة معرض الألبوم"
+                          src={getAqeeqAlbumImageSource(item)}
+                          alt={item.caption || item.fileName}
+                          className="block h-auto w-full object-contain transition duration-500 group-hover:scale-[1.02]"
+                        />
+                      </div>
                     )}
                     {/* Index Badge */}
-                    <span className="absolute right-2.5 top-2.5 z-10 rounded-lg border border-black/40 bg-black/65 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-200 backdrop-blur-sm">
+                    <span className="absolute right-2.5 top-2.5 z-10 rounded-lg border border-black/40 bg-black/65 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-200 backdrop-blur-sm shadow-md">
                       #{String(mediaIndex + 1).padStart(2, "0")}
                     </span>
                     {/* Caption Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 pt-8 text-[11px] font-bold text-white transition group-hover:from-black/95">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-3 pt-8 text-[11px] font-bold text-white opacity-90 transition duration-300 group-hover:opacity-100 group-hover:from-black/95">
                       <div className="truncate drop-shadow-sm">{item.caption || item.fileName}</div>
                       <div className="mt-0.5 text-[9px] text-amber-300/90 font-medium">انقر للعرض في الألبوم</div>
                     </div>
