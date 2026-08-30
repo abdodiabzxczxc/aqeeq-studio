@@ -66,7 +66,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             <img
               src="/alaqeeq-logo.png"
               alt="شعار مدارس العقيق الأهلية والدولية"
-              className="max-h-full max-w-full object-contain"
+              className={`max-h-full max-w-full object-contain transition duration-200 ${
+                dark ? "brightness-0 invert opacity-95" : ""
+              }`}
             />
           </button>
 
