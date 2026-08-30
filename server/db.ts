@@ -273,8 +273,33 @@ export type SiteBroadcast = {
   id?: string;
 };
 
+async function getLegacyBroadcastFromStorage(db: any): Promise<SiteBroadcast> {
+  let raw: string | undefined;
+  if (!db) {
+    raw = localSettings.get("site_broadcast");
+  } else {
+    try {
+      const rows = await db.select().from(settings).where(eq(settings.key, "site_broadcast")).limit(1);
+      if (rows.length > 0 && rows[0].value) {
+        try {
+          return JSON.parse(rows[0].value);
+        } catch {}
+      }
+    } catch {
+      raw = localSettings.get("site_broadcast");
+    }
+  }
+
+  if (raw) {
+    try {
+      return JSON.parse(raw) as SiteBroadcast;
+    } catch {}
+  }
+  return { enabled: false, message: "", type: "info" };
+}
+
 export async function listSiteBroadcastItems(): Promise<SiteBroadcastItem[]> {
-  const db = await getDb();
+  const db = await getDb().catch(() => null);
   let rawJson: string | undefined;
   if (!db) {
     rawJson = localSettings.get("site_broadcast_items");
@@ -283,7 +308,8 @@ export async function listSiteBroadcastItems(): Promise<SiteBroadcastItem[]> {
       const row = await db.select().from(settings).where(eq(settings.key, "site_broadcast_items")).limit(1);
       if (row.length > 0 && row[0].value) rawJson = row[0].value;
     } catch (err) {
-      console.warn("Failed to get site_broadcast_items:", err);
+      console.warn("Failed to get site_broadcast_items from db:", err);
+      rawJson = localSettings.get("site_broadcast_items");
     }
   }
 
@@ -294,8 +320,8 @@ export async function listSiteBroadcastItems(): Promise<SiteBroadcastItem[]> {
     } catch {}
   }
 
-  // Fallback to legacy single broadcast if items list is empty
-  const single = await getSiteBroadcast();
+  // Fallback to legacy single broadcast without calling listSiteBroadcastItems
+  const single = await getLegacyBroadcastFromStorage(db);
   if (single && single.message) {
     return [
       {
@@ -334,11 +360,9 @@ export async function saveSiteBroadcastItem(item: Omit<SiteBroadcastItem, "id" |
     newItem.createdAt = list[existingIdx].createdAt;
     list[existingIdx] = newItem;
   } else {
-    // If the new item is enabled, we can keep it active
     list.unshift(newItem);
   }
 
-  // If this item is enabled, optionally make other items disabled or keep multi
   if (newItem.enabled) {
     for (const other of list) {
       if (other.id !== id) other.enabled = false;
@@ -346,19 +370,17 @@ export async function saveSiteBroadcastItem(item: Omit<SiteBroadcastItem, "id" |
   }
 
   const json = JSON.stringify(list);
-  const db = await getDb();
-  if (!db) {
-    localSettings.set("site_broadcast_items", json);
-    localSettings.set("site_broadcast", JSON.stringify(newItem));
-  } else {
-    try {
+  localSettings.set("site_broadcast_items", json);
+  localSettings.set("site_broadcast", JSON.stringify(newItem));
+
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
       await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
       await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(newItem) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(newItem), updatedAt: new Date() } });
-    } catch (e) {
-      console.warn("Failed to persist broadcast to db, saving to localSettings:", e);
-      localSettings.set("site_broadcast_items", json);
-      localSettings.set("site_broadcast", JSON.stringify(newItem));
     }
+  } catch (e) {
+    console.warn("Failed to persist broadcast to db, saved to localSettings:", e);
   }
 
   return newItem;
@@ -368,20 +390,19 @@ export async function deleteSiteBroadcastItem(id: string): Promise<boolean> {
   let list = await listSiteBroadcastItems();
   list = list.filter((b) => b.id !== id);
   const json = JSON.stringify(list);
-  const db = await getDb();
-  if (!db) {
-    localSettings.set("site_broadcast_items", json);
-    const active = list.find((b) => b.enabled) || { enabled: false, message: "", type: "info" };
-    localSettings.set("site_broadcast", JSON.stringify(active));
-  } else {
-    try {
+  const active = list.find((b) => b.enabled) || { enabled: false, message: "", type: "info" };
+
+  localSettings.set("site_broadcast_items", json);
+  localSettings.set("site_broadcast", JSON.stringify(active));
+
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
       await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
-      const active = list.find((b) => b.enabled) || { enabled: false, message: "", type: "info" };
       await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(active) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(active), updatedAt: new Date() } });
-    } catch (e) {
-      console.warn("Failed to delete broadcast from db:", e);
-      localSettings.set("site_broadcast_items", json);
     }
+  } catch (e) {
+    console.warn("Failed to delete broadcast from db:", e);
   }
   return true;
 }
@@ -401,18 +422,19 @@ export async function toggleSiteBroadcastItem(id: string, enabled: boolean): Pro
   }
 
   const json = JSON.stringify(list);
-  const db = await getDb();
-  if (!db) {
-    localSettings.set("site_broadcast_items", json);
-    localSettings.set("site_broadcast", JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }));
-  } else {
-    try {
+  const active = enabled ? item : { enabled: false, message: "", type: "info" };
+
+  localSettings.set("site_broadcast_items", json);
+  localSettings.set("site_broadcast", JSON.stringify(active));
+
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
       await db.insert(settings).values({ key: "site_broadcast_items", value: json }).onDuplicateKeyUpdate({ set: { value: json, updatedAt: new Date() } });
-      await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(enabled ? item : { enabled: false, message: "", type: "info" }), updatedAt: new Date() } });
-    } catch (e) {
-      console.warn("Failed to toggle broadcast in db:", e);
-      localSettings.set("site_broadcast_items", json);
+      await db.insert(settings).values({ key: "site_broadcast", value: JSON.stringify(active) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(active), updatedAt: new Date() } });
     }
+  } catch (e) {
+    console.warn("Failed to toggle broadcast in db:", e);
   }
 
   return item;
@@ -433,24 +455,8 @@ export async function getSiteBroadcast(): Promise<SiteBroadcast> {
     };
   }
 
-  const db = await getDb();
-  let raw: string | undefined;
-  if (!db) {
-    raw = localSettings.get("site_broadcast");
-  } else {
-    try {
-      const row = await db.select().from(settings).where(eq(settings.key, "site_broadcast")).limit(1);
-      if (row.length > 0 && row[0].value) raw = row[0].value;
-    } catch {}
-  }
-
-  if (raw) {
-    try {
-      return JSON.parse(raw) as SiteBroadcast;
-    } catch {}
-  }
-
-  return { enabled: false, message: "", type: "info" };
+  const db = await getDb().catch(() => null);
+  return getLegacyBroadcastFromStorage(db);
 }
 
 export async function setSiteBroadcast(data: SiteBroadcast): Promise<SiteBroadcast> {
@@ -2354,9 +2360,13 @@ export async function logAudit(data: {
   details?: string;
   ipAddress?: string;
 }) {
-  const db = await getDb();
-  if (!db) return;
-  await db.insert(auditLogs).values(data);
+  try {
+    const db = await getDb().catch(() => null);
+    if (!db) return;
+    await db.insert(auditLogs).values(data);
+  } catch (err) {
+    console.warn("Failed to log audit event:", err);
+  }
 }
 
 export async function listAuditLogs(limit = 100, ceremonyId?: number) {

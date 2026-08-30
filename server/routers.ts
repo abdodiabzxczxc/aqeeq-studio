@@ -108,6 +108,7 @@ import {
   hideSiteStory,
   unhideSiteStory,
   getAqeeqAnalyticsSummary,
+  type SiteBroadcast,
 } from "./db";
 import { generateAiNewsStory, generateAiAlbumDescription } from "./aiStoryService";
 import { readGoogleDriveAlbum, getDrivePdfFileId } from "./googleDriveAlbum";
@@ -827,23 +828,23 @@ export const appRouter = router({
   executiveAdmin: router({
     getOverviewStats: adminProcedure.query(async () => {
       const [issues, albums, showcase, usersList, logs, broadcast, orchestration] = await Promise.all([
-        listSchoolNewsIssues(),
-        listAqeeqAlbums(),
-        getAqeeqShowcaseBySlug("news-offers"),
-        listUsers(),
-        listAuditLogs(10),
-        getSiteBroadcast(),
-        getSiteOrchestration(),
+        listSchoolNewsIssues().catch(() => []),
+        listAqeeqAlbums().catch(() => []),
+        getAqeeqShowcaseBySlug("news-offers").catch(() => null),
+        listUsers().catch(() => []),
+        listAuditLogs(10).catch(() => []),
+        getSiteBroadcast().catch((): SiteBroadcast => ({ enabled: false, message: "", type: "info" })),
+        getSiteOrchestration().catch(() => null),
       ]);
 
       const totalIssues = issues.length;
       const totalAlbums = albums.length;
-      const totalPosts = showcase?.posts?.length || 0;
-      const totalMediaFiles = albums.reduce((sum, alb) => sum + (alb.mediaCount || 0), 0) + totalPosts;
+      const totalPosts = (showcase as any)?.posts?.length || 0;
+      const totalMediaFiles = (albums as any[]).reduce((sum: number, alb: any) => sum + (alb.mediaCount || 0), 0) + totalPosts;
       const totalViews =
-        issues.reduce((sum, iss) => sum + (iss.viewCount || 0), 0) +
-        albums.reduce((sum, alb) => sum + (alb.viewCount || 0), 0) +
-        (showcase?.posts?.reduce((sum, p) => sum + (p.viewCount || 0), 0) || 0);
+        (issues as any[]).reduce((sum: number, iss: any) => sum + (iss.viewCount || 0), 0) +
+        (albums as any[]).reduce((sum: number, alb: any) => sum + (alb.viewCount || 0), 0) +
+        ((showcase as any)?.posts?.reduce((sum: number, p: any) => sum + (p.viewCount || 0), 0) || 0);
 
       const now = Date.now();
       const allActiveStories: Array<{
@@ -1079,9 +1080,9 @@ export const appRouter = router({
 
     getMasterContent: adminProcedure.query(async () => {
       const [issues, albums, showcase] = await Promise.all([
-        listSchoolNewsIssues(),
-        listAqeeqAlbums(),
-        getAqeeqShowcaseBySlug("news-offers"),
+        listSchoolNewsIssues().catch(() => []),
+        listAqeeqAlbums().catch(() => []),
+        getAqeeqShowcaseBySlug("news-offers").catch(() => null),
       ]);
 
       const unifiedList: Array<{

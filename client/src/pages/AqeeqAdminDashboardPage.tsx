@@ -293,12 +293,13 @@ const DEFAULT_ORCHESTRATION = {
   // Sync broadcast state from server once loaded
   const [broadcastInitialized, setBroadcastInitialized] = useState(false);
   if (stats?.broadcast && !broadcastInitialized) {
-    setBroadcastEnabled(stats.broadcast.enabled);
-    setBroadcastMessage(stats.broadcast.message || "");
-    setBroadcastType(stats.broadcast.type || "info");
-    setBroadcastLink(stats.broadcast.link || "");
-    setBroadcastLinkText(stats.broadcast.linkText || "");
-    if (stats.broadcast.id) setEditingBroadcastId(stats.broadcast.id);
+    const b = stats.broadcast as any;
+    setBroadcastEnabled(Boolean(b.enabled));
+    setBroadcastMessage(b.message || "");
+    setBroadcastType(b.type || "info");
+    setBroadcastLink(b.link || "");
+    setBroadcastLinkText(b.linkText || "");
+    if (b.id) setEditingBroadcastId(b.id);
     setBroadcastInitialized(true);
   }
 
@@ -2354,7 +2355,7 @@ const DEFAULT_ORCHESTRATION = {
 
               <div className="space-y-2">
                 {stats?.recentLogs?.length ? (
-                  stats.recentLogs.slice(0, 5).map((log) => (
+                  stats.recentLogs.slice(0, 5).map((log: any) => (
                     <div
                       key={log.id}
                       className={"flex items-center justify-between rounded-xl p-3 text-xs " + (
