@@ -5,6 +5,7 @@ import AqeeqAlbumSocialEmbed from "@/components/AqeeqAlbumSocialEmbed";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
+import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqAlbumSpreadWatermark } from "@/lib/aqeeqAlbumReaderTheme";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -353,15 +354,20 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </button>
             </div>
           ) : null}
+          {album.backgroundAudioUrl ? (
+            <AqeeqReaderAudioController
+              audioUrl={album.backgroundAudioUrl}
+              trackTitle={album.title}
+              dark={dark}
+            />
+          ) : null}
           <VisualEditable id="album-reader-theme-action" tag="button" label="زر مظهر قارئ الألبوم" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-theme-icon" label="أيقونة مظهر قارئ الألبوم" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
           <VisualEditable id="album-reader-archive-action" tag="button" label="زر كل الألبومات" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-archive-icon" label="أيقونة أرشيف الألبومات" icon="archive" size={16} /></VisualEditable>
           {isAdmin ? <VisualEditable id="album-reader-manage-action" tag="button" label="زر إدارة الألبوم" defaultText="إدارة الألبوم" as="button" onAction={() => navigate(`/albums/manage?album=${album.slug}`)} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-manage-icon" label="أيقونة إدارة الألبوم" icon="settings" size={16} /></VisualEditable> : null}
-          {album.backgroundAudioUrl ? <VisualEditable id="album-reader-sound-action" tag="button" label="زر موسيقى الألبوم" defaultText={soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"} as="button" onAction={() => void toggleSound()} className={`grid h-9 w-9 place-items-center rounded-xl border ${soundEnabled ? "border-amber-300/50 bg-amber-300/10 text-amber-200" : dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-sound-icon" label="أيقونة موسيقى الألبوم" icon="sound" size={16} /></VisualEditable> : null}
         </div>
       </header>
       <div className="mt-3 flex justify-end"><nav className={`inline-flex rounded-xl border p-1 ${dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-white"}`}>{([ ["spread", "الألبوم"], ["scroll", "قراءة طولية"], ["gallery", "كل الصور"] ] as const).map(([id, label]) => <VisualEditable key={id} id={`album-reader-mode-${id}`} tag="button" label={`زر وضع قراءة ${label}`} defaultText={label} as="button" onAction={() => setMode(id)} className={`rounded-lg px-3 py-2 text-[11px] font-black transition ${mode === id ? "bg-amber-300 text-slate-950" : dark ? "text-slate-400" : "text-slate-500"}`} />)}</nav></div>
       {album.description ? <VisualEditable id="album-reader-description" tag="text" label="وصف الألبوم في القارئ" defaultText={album.description} as="p" className={`mx-auto mt-4 max-w-4xl text-center text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`} /> : null}
-      {album.backgroundAudioUrl ? <audio ref={audioRef} src={album.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
       <section className={`relative mt-5 overflow-hidden rounded-[1.9rem] border ${dark ? "border-amber-300/20 bg-[#0d111b]" : "border-amber-700/15 bg-white"}`}>
         {watermark ? <VisualImage id="album-reader-watermark" label="العلامة المائية للألبوم" src={watermark} alt="" className={`pointer-events-none absolute z-0 ${watermarkPlacement} ${dark ? "brightness-0 invert" : ""}`} style={watermarkStyle} /> : null}
 

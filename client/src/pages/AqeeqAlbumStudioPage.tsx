@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
+import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
@@ -68,6 +69,7 @@ export default function AqeeqAlbumStudioPage() {
   const [newDescription, setNewDescription] = useState("");
   const [newDriveUrl, setNewDriveUrl] = useState("");
   const [newReadingMode, setNewReadingMode] = useState<AlbumMode>("spread");
+  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(null);
 
   const [mediaTarget, setMediaTarget] = useState<MediaTarget>(null);
   const [albumMediaLibraryOpen, setAlbumMediaLibraryOpen] = useState(false);
@@ -442,14 +444,21 @@ export default function AqeeqAlbumStudioPage() {
                   </div>
                 </div>
 
+                {/* Background Audio Manager */}
+                <AqeeqAudioManagerField
+                  value={backgroundAudioUrl}
+                  onChange={setBackgroundAudioUrl}
+                  dark={dark}
+                  label="موسيقى وخلفية الألبوم الصوتية"
+                />
+
                 {/* Album Branding & Watermark */}
                 <div className={"rounded-xl border p-3 " + (dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-50")}>
-                  <p className={"text-[11px] font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>هوية الألبوم</p>
+                  <p className={"text-[11px] font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>هوية الألبوم والعلامة المائية</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
                     {([
                       ["cover", "غلاف الألبوم", coverUrl, Camera],
                       ["headerLogo", "شعار الرأس", headerLogoUrl, ImageIcon],
-                      ["audio", "موسيقى الخلفية", backgroundAudioUrl, Music2],
                       ["watermark", "العلامة المائية", watermarkUrl, Sparkles],
                     ] as const).map(([field, label, value, Icon]) => (
                       <button
@@ -817,6 +826,12 @@ export default function AqeeqAlbumStudioPage() {
                 className={"mt-2 min-h-20 " + (dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black")}
               />
             </div>
+            <AqeeqAudioManagerField
+              value={newBackgroundAudioUrl}
+              onChange={setNewBackgroundAudioUrl}
+              dark={dark}
+              label="الموسيقى والخلفية الصوتية للألبوم (اختياري)"
+            />
             <Button
               onClick={() =>
                 create.mutate({
@@ -826,6 +841,7 @@ export default function AqeeqAlbumStudioPage() {
                   description: newDescription || null,
                   driveFolderUrl: newDriveUrl.trim() || null,
                   readingMode: newReadingMode,
+                  backgroundAudioUrl: newBackgroundAudioUrl,
                 })
               }
               disabled={create.isPending}

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { JOURNAL_READING_OPTIONS, normalizeJournalReadingMode } from "@/lib/journalReading";
 import { DEFAULT_JOURNAL_SEASON_LABEL, normalizeJournalSeasonLabel } from "@/lib/journalSeasonLabel";
+import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
@@ -70,6 +71,7 @@ export default function JournalStudioPage() {
   const [newSeasonLabel, setNewSeasonLabel] = useState(DEFAULT_JOURNAL_SEASON_LABEL);
   const [newMode, setNewMode] = useState<"spread" | "scroll">("spread");
   const [newDriveUrl, setNewDriveUrl] = useState("");
+  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(null);
 
   const [pageId, setPageId] = useState<number | null>(null);
   const [target, setTarget] = useState<Target>(null);
@@ -457,13 +459,20 @@ export default function JournalStudioPage() {
                   </div>
                 </div>
 
+                {/* Background Audio Manager */}
+                <AqeeqAudioManagerField
+                  value={backgroundAudioUrl}
+                  onChange={setBackgroundAudioUrl}
+                  dark={dark}
+                  label="موسيقى وخلفية العدد الصوتية"
+                />
+
                 {/* Reader Branding & Watermark */}
                 <div className={"rounded-xl border p-3 " + (dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-50")}>
-                  <p className={"text-[11px] font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>هوية القارئ</p>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  <p className={"text-[11px] font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>هوية القارئ والعلامة المائية</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {([
                       ["headerLogo", "شعار الرأس", headerLogoUrl, ImageIcon],
-                      ["audio", "موسيقى الخلفية", backgroundAudioUrl, Music2],
                       ["watermark", "العلامة المائية", watermarkUrl, Sparkles],
                     ] as const).map(([field, label, value, Icon]) => (
                       <button
@@ -838,6 +847,12 @@ export default function JournalStudioPage() {
                 className={"mt-2 min-h-20 " + (dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black")}
               />
             </div>
+            <AqeeqAudioManagerField
+              value={newBackgroundAudioUrl}
+              onChange={setNewBackgroundAudioUrl}
+              dark={dark}
+              label="الموسيقى والخلفية الصوتية للعدد (اختياري)"
+            />
             <Button
               onClick={() =>
                 create.mutate({
@@ -849,7 +864,7 @@ export default function JournalStudioPage() {
                   seasonLabel: normalizeJournalSeasonLabel(newSeasonLabel),
                   readingMode: newMode,
                   headerLogoUrl: null,
-                  backgroundAudioUrl: null,
+                  backgroundAudioUrl: newBackgroundAudioUrl,
                   watermarkUrl: null,
                   watermarkScale: 42,
                   watermarkOpacity: 12,

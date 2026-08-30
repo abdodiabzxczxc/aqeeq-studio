@@ -10,6 +10,7 @@ import { JOURNAL_READING_OPTIONS, JournalReadingMode, normalizeJournalReadingMod
 import { toggleJournalReaderTheme } from "@/lib/journalTheme";
 import { normalizeJournalWatermark } from "@/lib/journalWatermark";
 import { trpc } from "@/lib/trpc";
+import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { Archive, ArrowRight, Loader2, Moon, Newspaper, Settings2, Sun, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -60,12 +61,78 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   const watermark = normalizeJournalWatermark({ url: issue.watermarkUrl || brandLogoUrl, scale: issue.watermarkScale, opacity: issue.watermarkOpacity, position: issue.watermarkPosition, tint: issue.watermarkTint });
   const readerWatermark = { ...watermark, scale: 140, position: "bottom-left" as const, cropLeft: true, tint: readerTheme === "dark" ? "#ffffff" : watermark.tint };
-  const toggleSound = async () => {
-    const audio = audioRef.current;
-    if (!audio || !issue.backgroundAudioUrl) return;
-    if (audio.paused) { try { await audio.play(); setSoundEnabled(true); } catch { setSoundEnabled(false); } }
-    else { audio.pause(); setSoundEnabled(false); }
-  };
-  const unifiedHeader = <header className="aq-unified-reader-header" style={{ overflow: "visible" }}><div className="aq-unified-reader-identity"><div className="aq-unified-reader-copy"><VisualEditable id="news-reader-kicker" tag="text" label="شارة قارئ المجلة" defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}${issue.seasonLabel} · ${issue.issueDate}`} as="div" className="aq-unified-reader-kicker" /><VisualEditable id="news-reader-header-title" tag="text" label="عنوان قارئ المجلة" defaultText={issue.title} as="h1" className="aq-unified-reader-title" /></div></div><div className="aq-unified-reader-actions"><VisualEditable id="news-reader-theme-action" tag="button" label="زر مظهر قارئ المجلة" defaultText={readerTheme === "dark" ? "تشغيل وايت مود" : "تشغيل دارك مود"} as="button" onAction={toggleTheme} className="aq-unified-reader-icon" ><VisualIcon id="news-reader-theme-icon" label="أيقونة مظهر قارئ المجلة" icon={readerTheme === "dark" ? "sun" : "moon"} size={16} /></VisualEditable><VisualEditable id="news-reader-archive-action" tag="button" label="زر كل أعداد المجلة" defaultText="كل الأعداد" as="button" onAction={() => navigate("/journal")} className="aq-unified-reader-icon"><VisualIcon id="news-reader-archive-icon" label="أيقونة أرشيف المجلة" icon="menu" size={16} /></VisualEditable>{isAdmin ? <VisualEditable id="news-reader-manage-action" tag="button" label="زر إدارة العدد" defaultText="إدارة العدد" as="button" onAction={() => navigate(`/news/manage?issue=${issue.slug}`)} className="aq-unified-reader-icon"><VisualIcon id="news-reader-manage-icon" label="أيقونة إدارة العدد" icon="menu" size={16} /></VisualEditable> : null}{issue.backgroundAudioUrl ? <VisualEditable id="news-reader-sound-action" tag="button" label="زر موسيقى المجلة" defaultText={soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"} as="button" onAction={() => void toggleSound()} className={`aq-unified-reader-icon ${soundEnabled ? "is-active" : ""}`}><VisualIcon id="news-reader-sound-icon" label="أيقونة موسيقى المجلة" icon="send" size={16} /></VisualEditable> : null}</div></header>;
-  return <main dir="rtl" className={`aq-journal-reader-theme aq-journal-reader-theme-${readerTheme} min-h-screen text-slate-100`}><AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} /><div className={standalone ? "mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6" : "container py-6"}>{!standalone ? <VisualEditable id="news-reader-back-action" tag="button" label="زر رجوع مكتبة المجلة" defaultText="عودة إلى مجلة العقيق" as="button" onAction={() => navigate("/journal")} className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-200">{(text) => <><VisualIcon id="news-reader-back-icon" label="أيقونة رجوع المجلة" icon="external" size={16} />{text}</>}</VisualEditable> : null}<VisualEditable id="news-reader-shell" tag="section" label="إطار قارئ العدد" as="section" className="rounded-[2rem]"><VisualEditable id="news-reader-page-title" tag="text" label="عنوان العدد في القارئ" as="h1" defaultText={issue.title} className="sr-only" />{issue.backgroundAudioUrl ? <audio ref={audioRef} src={issue.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}{unifiedHeader}<nav className="aq-reader-mode-switch" aria-label="طريقة عرض العدد">{JOURNAL_READING_OPTIONS.map((option) => <VisualEditable key={option.id} id={`news-reader-mode-${option.id}`} tag="button" label={`زر وضع قراءة ${option.title}`} defaultText={option.title} as="button" onAction={() => setReaderMode(option.id)} className={readerMode === option.id ? "is-active" : ""} />)}</nav>{isFlipbook ? <SchoolNewsFlipbook title={issue.title} kicker={`${issue.seasonLabel} · ${issue.issueDate}`} pages={readerPages} coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl} watermark={readerWatermark} shareUrl={shareUrl} onArchive={() => navigate("/journal")} /> : <SchoolNewsPager title={issue.title} kicker={`${issue.seasonLabel} · ${issue.issueDate}`} pages={readerPages} coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl} shareUrl={shareUrl} initialMode={readerMode} onArchive={() => navigate("/journal")} />}</VisualEditable></div></main>;
+  const unifiedHeader = (
+    <header className="aq-unified-reader-header" style={{ overflow: "visible" }}>
+      <div className="aq-unified-reader-identity">
+        <div className="aq-unified-reader-copy">
+          <VisualEditable id="news-reader-kicker" tag="text" label="شارة قارئ المجلة" defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}${issue.seasonLabel} · ${issue.issueDate}`} as="div" className="aq-unified-reader-kicker" />
+          <VisualEditable id="news-reader-header-title" tag="text" label="عنوان قارئ المجلة" defaultText={issue.title} as="h1" className="aq-unified-reader-title" />
+        </div>
+      </div>
+      <div className="aq-unified-reader-actions">
+        {issue.backgroundAudioUrl ? (
+          <AqeeqReaderAudioController
+            audioUrl={issue.backgroundAudioUrl}
+            trackTitle={issue.title}
+            dark={readerTheme === "dark"}
+          />
+        ) : null}
+        <VisualEditable id="news-reader-theme-action" tag="button" label="زر مظهر قارئ المجلة" defaultText={readerTheme === "dark" ? "تشغيل وايت مود" : "تشغيل دارك مود"} as="button" onAction={toggleTheme} className="aq-unified-reader-icon">
+          <VisualIcon id="news-reader-theme-icon" label="أيقونة مظهر قارئ المجلة" icon={readerTheme === "dark" ? "sun" : "moon"} size={16} />
+        </VisualEditable>
+        <VisualEditable id="news-reader-archive-action" tag="button" label="زر كل أعداد المجلة" defaultText="كل الأعداد" as="button" onAction={() => navigate("/journal")} className="aq-unified-reader-icon">
+          <VisualIcon id="news-reader-archive-icon" label="أيقونة أرشيف المجلة" icon="menu" size={16} />
+        </VisualEditable>
+        {isAdmin ? (
+          <VisualEditable id="news-reader-manage-action" tag="button" label="زر إدارة العدد" defaultText="إدارة العدد" as="button" onAction={() => navigate(`/news/manage?issue=${issue.slug}`)} className="aq-unified-reader-icon">
+            <VisualIcon id="news-reader-manage-icon" label="أيقونة إدارة العدد" icon="menu" size={16} />
+          </VisualEditable>
+        ) : null}
+      </div>
+    </header>
+  );
+
+  return (
+    <main dir="rtl" className={`aq-journal-reader-theme aq-journal-reader-theme-${readerTheme} min-h-screen text-slate-100`}>
+      <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} />
+      <div className={standalone ? "mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6" : "container py-6"}>
+        {!standalone ? (
+          <VisualEditable id="news-reader-back-action" tag="button" label="زر رجوع مكتبة المجلة" defaultText="عودة إلى مجلة العقيق" as="button" onAction={() => navigate("/journal")} className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-200">
+            {(text) => <><VisualIcon id="news-reader-back-icon" label="أيقونة رجوع المجلة" icon="external" size={16} />{text}</>}
+          </VisualEditable>
+        ) : null}
+        <VisualEditable id="news-reader-shell" tag="section" label="إطار قارئ العدد" as="section" className="rounded-[2rem]">
+          <VisualEditable id="news-reader-page-title" tag="text" label="عنوان العدد في القارئ" as="h1" defaultText={issue.title} className="sr-only" />
+          {unifiedHeader}
+          <nav className="aq-reader-mode-switch" aria-label="طريقة عرض العدد">
+            {JOURNAL_READING_OPTIONS.map((option) => (
+              <VisualEditable key={option.id} id={`news-reader-mode-${option.id}`} tag="button" label={`زر وضع قراءة ${option.title}`} defaultText={option.title} as="button" onAction={() => setReaderMode(option.id)} className={readerMode === option.id ? "is-active" : ""} />
+            ))}
+          </nav>
+          {isFlipbook ? (
+            <SchoolNewsFlipbook
+              title={issue.title}
+              kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
+              pages={readerPages}
+              coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
+              watermark={readerWatermark}
+              shareUrl={shareUrl}
+              backgroundAudioUrl={issue.backgroundAudioUrl}
+              onArchive={() => navigate("/journal")}
+            />
+          ) : (
+            <SchoolNewsPager
+              title={issue.title}
+              kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
+              pages={readerPages}
+              coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
+              shareUrl={shareUrl}
+              initialMode={readerMode}
+              onArchive={() => navigate("/journal")}
+            />
+          )}
+        </VisualEditable>
+      </div>
+    </main>
+  );
 }

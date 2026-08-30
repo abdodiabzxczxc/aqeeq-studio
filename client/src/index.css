@@ -1770,3 +1770,31 @@ main:has(.aq-journal-studio-preview) > header { border-color: rgb(217 189 38 / .
 main:has(.aq-journal-studio-preview) [class*="text-emerald"] { color: var(--aq-green) !important; }
 main:has(.aq-journal-studio-preview) [class*="border-emerald"] { border-color: rgb(21 84 57 / .56) !important; }
 main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: var(--aq-green) !important; color: var(--aq-white) !important; }
+
+/* Animated Gold Equalizer for Audio Player */
+.aq-equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 14px;
+}
+.aq-equalizer-bar {
+  width: 2.5px;
+  background-color: currentColor;
+  border-radius: 9999px;
+  animation: aq-equalizer-bounce 0.8s ease-in-out infinite alternate;
+}
+.aq-equalizer-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.aq-equalizer-bar:nth-child(2) { height: 80%; animation-delay: 0.3s; }
+.aq-equalizer-bar:nth-child(3) { height: 100%; animation-delay: 0.0s; }
+.aq-equalizer-bar:nth-child(4) { height: 60%; animation-delay: 0.4s; }
+
+@keyframes aq-equalizer-bounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+.aq-equalizer-paused .aq-equalizer-bar {
+  animation: none !important;
+  transform: scaleY(0.3) !important;
+}
