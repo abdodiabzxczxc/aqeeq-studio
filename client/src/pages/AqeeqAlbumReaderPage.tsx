@@ -339,7 +339,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                   اسحب الصورة للتقليب أو استخدم الأسهم
                 </div>
               </div>
-              <div className="flex items-center justify-center gap-2">
+              <div dir="ltr" className="flex items-center justify-center gap-2">
                 <button
                   type="button"
                   onClick={() => moveThroughAlbum("previous")}
