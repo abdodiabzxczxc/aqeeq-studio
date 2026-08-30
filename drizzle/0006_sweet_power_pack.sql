@@ -1,0 +1,1 @@
+ALTER TABLE `auditLogs` ADD `ceremonyId` int;

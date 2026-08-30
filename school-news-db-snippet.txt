@@ -1,0 +1,141 @@
+995-    db.select().from(eventMaisonSettings),
+996-  ]);
+997-  const byCeremony = new Map(settingsRows.map((item) => [item.ceremonyId, item]));
+998-  return events.map((event) => ({ event, maison: byCeremony.get(event.id) ?? { ceremonyId: event.id, ...DEFAULT_MAISON_SETTINGS } }));
+999-}
+1000-
+1001-// ==================== School News ====================
+1002-
+1003:export async function listSchoolNewsIssues(status?: "draft" | "published") {
+1004-  const db = await getDb();
+1005-  if (!db) return [];
+1006-  const issues = status ? await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.status, status)).orderBy(desc(schoolNewsIssues.issueDate)) : await db.select().from(schoolNewsIssues).orderBy(desc(schoolNewsIssues.issueDate));
+1007-  const pages = await db.select().from(schoolNewsPages).orderBy(schoolNewsPages.pageOrder);
+1008-  return issues.map((issue) => ({ ...issue, pageCount: pages.filter((page) => page.issueId === issue.id).length }));
+1009-}
+1010-
+1011:export async function getSchoolNewsIssueBySlug(slug: string, includeDraft = false) {
+1012-  const db = await getDb();
+1013-  if (!db) return undefined;
+1014-  const rows = includeDraft ? await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.slug, slug)).limit(1) : await db.select().from(schoolNewsIssues).where(and(eq(schoolNewsIssues.slug, slug), eq(schoolNewsIssues.status, "published"))).limit(1);
+1015-  const issue = rows[0];
+1016-  if (!issue) return undefined;
+1017-  const pages = await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issue.id)).orderBy(schoolNewsPages.pageOrder);
+1018-  return { ...issue, pages };
+1019-}
+1020-
+1021:export async function createSchoolNewsIssue(data: typeof schoolNewsIssues.$inferInsert) {
+1022-  const db = await getDb();
+1023-  if (!db) throw new Error("DB not available");
+1024-  await db.insert(schoolNewsIssues).values(data);
+1025-  const rows = await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.slug, data.slug)).limit(1);
+1026-  return rows[0];
+1027-}
+1028-
+1029:export async function updateSchoolNewsIssue(id: number, data: Partial<typeof schoolNewsIssues.$inferInsert>) {
+1030-  const db = await getDb();
+1031-  if (!db) throw new Error("DB not available");
+1032-  await db.update(schoolNewsIssues).set(data).where(eq(schoolNewsIssues.id, id));
+1033-  return (await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.id, id)).limit(1))[0];
+1034-}
+1035-
+1036-export async function setSchoolNewsCover(issueId: number, cover: { imageUrl: string; imageStorageKey?: string | null }) {
+1037-  const db = await getDb();
+1038-  if (!db) throw new Error("DB not available");
+1039-  await db.update(schoolNewsIssues).set({ coverUrl: cover.imageUrl }).where(eq(schoolNewsIssues.id, issueId));
+1040-  const existing = await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId)).orderBy(schoolNewsPages.pageOrder);
+1041-  let coverPage = existing.find((page) => page.imageUrl === cover.imageUrl);
+1042-  if (!coverPage) {
+1043-    const inserted = await db.insert(schoolNewsPages).values({ issueId, imageUrl: cover.imageUrl, imageStorageKey: cover.imageStorageKey || undefined, caption: "غلاف العدد", pageOrder: 0 });
+1044-    const coverId = Number(inserted[0].insertId);
+1045-    coverPage = (await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.id, coverId)).limit(1))[0];
+1046-  }
+1047-  const ordered = [coverPage, ...existing.filter((page) => page.id !== coverPage.id)];
+1048-  await Promise.all(ordered.map((page, index) => db.update(schoolNewsPages).set({ pageOrder: index }).where(eq(schoolNewsPages.id, page.id))));
+1049:  return getSchoolNewsIssueBySlug((await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.id, issueId)).limit(1))[0].slug, true);
+1050-}
+1051-
+1052-export async function addSchoolNewsPages(issueId: number, pages: Array<{ imageUrl: string; imageStorageKey?: string; caption?: string }>) {
+1053-  const db = await getDb();
+1054-  if (!db) throw new Error("DB not available");
+1055-  const existing = await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId));
+1056-  const start = existing.length;
+1057-  if (pages.length) await db.insert(schoolNewsPages).values(pages.map((page, index) => ({ ...page, issueId, pageOrder: start + index })));
+1058-  return db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId)).orderBy(schoolNewsPages.pageOrder);
+1059-}
+1060-
+1061-export async function deleteSchoolNewsPage(id: number) {
+1062-  const db = await getDb();
+1063-  if (!db) throw new Error("DB not available");
+1064-  await db.delete(schoolNewsPages).where(eq(schoolNewsPages.id, id));
+1065-  return { success: true };
+1066-}
+1067-
+1068-export async function updateSchoolNewsPage(id: number, data: Partial<Pick<typeof schoolNewsPages.$inferInsert, "caption" | "pageOrder" | "imageUrl" | "imageStorageKey">>) {
+1069-  const db = await getDb();
+1070-  if (!db) throw new Error("DB not available");
+1071-  await db.update(schoolNewsPages).set(data).where(eq(schoolNewsPages.id, id));
+1072-  return (await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.id, id)).limit(1))[0];
+1073-}
+1074-
+1075-export async function reorderSchoolNewsPages(issueId: number, pageIds: number[]) {
+1076-  const db = await getDb();
+1077-  if (!db) throw new Error("DB not available");
+1078-  const existing = await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId));
+1079-  if (existing.length !== pageIds.length || existing.some((page) => !pageIds.includes(page.id))) throw new Error("ترتيب الصفحات غير صالح");
+1080-  await Promise.all(pageIds.map((id, index) => db.update(schoolNewsPages).set({ pageOrder: index }).where(eq(schoolNewsPages.id, id))));
+1081-  return db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId)).orderBy(schoolNewsPages.pageOrder);
+1082-}
+1083-
+1084-export async function deleteSchoolNewsIssue(id: number) {
+1085-  const db = await getDb();
+1086-  if (!db) throw new Error("DB not available");
+1087-  await db.delete(schoolNewsPages).where(eq(schoolNewsPages.issueId, id));
+1088-  await db.delete(schoolNewsIssues).where(eq(schoolNewsIssues.id, id));
+1089-  return { success: true };
+1090-}
+1091-
+1092-export async function publishSchoolNewsIssue(id: number) {
+1093:  return updateSchoolNewsIssue(id, { status: "published", publishedAt: new Date() });
+1094-}
+1095-
+1096-export async function getSchoolNewsMonthlyBook(monthKey: string) {
+1097-  const db = await getDb();
+1098-  if (!db) return { monthKey, issues: [], pages: [] };
+1099-  const issues = (await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.status, "published")).orderBy(schoolNewsIssues.issueDate)).filter((issue) => issue.issueDate.startsWith(monthKey));
+1100-  const pages = await db.select().from(schoolNewsPages).orderBy(schoolNewsPages.pageOrder);
+1101-  return {
+1102-    monthKey,
+1103-    issues,
+1104-    pages: issues.flatMap((issue) => {
+1105-      const issuePages = pages.filter((page) => page.issueId === issue.id);
+1106-      const hasCoverFirst = Boolean(issue.coverUrl && issuePages[0]?.imageUrl === issue.coverUrl);
+1107-      const cover = issue.coverUrl && !hasCoverFirst ? [{ id: -issue.id, issueId: issue.id, imageUrl: issue.coverUrl, imageStorageKey: null, caption: `غلاف ${issue.title}`, pageOrder: -1, createdAt: issue.createdAt, updatedAt: issue.updatedAt }] : [];
+1108-      return [...cover, ...issuePages].map((page) => ({ ...page, issueTitle: issue.title, issueDate: issue.issueDate }));
+1109-    }),
+1110-  };
+1111-}
+1112-
+1113-export async function listInvitationPresets(ceremonyId: number) {
+1114-  const db = await getDb();
+1115-  if (!db) return [];
+1116-  return db.select().from(invitationPresets).where(eq(invitationPresets.ceremonyId, ceremonyId)).orderBy(desc(invitationPresets.updatedAt));
+1117-}
+1118-
+1119-export async function createInvitationPreset(data: typeof invitationPresets.$inferInsert) {
+1120-  const db = await getDb();
+1121-  if (!db) throw new Error("DB not available");
+1122-  await db.insert(invitationPresets).values(data);
+1123-  const result = await db.select().from(invitationPresets).orderBy(desc(invitationPresets.id)).limit(1);
+1124-  return result[0];
+1125-}
+1126-
+1127-export async function deleteInvitationPreset(id: number, ceremonyId: number) {
+1128-  const db = await getDb();
+1129-  if (!db) throw new Error("DB not available");
+1130-  await db.delete(invitationPresets).where(and(eq(invitationPresets.id, id), eq(invitationPresets.ceremonyId, ceremonyId)));
+1131-}
+1132-
+1133-export async function setActiveCeremony(id: number) {
+1134-  const db = await getDb();
+1135-  if (!db) throw new Error("DB not available");

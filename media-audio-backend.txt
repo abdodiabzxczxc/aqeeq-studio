@@ -1,0 +1,38 @@
+drizzle/schema.ts:120:export const mediaAssets = mysqlTable("media_assets", {
+drizzle/schema.ts:124:  kind: mysqlEnum("kind", ["image", "video", "embed"]).notNull().default("image"),
+drizzle/schema.ts:125:  mimeType: varchar("mime_type", { length: 128 }),
+server/_core/imageGeneration.ts:14: *       mimeType: "image/jpeg"
+server/_core/imageGeneration.ts:31:    mimeType?: string;
+server/_core/imageGeneration.ts:92:      mimeType: string;
+server/_core/imageGeneration.ts:102:    result.image.mimeType
+server/_core/voiceTranscription.ts:95:    let mimeType: string;
+server/_core/voiceTranscription.ts:107:      mimeType = response.headers.get('content-type') || 'audio/mpeg';
+server/_core/voiceTranscription.ts:130:    const filename = `audio.${getFileExtension(mimeType)}`;
+server/_core/voiceTranscription.ts:131:    const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: mimeType });
+server/_core/voiceTranscription.ts:200:function getFileExtension(mimeType: string): string {
+server/_core/voiceTranscription.ts:212:  return mimeToExt[mimeType] || 'audio';
+server/db.ts:4:import { attendees, InsertAttendee, InsertUser, scanLogs, users, settings, ceremonies, eventMaisonSettings, invitationPresets, auditLogs, notifications, platformContent, platformContentHistory, visualElementOverrides, visualElementOverrideHistory, visualElementTrash, mediaAssets, pageSections, pageSectionHistory, visualFreeformElements, customPages, customPageHistory, eventTasks, schoolNewsIssues, schoolNewsPages } from "../drizzle/schema";
+server/db.ts:634:  return db.select().from(mediaAssets).orderBy(desc(mediaAssets.id)).limit(limit);
+server/db.ts:637:export async function createMediaAsset(data: typeof mediaAssets.$inferInsert) {
+server/db.ts:640:  await db.insert(mediaAssets).values(data);
+server/db.ts:641:  const result = await db.select().from(mediaAssets).orderBy(desc(mediaAssets.id)).limit(1);
+server/db.ts:648:  await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
+server/routers.test.ts:63:  createMediaAsset: vi.fn().mockResolvedValue({ id: 1, url: "/manus-storage/site-media/test.png", kind: "image", fileName: "test.png" }),
+server/routers.test.ts:471:    await caller.visualEditor.save({ pagePath: "/", elementId: "events-hero-season-image", elementTag: "image", mediaUrl: "/manus-storage/site-media/events-hero.png" });
+server/routers.test.ts:548:    await caller.visualEditor.media.upload({ fileName: "cover.png", mimeType: "image/png", base64: "data:image/png;base64,aGVsbG8=" });
+server/routers.test.ts:550:    expect(vi.mocked(createMediaAsset)).toHaveBeenCalledWith(expect.objectContaining({ fileName: "cover.png", kind: "image", uploadedBy: 1 }));
+server/routers.test.ts:552:    await expect(regular.visualEditor.media.upload({ fileName: "cover.png", mimeType: "image/png", base64: "data:image/png;base64,aGVsbG8=" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+server/routers.test.ts:561:    await caller.visualEditor.sections.save({ pagePath: "/", sectionId: "section-custom-image", sectionType: "custom", orderIndex: 1, config: { builderElement: "image", title: "صورة جديدة", imageUrl: "/manus-storage/site-media/new-image.png" } });
+server/routers.test.ts:584:    await caller.visualEditor.save({ pagePath: "/", elementId: "home-hero-logo", elementTag: "image", mediaUrl: "/manus-storage/site-media/hero-logo.png", altText: "شعار الفعالية", linkUrl: "/page/about-event", alignment: "center" });
+server/routers.test.ts:593:    await caller.visualEditor.freeform.save({ pagePath: "/", elementId: "free-image-resized", elementType: "image", preset: "cover", content: { mediaUrl: "/manus-storage/site-media/cover.png", altText: "صورة غلاف", linkUrl: "/page/about-event", objectFit: "cover" }, positionX: 780, positionY: 612, width: 460, height: 260, zIndex: 4 });
+server/routers/settings.ts:63:        const [, mimeType, encoded] = match;
+server/routers/settings.ts:69:        const extension = mimeType === "image/svg+xml" ? "svg" : mimeType.split("/")[1].replace("jpeg", "jpg");
+server/routers/settings.ts:70:        const uploaded = await storagePut(`logos/${input.key}.${extension}`, fileBuffer, mimeType);
+server/routers/visualEditor.ts:151:    upload: adminProcedure.input(z.object({ fileName: z.string().min(1).max(255), mimeType: z.string().min(3).max(128), base64: z.string().min(8).max(35_000_000), altText: z.string().max(300).optional() })).mutation(async ({ input, ctx }) => {
+server/routers/visualEditor.ts:152:      const isImage = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"].includes(input.mimeType);
+server/routers/visualEditor.ts:153:      const isVideo = ["video/mp4", "video/webm", "video/quicktime"].includes(input.mimeType);
+server/routers/visualEditor.ts:160:      const uploaded = await storagePut(`site-media/${ctx.user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${filename}`, data, input.mimeType);
+server/routers/visualEditor.ts:161:      const asset = await createMediaAsset({ storageKey: uploaded.key, url: uploaded.url, kind: isVideo ? "video" : "image", mimeType: input.mimeType, fileName: filename, fileSize: data.length, altText: input.altText?.trim() || null, uploadedBy: ctx.user.id });
+server/routers/visualEditor.ts:162:      await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.media_upload", details: JSON.stringify({ id: asset?.id, mimeType: input.mimeType, fileName: filename }) });
+server/routers/visualEditor.ts:168:      await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.media_embed", details: JSON.stringify({ id: asset?.id, url: input.url }) });
+server/routers/visualEditor.ts:173:      await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.media_delete", details: JSON.stringify(input) });

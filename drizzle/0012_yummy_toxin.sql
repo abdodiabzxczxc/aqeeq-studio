@@ -1,0 +1,1 @@
+ALTER TABLE `ceremonies` ADD `seatLabels` text;

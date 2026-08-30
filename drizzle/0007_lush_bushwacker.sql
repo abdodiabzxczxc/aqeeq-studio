@@ -1,0 +1,1 @@
+ALTER TABLE `ceremonies` ADD `eventType` varchar(64) DEFAULT 'custom' NOT NULL;

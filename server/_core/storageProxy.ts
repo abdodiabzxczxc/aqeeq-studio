@@ -1,0 +1,79 @@
+import express, { type Express } from "express";
+import fs from "node:fs";
+import path from "node:path";
+
+const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
+
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+}
+
+// Lightweight ephemeral RAM cache (0 bytes disk storage)
+const ephemeralMemoryCache = new Map<string, { buffer: Buffer; contentType: string }>();
+const MAX_RAM_ITEMS = 60;
+
+export function registerStorageProxy(app: Express) {
+  ensureUploadsDir();
+
+  // Serve static uploads for both /uploads and legacy /manus-storage paths
+  app.use("/uploads", express.static(UPLOADS_DIR, { maxAge: "30d" }));
+  app.use("/manus-storage", express.static(UPLOADS_DIR, { maxAge: "30d" }));
+
+  // Zero-Disk-Space High-Speed Google Drive Image Streamer & Browser Edge Cacher
+  app.get("/api/drive-proxy/:fileId", async (req, res) => {
+    const { fileId } = req.params;
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      return res.status(400).send("Invalid file ID");
+    }
+
+    // 1. Check RAM memory cache (0ms, 0 disk space)
+    const memCached = ephemeralMemoryCache.get(fileId);
+    if (memCached) {
+      res.setHeader("Content-Type", memCached.contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      return res.send(memCached.buffer);
+    }
+
+    try {
+      // 2. Fetch from Google CDN Edge
+      const cdnUrl = `https://lh3.googleusercontent.com/d/${fileId}=w1200`;
+      let driveRes = await fetch(cdnUrl, {
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+      });
+
+      // Fallback if needed
+      if (!driveRes.ok) {
+        const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        driveRes = await fetch(downloadUrl, {
+          headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+        });
+      }
+
+      if (!driveRes.ok) {
+        return res.redirect(`https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`);
+      }
+
+      const contentType = driveRes.headers.get("content-type") || "image/jpeg";
+      const arrayBuf = await driveRes.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+
+      // Keep only in temporary RAM, 0 disk space used
+      if (ephemeralMemoryCache.size >= MAX_RAM_ITEMS) {
+        const oldestKey = ephemeralMemoryCache.keys().next().value;
+        if (oldestKey) ephemeralMemoryCache.delete(oldestKey);
+      }
+      ephemeralMemoryCache.set(fileId, { buffer, contentType });
+
+      // Tell the browser to cache it on the user device for 1 year (0 server space)
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      return res.send(buffer);
+    } catch (err) {
+      console.warn("[DriveProxy] Streaming image fallback:", err);
+      return res.redirect(`https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`);
+    }
+  });
+}
+

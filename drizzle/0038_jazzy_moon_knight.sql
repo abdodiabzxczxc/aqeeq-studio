@@ -1,0 +1,1 @@
+ALTER TABLE `school_news_issues` ADD `reader_theme` varchar(16) DEFAULT 'dark' NOT NULL;

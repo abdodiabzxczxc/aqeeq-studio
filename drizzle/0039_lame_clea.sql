@@ -1,0 +1,1 @@
+ALTER TABLE `school_news_issues` MODIFY COLUMN `reading_mode` varchar(24) NOT NULL DEFAULT 'spread';

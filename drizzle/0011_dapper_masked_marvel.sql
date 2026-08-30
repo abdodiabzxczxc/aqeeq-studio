@@ -1,0 +1,1 @@
+ALTER TABLE `ceremonies` ADD `templateId` varchar(64) DEFAULT 'royal' NOT NULL;

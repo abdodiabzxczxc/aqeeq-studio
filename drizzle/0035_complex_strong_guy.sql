@@ -1,0 +1,1 @@
+ALTER TABLE `school_news_issues` ADD `reading_mode` varchar(24) DEFAULT 'pages' NOT NULL;

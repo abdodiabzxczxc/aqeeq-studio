@@ -1,0 +1,561 @@
+import { useAuth } from "@/_core/hooks/useAuth";
+import { AqeeqArchiveControls } from "@/components/AqeeqArchiveControls";
+import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { VisualEditable, VisualImage } from "@/components/VisualEditor";
+import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { trpc } from "@/lib/trpc";
+import { ArrowUpLeft, BookOpen, CalendarDays, ChevronLeft, FolderArchive, Layers, Loader2, Newspaper, Settings2, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useLocation } from "wouter";
+
+type NewsIssue = {
+  id: number;
+  title: string;
+  slug: string;
+  issueDate: string;
+  coverUrl: string | null;
+  description: string | null;
+  seasonLabel: string;
+  status: "draft" | "published";
+  pageCount: number;
+  viewCount?: number;
+  headerLogoUrl?: string | null;
+};
+
+const monthName = (key: string) => {
+  try {
+    return new Date(`${key}-01T12:00:00`).toLocaleDateString("ar-SA", {
+      year: "numeric",
+      month: "long",
+    });
+  } catch {
+    return key;
+  }
+};
+
+function directDriveImage(url: string | null | undefined) {
+  if (!url) return null;
+  const id =
+    url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    url.match(/[?&]id=([^&]+)/)?.[1] ||
+    url.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/)?.[1];
+  return id ? `/api/drive-proxy/${id}` : url;
+}
+
+function IssueCard({
+  issue,
+  index,
+  onOpen,
+  dark,
+}: {
+  issue: NewsIssue;
+  index: number;
+  onOpen: () => void;
+  dark: boolean;
+}) {
+  return (
+    <article className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
+      dark
+        ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
+        : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
+    }`}>
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
+      <div className="relative flex h-full flex-col gap-5 sm:flex-row">
+        {/* Magazine Cover Preview Container */}
+        <button
+          onClick={onOpen}
+          className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+            dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
+          }`}
+          aria-label={`قراءة ${issue.title}`}
+        >
+          {/* Background tilted page */}
+          <div
+            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 ${
+              dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
+            }`}
+            style={{ transform: "rotate(-7deg)" }}
+          >
+            {issue.coverUrl ? (
+              <VisualImage
+                id={`journal-card-back-cover-${issue.id}`}
+                label="صورة خلفية بطاقة المجلة"
+                src={directDriveImage(issue.coverUrl) || issue.coverUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : null}
+          </div>
+
+          {/* Front cover */}
+          <div
+            className={`absolute bottom-[6%] right-[10%] top-[6%] w-[60%] overflow-hidden rounded-[1rem] border p-1.5 shadow-xl ${
+              dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
+            }`}
+            style={{ transform: "rotate(2deg)" }}
+          >
+            {issue.coverUrl ? (
+              <VisualImage
+                id={`journal-card-cover-${issue.id}`}
+                label="غلاف بطاقة المجلة"
+                src={directDriveImage(issue.coverUrl) || issue.coverUrl}
+                alt={`غلاف ${issue.title}`}
+                className="h-full w-full rounded-[.7rem] object-cover"
+              />
+            ) : (
+              <div className={`grid h-full place-items-center ${dark ? "bg-[#161616] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"}`}>
+                <Newspaper size={34} />
+              </div>
+            )}
+          </div>
+        </button>
+
+        {/* Info */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
+              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+            }`}>
+              <BookOpen size={18} />
+            </div>
+            <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+              ISSUE · {String(index + 1).padStart(2, "0")}
+            </p>
+          </div>
+
+          <VisualEditable
+            id={`journal-card-title-${issue.id}`}
+            tag="text"
+            label="عنوان العدد"
+            defaultText={issue.title}
+            as="h3"
+            className={`mt-4 text-2xl font-black ${dark ? "text-white" : "text-black"}`}
+          />
+
+          <VisualEditable
+            id={`journal-card-description-${issue.id}`}
+            tag="text"
+            label="وصف العدد"
+            defaultText={
+              issue.description ||
+              "عدد أسبوعي من مجلة العقيق، يوثق أنشطة وفعاليات مدارس العقيق بتجربة قراءة تفاعلية."
+            }
+            as="p"
+            className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}
+          />
+
+          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${
+            dark ? "border-white/[0.08]" : "border-black/[0.08]"
+          }`}>
+            <div>
+              <b className={`block text-xl font-black ${dark ? "text-white" : "text-black"}`}>
+                {String(issue.pageCount || 0).padStart(2, "0")}
+              </b>
+              <span className={`text-[9px] font-black tracking-[.16em] ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                PAGES
+              </span>
+            </div>
+
+            <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : "text-slate-500"}`}>
+              <CalendarDays size={13} />
+              {issue.issueDate}
+            </span>
+
+            <button
+              onClick={onOpen}
+              className={`inline-flex items-center gap-2 text-xs font-black transition ${
+                dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
+              }`}
+            >
+              اقرأ العدد <ArrowUpLeft size={15} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default function SchoolNewsPage() {
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
+  const { user, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sort, setSort] = useState<AqeeqSortOption>("newest");
+  const isAdmin = isAuthenticated && user?.role === "admin";
+
+  const { data: issues = [], isLoading } = trpc.schoolNews.publicList.useQuery(
+    undefined,
+    { refetchOnWindowFocus: false }
+  );
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(
+    undefined,
+    { refetchOnMount: true, staleTime: 0 }
+  );
+
+  const visibleIssues = useMemo(
+    () => searchAndSortAqeeqContent(issues, searchQuery, sort) as NewsIssue[],
+    [issues, searchQuery, sort]
+  );
+
+  const featuredIssue = useMemo(() => {
+    if (orchestration?.heroCovers?.journalMode === "custom" && orchestration?.heroCovers?.customJournalIssueId) {
+      const found = issues.find((i) => i.id === orchestration.heroCovers.customJournalIssueId);
+      if (found) return found as NewsIssue;
+    }
+    return issues[0] as NewsIssue | undefined;
+  }, [issues, orchestration?.heroCovers]);
+
+  const secondIssue = useMemo(() => {
+    if (!featuredIssue) return undefined;
+    if (orchestration?.heroCovers?.journalSecondaryIssueId) {
+      const found = issues.find((i) => i.id === orchestration.heroCovers.journalSecondaryIssueId);
+      if (found) return found as NewsIssue;
+    }
+    return issues.find((i) => i.id !== featuredIssue.id) as NewsIssue | undefined;
+  }, [issues, featuredIssue, orchestration?.heroCovers?.journalSecondaryIssueId]);
+
+  const monthGroups = useMemo(() => {
+    const map = new Map<string, NewsIssue[]>();
+    issues.forEach((issue) => {
+      const key = issue.issueDate.slice(0, 7);
+      map.set(key, [...(map.get(key) || []), issue as NewsIssue]);
+    });
+    return Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
+  }, [issues]);
+
+  const totalPages = issues.reduce(
+    (total, issue) => total + Number(issue.pageCount || 0),
+    0
+  );
+
+  if (isLoading) {
+    return (
+      <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+        <Loader2 className="animate-spin text-[#f8ca14]" />
+      </div>
+    );
+  }
+
+  return (
+    <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+      {/* Top Header Bar */}
+      <AlaqeeqStudioSiteHeader
+        title="مجلة العقيق"
+        active="journal"
+        logoUrl={featuredIssue?.headerLogoUrl}
+      />
+
+      {featuredIssue ? (
+        <>
+          {/* Hero Section */}
+          <section className={`relative isolate overflow-hidden border-b ${
+            dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+          }`}>
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+
+            <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:px-8 md:py-16 lg:gap-16">
+              {/* Cover perspective on left in RTL */}
+              <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
+                {secondIssue ? (
+                  <button
+                    onClick={() => navigate(`/journal/${secondIssue.slug}`)}
+                    className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl ${
+                      dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                    }`}
+                    style={{ transform: "rotate(-7deg)" }}
+                    aria-label={`العدد السابق: ${secondIssue.title}`}
+                  >
+                    {secondIssue.coverUrl ? (
+                      <VisualImage
+                        id={`journal-hero-previous-cover-${secondIssue.id}`}
+                        label="غلاف العدد السابق"
+                        src={directDriveImage(secondIssue.coverUrl) || secondIssue.coverUrl}
+                        alt=""
+                        className="h-full w-full rounded-[1.2rem] object-cover"
+                      />
+                    ) : null}
+                  </button>
+                ) : null}
+
+                <button
+                  onClick={() => navigate(`/journal/${featuredIssue.slug}`)}
+                  className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
+                    dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                  }`}
+                  style={{ transform: "rotate(3deg)" }}
+                  aria-label={`العدد الحالي: ${featuredIssue.title}`}
+                >
+                  <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                    {featuredIssue.coverUrl ? (
+                      <VisualImage
+                        id={`journal-hero-current-cover-${featuredIssue.id}`}
+                        label="غلاف العدد الحالي"
+                        src={directDriveImage(featuredIssue.coverUrl) || featuredIssue.coverUrl}
+                        alt={`غلاف ${featuredIssue.title}`}
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"}`}>
+                        <Newspaper size={42} />
+                      </div>
+                    )}
+
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16">
+                      <span className="text-[10px] font-black text-[#f8ca14]">
+                        {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
+                      </span>
+                      <VisualEditable
+                        id="journal-hero-featured-title"
+                        tag="text"
+                        label="عنوان غلاف العدد الحالي"
+                        defaultText={featuredIssue.title}
+                        as="h2"
+                        className="mt-1 text-lg font-black text-white"
+                      />
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Text info */}
+              <div className="order-1 md:order-2">
+                <VisualEditable
+                  id="journal-hero-kicker"
+                  tag="text"
+                  label="شارة غلاف المجلة"
+                  defaultText={orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
+                  as="div"
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+                    dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                  }`}
+                >
+                  <Sparkles size={14} />
+                  {orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
+                </VisualEditable>
+
+                <VisualEditable
+                  id="journal-hero-title"
+                  tag="text"
+                  label="عنوان غلاف المجلة"
+                  defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبر يُقلب إلى ذكرى."}
+                  as="h1"
+                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${dark ? "text-white" : "text-black"}`}
+                />
+
+                <VisualEditable
+                  id="journal-hero-intro"
+                  tag="text"
+                  label="مقدمة غلاف المجلة"
+                  defaultText={
+                    orchestration?.heroCovers?.journalCustomDesc ||
+                    "رفوف رقمية تجمع أعداد مجلة ونشرات مدارس العقيق الأهلية، مع كتيبات شهرية مؤرشفة وتجربة تصفح تفاعلية راقية."
+                  }
+                  as="p"
+                  className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+                />
+
+                <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
+                  <span className={`rounded-full border px-3 py-2 ${
+                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  }`}>
+                    <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    {issues.length} عدد منشور
+                  </span>
+                  <span className={`rounded-full border px-3 py-2 ${
+                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  }`}>
+                    <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    {totalPages} صفحة
+                  </span>
+                  <span className={`rounded-full border px-3 py-2 ${
+                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  }`}>
+                    <FolderArchive className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    {monthGroups.length} كتيب شهري
+                  </span>
+                </div>
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <VisualEditable
+                    id="journal-hero-action"
+                    tag="button"
+                    label="زر قراءة العدد الحالي"
+                    defaultText="اقرأ العدد الحالي"
+                    as="button"
+                    onAction={() => navigate(`/journal/${featuredIssue.slug}`)}
+                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
+                      dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+                    }`}
+                  >
+                    <ArrowUpLeft size={16} />
+                    اقرأ العدد الحالي
+                  </VisualEditable>
+
+                  {isAdmin ? (
+                    <button
+                      onClick={() => navigate("/journal/manage")}
+                      className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                        dark
+                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                          : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                      }`}
+                    >
+                      <Settings2 size={16} />
+                      دخول استوديو المجلة
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Monthly Booklets Section */}
+          {monthGroups.length > 0 ? (
+            <section className={`border-b py-10 ${
+              dark ? "border-white/[0.08] bg-[#080808]" : "border-black/[0.06] bg-[#fbfbfb]"
+            }`}>
+              <div className="mx-auto max-w-[1320px] px-5 md:px-8">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FolderArchive size={18} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                    <h3 className={`text-lg font-black ${dark ? "text-white" : "text-black"}`}>
+                      الكتيبات الشهرية المجمعة
+                    </h3>
+                  </div>
+                  <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                    تتكون تلقائياً من أعداد كل شهر
+                  </span>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {monthGroups.map(([monthKey, entries]) => (
+                    <div
+                      key={monthKey}
+                      className={`group flex items-center justify-between rounded-2xl border p-4 transition ${
+                        dark
+                          ? "border-white/[0.08] bg-[#111111] hover:border-[#f8ca14]/40"
+                          : "border-black/[0.08] bg-white hover:border-[#08467d]/40 shadow-sm"
+                      }`}
+                    >
+                      <div>
+                        <h4 className={`font-black ${dark ? "text-white" : "text-black"}`}>
+                          كتيب {monthName(monthKey)}
+                        </h4>
+                        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                          {entries.length} أعداد ·{" "}
+                          {entries.reduce(
+                            (sum, i) => sum + Number(i.pageCount || 0),
+                            0
+                          )}{" "}
+                          صفحة
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/journal/month/${monthKey}`)}
+                        className={`inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-bold transition ${
+                          dark
+                            ? "bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                            : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                        }`}
+                      >
+                        فتح الكتيب
+                        <ChevronLeft size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          {/* Issues Archive Grid Section */}
+          <section className="mx-auto max-w-[1320px] px-5 py-12 md:px-8 md:py-16">
+            <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
+              dark ? "border-white/[0.08]" : "border-black/[0.08]"
+            }`}>
+              <div>
+                <VisualEditable
+                  id="journal-archive-kicker"
+                  tag="text"
+                  label="شارة أرشيف الأعداد"
+                  defaultText="JOURNAL ARCHIVE"
+                  as="p"
+                  className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                />
+                <VisualEditable
+                  id="journal-archive-title"
+                  tag="text"
+                  label="عنوان أرشيف الأعداد"
+                  defaultText="أعداد مجلة العقيق"
+                  as="h2"
+                  className={`mt-2 text-2xl font-black ${dark ? "text-white" : "text-black"}`}
+                />
+              </div>
+              <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                {visibleIssues.length} من {issues.length} عدد
+              </span>
+            </div>
+
+            <AqeeqArchiveControls
+              id="journal-archive-controls"
+              label="البحث وترتيب الأعداد"
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              sort={sort}
+              onSortChange={setSort}
+            />
+
+            {visibleIssues.length ? (
+              <div className="grid gap-6 lg:grid-cols-2">
+                {visibleIssues.map((issue, index) => (
+                  <IssueCard
+                    key={issue.id}
+                    issue={issue}
+                    index={index}
+                    dark={dark}
+                    onOpen={() => navigate(`/journal/${issue.slug}`)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <VisualEditable
+                id="journal-search-empty"
+                tag="text"
+                label="رسالة عدم وجود نتائج للأعداد"
+                defaultText="لا توجد أعداد مطابقة للبحث."
+                as="p"
+                className={`rounded-2xl border border-dashed p-8 text-center text-sm font-black ${
+                  dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/30 text-[#08467d]"
+                }`}
+              />
+            )}
+          </section>
+        </>
+      ) : (
+        <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
+          <Newspaper className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={48} />
+          <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>
+            أول عدد في الطريق
+          </h1>
+          <p className={`mx-auto mt-3 max-w-md text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}>
+            بعد نشر أول عدد من استوديو المجلة، سيظهر هنا كتاب الأسبوع والكتيبات
+            الشهرية.
+          </p>
+          {isAdmin ? (
+            <button
+              onClick={() => navigate("/journal/manage")}
+              className={`mt-6 rounded-xl px-4 py-3 text-xs font-black ${
+                dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+              }`}
+            >
+              إنشاء أول عدد
+            </button>
+          ) : null}
+        </section>
+      )}
+    </main>
+  );
+}

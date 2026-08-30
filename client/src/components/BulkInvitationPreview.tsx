@@ -1,0 +1,13 @@
+import { FileArchive, X } from "lucide-react";
+import { motion } from "framer-motion";
+import InvitationPngPreview from "./InvitationPngPreview";
+
+type Props = {
+  attendees: Array<{ id: number; fullName: string; idNumber: string; qrCode: string; ticketType: string; seatNumber?: string | null }>;
+  ceremonyTitle: string; ceremonySubtitle: string; templateId?: string | null; brandColor?: string | null; logoUrl?: string | null; invitationBackgroundUrl?: string | null; invitationDate?: string | null; invitationVenue?: string | null; invitationDressCode?: string | null; invitationLayout?: string | null;
+  onClose: () => void; onDownload: () => void;
+};
+
+export default function BulkInvitationPreview({ attendees, ceremonyTitle, ceremonySubtitle, templateId, brandColor, logoUrl, invitationBackgroundUrl, invitationDate, invitationVenue, invitationDressCode, invitationLayout, onClose, onDownload }: Props) {
+  return <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4" dir="rtl"><div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} /><motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="relative z-10 w-full max-w-5xl rounded-2xl border p-5" style={{ background: "oklch(12% 0.015 250)", borderColor: "oklch(66% 0.20 70 / 0.4)" }}><div className="mb-5 flex items-center justify-between"><div><h3 className="font-black text-amber-100">معاينة الدعوات الجماعية النهائية</h3><p className="mt-1 text-xs text-slate-500">كل بطاقة أدناه هي نفس PNG الذي سيُضاف إلى ملف ZIP.</p></div><button onClick={onClose} className="text-slate-400 hover:text-amber-200"><X size={19} /></button></div><div className="grid max-h-[60vh] gap-4 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-3">{attendees.map((attendee) => <InvitationPngPreview key={attendee.id} input={{ fullName: attendee.fullName, idNumber: attendee.idNumber, qrCode: attendee.qrCode, ticketType: attendee.ticketType, seatNumber: attendee.seatNumber, ceremonyTitle, ceremonySubtitle, templateId, brandColor, logoUrl, invitationBackgroundUrl, invitationDate, invitationVenue, invitationDressCode, invitationLayout }} alt={`دعوة ${attendee.fullName}`} className="aspect-[4/5] rounded-xl border border-amber-400/40 shadow-lg" />)}</div><div className="mt-5 flex gap-2"><button onClick={onClose} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm text-slate-300">إلغاء</button><button onClick={onDownload} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-amber-950" style={{ background: "var(--gold-gradient)" }}><FileArchive size={16} />تنزيل ZIP</button></div></motion.div></div>;
+}

@@ -1,0 +1,1 @@
+ALTER TABLE `aqeeq_albums` ADD `background_audio_url` varchar(1024);

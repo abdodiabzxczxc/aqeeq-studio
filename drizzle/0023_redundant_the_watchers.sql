@@ -1,0 +1,20 @@
+CREATE TABLE `visual_freeform_elements` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`page_path` varchar(255) NOT NULL,
+	`element_id` varchar(128) NOT NULL,
+	`element_type` enum('text','image','video','icon','button') NOT NULL,
+	`preset` varchar(64) NOT NULL DEFAULT 'default',
+	`content` text NOT NULL,
+	`position_x` int NOT NULL DEFAULT 500,
+	`position_y` int NOT NULL DEFAULT 500,
+	`width` int NOT NULL DEFAULT 360,
+	`height` int NOT NULL DEFAULT 120,
+	`z_index` int NOT NULL DEFAULT 1,
+	`status` enum('draft','published') NOT NULL DEFAULT 'draft',
+	`published_snapshot` text,
+	`updated_by` int NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `visual_freeform_elements_id` PRIMARY KEY(`id`),
+	CONSTRAINT `uk_freeform_element_path_id` UNIQUE(`page_path`,`element_id`)
+);

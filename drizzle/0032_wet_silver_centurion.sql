@@ -1,0 +1,1 @@
+ALTER TABLE `visual_element_overrides` ADD `is_locked` boolean DEFAULT false NOT NULL;

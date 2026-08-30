@@ -1,0 +1,92 @@
+1441-.aq-real-flipbook-page-number { position: absolute; inset-inline: 0; bottom: .55rem; text-align: center; color: rgba(61,48,29,.68); font-size: .62rem; font-weight: 900; letter-spacing: .15em; pointer-events: none; }
+1442-.aq-real-flipbook-end { display: grid; height: 100%; place-content: center; padding: 2rem; text-align: center; color: #332b20; background: radial-gradient(circle at 30% 20%, #fffef9, transparent 35%), linear-gradient(135deg, #eee5d5, #d4c2a3); }
+1443-.aq-real-flipbook-end-mark { font-size: .7rem; font-weight: 900; letter-spacing: .28em; color: #8d6e31; }
+1444-.aq-dark-reader-shell { min-height: 100vh; background: #080b12; }
+1445-.aq-dark-reader-shell .aq-dark-reader-chrome, .aq-dark-reader-shell .aq-dark-reader-footer, .aq-dark-reader-shell .aq-dark-reader-thumbs, .aq-dark-reader-shell > div > .mt-3 { display: none !important; }
+1446:.aq-dark-reader-stage { min-height: 100vh; border: 0 !important; border-radius: 0 !important; background: radial-gradient(circle at 24% 44%, rgba(214,185,106,.13), transparent 24%), radial-gradient(circle at 75% 65%, rgba(26,66,100,.25), transparent 35%), linear-gradient(145deg, #050b12, #0b1723 54%, #05080d) !important; }
+1447:.aq-dark-reader-stage::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.18), transparent 25%, transparent 75%, rgba(0,0,0,.18)), repeating-linear-gradient(135deg, transparent 0 13px, rgba(255,255,255,.012) 14px 15px); pointer-events: none; }
+1448-.aq-dark-reader-watermark { z-index: 1; width: var(--aq-watermark-scale); height: var(--aq-watermark-scale); opacity: var(--aq-watermark-opacity); background: var(--aq-watermark-tint); -webkit-mask: var(--aq-watermark-image) center / contain no-repeat; mask: var(--aq-watermark-image) center / contain no-repeat; filter: drop-shadow(0 0 22px color-mix(in srgb, var(--aq-watermark-tint), transparent 60%)); }
+1449-.aq-dark-reader-watermark-center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+1450-.aq-dark-reader-watermark-top-right { top: 6%; right: 5%; }
+1451-.aq-dark-reader-watermark-bottom-left { bottom: 5%; left: 5%; }
+1452-.aq-dark-reader-watermark-bottom-right { bottom: 5%; right: 5%; }
+1453:.aq-stacked-reader { z-index: 5; transform-origin: center center; transition: transform .18s cubic-bezier(.23,1,.32,1); }
+1454:.aq-stacked-reader-front, .aq-stacked-reader-shadow { position: absolute; aspect-ratio: 520 / 736; width: min(32rem, 68vw); overflow: hidden; border-radius: .14rem; background: #f8f5ed; box-shadow: 0 1.7rem 3.5rem rgba(0,0,0,.48); }
+1455:.aq-stacked-reader-front { z-index: 12; animation: aq-stacked-page-in .42s cubic-bezier(.23,1,.32,1); }
+1456:.aq-stacked-reader-front img, .aq-stacked-reader-shadow img { display: block; width: 100%; height: 100%; object-fit: contain; background: #f7f3ea; }
+1457:.aq-stacked-reader-shadow { z-index: calc(11 - var(--aq-stack-order)); opacity: calc(.045 + (var(--aq-stack-order) * .035)); filter: blur(calc(var(--aq-stack-order) * .45px)) saturate(.58); transform: translate(calc(var(--aq-stack-order) * .78rem), calc(var(--aq-stack-order) * .52rem)) rotate(calc(var(--aq-stack-order) * .26deg)); }
+1458:.aq-stacked-reader-number { position: absolute; inset-inline: 0; bottom: .45rem; text-align: center; color: rgba(61,48,29,.7); font-size: .62rem; font-weight: 900; letter-spacing: .15em; }
+1459-@keyframes aq-stacked-page-in { from { opacity: .12; transform: translateX(1.5rem) rotate(.7deg); } to { opacity: 1; transform: translateX(0) rotate(0); } }
+1460:.aq-dark-reader-stage .aq-real-flipbook { filter: drop-shadow(0 28px 40px rgba(0,0,0,.58)); }
+1461:.aq-dark-reader-stage .aq-real-flipbook-page { background: #f8f5ed; }
+1462:.aq-dark-reader-stage .aq-reference-flip-previous { left: clamp(1rem, 7vw, 7rem) !important; right: auto !important; }
+1463:.aq-dark-reader-stage .aq-reference-flip-next { right: clamp(1rem, 7vw, 7rem) !important; left: auto !important; }
+1464-.aq-dark-reader-rail { position: fixed; z-index: 40; left: clamp(.8rem, 2vw, 2.2rem); top: 50%; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(214,185,106,.25); border-radius: .75rem; background: rgba(6,13,21,.84); box-shadow: 0 1.5rem 3rem rgba(0,0,0,.32); transform: translateY(-50%); backdrop-filter: blur(16px); }
+1465-.aq-dark-reader-rail-button { display: grid; width: 2.65rem; height: 2.65rem; place-items: center; border-bottom: 1px solid rgba(255,255,255,.07); color: #c7d1df; transition: background .18s ease, color .18s ease, transform .18s ease; }
+1466-.aq-dark-reader-rail-button:last-child { border-bottom: 0; }
+1467-.aq-dark-reader-rail-button:hover:not(:disabled) { color: #111820; background: #d6b96a; }
+1468-.aq-dark-reader-rail-button:active:not(:disabled) { transform: scale(.95); }
+1469-.aq-dark-reader-rail-button:disabled { opacity: .28; cursor: not-allowed; }
+1470-.aq-dark-reader-footer { border-color: rgba(255,255,255,.08); }
+1471-.aq-dark-reader-thumbs::-webkit-scrollbar { height: 5px; }
+1472-.aq-dark-reader-thumbs::-webkit-scrollbar-thumb { background: rgba(214,185,106,.35); border-radius: 999px; }
+1473:@media (max-width: 760px) { .aq-dark-reader-rail { left: .7rem; top: auto; bottom: 1rem; flex-direction: row; max-width: calc(100vw - 1.4rem); transform: none; } .aq-dark-reader-rail-button { width: 2.35rem; height: 2.35rem; border-right: 1px solid rgba(255,255,255,.07); border-bottom: 0; } .aq-dark-reader-rail-button:last-child { border-right: 0; } .aq-stacked-reader-front, .aq-stacked-reader-shadow { width: min(20rem, 78vw); } .aq-dark-reader-stage .aq-reference-flip-previous { left: .7rem !important; } .aq-dark-reader-stage .aq-reference-flip-next { right: .7rem !important; } }
+1474:.aq-reference-flip-stage {
+1475-  min-height: clamp(34rem, 76vh, 56rem);
+1476-  border-radius: .8rem !important;
+1477-  background: radial-gradient(circle at 50% 48%, rgba(14, 48, 68, .08), transparent 36%), linear-gradient(125deg, #eef2ef, #fbfcfb 55%, #e5ece7) !important;
+1478-}
+1479:.aq-reference-flip-stage .aq-flipbook-watermark { opacity: .11; filter: grayscale(1) sepia(.18) saturate(.6) brightness(.76); }
+1480:.aq-reference-flipbook-wrap { max-width: 39rem !important; min-height: clamp(31rem, 68vh, 49rem) !important; }
+1481:.aq-reference-flipbook-wrap .aq-real-flipbook.stf__parent {
+1482-  width: min(32rem, 84vw) !important;
+1483-  max-width: min(32rem, 84vw) !important;
+1484-}
+1485:.aq-reference-flipbook-wrap .stf__wrapper { margin: 0 auto !important; }
+1486:.aq-reference-flip-previous { left: -5.6rem !important; right: auto !important; }
+1487:.aq-reference-flip-next { right: -5.6rem !important; left: auto !important; }
+1488-.aq-reference-reader-shell { position: relative; min-height: 100vh; background: #edf1ee; }
+1489-.aq-reference-reader-shell .aq-reference-reader-chrome { display: none !important; }
+1490-.aq-reference-reader-shell > div > .mt-3 { display: none !important; }
+1491-.aq-reference-tool-rail { position: fixed; z-index: 80; left: 3rem; top: 8.8rem; display: flex; flex-direction: column; gap: .45rem; }
+1492-.aq-reference-tool-button { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgba(39,55,68,.2); border-radius: .12rem; color: #315060; background: rgba(255,255,255,.82); box-shadow: 0 2px 6px rgba(27,42,52,.08); transition: transform .14s cubic-bezier(.23,1,.32,1), color .14s ease, background .14s ease; }
+1493-.aq-reference-tool-button:hover:not(:disabled) { color: #182d3b; background: #f5f8f7; transform: translateX(.14rem); }
+1494-.aq-reference-tool-button:disabled { cursor: not-allowed; opacity: .35; }
+1495-.aq-reference-stage-logo { z-index: 4; filter: saturate(.9); }
+1496-.aq-reference-stage-watermark { z-index: 1; top: 50%; right: 6%; transform: translateY(-50%); opacity: .075; filter: grayscale(1) sepia(.1) saturate(.65) brightness(.84); }
+1497-.aq-reference-page-stack { z-index: 2; top: 11%; bottom: 11%; left: calc(50% + 14.5rem); width: 1.5rem; border-radius: 0 .22rem .22rem 0; background: repeating-linear-gradient(to bottom, rgba(76,83,81,.28) 0 1px, rgba(255,255,255,.78) 1px 5px); box-shadow: 6px 4px 0 rgba(66,76,74,.12), 11px 8px 0 rgba(66,76,74,.08); }
+1498-.aq-reference-reader-shell .aq-reference-reader-chrome {
+1499-  position: absolute; z-index: 50; top: 1.1rem; left: 1.1rem; right: auto;
+1500-  width: auto; height: 0; margin: 0; padding: 0; overflow: visible;
+1501-  border: 0; background: transparent; box-shadow: none; backdrop-filter: none;
+1502-}
+1503-.aq-reference-reader-shell .aq-reference-reader-chrome > div:first-child { display: none; }
+1504-.aq-reference-reader-shell .aq-reference-reader-chrome > div:last-child {
+1505-  display: flex; flex-direction: column; gap: .38rem; padding: .45rem;
+1506-  border: 1px solid rgba(12,30,44,.14); border-radius: .4rem; background: rgba(255,255,255,.86); box-shadow: 0 12px 30px rgba(24,45,52,.13);
+1507-}
+1508-.aq-reference-reader-shell .aq-reference-reader-chrome > div:last-child > div { display: none; }
+1509-.aq-reference-reader-shell .aq-reference-reader-chrome button { border-color: rgba(12,30,44,.13); color: #163044; background: rgba(255,255,255,.76); }
+--
+1512-.aq-reference-reader-shell .aq-reference-reader-chrome button:not([aria-label]) { width: auto; padding: .62rem .7rem; font-size: .67rem; }
+1513-.aq-reference-reader-shell .aq-reference-reader-chrome button span { display: none; }
+1514-.aq-reference-reader-shell .aq-reference-reader-footer,
+1515-.aq-reference-reader-shell .aq-reference-reader-thumbs { display: none; }
+1516-@media (max-width: 767.98px) {
+1517:  .aq-reference-flip-stage { min-height: 33rem; border-radius: 1.25rem !important; }
+1518:  .aq-reference-flipbook-wrap { min-height: 29rem !important; }
+1519:  .aq-reference-flipbook-wrap .aq-real-flipbook.stf__parent { width: min(20rem, 84vw) !important; max-width: min(20rem, 84vw) !important; }
+1520:  .aq-reference-flip-previous { left: .35rem !important; right: auto !important; }
+1521:  .aq-reference-flip-next { right: .35rem !important; left: auto !important; }
+1522-  .aq-reference-reader-shell .aq-reference-reader-chrome { top: .7rem; left: .7rem; }
+1523-  .aq-reference-reader-shell .aq-reference-reader-chrome > div:last-child { flex-direction: row; }
+1524-  .aq-reference-reader-shell .aq-reference-reader-chrome > div:last-child button:nth-child(-n+2) { display: none; }
+1525-  .aq-reference-tool-rail { left: .8rem; top: auto; bottom: 1rem; flex-direction: row; gap: .32rem; max-width: calc(100vw - 1.6rem); overflow-x: auto; }
+1526-  .aq-reference-tool-button { width: 2.22rem; height: 2.22rem; flex: 0 0 auto; }
+1527-  .aq-reference-stage-logo { left: 1rem; top: 1rem; width: 8rem; height: 3.5rem; }
+1528-  .aq-reference-stage-watermark { right: -3.5rem; width: 18rem; height: 18rem; }
+1529-  .aq-reference-page-stack { left: calc(50% + 8.2rem); top: 18%; bottom: 18%; width: 1rem; }
+1530-}
+1531-@media (prefers-reduced-motion: reduce) {
+1532-  .aq-real-flipbook-wrap { transition: none !important; }
+1533-}

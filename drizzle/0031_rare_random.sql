@@ -1,0 +1,1 @@
+ALTER TABLE `visual_element_overrides` ADD `layer_opacity` int DEFAULT 100 NOT NULL;

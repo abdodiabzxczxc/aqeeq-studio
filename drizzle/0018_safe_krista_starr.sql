@@ -1,0 +1,1 @@
+ALTER TABLE `visual_element_overrides` ADD `published_snapshot` text;
