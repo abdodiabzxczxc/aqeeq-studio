@@ -114,6 +114,16 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     touchStartY.current = null;
   };
 
+  // Keep thumbnail strip synchronized with current image position
+  useEffect(() => {
+    if (mode === "spread") {
+      const activeThumb = document.getElementById(`aq-album-thumb-${index}`);
+      if (activeThumb) {
+        activeThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [index, mode]);
+
   const brandLogo = album?.headerLogoUrl || journalIssues[0]?.headerLogoUrl || snapshot?.settings.school_logo || null;
   const watermark = album?.watermarkUrl || brandLogo;
   const active = album?.media[index] as AlbumItem | undefined;
@@ -317,20 +327,61 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               </div>
             )}
 
-            {/* Caption */}
-            {active?.caption ? (
-              <div className={`mx-auto max-w-2xl text-center text-xs sm:text-sm font-bold ${dark ? "text-slate-300" : "text-slate-700"}`}>
-                {active.caption}
+            {/* Magazine-style Footer Bar with centered Flip Controls and Page Counter */}
+            <div className={`aq-dark-reader-footer relative mx-auto mt-3 flex max-w-5xl flex-col gap-4 rounded-2xl border p-3 md:flex-row md:items-center md:justify-between transition-colors ${
+              dark ? "border-white/10 bg-[#0d1019]/95" : "border-slate-900/10 bg-white/95 shadow-sm"
+            }`}>
+              <div className="min-w-0 text-center md:text-right">
+                <div className={`truncate text-xs font-bold ${dark ? "text-slate-100" : "text-slate-800"}`}>
+                  {active?.caption || active?.fileName || album.title}
+                </div>
+                <div className={`mt-0.5 text-[10px] ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                  اسحب الصورة للتقليب أو استخدم الأسهم
+                </div>
               </div>
-            ) : null}
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => moveThroughAlbum("previous")}
+                  disabled={index === 0}
+                  aria-label="الصورة السابقة"
+                  className={`grid h-9 w-9 place-items-center rounded-xl border transition hover:border-amber-300/50 hover:text-amber-200 disabled:opacity-25 active:scale-95 ${
+                    dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
+                  }`}
+                >
+                  <ChevronRight size={19} />
+                </button>
+                <span className={`min-w-24 text-center text-xs font-black font-mono ${dark ? "text-amber-200" : "text-amber-700"}`}>
+                  {String(index + 1).padStart(2, "0")} <span className="text-slate-500">/</span> {String(album.media.length).padStart(2, "0")}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => moveThroughAlbum("next")}
+                  disabled={index >= album.media.length - 1}
+                  aria-label="الصورة التالية"
+                  className={`grid h-9 w-9 place-items-center rounded-xl border transition hover:border-amber-300/50 hover:text-amber-200 disabled:opacity-25 active:scale-95 ${
+                    dark ? "border-white/10 text-slate-300" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
+                  }`}
+                >
+                  <ChevronLeft size={19} />
+                </button>
+              </div>
+              <div className={`hidden text-left text-[10px] font-bold md:block ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                ألبوم العقيق
+              </div>
+            </div>
 
-            {/* Seamless Thumbnails Ribbon Below */}
+            {/* Seamless Thumbnails Ribbon with RTL Auto-Scroll */}
             {album.media.length > 1 ? (
-              <div className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
-                dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
-              }`}>
+              <div
+                dir="rtl"
+                className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
+                  dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
+                }`}
+              >
                 {(album.media as AlbumItem[]).map((item, mediaIndex) => (
                   <button
+                    id={`aq-album-thumb-${mediaIndex}`}
                     key={item.id}
                     type="button"
                     onClick={() => setIndex(mediaIndex)}
