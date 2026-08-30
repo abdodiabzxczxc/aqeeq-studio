@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Image as ImageIcon,
   Loader2,
+  Maximize2,
   Search,
   Sparkles,
   Trophy,
@@ -18,12 +19,19 @@ import {
   Users,
   X,
   AlertCircle,
+  BookOpen,
+  ScanFace,
 } from "lucide-react";
 import { toast } from "sonner";
-import { matchSelfieAgainstPhotos, loadFaceRecognitionModels } from "@/lib/aqeeqFaceRecognition";
+import { matchSelfieAgainstPhotos } from "@/lib/aqeeqFaceRecognition";
+import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
 
 export type AlbumPhotoItem = {
   id: number;
+  albumId?: number;
+  albumTitle?: string;
+  albumSlug?: string;
   imageUrl: string;
   thumbnailUrl?: string | null;
   caption?: string | null;
@@ -38,8 +46,8 @@ type MatchedPhoto = AlbumPhotoItem & {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  albumTitle: string;
-  photos: AlbumPhotoItem[];
+  albumTitle?: string;
+  photos?: AlbumPhotoItem[];
   dark?: boolean;
 };
 
@@ -57,13 +65,22 @@ function normalizeArabicText(text: string): string {
     .trim();
 }
 
+const CEREMONY_TAGS = [
+  { id: "all", label: "🌟 كل الصور", keywords: [] },
+  { id: "honor", label: "🏆 التكريم والتتويج", keywords: ["تكريم", "تتويج", "درع", "وسام", "شرف", "اوائل", "أوائل", "فائز"] },
+  { id: "certs", label: "📜 استلام الشهادات", keywords: ["شهادة", "تخرج", "مسيرة", "وثيقة", "منصة", "تسليم"] },
+  { id: "portrait", label: "📸 البورتريه الفردي", keywords: ["بورتريه", "فردي", "طالب", "خريج", "صورة شخصية"] },
+  { id: "group", label: "👥 الصور الجماعية", keywords: ["جماعي", "دفعة", "فرسان", "صف", "طابور", "مجموعة", "فريق"] },
+];
+
 export function AqeeqFaceSearchModal({
   open,
   onOpenChange,
   albumTitle,
-  photos,
+  photos: propPhotos,
   dark = true,
 }: Props) {
+  const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [isScanning, setIsScanning] = useState(false);
@@ -73,6 +90,20 @@ export function AqeeqFaceSearchModal({
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<number>>(new Set());
   const [selfieSrc, setSelfieSrc] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState<MatchedPhoto | null>(null);
+
+  // Fetch all public media across all albums if not provided
+  const { data: globalMedia = [] } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, {
+    enabled: open && (!propPhotos || propPhotos.length === 0),
+    refetchOnWindowFocus: false,
+  });
+
+  const effectivePhotos: AlbumPhotoItem[] = useMemo(() => {
+    if (propPhotos && propPhotos.length > 0) return propPhotos;
+    return globalMedia;
+  }, [propPhotos, globalMedia]);
+
+  const effectiveAlbumTitle = albumTitle || "كافة ألبومات وفعاليات مدارس العقيق";
 
   const handleSelfieUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,9 +118,14 @@ export function AqeeqFaceSearchModal({
   };
 
   const runBiometricSearch = async (selfie: string | null, textQuery: string, tag: string) => {
+    if (!effectivePhotos.length) {
+      toast.error("لا توجد صور متاحة للبحث حالياً");
+      return;
+    }
+
     setIsScanning(true);
     setHasSearched(false);
-    setScanProgress({ current: 0, total: photos.length });
+    setScanProgress({ current: 0, total: effectivePhotos.length });
 
     try {
       const results: MatchedPhoto[] = [];
@@ -99,7 +135,7 @@ export function AqeeqFaceSearchModal({
         try {
           const aiMatches = await matchSelfieAgainstPhotos(
             selfie,
-            photos,
+            effectivePhotos,
             (current, total) => setScanProgress({ current, total })
           );
 
@@ -107,7 +143,7 @@ export function AqeeqFaceSearchModal({
             results.push({
               ...m.photo,
               confidence: m.confidence,
-              matchReason: `تطابق بيومتري بالذكاء الاصطناعي (${m.confidence}%)`,
+              matchReason: `تطابق بيومتري ذكي (${m.confidence}%)`,
             });
           }
         } catch (err: any) {
@@ -120,67 +156,76 @@ export function AqeeqFaceSearchModal({
         }
       }
 
-      // 2. Text / Student Name / Keywords Search
-      const normalizedQuery = normalizeArabicText(textQuery);
-      const queryTokens = normalizedQuery ? normalizedQuery.split(" ").filter((t) => t.length > 1) : [];
-      const normalizedTag = tag !== "all" ? normalizeArabicText(tag) : "";
+      // 2. Semantic text & filename & caption matching (if search term provided or if no selfie)
+      const normQuery = normalizeArabicText(textQuery);
+      if (normQuery.length >= 2) {
+        for (const photo of effectivePhotos) {
+          const captionNorm = normalizeArabicText(photo.caption || "");
+          const fileNorm = normalizeArabicText(photo.fileName || "");
+          const albumNorm = normalizeArabicText(photo.albumTitle || "");
 
-      if (queryTokens.length > 0 || normalizedTag) {
-        for (const photo of photos) {
-          if (results.some((r) => r.id === photo.id)) continue;
-
-          const normCaption = normalizeArabicText(photo.caption || "");
-          const normFileName = normalizeArabicText(photo.fileName || "");
-          const combinedText = `${normCaption} ${normFileName}`;
-
-          let textMatched = false;
-          let confidence = 0;
-          let reason = "";
-
-          if (queryTokens.length > 0) {
-            const matchedCount = queryTokens.filter((token) => combinedText.includes(token)).length;
-            if (matchedCount > 0) {
-              const ratio = matchedCount / queryTokens.length;
-              confidence = Math.round(75 + ratio * 24);
-              textMatched = true;
-              reason = `تطابق الاسم/الوصف (${Math.round(ratio * 100)}%)`;
+          if (
+            captionNorm.includes(normQuery) ||
+            fileNorm.includes(normQuery) ||
+            albumNorm.includes(normQuery)
+          ) {
+            if (!results.some((r) => r.id === photo.id)) {
+              results.push({
+                ...photo,
+                confidence: 94,
+                matchReason: `تطابق باسم الطالب أو الفقرة («${textQuery}»)`,
+              });
             }
-          }
-
-          if (normalizedTag && (normCaption.includes(normalizedTag) || normFileName.includes(normalizedTag))) {
-            confidence = Math.max(confidence, 85);
-            textMatched = true;
-            reason = reason || `ضمن فقرة ${tag}`;
-          }
-
-          if (textMatched) {
-            results.push({
-              ...photo,
-              confidence,
-              matchReason: reason,
-            });
           }
         }
       }
 
-      // Sort results by confidence descending
-      results.sort((a, b) => b.confidence - a.confidence);
+      // 3. Category Tag Filtering (if selected)
+      let finalResults = results;
+      if (tag !== "all") {
+        const tagObj = CEREMONY_TAGS.find((t) => t.id === tag);
+        if (tagObj && tagObj.keywords.length > 0) {
+          finalResults = finalResults.filter((photo) => {
+            const text = `${photo.caption || ""} ${photo.fileName || ""} ${photo.albumTitle || ""}`.toLowerCase();
+            return tagObj.keywords.some((kw) => text.includes(kw));
+          });
+        }
+      }
 
-      setMatchedList(results);
-      setSelectedPhotoIds(new Set(results.map((r) => r.id)));
-      setIsScanning(false);
+      // If user searched without selfie and with tag only, show matching photos from album
+      if (!selfie && !normQuery && tag !== "all") {
+        const tagObj = CEREMONY_TAGS.find((t) => t.id === tag);
+        if (tagObj) {
+          for (const photo of effectivePhotos) {
+            const text = `${photo.caption || ""} ${photo.fileName || ""} ${photo.albumTitle || ""}`.toLowerCase();
+            if (tagObj.keywords.some((kw) => text.includes(kw))) {
+              if (!finalResults.some((r) => r.id === photo.id)) {
+                finalResults.push({
+                  ...photo,
+                  confidence: 90,
+                  matchReason: `تصنيف ضمن فقرة ${tagObj.label}`,
+                });
+              }
+            }
+          }
+        }
+      }
+
+      setMatchedList(finalResults);
+      // Auto-select all matched photos
+      setSelectedPhotoIds(new Set(finalResults.map((p) => p.id)));
       setHasSearched(true);
 
-      if (results.length > 0) {
-        toast.success(`✨ تم العثور على (${results.length}) صورة متطابقة بالذكاء الاصطناعي!`);
+      if (finalResults.length > 0) {
+        toast.success(`✨ تم العثور على ${finalResults.length} صورة متطابقة بدقة!`);
       } else {
-        toast.info("لم نجد صوراً متطابقة مع هذه الصورة في الألبوم.");
+        toast.info("لم نجد صوراً متطابقة مع هذه الملامح أو البحث.");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Search error:", error);
+      toast.error("حدث خطأ أثناء إجراء البحث الذكي");
+    } finally {
       setIsScanning(false);
-      setHasSearched(true);
-      toast.error("حدث خطأ أثناء فحص الصور بالذكاء الاصطناعي");
     }
   };
 
@@ -193,279 +238,479 @@ export function AqeeqFaceSearchModal({
     });
   };
 
-  const handleDownloadSelected = () => {
-    const listToDownload = hasSearched && matchedList.length > 0
-      ? matchedList.filter((p) => selectedPhotoIds.has(p.id))
-      : photos.filter((p) => selectedPhotoIds.has(p.id));
+  const toggleSelectAll = () => {
+    if (selectedPhotoIds.size === matchedList.length) {
+      setSelectedPhotoIds(new Set());
+    } else {
+      setSelectedPhotoIds(new Set(matchedList.map((p) => p.id)));
+    }
+  };
 
-    if (listToDownload.length === 0) {
-      toast.error("يرجى تحديد صورة واحدة على الأقل للتنزيل");
+  const downloadSinglePhoto = async (photo: MatchedPhoto) => {
+    try {
+      const res = await fetch(photo.imageUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = photo.fileName || `aqeeq-photo-${photo.id}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("تم بدء تحميل الصورة بنجاح 📥");
+    } catch {
+      window.open(photo.imageUrl, "_blank");
+    }
+  };
+
+  const handleDownloadSelected = async () => {
+    if (selectedPhotoIds.size === 0) {
+      toast.error("يرجى تحديد صورة واحدة على الأقل للتحميل");
       return;
     }
 
     setIsDownloading(true);
-    toast.success(`جارٍ تنزيل ${listToDownload.length} صورة من ألبومك الشخصي…`);
+    const selectedPhotos = matchedList.filter((p) => selectedPhotoIds.has(p.id));
 
-    listToDownload.forEach((item, index) => {
-      setTimeout(() => {
-        const link = document.createElement("a");
-        link.href = item.imageUrl;
-        link.download = `aqeeq-photo-${item.id}.jpg`;
-        link.target = "_blank";
-        link.click();
-
-        if (index === listToDownload.length - 1) {
-          setIsDownloading(false);
-          toast.success("✨ اكتمل تنزيل جميع الصور المحددة بنجاح!");
+    try {
+      for (let i = 0; i < selectedPhotos.length; i++) {
+        const photo = selectedPhotos[i];
+        const res = await fetch(photo.imageUrl);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = photo.fileName || `aqeeq-memory-${i + 1}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (selectedPhotos.length > 1) {
+          await new Promise((r) => setTimeout(r, 400));
         }
-      }, index * 200);
-    });
+      }
+      toast.success(`🎉 تم تنزيل حزمة صورك (${selectedPhotos.length} صورة) بنجاح!`);
+    } catch (err) {
+      console.error(err);
+      toast.error("حدث خطأ أثناء تنزيل بعض الصور");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
-  const CEREMONY_TAGS = [
-    { id: "all", label: "🌟 جميع الصور" },
-    { id: "تخرج", label: "🎓 مسيرة التخرج" },
-    { id: "تكريم", label: "🏆 منصة التكريم" },
-    { id: "شهادة", label: "📜 تسليم الشهادات" },
-    { id: "بورتريه", label: "📸 لقطات فردية" },
-  ];
+  const openAlbumReaderAtPhoto = (photo: MatchedPhoto) => {
+    onOpenChange(false);
+    if (photo.albumSlug) {
+      navigate(`/albums/${encodeURIComponent(photo.albumSlug)}`);
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={`max-w-3xl overflow-hidden rounded-[2rem] border p-0 text-right shadow-2xl ${
-          dark ? "border-amber-400/25 bg-[#090d16] text-slate-100" : "border-slate-300 bg-white text-slate-900"
-        }`}
-        dir="rtl"
-      >
-        <DialogHeader className="border-b border-white/10 bg-amber-400/[.06] p-5 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30">
-                <Sparkles size={22} />
-              </div>
-              <div>
-                <DialogTitle className="text-lg sm:text-xl font-black text-amber-200">
-                  التعرف على الوجه بالذكاء الاصطناعي (AI Face Recognition) 🔍
-                </DialogTitle>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  محرك مطابقة البصمة البيومترية لملامح الوجه في «{albumTitle}»
-                </p>
-              </div>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="max-h-[76vh] space-y-5 overflow-y-auto p-5 sm:p-6">
-          {/* Search Inputs Card */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Selfie Upload */}
-            <label className="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-400/35 bg-amber-400/[.03] p-4 text-center transition hover:border-amber-400/60 hover:bg-amber-400/[.08]">
-              <input
-                type="file"
-                accept="image/*"
-                capture="user"
-                className="hidden"
-                onChange={handleSelfieUpload}
-              />
-              {selfieSrc ? (
-                <div className="relative h-14 w-14 overflow-hidden rounded-full ring-2 ring-emerald-400 shadow-md">
-                  <img src={selfieSrc} alt="Selfie" className="h-full w-full object-cover" />
-                  <span className="absolute bottom-0 right-0 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-[10px] text-white">
-                    ✓
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          className={`max-w-4xl overflow-hidden rounded-3xl border p-0 text-right shadow-2xl ${
+            dark ? "border-amber-400/25 bg-[#090d16] text-slate-100" : "border-slate-300 bg-white text-slate-900"
+          }`}
+          dir="rtl"
+        >
+          {/* Header */}
+          <DialogHeader className="border-b border-white/10 bg-gradient-to-r from-amber-400/[.08] via-amber-400/[.03] to-transparent p-5 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-400/20 ring-2 ring-amber-300/40">
+                  <ScanFace size={24} />
+                  <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-white ring-2 ring-[#090d16]">
+                    AI
                   </span>
                 </div>
-              ) : (
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/15 text-amber-300 group-hover:scale-105 transition">
-                  <Camera size={24} />
-                </div>
-              )}
-              <span className="mt-2 text-xs font-black text-amber-100">
-                {selfieSrc ? "تغيير صورة السيلفي" : "التقط أو ارفع صورة سيلفي 🤳"}
-              </span>
-              <span className="mt-0.5 text-[10px] text-slate-400">
-                للبحث البيومتري الحقيقي عن ملامح وجهك
-              </span>
-            </label>
-
-            {/* Name Search */}
-            <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-black/25 p-4">
-              <div>
-                <span className="text-xs font-black text-amber-100">أو ابحث باسم الطالب / المرحلة:</span>
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="مثال: عبد الرحمن، تكريم، ثالث ثانوي..."
-                  className={`mt-2 text-xs ${
-                    dark ? "border-white/10 bg-black/40 text-white placeholder:text-slate-600" : "border-slate-300 bg-white"
-                  }`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void runBiometricSearch(selfieSrc, searchTerm, selectedTag);
-                  }}
-                />
-              </div>
-              <Button
-                type="button"
-                onClick={() => void runBiometricSearch(selfieSrc, searchTerm, selectedTag)}
-                disabled={isScanning}
-                className="mt-3 bg-gradient-to-r from-amber-500 to-amber-300 text-xs font-black text-slate-950 hover:from-amber-400 hover:to-amber-200 shadow-md"
-              >
-                <Search size={14} className="ml-1.5" />
-                بدء البحث الذكي
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Ceremony Filters */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-white/10">
-            <span className="text-[11px] font-black text-slate-400 ml-1">تصفية حسب الفقرة:</span>
-            {CEREMONY_TAGS.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => {
-                  setSelectedTag(tag.id);
-                  void runBiometricSearch(selfieSrc, searchTerm, tag.id);
-                }}
-                className={`rounded-xl px-3 py-1.5 text-xs font-black transition ${
-                  selectedTag === tag.id
-                    ? "bg-amber-400 text-slate-950 shadow-sm"
-                    : "border border-white/10 bg-white/[0.03] text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
-                }`}
-              >
-                {tag.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Scanner Animation with Real Neural Progress */}
-          {isScanning ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-400/[.05] p-8 text-center animate-pulse">
-              <Loader2 size={36} className="animate-spin text-amber-400" />
-              <p className="mt-4 text-sm font-black text-amber-200">
-                جارٍ فحص ملامح الوجه واستخراج البصمة البيومترية…
-              </p>
-              {scanProgress.total > 0 && (
-                <div className="mt-3 w-full max-w-xs space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold text-amber-300">
-                    <span>تقدم الفحص العصبي</span>
-                    <span>{Math.round((scanProgress.current / scanProgress.total) * 100)}%</span>
-                  </div>
-                  <Progress value={(scanProgress.current / scanProgress.total) * 100} className="h-2 bg-black/40" />
-                  <p className="text-[9px] text-slate-400">
-                    تم فحص {scanProgress.current} من أصل {scanProgress.total} صورة في الألبوم
+                <div>
+                  <DialogTitle className="text-lg sm:text-xl font-black text-amber-200 flex items-center gap-2">
+                    <span>البحث عن صوري بالذكاء الاصطناعي</span>
+                    <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-300">
+                      Biometric Face Scan 🔍
+                    </span>
+                  </DialogTitle>
+                  <p className="mt-1 text-xs text-slate-400">
+                    محرك مطابقة ملامح الوجه والبصمة البيومترية في «{effectiveAlbumTitle}»
                   </p>
                 </div>
+              </div>
+
+              {effectivePhotos.length > 0 && (
+                <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-bold text-slate-300">
+                  <span className="text-amber-400 font-black">{effectivePhotos.length}</span> صورة متاحة للفحص
+                </div>
               )}
             </div>
-          ) : null}
+          </DialogHeader>
 
-          {/* Results Display */}
-          {hasSearched && !isScanning ? (
-            <div className="space-y-4 animate-in fade-in">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-y border-white/10 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/20 text-emerald-300">
-                    <UserCheck size={16} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-black text-emerald-300">
-                      {matchedList.length > 0
-                        ? `تم العثور على (${matchedList.length}) صورة متطابقة بيومترياً`
-                        : "لم نجد صوراً متطابقة"}
+          <div className="max-h-[78vh] space-y-5 overflow-y-auto p-5 sm:p-6">
+            {/* Search Station: Selfie Card & Smart Inputs */}
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-12">
+              {/* Selfie Camera Box (5 cols) */}
+              <label className="sm:col-span-5 group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-400/40 bg-amber-400/[.03] p-4 text-center transition hover:border-amber-400 hover:bg-amber-400/[.08] shadow-inner">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={handleSelfieUpload}
+                />
+                {selfieSrc ? (
+                  <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-2 ring-emerald-400 shadow-xl">
+                    <img src={selfieSrc} alt="Selfie" className="h-full w-full object-cover" />
+                    <span className="absolute bottom-1 right-1 grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-[10px] font-bold text-white shadow-md">
+                      ✓
                     </span>
-                    {matchedList.length > 0 && (
-                      <span className="text-[10px] text-slate-400 mr-2">
-                        (محدد {selectedPhotoIds.size} صورة)
-                      </span>
-                    )}
+                  </div>
+                ) : (
+                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 group-hover:scale-110 transition duration-300 ring-1 ring-amber-400/30">
+                    <Camera size={26} />
+                  </div>
+                )}
+                <span className="mt-2.5 text-xs font-black text-amber-200">
+                  {selfieSrc ? "تغيير صورة السيلفي 🔄" : "التقط أو ارفع صورة سيلفي 🤳"}
+                </span>
+                <span className="mt-0.5 text-[10px] text-slate-400">
+                  خوارزمية التعرف البيومتري ستطابق ملامحك فوراً
+                </span>
+              </label>
+
+              {/* Text & Ceremony Search Box (7 cols) */}
+              <div className="sm:col-span-7 flex flex-col justify-between rounded-2xl border border-white/10 bg-black/40 p-4">
+                <div>
+                  <label className="text-xs font-black text-amber-100 flex items-center justify-between">
+                    <span>أو ابحث باسم الطالب / الدفعة:</span>
+                    <span className="text-[10px] text-slate-400 font-normal">بحث نصي مدعوم بالذكاء الاصطناعي</span>
+                  </label>
+                  <div className="relative mt-2">
+                    <Input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="مثال: عبد الرحمن، تكريم، فرسان الموهبة..."
+                      className={`text-xs pr-9 ${
+                        dark ? "border-white/15 bg-black/60 text-white placeholder:text-slate-600" : "border-slate-300 bg-white"
+                      }`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") void runBiometricSearch(selfieSrc, searchTerm, selectedTag);
+                      }}
+                    />
+                    <Search size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   </div>
                 </div>
 
-                {matchedList.length > 0 && (
+                <div className="mt-3 flex items-center gap-2">
                   <Button
                     type="button"
-                    size="sm"
-                    onClick={handleDownloadSelected}
-                    disabled={isDownloading || selectedPhotoIds.size === 0}
-                    className="h-8 bg-emerald-500 text-xs font-black text-slate-950 hover:bg-emerald-400 shadow-md"
+                    onClick={() => void runBiometricSearch(selfieSrc, searchTerm, selectedTag)}
+                    disabled={isScanning}
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-amber-300 text-xs font-black text-slate-950 hover:from-amber-400 hover:to-amber-200 shadow-md py-4"
                   >
-                    {isDownloading ? (
-                      <Loader2 size={13} className="animate-spin ml-1.5" />
+                    {isScanning ? (
+                      <div className="flex items-center gap-1.5">
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>جارٍ الفحص والمطابقة…</span>
+                      </div>
                     ) : (
-                      <Download size={13} className="ml-1.5" />
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles size={14} />
+                        <span>بدء البحث بالذكاء الاصطناعي ✨</span>
+                      </div>
                     )}
-                    تنزيل ألبومي الخاص ({selectedPhotoIds.size})
                   </Button>
+
+                  {selfieSrc ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setSelfieSrc(null);
+                        setMatchedList([]);
+                        setHasSearched(false);
+                      }}
+                      className="border-white/10 text-xs text-slate-400 hover:text-white"
+                    >
+                      إعادة ضبط
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Ceremony Stage Filters */}
+            <div className="space-y-1.5 border-t border-white/10 pt-3">
+              <span className="text-[11px] font-bold text-slate-400">تصفية حسب فقرة الحفل:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {CEREMONY_TAGS.map((tag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTag(tag.id);
+                      void runBiometricSearch(selfieSrc, searchTerm, tag.id);
+                    }}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-black transition ${
+                      selectedTag === tag.id
+                        ? "bg-amber-400 text-slate-950 shadow-md ring-2 ring-amber-400/40"
+                        : "border border-white/10 bg-white/[0.03] text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
+                    }`}
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Scanning Progress Radar */}
+            {isScanning ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-400/[.04] p-8 text-center animate-pulse">
+                <div className="relative grid h-16 w-16 place-items-center rounded-full bg-amber-400/20 text-amber-300 ring-2 ring-amber-400/40">
+                  <ScanFace size={32} className="animate-pulse" />
+                  <div className="absolute inset-0 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                </div>
+                <p className="mt-4 text-sm font-black text-amber-200">
+                  جارٍ مطابقة البصمة البيومترية واستخراج ملامح الوجه…
+                </p>
+                {scanProgress.total > 0 && (
+                  <div className="mt-3 w-full max-w-sm space-y-1.5">
+                    <div className="flex justify-between text-[11px] font-black text-amber-300">
+                      <span>التقدم البيومتري</span>
+                      <span>{Math.round((scanProgress.current / scanProgress.total) * 100)}%</span>
+                    </div>
+                    <Progress value={(scanProgress.current / scanProgress.total) * 100} className="h-2.5 bg-black/50" />
+                    <p className="text-[10px] text-slate-400">
+                      تم فحص {scanProgress.current} من أصل {scanProgress.total} صورة
+                    </p>
+                  </div>
                 )}
               </div>
+            ) : null}
 
-              {matchedList.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                  {matchedList.map((photo) => {
-                    const isSelected = selectedPhotoIds.has(photo.id);
-                    return (
-                      <div
-                        key={photo.id}
-                        onClick={() => toggleSelect(photo.id)}
-                        className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl border transition duration-300 ${
-                          isSelected
-                            ? "border-emerald-400 ring-2 ring-emerald-400/50 shadow-lg shadow-emerald-500/10"
-                            : "border-white/10 opacity-80 hover:opacity-100"
-                        }`}
+            {/* RESULTS SHOWCASE (Ultra-Modern Redesign) */}
+            {hasSearched && !isScanning ? (
+              <div className="space-y-4 animate-in fade-in">
+                {/* Result Status & Bulk Action Toolbar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/40 p-3.5 backdrop-blur-md">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30">
+                      <UserCheck size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-emerald-300 flex items-center gap-2">
+                        <span>
+                          {matchedList.length > 0
+                            ? `تم العثور على (${matchedList.length}) صورة متطابقة معك`
+                            : "لم يتم العثور على صور متطابقة"}
+                        </span>
+                      </div>
+                      {matchedList.length > 0 && (
+                        <p className="text-[10px] text-slate-400">
+                          تم تحديد {selectedPhotoIds.size} من أصل {matchedList.length} صورة
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {matchedList.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={toggleSelectAll}
+                        className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white transition"
                       >
-                        <img
-                          src={photo.imageUrl}
-                          alt={photo.caption || "صورتك في الحفل"}
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                        />
+                        {selectedPhotoIds.size === matchedList.length ? "إلغاء التحديد" : "تحديد الكل ✓"}
+                      </button>
 
-                        {/* Match Confidence Badge */}
-                        <div className="absolute top-2 right-2 rounded-full border border-black/40 bg-black/80 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md shadow-md">
-                          ✨ {photo.confidence}% تطابق
-                        </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleDownloadSelected}
+                        disabled={isDownloading || selectedPhotoIds.size === 0}
+                        className="bg-emerald-500 text-xs font-black text-slate-950 hover:bg-emerald-400 shadow-md h-9 px-4"
+                      >
+                        {isDownloading ? (
+                          <Loader2 size={14} className="animate-spin ml-1.5" />
+                        ) : (
+                          <Download size={14} className="ml-1.5" />
+                        )}
+                        تنزيل الصور المحددة ({selectedPhotoIds.size})
+                      </Button>
+                    </div>
+                  )}
+                </div>
 
-                        {/* Checkbox */}
+                {/* Grid Gallery Cards */}
+                {matchedList.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {matchedList.map((photo) => {
+                      const isSelected = selectedPhotoIds.has(photo.id);
+                      return (
                         <div
-                          className={`absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full border transition ${
+                          key={photo.id}
+                          className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${
                             isSelected
-                              ? "border-emerald-400 bg-emerald-500 text-slate-950 font-black shadow-md"
-                              : "border-white/40 bg-black/60 text-transparent"
+                              ? "border-amber-400 ring-2 ring-amber-400/40 bg-amber-400/[.03] shadow-xl shadow-amber-400/10"
+                              : "border-white/10 bg-[#111522] hover:border-amber-400/50"
                           }`}
                         >
-                          <Check size={12} strokeWidth={3} className={isSelected ? "text-slate-950" : "opacity-0"} />
-                        </div>
+                          {/* Image Container with Natural Aspect */}
+                          <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/60">
+                            <img
+                              src={photo.imageUrl}
+                              alt={photo.caption || "صورتك في الحفل"}
+                              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                            />
 
-                        {/* Overlay Caption */}
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-2.5 pt-8">
-                          <p className="truncate text-[10px] font-bold text-slate-200">
-                            {photo.caption || photo.fileName || "لقطة من الحفل"}
-                          </p>
-                          <p className="truncate text-[8px] font-bold text-amber-300/90">
-                            {photo.matchReason}
-                          </p>
+                            {/* Biometric Confidence Holographic Badge */}
+                            <div className="absolute top-2.5 right-2.5 rounded-full border border-amber-300/40 bg-black/80 px-2.5 py-1 text-[10px] font-black text-amber-300 backdrop-blur-md shadow-lg flex items-center gap-1">
+                              <Sparkles size={11} className="text-amber-400" />
+                              <span>{photo.confidence}% تطابق</span>
+                            </div>
+
+                            {/* Checkbox selector */}
+                            <button
+                              type="button"
+                              onClick={() => toggleSelect(photo.id)}
+                              className={`absolute top-2.5 left-2.5 grid h-7 w-7 place-items-center rounded-xl border transition shadow-lg ${
+                                isSelected
+                                  ? "border-amber-400 bg-amber-400 text-slate-950 font-black"
+                                  : "border-white/40 bg-black/60 text-transparent hover:border-white"
+                              }`}
+                              title={isSelected ? "إلغاء التحديد" : "تحديد الصورة"}
+                            >
+                              <Check size={14} strokeWidth={3} className={isSelected ? "text-slate-950" : "opacity-0"} />
+                            </button>
+
+                            {/* Hover Quick Actions Bar */}
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition duration-200 group-hover:opacity-100 backdrop-blur-[2px]">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewPhoto(photo)}
+                                className="grid h-10 w-10 place-items-center rounded-xl border border-white/20 bg-black/70 text-white hover:bg-amber-400 hover:text-black transition shadow-lg"
+                                title="معاينة الصورة بالحجم الكامل"
+                              >
+                                <Maximize2 size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => downloadSinglePhoto(photo)}
+                                className="grid h-10 w-10 place-items-center rounded-xl border border-white/20 bg-black/70 text-white hover:bg-amber-400 hover:text-black transition shadow-lg"
+                                title="تحميل هذه الصورة فوراً"
+                              >
+                                <Download size={16} />
+                              </button>
+                              {photo.albumSlug ? (
+                                <button
+                                  type="button"
+                                  onClick={() => openAlbumReaderAtPhoto(photo)}
+                                  className="grid h-10 w-10 place-items-center rounded-xl border border-white/20 bg-black/70 text-white hover:bg-amber-400 hover:text-black transition shadow-lg"
+                                  title="فتح في الألبوم التفاعلي"
+                                >
+                                  <BookOpen size={16} />
+                                </button>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          {/* Details Footer */}
+                          <div className="p-3 bg-white/[0.02]">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="truncate text-xs font-black text-slate-100">
+                                {photo.caption || photo.fileName || "صورة من محفل التكريم"}
+                              </p>
+                            </div>
+                            <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+                              <span className="truncate text-amber-300/80 font-bold">{photo.matchReason}</span>
+                              {photo.albumTitle ? (
+                                <span className="truncate text-slate-500 font-mono">«{photo.albumTitle}»</span>
+                              ) : null}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center">
-                  <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-amber-400/10 text-amber-300">
-                    <AlertCircle size={20} />
+                      );
+                    })}
                   </div>
-                  <p className="text-xs font-black text-slate-300">
-                    لم نجد صوراً متطابقة مع هذه الملامح في الألبوم.
-                  </p>
-                  <p className="mt-1 text-[11px] text-slate-400">
-                    تأكد من اختيار صورة سيلفي واضحة بزاوية أمامية وإضاءة جيدة، أو ابحث بالاسم.
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 p-10 text-center">
+                    <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/10 text-amber-300 ring-1 ring-amber-400/20">
+                      <AlertCircle size={24} />
+                    </div>
+                    <p className="text-sm font-black text-slate-200">
+                      لم نتمكن من مطابقة هذا الوجه مع صور الألبوم الحالية.
+                    </p>
+                    <p className="mt-1.5 text-xs text-slate-400 max-w-md mx-auto leading-5">
+                      نصيحة: التقط سيلفي أمامية واضحة بدون نظارات شمسية أو إضاءة خلفية قوية، أو جرّب البحث بالاسم مباشرة.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* High-Resolution Fullscreen Lightbox Modal */}
+      {previewPhoto ? (
+        <Dialog open={Boolean(previewPhoto)} onOpenChange={() => setPreviewPhoto(null)}>
+          <DialogContent
+            className="max-w-3xl overflow-hidden rounded-3xl border border-amber-400/30 bg-[#070a11] p-0 text-right text-white shadow-2xl"
+            dir="rtl"
+          >
+            <div className="relative aspect-[4/3] sm:aspect-video w-full bg-black flex items-center justify-center">
+              <img
+                src={previewPhoto.imageUrl}
+                alt={previewPhoto.caption || ""}
+                className="max-h-full max-w-full object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => setPreviewPhoto(null)}
+                className="absolute top-4 left-4 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white hover:bg-white hover:text-black transition"
+              >
+                <X size={16} />
+              </button>
             </div>
-          ) : null}
-        </div>
-      </DialogContent>
-    </Dialog>
+            <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 bg-black/60 border-t border-white/10">
+              <div>
+                <p className="text-sm font-black text-amber-200">
+                  {previewPhoto.caption || previewPhoto.fileName || "صورة من ألبوم العقيق"}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  {previewPhoto.matchReason} {previewPhoto.albumTitle ? `· «${previewPhoto.albumTitle}»` : ""}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={() => downloadSinglePhoto(previewPhoto)}
+                  className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-9 px-4"
+                >
+                  <Download size={14} className="ml-1.5" />
+                  تحميل الصورة الأصلية
+                </Button>
+                {previewPhoto.albumSlug ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const slug = previewPhoto.albumSlug!;
+                      setPreviewPhoto(null);
+                      onOpenChange(false);
+                      navigate(`/albums/${encodeURIComponent(slug)}`);
+                    }}
+                    className="border-white/15 text-xs font-bold text-slate-300 hover:text-white"
+                  >
+                    <BookOpen size={14} className="ml-1.5" />
+                    عرض في الألبوم
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : null}
+    </>
   );
 }

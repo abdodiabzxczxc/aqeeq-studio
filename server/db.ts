@@ -1688,6 +1688,64 @@ export async function getAqeeqAlbumBySlug(slug: string, includeDraft = false) {
   return { ...album, media };
 }
 
+export async function listAllPublicAlbumMedia() {
+  const db = await getDb();
+  if (!db) {
+    const albums = await localAlbums.list("published");
+    const allMedia: Array<{
+      id: number;
+      albumId: number;
+      albumTitle: string;
+      albumSlug: string;
+      imageUrl: string;
+      thumbnailUrl: string | null;
+      caption: string | null;
+      fileName: string | null;
+    }> = [];
+    for (const a of albums) {
+      const full = await localAlbums.getBySlug(a.slug, false);
+      if (full?.media) {
+        for (const m of full.media) {
+          if (m.mediaType === "image") {
+            allMedia.push({
+              id: m.id,
+              albumId: a.id,
+              albumTitle: a.title,
+              albumSlug: a.slug,
+              imageUrl: m.mediaUrl,
+              thumbnailUrl: m.thumbnailUrl,
+              caption: m.caption,
+              fileName: m.fileName,
+            });
+          }
+        }
+      }
+    }
+    return allMedia;
+  }
+
+  const published = await db.select().from(aqeeqAlbums).where(eq(aqeeqAlbums.status, "published"));
+  if (!published.length) return [];
+  const albumMap = new Map(published.map((a) => [a.id, a]));
+  const media = await db.select().from(aqeeqAlbumMedia);
+
+  return media
+    .filter((m) => albumMap.has(m.albumId) && m.mediaType === "image")
+    .map((m) => {
+      const alb = albumMap.get(m.albumId)!;
+      return {
+        id: m.id,
+        albumId: m.albumId,
+        albumTitle: alb.title,
+        albumSlug: alb.slug,
+        imageUrl: m.mediaUrl,
+        thumbnailUrl: m.thumbnailUrl,
+        caption: m.caption,
+        fileName: m.fileName,
+      };
+    });
+}
+
 export async function createAqeeqAlbum(data: typeof aqeeqAlbums.$inferInsert) {
   const db = await getDb();
   if (!db) return localAlbums.create(data);

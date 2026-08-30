@@ -16,7 +16,9 @@ import {
   ArrowUpLeft,
   CornerDownLeft,
   SlidersHorizontal,
+  ScanFace,
 } from "lucide-react";
+import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
 
 type SearchCategory = "all" | "journal" | "albums" | "showcase";
 
@@ -53,6 +55,7 @@ export function AlaqeeqSpotlightSearch({
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<SearchCategory>("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Fetch real data
@@ -170,16 +173,18 @@ export function AlaqeeqSpotlightSearch({
     }
   };
 
-  if (!open) return null;
+  if (!open && !faceSearchOpen) return null;
 
   return (
-    <div
-      dir="rtl"
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 bg-black/60 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={() => onOpenChange(false)}
-    >
-      <div
-        className={"relative w-full max-w-2xl overflow-hidden rounded-3xl border shadow-2xl transition-all " + (
+    <>
+      {open ? (
+        <div
+          dir="rtl"
+          className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 bg-black/60 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => onOpenChange(false)}
+        >
+          <div
+            className={"relative w-full max-w-2xl overflow-hidden rounded-3xl border shadow-2xl transition-all " + (
           dark
             ? "border-white/[0.12] bg-[#0c0c0c] text-white shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
             : "border-black/[0.1] bg-white text-black shadow-[0_25px_60px_rgba(0,0,0,0.15)]"
@@ -258,10 +263,54 @@ export function AlaqeeqSpotlightSearch({
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={() => {
+              onOpenChange(false);
+              setFaceSearchOpen(true);
+            }}
+            className="mr-auto inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/15 px-3 py-1.5 text-xs font-black text-amber-300 hover:bg-amber-400 hover:text-black transition shadow-sm"
+          >
+            <ScanFace size={14} className="text-amber-400" />
+            <span>البحث بالوجه 🤳</span>
+          </button>
         </div>
 
         {/* Results List */}
         <div className="max-h-[60vh] overflow-y-auto p-3 scrollbar-none">
+          {/* AI Face Recognition Suggestion Banner */}
+          {!query ? (
+            <div
+              onClick={() => {
+                onOpenChange(false);
+                setFaceSearchOpen(true);
+              }}
+              className={`cursor-pointer rounded-2xl border p-3.5 mb-2.5 transition flex items-center justify-between gap-3 ${
+                dark
+                  ? "border-amber-400/30 bg-gradient-to-r from-amber-400/[0.12] via-amber-400/[0.04] to-transparent hover:border-amber-400/60"
+                  : "border-amber-500/30 bg-amber-50/80 hover:bg-amber-100/80 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-400 text-slate-950 shadow-md">
+                  <ScanFace size={20} />
+                </div>
+                <div>
+                  <span className="text-xs font-black text-amber-300">
+                    هل تبحث عن صورك أو صور ابنك في الحفلات؟ 🤳
+                  </span>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    استخدم تقنية التعرف البيومتري على ملامح الوجه للبحث الفوري في كافة ألبومات المدارس
+                  </p>
+                </div>
+              </div>
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-xl bg-amber-400 px-3 py-1 text-xs font-black text-slate-950 shadow-md">
+                <span>فحص السيلفي الآن</span>
+                <ArrowUpLeft size={13} />
+              </span>
+            </div>
+          ) : null}
+
           {filteredResults.length ? (
             <div className="space-y-1.5">
               {filteredResults.map((item, index) => {
@@ -374,5 +423,9 @@ export function AlaqeeqSpotlightSearch({
         </div>
       </div>
     </div>
+  ) : null}
+
+  <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
+</>
   );
 }

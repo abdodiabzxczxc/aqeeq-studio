@@ -65,6 +65,7 @@ import {
   getJournalStudioDefaults,
   setJournalStudioDefaults,
   listAqeeqAlbums,
+  listAllPublicAlbumMedia,
   getAqeeqAlbumBySlug,
   createAqeeqAlbum,
   updateAqeeqAlbum,
@@ -579,6 +580,7 @@ export const appRouter = router({
 
   aqeeqAlbums: router({
     publicList: publicProcedure.query(() => listAqeeqAlbums("published")),
+    allPublicMedia: publicProcedure.query(() => listAllPublicAlbumMedia()),
     recordView: publicProcedure.input(z.object({ id: z.number().int().positive(), viewerKey: z.string().trim().min(12).max(64) })).mutation(({ input }) => recordAqeeqContentView("album", input.id, input.viewerKey)),
     publicAlbum: publicProcedure.input(z.object({ slug: z.string().min(2).max(128) })).query(({ input }) => getAqeeqAlbumBySlug(input.slug)),
     list: adminProcedure.query(() => listAqeeqAlbums()),
