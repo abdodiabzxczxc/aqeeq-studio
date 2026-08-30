@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { JOURNAL_READING_OPTIONS, normalizeJournalReadingMode } from "@/lib/journalReading";
 import { DEFAULT_JOURNAL_SEASON_LABEL, normalizeJournalSeasonLabel } from "@/lib/journalSeasonLabel";
 import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
+import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
@@ -71,7 +72,7 @@ export default function JournalStudioPage() {
   const [newSeasonLabel, setNewSeasonLabel] = useState(DEFAULT_JOURNAL_SEASON_LABEL);
   const [newMode, setNewMode] = useState<"spread" | "scroll">("spread");
   const [newDriveUrl, setNewDriveUrl] = useState("");
-  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(null);
+  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(() => getAqeeqDefaultBackgroundAudio());
 
   const [pageId, setPageId] = useState<number | null>(null);
   const [target, setTarget] = useState<Target>(null);

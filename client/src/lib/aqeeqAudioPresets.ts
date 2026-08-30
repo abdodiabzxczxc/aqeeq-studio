@@ -36,3 +36,27 @@ export const AQEEQ_AUDIO_PRESETS: AudioPreset[] = [
     url: "https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-132.mp3",
   },
 ];
+
+const DEFAULT_AUDIO_STORAGE_KEY = "aqeeq_default_background_audio";
+
+export function getAqeeqDefaultBackgroundAudio(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(DEFAULT_AUDIO_STORAGE_KEY) || AQEEQ_AUDIO_PRESETS[0].url;
+  } catch {
+    return AQEEQ_AUDIO_PRESETS[0].url;
+  }
+}
+
+export function setAqeeqDefaultBackgroundAudio(url: string | null): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (url) {
+      localStorage.setItem(DEFAULT_AUDIO_STORAGE_KEY, url);
+    } else {
+      localStorage.removeItem(DEFAULT_AUDIO_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}

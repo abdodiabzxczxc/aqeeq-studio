@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
+import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
@@ -69,7 +70,7 @@ export default function AqeeqAlbumStudioPage() {
   const [newDescription, setNewDescription] = useState("");
   const [newDriveUrl, setNewDriveUrl] = useState("");
   const [newReadingMode, setNewReadingMode] = useState<AlbumMode>("spread");
-  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(null);
+  const [newBackgroundAudioUrl, setNewBackgroundAudioUrl] = useState<string | null>(() => getAqeeqDefaultBackgroundAudio());
 
   const [mediaTarget, setMediaTarget] = useState<MediaTarget>(null);
   const [albumMediaLibraryOpen, setAlbumMediaLibraryOpen] = useState(false);
