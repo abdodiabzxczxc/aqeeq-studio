@@ -1539,7 +1539,16 @@ export const appRouter = router({
           type: z.enum(["article", "podcast", "general"]).optional(),
           aspectRatio: z.enum(["16:9", "9:16", "1:1", "4:3", "3:4"]).optional(),
           model: z.enum(["flux-realism", "flux-pro", "flux", "turbo"]).optional(),
-          stylePreset: z.enum(["photorealistic", "cinematic", "editorial", "studio-pro"]).optional(),
+          stylePreset: z.enum([
+            "3d-luxury-gold",
+            "cinematic-stage",
+            "cyber-quantum",
+            "editorial-prestige",
+            "photorealistic",
+            "cinematic",
+            "editorial",
+            "studio-pro",
+          ]).optional(),
         })
       )
       .mutation(async ({ input }) => {

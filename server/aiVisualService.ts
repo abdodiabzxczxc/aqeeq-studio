@@ -8,7 +8,15 @@ export interface GenerateAiCoverParams {
   type?: "article" | "podcast" | "general";
   aspectRatio?: AspectRatioType;
   model?: "flux-realism" | "flux-pro" | "flux" | "turbo";
-  stylePreset?: "photorealistic" | "cinematic" | "editorial" | "studio-pro";
+  stylePreset?:
+    | "3d-luxury-gold"
+    | "cinematic-stage"
+    | "cyber-quantum"
+    | "editorial-prestige"
+    | "photorealistic"
+    | "cinematic"
+    | "editorial"
+    | "studio-pro";
 }
 
 export async function generateAiVisualCover(params: GenerateAiCoverParams): Promise<{
@@ -20,7 +28,7 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     type = "article",
     aspectRatio = "16:9",
     model = "flux-realism",
-    stylePreset = "photorealistic",
+    stylePreset = "3d-luxury-gold",
   } = params;
 
   let width = 1280;
@@ -49,25 +57,26 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     const apiKey = await getEffectiveGeminiApiKey();
     if (apiKey) {
       const ai = new GoogleGenAI({ apiKey });
-      const systemPrompt = `You are an award-winning executive art director and master prompt engineer for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
-Transform the following Arabic topic into an ultra-high-end, photorealistic English photography prompt:
-Topic: "${prompt}"
-Context: "${type === "podcast" ? "Official high-end Podcast / Broadcasting Studio visual cover" : "Prestigious Saudi educational article editorial cover"}"
-Orientation: "${aspectRatio === "9:16" || aspectRatio === "3:4" ? "Vertical Portrait / Poster" : aspectRatio === "1:1" ? "Square Composition" : "Cinematic Wide Landscape"}"
-Style Request: "${stylePreset}"
+      const systemPrompt = `You are a world-class 3D Art Director and Master Visual Concept Designer creating high-end, award-winning magazine & podcast covers for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
 
-Strict Quality & Art Direction Rules:
-1. PHOTO-REALISM FIRST: Must look like an authentic, high-budget commercial photograph shot by a world-class photographer with a Hasselblad H6D-100c or Sony A1 camera.
-2. OPTICAL DETAILS: 85mm f/1.4 lens, natural bokeh, razor-sharp focus on subject, authentic skin textures, natural subsurface scattering, zero cartoonish or plastic look.
-3. COMPOSITION: Formatted perfectly for ${aspectRatio === "9:16" ? "vertical 9:16 portrait mobile/poster layout" : aspectRatio === "1:1" ? "balanced 1:1 square framing" : "cinematic 16:9 wide landscape framing"}.
-4. CONTEXT & ARCHITECTURE: Authentic Saudi high-end educational environment in Medina, elegant Saudi attire (thobe, shemagh, abaya with dignity and class), modern architectural aesthetics, warm golden-hour lighting and subtle amber glow.
-5. NEGATIVE INSTRUCTIONS: NO cartoon, NO anime, NO surreal distortion, NO disfigured limbs, NO blurry faces, NO CGI plastic shine, NO text or watermarks.
-6. Return ONLY the finalized English prompt string, without any commentary or quotes.`;
+Goal: Turn the Arabic topic into a breathtaking, prestigious 3D conceptual cover scene (Cinema4D, Octane Render 8K, Unreal Engine 5.4 raytracing).
+
+Topic: "${prompt}"
+Medium: "${type === "podcast" ? "Official Audio Podcast & Radio Visual Cover" : "Prestigious Educational & Scientific Magazine Cover"}"
+Orientation: "${aspectRatio === "9:16" || aspectRatio === "3:4" ? "Vertical 9:16 Poster Layout" : aspectRatio === "1:1" ? "Square 1:1 Album Framing" : "Cinematic 16:9 Wide Landscape Framing"}"
+Chosen Style: "${stylePreset}"
+
+CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
+1. PURE CONCEPTUAL LUXURY: NEVER generate human faces, cartoon characters, or creepy avatars. Instead, create majestic 3D conceptual installations, obsidian marble podiums, floating golden geometric emblems, crystal refractions, laser circuitry, holographic data rings, glowing architectural lines, or warm volumetric god-rays.
+2. MATERIALITY: Polished 24k gold leaf, dark obsidian marble with subtle gold veins, frosted crystal glass with chromatic aberration, brushed titanium, warm amber ambient glow (#f8ca14).
+3. LIGHTING: Cinematic studio lighting, deep dramatic shadows, subsurface scattering on crystals, rim lighting, atmospheric dust motes, 8k resolution, photorealistic raytracing, Octane Render benchmark quality.
+4. IDENTITY: Subtle Islamic/Arabian geometric motifs infused with futuristic minimalism (representing Medina's intellectual excellence).
+5. Output format: Return ONLY the final detailed English prompt in one paragraph, no quotes, no markdown.`;
 
       const res = await ai.models.generateContent({
         model: "gemini-3.5-flash-lite",
         contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-        config: { temperature: 0.3 },
+        config: { temperature: 0.3, maxOutputTokens: 250 },
       });
 
       enhancedPrompt = res.text?.trim() || "";
@@ -77,16 +86,18 @@ Strict Quality & Art Direction Rules:
   }
 
   if (!enhancedPrompt) {
-    enhancedPrompt = `Ultra-photorealistic 8k commercial photography, prestigious Saudi modern school campus in Medina, high-end authentic scene, warm golden lighting, ${prompt}`;
+    enhancedPrompt = `A breathtaking 3D conceptual masterpiece for ${prompt}, majestic 24k gold and obsidian marble sculpture, floating crystal rings, volumetric warm golden lighting, Cinema4D Octane render 8K, ultra-detailed raytracing, cinematic magazine cover, no humans, no text`;
   }
 
+  // Append strict negative enhancements
+  const finalPromptWithDirectives = `${enhancedPrompt}, 8k resolution, octane render, masterpiece, dramatic lighting, luxury aesthetic`;
   const seed = Math.floor(Math.random() * 9000000) + 1000000;
-  const targetModel = model || "flux-realism";
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
+  const targetModel = model === "turbo" ? "turbo" : "flux";
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPromptWithDirectives)}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
 
   return {
     imageUrl,
-    enhancedPrompt,
+    enhancedPrompt: finalPromptWithDirectives,
   };
 }
 

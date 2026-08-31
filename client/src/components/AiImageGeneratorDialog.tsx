@@ -45,17 +45,16 @@ const CARD_STYLES = [
 ];
 
 const AI_ENGINES = [
-  { id: "flux-realism", label: "🌟 Flux Realism Pro (واقعية فوتوغرافية 8K)", desc: "الأفضل والأدق للصور الفوتوغرافية الواقعية بدون مظهر كرتوني" },
-  { id: "flux-pro", label: "💎 Flux Cinematic Ultra (سينمائي فاخر)", desc: "إضاءة درامية سينمائية عالية التباين" },
-  { id: "flux", label: "🎨 Flux Studio Standard (معياري)", desc: "توازن بين الألوان والأشكال" },
-  { id: "turbo", label: "⚡ Turbo Instant (توليد فوري)", desc: "سرعة فائقة في التوليد" },
+  { id: "flux-realism", label: "💎 Octane 3D Ultra (أعلى دقة 8K لمجسمات الذهب والرخام)", desc: "رندر ثلاثي الأبعاد فائق الفخامة للمجسمات والأغلفة الرسمية" },
+  { id: "flux-pro", label: "🌟 Cinematic Raytracing (إضاءة شعاعية وسينمائية)", desc: "إضاءة مسرحية درامية عالية التباين" },
+  { id: "turbo", label: "⚡ Turbo 3D Fast (توليد ثلاثي الأبعاد سريع)", desc: "توليد مفاهيمي ثلاثي الأبعاد سريع" },
 ] as const;
 
 const STYLE_PRESETS = [
-  { id: "photorealistic", label: "📸 تصوير فوتوغرافي واقعي (Hasselblad Camera)" },
-  { id: "cinematic", label: "🎬 سينمائي بإضاءة ذهبية دافئة (Golden Hour)" },
-  { id: "editorial", label: "📰 غلاف مجلة صحفية عالمية (Editorial Style)" },
-  { id: "studio-pro", label: "🎙️ استوديو احترافي بإضاءة موجهة (Studio Pro)" },
+  { id: "3d-luxury-gold", label: "🏆 مجسم ثلاثي الأبعاد فاخر (ذهب ورخام أسود - 3D Gold & Obsidian)" },
+  { id: "cinematic-stage", label: "🎬 مسرح سينمائي بإضاءة شعاعية درامية (Dramatic Volumetric Studio)" },
+  { id: "cyber-quantum", label: "⚡ مستقبل تقني وتكنولوجيا كمية (Futuristic Cyber Quantum)" },
+  { id: "editorial-prestige", label: "🏛️ غلاف مجلة عالمية فخم ومعماري (Architectural & Editorial Prestige)" },
 ] as const;
 
 export default function AiImageGeneratorDialog({
@@ -90,7 +89,7 @@ export default function AiImageGeneratorDialog({
   const [prompt, setPrompt] = useState(defaultPrompt);
   const [aspectRatio, setAspectRatio] = useState<AspectRatioChoice>("16:9");
   const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("flux-realism");
-  const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("photorealistic");
+  const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("3d-luxury-gold");
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
 
   useEffect(() => {
