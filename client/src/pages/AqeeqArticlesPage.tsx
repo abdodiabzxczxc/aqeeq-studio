@@ -732,8 +732,78 @@ export default function AqeeqArticlesPage() {
                 </div>
               )}
 
-              <div className="prose prose-invert max-w-none font-[Amiri,serif] text-lg sm:text-xl leading-9 font-normal whitespace-pre-wrap">
-                {readingArticle.content}
+              {/* Modern Crystal-Clear Tajawal Typography Article Body */}
+              <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-5 sm:p-8 font-[Tajawal,sans-serif]">
+                {(() => {
+                  const paragraphs = readingArticle.content.split(/\n\s*\n|\r\n\s*\r\n/);
+                  return (
+                    <div className="space-y-6 text-right">
+                      {paragraphs.map((p: string, idx: number) => {
+                        const trimmed = p.trim();
+                        if (!trimmed) return null;
+
+                        if (trimmed.startsWith("###") || trimmed.startsWith("##") || trimmed.startsWith("#")) {
+                          const cleanTitle = trimmed.replace(/^#+\s*/, "");
+                          return (
+                            <h3 key={idx} className="text-xl sm:text-2xl font-black text-[#f8ca14] pt-2 pb-1 border-b border-white/10">
+                              {cleanTitle}
+                            </h3>
+                          );
+                        }
+
+                        const lines = trimmed.split(/\n|\r\n/);
+                        return (
+                          <div key={idx} className="space-y-3">
+                            {lines.map((line: string, lIdx: number) => {
+                              const lineTrimmed = line.trim();
+                              if (!lineTrimmed) return null;
+
+                              const isNumbered = /^\d+[\.\-\)]\s*/.test(lineTrimmed);
+                              const isBullet = /^[\*\-•]\s*/.test(lineTrimmed);
+                              const cleanText = lineTrimmed.replace(/^(\d+[\.\-\)]|\*|\-|•)\s*/, "");
+
+                              const parts = (isNumbered || isBullet ? cleanText : lineTrimmed).split(/(\*\*[^*]+\*\*)/g);
+                              const renderedParts = parts.map((part: string, pIdx: number) => {
+                                if (part.startsWith("**") && part.endsWith("**")) {
+                                  return (
+                                    <strong key={pIdx} className="font-black text-[#f8ca14]">
+                                      {part.slice(2, -2)}
+                                    </strong>
+                                  );
+                                }
+                                return <span key={pIdx}>{part}</span>;
+                              });
+
+                              if (isNumbered || isBullet) {
+                                return (
+                                  <div key={lIdx} className="flex items-start gap-3 pr-2 sm:pr-4 py-1">
+                                    <span className="shrink-0 mt-2.5 h-2 w-2 rounded-full bg-[#f8ca14] shadow-[0_0_8px_#f8ca14]" />
+                                    <p className={`flex-1 text-base sm:text-lg leading-[2.3] font-normal ${
+                                      dark ? "text-slate-100" : "text-slate-800"
+                                    }`}>
+                                      {renderedParts}
+                                    </p>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <p
+                                  key={lIdx}
+                                  className={`text-base sm:text-lg leading-[2.3] font-normal ${
+                                    dark ? "text-slate-200" : "text-slate-800"
+                                  }`}
+                                >
+                                  {renderedParts}
+                                </p>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">

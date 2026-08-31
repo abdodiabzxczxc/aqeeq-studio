@@ -489,7 +489,7 @@ export default function AqeeqArticlesStudioPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <Label className="text-xs font-black text-slate-300">نص المقال الكامل (بالخط العربي الفاخر)</Label>
+                      <Label className="text-xs font-black text-slate-300">نص المقال الكامل</Label>
                       <span className="text-[10px] text-slate-400 font-mono">{editContent.length} حرف</span>
                     </div>
                     <Textarea
@@ -497,7 +497,7 @@ export default function AqeeqArticlesStudioPage() {
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
                       placeholder="اكتب أو عدّل نص المقال كاملاً هنا..."
-                      className={`font-[Amiri,serif] text-base leading-8 rounded-2xl ${
+                      className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl ${
                         dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
                       }`}
                     />
