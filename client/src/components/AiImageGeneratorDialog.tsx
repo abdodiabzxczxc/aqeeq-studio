@@ -1,12 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Sparkles,
   Loader2,
   Check,
-  Wand2,
   Palette,
   Camera,
   Search,
@@ -16,13 +13,15 @@ import {
   RectangleHorizontal,
   RectangleVertical,
   Square,
-  LayoutGrid,
   X,
   Layers,
+  UploadCloud,
+  ImageIcon,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { MASTER_PHOTO_CATALOG_500, MasterCatalogPhotoItem } from "@/lib/masterPhotoCatalog500";
+import html2canvas from "html2canvas";
+import { MASTER_PHOTO_CATALOG_500 } from "@/lib/masterPhotoCatalog500";
 
 interface AiImageGeneratorDialogProps {
   open: boolean;
@@ -33,7 +32,6 @@ interface AiImageGeneratorDialogProps {
   dark?: boolean;
 }
 
-type AspectRatioChoice = "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
 type OrientationFilter = "all" | "wide" | "tall" | "square";
 
 const CARD_STYLES = [
@@ -44,32 +42,17 @@ const CARD_STYLES = [
   { id: "crimson-ruby", label: "عقيقي قرمزي فاخر", bg: "from-[#420d18] via-[#21050b] to-[#0d0104]", accent: "#fb7185" },
 ];
 
-const AI_ENGINES = [
-  { id: "nano-banana-pro", label: "🍌 Google Nano Banana Pro (محرك جيميناي الخارق للصور)", desc: "محرك جوجل جيميناي الأصلي لتوليد الصور والمشاهد فائقة الواقعية" },
-  { id: "dalle3", label: "👑 OpenAI DALL-E 3 HD (خارق الواقعية بدقة فائقة)", desc: "محرك OpenAI الأصلي بدقة سينمائية وتفاصيل خارقة" },
-  { id: "flux-realism", label: "💎 Octane 3D Ultra (أعلى دقة 8K لمجسمات الذهب والرخام)", desc: "رندر ثلاثي الأبعاد فائق الفخامة للمجسمات والأغلفة الرسمية" },
-  { id: "flux-pro", label: "🌟 Cinematic Raytracing (إضاءة شعاعية وسينمائية)", desc: "إضاءة مسرحية درامية عالية التباين" },
-  { id: "turbo", label: "⚡ Turbo 3D Fast (توليد ثلاثي الأبعاد سريع)", desc: "توليد مفاهيمي ثلاثي الأبعاد سريع" },
-] as const;
-
-const STYLE_PRESETS = [
-  { id: "3d-luxury-gold", label: "🏆 مجسم ثلاثي الأبعاد فاخر (ذهب ورخام أسود - 3D Gold & Obsidian)" },
-  { id: "cinematic-stage", label: "🎬 مسرح سينمائي بإضاءة شعاعية درامية (Dramatic Volumetric Studio)" },
-  { id: "cyber-quantum", label: "⚡ مستقبل تقني وتكنولوجيا كمية (Futuristic Cyber Quantum)" },
-  { id: "editorial-prestige", label: "🏛️ غلاف مجلة عالمية فخم ومعماري (Architectural & Editorial Prestige)" },
-] as const;
-
 export default function AiImageGeneratorDialog({
   open,
   onOpenChange,
   onSelectCover,
   type = "article",
   defaultPrompt = "",
-  dark = true,
 }: AiImageGeneratorDialogProps) {
-  const [activeTab, setActiveTab] = useState<"gallery" | "globalSearch" | "aiPrompt" | "cardDesigner">("gallery");
+  const [activeTab, setActiveTab] = useState<"gallery" | "globalSearch" | "cardDesigner">("gallery");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Quick Catalog State (560+ Photos)
+  // Quick Catalog State (500+ Photos)
   const [catalogPage, setCatalogPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [catalogOrientation, setCatalogOrientation] = useState<OrientationFilter>("all");
@@ -77,9 +60,9 @@ export default function AiImageGeneratorDialog({
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
 
   // Live Global Search State
-  const [globalQuery, setGlobalQuery] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
+  const [globalQuery, setGlobalQuery] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست" : "روبوت وذكاء اصطناعي"));
   const [globalPage, setGlobalPage] = useState(1);
-  const [activeSearchTerm, setActiveSearchTerm] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
+  const [activeSearchTerm, setActiveSearchTerm] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست" : "روبوت وذكاء اصطناعي"));
   const [searchOrientation, setSearchOrientation] = useState<OrientationFilter>("all");
 
   // Card Designer state
@@ -87,18 +70,8 @@ export default function AiImageGeneratorDialog({
   const [cardCategory, setCardCategory] = useState(type === "podcast" ? "إذاعة وبودكاست" : "مقال تربوي");
   const [cardStyleIndex, setCardStyleIndex] = useState(0);
 
-  // AI Prompt State
-  const [prompt, setPrompt] = useState(defaultPrompt);
-  const [aspectRatio, setAspectRatio] = useState<AspectRatioChoice>("16:9");
-  const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("nano-banana-pro");
-  const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("3d-luxury-gold");
-  const [customApiKey, setCustomApiKey] = useState("");
-  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
-  const [alternates, setAlternates] = useState<{ url: string; title: string }[]>([]);
-
   useEffect(() => {
     if (open && defaultPrompt) {
-      setPrompt(defaultPrompt);
       setGlobalQuery(defaultPrompt);
       setActiveSearchTerm(defaultPrompt);
       setCardTitle(defaultPrompt.replace(/^غلاف صحفي لمقال بعنوان:\s*/, "").replace(/^غلاف إذاعي وبودكاست لحلقة بعنوان:\s*/, ""));
@@ -144,7 +117,6 @@ export default function AiImageGeneratorDialog({
   const {
     data: globalSearchData,
     isLoading: isGlobalSearching,
-    isFetching: isGlobalFetching,
   } = trpc.aiVisuals.searchRealPhotos.useQuery(
     {
       query: activeSearchTerm || (type === "podcast" ? "podcast studio microphone" : "education school"),
@@ -152,75 +124,57 @@ export default function AiImageGeneratorDialog({
       pageSize: 32,
       orientation: searchOrientation,
     },
-    {
-      enabled: Boolean(open),
-    }
+    { enabled: Boolean(open) }
   );
 
-  // Combine global search results with local search matches as instant fallback
+  // Combine global search results with local search matches
   const combinedSearchResults = useMemo(() => {
     const apiResults = globalSearchData?.results || [];
     if (apiResults.length > 0) return apiResults;
-
-    // Local fallback matching
     const q = activeSearchTerm.toLowerCase();
     const localMatches = MASTER_PHOTO_CATALOG_500.filter((p) => {
       if (searchOrientation !== "all" && p.orientation !== searchOrientation) return false;
       return p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
     });
-
     if (localMatches.length > 0) {
-      return localMatches.map((p) => ({
-        id: p.id,
-        title: p.title,
-        url: p.url,
-        thumbnail: p.url,
-        source: "catalog",
-        aspectRatio: p.orientation,
-      }));
+      return localMatches.map((p) => ({ id: p.id, title: p.title, url: p.url, thumbnail: p.url, source: "catalog", aspectRatio: p.orientation }));
     }
-
-    // Default fallback to first 28 catalog items
-    return MASTER_PHOTO_CATALOG_500.slice(0, 28).map((p) => ({
-      id: p.id,
-      title: p.title,
-      url: p.url,
-      thumbnail: p.url,
-      source: "catalog",
-      aspectRatio: p.orientation,
-    }));
+    return MASTER_PHOTO_CATALOG_500.slice(0, 28).map((p) => ({ id: p.id, title: p.title, url: p.url, thumbnail: p.url, source: "catalog", aspectRatio: p.orientation }));
   }, [globalSearchData, activeSearchTerm, searchOrientation]);
-
-  const generateMutation = trpc.aiVisuals.generateCover.useMutation({
-    onSuccess: (data) => {
-      setGeneratedUrl(data.imageUrl);
-      setAlternates((data as any).alternates || []);
-      toast.success("تم جلب المشهد البصري المطابق لطلبك بنجاح! ✨");
-    },
-    onError: (err) => {
-      toast.error(err.message || "تعذر توليد الصورة");
-    },
-  });
-
-  const handleAiGenerate = () => {
-    if (!prompt.trim()) {
-      toast.error("يرجى إدخال وصف المشهد");
-      return;
-    }
-    generateMutation.mutate({
-      prompt: prompt.trim(),
-      type,
-      aspectRatio,
-      model: selectedEngine,
-      stylePreset: selectedStyle,
-      apiKey: customApiKey.trim() || undefined,
-    });
-  };
 
   const handleApply = (url: string) => {
     onSelectCover(url);
+    toast.success("تم اعتماد الغلاف بنجاح! 📸");
     onOpenChange(false);
-    toast.success("تم اعتماد الغلاف الرسمي بنجاح! 🎨");
+  };
+
+  const handleExportCard = async () => {
+    const el = document.getElementById("aqeeq-branded-card");
+    if (!el) return;
+    try {
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
+      const dataUrl = canvas.toDataURL("image/png");
+      onSelectCover(dataUrl);
+      toast.success("تم تصدير واعتماد بطاقة الغلاف بنجاح! 🎨");
+      onOpenChange(false);
+    } catch (e) {
+      toast.error("حدث خطأ أثناء تصدير البطاقة");
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          onSelectCover(event.target.result as string);
+          toast.success("تم رفع واعتماد الغلاف بنجاح! ✨");
+          onOpenChange(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRunGlobalSearch = (e?: React.FormEvent) => {
@@ -254,10 +208,16 @@ export default function AiImageGeneratorDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 backdrop-blur-md animate-in fade-in-0 duration-200">
-      <div
-        className="relative w-full max-w-[1600px] h-[92vh] max-h-[92vh] rounded-3xl border border-white/20 bg-[#0d0d0d] text-white shadow-2xl flex flex-col overflow-hidden font-[Tajawal,sans-serif]"
-        dir="rtl"
-      >
+      <div className="relative w-full max-w-[1600px] h-[92vh] max-h-[92vh] rounded-3xl border border-white/20 bg-[#0d0d0d] text-white shadow-2xl flex flex-col overflow-hidden font-[Tajawal,sans-serif]" dir="rtl">
+        {/* Hidden File Input for Custom Image Upload */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileUpload}
+        />
+
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/10 bg-black/60 shrink-0">
           <div className="flex items-center gap-3">
@@ -268,11 +228,11 @@ export default function AiImageGeneratorDialog({
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm sm:text-base">استوديو الأغلفة والصور البصرية لمدارس العقيق</span>
                 <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black text-emerald-400">
-                  +600 PHOTOS 4K
+                  +500 PHOTOS 4K
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-normal">
-                كتالوج فوتوغرافي ضخم (+600 صورة 4K موثقة) + بحث حي في الأرشيف العالمي + توليد ذكي واقعي (Flux 8K)
+                كتالوج فوتوغرافي ضخم (+500 صورة 4K معتمدة) + بحث حي في الأرشيف العالمي + مصمم بطاقة الغلاف الأكاديمي
               </p>
             </div>
           </div>
@@ -307,19 +267,6 @@ export default function AiImageGeneratorDialog({
 
             <button
               type="button"
-              onClick={() => setActiveTab("aiPrompt")}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
-                activeTab === "aiPrompt"
-                  ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
-                  : "text-slate-300 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <Sparkles size={15} />
-              <span>🍌 Nano Banana Pro (جيميناي)</span>
-            </button>
-
-            <button
-              type="button"
               onClick={() => setActiveTab("cardDesigner")}
               className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
                 activeTab === "cardDesigner"
@@ -333,6 +280,16 @@ export default function AiImageGeneratorDialog({
 
             <button
               type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition"
+              title="رفع صورة من جهازك"
+            >
+              <UploadCloud size={15} />
+              <span>📤 رفع صورة من جهازك</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => onOpenChange(false)}
               className="mr-2 grid h-8 w-8 place-items-center rounded-xl bg-white/10 hover:bg-rose-500 hover:text-white text-slate-400 transition"
               title="إغلاق الاستوديو"
@@ -342,15 +299,15 @@ export default function AiImageGeneratorDialog({
           </div>
         </div>
 
-        {/* Main Studio Body (Two Columns: Right Sidebar + Left Canvas) */}
+        {/* Main Studio Body */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* ================= RIGHT CONTROL SIDEBAR (340px Fixed) ================= */}
           <div className="w-full md:w-[340px] lg:w-[360px] shrink-0 border-l border-white/10 bg-black/40 p-4 overflow-y-auto space-y-4">
-            {/* Quick Catalog Sidebar Controls (560+ Photos) */}
+            {/* Quick Catalog Sidebar Controls (500+ Photos) */}
             {activeTab === "gallery" && (
               <div className="space-y-4">
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">بحث سريع في الكتالوج (+560 صورة)</Label>
+                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">بحث سريع في الكتالوج (+500 صورة)</Label>
                   <Input
                     value={catalogSearch}
                     onChange={(e) => {
@@ -406,7 +363,7 @@ export default function AiImageGeneratorDialog({
 
                 <div>
                   <Label className="text-xs font-black text-slate-300 mb-2 block">الأقسام والتصنيفات المعتمدة</Label>
-                  <div className="space-y-1 max-h-[38vh] overflow-y-auto pr-1">
+                  <div className="flex flex-col gap-1 max-h-[38vh] overflow-y-auto pr-1">
                     {categories.map((cat) => (
                       <button
                         key={cat.id}
@@ -415,16 +372,28 @@ export default function AiImageGeneratorDialog({
                           setSelectedCategory(cat.id);
                           setCatalogPage(1);
                         }}
-                        className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition border ${
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition text-right ${
                           selectedCategory === cat.id
-                            ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-sm"
-                            : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
+                            ? "bg-[#f8ca14] text-black font-black shadow-md shadow-[#f8ca14]/20"
+                            : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
                         }`}
                       >
                         <span>{cat.label}</span>
+                        {selectedCategory === cat.id && <Check size={14} className="stroke-[3]" />}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="pt-2 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition"
+                  >
+                    <UploadCloud size={16} />
+                    <span>رفع غلاف من جهازك أو من Gemini Pro</span>
+                  </button>
                 </div>
               </div>
             )}
@@ -432,47 +401,31 @@ export default function AiImageGeneratorDialog({
             {/* Global Search Sidebar Controls */}
             {activeTab === "globalSearch" && (
               <div className="space-y-4">
-                <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">كلمة أو موضوع البحث</Label>
-                  <form onSubmit={handleRunGlobalSearch} className="space-y-2">
-                    <Input
-                      value={globalQuery}
-                      onChange={(e) => setGlobalQuery(e.target.value)}
-                      placeholder="اكتب أي موضوع بالعربية أو الإنجليزية..."
-                      className="text-xs h-10 rounded-xl bg-white/5 border-white/10 text-white font-bold"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isGlobalSearching || isGlobalFetching}
-                      className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs transition shadow-md shadow-[#f8ca14]/20"
-                    >
-                      {isGlobalSearching || isGlobalFetching ? (
-                        <Loader2 size={15} className="animate-spin" />
-                      ) : (
-                        <Search size={15} />
-                      )}
-                      <span>بحث فوري 4K</span>
-                    </button>
-                  </form>
-                </div>
+                <form onSubmit={handleRunGlobalSearch} className="space-y-3">
+                  <div>
+                    <Label className="text-xs font-black text-slate-300 mb-1.5 block">كلمة البحث في الأرشيف العالمي</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={globalQuery}
+                        onChange={(e) => setGlobalQuery(e.target.value)}
+                        placeholder="اكتب باللغة العربية أو الإنجليزية..."
+                        className="text-xs h-10 rounded-xl bg-white/5 border-white/10 text-white font-bold"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isGlobalSearching}
+                        className="shrink-0 px-4 h-10 rounded-xl bg-[#f8ca14] hover:bg-[#e5ba10] text-black font-black text-xs transition flex items-center gap-1"
+                      >
+                        {isGlobalSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                        <span>بحث</span>
+                      </button>
+                    </div>
+                  </div>
+                </form>
 
-                {/* Aspect Ratio Filter */}
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-2 block">📐 شكل وأبعاد الصور</Label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => { setSearchOrientation("all"); setGlobalPage(1); }}
-                      className={`flex items-center justify-center gap-1.5 p-2 rounded-xl text-xs font-black transition border ${
-                        searchOrientation === "all"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14]"
-                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <LayoutGrid size={14} />
-                      <span>كل الأشكال</span>
-                    </button>
-
+                  <Label className="text-xs font-black text-slate-300 mb-2 block">📐 المقاس المطلوب</Label>
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button
                       type="button"
                       onClick={() => { setSearchOrientation("wide"); setGlobalPage(1); }}
@@ -483,7 +436,7 @@ export default function AiImageGeneratorDialog({
                       }`}
                     >
                       <RectangleHorizontal size={14} />
-                      <span>بالعرض (16:9)</span>
+                      <span>عريض</span>
                     </button>
 
                     <button
@@ -496,7 +449,7 @@ export default function AiImageGeneratorDialog({
                       }`}
                     >
                       <RectangleVertical size={14} />
-                      <span>بالطول (9:16)</span>
+                      <span>طولي</span>
                     </button>
 
                     <button
@@ -509,12 +462,11 @@ export default function AiImageGeneratorDialog({
                       }`}
                     >
                       <Square size={14} />
-                      <span>مربع (1:1)</span>
+                      <span>مربع</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Quick Topics */}
                 <div>
                   <Label className="text-xs font-black text-slate-300 mb-2 block">⚡ مواضيع مقترحة</Label>
                   <div className="flex flex-wrap gap-1.5">
@@ -538,106 +490,6 @@ export default function AiImageGeneratorDialog({
               </div>
             )}
 
-            {/* AI Prompt Sidebar Controls */}
-            {activeTab === "aiPrompt" && (
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">
-                    🍌 ماذا تريد أن تولد بالذكاء الاصطناعي؟ *
-                  </Label>
-                  <Textarea
-                    rows={4}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="اكتب فكرتك كما هي بدقة، وسيقوم محرك Gemini Nano Banana Pro برسمها كما طلبتها بالضبط..."
-                    className="text-xs rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-[#f8ca14]"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    ✨ سيقوم الذكاء الاصطناعي بتنفيذ المشهد بدقة تصوير واقعية 8K فوراً.
-                  </p>
-                </div>
-
-                {/* Aspect Ratio Selector */}
-                <div>
-                  <Label className="text-xs font-black text-slate-300 mb-2 block">📐 مقاس واتجاه الصورة</Label>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setAspectRatio("16:9")}
-                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
-                        aspectRatio === "16:9"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
-                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <RectangleHorizontal size={18} />
-                      <span className="mt-1">عريض (16:9)</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setAspectRatio("9:16")}
-                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
-                        aspectRatio === "9:16"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
-                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <RectangleVertical size={18} />
-                      <span className="mt-1">طولي (9:16)</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setAspectRatio("1:1")}
-                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
-                        aspectRatio === "1:1"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
-                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <Square size={18} />
-                      <span className="mt-1">مربع (1:1)</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[11px] font-black text-emerald-300 flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>مفتاح Gemini متصل ونشط 100%</span>
-                    </Label>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300 font-mono">
-                      Connected
-                    </span>
-                  </div>
-                  <p className="text-[9.5px] text-slate-300 leading-relaxed">
-                    مفتاحك مسجل ويعمل تلقائياً لتشغيل ذكاء جيميناي وصياغة المقالات وتوليد الصور بدون الحاجة لإدخال أي شيء!
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAiGenerate}
-                  disabled={generateMutation.isPending}
-                  className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-amber-500 via-[#f8ca14] to-yellow-400 hover:opacity-95 text-black font-black text-sm transition shadow-lg shadow-amber-500/25 active:scale-[0.98]"
-                >
-                  {generateMutation.isPending ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" />
-                      <span>جاري توليد الصورة بواسطة Nano Banana Pro...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 size={18} />
-                      <span>{generatedUrl ? "🍌 توليد لقطة بديلة جديدة" : "🍌 توليد الصورة بواسطة Nano Banana Pro"}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
             {/* Card Designer Sidebar Controls */}
             {activeTab === "cardDesigner" && (
               <div className="space-y-3">
@@ -652,45 +504,51 @@ export default function AiImageGeneratorDialog({
                 </div>
 
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1 block">وسام التصنيف</Label>
+                  <Label className="text-xs font-black text-slate-300 mb-1 block">تصنيف الموضوع أو البرنامج</Label>
                   <Input
                     value={cardCategory}
                     onChange={(e) => setCardCategory(e.target.value)}
-                    placeholder="مثال: روبوت وابتكار / إذاعة وبودكاست..."
-                    className="text-xs rounded-xl bg-white/5 border-white/10 text-white"
+                    placeholder="مثال: مقال تربوي، إذاعة وبودكاست..."
+                    className="text-xs rounded-xl bg-white/5 border-white/10 text-white font-bold"
                   />
                 </div>
 
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">نمط الخلفية الملكية</Label>
-                  <div className="space-y-1.5">
+                  <Label className="text-xs font-black text-slate-300 mb-2 block">اختر ستايل وهوية البطاقة</Label>
+                  <div className="grid grid-cols-1 gap-1.5">
                     {CARD_STYLES.map((style, idx) => (
                       <button
                         key={style.id}
                         type="button"
                         onClick={() => setCardStyleIndex(idx)}
-                        className={`w-full flex items-center justify-between p-2 rounded-xl border text-xs font-bold transition ${
+                        className={`flex items-center gap-3 p-2.5 rounded-xl border text-right transition ${
                           cardStyleIndex === idx
-                            ? "border-[#f8ca14] bg-[#f8ca14]/10 text-white font-black"
-                            : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
+                            ? "border-[#f8ca14] bg-[#f8ca14]/15 text-white ring-1 ring-[#f8ca14]"
+                            : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <div className={`h-4 w-4 rounded-full bg-gradient-to-tr ${style.bg} border border-white/20`} />
-                          <span>{style.label}</span>
-                        </div>
-                        {cardStyleIndex === idx && <Check size={14} className="text-[#f8ca14]" />}
+                        <div className={`h-6 w-6 rounded-lg bg-gradient-to-br ${style.bg} border border-white/20 shrink-0`} />
+                        <span className="text-xs font-bold">{style.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleExportCard}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black p-3 text-xs transition shadow-lg shadow-emerald-500/20"
+                >
+                  <Check size={16} />
+                  <span>تصدير واعتماد بطاقة الغلاف الآن</span>
+                </button>
               </div>
             )}
           </div>
 
           {/* ================= LEFT MAIN CANVAS ================= */}
           <div className="flex-1 flex flex-col overflow-hidden bg-black/20 p-5">
-            {/* Quick Catalog Canvas Content (560+ Photos with pagination) */}
+            {/* Quick Catalog Canvas Content (500+ Photos with pagination) */}
             {activeTab === "gallery" && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
@@ -729,11 +587,16 @@ export default function AiImageGeneratorDialog({
                   </div>
                 </div>
 
+                {/* Photo Grid */}
                 <div className="flex-1 overflow-y-auto pt-4 pr-1">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 pb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 pb-6">
                     {paginatedCatalogPhotos.map((photo) => {
                       const aspectClass =
-                        photo.orientation === "tall" ? "aspect-[3/4]" : photo.orientation === "square" ? "aspect-square" : "aspect-video";
+                        photo.orientation === "tall"
+                          ? "aspect-[3/4]"
+                          : photo.orientation === "square"
+                          ? "aspect-square"
+                          : "aspect-video";
 
                       return (
                         <div
@@ -752,12 +615,12 @@ export default function AiImageGeneratorDialog({
                             loading="lazy"
                             onError={(e) => {
                               const el = e.currentTarget as HTMLImageElement;
-                              el.src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=85";
+                              el.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=85";
                             }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-2.5 flex flex-col justify-end">
-                            <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
                             <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
+                            <span className="text-[10px] text-[#f8ca14] font-medium">{photo.category}</span>
                           </div>
                           {selectedPhotoUrl === photo.url && (
                             <div className="absolute top-2 left-2 grid h-7 w-7 place-items-center rounded-full bg-[#f8ca14] text-black shadow-lg">
@@ -770,24 +633,20 @@ export default function AiImageGeneratorDialog({
                   </div>
                 </div>
 
-                {/* Bottom Action Bar */}
+                {/* Apply Selected Photo Bottom Bar */}
                 {selectedPhotoUrl && (
                   <div className="shrink-0 pt-3 border-t border-white/10 flex items-center justify-between gap-4 bg-black/60 p-3 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <img src={selectedPhotoUrl} alt="" className="h-12 w-20 rounded-xl object-cover border border-white/20" />
-                      <div>
-                        <p className="text-xs font-black text-emerald-400">تم تحديد الصورة الفوتوغرافية بنجاح</p>
-                        <p className="text-[11px] text-slate-400">جاهزة للاعتماد كغلاف رسمي فائق النقاء بدقة 4K</p>
-                      </div>
+                      <img src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
+                      <span className="text-xs text-slate-300 font-bold">تم تحديد الصورة وجاهزة للاعتماد كغلاف رسمي</span>
                     </div>
-
                     <button
                       type="button"
                       onClick={() => handleApply(selectedPhotoUrl)}
                       className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black px-6 py-2.5 text-xs transition shadow-lg shadow-emerald-500/20"
                     >
                       <Check size={16} />
-                      <span>اعتماد كغلاف رسمي الآن</span>
+                      <span>اعتماد هذه الصورة كغلاف رسمي الآن</span>
                     </button>
                   </div>
                 )}
@@ -798,35 +657,12 @@ export default function AiImageGeneratorDialog({
             {activeTab === "globalSearch" && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-300">
-                      نتائج البحث لمصطلح: <strong className="text-[#f8ca14]">"{activeSearchTerm}"</strong>
-                    </span>
-                    <span className="text-[11px] text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
-                      {searchOrientation === "tall" ? "بالطول (9:16)" : searchOrientation === "wide" ? "بالعرض (16:9)" : searchOrientation === "square" ? "مربع (1:1)" : "كل الأشكال"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setGlobalPage((p) => Math.max(1, p - 1))}
-                      disabled={globalPage <= 1}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-xl border border-white/10 bg-white/5 disabled:opacity-30 text-xs font-bold hover:bg-white/10"
-                    >
-                      <ChevronRight size={14} />
-                      <span>السابق</span>
-                    </button>
-                    <span className="text-xs text-slate-400 font-bold px-1">صفحة {globalPage}</span>
-                    <button
-                      type="button"
-                      onClick={() => setGlobalPage((p) => p + 1)}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold hover:bg-white/10"
-                    >
-                      <span>التالي</span>
-                      <ChevronLeft size={14} />
-                    </button>
-                  </div>
+                  <span className="text-xs font-bold text-slate-300">
+                    نتائج الأرشيف العالمي المفتوح لكلمة: <strong className="text-[#f8ca14]">"{activeSearchTerm}"</strong>
+                  </span>
+                  <span className="text-[11px] text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+                    {combinedSearchResults.length} نتيجة متوفرة
+                  </span>
                 </div>
 
                 <div className="flex-1 overflow-y-auto pt-4 pr-1">
@@ -862,7 +698,7 @@ export default function AiImageGeneratorDialog({
                               loading="lazy"
                               onError={(e) => {
                                 const el = e.currentTarget as HTMLImageElement;
-                                el.src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=85";
+                                el.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=85";
                               }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-2 flex flex-col justify-end">
@@ -881,7 +717,7 @@ export default function AiImageGeneratorDialog({
                     <div className="h-full grid place-items-center text-center text-slate-400 py-20">
                       <div>
                         <Search size={36} className="mx-auto text-slate-500 mb-2" />
-                        <p className="text-sm font-bold">اكتب كلمة البحث واضغط "بحث فوري 4K" لاستعراض الصور</p>
+                        <p className="text-sm font-bold">اكتب كلمة البحث واضغط "بحث" لاستعراض الصور</p>
                       </div>
                     </div>
                   )}
@@ -890,13 +726,9 @@ export default function AiImageGeneratorDialog({
                 {selectedPhotoUrl && (
                   <div className="shrink-0 pt-3 border-t border-white/10 flex items-center justify-between gap-4 bg-black/60 p-3 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <img src={selectedPhotoUrl} alt="" className="h-12 w-20 rounded-xl object-cover border border-white/20" />
-                      <div>
-                        <p className="text-xs font-black text-emerald-400">تم تحديد الصورة الفوتوغرافية بدقة 4K بنجاح</p>
-                        <p className="text-[11px] text-slate-400">انقر على الزر لاعتمادها فوراً كغلاف رسمي للمقال/البودكاست</p>
-                      </div>
+                      <img src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
+                      <span className="text-xs text-slate-300 font-bold">تم تحديد الصورة وجاهزة للاعتماد</span>
                     </div>
-
                     <button
                       type="button"
                       onClick={() => handleApply(selectedPhotoUrl)}
@@ -905,91 +737,6 @@ export default function AiImageGeneratorDialog({
                       <Check size={16} />
                       <span>اعتماد هذه الصورة كغلاف رسمي الآن</span>
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* AI Generator Canvas Content */}
-            {activeTab === "aiPrompt" && (
-              <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto p-4">
-                {generatedUrl ? (
-                  <div className="space-y-4 max-w-2xl w-full text-center">
-                    <div
-                      className={`relative mx-auto overflow-hidden rounded-3xl bg-black border-2 border-white/20 shadow-2xl ${
-                        aspectRatio === "9:16"
-                          ? "aspect-[9/16] max-h-[55vh]"
-                          : aspectRatio === "1:1"
-                          ? "aspect-square max-h-[55vh]"
-                          : aspectRatio === "3:4"
-                          ? "aspect-[3/4] max-h-[55vh]"
-                          : "aspect-video w-full max-h-[55vh]"
-                      }`}
-                    >
-                      <img
-                        src={generatedUrl}
-                        alt="Generated scene"
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          const el = e.currentTarget as HTMLImageElement;
-                          el.src = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85";
-                        }}
-                      />
-                    </div>
-
-                    {alternates.length > 0 && (
-                      <div className="space-y-2 pt-1">
-                        <span className="text-[11px] font-bold text-slate-400 block">
-                          📸 لقطات بديلة لنفس طلبك (اضغط للتبديل الفوري):
-                        </span>
-                        <div className="flex items-center justify-center gap-2 overflow-x-auto py-1">
-                          {alternates.map((alt, idx) => (
-                            <button
-                              key={idx}
-                              type="button"
-                              onClick={() => setGeneratedUrl(alt.url)}
-                              className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all hover:scale-105 ${
-                                generatedUrl === alt.url
-                                  ? "border-[#f8ca14] ring-2 ring-[#f8ca14]"
-                                  : "border-white/10 hover:border-white/30"
-                              }`}
-                            >
-                              <img src={alt.url} alt={alt.title} className="h-full w-full object-cover" />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-center gap-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => handleApply(generatedUrl)}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black px-8 py-3 text-sm transition shadow-xl shadow-emerald-500/20"
-                      >
-                        <Check size={18} />
-                        <span>اعتماد هذا المشهد كغلاف رسمي</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleAiGenerate}
-                        disabled={generateMutation.isPending}
-                        className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold px-5 py-3 text-xs transition"
-                      >
-                        <span>توليد لقطة بديلة</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-slate-400 max-w-md space-y-3">
-                    <div className="grid h-16 w-16 place-items-center rounded-3xl bg-amber-500/10 border border-amber-500/20 text-[#f8ca14] mx-auto shadow-inner">
-                      <Wand2 size={28} />
-                    </div>
-                    <h3 className="text-base font-black text-white">استوديو التوليد الذكي فائق الواقعية (8K)</h3>
-                    <p className="text-xs leading-6 text-slate-400">
-                      حدد وصف المشهد والأبعاد المطلوبة من القائمة الجانبية ثم اضغط «توليد المشهد الآن» لعرض النتيجة السينمائية هنا
-                    </p>
                   </div>
                 )}
               </div>
@@ -1008,45 +755,36 @@ export default function AiImageGeneratorDialog({
                     {/* Header of card */}
                     <div className="relative z-10 flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f8ca14]/40 bg-[#f8ca14]/15 px-3.5 py-1 text-xs font-black text-[#f8ca14]">
-                        <Sparkles size={12} /> {cardCategory}
+                        <span>مدارس العقيق الأهلية</span>
                       </span>
-                      <span className="text-xs font-black tracking-wider text-slate-400 uppercase">
-                        ALAQEEQ STUDIO
-                      </span>
+                      <span className="text-xs text-slate-400 font-bold">{cardCategory}</span>
                     </div>
 
-                    {/* Body Title */}
-                    <div className="relative z-10 space-y-2.5 my-auto">
-                      <h2 className="text-2xl sm:text-3xl font-black leading-snug text-white drop-shadow-md">
+                    {/* Title in center */}
+                    <div className="relative z-10 my-auto text-center px-4">
+                      <h2 className="text-2xl sm:text-3xl font-black text-white leading-relaxed drop-shadow-md">
                         {cardTitle || "عنوان المقال أو الحلقة"}
                       </h2>
-                      <p className="text-xs font-bold text-slate-300">
-                        صرح العقيق التعليمي · المدينة المنورة
-                      </p>
                     </div>
 
                     {/* Footer of card */}
-                    <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-3.5">
-                      <span className="text-[11px] font-black text-[#f8ca14]">
-                        مدارس العقيق الأهلية والدولية
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-mono">
-                        1448H · 2026
-                      </span>
+                    <div className="relative z-10 flex items-center justify-between pt-4 border-t border-white/10 text-xs text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-[#f8ca14]" />
+                        <span className="font-bold text-slate-300">المدينة المنورة • مجلة العقيق</span>
+                      </div>
+                      <span className="text-[11px] text-slate-500">إصدار رسمي معتمد</span>
                     </div>
                   </div>
 
-                  <div className="flex justify-center pt-2">
+                  <div className="text-center">
                     <button
                       type="button"
-                      onClick={() => {
-                        const curatedMatch = MASTER_PHOTO_CATALOG_500.find((p) => p.category.includes(cardCategory)) || MASTER_PHOTO_CATALOG_500[0];
-                        handleApply(curatedMatch.url);
-                      }}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black px-8 py-3 text-sm transition shadow-xl shadow-[#f8ca14]/20"
+                      onClick={handleExportCard}
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] hover:bg-[#e5ba10] text-black font-black px-8 py-3 text-sm transition shadow-xl shadow-[#f8ca14]/20"
                     >
                       <Check size={18} />
-                      <span>اعتماد بطاقة الغلاف الرسمي بالعنوان</span>
+                      <span>اعتماد هذه البطاقة كغلاف رسمي</span>
                     </button>
                   </div>
                 </div>
