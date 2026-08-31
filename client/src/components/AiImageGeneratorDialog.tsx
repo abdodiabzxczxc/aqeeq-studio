@@ -45,8 +45,9 @@ const CARD_STYLES = [
 ];
 
 const AI_ENGINES = [
-  { id: "flux-realism", label: "💎 Octane 3D Ultra (أعلى دقة 8K لمجسمات الذهب والرخام)", desc: "رندر ثلاثي الأبعاد فائق الفخامة للمجسمات والأغلفة الرسمية" },
+  { id: "nano-banana-pro", label: "🍌 Google Nano Banana Pro (محرك جيميناي الخارق للصور)", desc: "محرك جوجل جيميناي الأصلي لتوليد الصور والمشاهد فائقة الواقعية" },
   { id: "dalle3", label: "👑 OpenAI DALL-E 3 HD (خارق الواقعية بدقة فائقة)", desc: "محرك OpenAI الأصلي بدقة سينمائية وتفاصيل خارقة" },
+  { id: "flux-realism", label: "💎 Octane 3D Ultra (أعلى دقة 8K لمجسمات الذهب والرخام)", desc: "رندر ثلاثي الأبعاد فائق الفخامة للمجسمات والأغلفة الرسمية" },
   { id: "flux-pro", label: "🌟 Cinematic Raytracing (إضاءة شعاعية وسينمائية)", desc: "إضاءة مسرحية درامية عالية التباين" },
   { id: "turbo", label: "⚡ Turbo 3D Fast (توليد ثلاثي الأبعاد سريع)", desc: "توليد مفاهيمي ثلاثي الأبعاد سريع" },
 ] as const;
@@ -89,7 +90,7 @@ export default function AiImageGeneratorDialog({
   // AI Prompt State
   const [prompt, setPrompt] = useState(defaultPrompt);
   const [aspectRatio, setAspectRatio] = useState<AspectRatioChoice>("16:9");
-  const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("flux-realism");
+  const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("nano-banana-pro");
   const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("3d-luxury-gold");
   const [customApiKey, setCustomApiKey] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);

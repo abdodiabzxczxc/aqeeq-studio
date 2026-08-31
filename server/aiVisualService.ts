@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { getEffectiveGeminiApiKey } from "./schoolAiAssistant";
-import { getSetting, setSetting } from "./db";
+import { getSetting } from "./db";
 
 export type AspectRatioType = "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
 
@@ -8,7 +8,7 @@ export interface GenerateAiCoverParams {
   prompt: string;
   type?: "article" | "podcast" | "general";
   aspectRatio?: AspectRatioType;
-  model?: "dalle3" | "flux-pro" | "flux-realism" | "flux" | "turbo";
+  model?: "nano-banana-pro" | "dalle3" | "flux-pro" | "flux-realism" | "flux" | "turbo";
   stylePreset?:
     | "3d-luxury-gold"
     | "cinematic-stage"
@@ -18,7 +18,7 @@ export interface GenerateAiCoverParams {
     | "cinematic"
     | "editorial"
     | "studio-pro";
-  apiKey?: string; // Optional user-provided OpenAI or Replicate or Fal key
+  apiKey?: string; // Optional user-provided Gemini, OpenAI, or Replicate key
 }
 
 export async function generateAiVisualCover(params: GenerateAiCoverParams): Promise<{
@@ -30,7 +30,7 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     prompt,
     type = "article",
     aspectRatio = "16:9",
-    model = "flux-realism",
+    model = "nano-banana-pro",
     stylePreset = "3d-luxury-gold",
     apiKey,
   } = params;
@@ -55,31 +55,32 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     height = 720;
   }
 
-  // 1. Check for OpenAI API Key (from params or DB or ENV)
+  const effectiveGeminiKey =
+    (apiKey?.startsWith("AIza") || apiKey?.startsWith("AQ.") ? apiKey : null) ||
+    (await getEffectiveGeminiApiKey()) ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.GEMINI_API_KEY;
+
   const effectiveOpenAiKey =
-    apiKey || (await getSetting("openai_api_key")) || process.env.OPENAI_API_KEY;
+    (apiKey?.startsWith("sk-") ? apiKey : null) ||
+    (await getSetting("openai_api_key")) ||
+    process.env.OPENAI_API_KEY;
 
   let enhancedPrompt = "";
 
+  // Step 1: Prompt Enhancement using Gemini
   try {
-    const geminiKey = await getEffectiveGeminiApiKey();
-    if (geminiKey) {
-      const ai = new GoogleGenAI({ apiKey: geminiKey });
-      const systemPrompt = `You are a world-class 3D Art Director and Master Visual Concept Designer creating high-end, award-winning magazine & podcast covers for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
-
-Goal: Turn the Arabic topic into a breathtaking, prestigious 3D conceptual cover scene (Cinema4D, Octane Render 8K, Unreal Engine 5.4 raytracing).
-
+    if (effectiveGeminiKey) {
+      const ai = new GoogleGenAI({ apiKey: effectiveGeminiKey });
+      const systemPrompt = `You are a world-class 3D Art Director creating prestigious covers for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
 Topic: "${prompt}"
-Medium: "${type === "podcast" ? "Official Audio Podcast & Radio Visual Cover" : "Prestigious Educational & Scientific Magazine Cover"}"
-Orientation: "${aspectRatio === "9:16" || aspectRatio === "3:4" ? "Vertical 9:16 Poster Layout" : aspectRatio === "1:1" ? "Square 1:1 Album Framing" : "Cinematic 16:9 Wide Landscape Framing"}"
-Chosen Style: "${stylePreset}"
+Medium: "${type === "podcast" ? "Audio Podcast Visual Cover" : "Educational & Scientific Magazine Cover"}"
+Orientation: "${aspectRatio === "9:16" || aspectRatio === "3:4" ? "Vertical 9:16 Layout" : aspectRatio === "1:1" ? "Square 1:1 Framing" : "Cinematic 16:9 Wide Landscape"}"
+Style: "${stylePreset}"
 
-CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
-1. PURE CONCEPTUAL LUXURY: NEVER generate human faces, cartoon characters, or creepy avatars. Instead, create majestic 3D conceptual installations, obsidian marble podiums, floating golden geometric emblems, crystal refractions, laser circuitry, holographic data rings, glowing architectural lines, or warm volumetric god-rays.
-2. MATERIALITY: Polished 24k gold leaf, dark obsidian marble with subtle gold veins, frosted crystal glass with chromatic aberration, brushed titanium, warm amber ambient glow (#f8ca14).
-3. LIGHTING: Cinematic studio lighting, deep dramatic shadows, subsurface scattering on crystals, rim lighting, atmospheric dust motes, 8k resolution, photorealistic raytracing, Octane Render benchmark quality.
-4. IDENTITY: Subtle Islamic/Arabian geometric motifs infused with futuristic minimalism (representing Medina's intellectual excellence).
-5. Output format: Return ONLY the final detailed English prompt in one paragraph, no quotes, no markdown.`;
+ART DIRECTION RULES:
+1. PURE LUXURY & CONCEPTUAL PRESTIGE: Never generate distorted faces or creepy avatars. Focus on breathtaking 3D conceptual installations, obsidian marble podiums, floating 24k gold geometric emblems, frosted crystal refractions, laser circuitry, holographic data rings, volumetric lighting, 8k resolution, photorealistic raytracing.
+2. Output format: Return ONLY the final detailed English prompt in one paragraph, no quotes, no markdown.`;
 
       const res = await ai.models.generateContent({
         model: "gemini-3.5-flash-lite",
@@ -97,7 +98,47 @@ CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
     enhancedPrompt = `A breathtaking 3D conceptual masterpiece for ${prompt}, majestic 24k gold and obsidian marble sculpture, floating crystal rings, volumetric warm golden lighting, Cinema4D Octane render 8K, ultra-detailed raytracing, cinematic magazine cover, no humans, no text`;
   }
 
-  // If OpenAI API key is available, use DALL-E 3 HD!
+  // ================= 1. Nano Banana Pro (Google Gemini Image Generation) =================
+  if (model === "nano-banana-pro" && effectiveGeminiKey) {
+    const nanoModels = [
+      "gemini-3-pro-image",
+      "nano-banana-pro-preview",
+      "gemini-3.1-flash-image",
+      "gemini-2.5-flash-image",
+    ];
+
+    const ai = new GoogleGenAI({ apiKey: effectiveGeminiKey });
+    for (const nanoModel of nanoModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: nanoModel,
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: `${enhancedPrompt}, 8k photorealistic masterpiece, ultra-detailed, volumetric lighting, luxury quality` }],
+            },
+          ],
+        });
+
+        const parts = response.candidates?.[0]?.content?.parts || [];
+        for (const p of parts) {
+          if ((p as any).inlineData?.data) {
+            const mime = (p as any).inlineData.mimeType || "image/jpeg";
+            const base64Url = `data:${mime};base64,${(p as any).inlineData.data}`;
+            return {
+              imageUrl: base64Url,
+              enhancedPrompt,
+              engineUsed: `Google Gemini (${nanoModel} / Nano Banana Pro)`,
+            };
+          }
+        }
+      } catch (err: any) {
+        console.warn(`Nano Banana (${nanoModel}) attempt note:`, err?.message || err);
+      }
+    }
+  }
+
+  // ================= 2. OpenAI DALL-E 3 HD =================
   if (effectiveOpenAiKey && (model === "dalle3" || effectiveOpenAiKey.startsWith("sk-"))) {
     try {
       const dalleSize =
@@ -133,16 +174,13 @@ CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
             engineUsed: "OpenAI DALL-E 3 HD (Ultra Pro)",
           };
         }
-      } else {
-        const errJson = await openAiRes.json().catch(() => ({}));
-        console.warn("DALL-E 3 API error:", errJson);
       }
     } catch (err) {
       console.warn("DALL-E 3 request error:", err);
     }
   }
 
-  // Fallback / Default: Advanced Flux 3D Octane Engine
+  // ================= 3. Flux 3D Octane Render 8K Engine =================
   const finalPromptWithDirectives = `${enhancedPrompt}, 8k resolution, octane render, masterpiece, dramatic volumetric lighting, luxury aesthetic, cinema4d, unreal engine 5, photorealistic`;
   const seed = Math.floor(Math.random() * 9000000) + 1000000;
   const targetModel = model === "turbo" ? "turbo" : "flux";
@@ -153,7 +191,7 @@ CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
   return {
     imageUrl,
     enhancedPrompt: finalPromptWithDirectives,
-    engineUsed: "Flux 3D Octane 8K",
+    engineUsed: "Flux 3D Octane 8K (Nano Enhanced)",
   };
 }
 
@@ -178,7 +216,6 @@ export async function searchRealGlobalPhotos(params: {
 
   let searchKeywords = "education school";
 
-  // If query contains Arabic characters, translate to 1-2 clean English keywords using Gemini
   if (/[\u0600-\u06FF]/.test(query)) {
     try {
       const apiKey = await getEffectiveGeminiApiKey();
@@ -208,7 +245,6 @@ export async function searchRealGlobalPhotos(params: {
 
   const results: SearchPhotoResult[] = [];
 
-  // Source 1: Wikimedia Commons Live High-Res API
   try {
     const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
       searchKeywords
@@ -258,7 +294,6 @@ export async function searchRealGlobalPhotos(params: {
     console.warn("Wikimedia search error:", err);
   }
 
-  // Source 2: Openverse Live Search API
   if (results.length < pageSize) {
     try {
       let openverseUrl = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(

@@ -1538,7 +1538,9 @@ export const appRouter = router({
           prompt: z.string().min(2, "يرجى إدخال وصف أو فكرة الصورة"),
           type: z.enum(["article", "podcast", "general"]).optional(),
           aspectRatio: z.enum(["16:9", "9:16", "1:1", "4:3", "3:4"]).optional(),
-          model: z.enum(["dalle3", "flux-pro", "flux-realism", "flux", "turbo"]).optional(),
+          model: z
+            .enum(["nano-banana-pro", "dalle3", "flux-pro", "flux-realism", "flux", "turbo"])
+            .optional(),
           stylePreset: z.enum([
             "3d-luxury-gold",
             "cinematic-stage",
