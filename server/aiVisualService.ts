@@ -39,7 +39,6 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     width = 1024;
     height = 768;
   } else {
-    // 16:9 default
     width = 1280;
     height = 720;
   }
@@ -108,11 +107,11 @@ export async function searchRealGlobalPhotos(params: {
   pageSize?: number;
   orientation?: "all" | "wide" | "tall" | "square";
 }): Promise<{ results: SearchPhotoResult[]; total: number; queryUsed: string }> {
-  const { query, page = 1, pageSize = 30, orientation = "all" } = params;
+  const { query, page = 1, pageSize = 32, orientation = "all" } = params;
 
-  let englishKeywords = query.trim();
+  let searchKeywords = "education school";
 
-  // If query contains Arabic characters, translate to precise photography keywords using Gemini
+  // If query contains Arabic characters, translate to 1-2 clean English keywords using Gemini
   if (/[\u0600-\u06FF]/.test(query)) {
     try {
       const apiKey = await getEffectiveGeminiApiKey();
@@ -125,68 +124,118 @@ export async function searchRealGlobalPhotos(params: {
               role: "user",
               parts: [
                 {
-                  text: `Translate and optimize this Arabic image search query into 2-3 precise English keywords for a high-quality global photo library. Return ONLY the English keywords separated by single spaces, no punctuation:\nSearch: "${query}"`,
+                  text: `Translate and summarize this Arabic image topic into EXACTLY 1 or 2 high-level English search words for stock photography (e.g. "robotics", "podcast studio", "graduation", "library", "chemistry laboratory", "swimming", "taekwondo", "saudi flag"). Return ONLY the 1-2 words without any punctuation:\nTopic: "${query}"`,
                 },
               ],
             },
           ],
-          config: { temperature: 0.2, maxOutputTokens: 30 },
+          config: { temperature: 0.1, maxOutputTokens: 20 },
         });
         const translated = res.text?.trim().replace(/["'\n\r]/g, "");
-        if (translated) englishKeywords = translated;
+        if (translated) searchKeywords = translated;
       }
     } catch (e) {}
+  } else if (query.trim()) {
+    searchKeywords = query.trim().split(/\s+/).slice(0, 3).join(" ");
   }
 
+  const results: SearchPhotoResult[] = [];
+
+  // Source 1: Wikimedia Commons Live High-Res API
   try {
-    let url = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(
-      englishKeywords
-    )}&page=${page}&page_size=${pageSize}`;
+    const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
+      searchKeywords
+    )}&gsrnamespace=6&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=800&format=json&gsrlimit=${pageSize}&gsroffset=${
+      (page - 1) * pageSize
+    }`;
 
-    if (orientation && orientation !== "all") {
-      url += `&aspect_ratio=${orientation}`;
-    }
-
-    const response = await fetch(url, {
-      headers: { "User-Agent": "AqeeqStudio/1.0" },
+    const wikiRes = await fetch(wikiUrl, {
+      headers: { "User-Agent": "AqeeqStudio/2.0 (education platform)" },
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      const results: SearchPhotoResult[] = (data.results || []).map((item: any) => {
-        let detectedRatio: "wide" | "tall" | "square" = "wide";
-        if (item.width && item.height) {
-          const r = item.width / item.height;
-          if (r > 1.2) detectedRatio = "wide";
-          else if (r < 0.85) detectedRatio = "tall";
+    if (wikiRes.ok) {
+      const wikiData = await wikiRes.json();
+      const pages = Object.values(wikiData.query?.pages || {});
+      pages.forEach((p: any) => {
+        const info = p.imageinfo?.[0];
+        if (info && info.thumburl && !info.mime?.includes("svg")) {
+          const w = info.thumbwidth || info.width || 800;
+          const h = info.thumbheight || info.height || 600;
+          const ratio = w / h;
+          let detectedRatio: "wide" | "tall" | "square" = "wide";
+          if (ratio > 1.2) detectedRatio = "wide";
+          else if (ratio < 0.85) detectedRatio = "tall";
           else detectedRatio = "square";
+
+          if (orientation === "all" || orientation === detectedRatio) {
+            const cleanTitle = (p.title || "")
+              .replace(/^File:/i, "")
+              .replace(/\.[^/.]+$/, "")
+              .replace(/_/g, " ");
+
+            results.push({
+              id: `wiki-${p.pageid || Math.random()}`,
+              title: cleanTitle || query,
+              url: info.url,
+              thumbnail: info.thumburl,
+              source: "wikimedia",
+              width: w,
+              height: h,
+              aspectRatio: detectedRatio,
+            });
+          }
         }
-
-        return {
-          id: String(item.id || Math.random()),
-          title: item.title || query,
-          url: item.url,
-          thumbnail: item.thumbnail || item.url,
-          source: item.source || "openverse",
-          width: item.width,
-          height: item.height,
-          aspectRatio: detectedRatio,
-        };
       });
-
-      return {
-        results,
-        total: data.result_count || results.length,
-        queryUsed: englishKeywords,
-      };
     }
   } catch (err) {
-    console.warn("Global photo search error:", err);
+    console.warn("Wikimedia search error:", err);
+  }
+
+  // Source 2: Openverse Live Search API
+  if (results.length < pageSize) {
+    try {
+      let openverseUrl = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(
+        searchKeywords
+      )}&page=${page}&page_size=${pageSize}`;
+      if (orientation !== "all") {
+        openverseUrl += `&aspect_ratio=${orientation}`;
+      }
+
+      const ovRes = await fetch(openverseUrl, {
+        headers: { "User-Agent": "AqeeqStudio/2.0" },
+      });
+
+      if (ovRes.ok) {
+        const ovData = await ovRes.json();
+        (ovData.results || []).forEach((item: any) => {
+          let detectedRatio: "wide" | "tall" | "square" = "wide";
+          if (item.width && item.height) {
+            const r = item.width / item.height;
+            if (r > 1.2) detectedRatio = "wide";
+            else if (r < 0.85) detectedRatio = "tall";
+            else detectedRatio = "square";
+          }
+
+          results.push({
+            id: `ov-${item.id || Math.random()}`,
+            title: item.title || query,
+            url: item.url,
+            thumbnail: item.thumbnail || item.url,
+            source: "openverse",
+            width: item.width,
+            height: item.height,
+            aspectRatio: detectedRatio,
+          });
+        });
+      }
+    } catch (err) {
+      console.warn("Openverse fallback search error:", err);
+    }
   }
 
   return {
-    results: [],
-    total: 0,
-    queryUsed: englishKeywords,
+    results,
+    total: results.length > 0 ? 500 : 0,
+    queryUsed: searchKeywords,
   };
 }
