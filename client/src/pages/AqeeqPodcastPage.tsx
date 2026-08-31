@@ -331,7 +331,7 @@ export default function AqeeqPodcastPage() {
       }`}
     >
       {/* Top Header Bar */}
-      <AlaqeeqStudioSiteHeader title="إذاعة وبودكاست العقيق" active="studio" />
+      <AlaqeeqStudioSiteHeader title="إذاعة وبودكاست العقيق" active="podcast" />
 
       {/* Hero Section matching Journal & Albums */}
       <section

@@ -180,7 +180,7 @@ export default function AqeeqArticlesStudioPage() {
   return (
     <div dir="rtl" className={`min-h-screen font-[Tajawal,sans-serif] ${dark ? "bg-[#080808] text-white" : "bg-[#f8f9fc] text-slate-900"}`}>
       {/* Site Header */}
-      <AlaqeeqStudioSiteHeader title="استوديو إدارة المقالات" active="studio" />
+      <AlaqeeqStudioSiteHeader title="استوديو إدارة المقالات" active="articles" />
 
       {/* Studio Command Bar */}
       <header className={`sticky top-[66px] sm:top-[80px] z-30 border-b backdrop-blur-xl transition ${

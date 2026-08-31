@@ -290,7 +290,7 @@ export default function AqeeqArticlesPage() {
       }`}
     >
       {/* Top Header Bar */}
-      <AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="studio" />
+      <AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="articles" />
 
       {/* Hero Section matching Journal & Albums */}
       <section

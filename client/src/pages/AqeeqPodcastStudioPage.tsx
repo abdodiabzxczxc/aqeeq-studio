@@ -192,7 +192,7 @@ export default function AqeeqPodcastStudioPage() {
   return (
     <div dir="rtl" className={`min-h-screen font-[Tajawal,sans-serif] ${dark ? "bg-[#080808] text-white" : "bg-[#f8f9fc] text-slate-900"}`}>
       {/* Site Header */}
-      <AlaqeeqStudioSiteHeader title="استوديو إدارة الإذاعة والبودكاست" active="studio" />
+      <AlaqeeqStudioSiteHeader title="استوديو إدارة الإذاعة والبودكاست" active="podcast" />
 
       {/* Studio Command Bar */}
       <header className={`sticky top-[66px] sm:top-[80px] z-30 border-b backdrop-blur-xl transition ${
