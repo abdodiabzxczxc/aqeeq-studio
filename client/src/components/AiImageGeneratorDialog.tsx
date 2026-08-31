@@ -314,7 +314,7 @@ export default function AiImageGeneratorDialog({
               }`}
             >
               <Sparkles size={15} />
-              <span>✨ توليد واقعي (Flux 8K)</span>
+              <span>🍌 Nano Banana Pro (جيميناي)</span>
             </button>
 
             <button
@@ -541,141 +541,100 @@ export default function AiImageGeneratorDialog({
             {activeTab === "aiPrompt" && (
               <div className="space-y-4">
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">وصف المشهد المراد توليده *</Label>
+                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">
+                    🍌 ماذا تريد أن تولد بالذكاء الاصطناعي؟ *
+                  </Label>
                   <Textarea
-                    rows={3}
+                    rows={4}
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="اكتب وصفاً باللغة العربية (مثلاً: طلاب سعوديون في مختبر الروبوت والذكاء الاصطناعي مع إضاءة سينمائية)..."
-                    className="text-xs rounded-xl bg-white/5 border-white/10 text-white"
+                    placeholder="اكتب فكرتك كما هي بدقة، وسيقوم محرك Gemini Nano Banana Pro برسمها كما طلبتها بالضبط..."
+                    className="text-xs rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-[#f8ca14]"
                   />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    ✨ سيقوم الذكاء الاصطناعي بتنفيذ المشهد بدقة تصوير واقعية 8K فوراً.
+                  </p>
                 </div>
 
                 {/* Aspect Ratio Selector */}
                 <div>
-                  <Label className="text-xs font-black text-slate-300 mb-2 block">📐 أبعاد وشكل الصورة</Label>
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <Label className="text-xs font-black text-slate-300 mb-2 block">📐 مقاس واتجاه الصورة</Label>
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button
                       type="button"
                       onClick={() => setAspectRatio("16:9")}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl text-xs font-bold transition border ${
+                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
                         aspectRatio === "16:9"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
+                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
                           : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                       }`}
                     >
-                      <RectangleHorizontal size={16} />
-                      <span>بالعرض (16:9)</span>
-                      <span className="text-[9px] opacity-75">للمقالات والمواقع</span>
+                      <RectangleHorizontal size={18} />
+                      <span className="mt-1">عريض (16:9)</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setAspectRatio("9:16")}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl text-xs font-bold transition border ${
+                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
                         aspectRatio === "9:16"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
+                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
                           : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                       }`}
                     >
-                      <RectangleVertical size={16} />
-                      <span>بالطول (9:16)</span>
-                      <span className="text-[9px] opacity-75">للهواتف والستوري</span>
+                      <RectangleVertical size={18} />
+                      <span className="mt-1">طولي (9:16)</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setAspectRatio("1:1")}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl text-xs font-bold transition border ${
+                      className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-xs font-bold transition border ${
                         aspectRatio === "1:1"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
+                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
                           : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                       }`}
                     >
-                      <Square size={16} />
-                      <span>مربع (1:1)</span>
-                      <span className="text-[9px] opacity-75">للبودكاست وإنستغرام</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setAspectRatio("3:4")}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl text-xs font-bold transition border ${
-                        aspectRatio === "3:4"
-                          ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
-                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <RectangleVertical size={16} />
-                      <span>طولي قياسي (3:4)</span>
-                      <span className="text-[9px] opacity-75">للبوسترات والمجلات</span>
+                      <Square size={18} />
+                      <span className="mt-1">مربع (1:1)</span>
                     </button>
                   </div>
                 </div>
 
-                <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">محرك التوليد البصري</Label>
-                  <select
-                    value={selectedEngine}
-                    onChange={(e) => setSelectedEngine(e.target.value as any)}
-                    className="w-full text-xs rounded-xl border border-white/10 bg-[#161616] p-2.5 text-white font-bold outline-none"
-                  >
-                    {AI_ENGINES.map((eng) => (
-                      <option key={eng.id} value={eng.id}>
-                        {eng.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {selectedEngine === "dalle3" && (
-                  <div className="space-y-1.5 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30">
-                    <Label className="text-[11px] font-black text-amber-300 block">
-                      🔑 مفتاح OpenAI API (لتوليد DALL-E 3 HD الخارق)
+                <div className="space-y-1.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] font-black text-amber-300">
+                      🔑 مفتاح Google Gemini / OpenAI (اختياري)
                     </Label>
-                    <Input
-                      type="password"
-                      value={customApiKey}
-                      onChange={(e) => setCustomApiKey(e.target.value)}
-                      placeholder="sk-proj-..."
-                      className="text-xs h-9 rounded-xl bg-black/60 border-amber-500/40 text-white font-mono"
-                    />
-                    <p className="text-[10px] text-slate-400">
-                      يستخدم مفتاح OpenAI الخاص بك للاتصال المباشر بـ DALL-E 3 بدقة سينمائية وتفاصيل خارقة.
-                    </p>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono">Pro Engine</span>
                   </div>
-                )}
-
-                <div>
-                  <Label className="text-xs font-black text-slate-300 mb-1.5 block">النمط البصري الفني</Label>
-                  <select
-                    value={selectedStyle}
-                    onChange={(e) => setSelectedStyle(e.target.value as any)}
-                    className="w-full text-xs rounded-xl border border-white/10 bg-[#161616] p-2.5 text-white font-bold outline-none"
-                  >
-                    {STYLE_PRESETS.map((st) => (
-                      <option key={st.id} value={st.id}>
-                        {st.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Input
+                    type="password"
+                    value={customApiKey}
+                    onChange={(e) => setCustomApiKey(e.target.value)}
+                    placeholder="AQ... أو sk-proj-... (اختياري)"
+                    className="text-xs h-9 rounded-xl bg-black/60 border-amber-500/30 text-white font-mono"
+                  />
+                  <p className="text-[9.5px] text-slate-400 leading-relaxed">
+                    إذا كان لديك مفتاح خاص من Google AI Studio أو OpenAI ضعه هنا للتوليد المباشر من سيرفرات جوجل المتقدمة.
+                  </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAiGenerate}
                   disabled={generateMutation.isPending}
-                  className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black font-black text-xs transition shadow-lg shadow-amber-500/20"
+                  className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-amber-500 via-[#f8ca14] to-yellow-400 hover:opacity-95 text-black font-black text-sm transition shadow-lg shadow-amber-500/25 active:scale-[0.98]"
                 >
                   {generateMutation.isPending ? (
                     <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>جاري التوليد بأعلى دقة واقعية...</span>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>جاري توليد الصورة بواسطة Nano Banana Pro...</span>
                     </>
                   ) : (
                     <>
-                      <Wand2 size={16} />
-                      <span>{generatedUrl ? "توليد صورة بديلة" : "توليد المشهد الآن"}</span>
+                      <Wand2 size={18} />
+                      <span>{generatedUrl ? "🍌 توليد لقطة بديلة جديدة" : "🍌 توليد الصورة بواسطة Nano Banana Pro"}</span>
                     </>
                   )}
                 </button>

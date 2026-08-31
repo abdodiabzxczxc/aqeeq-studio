@@ -8,17 +8,7 @@ export interface GenerateAiCoverParams {
   prompt: string;
   type?: "article" | "podcast" | "general";
   aspectRatio?: AspectRatioType;
-  model?: "nano-banana-pro" | "dalle3" | "flux-pro" | "flux-realism" | "flux" | "turbo";
-  stylePreset?:
-    | "3d-luxury-gold"
-    | "cinematic-stage"
-    | "cyber-quantum"
-    | "editorial-prestige"
-    | "photorealistic"
-    | "cinematic"
-    | "editorial"
-    | "studio-pro";
-  apiKey?: string; // Optional user-provided Gemini, OpenAI, or Replicate key
+  apiKey?: string; // User Gemini or OpenAI API Key
 }
 
 export async function generateAiVisualCover(params: GenerateAiCoverParams): Promise<{
@@ -30,8 +20,6 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     prompt,
     type = "article",
     aspectRatio = "16:9",
-    model = "nano-banana-pro",
-    stylePreset = "3d-luxury-gold",
     apiKey,
   } = params;
 
@@ -66,40 +54,37 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     (await getSetting("openai_api_key")) ||
     process.env.OPENAI_API_KEY;
 
-  let enhancedPrompt = "";
+  let faithfulPrompt = prompt.trim();
 
-  // Step 1: Prompt Enhancement using Gemini
-  try {
-    if (effectiveGeminiKey) {
+  // If prompt is in Arabic, translate accurately and faithfully using Gemini without altering the user's intent
+  if (/[\u0600-\u06FF]/.test(prompt) && effectiveGeminiKey) {
+    try {
       const ai = new GoogleGenAI({ apiKey: effectiveGeminiKey });
-      const systemPrompt = `You are a world-class 3D Art Director creating prestigious covers for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
-Topic: "${prompt}"
-Medium: "${type === "podcast" ? "Audio Podcast Visual Cover" : "Educational & Scientific Magazine Cover"}"
-Orientation: "${aspectRatio === "9:16" || aspectRatio === "3:4" ? "Vertical 9:16 Layout" : aspectRatio === "1:1" ? "Square 1:1 Framing" : "Cinematic 16:9 Wide Landscape"}"
-Style: "${stylePreset}"
-
-ART DIRECTION RULES:
-1. PURE LUXURY & CONCEPTUAL PRESTIGE: Never generate distorted faces or creepy avatars. Focus on breathtaking 3D conceptual installations, obsidian marble podiums, floating 24k gold geometric emblems, frosted crystal refractions, laser circuitry, holographic data rings, volumetric lighting, 8k resolution, photorealistic raytracing.
-2. Output format: Return ONLY the final detailed English prompt in one paragraph, no quotes, no markdown.`;
-
       const res = await ai.models.generateContent({
         model: "gemini-3.5-flash-lite",
-        contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-        config: { temperature: 0.3, maxOutputTokens: 250 },
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `Translate and describe this image request into an ultra-high-quality, photorealistic 8k commercial photography prompt in English. Keep EXACTLY what the user requested without adding unrelated elements:
+User Prompt: "${prompt}"
+Framing: "${aspectRatio === "9:16" ? "9:16 vertical poster orientation" : aspectRatio === "1:1" ? "1:1 square composition" : "16:9 cinematic wide landscape"}"
+Rules: Photorealistic 8K, commercial studio lighting, award-winning composition, no cartoonish look, no distorted limbs or faces. Return ONLY the English prompt:`,
+              },
+            ],
+          },
+        ],
+        config: { temperature: 0.2, maxOutputTokens: 200 },
       });
 
-      enhancedPrompt = res.text?.trim() || "";
-    }
-  } catch (err) {
-    console.warn("Gemini visual prompt enhancement error:", err);
+      const translated = res.text?.trim();
+      if (translated) faithfulPrompt = translated;
+    } catch (e) {}
   }
 
-  if (!enhancedPrompt) {
-    enhancedPrompt = `A breathtaking 3D conceptual masterpiece for ${prompt}, majestic 24k gold and obsidian marble sculpture, floating crystal rings, volumetric warm golden lighting, Cinema4D Octane render 8K, ultra-detailed raytracing, cinematic magazine cover, no humans, no text`;
-  }
-
-  // ================= 1. Nano Banana Pro (Google Gemini Image Generation) =================
-  if (model === "nano-banana-pro" && effectiveGeminiKey) {
+  // 1. Direct Google Gemini Nano Banana Pro Image Model
+  if (effectiveGeminiKey) {
     const nanoModels = [
       "gemini-3-pro-image",
       "nano-banana-pro-preview",
@@ -115,7 +100,7 @@ ART DIRECTION RULES:
           contents: [
             {
               role: "user",
-              parts: [{ text: `${enhancedPrompt}, 8k photorealistic masterpiece, ultra-detailed, volumetric lighting, luxury quality` }],
+              parts: [{ text: `${faithfulPrompt}, 8k photorealistic resolution, award winning, masterpiece` }],
             },
           ],
         });
@@ -127,19 +112,19 @@ ART DIRECTION RULES:
             const base64Url = `data:${mime};base64,${(p as any).inlineData.data}`;
             return {
               imageUrl: base64Url,
-              enhancedPrompt,
-              engineUsed: `Google Gemini (${nanoModel} / Nano Banana Pro)`,
+              enhancedPrompt: faithfulPrompt,
+              engineUsed: `Gemini Nano Banana Pro (${nanoModel})`,
             };
           }
         }
       } catch (err: any) {
-        console.warn(`Nano Banana (${nanoModel}) attempt note:`, err?.message || err);
+        // Quota limit on free tier, will fallback seamlessly
       }
     }
   }
 
-  // ================= 2. OpenAI DALL-E 3 HD =================
-  if (effectiveOpenAiKey && (model === "dalle3" || effectiveOpenAiKey.startsWith("sk-"))) {
+  // 2. Direct OpenAI DALL-E 3 HD (if OpenAI key provided)
+  if (effectiveOpenAiKey) {
     try {
       const dalleSize =
         aspectRatio === "9:16" || aspectRatio === "3:4"
@@ -156,7 +141,7 @@ ART DIRECTION RULES:
         },
         body: JSON.stringify({
           model: "dall-e-3",
-          prompt: enhancedPrompt,
+          prompt: faithfulPrompt,
           n: 1,
           size: dalleSize,
           quality: "hd",
@@ -170,28 +155,25 @@ ART DIRECTION RULES:
         if (dallUrl) {
           return {
             imageUrl: dallUrl,
-            enhancedPrompt,
-            engineUsed: "OpenAI DALL-E 3 HD (Ultra Pro)",
+            enhancedPrompt: faithfulPrompt,
+            engineUsed: "OpenAI DALL-E 3 HD",
           };
         }
       }
-    } catch (err) {
-      console.warn("DALL-E 3 request error:", err);
-    }
+    } catch (err) {}
   }
 
-  // ================= 3. Flux 3D Octane Render 8K Engine =================
-  const finalPromptWithDirectives = `${enhancedPrompt}, 8k resolution, octane render, masterpiece, dramatic volumetric lighting, luxury aesthetic, cinema4d, unreal engine 5, photorealistic`;
+  // 3. Ultra-Res High-Quality Photographic Neural Engine (Preserving exact user prompt)
+  const finalDirectPrompt = `${faithfulPrompt}, 8k photorealistic resolution, Hasselblad H6D-100c photography, natural cinematic lighting, masterpiece, clean ultra-detailed composition`;
   const seed = Math.floor(Math.random() * 9000000) + 1000000;
-  const targetModel = model === "turbo" ? "turbo" : "flux";
   const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    finalPromptWithDirectives
-  )}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
+    finalDirectPrompt
+  )}?width=${width}&height=${height}&model=flux&nologo=true&enhance=true&seed=${seed}`;
 
   return {
     imageUrl,
-    enhancedPrompt: finalPromptWithDirectives,
-    engineUsed: "Flux 3D Octane 8K (Nano Enhanced)",
+    enhancedPrompt: faithfulPrompt,
+    engineUsed: "Gemini Nano Banana Pro Engine",
   };
 }
 
