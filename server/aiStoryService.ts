@@ -67,6 +67,8 @@ function detectCategory(text: string): TopicCategory {
   return "general";
 }
 
+import { getEffectiveGeminiApiKey } from "./schoolAiAssistant";
+
 /**
  * Real Google Gemini AI Journalistic Synthesizer
  */
@@ -74,13 +76,13 @@ async function callGeminiAi(input: GenerateStoryInput, apiKey: string): Promise<
   try {
     const ai = new GoogleGenAI({ apiKey });
     const prompt = `أنت رئيس التحرير وكبير المحررين الصحفيين لأرقى مجلة مدرسية وإعلامية في المملكة العربية السعودية: "مجلة مدارس العقيق الأهلية والدولية".
-المطلوب منك صياغة تغطية صحفية ملكية رفيعة المستوى، مبهرة لغوياً، احترافية، فخمة وخالية من الركاكة أو الكليشيهات المكررة.
+المطلوب منك صياغة تغطية صحفية ملكية رفيعة المستوى، مبهرة لغوياً، احترافية، فخمة، حصرية، وخالية من الركاكة أو الكليشيهات المكررة.
 
-بيانات الفعالية:
-- الموضوع أو العنوان: "${input.topic || input.prompt}"
-- النقاط والمحاور المحددة: "${input.keyPoints || "تغطية شاملة ومتميزة"}"
+بيانات الفعالية / الحدث:
+- الموضوع أو العنوان: "${input.topic || input.prompt || "فعاليات وأنشطة مدارس العقيق"}"
+- النقاط والمحاور المحددة: "${input.keyPoints || "تغطية شاملة ومتميزة وإبراز إنجازات الطلاب"}"
 - النبرة والأسلوب: "${input.tone || "royal"}"
-- اسم المدارس: "${input.schoolName || "مدارس العقيق الأهلية والدولية"}"
+- اسم المدارس: "${input.schoolName || "مدارس العقيق الأهلية والدولية بالمدينة المنورة"}"
 
 يجب أن ترجع النتيجة بتنسيق JSON حصراً بدون أي كود إضافي، وبالمفاتيح التالية:
 {
@@ -93,21 +95,32 @@ async function callGeminiAi(input: GenerateStoryInput, apiKey: string): Promise<
   "suggestedCaptions": ["تعليق دقيق للصورة الأولى", "تعليق للصورة الثانية", "تعليق للصورة الثالثة", "تعليق للصورة الرابعة", "تعليق للصورة الخامسة"]
 }`;
 
-    const res = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+    const models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+    for (const model of models) {
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            temperature: 0.75,
+            maxOutputTokens: 2000,
+          },
+        });
 
-    const text = res.text?.trim();
-    if (!text) return null;
-    return JSON.parse(text) as GeneratedStoryOutput;
+        const text = res.text?.trim();
+        if (text) {
+          const parsed = JSON.parse(text) as GeneratedStoryOutput;
+          if (parsed.headline && parsed.body) return parsed;
+        }
+      } catch (err: any) {
+        console.warn(`AI story model ${model} attempt failed:`, err?.message?.slice(0, 80));
+      }
+    }
   } catch (err) {
     console.warn("Gemini API call failed, falling back to NLP engine:", err);
-    return null;
   }
+  return null;
 }
 
 /**
@@ -251,7 +264,7 @@ export function synthesizeJournalisticStory(
 }
 
 export async function generateAiNewsStory(input: GenerateStoryInput): Promise<GeneratedStoryOutput> {
-  const apiKey = input.apiKey || process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  const apiKey = input.apiKey || (await getEffectiveGeminiApiKey());
   if (apiKey) {
     const geminiResult = await callGeminiAi(input, apiKey);
     if (geminiResult) return geminiResult;

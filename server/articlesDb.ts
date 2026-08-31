@@ -245,7 +245,8 @@ export async function likeArticle(id: number): Promise<number> {
 
 export async function aiPolishArticle(title: string, content: string): Promise<{ polishedTitle: string; polishedContent: string; polishedExcerpt: string }> {
   try {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    const { getEffectiveGeminiApiKey } = await import("./schoolAiAssistant");
+    const apiKey = await getEffectiveGeminiApiKey();
     if (!apiKey) {
       return {
         polishedTitle: title,
@@ -269,20 +270,25 @@ export async function aiPolishArticle(title: string, content: string): Promise<{
   "polishedExcerpt": "موجز جذاب للمقال في سطرين (حد أقصى 150 حرف)"
 }`;
 
-    const res = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: { responseMimeType: "application/json" },
-    });
+    const models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+    for (const model of models) {
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          config: { responseMimeType: "application/json" },
+        });
 
-    const text = res.text?.trim();
-    if (text) {
-      const parsed = JSON.parse(text);
-      return {
-        polishedTitle: parsed.polishedTitle || title,
-        polishedContent: parsed.polishedContent || content,
-        polishedExcerpt: parsed.polishedExcerpt || content.slice(0, 160) + "...",
-      };
+        const text = res.text?.trim();
+        if (text) {
+          const parsed = JSON.parse(text);
+          return {
+            polishedTitle: parsed.polishedTitle || title,
+            polishedContent: parsed.polishedContent || content,
+            polishedExcerpt: parsed.polishedExcerpt || content.slice(0, 160) + "...",
+          };
+        }
+      } catch (err) {}
     }
   } catch (err) {
     console.warn("AI article polish error:", err);

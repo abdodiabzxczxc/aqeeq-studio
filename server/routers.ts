@@ -599,7 +599,7 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.publish", details: JSON.stringify({ issueId: input.id }) });
       return issue;
     }),
-    generateAiStory: staffProcedure
+    generateAiStory: publicProcedure
       .input(
         z.object({
           title: z.string().optional(),
@@ -672,7 +672,7 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_album.delete", details: JSON.stringify({ id: input.id }) });
       return result;
     }),
-    generateAiStory: staffProcedure
+    generateAiStory: publicProcedure
       .input(
         z.object({
           title: z.string().optional(),
