@@ -264,11 +264,11 @@ export default function AiImageGeneratorDialog({
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm sm:text-base">استوديو الأغلفة والصور البصرية لمدارس العقيق</span>
                 <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black text-emerald-400">
-                  +560 PHOTOS 4K
+                  +600 PHOTOS 4K
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-normal">
-                كتالوج فوتوغرافي ضخم (+560 صورة 4K) + بحث حي في الأرشيف العالمي + توليد ذكي واقعي (Flux 8K)
+                كتالوج فوتوغرافي ضخم (+600 صورة 4K موثقة) + بحث حي في الأرشيف العالمي + توليد ذكي واقعي (Flux 8K)
               </p>
             </div>
           </div>
@@ -773,6 +773,10 @@ export default function AiImageGeneratorDialog({
                             alt={photo.title}
                             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                             loading="lazy"
+                            onError={(e) => {
+                              const el = e.currentTarget as HTMLImageElement;
+                              el.src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=85";
+                            }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-2.5 flex flex-col justify-end">
                             <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
@@ -879,6 +883,10 @@ export default function AiImageGeneratorDialog({
                               alt={photo.title}
                               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                               loading="lazy"
+                              onError={(e) => {
+                                const el = e.currentTarget as HTMLImageElement;
+                                el.src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=85";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-2 flex flex-col justify-end">
                               <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
