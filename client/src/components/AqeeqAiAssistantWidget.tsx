@@ -295,7 +295,7 @@ export function AqeeqAiAssistantWidget() {
                 </div>
                 <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>{aiStatus?.hasLiveGemini ? "متصل بنموذج Gemini 2.5 Flash الذكي" : "جاهز للرد والمساعدة التربوية"}</span>
+                  <span>{aiStatus?.hasLiveGemini ? "متصل بنموذج Gemini 3.6 Flash الذكي ⚡" : "جاهز للرد والمساعدة التربوية"}</span>
                 </p>
               </div>
             </div>
@@ -462,7 +462,7 @@ export function AqeeqAiAssistantWidget() {
           <DialogHeader className="text-right border-b border-white/10 pb-4">
             <DialogTitle className="text-lg font-black flex items-center gap-2 text-amber-300">
               <Sparkles size={20} className="text-amber-400" />
-              <span>ربط الذكاء الاصطناعي الحي (Google Gemini 2.5 Flash)</span>
+              <span>ربط الذكاء الاصطناعي الحي (Google Gemini 3.6 Flash)</span>
             </DialogTitle>
           </DialogHeader>
 

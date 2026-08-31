@@ -1454,7 +1454,7 @@ export const appRouter = router({
       const apiKey = await getEffectiveGeminiApiKey();
       return {
         hasLiveGemini: Boolean(apiKey),
-        model: apiKey ? "Gemini 2.5 Flash" : "Aqeeq Educational Knowledge Engine",
+        model: apiKey ? "Gemini 3.6 Flash" : "Aqeeq Educational Knowledge Engine",
         features: [
           "ذاكرة حوارية متعددة الأدوار (Multi-turn Context Memory)",
           "موسوعة شاملة لكافة مراحل وبرامج ومدارس العقيق",
@@ -1507,7 +1507,7 @@ export const appRouter = router({
             fs.writeFileSync(envPath, content);
           } catch (e) {}
 
-          return { success: true, message: "تم تفعيل الذكاء الاصطناعي الحقيقي (Gemini 2.5 Flash) بنجاح! 🚀" };
+          return { success: true, message: "تم تفعيل الذكاء الاصطناعي الحقيقي (Gemini 3.6 Flash) بنجاح! 🚀" };
         } catch (err: any) {
           throw new TRPCError({
             code: "BAD_REQUEST",
