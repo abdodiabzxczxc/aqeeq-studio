@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import MediaLibrary from "@/components/MediaLibrary";
+import AiImageGeneratorDialog from "@/components/AiImageGeneratorDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +64,9 @@ export default function AqeeqArticlesStudioPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
+  const [isAiImageOpen, setIsAiImageOpen] = useState(false);
+  const [aiImageTarget, setAiImageTarget] = useState<"edit" | "new">("edit");
+  const [aiImagePrompt, setAiImagePrompt] = useState("");
 
   // Form State for editing selected article
   const [editTitle, setEditTitle] = useState("");
@@ -522,14 +526,27 @@ export default function AqeeqArticlesStudioPage() {
                           placeholder="رابط مباشر للصورة أو رابط Google Drive..."
                           className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
                         />
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAiImageTarget("edit");
+                              setAiImagePrompt(editTitle ? `غلاف صحفي لمقال بعنوان: ${editTitle}` : "غلاف صحفي فاخر لمقال تربوي بمدارس العقيق");
+                              setIsAiImageOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black px-3 py-1.5 text-xs font-black transition shadow-md shadow-amber-500/20"
+                          >
+                            <Sparkles size={14} />
+                            <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => setIsMediaLibraryOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black px-3 py-1.5 text-xs font-black transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 text-xs font-bold transition"
                           >
                             <ImageIcon size={14} />
-                            <span>اختيار من مكتبة وسائط العقيق</span>
+                            <span>اختيار من وسائط العقيق</span>
                           </button>
                           {editCoverUrl && (
                             <button
@@ -664,20 +681,46 @@ export default function AqeeqArticlesStudioPage() {
                 value={newContent}
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="اكتب نص المقال الكامل هنا..."
-                className={`font-[Amiri,serif] text-base leading-8 rounded-2xl ${
+                className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl ${
                   dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
                 }`}
               />
             </div>
 
-            <div>
-              <Label className="text-xs font-black text-slate-300 mb-1.5 block">رابط الغلاف (اختياري)</Label>
+            <div className="rounded-2xl border border-current/10 p-3.5 space-y-2">
+              <Label className="text-xs font-black text-slate-300 block">غلاف المقال البصري (اختياري)</Label>
               <Input
                 value={newCoverUrl || ""}
                 onChange={(e) => setNewCoverUrl(e.target.value)}
-                placeholder="رابط مباشر للصورة أو من وسائط العقيق..."
+                placeholder="رابط مباشر للصورة أو رابط Google Drive..."
                 className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
               />
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiImageTarget("new");
+                    setAiImagePrompt(newTitle ? `غلاف صحفي لمقال بعنوان: ${newTitle}` : "غلاف صحفي فاخر لمقال مدرسي بمدارس العقيق");
+                    setIsAiImageOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black px-3 py-1.5 text-xs font-black transition shadow-md shadow-amber-500/20"
+                >
+                  <Sparkles size={14} />
+                  <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiImageTarget("new");
+                    setIsMediaLibraryOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 text-xs font-bold transition"
+                >
+                  <ImageIcon size={14} />
+                  <span>اختيار من وسائط العقيق</span>
+                </button>
+              </div>
             </div>
 
             <div className="pt-4 flex justify-end gap-2">
@@ -812,9 +855,29 @@ export default function AqeeqArticlesStudioPage() {
         open={isMediaLibraryOpen}
         onClose={() => setIsMediaLibraryOpen(false)}
         onSelect={(item) => {
-          setEditCoverUrl(item.url);
+          if (aiImageTarget === "new") {
+            setNewCoverUrl(item.url);
+          } else {
+            setEditCoverUrl(item.url);
+          }
           setIsMediaLibraryOpen(false);
           toast.success("تم تحديد غلاف المقال بنجاح!");
+        }}
+      />
+
+      {/* AI Image & Cover Generator Modal */}
+      <AiImageGeneratorDialog
+        open={isAiImageOpen}
+        onOpenChange={setIsAiImageOpen}
+        type="article"
+        defaultPrompt={aiImagePrompt}
+        dark={dark}
+        onSelectCover={(url) => {
+          if (aiImageTarget === "new") {
+            setNewCoverUrl(url);
+          } else {
+            setEditCoverUrl(url);
+          }
         }}
       />
     </div>

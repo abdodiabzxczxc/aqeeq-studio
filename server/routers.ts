@@ -140,6 +140,7 @@ import {
   likePodcast,
 } from "./podcastDb";
 import { askSchoolAiAssistant, getEffectiveGeminiApiKey } from "./schoolAiAssistant";
+import { generateAiVisualCover } from "./aiVisualService";
 import {
   getLiveEvent,
   listAllLiveEvents,
@@ -1526,6 +1527,21 @@ export const appRouter = router({
             message: `تعذر تفعيل المفتاح: ${err?.message || "يرجى التأكد من صلاحية المفتاح من aistudio.google.com"}`,
           });
         }
+      }),
+  }),
+
+  // ==================== 4. AI Visuals & Cover Generator ====================
+  aiVisuals: router({
+    generateCover: adminProcedure
+      .input(
+        z.object({
+          prompt: z.string().min(2, "يرجى إدخال وصف أو فكرة الصورة"),
+          type: z.enum(["article", "podcast", "general"]).optional(),
+          aspectRatio: z.enum(["16:9", "1:1", "4:3"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return generateAiVisualCover(input);
       }),
   }),
 

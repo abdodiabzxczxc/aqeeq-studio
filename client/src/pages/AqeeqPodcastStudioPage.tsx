@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import MediaLibrary from "@/components/MediaLibrary";
+import AiImageGeneratorDialog from "@/components/AiImageGeneratorDialog";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +75,9 @@ export default function AqeeqPodcastStudioPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
+  const [isAiImageOpen, setIsAiImageOpen] = useState(false);
+  const [aiImageTarget, setAiImageTarget] = useState<"editCover" | "newCover">("editCover");
+  const [aiImagePrompt, setAiImagePrompt] = useState("");
   const [mediaTarget, setMediaTarget] = useState<"editCover" | "newCover" | "editMedia" | "newMedia">("editCover");
 
   // Form State for editing
@@ -532,17 +536,30 @@ export default function AqeeqPodcastStudioPage() {
                           placeholder="رابط مباشر للغلاف أو رابط Google Drive..."
                           className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
                         />
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAiImageTarget("editCover");
+                              setAiImagePrompt(editTitle ? `غلاف إذاعي وبودكاست لحلقة بعنوان: ${editTitle}` : "غلاف احترافي لاستوديو وبودكاست مدارس العقيق");
+                              setIsAiImageOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
+                          >
+                            <Sparkles size={14} />
+                            <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => {
                               setMediaTarget("editCover");
                               setIsMediaLibraryOpen(true);
                             }}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-purple-400/30 bg-purple-400/10 text-purple-300 hover:bg-purple-400 hover:text-black px-3 py-1.5 text-xs font-black transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 text-xs font-bold transition"
                           >
                             <ImageIcon size={14} />
-                            <span>اختيار من مكتبة وسائط العقيق</span>
+                            <span>اختيار من وسائط العقيق</span>
                           </button>
                           {editCoverUrl && (
                             <button
@@ -730,25 +747,38 @@ export default function AqeeqPodcastStudioPage() {
               />
             </div>
 
-            <div>
-              <Label className="text-xs font-black text-slate-300 mb-1.5 block">غلاف الحلقة (اختياري)</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newCoverUrl || ""}
-                  onChange={(e) => setNewCoverUrl(e.target.value)}
-                  placeholder="رابط صورة الغلاف..."
-                  className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
-                />
+            <div className="rounded-2xl border border-current/10 p-3.5 space-y-2">
+              <Label className="text-xs font-black text-slate-300 block">غلاف الحلقة المرئي (Artwork Cover)</Label>
+              <Input
+                value={newCoverUrl || ""}
+                onChange={(e) => setNewCoverUrl(e.target.value)}
+                placeholder="رابط صورة الغلاف أو رابط Google Drive..."
+                className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiImageTarget("newCover");
+                    setAiImagePrompt(newTitle ? `غلاف إذاعي وبودكاست لحلقة بعنوان: ${newTitle}` : "غلاف احترافي لبودكاست مدرسي بمدارس العقيق");
+                    setIsAiImageOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
+                >
+                  <Sparkles size={14} />
+                  <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
                     setMediaTarget("newCover");
                     setIsMediaLibraryOpen(true);
                   }}
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-300 transition"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 text-xs font-bold transition"
                 >
                   <ImageIcon size={14} />
-                  <span>وسائط</span>
+                  <span>وسائط العقيق</span>
                 </button>
               </div>
             </div>
@@ -798,6 +828,22 @@ export default function AqeeqPodcastStudioPage() {
           else if (mediaTarget === "newMedia") setNewMediaUrl(item.url);
           setIsMediaLibraryOpen(false);
           toast.success("تم تحديد الملف بنجاح!");
+        }}
+      />
+
+      {/* AI Image & Cover Generator Modal */}
+      <AiImageGeneratorDialog
+        open={isAiImageOpen}
+        onOpenChange={setIsAiImageOpen}
+        type="podcast"
+        defaultPrompt={aiImagePrompt}
+        dark={dark}
+        onSelectCover={(url) => {
+          if (aiImageTarget === "newCover") {
+            setNewCoverUrl(url);
+          } else {
+            setEditCoverUrl(url);
+          }
         }}
       />
     </div>
