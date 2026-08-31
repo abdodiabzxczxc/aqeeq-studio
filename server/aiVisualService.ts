@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { getEffectiveGeminiApiKey } from "./schoolAiAssistant";
+import { getSetting, setSetting } from "./db";
 
 export type AspectRatioType = "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
 
@@ -7,7 +8,7 @@ export interface GenerateAiCoverParams {
   prompt: string;
   type?: "article" | "podcast" | "general";
   aspectRatio?: AspectRatioType;
-  model?: "flux-realism" | "flux-pro" | "flux" | "turbo";
+  model?: "dalle3" | "flux-pro" | "flux-realism" | "flux" | "turbo";
   stylePreset?:
     | "3d-luxury-gold"
     | "cinematic-stage"
@@ -17,11 +18,13 @@ export interface GenerateAiCoverParams {
     | "cinematic"
     | "editorial"
     | "studio-pro";
+  apiKey?: string; // Optional user-provided OpenAI or Replicate or Fal key
 }
 
 export async function generateAiVisualCover(params: GenerateAiCoverParams): Promise<{
   imageUrl: string;
   enhancedPrompt: string;
+  engineUsed: string;
 }> {
   const {
     prompt,
@@ -29,6 +32,7 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     aspectRatio = "16:9",
     model = "flux-realism",
     stylePreset = "3d-luxury-gold",
+    apiKey,
   } = params;
 
   let width = 1280;
@@ -51,12 +55,16 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     height = 720;
   }
 
+  // 1. Check for OpenAI API Key (from params or DB or ENV)
+  const effectiveOpenAiKey =
+    apiKey || (await getSetting("openai_api_key")) || process.env.OPENAI_API_KEY;
+
   let enhancedPrompt = "";
 
   try {
-    const apiKey = await getEffectiveGeminiApiKey();
-    if (apiKey) {
-      const ai = new GoogleGenAI({ apiKey });
+    const geminiKey = await getEffectiveGeminiApiKey();
+    if (geminiKey) {
+      const ai = new GoogleGenAI({ apiKey: geminiKey });
       const systemPrompt = `You are a world-class 3D Art Director and Master Visual Concept Designer creating high-end, award-winning magazine & podcast covers for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
 
 Goal: Turn the Arabic topic into a breathtaking, prestigious 3D conceptual cover scene (Cinema4D, Octane Render 8K, Unreal Engine 5.4 raytracing).
@@ -89,15 +97,63 @@ CRITICAL ART DIRECTION INSTRUCTIONS (ZERO DISTORTED FACES):
     enhancedPrompt = `A breathtaking 3D conceptual masterpiece for ${prompt}, majestic 24k gold and obsidian marble sculpture, floating crystal rings, volumetric warm golden lighting, Cinema4D Octane render 8K, ultra-detailed raytracing, cinematic magazine cover, no humans, no text`;
   }
 
-  // Append strict negative enhancements
-  const finalPromptWithDirectives = `${enhancedPrompt}, 8k resolution, octane render, masterpiece, dramatic lighting, luxury aesthetic`;
+  // If OpenAI API key is available, use DALL-E 3 HD!
+  if (effectiveOpenAiKey && (model === "dalle3" || effectiveOpenAiKey.startsWith("sk-"))) {
+    try {
+      const dalleSize =
+        aspectRatio === "9:16" || aspectRatio === "3:4"
+          ? "1024x1792"
+          : aspectRatio === "1:1"
+          ? "1024x1024"
+          : "1792x1024";
+
+      const openAiRes = await fetch("https://api.openai.com/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${effectiveOpenAiKey}`,
+        },
+        body: JSON.stringify({
+          model: "dall-e-3",
+          prompt: enhancedPrompt,
+          n: 1,
+          size: dalleSize,
+          quality: "hd",
+          style: "vivid",
+        }),
+      });
+
+      if (openAiRes.ok) {
+        const dalleData = await openAiRes.json();
+        const dallUrl = dalleData.data?.[0]?.url;
+        if (dallUrl) {
+          return {
+            imageUrl: dallUrl,
+            enhancedPrompt,
+            engineUsed: "OpenAI DALL-E 3 HD (Ultra Pro)",
+          };
+        }
+      } else {
+        const errJson = await openAiRes.json().catch(() => ({}));
+        console.warn("DALL-E 3 API error:", errJson);
+      }
+    } catch (err) {
+      console.warn("DALL-E 3 request error:", err);
+    }
+  }
+
+  // Fallback / Default: Advanced Flux 3D Octane Engine
+  const finalPromptWithDirectives = `${enhancedPrompt}, 8k resolution, octane render, masterpiece, dramatic volumetric lighting, luxury aesthetic, cinema4d, unreal engine 5, photorealistic`;
   const seed = Math.floor(Math.random() * 9000000) + 1000000;
   const targetModel = model === "turbo" ? "turbo" : "flux";
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPromptWithDirectives)}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+    finalPromptWithDirectives
+  )}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
 
   return {
     imageUrl,
     enhancedPrompt: finalPromptWithDirectives,
+    engineUsed: "Flux 3D Octane 8K",
   };
 }
 

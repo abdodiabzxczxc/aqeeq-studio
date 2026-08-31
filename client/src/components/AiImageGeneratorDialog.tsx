@@ -46,6 +46,7 @@ const CARD_STYLES = [
 
 const AI_ENGINES = [
   { id: "flux-realism", label: "💎 Octane 3D Ultra (أعلى دقة 8K لمجسمات الذهب والرخام)", desc: "رندر ثلاثي الأبعاد فائق الفخامة للمجسمات والأغلفة الرسمية" },
+  { id: "dalle3", label: "👑 OpenAI DALL-E 3 HD (خارق الواقعية بدقة فائقة)", desc: "محرك OpenAI الأصلي بدقة سينمائية وتفاصيل خارقة" },
   { id: "flux-pro", label: "🌟 Cinematic Raytracing (إضاءة شعاعية وسينمائية)", desc: "إضاءة مسرحية درامية عالية التباين" },
   { id: "turbo", label: "⚡ Turbo 3D Fast (توليد ثلاثي الأبعاد سريع)", desc: "توليد مفاهيمي ثلاثي الأبعاد سريع" },
 ] as const;
@@ -90,6 +91,7 @@ export default function AiImageGeneratorDialog({
   const [aspectRatio, setAspectRatio] = useState<AspectRatioChoice>("16:9");
   const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("flux-realism");
   const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("3d-luxury-gold");
+  const [customApiKey, setCustomApiKey] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -209,6 +211,7 @@ export default function AiImageGeneratorDialog({
       aspectRatio,
       model: selectedEngine,
       stylePreset: selectedStyle,
+      apiKey: customApiKey.trim() || undefined,
     });
   };
 
@@ -623,6 +626,24 @@ export default function AiImageGeneratorDialog({
                     ))}
                   </select>
                 </div>
+
+                {selectedEngine === "dalle3" && (
+                  <div className="space-y-1.5 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30">
+                    <Label className="text-[11px] font-black text-amber-300 block">
+                      🔑 مفتاح OpenAI API (لتوليد DALL-E 3 HD الخارق)
+                    </Label>
+                    <Input
+                      type="password"
+                      value={customApiKey}
+                      onChange={(e) => setCustomApiKey(e.target.value)}
+                      placeholder="sk-proj-..."
+                      className="text-xs h-9 rounded-xl bg-black/60 border-amber-500/40 text-white font-mono"
+                    />
+                    <p className="text-[10px] text-slate-400">
+                      يستخدم مفتاح OpenAI الخاص بك للاتصال المباشر بـ DALL-E 3 بدقة سينمائية وتفاصيل خارقة.
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <Label className="text-xs font-black text-slate-300 mb-1.5 block">النمط البصري الفني</Label>
