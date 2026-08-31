@@ -11,8 +11,11 @@ import {
   Palette,
   Camera,
   Search,
-  Sliders,
+  Globe,
+  RefreshCw,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -26,7 +29,7 @@ interface AiImageGeneratorDialogProps {
   dark?: boolean;
 }
 
-// 🏛️ موسوعة الصور الفوتوغرافية الحقيقية فائقة الجودة 4K لمدارس العقيق
+// 🏛️ كتالوج الأغلفة السريعة 4K المعتمدة
 const MASTER_PHOTO_CATALOG = [
   // 🤖 1. الروبوت والذكاء الاصطناعي وهندسة المستقبل
   {
@@ -228,7 +231,7 @@ const MASTER_PHOTO_CATALOG = [
   {
     title: "شاطئ البحر الأحمر ومنتجع الدلافين بينبع",
     category: "رحلات واستكشاف",
-    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85",
+    url: "https://images.unsplash.com/photo-1507525428033-b723cf961d3e?auto=format&fit=crop&w=1200&q=85",
   },
 ];
 
@@ -262,9 +265,16 @@ export default function AiImageGeneratorDialog({
   defaultPrompt = "",
   dark = true,
 }: AiImageGeneratorDialogProps) {
-  const [activeTab, setActiveTab] = useState<"gallery" | "cardDesigner" | "aiPrompt">("gallery");
+  const [activeTab, setActiveTab] = useState<"globalSearch" | "gallery" | "aiPrompt" | "cardDesigner">("globalSearch");
+  
+  // Live Global Search State
+  const [globalQuery, setGlobalQuery] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
+  const [globalPage, setGlobalPage] = useState(1);
+  const [activeSearchTerm, setActiveSearchTerm] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
+
+  // Quick Catalog State
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [catalogSearch, setCatalogSearch] = useState("");
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
 
   // Card Designer state
@@ -282,9 +292,28 @@ export default function AiImageGeneratorDialog({
   useEffect(() => {
     if (open && defaultPrompt) {
       setPrompt(defaultPrompt);
+      setGlobalQuery(defaultPrompt);
+      setActiveSearchTerm(defaultPrompt);
       setCardTitle(defaultPrompt.replace(/^غلاف صحفي لمقال بعنوان:\s*/, "").replace(/^غلاف إذاعي وبودكاست لحلقة بعنوان:\s*/, ""));
     }
   }, [open, defaultPrompt]);
+
+  // Live Real Global Photo Search Query
+  const {
+    data: globalSearchData,
+    isLoading: isGlobalSearching,
+    isFetching: isGlobalFetching,
+    refetch: refetchGlobalSearch,
+  } = trpc.aiVisuals.searchRealPhotos.useQuery(
+    {
+      query: activeSearchTerm || (type === "podcast" ? "podcast studio microphone" : "education school"),
+      page: globalPage,
+      pageSize: 30,
+    },
+    {
+      enabled: Boolean(open),
+    }
+  );
 
   const categories = [
     { id: "all", label: `✨ كل الصور (${MASTER_PHOTO_CATALOG.length})` },
@@ -299,10 +328,10 @@ export default function AiImageGeneratorDialog({
     { id: "رحلات واستكشاف", label: "🚀 رحلات واستكشاف" },
   ];
 
-  const filteredPhotos = MASTER_PHOTO_CATALOG.filter((p) => {
+  const filteredCatalogPhotos = MASTER_PHOTO_CATALOG.filter((p) => {
     if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    if (catalogSearch.trim()) {
+      const q = catalogSearch.toLowerCase();
       return p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
     }
     return true;
@@ -338,12 +367,36 @@ export default function AiImageGeneratorDialog({
     toast.success("تم اعتماد الغلاف الرسمي بنجاح! 🎨");
   };
 
+  const handleRunGlobalSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!globalQuery.trim()) {
+      toast.error("يرجى كتابة كلمة البحث");
+      return;
+    }
+    setGlobalPage(1);
+    setActiveSearchTerm(globalQuery.trim());
+  };
+
+  const quickSearchPills = [
+    "🤖 روبوت وذكاء اصطناعي",
+    "🎙️ استوديو بودكاست وميكروفون",
+    "🏆 كؤوس وتكريم المتفوقين",
+    "🎓 حفل تخرج وقبعات",
+    "🔬 مختبر كيمياء ومجاهر",
+    "📚 مكتبة كبرى وقراءة",
+    "🏊‍♂️ مسبح أولمبي وسباحة",
+    "🥋 تايكوندو وفنون قتالية",
+    "⚽ ملعب كرة قدم معشب",
+    "🇸🇦 العلم السعودي وتراث",
+    "🚀 جبال العلا التاريخية",
+  ];
+
   const activeCardStyle = CARD_STYLES[cardStyleIndex];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`max-w-4xl max-h-[92vh] overflow-y-auto font-[Tajawal,sans-serif] ${
+        className={`max-w-5xl max-h-[92vh] overflow-y-auto font-[Tajawal,sans-serif] ${
           dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-slate-900"
         }`}
         dir="rtl"
@@ -352,17 +405,17 @@ export default function AiImageGeneratorDialog({
           <DialogTitle className="flex items-center justify-between gap-3 text-base font-black border-b border-white/10 pb-3">
             <div className="flex items-center gap-2.5">
               <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black shadow-lg">
-                <Camera size={18} />
+                <Globe size={20} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span>استوديو الأغلفة البصرية الفاخرة</span>
-                  <span className="rounded-full bg-[#f8ca14]/20 border border-[#f8ca14]/40 px-2 py-0.5 text-[10px] font-black text-[#f8ca14]">
-                    PRO 4K
+                  <span>المحرك الشامل للصور والأغلفة فائقة الجودة</span>
+                  <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black text-emerald-400">
+                    +700M 4K PHOTOS
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 font-normal mt-0.5">
-                  مكتبة فوتوغرافية حقيقية متكاملة لمدارس العقيق + محرك توليد فائق الواقعية (Flux Realism 8K)
+                  بحث مباشر في ملايين الصور الفوتوغرافية الحقيقية بدقة 4K + محرك الذكاء الاصطناعي (Flux Realism Pro 8K)
                 </p>
               </div>
             </div>
@@ -373,15 +426,15 @@ export default function AiImageGeneratorDialog({
         <div className="flex flex-wrap items-center gap-2 pt-1 border-b border-white/10 pb-3">
           <button
             type="button"
-            onClick={() => setActiveTab("gallery")}
+            onClick={() => setActiveTab("globalSearch")}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition ${
-              activeTab === "gallery"
+              activeTab === "globalSearch"
                 ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
                 : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
             }`}
           >
-            <Camera size={15} />
-            <span>🏛️ مكتبة الصور الفوتوغرافية الحقيقية 4K ({MASTER_PHOTO_CATALOG.length})</span>
+            <Globe size={15} />
+            <span>🌐 البحث الحي في ملايين الصور الحقيقية (4K Search)</span>
           </button>
 
           <button
@@ -394,7 +447,20 @@ export default function AiImageGeneratorDialog({
             }`}
           >
             <Sparkles size={15} />
-            <span>✨ محرك التوليد الذكي فائق الواقعية (Flux Realism 8K)</span>
+            <span>✨ توليد ذكي فائق الواقعية (Flux Realism 8K)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("gallery")}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition ${
+              activeTab === "gallery"
+                ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
+                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+            }`}
+          >
+            <Camera size={15} />
+            <span>🏛️ الأغلفة السريعة المعتمدة ({MASTER_PHOTO_CATALOG.length})</span>
           </button>
 
           <button
@@ -407,73 +473,129 @@ export default function AiImageGeneratorDialog({
             }`}
           >
             <Palette size={15} />
-            <span>🎨 مصمم بطاقة الغلاف الملكي بالعنوان</span>
+            <span>🎨 مصمم بطاقة الغلاف بالعنوان</span>
           </button>
         </div>
 
-        {/* TAB 1: Real 4K Photography Gallery */}
-        {activeTab === "gallery" && (
+        {/* TAB 1: Global Live Search Engine (Millions of 4K Photos) */}
+        {activeTab === "globalSearch" && (
           <div className="space-y-4 pt-2">
-            {/* Search and Category Filters */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            {/* Search Input Bar */}
+            <form onSubmit={handleRunGlobalSearch} className="flex gap-2">
               <div className="relative flex-1">
-                <Search size={14} className="absolute right-3 top-3 text-slate-400" />
+                <Search size={16} className="absolute right-3.5 top-3.5 text-slate-400" />
                 <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث بالكلمات (مثال: روبوت، إذاعة، تكريم، مسبح، مختبر، العلا، قراءة، كيمياء)..."
-                  className="pr-9 text-xs rounded-xl bg-white/5 border-white/10 text-white"
+                  value={globalQuery}
+                  onChange={(e) => setGlobalQuery(e.target.value)}
+                  placeholder="ابحث عن أي موضوع بالعربية أو الإنجليزية (مثلاً: روبوت فيرست ليغو، مسبح أولمبي، ميكروفون إذاعة، كأس التفوق، رحلة العلا)..."
+                  className="pr-10 h-11 text-xs rounded-xl bg-white/5 border-white/10 text-white font-bold"
                 />
               </div>
+              <button
+                type="submit"
+                disabled={isGlobalSearching || isGlobalFetching}
+                className="inline-flex items-center gap-2 px-6 h-11 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs transition shadow-md shadow-[#f8ca14]/20"
+              >
+                {isGlobalSearching || isGlobalFetching ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Search size={16} />
+                )}
+                <span>بحث 4K</span>
+              </button>
+            </form>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                      selectedCategory === cat.id
-                        ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
-                        : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Photo Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[50vh] overflow-y-auto pr-1">
-              {filteredPhotos.map((photo, idx) => (
-                <div
+            {/* Quick Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+              {quickSearchPills.map((pill, idx) => (
+                <button
                   key={idx}
-                  onClick={() => setSelectedPhotoUrl(photo.url)}
-                  className={`group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border transition-all ${
-                    selectedPhotoUrl === photo.url
-                      ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
-                      : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
-                  }`}
+                  type="button"
+                  onClick={() => {
+                    const clean = pill.replace(/^[^\s]+\s*/, "");
+                    setGlobalQuery(clean);
+                    setActiveSearchTerm(clean);
+                    setGlobalPage(1);
+                  }}
+                  className="whitespace-nowrap px-3 py-1 rounded-lg text-[11px] font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
                 >
-                  <img
-                    src={photo.url}
-                    alt={photo.title}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-2.5 flex flex-col justify-end">
-                    <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
-                    <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
-                  </div>
-                  {selectedPhotoUrl === photo.url && (
-                    <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
-                      <Check size={14} className="stroke-[3]" />
-                    </div>
-                  )}
-                </div>
+                  {pill}
+                </button>
               ))}
             </div>
+
+            {/* Results Grid */}
+            {isGlobalSearching ? (
+              <div className="grid place-items-center py-16 text-slate-400">
+                <Loader2 size={36} className="animate-spin text-[#f8ca14] mb-3" />
+                <p className="text-xs font-bold">جاري البحث المباشر في ملايين الصور الفوتوغرافية بدقة 4K...</p>
+              </div>
+            ) : globalSearchData?.results && globalSearchData.results.length > 0 ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span>تم العثور على صور حقيقية فائقة الجودة لمصطلح: <strong className="text-[#f8ca14]">"{activeSearchTerm}"</strong></span>
+                  <span>الصفحة {globalPage}</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[50vh] overflow-y-auto pr-1">
+                  {globalSearchData.results.map((photo) => (
+                    <div
+                      key={photo.id}
+                      onClick={() => setSelectedPhotoUrl(photo.url)}
+                      className={`group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border transition-all ${
+                        selectedPhotoUrl === photo.url
+                          ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
+                          : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <img
+                        src={photo.thumbnail || photo.url}
+                        alt={photo.title}
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-2 flex flex-col justify-end">
+                        <span className="text-[10px] font-bold text-white line-clamp-1">{photo.title}</span>
+                      </div>
+                      {selectedPhotoUrl === photo.url && (
+                        <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
+                          <Check size={14} className="stroke-[3]" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setGlobalPage((p) => Math.max(1, p - 1))}
+                    disabled={globalPage <= 1}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 disabled:opacity-30 text-xs font-bold"
+                  >
+                    <ChevronRight size={15} />
+                    <span>السابق</span>
+                  </button>
+
+                  <span className="text-xs text-slate-400 font-bold">صفحة {globalPage}</span>
+
+                  <button
+                    type="button"
+                    onClick={() => setGlobalPage((p) => p + 1)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold hover:bg-white/10"
+                  >
+                    <span>المزيد من النتائج</span>
+                    <ChevronLeft size={15} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="py-12 text-center text-slate-400 space-y-2">
+                <Search size={32} className="mx-auto text-slate-500" />
+                <p className="text-xs font-bold">اكتب كلمة البحث واضغط Enter لاستعراض آلاف الصور الفوتوغرافية الحقيقية</p>
+              </div>
+            )}
 
             {/* Apply Selected Photo Bar */}
             {selectedPhotoUrl && (
@@ -481,8 +603,8 @@ export default function AiImageGeneratorDialog({
                 <div className="flex items-center gap-3">
                   <img src={selectedPhotoUrl} alt="" className="h-12 w-20 rounded-xl object-cover border border-white/20" />
                   <div>
-                    <p className="text-xs font-black text-emerald-300">تم تحديد الصورة الفوتوغرافية الحقيقية بنجاح</p>
-                    <p className="text-[11px] text-slate-400">جودة 4K فائقة الوضوح معتمدة لمدارس العقيق</p>
+                    <p className="text-xs font-black text-emerald-300">تم تحديد الصورة الفوتوغرافية الحقيقية بدقة 4K</p>
+                    <p className="text-[11px] text-slate-400">جاهزة للاعتماد كغلاف رسمي فائق النقاء</p>
                   </div>
                 </div>
 
@@ -637,7 +759,95 @@ export default function AiImageGeneratorDialog({
           </div>
         )}
 
-        {/* TAB 3: Official Branded Card Designer */}
+        {/* TAB 3: Quick Catalog */}
+        {activeTab === "gallery" && (
+          <div className="space-y-4 pt-2">
+            {/* Search and Category Filters */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search size={14} className="absolute right-3 top-3 text-slate-400" />
+                <Input
+                  value={catalogSearch}
+                  onChange={(e) => setCatalogSearch(e.target.value)}
+                  placeholder="ابحث في الكتالوج السريع..."
+                  className="pr-9 text-xs rounded-xl bg-white/5 border-white/10 text-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+                      selectedCategory === cat.id
+                        ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
+                        : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Photo Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[50vh] overflow-y-auto pr-1">
+              {filteredCatalogPhotos.map((photo, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedPhotoUrl(photo.url)}
+                  className={`group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border transition-all ${
+                    selectedPhotoUrl === photo.url
+                      ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
+                      : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
+                  }`}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.title}
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-2.5 flex flex-col justify-end">
+                    <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
+                    <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
+                  </div>
+                  {selectedPhotoUrl === photo.url && (
+                    <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
+                      <Check size={14} className="stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Apply Selected Photo Bar */}
+            {selectedPhotoUrl && (
+              <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-3 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <img src={selectedPhotoUrl} alt="" className="h-12 w-20 rounded-xl object-cover border border-white/20" />
+                  <div>
+                    <p className="text-xs font-black text-emerald-300">تم تحديد الصورة الفوتوغرافية الحقيقية</p>
+                    <p className="text-[11px] text-slate-400">جودة 4K معتمدة لمدارس العقيق</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleApply(selectedPhotoUrl)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black px-5 py-2 text-xs transition shadow-lg shadow-emerald-500/20"
+                >
+                  <Check size={16} />
+                  <span>اعتماد كغلاف رسمي الآن</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: Official Branded Card Designer */}
         {activeTab === "cardDesigner" && (
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

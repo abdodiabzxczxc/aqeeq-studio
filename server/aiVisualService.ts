@@ -76,3 +76,83 @@ Strict Quality & Art Direction Rules:
     enhancedPrompt,
   };
 }
+
+export interface SearchPhotoResult {
+  id: string;
+  title: string;
+  url: string;
+  thumbnail: string;
+  source: string;
+  aspectRatio?: string;
+}
+
+export async function searchRealGlobalPhotos(params: {
+  query: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ results: SearchPhotoResult[]; total: number; queryUsed: string }> {
+  const { query, page = 1, pageSize = 30 } = params;
+
+  let englishKeywords = query.trim();
+
+  // If query contains Arabic characters, translate to precise photography keywords using Gemini
+  if (/[\u0600-\u06FF]/.test(query)) {
+    try {
+      const apiKey = await getEffectiveGeminiApiKey();
+      if (apiKey) {
+        const ai = new GoogleGenAI({ apiKey });
+        const res = await ai.models.generateContent({
+          model: "gemini-3.5-flash-lite",
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `Translate and optimize this Arabic image search query into 2-3 precise English keywords for a high-quality global photo library. Return ONLY the English keywords separated by single spaces, no punctuation:\nSearch: "${query}"`,
+                },
+              ],
+            },
+          ],
+          config: { temperature: 0.2, maxOutputTokens: 30 },
+        });
+        const translated = res.text?.trim().replace(/["'\n\r]/g, "");
+        if (translated) englishKeywords = translated;
+      }
+    } catch (e) {}
+  }
+
+  try {
+    const url = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(
+      englishKeywords
+    )}&page=${page}&page_size=${pageSize}`;
+    const response = await fetch(url, {
+      headers: { "User-Agent": "AqeeqStudio/1.0" },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const results: SearchPhotoResult[] = (data.results || []).map((item: any) => ({
+        id: String(item.id || Math.random()),
+        title: item.title || query,
+        url: item.url,
+        thumbnail: item.thumbnail || item.url,
+        source: item.source || "openverse",
+        aspectRatio: item.width && item.height ? `${item.width}:${item.height}` : undefined,
+      }));
+
+      return {
+        results,
+        total: data.result_count || results.length,
+        queryUsed: englishKeywords,
+      };
+    }
+  } catch (err) {
+    console.warn("Global photo search error:", err);
+  }
+
+  return {
+    results: [],
+    total: 0,
+    queryUsed: englishKeywords,
+  };
+}

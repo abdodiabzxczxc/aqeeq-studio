@@ -140,7 +140,7 @@ import {
   likePodcast,
 } from "./podcastDb";
 import { askSchoolAiAssistant, getEffectiveGeminiApiKey } from "./schoolAiAssistant";
-import { generateAiVisualCover } from "./aiVisualService";
+import { generateAiVisualCover, searchRealGlobalPhotos } from "./aiVisualService";
 import {
   getLiveEvent,
   listAllLiveEvents,
@@ -1544,6 +1544,18 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         return generateAiVisualCover(input);
+      }),
+
+    searchRealPhotos: adminProcedure
+      .input(
+        z.object({
+          query: z.string().min(1, "يرجى إدخال كلمة البحث"),
+          page: z.number().optional(),
+          pageSize: z.number().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        return searchRealGlobalPhotos(input);
       }),
   }),
 
