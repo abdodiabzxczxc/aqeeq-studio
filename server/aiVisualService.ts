@@ -31,14 +31,15 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
       const ai = new GoogleGenAI({ apiKey });
       const systemPrompt = `You are a world-class art director and visual concept artist for «Al-Aqeeq Educational Group» in Medina, Saudi Arabia.
 Transform the following Arabic topic or description into an ultra-detailed, photorealistic English visual prompt for Flux / Midjourney:
-User Description: "${prompt}"
-Context Type: "${type === "podcast" ? "Podcast cover art / modern broadcasting studio" : "School article cover / prestigious educational photography"}"
+User Topic / Description: "${prompt}"
+Context Type: "${type === "podcast" ? "Podcast cover art / modern broadcasting audio-visual studio" : "School article cover / prestigious educational photography"}"
 
 Key Artistic Guidelines:
-- Style: Highly cinematic, photorealistic 8k, modern Saudi cultural elegance, luxurious golden lighting, shallow depth of field.
-- Setting: Contemporary high-end Saudi school, smart AI labs, podcast studios, Medina architectural subtle aesthetics, or inspiring educational scenes.
-- Negative Elements: NO distorted faces, NO ugly artifacts, NO text or watermark overlays.
-- Return ONLY the final English prompt string, without any introductory or concluding comments.`;
+1. TOPIC RELEVANCE: The generated scene MUST strictly and vividly reflect the specific topic and subject matter described above (e.g. if it is about robotics, show high-tech robotics in a modern lab; if it is about sports/taekwondo/swimming, show state-of-the-art sports facilities; if it is about national day or trips like Al-Ula, show that exact authentic environment; if it is about reading/library, show a luxurious school library).
+2. BRAND & CULTURAL ELEGANCE: Infuse modern Saudi cultural aesthetics, contemporary high-end architecture in Medina, warm golden lighting, and premium educational ambiance.
+3. QUALITY: Highly cinematic, photorealistic 8k, shallow depth of field, award-winning editorial magazine cover aesthetics.
+4. NEGATIVE CONSTRAINTS: NO distorted faces, NO extra limbs, NO blurry artifacts, NO text or watermarks overlaid on the image.
+5. Return ONLY the final English prompt string without any quotes or explanations.`;
 
       const res = await ai.models.generateContent({
         model: "gemini-3.5-flash-lite",

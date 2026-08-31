@@ -48,8 +48,10 @@ export default function AiImageGeneratorDialog({
   const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
-    if (open && defaultPrompt && !prompt) {
-      setPrompt(defaultPrompt);
+    if (open) {
+      if (defaultPrompt) {
+        setPrompt(defaultPrompt);
+      }
     }
   }, [open, defaultPrompt]);
 
@@ -57,7 +59,7 @@ export default function AiImageGeneratorDialog({
     onSuccess: (data) => {
       setImageLoading(true);
       setGeneratedUrl(data.imageUrl);
-      toast.success("تم توليد المشهد البصري بنجاح بالذكاء الاصطناعي! ✨");
+      toast.success("تم توليد المشهد البصري المخصص بنجاح بالذكاء الاصطناعي! ✨");
     },
     onError: (err) => {
       toast.error(err.message || "تعذر توليد الصورة");
@@ -104,14 +106,34 @@ export default function AiImageGeneratorDialog({
               <span>توليد وتصميم غلاف بالذكاء الاصطناعي (Gemini Vision + Flux)</span>
               <p className="text-xs text-slate-400 font-normal mt-0.5">
                 {type === "podcast"
-                  ? "توليد هوية بصرية مخصصة لحلقة البودكاست بجودة استوديو احترافية"
-                  : "توليد صورة غلاف صحفية فاخرة تعكس موضوع المقال وهوية مدارس العقيق"}
+                  ? "توليد هوية بصرية مخصصة لحلقة البودكاست مستوحاة من محاورها"
+                  : "توليد صورة غلاف صحفية فاخرة تعكس موضوع المقال وهوية مدارس العقيق بدقة"}
               </p>
             </div>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
+          {defaultPrompt && (
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-amber-300 font-bold">
+                <Sparkles size={14} className="shrink-0 text-[#f8ca14]" />
+                <span className="line-clamp-1">موضوع المحتوى المحدد: {defaultPrompt}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPrompt(defaultPrompt);
+                  handleGenerate(defaultPrompt);
+                }}
+                disabled={generateMutation.isPending}
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black px-3 py-1 text-[11px] transition shadow-sm"
+              >
+                <span>توليد فوري لهذا الموضوع</span>
+              </button>
+            </div>
+          )}
+
           {/* Prompt Input */}
           <div>
             <Label className="text-xs font-black text-slate-300">وصف المشهد أو فكرة الغلاف *</Label>
