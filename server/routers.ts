@@ -129,6 +129,7 @@ import {
   deleteArticle,
   likeArticle,
   aiPolishArticle,
+  aiDraftArticle,
 } from "./articlesDb";
 import {
   getPodcasts,
@@ -1356,6 +1357,17 @@ export const appRouter = router({
       .input(z.object({ title: z.string(), content: z.string() }))
       .mutation(async ({ input }) => {
         return aiPolishArticle(input.title, input.content);
+      }),
+
+    aiDraft: adminProcedure
+      .input(
+        z.object({
+          topic: z.string().min(2, "يرجى كتابة فكرة أو موضوع المقال"),
+          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return aiDraftArticle(input);
       }),
 
     delete: adminProcedure

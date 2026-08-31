@@ -256,8 +256,8 @@ export async function aiPolishArticle(title: string, content: string): Promise<{
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const prompt = `أنت خبير لغوي وتربوي متميز في مدارس العقيق.
-قم بالتدقيق اللغوي والإملائي وتحسين الصياغة للمقال المدرسي التالي ليصبح أسلوبه راقياً ومشوقاً وصحيحاً لغوياً:
+    const prompt = `أنت رئيس التحرير والخبير اللغوي والصحفي الرسمي لـ «مدارس العقيق الأهلية والدولية بالمدينة المنورة».
+قم بالتدقيق اللغوي والإملائي وإعادة الصياغة الصحفية الراقية للمقال المدرسي التالي مع الحفاظ على روح الفكرة ومصداقيتها وهويتها العقيقية:
 
 العنوان الأصلي: "${title}"
 نص المقال:
@@ -265,9 +265,9 @@ export async function aiPolishArticle(title: string, content: string): Promise<{
 
 أعد النتيجة بصيغة JSON فقط بهذا الشكل الدقيق:
 {
-  "polishedTitle": "العنوان المحسّن والمصقول",
-  "polishedContent": "نص المقال المصحح لغوياً والمنسق بالفقرات",
-  "polishedExcerpt": "موجز جذاب للمقال في سطرين (حد أقصى 150 حرف)"
+  "polishedTitle": "العنوان الصحفي المحسّن والمصقول",
+  "polishedContent": "نص المقال المصحح لغوياً والمنسق بفقرات احترافية",
+  "polishedExcerpt": "موجز صحفي جذاب للمقال في سطرين (حد أقصى 150 حرف)"
 }`;
 
     const models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
@@ -276,7 +276,7 @@ export async function aiPolishArticle(title: string, content: string): Promise<{
         const res = await ai.models.generateContent({
           model,
           contents: [{ role: "user", parts: [{ text: prompt }] }],
-          config: { responseMimeType: "application/json" },
+          config: { responseMimeType: "application/json", temperature: 0.25 },
         });
 
         const text = res.text?.trim();
@@ -298,5 +298,78 @@ export async function aiPolishArticle(title: string, content: string): Promise<{
     polishedTitle: title,
     polishedContent: content,
     polishedExcerpt: content.slice(0, 160).replace(/[\r\n]+/g, " ") + "...",
+  };
+}
+
+export async function aiDraftArticle(params: {
+  topic: string;
+  category?: "تربوي" | "إبداعات الطلاب" | "إرشاد أسري" | "أنشطة وفعاليات" | "تجارب ملهمة";
+  authorRole?: string;
+}): Promise<{ title: string; excerpt: string; content: string; category: string }> {
+  try {
+    const { getEffectiveGeminiApiKey } = await import("./schoolAiAssistant");
+    const apiKey = await getEffectiveGeminiApiKey();
+    if (!apiKey) {
+      return {
+        title: `مقال صحفي: ${params.topic}`,
+        excerpt: `مقال تربوي يسلّط الضوء على ${params.topic} في مدارس العقيق الأهلية والدولية بالمدينة المنورة.`,
+        content: `في إطار رسالة مدارس العقيق الأهلية والدولية نحو إلهام الأجيال وتنمية القدرات، يسرنا استعراض موضوع ${params.topic} وتأثيره الإيجابي على رحلة الطلاب التعليمية.`,
+        category: params.category || "تربوي",
+      };
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `أنت رئيس التحرير والكاتب الصحفي الرسمي لـ «مدارس العقيق الأهلية والدولية بالمدينة المنورة» و«استوديو العقيق».
+المطلوب منك كتابة مقال صحفي وتربوي متكامل، مشوق، ورصين حول الفكرة أو الحدث التالي:
+الموضوع: "${params.topic}"
+التصنيف المطلوب: "${params.category || 'تربوي'}"
+
+إرشادات الصياغة الصحفية الذكية:
+1. الارتكاز على هوية مدارس العقيق وقيمها وأركانها الأربعة (نُلهم الأجيال، نُنمّي القدرات، نحتفي بالتميّز، نصنع الأثر).
+2. الالتزام بالدقة والمصداقية واللغة العربية الفصحى الرصينة.
+3. التنسيق بفقرات متماسكة مع مقدمة جذابة، محاور واضحة، وخاتمة ملهمة.
+4. إبراز البيئة التعليمية المتطورة، التميز الأكاديمي، والمراكز المعتمدة بمدارس العقيق.
+
+أعد النتيجة بصيغة JSON فقط بهذا الشكل الدقيق:
+{
+  "title": "عنوان صحفي جذاب ومبتكر",
+  "excerpt": "موجز صحفي في حدود 150 حرف يلخص جوهر المقال",
+  "content": "نص المقال الكامل منسقاً بفقرات ومقدمة وخاتمة ملهمة",
+  "category": "${params.category || 'تربوي'}"
+}`;
+
+    const models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+    for (const model of models) {
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          config: { 
+            responseMimeType: "application/json",
+            temperature: 0.3,
+          },
+        });
+
+        const text = res.text?.trim();
+        if (text) {
+          const parsed = JSON.parse(text);
+          return {
+            title: parsed.title || `مقال صحفي: ${params.topic}`,
+            excerpt: parsed.excerpt || `مقال عن ${params.topic}`,
+            content: parsed.content || "",
+            category: parsed.category || params.category || "تربوي",
+          };
+        }
+      } catch (err) {}
+    }
+  } catch (err) {
+    console.warn("AI article draft error:", err);
+  }
+
+  return {
+    title: `مقال صحفي: ${params.topic}`,
+    excerpt: `مقال صحفي يتناول ${params.topic} في مدارس العقيق.`,
+    content: `مقال صحفي حول ${params.topic}`,
+    category: params.category || "تربوي",
   };
 }

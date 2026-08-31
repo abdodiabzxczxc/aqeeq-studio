@@ -144,6 +144,23 @@ export default function AqeeqArticlesStudioPage() {
     onError: (err) => toast.error(err.message || "تعذر الحذف"),
   });
 
+  const [isAiWriterOpen, setIsAiWriterOpen] = useState(false);
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiCategory, setAiCategory] = useState<(typeof CATEGORIES)[number]>("تربوي");
+
+  const aiDraftMutation = trpc.articles.aiDraft.useMutation({
+    onSuccess: (data) => {
+      setNewTitle(data.title);
+      setNewExcerpt(data.excerpt);
+      setNewContent(data.content);
+      setNewCategory(data.category as any);
+      setIsAiWriterOpen(false);
+      setIsCreateOpen(true);
+      toast.success("تمت صياغة المقال الصحفي بالذكاء الاصطناعي بنجاح! ✨");
+    },
+    onError: (err) => toast.error(err.message || "تعذر توليد المقال"),
+  });
+
   const aiPolishMutation = trpc.articles.aiPolish.useMutation({
     onSuccess: (data) => {
       setEditTitle(data.polishedTitle);
@@ -204,6 +221,14 @@ export default function AqeeqArticlesStudioPage() {
 
           <div className="flex items-center gap-2.5">
             <button
+              onClick={() => setIsAiWriterOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-[#f8ca14] hover:opacity-90 px-4 py-2 text-xs font-black text-black shadow-lg shadow-amber-500/20 transition"
+            >
+              <Sparkles size={15} />
+              <span>استوديو الصياغة الصحفية الذكية (AI Writer)</span>
+            </button>
+
+            <button
               onClick={() => navigate("/articles")}
               className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
                 dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300" : "border-black/10 bg-slate-100 hover:bg-slate-200 text-slate-700"
@@ -215,10 +240,10 @@ export default function AqeeqArticlesStudioPage() {
 
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 px-4 py-2 text-xs font-black text-black shadow-lg shadow-[#f8ca14]/20 transition"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-xs font-black text-white transition"
             >
               <Plus size={16} />
-              <span>كتابة مقال رسمي جديد</span>
+              <span>كتابة مقال يدوي</span>
             </button>
           </div>
         </div>
@@ -682,6 +707,100 @@ export default function AqeeqArticlesStudioPage() {
               >
                 <Check size={16} />
                 <span>{createMutation.isPending ? "جاري النشر..." : "نشر المقال فوراً"}</span>
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Journalist / Writer Dialog */}
+      <Dialog open={isAiWriterOpen} onOpenChange={setIsAiWriterOpen}>
+        <DialogContent className={`max-w-xl font-[Tajawal,sans-serif] ${dark ? "bg-[#121212] border-white/10 text-white" : "bg-white border-black/10 text-slate-900"}`}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-black">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black">
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <span>استوديو الصياغة الصحفية الذكية (AI Journalist)</span>
+                <p className="text-xs text-slate-400 font-normal mt-0.5">
+                  اكتب فكرة المقال أو الحدث المدرسي، وسيقوم الذكاء الاصطناعي بصياغة مقال صحفي احترافي متكامل بالهوية العقيقية
+                </p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div>
+              <Label className="text-xs font-black">موضوع أو فكرة المقال *</Label>
+              <Textarea
+                rows={3}
+                value={aiTopic}
+                onChange={(e) => setAiTopic(e.target.value)}
+                placeholder="مثال: فوز طلاب مدارس العقيق بالمركز الأول في بطولة الروبوت FIRST LEGO League، أو زيارة المعرض العلمي، أو اليوم الوطني السعودي..."
+                className={`text-xs mt-1.5 rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs font-black">التصنيف الصحفي</Label>
+              <select
+                value={aiCategory}
+                onChange={(e) => setAiCategory(e.target.value as any)}
+                className={`w-full text-xs mt-1.5 rounded-xl border p-2.5 outline-none font-bold ${
+                  dark ? "bg-[#181818] border-white/10 text-white" : "bg-slate-50 border-black/10 text-slate-800"
+                }`}
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3.5 space-y-1 text-[11px] text-amber-300">
+              <div className="font-black flex items-center gap-1.5">
+                <Wand2 size={13} />
+                <span>مميزات الصياغة الصحفية الذكية:</span>
+              </div>
+              <ul className="list-disc list-inside space-y-0.5 text-slate-400">
+                <li>صياغة لغوية فصيحة ورصينة ترتكز على أركان العقيق الأربعة.</li>
+                <li>توليد عنوان صحفي جذاب وموجز تلخيصي منسق.</li>
+                <li>إمكانية المراجعة والتعديل اليدوي قبل النشر المباشر.</li>
+              </ul>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setIsAiWriterOpen(false)}>
+                إلغاء
+              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!aiTopic.trim()) {
+                    toast.error("يرجى كتابة فكرة أو موضوع المقال");
+                    return;
+                  }
+                  aiDraftMutation.mutate({
+                    topic: aiTopic,
+                    category: aiCategory,
+                  });
+                }}
+                disabled={aiDraftMutation.isPending}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black font-black px-6 py-2.5 text-xs transition shadow-lg shadow-amber-500/20"
+              >
+                {aiDraftMutation.isPending ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" />
+                    <span>جاري التحرير والصياغة الصحفية...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={15} />
+                    <span>توليد وصياغة المقال فوراً</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
