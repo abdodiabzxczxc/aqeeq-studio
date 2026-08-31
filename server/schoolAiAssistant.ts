@@ -142,8 +142,14 @@ const SYSTEM_INSTRUCTION_CORPUS = `
      • **البوابة الرسمية**: https://aqeeq.edu.sa
      • **حساب منصة X (تويتر)**: [@alaqeeq_school](https://x.com/alaqeeq_school)
      • **حساب إنستغرام**: [@alaqeeq_schools](https://www.instagram.com/alaqeeq_schools/)
-     • **قناة يوتيوب الرسمية**: [@alaqeeqschools](https://www.youtube.com/@alaqeeqschools)
      • **أرقام الواتساب للتسجيل والأنشطة**: 0558559707 / 0568742104
+
+   - **القيادة العليا ومجلس الإدارة (Leadership & Executive Management)**:
+     • **أ. محمد شربيني**: رئيس مجلس الإدارة (Chairman of the Board of Directors).
+     • **أ. مؤيد شربيني**: نائب رئيس مجلس الإدارة (Vice Chairman of the Board of Directors).
+     • **أ. أحمد شربيني**: المدير التنفيذي لشركة العقيق القابضة (Chief Executive Officer - CEO).
+     • **أ. عبدالله ناصر الحربي**: نائب الرئيس التنفيذي لقطاع التعليم والتدريب (Vice CEO for Education & Training Sector).
+     • **أ. محمد زايد**: رئيس قطاع المتابعة والتطوير في شركة العقيق القابضة.
 
    - **سجل الشرف والبطولات وإنجازات الطلاب (موثقة بالأسماء والمراكز)**:
      • **اختبار القدرات والتحصيلي والاعتماد الأكاديمي**:
