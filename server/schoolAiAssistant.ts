@@ -272,7 +272,7 @@ export async function askSchoolAiAssistant(
       for (const model of modelsToTry) {
         try {
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("AI_TIMEOUT")), 5000)
+            setTimeout(() => reject(new Error("AI_TIMEOUT")), 15000)
           );
 
           const apiPromise = ai.models.generateContent({
