@@ -16,6 +16,70 @@ export type ActionShortcut = {
   icon: string;
 };
 
+// Singleton Client Cache
+let cachedAiClient: { key: string; client: GoogleGenAI } | null = null;
+function getAiClient(apiKey: string): GoogleGenAI {
+  if (!cachedAiClient || cachedAiClient.key !== apiKey) {
+    cachedAiClient = { key: apiKey, client: new GoogleGenAI({ apiKey }) };
+  }
+  return cachedAiClient.client;
+}
+
+// In-Memory Live Platform Data Cache (2-minute TTL for zero database latency)
+let cachedLivePlatformData = "";
+let lastLivePlatformFetchTime = 0;
+const LIVE_CACHE_TTL_MS = 120_000;
+
+async function getCachedLivePlatformData(): Promise<string> {
+  const now = Date.now();
+  if (cachedLivePlatformData && now - lastLivePlatformFetchTime < LIVE_CACHE_TTL_MS) {
+    return cachedLivePlatformData;
+  }
+  try {
+    const [recentArticles, recentPodcasts, recentIssues, recentAlbums, broadcast] = await Promise.all([
+      getPublishedArticles().catch(() => []),
+      getPodcasts().catch(() => []),
+      listSchoolNewsIssues("published").catch(() => []),
+      listAqeeqAlbums("published").catch(() => []),
+      getSiteBroadcast().catch(() => null),
+    ]);
+
+    const articlesSummary = (recentArticles as any[])
+      .slice(0, 3)
+      .map((a: any) => `• مقال: «${a.title}» للكاتب ${a.authorName} (${a.category})`)
+      .join("\n");
+
+    const podcastsSummary = (recentPodcasts as any[])
+      .slice(0, 3)
+      .map((p: any) => `• حلقة: «${p.title}» - ${p.category} (${p.mediaType === "video" ? "فيديو" : "صوت"})`)
+      .join("\n");
+
+    const issuesSummary = (recentIssues as any[])
+      .slice(0, 2)
+      .map((i: any) => `• عدد المجلة: «${i.title}»`)
+      .join("\n");
+
+    const albumsSummary = (recentAlbums as any[])
+      .slice(0, 2)
+      .map((alb: any) => `• ألبوم: «${alb.title}»`)
+      .join("\n");
+
+    cachedLivePlatformData = `
+--- بيانات حية من منصة استوديو العقيق حالياً ---
+${broadcast?.enabled && broadcast.message ? `📢 تنبيه معلن في المنصة: "${broadcast.message}"` : ""}
+${issuesSummary ? `أحدث أعداد المجلة:\n${issuesSummary}` : ""}
+${albumsSummary ? `أحدث ألبومات الصور:\n${albumsSummary}` : ""}
+${articlesSummary ? `أحدث المقالات:\n${articlesSummary}` : ""}
+${podcastsSummary ? `أحدث حلقات البودكاست:\n${podcastsSummary}` : ""}
+-----------------------------------------
+`;
+    lastLivePlatformFetchTime = now;
+  } catch (e) {
+    // Non-blocking
+  }
+  return cachedLivePlatformData;
+}
+
 export async function getEffectiveGeminiApiKey(): Promise<string | null> {
   if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
   if (process.env.GOOGLE_API_KEY) return process.env.GOOGLE_API_KEY;
@@ -75,61 +139,20 @@ export async function askSchoolAiAssistant(
   messages: ChatMessage[],
   userPrompt: string
 ): Promise<{ reply: string; suggestedQuestions: string[]; actionShortcuts?: ActionShortcut[] }> {
-  // 1. Fetch live platform context
-  let livePlatformData = "";
-  try {
-    const [recentArticles, recentPodcasts, recentIssues, recentAlbums, broadcast] = await Promise.all([
-      getPublishedArticles().catch(() => []),
-      getPodcasts().catch(() => []),
-      listSchoolNewsIssues("published").catch(() => []),
-      listAqeeqAlbums("published").catch(() => []),
-      getSiteBroadcast().catch(() => null),
-    ]);
-
-    const articlesSummary = (recentArticles as any[])
-      .slice(0, 3)
-      .map((a: any) => `• مقال: «${a.title}» للكاتب ${a.authorName} (${a.category})`)
-      .join("\n");
-
-    const podcastsSummary = (recentPodcasts as any[])
-      .slice(0, 3)
-      .map((p: any) => `• حلقة: «${p.title}» - ${p.category} (${p.mediaType === "video" ? "فيديو" : "صوت"})`)
-      .join("\n");
-
-    const issuesSummary = (recentIssues as any[])
-      .slice(0, 2)
-      .map((i: any) => `• عدد المجلة: «${i.title}»`)
-      .join("\n");
-
-    const albumsSummary = (recentAlbums as any[])
-      .slice(0, 2)
-      .map((alb: any) => `• ألبوم: «${alb.title}»`)
-      .join("\n");
-
-    livePlatformData = `
---- بيانات حية من منصة استوديو العقيق حالياً ---
-${broadcast?.enabled && broadcast.message ? `📢 تنبيه معلن في المنصة: "${broadcast.message}"` : ""}
-${issuesSummary ? `أحدث أعداد المجلة:\n${issuesSummary}` : ""}
-${albumsSummary ? `أحدث ألبومات الصور:\n${albumsSummary}` : ""}
-${articlesSummary ? `أحدث المقالات:\n${articlesSummary}` : ""}
-${podcastsSummary ? `أحدث حلقات البودكاست:\n${podcastsSummary}` : ""}
------------------------------------------
-`;
-  } catch (e) {
-    // Non-blocking
-  }
+  // 1. Fetch live platform context (cached with 0ms overhead)
+  const livePlatformData = await getCachedLivePlatformData();
 
   // 2. Discover Gemini API Key
   const apiKey = await getEffectiveGeminiApiKey();
 
   if (apiKey) {
     try {
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = getAiClient(apiKey);
 
-      // Format multi-turn conversation history for Gemini
+      // Format clean multi-turn conversation history (last 10 turns for optimal speed)
       const formattedContents: any[] = [];
+      const recentHistory = (messages || []).slice(-10);
 
-      const recentHistory = (messages || []).slice(-16);
       for (const msg of recentHistory) {
         if (!msg.content || typeof msg.content !== "string") continue;
         const role = msg.role === "user" ? "user" : "model";
@@ -156,31 +179,27 @@ ${podcastsSummary ? `أحدث حلقات البودكاست:\n${podcastsSummary}
       const fullSystemContext = `${SYSTEM_INSTRUCTION_CORPUS}\n\n${livePlatformData}`;
 
       let rawReply = "";
-      try {
-        const res = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
-          contents: formattedContents,
-          config: {
-            systemInstruction: fullSystemContext,
-            temperature: 0.75,
-            maxOutputTokens: 1800,
-          },
-        });
-        rawReply = res.text?.trim() || "";
-      } catch (mErr) {
-        console.warn("Primary gemini-3.6-flash call encountered issue, attempting secondary route:", mErr);
-        const res = await ai.models.generateContent({
-          model: "gemini-2.0-flash",
-          contents: formattedContents,
-          config: {
-            systemInstruction: fullSystemContext,
-            temperature: 0.75,
-            maxOutputTokens: 1800,
-          },
-        });
-        rawReply = res.text?.trim() || "";
+      for (let attempt = 0; attempt <= 2; attempt++) {
+        try {
+          const res = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: formattedContents,
+            config: {
+              systemInstruction: fullSystemContext,
+              temperature: 0.72,
+              maxOutputTokens: 1200,
+            },
+          });
+          rawReply = res.text?.trim() || "";
+          if (rawReply) break;
+        } catch (mErr) {
+          if (attempt === 2) {
+            console.warn("Gemini call failed after retries:", mErr);
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
+          }
+        }
       }
-
       if (rawReply) {
         const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
         const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
@@ -191,11 +210,11 @@ ${podcastsSummary ? `أحدث حلقات البودكاست:\n${podcastsSummary}
         };
       }
     } catch (err) {
-      console.warn("Gemini Live AI Assistant generation error:", err);
+      console.warn("Gemini Live AI generation error:", err);
     }
   }
 
-  // 3. Fallback: Friendly Natural Conversational Reply
+  // 3. Fallback
   return getDeepConversationalReasoningReply(userPrompt, messages);
 }
 
