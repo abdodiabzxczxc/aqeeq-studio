@@ -1483,7 +1483,7 @@ export const appRouter = router({
           const { GoogleGenAI } = await import("@google/genai");
           const ai = new GoogleGenAI({ apiKey: key });
           const res = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3.6-flash",
             contents: [{ role: "user", parts: [{ text: "أجب بكلمة واحدة: جاهز" }] }],
             config: { maxOutputTokens: 20 },
           });

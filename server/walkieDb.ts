@@ -156,7 +156,7 @@ export async function transcribeAudioWithGemini(audioBase64: string): Promise<st
     const cleanBase64 = audioBase64.replace(/^data:[^;]+;base64,/, "");
 
     const res = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.6-flash",
       contents: [
         {
           role: "user",

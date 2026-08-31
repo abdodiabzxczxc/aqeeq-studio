@@ -216,17 +216,30 @@ ${podcastsSummary ? `أحدث حلقات الإذاعة والبودكاست:\n$
 
       const fullSystemContext = `${SYSTEM_INSTRUCTION_CORPUS}\n\n${livePlatformData}`;
 
-      const res = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: formattedContents,
-        config: {
-          systemInstruction: fullSystemContext,
-          temperature: 0.68,
-          maxOutputTokens: 1600,
-        },
-      });
-
-      const rawReply = res.text?.trim();
+      let rawReply = "";
+      try {
+        const res = await ai.models.generateContent({
+          model: "gemini-3.6-flash",
+          contents: formattedContents,
+          config: {
+            systemInstruction: fullSystemContext,
+            temperature: 0.7,
+            maxOutputTokens: 1800,
+          },
+        });
+        rawReply = res.text?.trim() || "";
+      } catch (mErr) {
+        const res = await ai.models.generateContent({
+          model: "gemini-2.0-flash",
+          contents: formattedContents,
+          config: {
+            systemInstruction: fullSystemContext,
+            temperature: 0.7,
+            maxOutputTokens: 1800,
+          },
+        });
+        rawReply = res.text?.trim() || "";
+      }
       if (rawReply) {
         const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
         const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
