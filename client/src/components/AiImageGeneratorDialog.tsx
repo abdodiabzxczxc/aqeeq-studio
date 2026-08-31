@@ -94,6 +94,7 @@ export default function AiImageGeneratorDialog({
   const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("3d-luxury-gold");
   const [customApiKey, setCustomApiKey] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [alternates, setAlternates] = useState<{ url: string; title: string }[]>([]);
 
   useEffect(() => {
     if (open && defaultPrompt) {
@@ -193,7 +194,8 @@ export default function AiImageGeneratorDialog({
   const generateMutation = trpc.aiVisuals.generateCover.useMutation({
     onSuccess: (data) => {
       setGeneratedUrl(data.imageUrl);
-      toast.success("تم توليد المشهد البصري فائق الواقعية بنجاح! ✨");
+      setAlternates((data as any).alternates || []);
+      toast.success("تم جلب المشهد البصري المطابق لطلبك بنجاح! ✨");
     },
     onError: (err) => {
       toast.error(err.message || "تعذر توليد الصورة");
@@ -934,6 +936,30 @@ export default function AiImageGeneratorDialog({
                         }}
                       />
                     </div>
+
+                    {alternates.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        <span className="text-[11px] font-bold text-slate-400 block">
+                          📸 لقطات بديلة لنفس طلبك (اضغط للتبديل الفوري):
+                        </span>
+                        <div className="flex items-center justify-center gap-2 overflow-x-auto py-1">
+                          {alternates.map((alt, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setGeneratedUrl(alt.url)}
+                              className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all hover:scale-105 ${
+                                generatedUrl === alt.url
+                                  ? "border-[#f8ca14] ring-2 ring-[#f8ca14]"
+                                  : "border-white/10 hover:border-white/30"
+                              }`}
+                            >
+                              <img src={alt.url} alt={alt.title} className="h-full w-full object-cover" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-center gap-3 pt-2">
                       <button

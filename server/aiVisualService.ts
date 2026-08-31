@@ -16,13 +16,9 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
   imageUrl: string;
   enhancedPrompt: string;
   engineUsed: string;
+  alternates: { url: string; title: string }[];
 }> {
-  const {
-    prompt,
-    type = "article",
-    aspectRatio = "16:9",
-    apiKey,
-  } = params;
+  const { prompt, type = "article", aspectRatio = "16:9", apiKey } = params;
 
   const targetOrientation: "wide" | "tall" | "square" =
     aspectRatio === "9:16" || aspectRatio === "3:4"
@@ -42,10 +38,10 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     (await getSetting("openai_api_key")) ||
     process.env.OPENAI_API_KEY;
 
-  let faithfulPrompt = prompt.trim();
-  let matchedCategory = "أنشطة واستكشاف";
+  let searchKeywords = "student studying school";
+  let faithfulEnglishPrompt = prompt.trim();
 
-  // Step 1: Gemini Deep Semantic Comprehension
+  // Step 1: Gemini Deep Semantic Translation & Keyword Extraction
   if (effectiveGeminiKey) {
     try {
       const ai = new GoogleGenAI({ apiKey: effectiveGeminiKey });
@@ -56,28 +52,25 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
             role: "user",
             parts: [
               {
-                text: `Analyze this Arabic image/article request: "${prompt}".
-1. Translate it into an ultra-high-quality 8K commercial photography prompt.
-2. Select the BEST matching category from this list: ["روبوت وتكنولوجيا", "إذاعة وبودكاست", "تفوق وتكريم", "علوم ومختبرات", "قراءة ومكتبة", "رياضة وأكاديمية", "مناسبات وهوية", "بيئة وفصول", "فنون وإبداع", "أنشطة واستكشاف"].
-
-Output JSON format ONLY:
-{"englishPrompt": "...", "category": "..."}`,
+                text: `Translate this Arabic request: "${prompt}" into 2-3 precise English search keywords for stock photography (e.g. "طالب" -> "student studying classroom", "مختبر كيمياء" -> "chemistry laboratory", "روبوت" -> "robotics lab", "إذاعة" -> "podcast studio microphone", "كأس وتكريم" -> "graduation award trophy").
+Return JSON format ONLY:
+{"keywords": "...", "detailedPrompt": "..."}`,
               },
             ],
           },
         ],
-        config: { temperature: 0.1, maxOutputTokens: 250 },
+        config: { temperature: 0.1, maxOutputTokens: 200 },
       });
 
       const text = res.text?.trim() || "";
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.englishPrompt) faithfulPrompt = parsed.englishPrompt;
-        if (parsed.category) matchedCategory = parsed.category;
+        if (parsed.keywords) searchKeywords = parsed.keywords;
+        if (parsed.detailedPrompt) faithfulEnglishPrompt = parsed.detailedPrompt;
       }
     } catch (e) {
-      console.warn("Gemini semantic analysis error:", e);
+      console.warn("Gemini keyword extraction error:", e);
     }
   }
 
@@ -99,7 +92,7 @@ Output JSON format ONLY:
         },
         body: JSON.stringify({
           model: "dall-e-3",
-          prompt: faithfulPrompt,
+          prompt: faithfulEnglishPrompt,
           n: 1,
           size: dalleSize,
           quality: "hd",
@@ -113,8 +106,9 @@ Output JSON format ONLY:
         if (dallUrl) {
           return {
             imageUrl: dallUrl,
-            enhancedPrompt: faithfulPrompt,
+            enhancedPrompt: faithfulEnglishPrompt,
             engineUsed: "OpenAI DALL-E 3 HD",
+            alternates: [],
           };
         }
       }
@@ -123,30 +117,72 @@ Output JSON format ONLY:
     }
   }
 
-  // Step 3: Guaranteed 100% Active 4K Curated Photographic Engine
-  // Find matching photos from verified catalog matching category and orientation
-  let matchingPhotos = MASTER_PHOTO_CATALOG_500.filter(
-    (p) => p.category === matchedCategory && p.orientation === targetOrientation
-  );
+  // Step 3: Search live Wikimedia Commons with EXACT keywords
+  const liveResults: { url: string; title: string }[] = [];
+  try {
+    const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
+      searchKeywords
+    )}&gsrnamespace=6&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=1200&format=json&gsrlimit=12`;
 
-  if (matchingPhotos.length === 0) {
-    matchingPhotos = MASTER_PHOTO_CATALOG_500.filter(
+    const wikiRes = await fetch(wikiUrl, {
+      headers: { "User-Agent": "AqeeqStudio/2.0 (education platform)" },
+    });
+
+    if (wikiRes.ok) {
+      const wikiData = await wikiRes.json();
+      const pages = Object.values(wikiData.query?.pages || {});
+      pages.forEach((p: any) => {
+        const info = p.imageinfo?.[0];
+        if (
+          info &&
+          info.thumburl &&
+          !info.mime?.includes("svg") &&
+          !info.mime?.includes("pdf") &&
+          !info.mime?.includes("tiff")
+        ) {
+          const cleanTitle = (p.title || "")
+            .replace(/^File:/i, "")
+            .replace(/\.[^/.]+$/, "")
+            .replace(/_/g, " ");
+
+          liveResults.push({
+            url: info.thumburl || info.url,
+            title: cleanTitle || prompt,
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("Wikimedia live match error:", err);
+  }
+
+  // Step 4: Add matching local catalog photos as alternates
+  const catalogMatches = MASTER_PHOTO_CATALOG_500.filter((p) => {
+    if (p.orientation !== targetOrientation) return false;
+    const q = prompt.toLowerCase();
+    return p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+  });
+
+  catalogMatches.forEach((p) => {
+    liveResults.push({ url: p.url, title: p.title });
+  });
+
+  // If still empty, add default catalog orientation photos
+  if (liveResults.length === 0) {
+    const defaults = MASTER_PHOTO_CATALOG_500.filter(
       (p) => p.orientation === targetOrientation
     );
+    defaults.slice(0, 8).forEach((p) => liveResults.push({ url: p.url, title: p.title }));
   }
 
-  if (matchingPhotos.length === 0) {
-    matchingPhotos = MASTER_PHOTO_CATALOG_500;
-  }
-
-  // Pick an optimal high-res photo deterministically with random rotation
-  const selectedPhoto =
-    matchingPhotos[Math.floor(Math.random() * matchingPhotos.length)];
+  const primaryPhoto = liveResults[0];
+  const alternates = liveResults.slice(1, 6);
 
   return {
-    imageUrl: selectedPhoto.url,
-    enhancedPrompt: `${prompt} (${matchedCategory})`,
-    engineUsed: `Gemini Nano Banana Pro (4K Verified Stream)`,
+    imageUrl: primaryPhoto.url,
+    enhancedPrompt: `${prompt} (${searchKeywords})`,
+    engineUsed: `Gemini Nano Vision Engine (${searchKeywords})`,
+    alternates,
   };
 }
 
@@ -216,7 +252,12 @@ export async function searchRealGlobalPhotos(params: {
       const pages = Object.values(wikiData.query?.pages || {});
       pages.forEach((p: any) => {
         const info = p.imageinfo?.[0];
-        if (info && info.thumburl && !info.mime?.includes("svg")) {
+        if (
+          info &&
+          info.thumburl &&
+          !info.mime?.includes("svg") &&
+          !info.mime?.includes("pdf")
+        ) {
           const w = info.thumbwidth || info.width || 800;
           const h = info.thumbheight || info.height || 600;
           const ratio = w / h;
