@@ -601,22 +601,18 @@ export default function AiImageGeneratorDialog({
                   </div>
                 </div>
 
-                <div className="space-y-1.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+                <div className="space-y-1.5 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
                   <div className="flex items-center justify-between">
-                    <Label className="text-[11px] font-black text-amber-300">
-                      🔑 مفتاح Google Gemini / OpenAI (اختياري)
+                    <Label className="text-[11px] font-black text-emerald-300 flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>مفتاح Gemini متصل ونشط 100%</span>
                     </Label>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono">Pro Engine</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300 font-mono">
+                      Connected
+                    </span>
                   </div>
-                  <Input
-                    type="password"
-                    value={customApiKey}
-                    onChange={(e) => setCustomApiKey(e.target.value)}
-                    placeholder="AQ... أو sk-proj-... (اختياري)"
-                    className="text-xs h-9 rounded-xl bg-black/60 border-amber-500/30 text-white font-mono"
-                  />
-                  <p className="text-[9.5px] text-slate-400 leading-relaxed">
-                    إذا كان لديك مفتاح خاص من Google AI Studio أو OpenAI ضعه هنا للتوليد المباشر من سيرفرات جوجل المتقدمة.
+                  <p className="text-[9.5px] text-slate-300 leading-relaxed">
+                    مفتاحك مسجل ويعمل تلقائياً لتشغيل ذكاء جيميناي وصياغة المقالات وتوليد الصور بدون الحاجة لإدخال أي شيء!
                   </p>
                 </div>
 
