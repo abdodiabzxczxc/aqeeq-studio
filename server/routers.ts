@@ -1537,7 +1537,7 @@ export const appRouter = router({
         z.object({
           prompt: z.string().min(2, "يرجى إدخال وصف أو فكرة الصورة"),
           type: z.enum(["article", "podcast", "general"]).optional(),
-          aspectRatio: z.enum(["16:9", "1:1", "4:3"]).optional(),
+          aspectRatio: z.enum(["16:9", "9:16", "1:1", "4:3", "3:4"]).optional(),
           model: z.enum(["flux-realism", "flux-pro", "flux", "turbo"]).optional(),
           stylePreset: z.enum(["photorealistic", "cinematic", "editorial", "studio-pro"]).optional(),
         })
@@ -1552,6 +1552,7 @@ export const appRouter = router({
           query: z.string().min(1, "يرجى إدخال كلمة البحث"),
           page: z.number().optional(),
           pageSize: z.number().optional(),
+          orientation: z.enum(["all", "wide", "tall", "square"]).optional(),
         })
       )
       .query(async ({ input }) => {

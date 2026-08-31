@@ -12,10 +12,12 @@ import {
   Camera,
   Search,
   Globe,
-  RefreshCw,
-  ExternalLink,
   ChevronLeft,
   ChevronRight,
+  RectangleHorizontal,
+  RectangleVertical,
+  Square,
+  LayoutGrid,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -29,209 +31,179 @@ interface AiImageGeneratorDialogProps {
   dark?: boolean;
 }
 
+type AspectRatioChoice = "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
+type OrientationFilter = "all" | "wide" | "tall" | "square";
+
 // 🏛️ كتالوج الأغلفة السريعة 4K المعتمدة
 const MASTER_PHOTO_CATALOG = [
-  // 🤖 1. الروبوت والذكاء الاصطناعي وهندسة المستقبل
+  // 🤖 روبوت وابتكار
   {
     title: "مختبر الروبوتات والذكاء الاصطناعي المتقدم",
     category: "روبوت وابتكار",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "برمجة اللوحات الإلكترونية والمعالجات",
     category: "روبوت وابتكار",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "هندسة الأردوينو ومستشعرات الروبوت",
     category: "روبوت وابتكار",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "شاشات البرمجة والذكاء الاصطناعي الحديث",
     category: "روبوت وابتكار",
-    url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=85",
   },
   {
     title: "ذراع روبوتي تفاعلي ومختبر الابتكار",
     category: "روبوت وابتكار",
-    url: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "أكاديمية البرمجة وتطوير التطبيقات",
-    category: "روبوت وابتكار",
-    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=85",
+    orientation: "square" as const,
+    url: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1000&q=85",
   },
 
-  // 🎙️ 2. الإذاعة والبودكاست والاستوديوهات الصوتية
+  // 🎙️ إذاعة وبودكاست
   {
     title: "ميكروفون إذاعي فخم واستوديو احترافي",
     category: "إذاعة وبودكاست",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "استوديو صوتي عازل مع سماعات ومكسر",
     category: "إذاعة وبودكاست",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "طاولة حوار وميكروفونات متعددة للضيوف",
     category: "إذاعة وبودكاست",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    title: "ميكروفون كلاسيكي ذهبي بإضاءة دافئة",
+    title: "ميكروفون كلاسيكي ذهبي طولي",
     category: "إذاعة وبودكاست",
-    url: "https://images.unsplash.com/photo-1520523839898-50712825e3a7?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1520523839898-50712825e3a7?auto=format&fit=crop&w=800&q=85",
   },
   {
-    title: "هندسة الصوت والتسجيل الإذاعي الصباحي",
+    title: "سماعات استوديو مربعة للموسيقى والصوت",
     category: "إذاعة وبودكاست",
-    url: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=85",
+    orientation: "square" as const,
+    url: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=85",
   },
 
-  // 🏆 3. التفوق والجوائز والتكريم
+  // 🏆 تفوق وتكريم
   {
     title: "كأس التفوق والتميز الذهبي",
     category: "تفوق وتكريم",
-    url: "https://images.unsplash.com/photo-1569517282132-25d22f4573e6?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1569517282132-25d22f4573e6?auto=format&fit=crop&w=800&q=85",
   },
   {
     title: "ميداليات التكريم والإنجازات المدرسية",
     category: "تفوق وتكريم",
-    url: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=1200&q=85",
+    orientation: "square" as const,
+    url: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=1000&q=85",
   },
   {
     title: "قبعة التخرج والشهادة الأكاديمية",
     category: "تفوق وتكريم",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "احتفال الإنجاز والتخرج الماسي الفخم",
     category: "تفوق وتكريم",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=85",
   },
-  {
-    title: "منصة التتويج والنجاح الأكاديمي",
-    category: "تفوق وتكريم",
-    url: "https://images.unsplash.com/photo-1532649538693-f3a2ec1bf8bd?auto=format&fit=crop&w=1200&q=85",
-  },
 
-  // 🔬 4. العلوم والمختبرات والأبحاث
+  // 🔬 علوم ومختبرات
   {
     title: "مختبر علمي متطور ومحاليل ملونة",
     category: "علوم ومختبرات",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "مجهر دقيق وأبحاث بيولوجية متقدمة",
     category: "علوم ومختبرات",
-    url: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=85",
   },
   {
     title: "أنابيب اختبار وتجارب كيميائية مدرسية",
     category: "علوم ومختبرات",
-    url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "فيزياء وموجات ضوئية وتجارب عملية",
-    category: "علوم ومختبرات",
-    url: "https://images.unsplash.com/photo-1607988795691-3d0147b43231?auto=format&fit=crop&w=1200&q=85",
+    orientation: "square" as const,
+    url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=85",
   },
 
-  // 📚 5. المكتبة والقراءة والثقافة
+  // 📚 قراءة ومكتبة
   {
     title: "مكتبة كبرى وصرح معرفي فاخر",
     category: "قراءة ومكتبة",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "كتاب مفتوح في إضاءة ذهبية ملهمة",
     category: "قراءة ومكتبة",
-    url: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=85",
   },
   {
     title: "رفوف الكتب والثقافة المدرسية العريقة",
     category: "قراءة ومكتبة",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1507842229451-9f0147b19811?auto=format&fit=crop&w=1200&q=85",
   },
-  {
-    title: "جلسة قراءة وبحث هادئة لطلاب متميزين",
-    category: "قراءة ومكتبة",
-    url: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=85",
-  },
 
-  // 🏊‍♂️ 6. الرياضة والأكاديمية الرياضية
+  // 🏊‍♂️ رياضة وأكاديمية
   {
     title: "مسبح مدرسي أولمبي ومسارات السباحة",
     category: "رياضة وأكاديمية",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "ملعب كرة قدم عشبي حديث ومضاء",
-    category: "رياضة وأكاديمية",
-    url: "https://images.unsplash.com/photo-1529900245534-47fbf76681e0?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "فنون قتالية تايكوندو وتدريبات لياقة",
     category: "رياضة وأكاديمية",
-    url: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=85",
   },
   {
-    title: "صالة رياضية مجهزة وأجهزة لياقة بدنية",
+    title: "ملعب كرة قدم عشبي حديث ومضاء",
     category: "رياضة وأكاديمية",
-    url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85",
+    orientation: "wide" as const,
+    url: "https://images.unsplash.com/photo-1529900245534-47fbf76681e0?auto=format&fit=crop&w=1200&q=85",
   },
 
-  // 🇸🇦 7. المناسبات الوطنية والهوية السعودية
+  // 🇸🇦 مناسبات وهوية
   {
     title: "العلم السعودي وهيبة الوطن",
     category: "مناسبات وهوية",
-    url: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=85",
+    orientation: "tall" as const,
+    url: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=85",
   },
   {
     title: "أصالة المدينة المنورة وشروق ذهبي مهيب",
     category: "مناسبات وهوية",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    title: "تراث سعودي عريق وفخر التأسيس",
-    category: "مناسبات وهوية",
-    url: "https://images.unsplash.com/photo-1512632570417-a60037a28e75?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "سماء طيبة الطيبة وأجواء روحانية راقية",
-    category: "مناسبات وهوية",
-    url: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=85",
-  },
-
-  // 🏫 8. الفصول الذكية والبيئة التعليمية
-  {
-    title: "فصل دراسي حديث وشاشات ذكية متطورة",
-    category: "بيئة وفصول",
-    url: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "نقاش جماعي وتفكير نقدي في بيئة ملهمة",
-    category: "بيئة وفصول",
-    url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "مدرج وقاعة محاضرات كبرى للمؤتمرات",
-    category: "بيئة وفصول",
-    url: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=85",
-  },
-
-  // 🚀 9. الرحلات الاستكشافية والمغامرات
-  {
-    title: "جبال وصخور العلا الأثرية والتاريخية",
+    title: "جبال وصخور العلا التاريخية",
     category: "رحلات واستكشاف",
+    orientation: "wide" as const,
     url: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "شاطئ البحر الأحمر ومنتجع الدلافين بينبع",
-    category: "رحلات واستكشاف",
-    url: "https://images.unsplash.com/photo-1507525428033-b723cf961d3e?auto=format&fit=crop&w=1200&q=85",
   },
 ];
 
@@ -265,15 +237,17 @@ export default function AiImageGeneratorDialog({
   defaultPrompt = "",
   dark = true,
 }: AiImageGeneratorDialogProps) {
-  const [activeTab, setActiveTab] = useState<"globalSearch" | "gallery" | "aiPrompt" | "cardDesigner">("globalSearch");
+  const [activeTab, setActiveTab] = useState<"globalSearch" | "aiPrompt" | "gallery" | "cardDesigner">("globalSearch");
   
   // Live Global Search State
   const [globalQuery, setGlobalQuery] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
   const [globalPage, setGlobalPage] = useState(1);
   const [activeSearchTerm, setActiveSearchTerm] = useState(defaultPrompt || (type === "podcast" ? "إذاعة وبودكاست ميكروفون" : "روبوت وذكاء اصطناعي"));
+  const [searchOrientation, setSearchOrientation] = useState<OrientationFilter>("all");
 
   // Quick Catalog State
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [catalogOrientation, setCatalogOrientation] = useState<OrientationFilter>("all");
   const [catalogSearch, setCatalogSearch] = useState("");
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
 
@@ -284,7 +258,7 @@ export default function AiImageGeneratorDialog({
 
   // AI Prompt State
   const [prompt, setPrompt] = useState(defaultPrompt);
-  const [aspectRatio, setAspectRatio] = useState<"16:9" | "1:1" | "4:3">("16:9");
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioChoice>("16:9");
   const [selectedEngine, setSelectedEngine] = useState<(typeof AI_ENGINES)[number]["id"]>("flux-realism");
   const [selectedStyle, setSelectedStyle] = useState<(typeof STYLE_PRESETS)[number]["id"]>("photorealistic");
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
@@ -298,17 +272,17 @@ export default function AiImageGeneratorDialog({
     }
   }, [open, defaultPrompt]);
 
-  // Live Real Global Photo Search Query
+  // Live Real Global Photo Search Query with Orientation Filter
   const {
     data: globalSearchData,
     isLoading: isGlobalSearching,
     isFetching: isGlobalFetching,
-    refetch: refetchGlobalSearch,
   } = trpc.aiVisuals.searchRealPhotos.useQuery(
     {
       query: activeSearchTerm || (type === "podcast" ? "podcast studio microphone" : "education school"),
       page: globalPage,
       pageSize: 30,
+      orientation: searchOrientation,
     },
     {
       enabled: Boolean(open),
@@ -316,7 +290,7 @@ export default function AiImageGeneratorDialog({
   );
 
   const categories = [
-    { id: "all", label: `✨ كل الصور (${MASTER_PHOTO_CATALOG.length})` },
+    { id: "all", label: `✨ كل التصنيفات (${MASTER_PHOTO_CATALOG.length})` },
     { id: "روبوت وابتكار", label: "🤖 روبوت وتكنولوجيا" },
     { id: "إذاعة وبودكاست", label: "🎙️ إذاعة وبودكاست" },
     { id: "تفوق وتكريم", label: "🏆 تفوق وتكريم" },
@@ -324,12 +298,11 @@ export default function AiImageGeneratorDialog({
     { id: "قراءة ومكتبة", label: "📚 قراءة ومكتبة" },
     { id: "رياضة وأكاديمية", label: "⚽ رياضة وأكاديمية" },
     { id: "مناسبات وهوية", label: "🇸🇦 مناسبات وهوية" },
-    { id: "بيئة وفصول", label: "🏫 بيئة وفصول" },
-    { id: "رحلات واستكشاف", label: "🚀 رحلات واستكشاف" },
   ];
 
   const filteredCatalogPhotos = MASTER_PHOTO_CATALOG.filter((p) => {
     if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
+    if (catalogOrientation !== "all" && p.orientation !== catalogOrientation) return false;
     if (catalogSearch.trim()) {
       const q = catalogSearch.toLowerCase();
       return p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
@@ -409,13 +382,13 @@ export default function AiImageGeneratorDialog({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span>المحرك الشامل للصور والأغلفة فائقة الجودة</span>
+                  <span>المحرك الشامل للصور والأغلفة (بالعرض / بالطول / مربع)</span>
                   <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black text-emerald-400">
-                    +700M 4K PHOTOS
+                    4K PRO
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 font-normal mt-0.5">
-                  بحث مباشر في ملايين الصور الفوتوغرافية الحقيقية بدقة 4K + محرك الذكاء الاصطناعي (Flux Realism Pro 8K)
+                  توليد وبحث في ملايين الصور الحقيقية بدقة 4K مع تحكم كامل في الأبعاد: بالعرض 16:9، بالطول 9:16، ومربع 1:1
                 </p>
               </div>
             </div>
@@ -460,7 +433,7 @@ export default function AiImageGeneratorDialog({
             }`}
           >
             <Camera size={15} />
-            <span>🏛️ الأغلفة السريعة المعتمدة ({MASTER_PHOTO_CATALOG.length})</span>
+            <span>🏛️ الكتالوج السريع المعتمد ({MASTER_PHOTO_CATALOG.length})</span>
           </button>
 
           <button
@@ -477,7 +450,7 @@ export default function AiImageGeneratorDialog({
           </button>
         </div>
 
-        {/* TAB 1: Global Live Search Engine (Millions of 4K Photos) */}
+        {/* TAB 1: Global Live Search Engine with Orientation Filter */}
         {activeTab === "globalSearch" && (
           <div className="space-y-4 pt-2">
             {/* Search Input Bar */}
@@ -505,23 +478,81 @@ export default function AiImageGeneratorDialog({
               </button>
             </form>
 
-            {/* Quick Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-              {quickSearchPills.map((pill, idx) => (
+            {/* Orientation Filter Switcher */}
+            <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-2xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-black text-slate-300 ml-2">📐 شكل وأبعاد الصور:</span>
                 <button
-                  key={idx}
                   type="button"
-                  onClick={() => {
-                    const clean = pill.replace(/^[^\s]+\s*/, "");
-                    setGlobalQuery(clean);
-                    setActiveSearchTerm(clean);
-                    setGlobalPage(1);
-                  }}
-                  className="whitespace-nowrap px-3 py-1 rounded-lg text-[11px] font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
+                  onClick={() => { setSearchOrientation("all"); setGlobalPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                    searchOrientation === "all"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14]"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
                 >
-                  {pill}
+                  <LayoutGrid size={14} />
+                  <span>الكل</span>
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  onClick={() => { setSearchOrientation("wide"); setGlobalPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                    searchOrientation === "wide"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14]"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleHorizontal size={14} />
+                  <span>بالعرض (Landscape)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setSearchOrientation("tall"); setGlobalPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                    searchOrientation === "tall"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14]"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleVertical size={14} />
+                  <span>بالطول (Portrait / ستوري)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setSearchOrientation("square"); setGlobalPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                    searchOrientation === "square"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14]"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <Square size={14} />
+                  <span>مربع (1:1 Square)</span>
+                </button>
+              </div>
+
+              {/* Quick Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
+                {quickSearchPills.slice(0, 5).map((pill, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      const clean = pill.replace(/^[^\s]+\s*/, "");
+                      setGlobalQuery(clean);
+                      setActiveSearchTerm(clean);
+                      setGlobalPage(1);
+                    }}
+                    className="whitespace-nowrap px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
+                  >
+                    {pill}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Results Grid */}
@@ -533,37 +564,46 @@ export default function AiImageGeneratorDialog({
             ) : globalSearchData?.results && globalSearchData.results.length > 0 ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>تم العثور على صور حقيقية فائقة الجودة لمصطلح: <strong className="text-[#f8ca14]">"{activeSearchTerm}"</strong></span>
+                  <span>تم العثور على صور حقيقية لمصطلح: <strong className="text-[#f8ca14]">"{activeSearchTerm}"</strong> ({searchOrientation === "tall" ? "بالطول" : searchOrientation === "wide" ? "بالعرض" : searchOrientation === "square" ? "مربع" : "كل الأبعاد"})</span>
                   <span>الصفحة {globalPage}</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[50vh] overflow-y-auto pr-1">
-                  {globalSearchData.results.map((photo) => (
-                    <div
-                      key={photo.id}
-                      onClick={() => setSelectedPhotoUrl(photo.url)}
-                      className={`group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border transition-all ${
-                        selectedPhotoUrl === photo.url
-                          ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
-                          : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
-                      }`}
-                    >
-                      <img
-                        src={photo.thumbnail || photo.url}
-                        alt={photo.title}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-2 flex flex-col justify-end">
-                        <span className="text-[10px] font-bold text-white line-clamp-1">{photo.title}</span>
-                      </div>
-                      {selectedPhotoUrl === photo.url && (
-                        <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
-                          <Check size={14} className="stroke-[3]" />
+                  {globalSearchData.results.map((photo) => {
+                    const aspectClass =
+                      searchOrientation === "tall" || photo.aspectRatio === "tall"
+                        ? "aspect-[3/4]"
+                        : searchOrientation === "square" || photo.aspectRatio === "square"
+                        ? "aspect-square"
+                        : "aspect-video";
+
+                    return (
+                      <div
+                        key={photo.id}
+                        onClick={() => setSelectedPhotoUrl(photo.url)}
+                        className={`group relative ${aspectClass} cursor-pointer overflow-hidden rounded-2xl border transition-all ${
+                          selectedPhotoUrl === photo.url
+                            ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
+                            : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
+                        }`}
+                      >
+                        <img
+                          src={photo.thumbnail || photo.url}
+                          alt={photo.title}
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-2 flex flex-col justify-end">
+                          <span className="text-[10px] font-bold text-white line-clamp-1">{photo.title}</span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        {selectedPhotoUrl === photo.url && (
+                          <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
+                            <Check size={14} className="stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Pagination Controls */}
@@ -621,7 +661,7 @@ export default function AiImageGeneratorDialog({
           </div>
         )}
 
-        {/* TAB 2: AI High-End Realistic Generation Engine */}
+        {/* TAB 2: AI High-End Realistic Generation Engine with Aspect Ratio Controls */}
         {activeTab === "aiPrompt" && (
           <div className="space-y-4 pt-2">
             {/* Topic Badge */}
@@ -657,6 +697,82 @@ export default function AiImageGeneratorDialog({
               />
             </div>
 
+            {/* Aspect Ratio Selector (بالعرض / بالطول / مربع) */}
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">📐 أبعاد وشكل الصورة المطلوبة</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAspectRatio("16:9")}
+                  className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition ${
+                    aspectRatio === "16:9"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleHorizontal size={18} />
+                  <span>عريض بالعرض (16:9)</span>
+                  <span className="text-[9px] opacity-75">للمقالات والمواقع</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAspectRatio("9:16")}
+                  className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition ${
+                    aspectRatio === "9:16"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleVertical size={18} />
+                  <span>طولي بالطول (9:16)</span>
+                  <span className="text-[9px] opacity-75">للهواتف والستوري</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAspectRatio("1:1")}
+                  className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition ${
+                    aspectRatio === "1:1"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <Square size={18} />
+                  <span>مربع (1:1)</span>
+                  <span className="text-[9px] opacity-75">للبودكاست والإنستغرام</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAspectRatio("3:4")}
+                  className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition ${
+                    aspectRatio === "3:4"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleVertical size={18} />
+                  <span>طولي قياسي (3:4)</span>
+                  <span className="text-[9px] opacity-75">للبوسترات والكتب</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAspectRatio("4:3")}
+                  className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition ${
+                    aspectRatio === "4:3"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black shadow-md shadow-[#f8ca14]/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <RectangleHorizontal size={18} />
+                  <span>كلاسيكي (4:3)</span>
+                  <span className="text-[9px] opacity-75">شاشات العرض</span>
+                </button>
+              </div>
+            </div>
+
             {/* Engine & Style Selectors */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -690,26 +806,7 @@ export default function AiImageGeneratorDialog({
               </div>
             </div>
 
-            {/* Aspect Ratio and Generate Button */}
-            <div className="flex items-center justify-between gap-4 pt-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-slate-300">أبعاد الصورة:</span>
-                {(["16:9", "1:1", "4:3"] as const).map((ratio) => (
-                  <button
-                    key={ratio}
-                    type="button"
-                    onClick={() => setAspectRatio(ratio)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-black border transition ${
-                      aspectRatio === ratio
-                        ? "bg-[#f8ca14] text-black border-[#f8ca14]"
-                        : "border-white/10 bg-white/5 text-slate-300"
-                    }`}
-                  >
-                    {ratio === "16:9" ? "16:9 (عريض)" : ratio === "1:1" ? "1:1 (مربع)" : "4:3 (كلاسيكي)"}
-                  </button>
-                ))}
-              </div>
-
+            <div className="flex justify-end pt-1">
               <button
                 type="button"
                 onClick={handleAiGenerate}
@@ -733,7 +830,17 @@ export default function AiImageGeneratorDialog({
             {/* Generated Image Result */}
             {generatedUrl && (
               <div className="rounded-2xl border border-white/10 bg-black/60 p-3 space-y-3">
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black border border-white/10">
+                <div
+                  className={`relative mx-auto overflow-hidden rounded-xl bg-black border border-white/10 ${
+                    aspectRatio === "9:16"
+                      ? "aspect-[9/16] max-w-[280px]"
+                      : aspectRatio === "1:1"
+                      ? "aspect-square max-w-[360px]"
+                      : aspectRatio === "3:4"
+                      ? "aspect-[3/4] max-w-[320px]"
+                      : "aspect-video w-full"
+                  }`}
+                >
                   <img src={generatedUrl} alt="Generated Scene" className="h-full w-full object-cover" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -759,7 +866,7 @@ export default function AiImageGeneratorDialog({
           </div>
         )}
 
-        {/* TAB 3: Quick Catalog */}
+        {/* TAB 3: Quick Catalog with Orientation Filter */}
         {activeTab === "gallery" && (
           <div className="space-y-4 pt-2">
             {/* Search and Category Filters */}
@@ -774,53 +881,99 @@ export default function AiImageGeneratorDialog({
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                      selectedCategory === cat.id
-                        ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
-                        : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
+              {/* Orientation Filter */}
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCatalogOrientation("all")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                    catalogOrientation === "all" ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "border-white/10 text-slate-300"
+                  }`}
+                >
+                  الكل
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogOrientation("wide")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                    catalogOrientation === "wide" ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "border-white/10 text-slate-300"
+                  }`}
+                >
+                  بالعرض
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogOrientation("tall")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                    catalogOrientation === "tall" ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "border-white/10 text-slate-300"
+                  }`}
+                >
+                  بالطول
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogOrientation("square")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                    catalogOrientation === "square" ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "border-white/10 text-slate-300"
+                  }`}
+                >
+                  مربع
+                </button>
               </div>
+            </div>
+
+            {/* Category Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+                    selectedCategory === cat.id
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-black"
+                      : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
 
             {/* Photo Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[50vh] overflow-y-auto pr-1">
-              {filteredCatalogPhotos.map((photo, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedPhotoUrl(photo.url)}
-                  className={`group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border transition-all ${
-                    selectedPhotoUrl === photo.url
-                      ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
-                      : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
-                  }`}
-                >
-                  <img
-                    src={photo.url}
-                    alt={photo.title}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-2.5 flex flex-col justify-end">
-                    <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
-                    <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
-                  </div>
-                  {selectedPhotoUrl === photo.url && (
-                    <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
-                      <Check size={14} className="stroke-[3]" />
+              {filteredCatalogPhotos.map((photo, idx) => {
+                const aspectClass =
+                  photo.orientation === "tall" ? "aspect-[3/4]" : photo.orientation === "square" ? "aspect-square" : "aspect-video";
+
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedPhotoUrl(photo.url)}
+                    className={`group relative ${aspectClass} cursor-pointer overflow-hidden rounded-2xl border transition-all ${
+                      selectedPhotoUrl === photo.url
+                        ? "ring-2 ring-[#f8ca14] border-[#f8ca14] scale-[1.02]"
+                        : "border-white/10 hover:border-white/30 hover:scale-[1.01]"
+                    }`}
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.title}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-2.5 flex flex-col justify-end">
+                      <span className="text-[9px] font-black text-[#f8ca14]">{photo.category}</span>
+                      <span className="text-[11px] font-bold text-white line-clamp-1">{photo.title}</span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {selectedPhotoUrl === photo.url && (
+                      <div className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-[#f8ca14] text-black shadow-md">
+                        <Check size={14} className="stroke-[3]" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Apply Selected Photo Bar */}
