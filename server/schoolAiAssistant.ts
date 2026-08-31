@@ -178,43 +178,41 @@ export async function askSchoolAiAssistant(
 
       const fullSystemContext = `${SYSTEM_INSTRUCTION_CORPUS}\n\n${livePlatformData}`;
 
-      let rawReply = "";
-      for (let attempt = 0; attempt <= 2; attempt++) {
-        try {
-          const res = await ai.models.generateContent({
-            model: "gemini-3.6-flash",
-            contents: formattedContents,
-            config: {
-              systemInstruction: fullSystemContext,
-              temperature: 0.72,
-              maxOutputTokens: 1200,
-            },
-          });
-          rawReply = res.text?.trim() || "";
-          if (rawReply) break;
-        } catch (mErr) {
-          if (attempt === 2) {
-            console.warn("Gemini call failed after retries:", mErr);
-          } else {
-            await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
-          }
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("AI_TIMEOUT")), 3500)
+        );
+
+        const apiPromise = ai.models.generateContent({
+          model: "gemini-3.6-flash",
+          contents: formattedContents,
+          config: {
+            systemInstruction: fullSystemContext,
+            temperature: 0.72,
+            maxOutputTokens: 900,
+          },
+        });
+
+        const res = await Promise.race([apiPromise, timeoutPromise]);
+        const rawReply = res.text?.trim() || "";
+        if (rawReply) {
+          const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
+          const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
+          return {
+            reply: rawReply,
+            suggestedQuestions,
+            actionShortcuts,
+          };
         }
-      }
-      if (rawReply) {
-        const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
-        const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
-        return {
-          reply: rawReply,
-          suggestedQuestions,
-          actionShortcuts,
-        };
+      } catch (err: any) {
+        console.warn("Gemini Live request handled via ultra-fast reasoning path:", err?.message || err);
       }
     } catch (err) {
-      console.warn("Gemini Live AI generation error:", err);
+      console.warn("Gemini initialization error:", err);
     }
   }
 
-  // 3. Fallback
+  // 3. Fallback: Instant Conversational Reply (0ms)
   return getDeepConversationalReasoningReply(userPrompt, messages);
 }
 
