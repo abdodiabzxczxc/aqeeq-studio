@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,7 +35,7 @@ interface AiImageGeneratorDialogProps {
 type AspectRatioChoice = "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
 type OrientationFilter = "all" | "wide" | "tall" | "square";
 
-// 🏛️ كتالوج الأغلفة السريعة 4K المعتمدة
+// 🏛️ كتالوج الأغلفة السريعة 4K المعتمدة لمدارس العقيق
 const MASTER_PHOTO_CATALOG = [
   // 🤖 روبوت وابتكار
   {
@@ -368,16 +367,16 @@ export default function AiImageGeneratorDialog({
 
   const activeCardStyle = CARD_STYLES[cardStyleIndex];
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={`max-w-[96vw] w-[96vw] h-[92vh] max-h-[92vh] p-0 overflow-hidden font-[Tajawal,sans-serif] flex flex-col rounded-3xl border ${
-          dark ? "bg-[#0a0a0a] border-white/15 text-white" : "bg-slate-50 border-black/15 text-slate-900"
-        }`}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 backdrop-blur-md animate-in fade-in-0 duration-200">
+      <div
+        className="relative w-full max-w-[1600px] h-[92vh] max-h-[92vh] rounded-3xl border border-white/20 bg-[#0d0d0d] text-white shadow-2xl flex flex-col overflow-hidden font-[Tajawal,sans-serif]"
         dir="rtl"
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/10 bg-black/40 shrink-0">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/10 bg-black/60 shrink-0">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black shadow-lg">
               <Camera size={20} />
@@ -400,53 +399,62 @@ export default function AiImageGeneratorDialog({
             <button
               type="button"
               onClick={() => setActiveTab("globalSearch")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
                 activeTab === "globalSearch"
                   ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Globe size={14} />
+              <Globe size={15} />
               <span>🌐 بحث مباشر (700M+ صورة)</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("aiPrompt")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
                 activeTab === "aiPrompt"
                   ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Sparkles size={14} />
+              <Sparkles size={15} />
               <span>✨ توليد واقعي (Flux 8K)</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("gallery")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
                 activeTab === "gallery"
                   ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Layers size={14} />
+              <Layers size={15} />
               <span>🏛️ الكتالوج السريع ({MASTER_PHOTO_CATALOG.length})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("cardDesigner")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition ${
                 activeTab === "cardDesigner"
                   ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Palette size={14} />
+              <Palette size={15} />
               <span>🎨 مصمم بطاقة الغلاف</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="mr-2 grid h-8 w-8 place-items-center rounded-xl bg-white/10 hover:bg-rose-500 hover:text-white text-slate-400 transition"
+              title="إغلاق الاستوديو"
+            >
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -454,7 +462,7 @@ export default function AiImageGeneratorDialog({
         {/* Main Studio Body (Two Columns: Right Sidebar + Left Canvas) */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* ================= RIGHT CONTROL SIDEBAR (340px Fixed) ================= */}
-          <div className="w-full md:w-[340px] lg:w-[360px] shrink-0 border-l border-white/10 bg-black/50 p-4 overflow-y-auto space-y-4">
+          <div className="w-full md:w-[340px] lg:w-[360px] shrink-0 border-l border-white/10 bg-black/40 p-4 overflow-y-auto space-y-4">
             {/* Global Search Sidebar Controls */}
             {activeTab === "globalSearch" && (
               <div className="space-y-4">
@@ -482,7 +490,7 @@ export default function AiImageGeneratorDialog({
                   </form>
                 </div>
 
-                {/* Aspect Ratio Filter (Clean 2x2 Grid, NO horizontal scroll) */}
+                {/* Aspect Ratio Filter (Clean 2x2 Grid) */}
                 <div>
                   <Label className="text-xs font-black text-slate-300 mb-2 block">📐 شكل وأبعاد الصور</Label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -540,7 +548,7 @@ export default function AiImageGeneratorDialog({
                   </div>
                 </div>
 
-                {/* Quick Topics (Wrap grid, NO horizontal scroll) */}
+                {/* Quick Topics */}
                 <div>
                   <Label className="text-xs font-black text-slate-300 mb-2 block">⚡ مواضيع وأقسام مقترحة</Label>
                   <div className="flex flex-wrap gap-1.5">
@@ -1116,7 +1124,7 @@ export default function AiImageGeneratorDialog({
             )}
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
