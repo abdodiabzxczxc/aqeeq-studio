@@ -1468,9 +1468,52 @@ export const appRouter = router({
     saveApiKey: adminProcedure
       .input(z.object({ apiKey: z.string() }))
       .mutation(async ({ input }) => {
-        await setSetting("gemini_api_key", input.apiKey.trim());
-        process.env.GEMINI_API_KEY = input.apiKey.trim();
+        const key = input.apiKey.trim();
+        await setSetting("gemini_api_key", key);
+        process.env.GEMINI_API_KEY = key;
+        process.env.GOOGLE_API_KEY = key;
         return { success: true };
+      }),
+
+    testAndSaveApiKey: publicProcedure
+      .input(z.object({ apiKey: z.string().min(1, "يرجى إدخال مفتاح API") }))
+      .mutation(async ({ input }) => {
+        const key = input.apiKey.trim();
+        try {
+          const { GoogleGenAI } = await import("@google/genai");
+          const ai = new GoogleGenAI({ apiKey: key });
+          const res = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: [{ role: "user", parts: [{ text: "أجب بكلمة واحدة: جاهز" }] }],
+            config: { maxOutputTokens: 20 },
+          });
+          const reply = res.text?.trim();
+          if (!reply) throw new Error("لم يتم استلام رد من النموذج");
+
+          await setSetting("gemini_api_key", key);
+          process.env.GEMINI_API_KEY = key;
+          process.env.GOOGLE_API_KEY = key;
+
+          try {
+            const fs = await import("fs");
+            const path = await import("path");
+            const envPath = path.resolve(process.cwd(), ".env");
+            let content = fs.existsSync(envPath) ? fs.readFileSync(envPath, "utf-8") : "";
+            if (content.includes("GEMINI_API_KEY=")) {
+              content = content.replace(/GEMINI_API_KEY=.*/g, `GEMINI_API_KEY=${key}`);
+            } else {
+              content += `\nGEMINI_API_KEY=${key}\n`;
+            }
+            fs.writeFileSync(envPath, content);
+          } catch (e) {}
+
+          return { success: true, message: "تم تفعيل الذكاء الاصطناعي الحقيقي (Gemini 2.5 Flash) بنجاح! 🚀" };
+        } catch (err: any) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `تعذر تفعيل المفتاح: ${err?.message || "يرجى التأكد من صلاحية المفتاح من aistudio.google.com"}`,
+          });
+        }
       }),
   }),
 

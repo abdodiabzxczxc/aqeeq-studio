@@ -20,8 +20,14 @@ import {
   Copy,
   Check,
   Zap,
+  Key,
+  Settings,
+  ShieldCheck,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
@@ -41,9 +47,9 @@ type ChatMsg = {
 const INITIAL_MESSAGE: ChatMsg = {
   role: "assistant",
   content: `مرحباً بك في **مدارس العقيق الأهلية والدولية بالمدينة المنورة**! 💎🤖
-أنا مستشارك التعليمي الذكي فائق التطور. أعرف كل تفاصيل المدارس من مرحلة رياض الأطفال حتى الثانوي والمسار الدولي والدبلومة الأمريكية.
+أنا مستشارك التعليمي والذكاء الاصطناعي التفاعلي الفائق. أنا جاهز للحديث معك بطلاقة وفهم عميق لكل تفاصيل المدارس، ومقارنة المناهج والمسارات، وحساب الخصومات، والإجابة على أي سؤال تربوي أو تقني.
 
-كيف يمكنني خدمتك اليوم؟ يمكنك سؤالي عن أي شيء أو اختيار أحد المواضيع المقترحة:`,
+كيف يمكنني مساعدتك اليوم؟`,
   suggestedQuestions: [
     "قارن لي بين المسار الوطني والدبلومة الأمريكية",
     "ما هي شروط ورسوم القبول وخصومات الإخوة؟",
@@ -133,12 +139,31 @@ function renderInlineBoldAndLinks(str: string) {
 export function AqeeqAiAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+  const [geminiApiKeyInput, setGeminiApiKeyInput] = useState("");
   const [inputPrompt, setInputPrompt] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([INITIAL_MESSAGE]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [, navigate] = useLocation();
+
+  const utils = trpc.useUtils();
+  const { data: aiStatus, refetch: refetchAiStatus } = trpc.schoolAi.getAiStatus.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  const saveKeyMutation = trpc.schoolAi.testAndSaveApiKey.useMutation({
+    onSuccess: (res) => {
+      toast.success(res.message);
+      setIsKeyModalOpen(false);
+      void refetchAiStatus();
+      void utils.schoolAi.getAiStatus.invalidate();
+    },
+    onError: (err) => {
+      toast.error(err.message || "فشل التحقق من المفتاح");
+    },
+  });
 
   const askAiMutation = trpc.schoolAi.ask.useMutation({
     onSuccess: (data: any) => {
@@ -216,7 +241,9 @@ export function AqeeqAiAssistantWidget() {
         >
           <div className="relative grid h-11 w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
             <Bot size={24} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse" />
+            <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-slate-950 animate-pulse ${
+              aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"
+            }`} />
           </div>
 
           <div className="hidden sm:block text-right">
@@ -224,7 +251,9 @@ export function AqeeqAiAssistantWidget() {
               <span className="text-xs font-black text-amber-300">مساعد العقيق الذكي</span>
               <Sparkles size={12} className="text-amber-400" />
             </div>
-            <p className="text-[10px] text-slate-300 font-bold">اسألني أي شيء عن المدارس 🤖</p>
+            <p className="text-[10px] text-slate-300 font-bold">
+              {aiStatus?.hasLiveGemini ? "Gemini Live AI متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
+            </p>
           </div>
         </button>
       )}
@@ -243,23 +272,43 @@ export function AqeeqAiAssistantWidget() {
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md">
                 <Bot size={22} />
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0f1424]" />
+                <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-[#0f1424] ${
+                  aiStatus?.hasLiveGemini ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
+                }`} />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
-                  <span>مساعد مدارس العقيق الذكي</span>
-                  <span className="rounded-md bg-amber-400/20 border border-amber-400/40 px-1.5 py-0.2 text-[9px] text-amber-300 font-mono">
-                    GEMINI PRO
-                  </span>
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-white">مساعد مدارس العقيق الذكي</h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsKeyModalOpen(true)}
+                    className={`rounded-md px-1.5 py-0.5 text-[9px] font-mono font-black flex items-center gap-1 transition ${
+                      aiStatus?.hasLiveGemini
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                        : "bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400 hover:text-black"
+                    }`}
+                    title="إعدادات وربط مفتاح الذكاء الاصطناعي"
+                  >
+                    <Sparkles size={10} />
+                    <span>{aiStatus?.hasLiveGemini ? "GEMINI LIVE ⚡" : "تفعيل الذكاء الحي 🔑"}</span>
+                  </button>
+                </div>
                 <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>متصل وجاهز للإجابة الفورية</span>
+                  <span>{aiStatus?.hasLiveGemini ? "متصل بنموذج Gemini 2.5 Flash الذكي" : "جاهز للرد والمساعدة التربوية"}</span>
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setIsKeyModalOpen(true)}
+                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:text-amber-300 hover:bg-white/10 transition"
+                title="ربط مفتاح الذكاء الاصطناعي (Gemini Key)"
+              >
+                <Settings size={15} />
+              </button>
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
@@ -370,7 +419,7 @@ export function AqeeqAiAssistantWidget() {
             {askAiMutation.isPending && (
               <div className="flex items-center gap-2.5 text-amber-300 text-xs font-black bg-[#111728] border border-amber-400/30 p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse">
                 <Sparkles size={16} className="text-amber-400 animate-spin" />
-                <span>المساعد الذكي يفكر ويصيغ الإجابة النموذجية...</span>
+                <span>المساعد الذكي يفكر ويصيغ الإجابة الحية...</span>
               </div>
             )}
 
@@ -403,6 +452,88 @@ export function AqeeqAiAssistantWidget() {
           </form>
         </div>
       )}
+
+      {/* Google Gemini Key Setup Dialog */}
+      <Dialog open={isKeyModalOpen} onOpenChange={setIsKeyModalOpen}>
+        <DialogContent
+          className="max-w-lg rounded-[2.5rem] border border-amber-400/40 bg-[#0a0d18] text-white p-6 sm:p-8 text-right shadow-2xl"
+          dir="rtl"
+        >
+          <DialogHeader className="text-right border-b border-white/10 pb-4">
+            <DialogTitle className="text-lg font-black flex items-center gap-2 text-amber-300">
+              <Sparkles size={20} className="text-amber-400" />
+              <span>ربط الذكاء الاصطناعي الحي (Google Gemini 2.5 Flash)</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2 text-xs leading-relaxed">
+            <p className="text-slate-300">
+              لجعل المساعد يتحدث معك بحرية وذكاء فائق تماماً مثل النماذج العالمية وبدون أي إجابات محفوظة مسبقاً، يمكنك ربط مفتاح API مجاني من Google:
+            </p>
+
+            <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-3.5 space-y-2">
+              <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                <Key size={14} />
+                <span>كيف تحصل على المفتاح المجاني في 10 ثوانٍ؟</span>
+              </p>
+              <ol className="list-decimal list-inside space-y-1 text-slate-300 text-[11px]">
+                <li>افتح موقع Google AI Studio: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-amber-400 font-bold underline">aistudio.google.com/app/apikey ↗</a></li>
+                <li>سجل دخول بحساب Google واضغط على <strong>Create API Key</strong>.</li>
+                <li>انسخ المفتاح والصقه في الحقل أدناه واضغط <strong>تفعيل وحفظ</strong>.</li>
+              </ol>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-black text-slate-400">مفتاح Google Gemini API Key</label>
+              <Input
+                type="password"
+                value={geminiApiKeyInput}
+                onChange={(e) => setGeminiApiKeyInput(e.target.value)}
+                placeholder="AIzaSy..."
+                className="font-mono text-xs rounded-xl bg-black/60 border-white/15 text-white"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <div className="text-[11px] text-slate-400">
+                {aiStatus?.hasLiveGemini ? (
+                  <span className="text-emerald-400 font-bold flex items-center gap-1">
+                    <ShieldCheck size={14} />
+                    <span>الذكاء الاصطناعي الحي مفعّل حالياً بنجاح!</span>
+                  </span>
+                ) : (
+                  <span className="text-slate-400">الحالة الحالية: محرك المعرفة الأساسي</span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!geminiApiKeyInput.trim()) {
+                    toast.error("يرجى إدخال مفتاح API");
+                    return;
+                  }
+                  saveKeyMutation.mutate({ apiKey: geminiApiKeyInput });
+                }}
+                disabled={saveKeyMutation.isPending}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black px-5 py-2.5 text-xs font-black transition shadow-lg shadow-[#f8ca14]/20"
+              >
+                {saveKeyMutation.isPending ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>جاري التحقق والتفعيل...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check size={15} />
+                    <span>تفعيل الذكاء الحي فوراً</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
