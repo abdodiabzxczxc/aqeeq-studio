@@ -108,6 +108,7 @@ import {
   hideSiteStory,
   unhideSiteStory,
   getAqeeqAnalyticsSummary,
+  setSetting,
   type SiteBroadcast,
 } from "./db";
 import { generateAiNewsStory, generateAiAlbumDescription } from "./aiStoryService";
@@ -137,7 +138,7 @@ import {
   deletePodcast,
   likePodcast,
 } from "./podcastDb";
-import { askSchoolAiAssistant } from "./schoolAiAssistant";
+import { askSchoolAiAssistant, getEffectiveGeminiApiKey } from "./schoolAiAssistant";
 import {
   getLiveEvent,
   listAllLiveEvents,
@@ -1447,6 +1448,29 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         return askSchoolAiAssistant(input.history || [], input.prompt);
+      }),
+
+    getAiStatus: publicProcedure.query(async () => {
+      const apiKey = await getEffectiveGeminiApiKey();
+      return {
+        hasLiveGemini: Boolean(apiKey),
+        model: apiKey ? "Gemini 2.5 Flash" : "Aqeeq Educational Knowledge Engine",
+        features: [
+          "ذاكرة حوارية متعددة الأدوار (Multi-turn Context Memory)",
+          "موسوعة شاملة لكافة مراحل وبرامج ومدارس العقيق",
+          "مقارنة ذكية بين الدبلومة الأمريكية والمسار الوطني",
+          "استعلام فوري عن أحدث المقالات والألبومات والمجلات",
+          "دعم كامل لكافة اللهجات العربية والاستفسارات التربوية",
+        ],
+      };
+    }),
+
+    saveApiKey: adminProcedure
+      .input(z.object({ apiKey: z.string() }))
+      .mutation(async ({ input }) => {
+        await setSetting("gemini_api_key", input.apiKey.trim());
+        process.env.GEMINI_API_KEY = input.apiKey.trim();
+        return { success: true };
       }),
   }),
 
