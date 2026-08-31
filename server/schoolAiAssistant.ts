@@ -178,34 +178,41 @@ export async function askSchoolAiAssistant(
 
       const fullSystemContext = `${SYSTEM_INSTRUCTION_CORPUS}\n\n${livePlatformData}`;
 
-      try {
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("AI_TIMEOUT")), 3500)
-        );
+      const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+      let rawReply = "";
 
-        const apiPromise = ai.models.generateContent({
-          model: "gemini-3.6-flash",
-          contents: formattedContents,
-          config: {
-            systemInstruction: fullSystemContext,
-            temperature: 0.72,
-            maxOutputTokens: 900,
-          },
-        });
+      for (const model of modelsToTry) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("AI_TIMEOUT")), 5000)
+          );
 
-        const res = await Promise.race([apiPromise, timeoutPromise]);
-        const rawReply = res.text?.trim() || "";
-        if (rawReply) {
-          const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
-          const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
-          return {
-            reply: rawReply,
-            suggestedQuestions,
-            actionShortcuts,
-          };
+          const apiPromise = ai.models.generateContent({
+            model,
+            contents: formattedContents,
+            config: {
+              systemInstruction: fullSystemContext,
+              temperature: 0.72,
+              maxOutputTokens: 900,
+            },
+          });
+
+          const res = await Promise.race([apiPromise, timeoutPromise]);
+          rawReply = res.text?.trim() || "";
+          if (rawReply) break;
+        } catch (err: any) {
+          console.warn(`Model ${model} attempt failed:`, err?.message?.slice(0, 80));
         }
-      } catch (err: any) {
-        console.warn("Gemini Live request handled via ultra-fast reasoning path:", err?.message || err);
+      }
+
+      if (rawReply) {
+        const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
+        const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
+        return {
+          reply: rawReply,
+          suggestedQuestions,
+          actionShortcuts,
+        };
       }
     } catch (err) {
       console.warn("Gemini initialization error:", err);
