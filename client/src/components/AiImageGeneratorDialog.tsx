@@ -81,16 +81,15 @@ export default function AiImageGeneratorDialog({
   // Categories list
   const categories = [
     { id: "all", label: `✨ كل الأقسام (${MASTER_PHOTO_CATALOG_500.length})` },
-    { id: "مناسبات وهوية", label: "🇸🇦 مناسبات وهوية سعودية" },
-    { id: "رحلات واستكشاف", label: "🚀 رحلات واستكشاف ومعسكرات" },
-    { id: "روبوت وتكنولوجيا", label: "🤖 روبوت وتقنية وطنية" },
-    { id: "إذاعة وبودكاست", label: "🎙️ إذاعة وبودكاست العقيق" },
-    { id: "تفوق وتكريم", label: "🏆 تفوق وتكريم وجوائز" },
-    { id: "علوم ومختبرات", label: "🔬 مختبرات وتجارب علمية" },
-    { id: "قراءة ومكتبة", label: "📚 قراءة ومكتبات وتحدي القراءة" },
-    { id: "رياضة وأكاديمية", label: "⚽ بطولات ورياضة مدرسية" },
-    { id: "بيئة وفصول", label: "🏫 بيئة وفصول ذكية" },
-    { id: "فنون وإبداع", label: "🎨 فنون وخط عربي وإبداع" },
+    { id: "روبوت وتكنولوجيا", label: "🤖 روبوت وتكنولوجيا" },
+    { id: "إذاعة وبودكاست", label: "🎙️ إذاعة وبودكاست" },
+    { id: "تفوق وتكريم", label: "🏆 تفوق وتكريم" },
+    { id: "علوم ومختبرات", label: "🔬 علوم ومختبرات" },
+    { id: "قراءة ومكتبة", label: "📚 قراءة ومكتبة" },
+    { id: "رياضة وأكاديمية", label: "⚽ رياضة وأكاديمية" },
+    { id: "بيئة وفصول", label: "🏫 بيئة وفصول" },
+    { id: "فنون وإبداع", label: "🎨 فنون وإبداع" },
+    { id: "رحلات واستكشاف", label: "🚀 رحلات واستكشاف" },
   ];
 
   // Filter Catalog Photos
@@ -228,11 +227,11 @@ export default function AiImageGeneratorDialog({
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm sm:text-base">استوديو الأغلفة والصور البصرية لمدارس العقيق</span>
                 <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black text-emerald-400">
-                  +1200 PHOTOS 4K (طابع وهوية سعودية)
+                  استوديو الأغلفة المعتمد 4K
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-normal">
-                موسوعة فوتوغرافية ضخمة (+1280 صورة 4K بهوية سعودية أصيلة) + رحلات وأنشطة كشفية ومدرسية + بحث حي ومصمم أغلفة
+                كتالوج فوتوغرافي معتمد + بحث مباشر في الأرشيف العالمي + مصمم بطاقة الغلاف + رفع صور المدرسة
               </p>
             </div>
           </div>
