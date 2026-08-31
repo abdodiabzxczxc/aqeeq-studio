@@ -1538,6 +1538,8 @@ export const appRouter = router({
           prompt: z.string().min(2, "يرجى إدخال وصف أو فكرة الصورة"),
           type: z.enum(["article", "podcast", "general"]).optional(),
           aspectRatio: z.enum(["16:9", "1:1", "4:3"]).optional(),
+          model: z.enum(["flux-realism", "flux-pro", "flux", "turbo"]).optional(),
+          stylePreset: z.enum(["photorealistic", "cinematic", "editorial", "studio-pro"]).optional(),
         })
       )
       .mutation(async ({ input }) => {

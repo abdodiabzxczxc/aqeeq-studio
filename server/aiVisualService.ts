@@ -5,13 +5,21 @@ export interface GenerateAiCoverParams {
   prompt: string;
   type?: "article" | "podcast" | "general";
   aspectRatio?: "16:9" | "1:1" | "4:3";
+  model?: "flux-realism" | "flux-pro" | "flux" | "turbo";
+  stylePreset?: "photorealistic" | "cinematic" | "editorial" | "studio-pro";
 }
 
 export async function generateAiVisualCover(params: GenerateAiCoverParams): Promise<{
   imageUrl: string;
   enhancedPrompt: string;
 }> {
-  const { prompt, type = "article", aspectRatio = "16:9" } = params;
+  const {
+    prompt,
+    type = "article",
+    aspectRatio = "16:9",
+    model = "flux-realism",
+    stylePreset = "photorealistic",
+  } = params;
 
   let width = 1280;
   let height = 720;
@@ -29,22 +37,24 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     const apiKey = await getEffectiveGeminiApiKey();
     if (apiKey) {
       const ai = new GoogleGenAI({ apiKey });
-      const systemPrompt = `You are a world-class art director and visual concept artist for «Al-Aqeeq Educational Group» in Medina, Saudi Arabia.
-Transform the following Arabic topic or description into an ultra-detailed, photorealistic English visual prompt for Flux / Midjourney:
-User Topic / Description: "${prompt}"
-Context Type: "${type === "podcast" ? "Podcast cover art / modern broadcasting audio-visual studio" : "School article cover / prestigious educational photography"}"
+      const systemPrompt = `You are an award-winning executive art director and master prompt engineer for «Al-Aqeeq Schools & Studio» in Medina, Saudi Arabia.
+Transform the following Arabic topic into an ultra-high-end, photorealistic English photography prompt:
+Topic: "${prompt}"
+Context: "${type === "podcast" ? "Official high-end Podcast / Broadcasting Studio visual cover" : "Prestigious Saudi educational article editorial cover"}"
+Style Request: "${stylePreset}"
 
-Key Artistic Guidelines:
-1. TOPIC RELEVANCE: The generated scene MUST strictly and vividly reflect the specific topic and subject matter described above (e.g. if it is about robotics, show high-tech robotics in a modern lab; if it is about sports/taekwondo/swimming, show state-of-the-art sports facilities; if it is about national day or trips like Al-Ula, show that exact authentic environment; if it is about reading/library, show a luxurious school library).
-2. BRAND & CULTURAL ELEGANCE: Infuse modern Saudi cultural aesthetics, contemporary high-end architecture in Medina, warm golden lighting, and premium educational ambiance.
-3. QUALITY: Highly cinematic, photorealistic 8k, shallow depth of field, award-winning editorial magazine cover aesthetics.
-4. NEGATIVE CONSTRAINTS: NO distorted faces, NO extra limbs, NO blurry artifacts, NO text or watermarks overlaid on the image.
-5. Return ONLY the final English prompt string without any quotes or explanations.`;
+Strict Quality & Art Direction Rules:
+1. PHOTO-REALISM FIRST: Must look like an authentic, high-budget commercial photograph shot by a world-class photographer with a Hasselblad H6D-100c or Sony A1 camera.
+2. OPTICAL DETAILS: 85mm f/1.4 lens, natural bokeh, razor-sharp focus on subject, authentic skin textures, natural subsurface scattering, zero cartoonish or plastic look.
+3. CONTEXT & ARCHITECTURE: Authentic Saudi high-end educational environment in Medina, elegant Saudi attire (thobe, shemagh, abaya with dignity and class), modern architectural aesthetics, warm golden-hour lighting and subtle amber glow.
+4. SPECIFICITY: If the topic is Robotics/AI, feature real high-tech robotics equipment, LEGO League discovery boards, microcontrollers. If about swimming/taekwondo, feature real Olympic lanes, dojos. If about awards, feature real polished brass trophies. If about podcast, feature real Shure SM7B studio microphone with warm LED studio panels.
+5. NEGATIVE INSTRUCTIONS: NO cartoon, NO anime, NO surreal distortion, NO disfigured limbs, NO blurry faces, NO CGI plastic shine, NO text or watermarks.
+6. Return ONLY the finalized English prompt string, without any commentary or quotes.`;
 
       const res = await ai.models.generateContent({
         model: "gemini-3.5-flash-lite",
         contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-        config: { temperature: 0.4 },
+        config: { temperature: 0.3 },
       });
 
       enhancedPrompt = res.text?.trim() || "";
@@ -54,11 +64,12 @@ Key Artistic Guidelines:
   }
 
   if (!enhancedPrompt) {
-    enhancedPrompt = `Cinematic photorealistic 8k modern Saudi educational scene in Madinah, high-end school campus, inspiring students, warm golden hour volumetric lighting, ultra-detailed textures, ${prompt}`;
+    enhancedPrompt = `Ultra-photorealistic 8k commercial photography, prestigious Saudi modern school campus in Medina, high-end authentic scene, warm golden lighting, 85mm portrait lens, ${prompt}`;
   }
 
   const seed = Math.floor(Math.random() * 9000000) + 1000000;
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&model=flux&nologo=true&enhance=true&seed=${seed}`;
+  const targetModel = model || "flux-realism";
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&model=${targetModel}&nologo=true&enhance=true&seed=${seed}`;
 
   return {
     imageUrl,
