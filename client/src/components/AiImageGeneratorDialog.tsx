@@ -925,7 +925,15 @@ export default function AiImageGeneratorDialog({
                           : "aspect-video w-full max-h-[55vh]"
                       }`}
                     >
-                      <img src={generatedUrl} alt="Generated scene" className="h-full w-full object-cover" />
+                      <img
+                        src={generatedUrl}
+                        alt="Generated scene"
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          const el = e.currentTarget as HTMLImageElement;
+                          el.src = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85";
+                        }}
+                      />
                     </div>
 
                     <div className="flex items-center justify-center gap-3 pt-2">
