@@ -116,8 +116,7 @@ export default function AiImageGeneratorDialog({
     { id: "مناسبات وهوية", label: "🇸🇦 مناسبات وهوية" },
     { id: "بيئة وفصول", label: "🏫 بيئة وفصول" },
     { id: "فنون وإبداع", label: "🎨 فنون وإبداع" },
-    { id: "أنشطة ومسابقات", label: "🌟 أنشطة ومسابقات" },
-    { id: "رحلات واستكشاف", label: "🚀 رحلات واستكشاف" },
+    { id: "أنشطة واستكشاف", label: "🚀 أنشطة واستكشاف" },
   ];
 
   // Filter Catalog Photos

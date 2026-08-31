@@ -43,7 +43,7 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
     process.env.OPENAI_API_KEY;
 
   let faithfulPrompt = prompt.trim();
-  let matchedCategory = "أنشطة ومسابقات";
+  let matchedCategory = "أنشطة واستكشاف";
 
   // Step 1: Gemini Deep Semantic Comprehension
   if (effectiveGeminiKey) {
@@ -58,7 +58,7 @@ export async function generateAiVisualCover(params: GenerateAiCoverParams): Prom
               {
                 text: `Analyze this Arabic image/article request: "${prompt}".
 1. Translate it into an ultra-high-quality 8K commercial photography prompt.
-2. Select the BEST matching category from this list: ["روبوت وتكنولوجيا", "إذاعة وبودكاست", "تفوق وتكريم", "علوم ومختبرات", "قراءة ومكتبة", "رياضة وأكاديمية", "مناسبات وهوية", "بيئة وفصول", "فنون وإبداع", "أنشطة ومسابقات", "رحلات واستكشاف"].
+2. Select the BEST matching category from this list: ["روبوت وتكنولوجيا", "إذاعة وبودكاست", "تفوق وتكريم", "علوم ومختبرات", "قراءة ومكتبة", "رياضة وأكاديمية", "مناسبات وهوية", "بيئة وفصول", "فنون وإبداع", "أنشطة واستكشاف"].
 
 Output JSON format ONLY:
 {"englishPrompt": "...", "category": "..."}`,
