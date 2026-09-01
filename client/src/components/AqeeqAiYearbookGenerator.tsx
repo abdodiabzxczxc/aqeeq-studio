@@ -225,37 +225,47 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black text-white flex items-center justify-center overflow-hidden"
             >
-              {/* Scene 1: Intro Text 1 */}
+              {/* Scene 1: Intro Text 1 (Continuous Slow Zoom In) */}
               <AnimatePresence>
                 {sceneIndex === 0 && (
                   <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -15 }}
-                    transition={{ duration: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1.04 }}
+                    exit={{ opacity: 0, scale: 1.08 }}
+                    transition={{
+                      opacity: { duration: 0.6, ease: "easeInOut" },
+                      scale: { duration: 2.8, ease: "linear" },
+                    }}
                     className="absolute inset-0 flex items-center justify-center text-center px-6"
                   >
-                    <div>
-                      <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed">في كل عام،</h2>
-                      <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed text-[#e5b84f]">تُكتب قصة جديدة...</h2>
+                    <div className="relative">
+                      {/* Ambient Golden Halo behind text */}
+                      <div className="absolute -inset-10 bg-[radial-gradient(circle_at_center,rgba(229,184,79,0.15),transparent_70%)] pointer-events-none" />
+                      <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed drop-shadow-md">في كل عام،</h2>
+                      <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed text-[#e5b84f] drop-shadow-[0_0_25px_rgba(229,184,79,0.4)]">تُكتب قصة جديدة...</h2>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Scene 2: Intro Text 2 */}
+              {/* Scene 2: Intro Text 2 (Continuous Slow Zoom Out) */}
               <AnimatePresence>
                 {sceneIndex === 1 && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.06 }}
-                    transition={{ duration: 0.8 }}
+                    initial={{ opacity: 0, scale: 1.06 }}
+                    animate={{ opacity: 1, scale: 0.98 }}
+                    exit={{ opacity: 0, scale: 0.94 }}
+                    transition={{
+                      opacity: { duration: 0.6, ease: "easeInOut" },
+                      scale: { duration: 2.8, ease: "linear" },
+                    }}
                     className="absolute inset-0 flex items-center justify-center text-center px-6"
                   >
-                    <div>
-                      <h2 className="text-5xl md:text-8xl font-black drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">وهذا العام...</h2>
-                      <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#08467d] to-[#4da1eb] mt-4">كانت الكاميرا تبحث عنك!</h2>
+                    <div className="relative">
+                      {/* Ambient Blue-Cyan Halo */}
+                      <div className="absolute -inset-12 bg-[radial-gradient(circle_at_center,rgba(77,161,235,0.2),transparent_70%)] pointer-events-none" />
+                      <h2 className="text-5xl md:text-8xl font-black drop-shadow-[0_0_35px_rgba(255,255,255,0.35)]">وهذا العام...</h2>
+                      <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#e5b84f] via-[#f8ca14] to-[#f8ca14] mt-4 drop-shadow-[0_0_20px_rgba(248,202,20,0.4)]">كانت الكاميرا تبحث عنك!</h2>
                     </div>
                   </motion.div>
                 )}
@@ -305,19 +315,34 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                 )}
               </AnimatePresence>
 
-
-
-              {/* Scene 4: Climax (Logo) */}
+              {/* Scene 4: Climax (Continuous Slow Breathing Motion & Glow) */}
               <AnimatePresence>
                 {sceneIndex === 3 && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
-                    <GraduationCap size={100} className="text-[#e5b84f] mb-8 animate-pulse" />
-                    <h1 className="text-4xl md:text-7xl font-black font-['Tajawal'] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-300 to-white drop-shadow-lg mb-4 text-center">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.94 }}
+                    animate={{ opacity: 1, scale: 1.03 }}
+                    transition={{
+                      opacity: { duration: 0.8, ease: "easeOut" },
+                      scale: { duration: 8.0, ease: "linear" },
+                    }}
+                    className="absolute inset-0 bg-black flex flex-col items-center justify-center z-30 overflow-hidden"
+                  >
+                    {/* Ambient Glow */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(229,184,79,0.18),transparent_65%)] pointer-events-none" />
+
+                    <div className="relative mb-8 flex items-center justify-center">
+                      <div className="absolute -inset-6 bg-gradient-to-r from-[#e5b84f] to-amber-600 rounded-full blur-2xl opacity-40 animate-pulse" />
+                      <GraduationCap size={100} className="text-[#e5b84f] relative z-10 drop-shadow-[0_0_30px_rgba(229,184,79,0.7)]" />
+                    </div>
+
+                    <h1 className="text-4xl md:text-7xl font-black font-['Tajawal'] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-white drop-shadow-2xl mb-4 text-center">
                       مدارس العقيق تفخر بك
                     </h1>
-                    <p className="text-[#e5b84f] text-xl md:text-2xl font-bold tracking-widest mb-12">أنت بطل قصتنا</p>
-                    <Button onClick={closeWrapped} className="rounded-full h-14 px-10 bg-white/10 hover:bg-white/20 text-white font-bold backdrop-blur-md border border-white/20 transition-all">
-                      إنهاء العرض
+                    <p className="text-[#e5b84f] text-xl md:text-2xl font-bold tracking-widest mb-12 drop-shadow-lg">
+                      أنت بطل قصتنا 🌟
+                    </p>
+                    <Button onClick={closeWrapped} className="rounded-full h-14 px-10 bg-gradient-to-r from-[#e5b84f] to-[#c59c3a] hover:from-[#f0c35f] hover:to-[#d0a74b] text-black font-black text-lg shadow-xl shadow-[#e5b84f]/30 transition-all active:scale-95">
+                      إنهاء العرض ✨
                     </Button>
                   </motion.div>
                 )}
