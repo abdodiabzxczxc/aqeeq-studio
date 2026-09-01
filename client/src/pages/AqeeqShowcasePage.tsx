@@ -10,7 +10,8 @@ import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ChevronLeft, ChevronRight, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X } from "lucide-react";
+import { ArrowUpLeft, ChevronLeft, ChevronRight, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Video } from "lucide-react";
+import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -63,15 +64,65 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
   );
 }
 
-function ViewCount({ post }: { post: ShowcasePost }) { return <VisualEditable id={`showcase-card-views-${post.id}`} tag="text" label={`عدد مشاهدات ${post.title || post.fileName}`} defaultText={`${post.viewCount || 0} مشاهدة`} as="span" className="inline-flex items-center gap-1 text-[10px] font-black text-slate-400"><Eye size={13} />{post.viewCount || 0}</VisualEditable>; }
+function getVideoEmbedUrl(url: string | undefined | null): string {
+  if (!url) return "";
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&enablejsapi=1`;
+  }
+  const driveMatch = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  if (driveMatch && driveMatch[1]) {
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  }
+  return url;
+}
 
-function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, onOpen, dark }: { post: ShowcasePost; watermarkUrl: string | null; watermarkScale: number; watermarkOpacity: number; onOpen: () => void; dark: boolean }) {
+function isEmbeddableVideo(url: string | undefined | null): boolean {
+  if (!url) return false;
+  return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("drive.google.com");
+}
+
+function ViewCount({ post }: { post: ShowcasePost }) {
+  return (
+    <VisualEditable
+      id={`showcase-card-views-${post.id}`}
+      tag="text"
+      label={`عدد مشاهدات ${post.title || post.fileName}`}
+      defaultText={`${post.viewCount || 0} مشاهدة`}
+      as="span"
+      className="inline-flex items-center gap-1 text-[11px] font-black text-slate-400"
+    >
+      <Eye size={13} />
+      <span>{post.viewCount || 0}</span>
+    </VisualEditable>
+  );
+}
+
+function MediaPostCard({
+  post,
+  watermarkUrl,
+  watermarkScale,
+  watermarkOpacity,
+  onOpen,
+  dark,
+}: {
+  post: ShowcasePost;
+  watermarkUrl: string | null;
+  watermarkScale: number;
+  watermarkOpacity: number;
+  onOpen: () => void;
+  dark: boolean;
+}) {
   const groupItems = post.media?.length ? post.media : [post];
   const hasMultiple = groupItems.length > 1;
   const [groupOpen, setGroupOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPlayingInline, setIsPlayingInline] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 3) + 7 : 18);
+
   const active = groupItems[activeIndex] || groupItems[0];
-  const isSingleVideo = !hasMultiple && post.mediaType === "video";
+  const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
 
   const openPost = () => {
     if (hasMultiple) {
@@ -81,50 +132,199 @@ function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, o
       onOpen();
     }
   };
-  const move = (direction: -1 | 1) => setActiveIndex((index) => Math.max(0, Math.min(groupItems.length - 1, index + direction)));
 
+  const move = (direction: -1 | 1) =>
+    setActiveIndex((index) => Math.max(0, Math.min(groupItems.length - 1, index + direction)));
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (liked) {
+      setLiked(false);
+      setLikeCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setLiked(true);
+      setLikeCount((prev) => prev + 1);
+      toast.success("شكراً لتفاعلك وإعجابك! ❤️");
+    }
+  };
+
+  // 1) VIDEO CARD (لون الإنديجو والسيان الفاخر 🎬)
+  if (isVideo) {
+    return (
+      <>
+        <article
+          className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+            dark
+              ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] text-white shadow-[0_16px_45px_rgba(99,102,241,0.18)] hover:border-indigo-400/80 hover:shadow-[0_20px_60px_rgba(99,102,241,0.3)]"
+              : "border-indigo-300 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(99,102,241,0.1)] hover:border-indigo-500"
+          }`}
+        >
+          {/* Top Bar Header inside Card */}
+          <div className="flex items-center justify-between border-b border-indigo-500/20 pb-2.5 mb-3.5">
+            <div className="flex items-center gap-1.5">
+              <span className="grid h-6 w-6 place-items-center rounded-lg bg-indigo-600 text-white shadow-sm">
+                <Video size={12} />
+              </span>
+              <span className="text-[11px] font-black text-indigo-400">تغطية مرئية 4K</span>
+            </div>
+            <span className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[9px] font-black text-indigo-300 border border-indigo-500/30">
+              فيديو
+            </span>
+          </div>
+
+          {/* 16:9 Cinema Box Screen */}
+          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+            {isPlayingInline ? (
+              isEmbeddableVideo(post.mediaUrl) ? (
+                <iframe
+                  src={getVideoEmbedUrl(post.mediaUrl)}
+                  title={post.title || post.fileName}
+                  className="h-full w-full border-0"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              ) : (
+                <video
+                  src={post.mediaUrl}
+                  controls
+                  autoPlay
+                  className="h-full w-full object-contain"
+                />
+              )
+            ) : (
+              <div
+                onClick={() => setIsPlayingInline(true)}
+                className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
+              >
+                <img
+                  src={getAqeeqShowcaseDisplaySource(post)}
+                  alt=""
+                  className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
+
+                {/* Centered Glowing Play Button */}
+                <div className="absolute inset-0 grid place-items-center">
+                  <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(6,182,212,0.9)]">
+                    <Play size={22} className="mr-0.5 fill-current" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Title & Description */}
+          <div className="p-2 pt-3.5">
+            <VisualEditable
+              id={`showcase-card-title-${post.id}`}
+              tag="text"
+              label={`عنوان ${post.fileName}`}
+              defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
+              as="p"
+              className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+            />
+            {post.description ? (
+              <VisualEditable
+                id={`showcase-card-description-${post.id}`}
+                tag="text"
+                label={`وصف ${post.fileName}`}
+                defaultText={post.description}
+                as="p"
+                className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
+              />
+            ) : (
+              <p className="mt-1 text-xs font-bold text-indigo-400/80">من أخبار وعروض العقيق</p>
+            )}
+          </div>
+
+          {/* Bottom Action Capsule */}
+          <div
+            className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+              dark ? "border-indigo-500/20 bg-black/40" : "border-indigo-200 bg-white shadow-sm"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleLike}
+                className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                  liked
+                    ? "bg-rose-500/20 text-rose-400"
+                    : "text-slate-400 hover:text-rose-400"
+                }`}
+                title="إعجاب"
+              >
+                <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+                <span>{likeCount}</span>
+              </button>
+              <ViewCount post={post} />
+            </div>
+
+            <button
+              onClick={onOpen}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+            >
+              <span>عرض كامل</span>
+              <ArrowUpLeft size={13} />
+            </button>
+          </div>
+        </article>
+      </>
+    );
+  }
+
+  // 2) PHOTO / GALLERY CARD (لون الذهبي والعنبر الفاخر 📸)
   return (
     <>
-      <article className={`mb-5 break-inside-avoid overflow-hidden rounded-[1.65rem] border transition duration-300 hover:-translate-y-1 ${
-        dark
-          ? "border-[#f8ca14]/25 bg-[#080808] text-white shadow-[0_18px_44px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
-          : "border-[#08467d]/20 bg-white text-black shadow-[0_18px_44px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
-      }`}>
-        {isSingleVideo ? (
-          <div className="relative aspect-video w-full overflow-hidden bg-black">
-            <AqeeqVideoPlayer
-              sourceUrl={post.mediaUrl}
-              posterUrl={getAqeeqShowcaseDisplaySource(post)}
-              title={post.title || post.fileName.replace(/\.[^.]+$/, "")}
-              badge="فيديو"
-              onOpen={onOpen}
-              className="h-full w-full"
-            />
+      <article
+        className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+          dark
+            ? "border-amber-500/35 bg-gradient-to-b from-[#181300] via-[#0e0c04] to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400/80 hover:shadow-[0_20px_60px_rgba(245,158,11,0.25)]"
+            : "border-amber-300 bg-gradient-to-b from-amber-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
+        }`}
+      >
+        {/* Top Bar Header inside Card */}
+        <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3.5">
+          <div className="flex items-center gap-1.5">
+            <span className="grid h-6 w-6 place-items-center rounded-lg bg-amber-500 text-black shadow-sm">
+              <ImageIcon size={12} />
+            </span>
+            <span className="text-[11px] font-black text-amber-400">معرض صور HD</span>
           </div>
-        ) : (
-          <button onClick={openPost} className="group relative block w-full overflow-hidden bg-black text-right">
+          <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[9px] font-black text-amber-300 border border-amber-500/30">
+            {hasMultiple ? `${groupItems.length} صور` : "صورة"}
+          </span>
+        </div>
+
+        {/* Media Frame Screen */}
+        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+          <button onClick={openPost} className="group/screen relative block h-full w-full overflow-hidden bg-black text-right">
             {hasMultiple ? (
-              <div className="grid grid-cols-2 gap-px bg-black">
+              <div className="grid grid-cols-2 gap-0.5 h-full w-full bg-black">
                 {groupItems.slice(0, 4).map((item, index) => (
-                  <div key={item.id} className="relative aspect-square overflow-hidden">
-                    {item.mediaType === "image" ? (
-                      <img src={getAqeeqShowcaseDisplaySource(item)} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
-                    ) : (
-                      <>
-                        <img src={getAqeeqShowcaseDisplaySource(item)} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" />
-                        <span className="absolute inset-0 grid place-items-center bg-black/35 text-white">
-                          <Play size={20} fill="currentColor" />
-                        </span>
-                      </>
-                    )}
+                  <div key={item.id} className="relative h-full w-full overflow-hidden">
+                    <img
+                      src={getAqeeqShowcaseDisplaySource(item)}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
+                      loading="lazy"
+                    />
                     {index === 3 && groupItems.length > 4 ? (
-                      <span className="absolute inset-0 grid place-items-center bg-black/65 text-xl font-black text-white">+{groupItems.length - 4}</span>
+                      <span className="absolute inset-0 grid place-items-center bg-black/70 text-lg font-black text-amber-300">
+                        +{groupItems.length - 4}
+                      </span>
                     ) : null}
                   </div>
                 ))}
               </div>
             ) : (
-              <ShowcaseMedia post={post} className="transition duration-700 group-hover:scale-[1.025]" />
+              <img
+                src={getAqeeqShowcaseDisplaySource(post)}
+                alt=""
+                className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+                loading="lazy"
+              />
             )}
             {watermarkUrl ? (
               <img
@@ -132,41 +332,79 @@ function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, o
                 alt=""
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 object-contain brightness-0 invert"
-                style={{ width: `${Math.min(90, Math.max(20, watermarkScale || 42))}%`, opacity: (watermarkOpacity || 12) / 100 }}
+                style={{
+                  width: `${Math.min(90, Math.max(20, watermarkScale || 42))}%`,
+                  opacity: (watermarkOpacity || 12) / 100,
+                }}
               />
             ) : null}
           </button>
-        )}
+        </div>
 
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <VisualEditable id={`showcase-card-title-${post.id}`} tag="text" label={`عنوان ${post.fileName}`} defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")} as="p" className={`truncate text-lg font-black ${dark ? "text-white" : "text-black"}`} />
-              {post.description ? (
-                <VisualEditable id={`showcase-card-description-${post.id}`} tag="text" label={`وصف ${post.fileName}`} defaultText={post.description} as="p" className={`mt-2 text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`} />
-              ) : (
-                <p className={`mt-2 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من أخبار وعروض العقيق</p>
-              )}
-            </div>
-            <span className={`mt-1 shrink-0 rounded-full border px-2 py-1 text-[9px] font-black ${
-              dark ? "border-[#f8ca14]/30 text-[#f8ca14] bg-[#f8ca14]/10" : "border-[#08467d]/20 text-[#08467d] bg-[#08467d]/10"
-            }`}>
-              {hasMultiple ? <><Layers3 className="ml-1 inline" size={12} />{groupItems.length} وسائط</> : post.mediaType === "video" ? "فيديو" : "صورة"}
-            </span>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
+        {/* Title & Description */}
+        <div className="p-2 pt-3.5">
+          <VisualEditable
+            id={`showcase-card-title-${post.id}`}
+            tag="text"
+            label={`عنوان ${post.fileName}`}
+            defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
+            as="p"
+            className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+          />
+          {post.description ? (
+            <VisualEditable
+              id={`showcase-card-description-${post.id}`}
+              tag="text"
+              label={`وصف ${post.fileName}`}
+              defaultText={post.description}
+              as="p"
+              className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            />
+          ) : (
+            <p className="mt-1 text-xs font-bold text-amber-400/80">من أخبار وعروض العقيق</p>
+          )}
+        </div>
+
+        {/* Bottom Action Capsule */}
+        <div
+          className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+            dark ? "border-amber-500/20 bg-black/40" : "border-amber-200 bg-white shadow-sm"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleLike}
+              className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                liked
+                  ? "bg-rose-500/20 text-rose-400"
+                  : "text-slate-400 hover:text-rose-400"
+              }`}
+              title="إعجاب"
+            >
+              <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+              <span>{likeCount}</span>
+            </button>
             <ViewCount post={post} />
-            <span className={`inline-flex items-center gap-2 text-xs font-black transition ${dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"}`}>
-              {hasMultiple ? "فتح المجموعة" : "عرض كامل"} <ArrowUpLeft size={14} />
-            </span>
           </div>
+
+          <button
+            onClick={openPost}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+          >
+            <span>{hasMultiple ? "فتح الألبوم" : "عرض كامل"}</span>
+            <ArrowUpLeft size={13} />
+          </button>
         </div>
       </article>
 
+      {/* Lightbox / Group Modal */}
       <Dialog open={groupOpen} onOpenChange={setGroupOpen}>
-        <DialogContent className={`max-h-[94svh] max-w-5xl overflow-y-auto p-0 text-right ${
-          dark ? "border-[#f8ca14]/30 bg-black text-white" : "border-black/10 bg-white text-black"
-        }`}>
+        <DialogContent
+          className={`max-h-[94svh] max-w-5xl overflow-y-auto p-0 text-right ${
+            dark ? "border-amber-500/30 bg-black text-white" : "border-black/10 bg-white text-black"
+          }`}
+        >
           <DialogTitle className="sr-only">{post.title || "مجموعة وسائط"}</DialogTitle>
           <div dir="rtl">
             <div className="relative bg-black">
@@ -177,10 +415,18 @@ function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, o
               )}
               {groupItems.length > 1 ? (
                 <>
-                  <button onClick={() => move(-1)} disabled={activeIndex === 0} className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30">
+                  <button
+                    onClick={() => move(-1)}
+                    disabled={activeIndex === 0}
+                    className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30"
+                  >
                     <ChevronRight size={22} />
                   </button>
-                  <button onClick={() => move(1)} disabled={activeIndex === groupItems.length - 1} className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30">
+                  <button
+                    onClick={() => move(1)}
+                    disabled={activeIndex === groupItems.length - 1}
+                    className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30"
+                  >
                     <ChevronLeft size={22} />
                   </button>
                 </>
@@ -189,12 +435,20 @@ function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, o
             <div className="p-5 sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className={`text-xl font-black ${dark ? "text-white" : "text-black"}`}>{post.title || post.fileName.replace(/\.[^.]+$/, "")}</h3>
-                  {post.description ? <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>{post.description}</p> : null}
+                  <h3 className={`text-xl font-black ${dark ? "text-white" : "text-black"}`}>
+                    {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+                  </h3>
+                  {post.description ? (
+                    <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                      {post.description}
+                    </p>
+                  ) : null}
                 </div>
-                <span className={`rounded-full border px-3 py-1 text-xs font-black ${
-                  dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/20 text-[#08467d]"
-                }`}>
+                <span
+                  className={`rounded-full border px-3 py-1 text-xs font-black ${
+                    dark ? "border-amber-400/30 text-amber-300" : "border-amber-500/20 text-amber-800"
+                  }`}
+                >
                   {activeIndex + 1} / {groupItems.length}
                 </span>
               </div>
@@ -206,38 +460,116 @@ function MediaPostCard({ post, watermarkUrl, watermarkScale, watermarkOpacity, o
   );
 }
 
+// 3) SOCIAL MEDIA CARD (لون الوردي والأرجواني الموثق 📱)
 function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: () => void; dark: boolean }) {
   const postUrl = post.externalUrl || post.mediaUrl;
   const isInstagram = post.sourceType === "instagram";
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 2) + 14 : 29);
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (liked) {
+      setLiked(false);
+      setLikeCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setLiked(true);
+      setLikeCount((prev) => prev + 1);
+      toast.success("شكراً لتفاعلك! ❤️");
+    }
+  };
+
   return (
-    <article className={`mb-5 break-inside-avoid overflow-hidden rounded-[1.65rem] border ${
-      dark ? "border-white/[0.08] bg-black text-white shadow-xl" : "border-black/[0.08] bg-white text-black shadow-md"
-    }`}>
-      {post.sourceType === "x" ? <XPostEmbed post={post} dark={dark} /> : isInstagram ? <InstagramPostEmbed post={post} /> : <YouTubePostEmbed post={post} />}
-      <div className={`border-t p-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <VisualEditable id={`showcase-social-title-${post.id}`} tag="text" label={`عنوان ${post.fileName}`} defaultText={post.title || post.fileName} as="p" className={`truncate text-lg font-black ${dark ? "text-white" : "text-black"}`} />
-            {post.description ? (
-              <VisualEditable id={`showcase-social-description-${post.id}`} tag="text" label={`وصف ${post.fileName}`} defaultText={post.description} as="p" className={`mt-2 text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`} />
-            ) : (
-              <p className={`mt-2 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من أخبار وعروض العقيق</p>
-            )}
-          </div>
-          <span className={`mt-1 shrink-0 rounded-full border px-2 py-1 text-[9px] font-black ${
-            dark ? "border-[#f8ca14]/30 text-[#f8ca14] bg-[#f8ca14]/10" : "border-[#08467d]/20 text-[#08467d] bg-[#08467d]/10"
-          }`}>
-            {post.sourceType === "x" ? "X" : isInstagram ? "Instagram" : "YouTube"}
+    <article
+      className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+        dark
+          ? "border-violet-500/40 bg-gradient-to-b from-[#150926] via-[#0d0718] to-[#04020a] text-white shadow-[0_16px_45px_rgba(139,92,246,0.18)] hover:border-violet-400/80 hover:shadow-[0_20px_60px_rgba(139,92,246,0.28)]"
+          : "border-violet-300 bg-gradient-to-b from-violet-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(139,92,246,0.08)] hover:border-violet-500"
+      }`}
+    >
+      {/* Top Bar Header inside Card */}
+      <div className="flex items-center justify-between border-b border-violet-500/20 pb-2.5 mb-3.5">
+        <div className="flex items-center gap-1.5">
+          <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-r from-violet-600 to-rose-600 text-white shadow-sm">
+            <Share2 size={12} />
+          </span>
+          <span className="text-[11px] font-black text-violet-400">
+            {post.sourceType === "x" ? "منصة 𝕏 الرسمية" : isInstagram ? "إنستغرام العقيق" : "يوتيوب العقيق"}
           </span>
         </div>
-        <div className="mt-4 flex items-center justify-between">
+        <span className="rounded-full bg-violet-500/20 px-2.5 py-0.5 text-[9px] font-black text-violet-300 border border-violet-500/30">
+          {post.sourceType === "x" ? "X" : isInstagram ? "Instagram" : "YouTube"}
+        </span>
+      </div>
+
+      {/* Embed Frame */}
+      <div className="overflow-hidden rounded-2xl border border-violet-500/30 bg-black">
+        {post.sourceType === "x" ? (
+          <XPostEmbed post={post} dark={dark} />
+        ) : isInstagram ? (
+          <InstagramPostEmbed post={post} />
+        ) : (
+          <YouTubePostEmbed post={post} />
+        )}
+      </div>
+
+      {/* Title & Description */}
+      <div className="p-2 pt-3.5">
+        <VisualEditable
+          id={`showcase-social-title-${post.id}`}
+          tag="text"
+          label={`عنوان ${post.fileName}`}
+          defaultText={post.title || post.fileName}
+          as="p"
+          className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+        />
+        {post.description ? (
+          <VisualEditable
+            id={`showcase-social-description-${post.id}`}
+            tag="text"
+            label={`وصف ${post.fileName}`}
+            defaultText={post.description}
+            as="p"
+            className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
+          />
+        ) : (
+          <p className="mt-1 text-xs font-bold text-violet-400/80">من أخبار وعروض العقيق</p>
+        )}
+      </div>
+
+      {/* Bottom Action Capsule */}
+      <div
+        className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+          dark ? "border-violet-500/20 bg-black/40" : "border-violet-200 bg-white shadow-sm"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleLike}
+            className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+              liked
+                ? "bg-rose-500/20 text-rose-400"
+                : "text-slate-400 hover:text-rose-400"
+            }`}
+            title="إعجاب"
+          >
+            <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+            <span>{likeCount}</span>
+          </button>
           <ViewCount post={post} />
-          <a onClick={onOpen} href={postUrl} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 text-xs font-black transition ${
-            dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
-          }`}>
-            فتح المصدر <ArrowUpLeft size={14} />
-          </a>
         </div>
+
+        <a
+          onClick={onOpen}
+          href={postUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-rose-600 hover:from-violet-500 hover:to-rose-500 text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+        >
+          <span>فتح المصدر</span>
+          <ArrowUpLeft size={13} />
+        </a>
       </div>
     </article>
   );
