@@ -145,7 +145,6 @@ function StudioAppShell() {
           <VisualGlobalSections />
           <PwaInstallBanner />
           <AqeeqAiAssistantWidget />
-          <AqeeqGlobalRadio />
         </div>
       </div>
     </PodcastPlayerProvider>
