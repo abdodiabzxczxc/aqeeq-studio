@@ -629,12 +629,33 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     };
   }, [activeItem]);
 
-  // Audio source effect
+  // Audio source effect — loads and plays new track instantly using preload
   useEffect(() => {
     if (activeItem && activeItem.mediaType === "audio" && audioRef.current) {
-      audioRef.current.src = activeItem.mediaUrl;
-      audioRef.current.play().catch(() => setIsPlaying(false));
+      const audio = audioRef.current;
+
+      // If same URL is already loaded (e.g., just unpaused), just resume
+      if (audio.src && audio.src.includes(activeItem.mediaUrl.replace(/^\//, "")) && !audio.ended) {
+        audio.play().catch(() => setIsPlaying(false));
+        return;
+      }
+
+      // Load new source
+      audio.preload = "auto";
+      audio.src = activeItem.mediaUrl;
+      audio.load();
+
+      const onCanPlay = () => {
+        audio.play().catch(() => setIsPlaying(false));
+        audio.removeEventListener("canplay", onCanPlay);
+      };
+      audio.addEventListener("canplay", onCanPlay);
+
       setIsPlaying(true);
+
+      return () => {
+        audio.removeEventListener("canplay", onCanPlay);
+      };
     }
   }, [activeItem?.id, activeItem?.mediaUrl]);
 
@@ -798,6 +819,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
+        preload="auto"
+        crossOrigin="anonymous"
         className="hidden"
       />
 

@@ -123,6 +123,15 @@ export function registerStorageProxy(app: Express) {
     }
   });
 
+// Lightweight ephemeral audio RAM cache (0ms instant playback, seek & resume)
+const audioMemoryCache = new Map<string, { buffer: Buffer; contentType: string; etag: string }>();
+const MAX_AUDIO_RAM_ITEMS = 60;
+
+function evictOldestAudio() {
+  const oldest = audioMemoryCache.keys().next().value;
+  if (oldest) audioMemoryCache.delete(oldest);
+}
+
   // Zero-Disk-Space High-Speed Google Drive Audio Streamer with Range & All-Format Support
   app.get("/api/drive-audio-proxy/:fileId", async (req, res) => {
     const { fileId } = req.params;
@@ -134,84 +143,109 @@ export function registerStorageProxy(app: Express) {
     res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
-    try {
-      const googleDownloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
-      const rangeHeader = req.headers.range;
+    const requestedExt = (req.query.ext as string)?.toLowerCase();
+    const mimeMap: Record<string, string> = {
+      mp3: "audio/mpeg",
+      m4a: "audio/mp4",
+      wav: "audio/wav",
+      aac: "audio/aac",
+      ogg: "audio/ogg",
+      oga: "audio/ogg",
+      opus: "audio/opus",
+      flac: "audio/flac",
+      weba: "audio/webm",
+      webm: "audio/webm",
+      wma: "audio/x-ms-wma",
+      aiff: "audio/aiff",
+      aif: "audio/aiff",
+      mid: "audio/midi",
+      midi: "audio/midi",
+      amr: "audio/amr",
+      ac3: "audio/ac3",
+      mka: "audio/x-matroska",
+      caf: "audio/x-caf",
+    };
 
-      const fetchHeaders: Record<string, string> = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      };
+    const serveBuffer = (buffer: Buffer, contentType: string, etag: string) => {
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Accept-Ranges", "bytes");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.setHeader("ETag", etag);
+
+      const rangeHeader = req.headers.range;
       if (rangeHeader) {
-        fetchHeaders.Range = rangeHeader;
+        const parts = rangeHeader.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10) || 0;
+        const end = parts[1] ? parseInt(parts[1], 10) : buffer.length - 1;
+
+        if (start >= buffer.length || end >= buffer.length) {
+          res.setHeader("Content-Range", `bytes */${buffer.length}`);
+          return res.status(416).send("Requested Range Not Satisfiable");
+        }
+
+        const chunksize = end - start + 1;
+        res.status(206);
+        res.setHeader("Content-Range", `bytes ${start}-${end}/${buffer.length}`);
+        res.setHeader("Content-Length", String(chunksize));
+        return res.end(buffer.subarray(start, end + 1));
+      } else {
+        res.status(200);
+        res.setHeader("Content-Length", String(buffer.length));
+        return res.end(buffer);
+      }
+    };
+
+    // 1. Check RAM Cache (0ms instant response)
+    const cached = audioMemoryCache.get(fileId);
+    if (cached) {
+      if (req.headers["if-none-match"] === cached.etag && !req.headers.range) {
+        return res.status(304).end();
+      }
+      return serveBuffer(cached.buffer, cached.contentType, cached.etag);
+    }
+
+    try {
+      const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+      
+      // Try fast usercontent direct endpoint first, fallback to uc
+      const downloadUrls = [
+        `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download&confirm=t`,
+        `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`,
+        `https://docs.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`,
+      ];
+
+      let driveRes: Response | null = null;
+      for (const u of downloadUrls) {
+        try {
+          const r = await fetchWithTimeout(u, {
+            headers: { "User-Agent": UA },
+            timeoutMs: 15000,
+          });
+          if (r.ok || r.status === 206) {
+            driveRes = r;
+            break;
+          }
+        } catch {}
       }
 
-      const driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders });
-
-      if (!driveRes.ok && driveRes.status !== 206) {
-        return res.status(driveRes.status).send("Failed to stream audio from Google Drive");
+      if (!driveRes || (!driveRes.ok && driveRes.status !== 206)) {
+        return res.status(502).send("Failed to stream audio from Google Drive");
       }
 
       const rawContentType = driveRes.headers.get("content-type") || "";
-      const contentLength = driveRes.headers.get("content-length");
-      const contentRange = driveRes.headers.get("content-range");
-      const acceptRanges = driveRes.headers.get("accept-ranges") || "bytes";
-
-      const requestedExt = (req.query.ext as string)?.toLowerCase();
-      const mimeMap: Record<string, string> = {
-        mp3: "audio/mpeg",
-        m4a: "audio/mp4",
-        wav: "audio/wav",
-        aac: "audio/aac",
-        ogg: "audio/ogg",
-        oga: "audio/ogg",
-        opus: "audio/opus",
-        flac: "audio/flac",
-        weba: "audio/webm",
-        webm: "audio/webm",
-        wma: "audio/x-ms-wma",
-        aiff: "audio/aiff",
-        aif: "audio/aiff",
-        mid: "audio/midi",
-        midi: "audio/midi",
-        amr: "audio/amr",
-        ac3: "audio/ac3",
-        mka: "audio/x-matroska",
-        caf: "audio/x-caf",
-      };
-
       let finalContentType = (requestedExt && mimeMap[requestedExt]) || rawContentType;
       if (!finalContentType || !finalContentType.includes("audio")) {
         finalContentType = "audio/mpeg";
       }
 
-      res.status(driveRes.status);
-      res.setHeader("Content-Type", finalContentType);
-      res.setHeader("Accept-Ranges", acceptRanges);
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      if (contentLength) res.setHeader("Content-Length", contentLength);
-      if (contentRange) res.setHeader("Content-Range", contentRange);
+      const arrayBuf = await driveRes.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+      const etag = `"${fileId}-${buffer.length}"`;
 
-      if (driveRes.body) {
-        const reader = driveRes.body.getReader();
-        const pump = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                res.end();
-                break;
-              }
-              res.write(value);
-            }
-          } catch {
-            res.end();
-          }
-        };
-        await pump();
-      } else {
-        const buf = Buffer.from(await driveRes.arrayBuffer());
-        res.send(buf);
-      }
+      if (audioMemoryCache.size >= MAX_AUDIO_RAM_ITEMS) evictOldestAudio();
+      audioMemoryCache.set(fileId, { buffer, contentType: finalContentType, etag });
+
+      return serveBuffer(buffer, finalContentType, etag);
     } catch (err) {
       console.warn("[DriveAudioProxy] Audio streaming error:", err);
       res.status(500).send("Error streaming audio");
