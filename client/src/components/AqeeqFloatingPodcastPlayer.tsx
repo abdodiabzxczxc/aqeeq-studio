@@ -28,6 +28,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 export type AudioTrackType = "song" | "podcast";
 
@@ -151,6 +152,8 @@ type AudioPlayerContextType = {
   isMuted: boolean;
   progress: number;
   duration: number;
+  currentTime: number;
+  volume: number;
   currentTrackType: AudioTrackType | null;
 
   // Actions
@@ -165,6 +168,9 @@ type AudioPlayerContextType = {
   pausePodcast: () => void;
   stopPodcast: () => void;
   returnToSongs: () => void;
+  seek: (time: number) => void;
+  setVolume: (vol: number) => void;
+  toggleMute: () => void;
 
   // Song playlist
   songs: UniversalAudioItem[];
@@ -178,6 +184,8 @@ const PodcastPlayerContext = createContext<AudioPlayerContextType>({
   isMuted: false,
   progress: 0,
   duration: 0,
+  currentTime: 0,
+  volume: 1,
   currentTrackType: null,
   playSong: () => {},
   playPodcast: () => {},
@@ -190,6 +198,9 @@ const PodcastPlayerContext = createContext<AudioPlayerContextType>({
   pausePodcast: () => {},
   stopPodcast: () => {},
   returnToSongs: () => {},
+  seek: () => {},
+  setVolume: () => {},
+  toggleMute: () => {},
   songs: [],
   allPodcasts: [],
 });
@@ -499,6 +510,51 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     );
   }, [podcastsList, playlistSearch]);
 
+  const [location] = useLocation();
+  const isAtheerPage = location === "/atheer" || location.startsWith("/atheer");
+
+  const seek = (time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setProgress(time);
+    }
+  };
+
+  const changeVolume = (newVol: number) => {
+    const clamped = Math.max(0, Math.min(1, newVol));
+    setVolume(clamped);
+    if (audioRef.current) {
+      audioRef.current.volume = clamped;
+      setIsMuted(clamped === 0);
+    }
+  };
+
+  // Global video auto-pause listener: pauses background audio whenever any video starts playing
+  useEffect(() => {
+    const handleVideoPlaying = () => {
+      if (isPlaying) {
+        pausePodcast();
+      }
+    };
+
+    const handleMediaPlay = (e: Event) => {
+      const target = e.target;
+      if (target instanceof HTMLVideoElement && target !== (audioRef.current as any)) {
+        if (isPlaying) {
+          pausePodcast();
+        }
+      }
+    };
+
+    window.addEventListener("aqeeq-video-playing", handleVideoPlaying);
+    document.addEventListener("play", handleMediaPlay, true);
+
+    return () => {
+      window.removeEventListener("aqeeq-video-playing", handleVideoPlaying);
+      document.removeEventListener("play", handleMediaPlay, true);
+    };
+  }, [isPlaying]);
+
   return (
     <PodcastPlayerContext.Provider
       value={{
@@ -508,6 +564,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         isMuted,
         progress,
         duration,
+        currentTime: progress,
+        volume,
         currentTrackType: activeItem?.type || null,
         playSong,
         playPodcast,
@@ -520,6 +578,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         pausePodcast,
         stopPodcast,
         returnToSongs,
+        seek,
+        setVolume: changeVolume,
+        toggleMute,
         songs: schoolSongs,
         allPodcasts: podcastsList,
       }}
@@ -533,24 +594,24 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       />
 
       {/* ========================================================================= */}
-      {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK (Bottom-Right) */}
+      {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK (Hidden on /atheer) */}
       {/* ========================================================================= */}
-      <div
-        dir="rtl"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 select-none"
-      >
-        <div className="relative flex items-center gap-3">
+      {!isAtheerPage && (
+        <div
+          dir="rtl"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 select-none"
+        >
+          <div className="relative flex items-center gap-3">
 
-          {/* Post-Podcast Choice Notification (Right above the dock) */}
-          {completionPrompt.visible && (
-            <div className={`absolute bottom-full mb-3 right-0 w-max flex items-center gap-2 p-3 rounded-2xl border backdrop-blur-2xl shadow-2xl animate-in slide-in-from-bottom-2 duration-200 ring-1 ${
-              isDark
-                ? "border-amber-400/50 bg-[#090b10]/98 text-white ring-amber-400/30"
-                : "border-slate-200/90 bg-white/98 text-slate-900 ring-amber-400/30 shadow-[0_12px_36px_rgba(0,0,0,0.14)]"
-            }`}>
-              <Headphones size={16} className={`animate-pulse shrink-0 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
+            {completionPrompt.visible && (
+              <div className={`absolute bottom-full mb-3 right-0 w-max flex items-center gap-2 p-3 rounded-2xl border backdrop-blur-2xl shadow-2xl animate-in slide-in-from-bottom-2 duration-200 ring-1 ${
+                isDark
+                  ? "border-amber-400/50 bg-[#090b10]/98 text-white ring-amber-400/30"
+                  : "border-slate-200/90 bg-white/98 text-slate-900 ring-amber-400/30 shadow-[0_12px_36px_rgba(0,0,0,0.14)]"
+              }`}>
+                <Headphones size={16} className={`animate-pulse shrink-0 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
               <div className="text-right pl-2">
                 <p className={`text-[11px] font-black ${isDark ? "text-amber-300" : "text-amber-800"}`}>انتهت الحلقة: {completionPrompt.finishedPodcastTitle}</p>
                 <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>ماذا تود أن تستمع الآن؟</p>
@@ -1009,11 +1070,12 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
         </div>
       </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 2. LUXURY FLOATING PLAYLIST SHEET (Anchored right above the Vinyl Dock) */}
       {/* ========================================================================= */}
-      {playlistDrawerOpen && (
+      {playlistDrawerOpen && !isAtheerPage && (
         <div
           ref={playlistSheetRef}
           dir="rtl"

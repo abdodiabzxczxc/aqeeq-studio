@@ -28,6 +28,9 @@ import {
   Flame,
   FileText,
   Volume2,
+  VolumeX,
+  SkipForward,
+  SkipBack,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -38,6 +41,13 @@ const ATHEER_CATEGORIES = [
   { id: "videos", label: "🎬 تحت الضوء (مرئي)" },
   { id: "audio", label: "🎙️ خلف المايك (مسموع)" },
 ] as const;
+
+function formatAudioTime(secs: number) {
+  if (isNaN(secs) || secs < 0) return "00:00";
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -61,7 +71,27 @@ export default function AqeeqPodcastPage() {
     staleTime: 0,
   });
 
-  const { activeItem, activePodcast, isPlaying, playSong, playPodcast, pausePodcast, songs } = usePodcastPlayer();
+  const {
+    activeItem,
+    activePodcast,
+    isPlaying,
+    currentTime,
+    duration,
+    seek,
+    volume,
+    setVolume,
+    isMuted,
+    toggleMute,
+    togglePlay,
+    playSong,
+    playPodcast,
+    pausePodcast,
+    playNextSong,
+    playPrevSong,
+    playNextPodcast,
+    handlePrevOrRestart,
+    songs,
+  } = usePodcastPlayer();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,6 +181,23 @@ export default function AqeeqPodcastPage() {
     return audioPodcasts[0] || null;
   }, [audioPodcasts, selectedAudioId, activePodcast]);
 
+  const handlePlayVideoInline = (videoId: number) => {
+    pausePodcast();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-playing"));
+    }
+    setSelectedVideoId(videoId);
+    setInlinePlayingVideoId(videoId);
+  };
+
+  const handleOpenVideoModal = (video: any) => {
+    pausePodcast();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-playing"));
+    }
+    setWatchingVideoPodcast(video);
+  };
+
   // Unified items list for Signature 3D & Master Console
   const unifiedItems = useMemo(() => {
     const list: any[] = [];
@@ -212,7 +259,7 @@ export default function AqeeqPodcastPage() {
   }, [unifiedItems, selectedCategory, searchQuery]);
   const handlePlayOrOpen = (item: any) => {
     if (item.mediaType === "video") {
-      setWatchingVideoPodcast(item.originalItem || item);
+      handleOpenVideoModal(item.originalItem || item);
     } else if (item.mediaType === "song") {
       playSong(item.originalItem || item);
     } else {
@@ -655,40 +702,114 @@ export default function AqeeqPodcastPage() {
                   </p>
                 </div>
 
-                {/* Equalizer Waveform Indicator when playing */}
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-end gap-1 h-5">
-                      <span className={`w-1 bg-amber-400 rounded-full ${isPlaying ? "animate-[bounce_0.6s_infinite] h-5" : "h-2"}`} />
-                      <span className={`w-1 bg-amber-400 rounded-full ${isPlaying ? "animate-[bounce_0.8s_infinite] h-3.5" : "h-2"}`} />
-                      <span className={`w-1 bg-amber-400 rounded-full ${isPlaying ? "animate-[bounce_0.5s_infinite] h-4.5" : "h-2"}`} />
-                      <span className={`w-1 bg-amber-400 rounded-full ${isPlaying ? "animate-[bounce_0.9s_infinite] h-3" : "h-2"}`} />
+                {/* Master Interactive Player Console */}
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 space-y-3">
+                  
+                  {/* Progress Seek Scrubber */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                      <span>{formatAudioTime(currentTime)}</span>
+                      <span>{formatAudioTime(duration)}</span>
                     </div>
-                    <span className="text-[10px] font-black text-slate-300">
-                      {isPlaying ? "جاري العزف الحي..." : "جاهز للتشغيل"}
-                    </span>
+                    <div className="relative h-2 flex items-center cursor-pointer group/bar">
+                      <div className="h-1.5 w-full bg-white/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full transition-all duration-75"
+                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration || 100}
+                        value={currentTime || 0}
+                        onChange={(e) => seek(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {activeItem?.lyrics && (
+                  {/* Playback Transport & Volume Controls */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    
+                    {/* Volume Slider & Mute */}
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={() => setSelectedLyricsSong(activeItem)}
-                        className="rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400 hover:text-slate-950 text-amber-300 px-3 py-1 text-[11px] font-black transition flex items-center gap-1"
+                        onClick={toggleMute}
+                        className="text-slate-400 hover:text-amber-400 transition p-1"
+                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
                       >
-                        <FileText size={12} />
-                        <span>الكلمات</span>
+                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-amber-400" />}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={(e) => handleShare(activeItem || songs[0], e)}
-                      className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
-                      title="مشاركة النشيد"
-                    >
-                      <Share2 size={13} />
-                    </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                        className="w-12 sm:w-16 h-1 bg-white/20 accent-amber-400 rounded-full cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Transport Buttons: Prev | Play/Pause | Next */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={playPrevSong}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="النشيد السابق"
+                      >
+                        <SkipBack size={14} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (activeItem) togglePlay();
+                          else playSong(0);
+                        }}
+                        className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-400/30 transition active:scale-95"
+                        title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
+                      >
+                        {isPlaying ? <Pause size={18} /> : <Play size={18} className="fill-current mr-0.5" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={playNextSong}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="النشيد التالي"
+                      >
+                        <SkipForward size={14} />
+                      </button>
+                    </div>
+
+                    {/* Lyrics / Share */}
+                    <div className="flex items-center gap-1.5">
+                      {activeItem?.lyrics && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLyricsSong(activeItem)}
+                          className="rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400 hover:text-slate-950 text-amber-300 px-2.5 py-1 text-[10px] font-black transition"
+                          title="ديوان الكلمات"
+                        >
+                          📜 كلمات
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => handleShare(activeItem || songs[0], e)}
+                        className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
+                        title="مشاركة"
+                      >
+                        <Share2 size={13} />
+                      </button>
+                    </div>
+
                   </div>
+
                 </div>
 
               </div>
@@ -879,7 +1000,7 @@ export default function AqeeqPodcastPage() {
                     <div
                       onClick={() => {
                         if (currentActiveVideo) {
-                          setInlinePlayingVideoId(currentActiveVideo.id);
+                          handlePlayVideoInline(currentActiveVideo.id);
                         }
                       }}
                       className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
@@ -947,7 +1068,7 @@ export default function AqeeqPodcastPage() {
                     {inlinePlayingVideoId === currentActiveVideo?.id && (
                       <button
                         type="button"
-                        onClick={() => setWatchingVideoPodcast(currentActiveVideo)}
+                        onClick={() => handleOpenVideoModal(currentActiveVideo)}
                         className="rounded-xl border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-3 py-1 text-[11px] font-black transition flex items-center gap-1"
                       >
                         <Maximize2 size={12} />
@@ -977,10 +1098,7 @@ export default function AqeeqPodcastPage() {
                         {/* Video Thumbnail */}
                         <button
                           type="button"
-                          onClick={() => {
-                            setSelectedVideoId(video.id);
-                            setInlinePlayingVideoId(video.id);
-                          }}
+                          onClick={() => handlePlayVideoInline(video.id)}
                           className="relative h-16 w-24 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-black group-hover:scale-105 transition"
                         >
                           {video.coverUrl ? (
@@ -1004,10 +1122,7 @@ export default function AqeeqPodcastPage() {
                           </div>
 
                           <h4
-                            onClick={() => {
-                              setSelectedVideoId(video.id);
-                              setInlinePlayingVideoId(video.id);
-                            }}
+                            onClick={() => handlePlayVideoInline(video.id)}
                             className="mt-1 text-xs sm:text-sm font-black text-white hover:text-indigo-300 cursor-pointer truncate transition"
                           >
                             {video.title}
@@ -1040,10 +1155,7 @@ export default function AqeeqPodcastPage() {
 
                           <button
                             type="button"
-                            onClick={() => {
-                              setSelectedVideoId(video.id);
-                              setInlinePlayingVideoId(video.id);
-                            }}
+                            onClick={() => handlePlayVideoInline(video.id)}
                             className={`inline-flex items-center gap-1 rounded-xl px-3 py-1 text-xs font-black transition shadow-sm ${
                               isThisPlaying
                                 ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
@@ -1184,40 +1296,118 @@ export default function AqeeqPodcastPage() {
                   </p>
                 </div>
 
-                {/* Equalizer & Action Bar */}
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-end gap-1 h-5">
-                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.6s_infinite] h-5" : "h-2"}`} />
-                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.8s_infinite] h-3.5" : "h-2"}`} />
-                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.5s_infinite] h-4.5" : "h-2"}`} />
-                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.9s_infinite] h-3" : "h-2"}`} />
+                {/* Master Interactive Podcast Console */}
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 space-y-3">
+                  
+                  {/* Progress Seek Scrubber */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                      <span>{formatAudioTime(currentTime)}</span>
+                      <span>{formatAudioTime(duration)}</span>
                     </div>
-                    <span className="text-[10px] font-black text-slate-300">
-                      {isCurrentPlaying(currentActiveAudio?.id) ? "🔴 جاري البث المباشر..." : "جاهز للاستماع"}
-                    </span>
+                    <div className="relative h-2 flex items-center cursor-pointer group/bar">
+                      <div className="h-1.5 w-full bg-white/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75"
+                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration || 100}
+                        value={currentTime || 0}
+                        onChange={(e) => seek(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {currentActiveAudio && (
+                  {/* Playback Transport & Volume Controls */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    
+                    {/* Volume Slider & Mute */}
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={(e) => handleLike(currentActiveAudio, e)}
-                        className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-2.5 py-1 text-[11px] font-bold transition"
+                        onClick={toggleMute}
+                        className="text-slate-400 hover:text-emerald-400 transition p-1"
+                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
                       >
-                        <Heart size={12} className="fill-rose-500/20" />
-                        <span>{currentActiveAudio.likesCount || 0}</span>
+                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-emerald-400" />}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={(e) => handleShare(currentActiveAudio, e)}
-                      className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
-                      title="مشاركة البودكاست"
-                    >
-                      <Share2 size={13} />
-                    </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                        className="w-12 sm:w-16 h-1 bg-white/20 accent-emerald-400 rounded-full cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Transport Buttons: Prev | Play/Pause | Next */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handlePrevOrRestart}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="الحلقة السابقة"
+                      >
+                        <SkipBack size={14} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (currentActiveAudio) {
+                            if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
+                            else playPodcast(currentActiveAudio);
+                          } else if (audioPodcasts[0]) {
+                            playPodcast(audioPodcasts[0]);
+                          }
+                        }}
+                        className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/30 transition active:scale-95"
+                        title={isCurrentPlaying(currentActiveAudio?.id) ? "إيقاف مؤقت" : "استماع"}
+                      >
+                        {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={18} /> : <Play size={18} className="fill-current mr-0.5" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={playNextPodcast}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="الحلقة التالية"
+                      >
+                        <SkipForward size={14} />
+                      </button>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5">
+                      {currentActiveAudio && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleLike(currentActiveAudio, e)}
+                          className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-2.5 py-1 text-[11px] font-bold transition"
+                        >
+                          <Heart size={12} className="fill-rose-500/20" />
+                          <span>{currentActiveAudio.likesCount || 0}</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => handleShare(currentActiveAudio, e)}
+                        className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
+                        title="مشاركة البودكاست"
+                      >
+                        <Share2 size={13} />
+                      </button>
+                    </div>
+
                   </div>
+
                 </div>
 
               </div>
