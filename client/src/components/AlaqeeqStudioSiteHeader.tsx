@@ -54,7 +54,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   if (!currentActive || currentActive === "studio") {
     if (location.startsWith("/articles") || location.startsWith("/article")) {
       currentActive = "articles";
-    } else if (location.startsWith("/podcast")) {
+    } else if (location.startsWith("/podcast") || location.startsWith("/atheer")) {
       currentActive = "podcast";
     } else if (location.startsWith("/journal") || location.startsWith("/news")) {
       currentActive = "journal";
@@ -109,7 +109,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             <VisualEditable id="aqeeq-studio-nav-albums" tag="button" label="اسم رابط الألبوم" defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"} as="button" onAction={() => go("/albums")} className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`} />
             <VisualEditable id="aqeeq-studio-nav-showcase" tag="button" label="اسم رابط الأخبار والعروض" defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"} as="button" onAction={() => go("/offers")} className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`} />
             <VisualEditable id="aqeeq-studio-nav-articles" tag="button" label="اسم رابط المقالات" defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات ✍️"} as="button" onAction={() => go("/articles")} className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`} />
-            <VisualEditable id="aqeeq-studio-nav-podcast" tag="button" label="اسم رابط البودكاست" defaultText={(orchestration?.nav as any)?.podcastLabel || "الإذاعة والبودكاست 🎙️"} as="button" onAction={() => go("/podcast")} className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`} />
+            <VisualEditable id="aqeeq-studio-nav-podcast" tag="button" label="اسم رابط أثير العقيق" defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق 🎙️"} as="button" onAction={() => go("/atheer")} className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`} />
           </nav>
 
           {/* Left Action Buttons (Compact & Zero Collision on Mobile) */}
@@ -309,7 +309,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <VisualEditable id="aqeeq-studio-mobile-nav-albums" tag="button" label="اسم رابط الألبوم للهاتف" defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"} as="button" onAction={() => go("/albums")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "albums" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-showcase" tag="button" label="اسم رابط الأخبار للهاتف" defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"} as="button" onAction={() => go("/offers")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "showcase" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-articles" tag="button" label="اسم رابط المقالات للهاتف" defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات ✍️"} as="button" onAction={() => go("/articles")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "articles" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
-                <VisualEditable id="aqeeq-studio-mobile-nav-podcast" tag="button" label="اسم رابط البودكاست للهاتف" defaultText={(orchestration?.nav as any)?.podcastLabel || "الإذاعة والبودكاست 🎙️"} as="button" onAction={() => go("/podcast")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "podcast" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
+                <VisualEditable id="aqeeq-studio-mobile-nav-podcast" tag="button" label="اسم رابط أثير العقيق للهاتف" defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق 🎙️"} as="button" onAction={() => go("/atheer")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "podcast" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
               </div>
             </div>
           )}

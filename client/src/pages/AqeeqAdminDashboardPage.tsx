@@ -722,7 +722,7 @@ const DEFAULT_ORCHESTRATION = {
             { key: "content", label: "الجدول الموحد للمحتوى", icon: Layers, badge: masterContent.length },
             { key: "broadcast", label: "شريط التنبيهات العاجل", icon: Megaphone, alert: broadcastEnabled },
             { key: "articles", label: "مراجعة المقالات ✍️", icon: BookOpen, badge: allAdminArticles.filter((a) => a.status === "pending").length || undefined },
-            { key: "podcast", label: "الإذاعة والبودكاست 🎙️", icon: Radio, badge: allAdminPodcasts.length },
+            { key: "podcast", label: "أثير العقيق 🎙️", icon: Radio, badge: allAdminPodcasts.length },
             { key: "music", label: "أغاني وراديو العقيق 🎵", icon: Headphones, badge: (orchestrationForm.schoolSongs || []).length },
             { key: "whatsapp", label: "مُولّد حملات الواتساب وQR", icon: Share2 },
           ].map((tab) => {
@@ -1727,7 +1727,7 @@ const DEFAULT_ORCHESTRATION = {
                             dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
                           )}>
                             <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-purple-400">معاينة هيرو صفحة الإذاعة والبودكاست (/podcast)</span>
+                              <span className="text-xs font-black text-purple-400">معاينة هيرو صفحة أثير العقيق (/atheer)</span>
                               <a href="/podcast" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-400 hover:underline">
                                 <span>معاينة الصفحة الحية</span>
                                 <ArrowUpLeft size={13} />

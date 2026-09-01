@@ -197,7 +197,7 @@ export default function AqeeqPodcastStudioPage() {
   return (
     <div dir="rtl" className={`min-h-screen font-[Tajawal,sans-serif] ${dark ? "bg-[#080808] text-white" : "bg-[#f8f9fc] text-slate-900"}`}>
       {/* Site Header */}
-      <AlaqeeqStudioSiteHeader title="استوديو إدارة الإذاعة والبودكاست" active="podcast" />
+      <AlaqeeqStudioSiteHeader title="استوديو أثير العقيق" active="podcast" />
 
       {/* Studio Command Bar */}
       <header className={`sticky top-[66px] sm:top-[80px] z-30 border-b backdrop-blur-xl transition ${
@@ -210,24 +210,24 @@ export default function AqeeqPodcastStudioPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black">استوديو إنتاج وإدارة البودكاست والإذاعة</h1>
+                <h1 className="text-lg font-black">استوديو إنتاج وإدارة أثير العقيق 🎙️</h1>
                 <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2.5 py-0.5 text-[10px] font-black text-purple-300">
-                  BROADCAST PRO
+                  ATHEER PRO
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-bold">إدارة حلقات الإذاعة المدرسية، بودكاست القيادات، واللقاءات الحوارية والمرئية</p>
+              <p className="text-xs text-slate-400 font-bold">إدارة حلقات البودكاست المرئي والمسموع، الإذاعة المدرسية، والأناشيد والكورال</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => navigate("/podcast")}
+              onClick={() => navigate("/atheer")}
               className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
                 dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300" : "border-black/10 bg-slate-100 hover:bg-slate-200 text-slate-700"
               }`}
             >
               <ArrowUpLeft size={14} />
-              <span>معاينة الواجهة العامة</span>
+              <span>معاينة منصة أثير العقيق</span>
             </button>
 
             <button

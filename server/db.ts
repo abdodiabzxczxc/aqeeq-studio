@@ -669,6 +669,8 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     journalLabel: "مجلة العقيق",
     albumsLabel: "ألبوم العقيق",
     showcaseLabel: "الأخبار والعروض",
+    articlesLabel: "المقالات ✍️",
+    podcastLabel: "أثير العقيق 🎙️",
     logoUrl: "/alaqeeq-logo.png",
   },
   heroCovers: {

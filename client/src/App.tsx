@@ -68,6 +68,8 @@ function Router() {
       <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
       <Route path="/articles" component={AqeeqArticlesPage} />
       <Route path="/articles/:slug" component={AqeeqArticlesPage} />
+      <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
+      <Route path="/atheer" component={AqeeqPodcastPage} />
       <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
       <Route path="/podcast" component={AqeeqPodcastPage} />
       <Route path="/journal" component={SchoolNewsPage} />
