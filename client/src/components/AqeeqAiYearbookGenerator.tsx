@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Sparkles, GraduationCap, Play, Download, X, Film, Image as ImageIcon, CheckCircle, ChevronLeft } from "lucide-react";
+import { Sparkles, GraduationCap, Play, Download, X, Film, Image as ImageIcon, CheckCircle, ChevronLeft, Loader2, Share2 } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { getAqeeqAlbumImageSource, getAqeeqDriveFileId } from "@/lib/aqeeqAlbumMedia";
+import { toast } from "sonner";
 
 /** تحوّل أي رابط Drive إلى البروكسي السريع */
 function resolveImageUrl(url: string): string {
@@ -24,6 +25,8 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
   const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
   const [stage, setStage] = useState<"input" | "processing" | "cinematic">("input");
   const [progress, setProgress] = useState(0);
+  const [isExportingVideo, setIsExportingVideo] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
 
   // Fetch media for cinematic simulation (always enabled so it's ready when they click)
   const { data: allMediaDetails } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -112,6 +115,221 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     setTimeout(() => setSceneIndex(3), 21500); // 21.5s: climax logo (8 photos × 2.0s + buffer)
   };
 
+  // Helper to draw image maintaining aspect ratio with object-fit: cover and zoom scale
+  const drawImageCover = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, scale: number) => {
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const canvasRatio = w / h;
+    let renderW = w;
+    let renderH = h;
+    if (imgRatio > canvasRatio) {
+      renderH = h;
+      renderW = h * imgRatio;
+    } else {
+      renderW = w;
+      renderH = w / imgRatio;
+    }
+    renderW *= scale;
+    renderH *= scale;
+    const offsetX = (w - renderW) / 2;
+    const offsetY = (h - renderH) / 2;
+    ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
+  };
+
+  // Export full cinematic sequence as MP4/WebM video
+  const handleExportVideo = async () => {
+    if (isExportingVideo) return;
+    setIsExportingVideo(true);
+    setExportProgress(5);
+
+    try {
+      const isPortrait = orientation === "portrait";
+      const width = isPortrait ? 720 : 1280;
+      const height = isPortrait ? 1280 : 720;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        toast.error("تعذر إنشاء بيئة تصدير الفيديو");
+        setIsExportingVideo(false);
+        return;
+      }
+
+      // Preload photos for canvas
+      const photoUrls = matchedPhotos.slice(0, 8);
+      const loadedImages: HTMLImageElement[] = [];
+
+      for (let idx = 0; idx < photoUrls.length; idx++) {
+        const url = photoUrls[idx];
+        try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          await new Promise((res) => {
+            img.onload = res;
+            img.onerror = () => res(null);
+            img.src = url;
+          });
+          if (img.naturalWidth > 0) loadedImages.push(img);
+        } catch {}
+        setExportProgress(5 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 25));
+      }
+
+      const stream = canvas.captureStream(30);
+
+      // Mix audio if available
+      try {
+        if (audioRef.current && audioRef.current.src) {
+          const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const audioSource = audioCtx.createMediaElementSource(audioRef.current);
+          const audioDest = audioCtx.createMediaStreamDestination();
+          audioSource.connect(audioDest);
+          audioSource.connect(audioCtx.destination);
+          const audioTrack = audioDest.stream.getAudioTracks()[0];
+          if (audioTrack) stream.addTrack(audioTrack);
+        }
+      } catch {}
+
+      const mimeTypes = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+      const supportedMime = mimeTypes.find((t) => MediaRecorder.isTypeSupported(t)) || "video/webm";
+
+      const chunks: Blob[] = [];
+      const recorder = new MediaRecorder(stream, { mimeType: supportedMime });
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      const totalSeconds = 2.0 + 2.0 + Math.max(1, loadedImages.length) * 2.0 + 3.0;
+      const fps = 30;
+      const totalFrames = Math.floor(totalSeconds * fps);
+
+      recorder.start();
+
+      let currentFrame = 0;
+      const frameStepMs = 1000 / fps;
+
+      const renderLoop = async () => {
+        while (currentFrame < totalFrames) {
+          const currentTime = currentFrame / fps;
+
+          // Clear
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(0, 0, width, height);
+
+          if (currentTime < 2.0) {
+            // Scene 1: Intro
+            const t = currentTime / 2.0;
+            const scale = 0.95 + t * 0.09;
+            const alpha = t < 0.3 ? t / 0.3 : t > 0.7 ? (1 - t) / 0.3 : 1;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(scale, scale);
+
+            ctx.font = "bold 32px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.fillText("في كل عام،", 0, -25);
+
+            ctx.font = "bold 44px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#f8ca14";
+            ctx.fillText("تُكتب قصة جديدة...", 0, 35);
+            ctx.restore();
+          } else if (currentTime < 4.0) {
+            // Scene 2: Intro 2
+            const t = (currentTime - 2.0) / 2.0;
+            const scale = 1.05 - t * 0.07;
+            const alpha = t < 0.3 ? t / 0.3 : t > 0.7 ? (1 - t) / 0.3 : 1;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(scale, scale);
+
+            ctx.font = "900 48px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.fillText("وهذا العام...", 0, -25);
+
+            ctx.font = "bold 38px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#f8ca14";
+            ctx.fillText("كانت الكاميرا تبحث عنك!", 0, 35);
+            ctx.restore();
+          } else if (currentTime < 4.0 + loadedImages.length * 2.0) {
+            // Scene 3: Photos Montage
+            const montageTime = currentTime - 4.0;
+            const photoIdx = Math.min(loadedImages.length - 1, Math.floor(montageTime / 2.0));
+            const photoT = (montageTime % 2.0) / 2.0;
+            const img = loadedImages[photoIdx];
+
+            if (img) {
+              const zoomIn = photoIdx % 2 === 0;
+              const scale = zoomIn ? 1.0 + photoT * 0.14 : 1.14 - photoT * 0.14;
+
+              ctx.save();
+              drawImageCover(ctx, img, width, height, scale);
+
+              const grad = ctx.createRadialGradient(width / 2, height / 2, width * 0.2, width / 2, height / 2, width * 0.75);
+              grad.addColorStop(0, "rgba(0,0,0,0)");
+              grad.addColorStop(1, "rgba(0,0,0,0.75)");
+              ctx.fillStyle = grad;
+              ctx.fillRect(0, 0, width, height);
+              ctx.restore();
+            }
+          } else {
+            // Scene 4: Outro Climax
+            const t = (currentTime - 4.0 - loadedImages.length * 2.0) / 3.0;
+            const scale = 0.96 + t * 0.06;
+            const alpha = t < 0.25 ? t / 0.25 : 1;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(scale, scale);
+
+            ctx.font = "900 46px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.fillText("مدارس العقيق تفخر بك", 0, -20);
+
+            ctx.font = "bold 26px Tajawal, Cairo, sans-serif";
+            ctx.fillStyle = "#f8ca14";
+            ctx.fillText("أنت بطل قصتنا 🌟", 0, 35);
+            ctx.restore();
+          }
+
+          currentFrame++;
+          setExportProgress(30 + Math.floor((currentFrame / totalFrames) * 65));
+          await new Promise((r) => setTimeout(r, frameStepMs / 2)); // Render fast!
+        }
+
+        recorder.stop();
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: supportedMime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setExportProgress(100);
+        setIsExportingVideo(false);
+        toast.success("تم تجهيز وتحميل الفيديو التوثيقي بنجاح! 🎬✨");
+      };
+
+      renderLoop();
+    } catch (err) {
+      console.error("Video export error:", err);
+      toast.error("حدث خطأ أثناء تصدير الفيديو");
+      setIsExportingVideo(false);
+    }
+  };
+
   const closeWrapped = () => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -122,8 +340,11 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       setStage("input");
       setStudentPhoto(null);
       setProgress(0);
+      setIsExportingVideo(false);
+      setExportProgress(0);
     }, 500);
   };
+
 
   // Determine dynamic classes based on stage and orientation
   // We MUST use sm:max-w-* to override the default sm:max-w-lg in shadcn DialogContent!
@@ -338,12 +559,60 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                     <h1 className="text-4xl md:text-7xl font-black font-['Tajawal'] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-white drop-shadow-2xl mb-4 text-center">
                       مدارس العقيق تفخر بك
                     </h1>
-                    <p className="text-[#e5b84f] text-xl md:text-2xl font-bold tracking-widest mb-12 drop-shadow-lg">
+                    <p className="text-[#e5b84f] text-xl md:text-2xl font-bold tracking-widest mb-10 drop-shadow-lg">
                       أنت بطل قصتنا 🌟
                     </p>
-                    <Button onClick={closeWrapped} className="rounded-full h-14 px-10 bg-gradient-to-r from-[#e5b84f] to-[#c59c3a] hover:from-[#f0c35f] hover:to-[#d0a74b] text-black font-black text-lg shadow-xl shadow-[#e5b84f]/30 transition-all active:scale-95">
-                      إنهاء العرض ✨
-                    </Button>
+
+                    {/* Actions Group */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3.5 z-40">
+                      {/* Download Video Button */}
+                      <Button
+                        onClick={handleExportVideo}
+                        disabled={isExportingVideo}
+                        className="rounded-full h-14 px-8 bg-gradient-to-r from-[#e5b84f] via-[#f8ca14] to-[#c59c3a] hover:from-[#f0c35f] hover:to-[#d0a74b] text-black font-black text-base shadow-2xl shadow-[#e5b84f]/40 transition-all active:scale-95 flex items-center gap-2.5"
+                      >
+                        {isExportingVideo ? (
+                          <>
+                            <Loader2 size={20} className="animate-spin text-black" />
+                            <span>جاري تصدير الفيديو... {exportProgress}%</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={20} className="text-black" />
+                            <span>تحميل الفيديو التوثيقي 🎬</span>
+                          </>
+                        )}
+                      </Button>
+
+                      {/* Share Button */}
+                      <Button
+                        onClick={() => {
+                          if (navigator.share) {
+                            navigator.share({
+                              title: "حصاد العقيق الذكي 2026",
+                              text: "شاهد لحظاتي وإنجازاتي في حصاد العقيق الذكي 🌟",
+                              url: window.location.href,
+                            }).catch(() => {});
+                          } else {
+                            navigator.clipboard.writeText(window.location.href);
+                            toast.success("تم نسخ رابط المنصة للمشاركة 📋");
+                          }
+                        }}
+                        className="rounded-full h-14 px-6 bg-white/10 hover:bg-white/20 text-white font-bold text-base backdrop-blur-md border border-white/20 transition-all active:scale-95 flex items-center gap-2"
+                      >
+                        <Share2 size={18} />
+                        <span>مشاركة</span>
+                      </Button>
+
+                      {/* Close Button */}
+                      <Button
+                        onClick={closeWrapped}
+                        variant="ghost"
+                        className="rounded-full h-14 px-6 text-white/60 hover:text-white hover:bg-white/5 transition-all text-sm font-bold"
+                      >
+                        إنهاء العرض ✨
+                      </Button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
