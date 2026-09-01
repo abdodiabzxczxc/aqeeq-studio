@@ -242,20 +242,20 @@ export function AqeeqAiAssistantWidget() {
   };
 
   return (
-    <div dir="rtl" className="fixed bottom-5 left-5 z-50 font-[Tajawal,sans-serif]">
+    <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`group relative flex items-center gap-3 rounded-full border p-2.5 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
+          className={`group relative flex items-center gap-3 rounded-full border p-2 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
             isDark
               ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
               : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
           }`}
         >
-          <div className="relative grid h-11 w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
-            <Bot size={24} className="group-hover:rotate-12 transition-transform duration-300" />
+          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
+            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
             <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
               isDark ? "border-slate-950" : "border-white"
             } animate-pulse ${
@@ -278,14 +278,14 @@ export function AqeeqAiAssistantWidget() {
       {/* Interactive Luxury Chat Window */}
       {isOpen && (
         <div
-          className={`flex flex-col transition-all duration-300 rounded-[2rem] border shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 overflow-hidden ${
+          className={`flex flex-col transition-all duration-300 border shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2rem] w-full sm:w-[460px] h-[100dvh] sm:h-[600px] max-h-none sm:max-h-[88vh] z-50 ${
             isDark
-              ? "border-amber-400/40 bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-amber-400/20"
-              : "border-slate-200/90 bg-white/98 text-slate-900 shadow-[0_25px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30"
+              ? "border-amber-400/40 bg-[#070a12] sm:bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-amber-400/20"
+              : "border-slate-200/90 bg-white sm:bg-white/98 text-slate-900 shadow-[0_25px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30"
           } ${
             isExpanded
-              ? "w-[96vw] sm:w-[720px] h-[85vh] max-h-[820px]"
-              : "w-[94vw] sm:w-[460px] h-[600px] max-h-[88vh]"
+              ? "sm:w-[720px] sm:h-[85vh] sm:max-h-[820px]"
+              : ""
           }`}
         >
           {/* Header */}
@@ -495,7 +495,7 @@ export function AqeeqAiAssistantWidget() {
               e.preventDefault();
               handleSend();
             }}
-            className={`border-t p-3 flex items-center gap-2 transition-colors ${
+            className={`border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center gap-2 transition-colors ${
               isDark ? "border-white/10 bg-[#0a0e1a]" : "border-slate-200 bg-white"
             }`}
           >

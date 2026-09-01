@@ -115,77 +115,81 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           {/* Left Action Buttons (Compact & Zero Collision on Mobile) */}
           <div dir="ltr" className="absolute left-3.5 sm:left-6 md:left-8 top-1/2 flex -translate-y-1/2 items-center gap-1.5 sm:gap-2.5 md:gap-3">
             
-            {/* 1. Options Dropdown Menu OR Login Button (Far Left edge) */}
+            {/* 1. Options Dropdown Menu OR Login Button (Desktop / Tablet) */}
             {isAuthenticated ? (
-              <DropdownMenu dir="rtl">
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
-                      dark
-                        ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                        : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
-                    }`}
-                    aria-label="قائمة الخيارات"
-                    title="قائمة الخيارات"
-                  >
-                    <Settings2 size={17} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className={`w-56 mt-2 rounded-2xl border ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
-                  <DropdownMenuLabel className="font-black text-xs text-center py-2">
-                    {user?.name || "المشرف العام"}
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
-                  
-                  {/* Admin Only Actions */}
-                  {isAdmin && (
-                    <>
-                      <DropdownMenuItem onClick={() => editor.toggleEditing()} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
-                        <PencilRuler size={15} className="text-emerald-500" />
-                        <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem onClick={() => navigate("/admin")} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
-                        <LayoutDashboard size={15} className="text-blue-500" />
-                        <span>لوحة التحكم للإدارة</span>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  
-                  <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
-                  
-                  {/* Auth Logout */}
-                  <DropdownMenuItem onClick={handleAuth} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"} rounded-xl`}>
-                    <LogOut size={15} />
-                    <span>تسجيل الخروج</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="hidden sm:block">
+                <DropdownMenu dir="rtl">
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark
+                          ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                      }`}
+                      aria-label="قائمة الخيارات"
+                      title="قائمة الخيارات"
+                    >
+                      <Settings2 size={17} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className={`w-56 mt-2 rounded-2xl border ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
+                    <DropdownMenuLabel className="font-black text-xs text-center py-2">
+                      {user?.name || "المشرف العام"}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
+                    
+                    {/* Admin Only Actions */}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem onClick={() => editor.toggleEditing()} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
+                          <PencilRuler size={15} className="text-emerald-500" />
+                          <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem onClick={() => navigate("/admin")} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
+                          <LayoutDashboard size={15} className="text-blue-500" />
+                          <span>لوحة التحكم للإدارة</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
+                    
+                    {/* Auth Logout */}
+                    <DropdownMenuItem onClick={handleAuth} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"} rounded-xl`}>
+                      <LogOut size={15} />
+                      <span>تسجيل الخروج</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <VisualEditable
-                id="aqeeq-studio-auth-action"
-                tag="button"
-                label="زر تسجيل الدخول"
-                defaultText="تسجيل الدخول"
-                as="button"
-                onAction={handleAuth}
-                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
-                  dark
-                    ? "border-[#08467d]/30 bg-[#08467d]/10 text-slate-300 hover:bg-[#08467d]/30 hover:text-white"
-                    : "border-[#08467d]/20 bg-[#08467d]/5 text-slate-700 hover:bg-[#08467d]/10 hover:text-black"
-                }`}
-                title="تسجيل الدخول"
-                aria-label="تسجيل الدخول"
-              >
-                <VisualIcon id="aqeeq-studio-login-icon" label="أيقونة الدخول" icon="login" size={17} />
-              </VisualEditable>
+              <div className="hidden sm:block">
+                <VisualEditable
+                  id="aqeeq-studio-auth-action"
+                  tag="button"
+                  label="زر تسجيل الدخول"
+                  defaultText="تسجيل الدخول"
+                  as="button"
+                  onAction={handleAuth}
+                  className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
+                    dark
+                      ? "border-[#08467d]/30 bg-[#08467d]/10 text-slate-300 hover:bg-[#08467d]/30 hover:text-white"
+                      : "border-[#08467d]/20 bg-[#08467d]/5 text-slate-700 hover:bg-[#08467d]/10 hover:text-black"
+                  }`}
+                  title="تسجيل الدخول"
+                  aria-label="تسجيل الدخول"
+                >
+                  <VisualIcon id="aqeeq-studio-login-icon" label="أيقونة الدخول" icon="login" size={17} />
+                </VisualEditable>
+              </div>
             )}
 
-            {/* 2. Unified Creator Studio Button (Icon Only) */}
+            {/* 2. Unified Creator Studio Button (Desktop) */}
             {isAdmin ? (
               <button
                 onClick={() => setCreatorModalOpen(true)}
-                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
+                className={`hidden sm:grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
                   dark
                     ? "border-[#e5b84f]/50 bg-[#e5b84f]/10 text-[#e5b84f] hover:bg-[#e5b84f] hover:text-black hover:shadow-[#e5b84f]/30"
                     : "border-[#e5b84f]/60 bg-[#e5b84f]/10 text-[#c59c3a] hover:bg-[#e5b84f] hover:text-white"
@@ -197,10 +201,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </button>
             ) : null}
 
-            {/* 3. Theme Toggle (Always Outside on both Mobile & Desktop) */}
+            {/* 3. Theme Toggle (Desktop) */}
             <button
               onClick={toggleTheme}
-              className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
+              className={`hidden sm:grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
                   : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
@@ -210,7 +214,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={17} />
             </button>
 
-            {/* 4. Spotlight Search Trigger (Closest to center) */}
+            {/* 4. Spotlight Search Trigger (Always Visible) */}
             <button
               onClick={() => setSearchOpen(true)}
               className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
@@ -224,8 +228,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <Search size={17} />
             </button>
 
-
-            {/* Mobile Hamburger Menu Button */}
+            {/* 5. Mobile Hamburger Menu Button */}
             <button
               onClick={() => setMobileMenuOpen((open) => !open)}
               className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition md:hidden active:scale-95 ${
@@ -252,15 +255,48 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
                   <span className="text-xs font-black">{isAuthenticated ? (user?.name || "المشرف العام") : "زائر الاستوديو"}</span>
                 </div>
+                
+                <div className="flex items-center gap-1.5">
+                  {/* Theme Toggle in Mobile Drawer */}
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className={`inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[11px] font-black transition ${
+                      dark ? "border-amber-400/30 bg-amber-400/10 text-amber-300" : "border-slate-300 bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    {dark ? <Sun size={13} /> : <Moon size={13} />}
+                    <span>{dark ? "فاتح" : "داكن"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); handleAuth(); }}
+                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-black transition ${
+                      dark ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    <VisualIcon id="aqeeq-studio-auth-drawer-icon" label="أيقونة الدخول" icon={isAuthenticated ? "logout" : "login"} size={14} />
+                    <span>{isAuthenticated ? "خروج" : "دخول"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Face Search Quick Launcher inside Mobile Drawer */}
+              <div className="mb-3">
                 <button
                   type="button"
-                  onClick={() => { setMobileMenuOpen(false); handleAuth(); }}
-                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition ${
-                    dark ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setFaceSearchOpen(true);
+                  }}
+                  className="w-full flex items-center justify-between rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-transparent p-3 text-xs font-black text-amber-200 transition active:scale-95 shadow-sm"
                 >
-                  <VisualIcon id="aqeeq-studio-auth-drawer-icon" label="أيقونة الدخول" icon={isAuthenticated ? "logout" : "login"} size={14} />
-                  <span>{isAuthenticated ? "تسجيل الخروج" : "تسجيل الدخول"}</span>
+                  <span className="flex items-center gap-2">
+                    <ScanFace size={16} className="text-amber-300" />
+                    <span>البحث عن صوري بالذكاء الاصطناعي 🔍</span>
+                  </span>
+                  <span className="rounded-lg bg-amber-400 px-2 py-0.5 text-[9px] font-black text-black">AI SCAN</span>
                 </button>
               </div>
 
@@ -271,9 +307,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     type="button"
                     onClick={() => {
                       setMobileMenuOpen(false);
+                      setCreatorModalOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between rounded-xl border border-[#e5b84f]/40 bg-[#e5b84f]/15 p-2.5 text-xs font-black text-[#e5b84f] transition active:scale-95 shadow-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Plus size={16} />
+                      إنشاء محتوى جديد
+                    </span>
+                    <span className="rounded-lg bg-[#e5b84f] px-2 py-0.5 text-[10px] font-black text-black">NEW</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
                       editor.toggleEditing();
                     }}
-                    className={`w-full flex items-center justify-between rounded-xl p-3 text-xs font-black transition active:scale-95 shadow-md ${
+                    className={`w-full flex items-center justify-between rounded-xl p-2.5 text-xs font-black transition active:scale-95 shadow-md ${
                       editor.isEditing
                         ? "border-rose-400 bg-rose-500/25 text-rose-100 ring-2 ring-rose-400/40 animate-pulse"
                         : "border border-amber-400/40 bg-amber-400/15 text-amber-200"
@@ -291,7 +342,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   <button
                     type="button"
                     onClick={() => go("/admin")}
-                    className="w-full flex items-center justify-between rounded-xl bg-gradient-to-r from-[#08467d] to-[#0c599c] p-3 text-xs font-black text-white shadow-lg shadow-[#08467d]/30 active:scale-95 transition"
+                    className="w-full flex items-center justify-between rounded-xl bg-gradient-to-r from-[#08467d] to-[#0c599c] p-2.5 text-xs font-black text-white shadow-lg shadow-[#08467d]/30 active:scale-95 transition"
                   >
                     <span className="flex items-center gap-2">
                       <LayoutDashboard size={16} className="text-[#f8ca14]" />
@@ -303,7 +354,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               ) : null}
 
               {/* Navigation Links */}
-              <div className="space-y-1">
+              <div className="space-y-1 border-t border-current/10 pt-2">
                 <VisualEditable id="aqeeq-studio-mobile-nav-home" tag="button" label="اسم رابط الرئيسية للهاتف" defaultText={orchestration?.nav?.homeLabel || "الرئيسية"} as="button" onAction={() => go("/")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "studio" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-journal" tag="button" label="اسم رابط المجلة للهاتف" defaultText={orchestration?.nav?.journalLabel || "مجلة العقيق"} as="button" onAction={() => go("/journal")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "journal" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />
                 <VisualEditable id="aqeeq-studio-mobile-nav-albums" tag="button" label="اسم رابط الألبوم للهاتف" defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"} as="button" onAction={() => go("/albums")} className={`aq-studio-mobile-link w-full text-right p-2.5 rounded-xl font-black text-xs transition flex items-center gap-2.5 ${currentActive === "albums" ? (dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]") : ""}`} />

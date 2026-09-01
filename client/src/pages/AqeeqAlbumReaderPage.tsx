@@ -68,7 +68,12 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!album) return;
-    setMode(album.media.some((item) => item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") ? "scroll" : album.readingMode === "gallery" || album.readingMode === "scroll" ? album.readingMode : "spread");
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (isMobile) {
+      setMode(album.readingMode === "gallery" ? "gallery" : "scroll");
+    } else {
+      setMode(album.media.some((item) => item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") ? "scroll" : album.readingMode === "gallery" || album.readingMode === "scroll" ? album.readingMode : "spread");
+    }
     setIndex(0);
   }, [album?.id, album?.readingMode]);
 

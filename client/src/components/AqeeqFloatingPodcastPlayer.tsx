@@ -788,7 +788,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         dir="rtl"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 select-none"
+        className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-3.5 sm:right-6 z-50 select-none"
       >
           <div className="relative flex items-center gap-3">
 
@@ -855,7 +855,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 }
               }
             }}
-            className={`relative grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-full border-2 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 ${
+            className={`relative grid h-13 w-13 sm:h-16 sm:w-16 place-items-center rounded-full border-2 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 ${
               isVideo
                 ? isDark
                   ? "bg-gradient-to-tr from-[#0b1022] via-[#0e1635] to-[#122046] border-cyan-400/60 shadow-[0_12px_36px_rgba(6,182,212,0.45)] ring-2 ring-cyan-400/30"
@@ -994,7 +994,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
           {/* Attached Control Dock (Single-Line Capsule: Stretches HORIZONTALLY ONLY) */}
           {isDockVisible && (
             <div
-              className={`flex items-center gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-13 sm:h-14 px-3.5 sm:px-4 shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2.5 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
                 isPodcast
                   ? isDark
                     ? "border-indigo-400/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-indigo-400/30"

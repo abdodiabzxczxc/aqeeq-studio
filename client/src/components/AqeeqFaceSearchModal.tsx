@@ -354,37 +354,85 @@ export function AqeeqFaceSearchModal({
             </div>
           </DialogHeader>
 
-          <div className="max-h-[78vh] space-y-5 overflow-y-auto p-5 sm:p-6">
-            {/* Search Station: Selfie Card & Smart Inputs */}
+          <div className="max-h-[78vh] space-y-5 overflow-y-auto p-4 sm:p-6">
+            {/* Search Station: Dual Upload (Gallery + Camera) & Smart Inputs */}
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-12">
-              {/* Selfie Camera Box (5 cols) */}
-              <label className="sm:col-span-5 group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-400/40 bg-amber-400/[.03] p-4 text-center transition hover:border-amber-400 hover:bg-amber-400/[.08] shadow-inner">
+              {/* Selfie & Photo Upload Box (5 cols) */}
+              <div className="sm:col-span-5 flex flex-col justify-between rounded-2xl border-2 border-dashed border-amber-400/40 bg-amber-400/[.03] p-4 text-center transition hover:border-amber-400 hover:bg-amber-400/[.06] shadow-inner">
+                {/* Hidden File Inputs */}
                 <input
                   type="file"
+                  id="face-search-gallery-input"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleSelfieUpload}
+                />
+                <input
+                  type="file"
+                  id="face-search-camera-input"
                   accept="image/*"
                   capture="user"
                   className="hidden"
                   onChange={handleSelfieUpload}
                 />
+
                 {selfieSrc ? (
-                  <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-2 ring-emerald-400 shadow-xl">
-                    <img src={selfieSrc} alt="Selfie" className="h-full w-full object-cover" />
-                    <span className="absolute bottom-1 right-1 grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-[10px] font-bold text-white shadow-md">
-                      ✓
-                    </span>
+                  <div className="flex flex-col items-center justify-center gap-2 py-1">
+                    <div className="relative h-20 w-20 overflow-hidden rounded-2xl ring-4 ring-emerald-400/60 shadow-xl">
+                      <img src={selfieSrc} alt="Uploaded Face" className="h-full w-full object-cover" />
+                      <span className="absolute bottom-1 right-1 grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-[10px] font-bold text-white shadow-md">
+                        ✓
+                      </span>
+                    </div>
+                    <span className="text-xs font-black text-emerald-400">تم اختيار صورتك بنجاح ✨</span>
+                    <div className="mt-1 flex w-full gap-2">
+                      <label
+                        htmlFor="face-search-gallery-input"
+                        className="flex-1 cursor-pointer rounded-xl border border-amber-400/30 bg-black/40 py-1.5 text-[11px] font-black text-amber-200 transition hover:bg-amber-400 hover:text-black"
+                      >
+                        🖼️ من المعرض
+                      </label>
+                      <label
+                        htmlFor="face-search-camera-input"
+                        className="flex-1 cursor-pointer rounded-xl border border-amber-400/30 bg-black/40 py-1.5 text-[11px] font-black text-amber-200 transition hover:bg-amber-400 hover:text-black"
+                      >
+                        📸 سيلفي
+                      </label>
+                    </div>
                   </div>
                 ) : (
-                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 group-hover:scale-110 transition duration-300 ring-1 ring-amber-400/30">
-                    <Camera size={26} />
+                  <div className="flex flex-col items-center justify-center py-2">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30 mb-2">
+                      <ScanFace size={24} />
+                    </div>
+                    <span className="text-xs font-black text-amber-100 mb-1">
+                      ارفع صورتك لمطابقة ملامحك بيومترياً
+                    </span>
+                    <span className="text-[10px] text-slate-400 mb-3 max-w-[200px]">
+                      اختر صورة من استوديو الموبايل أو التقط سيلفي مباشرة
+                    </span>
+
+                    {/* Dual Action Buttons */}
+                    <div className="flex flex-col sm:flex-row w-full gap-2">
+                      <label
+                        htmlFor="face-search-gallery-input"
+                        className="flex-1 flex items-center justify-center gap-1.5 cursor-pointer rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 py-2.5 px-3 text-xs font-black text-slate-950 shadow-md transition hover:scale-[1.02] active:scale-95"
+                      >
+                        <ImageIcon size={15} />
+                        <span>من معرض الصور</span>
+                      </label>
+
+                      <label
+                        htmlFor="face-search-camera-input"
+                        className="flex-1 flex items-center justify-center gap-1.5 cursor-pointer rounded-xl border border-amber-400/40 bg-black/50 py-2.5 px-3 text-xs font-black text-amber-200 shadow-sm transition hover:bg-amber-400/20 active:scale-95"
+                      >
+                        <Camera size={15} />
+                        <span>التقاط سيلفي 🤳</span>
+                      </label>
+                    </div>
                   </div>
                 )}
-                <span className="mt-2.5 text-xs font-black text-amber-200">
-                  {selfieSrc ? "تغيير صورة السيلفي 🔄" : "التقط أو ارفع صورة سيلفي 🤳"}
-                </span>
-                <span className="mt-0.5 text-[10px] text-slate-400">
-                  خوارزمية التعرف البيومتري ستطابق ملامحك فوراً
-                </span>
-              </label>
+              </div>
 
               {/* Text & Ceremony Search Box (7 cols) */}
               <div className="sm:col-span-7 flex flex-col justify-between rounded-2xl border border-white/10 bg-black/40 p-4">
@@ -418,13 +466,13 @@ export function AqeeqFaceSearchModal({
                   >
                     {isScanning ? (
                       <div className="flex items-center gap-1.5">
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>جارٍ الفحص والمطابقة…</span>
+                        <Loader2 size={15} className="animate-spin text-slate-950" />
+                        <span>جاري المسح البيومتري الذكي…</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5">
-                        <Sparkles size={14} />
-                        <span>بدء البحث بالذكاء الاصطناعي ✨</span>
+                        <Sparkles size={15} className="text-slate-950" />
+                        <span>بدء فحص ومطابقة الوجه في الألبوم 🔍</span>
                       </div>
                     )}
                   </Button>

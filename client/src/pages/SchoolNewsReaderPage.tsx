@@ -41,7 +41,14 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
   const [flipZoom, setFlipZoom] = useState<number>(1);
 
   useEffect(() => {
-    if (issue) setReaderMode(normalizeJournalReadingMode(issue.readingMode));
+    if (issue) {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      if (isMobile) {
+        setReaderMode(issue.readingMode === "single" ? "single" : "scroll");
+      } else {
+        setReaderMode(normalizeJournalReadingMode(issue.readingMode));
+      }
+    }
   }, [issue?.id, issue?.readingMode]);
 
   useEffect(() => {
