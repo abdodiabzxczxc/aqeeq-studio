@@ -35,6 +35,7 @@ import {
   ChevronRight,
   LayoutGrid,
   List,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -146,7 +147,7 @@ export default function AqeeqPodcastPage() {
 
   const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
     if (ref.current) {
-      const scrollAmount = direction === "right" ? -340 : 340;
+      const scrollAmount = direction === "right" ? -350 : 350;
       ref.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
@@ -187,7 +188,11 @@ export default function AqeeqPodcastPage() {
       if (selectedCategory === "songs" || selectedCategory === "audio") return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        return p.title.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
+        return (
+          p.title.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
+          (p.hostName && p.hostName.toLowerCase().includes(q))
+        );
       }
       return true;
     });
@@ -199,7 +204,11 @@ export default function AqeeqPodcastPage() {
       if (selectedCategory === "songs" || selectedCategory === "videos") return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        return p.title.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
+        return (
+          p.title.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
+          (p.hostName && p.hostName.toLowerCase().includes(q))
+        );
       }
       return true;
     });
@@ -210,7 +219,11 @@ export default function AqeeqPodcastPage() {
     return (songs || []).filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        return s.title.toLowerCase().includes(q) || (s.artistOrHost && s.artistOrHost.toLowerCase().includes(q));
+        return (
+          s.title.toLowerCase().includes(q) ||
+          (s.artistOrHost && s.artistOrHost.toLowerCase().includes(q)) ||
+          (s.description && s.description.toLowerCase().includes(q))
+        );
       }
       return true;
     });
@@ -591,7 +604,7 @@ export default function AqeeqPodcastPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ابحث في الأناشيد، الحلقات، والضيوف..."
+                placeholder="ابحث في الأناشيد، الحلقات، والمؤلفين..."
                 className={`w-full rounded-xl border pr-9 pl-4 py-2 text-xs font-bold outline-none transition ${
                   dark
                     ? "border-white/10 bg-black text-white focus:border-[#f8ca14]"
@@ -617,7 +630,7 @@ export default function AqeeqPodcastPage() {
         {filteredSongs && filteredSongs.length > 0 && (
           <section
             id="anthems-pavilion"
-            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4.5 sm:p-7 transition ${
+            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
               dark
                 ? "border-amber-400/40 bg-gradient-to-b from-[#141208] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(248,202,20,0.1)]"
                 : "border-amber-200/80 bg-gradient-to-b from-amber-50/70 via-white to-slate-50 shadow-lg"
@@ -628,7 +641,7 @@ export default function AqeeqPodcastPage() {
             <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-amber-500/10 blur-3xl" />
 
             {/* Pavilion Header */}
-            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-5 ${
+            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
               dark ? "border-amber-400/20" : "border-amber-200"
             }`}>
               <div className="flex items-center gap-3">
@@ -644,10 +657,10 @@ export default function AqeeqPodcastPage() {
                     }`}>
                       ROYAL DISCOGRAPHY · {filteredSongs.length} نشيداً
                     </span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-mono ${
-                      dark ? "bg-white/5 border-white/10 text-slate-400" : "bg-slate-100 border-slate-200 text-slate-600"
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-amber-400/10 text-amber-300 border-amber-400/20" : "bg-amber-100/60 text-amber-900 border-amber-200"
                     }`}>
-                      Master HD
+                      إشراف: قسم التربية الموسيقية 🎼
                     </span>
                   </div>
                   <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
@@ -723,76 +736,79 @@ export default function AqeeqPodcastPage() {
               </div>
             </div>
 
-            {/* Pavilion Layout */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Pavilion Layout: Exactly Balanced Height */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
-              {/* Grand Dynamic Vinyl Deck Centerpiece (Sticky) */}
-              <div className={`lg:col-span-5 lg:sticky lg:top-24 text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl space-y-3.5 ${
+              {/* Grand Dynamic Vinyl Deck Centerpiece */}
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl ${
                 dark ? "border-amber-400/30 bg-black/60 text-white" : "border-amber-200 bg-white/95 text-slate-900"
               }`}>
                 
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
                   <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-amber-400" : "text-amber-700"}`}>
                     <Sparkles size={12} />
-                    <span>مشغل الأسطوانة الذهبية</span>
+                    <span>مشغل الأسطوانة الذهبية الحي</span>
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">
                     {activeItem ? activeItem.title : "تراك #01"}
                   </span>
                 </div>
 
-                {/* Massive Interactive Vinyl Disc */}
-                <div className="relative mx-auto h-36 w-36 sm:h-40 sm:w-40 grid place-items-center">
-                  <div className={`absolute inset-0 rounded-full border-4 border-amber-400/40 bg-[#05060a] shadow-[0_0_30px_rgba(248,202,20,0.2)] transition ${
-                    isPlaying ? "border-amber-400 shadow-[0_0_40px_rgba(248,202,20,0.35)]" : ""
-                  }`} />
-                  <div className="absolute inset-2.5 rounded-full border border-white/10" />
-                  <div className="absolute inset-5 rounded-full border border-amber-400/10" />
-                  <div className="absolute inset-7.5 rounded-full border border-white/10" />
+                {/* Disc Graphic */}
+                <div className="relative mx-auto my-auto py-2 grid place-items-center">
+                  <div className="relative h-32 w-32 sm:h-36 sm:w-36 grid place-items-center">
+                    <div className={`absolute inset-0 rounded-full border-4 border-amber-400/40 bg-[#05060a] shadow-[0_0_30px_rgba(248,202,20,0.2)] transition ${
+                      isPlaying ? "border-amber-400 shadow-[0_0_40px_rgba(248,202,20,0.35)]" : ""
+                    }`} />
+                    <div className="absolute inset-2.5 rounded-full border border-white/10" />
+                    <div className="absolute inset-5 rounded-full border border-amber-400/10" />
 
-                  {/* Center Disc Artwork */}
-                  <div
-                    onClick={() => {
-                      if (activeItem) {
-                        if (isPlaying) pausePodcast();
-                        else playSong(activeItem);
-                      } else {
-                        playSong(0);
-                      }
-                    }}
-                    className={`relative cursor-pointer h-20 w-20 rounded-full bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 shadow-xl overflow-hidden grid place-items-center ${
-                      isPlaying ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
-                    }`}
-                  >
-                    <img
-                      src={dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg"}
-                      alt=""
-                      className="h-full w-full object-cover opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-black/60 text-amber-400 backdrop-blur-sm shadow-md">
-                        {isPlaying ? <Pause size={15} /> : <Play size={15} className="fill-current mr-0.5" />}
+                    <div
+                      onClick={() => {
+                        if (activeItem) {
+                          if (isPlaying) pausePodcast();
+                          else playSong(activeItem);
+                        } else {
+                          playSong(0);
+                        }
+                      }}
+                      className={`relative cursor-pointer h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 shadow-xl overflow-hidden grid place-items-center ${
+                        isPlaying ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
+                      }`}
+                    >
+                      <img
+                        src={dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg"}
+                        alt=""
+                        className="h-full w-full object-cover opacity-90"
+                      />
+                      <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                        <div className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-amber-400 backdrop-blur-sm shadow-md">
+                          {isPlaying ? <Pause size={13} /> : <Play size={13} className="fill-current mr-0.5" />}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Disc Info & Controls */}
-                <div className="space-y-0.5">
+                {/* Disc Info with Department Authorship */}
+                <div className="space-y-1 my-1">
                   <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
                     {activeItem ? activeItem.title : songs[0]?.title || "نشيد صرح العقيق"}
                   </h3>
-                  <p className={`text-[11px] font-bold ${dark ? "text-amber-400" : "text-amber-700"}`}>
-                    {activeItem ? activeItem.artistOrHost : songs[0]?.artistOrHost || "كورال ومدارس العقيق"}
-                  </p>
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                    <span className={`text-[11px] font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>
+                      {activeItem?.artistOrHost || "قسم التربية الموسيقية · كورال العقيق"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold">
+                      · {activeItem?.description ? "كلمات معتمدة" : "تأليف وألحان التربية الموسيقية"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Master Interactive Player Console */}
-                <div className={`rounded-xl border p-2.5 space-y-2 ${
+                {/* Master Console */}
+                <div className={`rounded-xl border p-2.5 space-y-2 mt-auto ${
                   dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                 }`}>
-                  
-                  {/* Progress Seek Scrubber */}
                   <div dir="ltr" className="space-y-0.5">
                     <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
                       <span>{formatAudioTime(currentTime)}</span>
@@ -816,9 +832,7 @@ export default function AqeeqPodcastPage() {
                     </div>
                   </div>
 
-                  {/* Playback Transport Controls */}
                   <div className="flex items-center justify-between gap-1.5 pt-0.5">
-                    {/* 1. Like, Lyrics, Share */}
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
@@ -863,7 +877,6 @@ export default function AqeeqPodcastPage() {
                       </button>
                     </div>
 
-                    {/* 2. Transport Buttons */}
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
@@ -900,7 +913,6 @@ export default function AqeeqPodcastPage() {
                       </button>
                     </div>
 
-                    {/* 3. Volume Slider & Mute */}
                     <div dir="ltr" className="flex items-center gap-1">
                       <button
                         type="button"
@@ -920,27 +932,25 @@ export default function AqeeqPodcastPage() {
                         className={`w-10 sm:w-12 h-1 accent-amber-400 rounded-full cursor-pointer ${dark ? "bg-white/20" : "bg-slate-300"}`}
                       />
                     </div>
-
                   </div>
-
                 </div>
 
               </div>
 
-              {/* Media Hub: 2-Row Carousel Mode or List Playlist Mode */}
-              <div className="lg:col-span-7">
+              {/* Media Hub: 2-Row Carousel (Height Matched 100%) */}
+              <div className="lg:col-span-7 flex flex-col justify-between">
                 {songsViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={songsScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[270px] sm:auto-cols-[310px] gap-3 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
                   >
                     {(filteredSongs || []).map((song: any, idx: number) => {
                       const isThisPlaying = isCurrentPlaying(song.id);
                       return (
                         <div
                           key={song.id || idx}
-                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3 transition duration-300 hover:-translate-y-0.5 ${
+                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
                             isThisPlaying
                               ? "border-amber-400 bg-amber-400/15 ring-2 ring-amber-400/40 shadow-[0_8px_20px_rgba(248,202,20,0.18)]"
                               : dark
@@ -948,66 +958,76 @@ export default function AqeeqPodcastPage() {
                               : "border-slate-200/90 bg-white hover:border-amber-400 hover:shadow-md shadow-sm"
                           }`}
                         >
-                          <div className="flex items-start gap-2.5 text-right">
-                            {/* Mini Vinyl Art */}
+                          {/* Top: Disc & Title */}
+                          <div className="flex items-start gap-3 text-right">
                             <button
                               type="button"
                               onClick={() => playSong(song)}
-                              className={`relative h-12 w-12 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
+                              className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
                                 dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
                               }`}
                             >
-                              <Disc size={24} className={`text-amber-400 ${isThisPlaying ? "animate-[spin_4s_linear_infinite]" : ""}`} />
+                              <Disc size={26} className={`text-amber-400 ${isThisPlaying ? "animate-[spin_4s_linear_infinite]" : ""}`} />
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                {isThisPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white fill-current" />}
+                                {isThisPlaying ? <Pause size={13} className="text-white" /> : <Play size={13} className="text-white fill-current" />}
                               </div>
                             </button>
 
                             <div className="text-right min-w-0 flex-1">
                               <div className="flex items-center justify-between">
-                                <span className={`text-[8.5px] font-mono font-black uppercase ${dark ? "text-amber-400" : "text-amber-700"}`}>
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-amber-400" : "text-amber-700"}`}>
                                   تراك #{String(idx + 1).padStart(2, "0")}
                                 </span>
-                                <span className="text-[8.5px] font-mono text-slate-400">03:45</span>
+                                <span className="text-[9px] font-mono text-slate-400">03:45</span>
                               </div>
 
                               <h4
                                 onClick={() => playSong(song)}
-                                className={`mt-0.5 text-xs font-black cursor-pointer truncate transition ${
+                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
                                   dark ? "text-white hover:text-amber-300" : "text-slate-900 hover:text-amber-600"
                                 }`}
                               >
                                 {song.title}
                               </h4>
 
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {song.artistOrHost || "كورال ومدارس العقيق"}
+                              {/* Department of Music Authorship */}
+                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
+                                <span className={dark ? "text-amber-400/90" : "text-amber-700"}>
+                                  {song.artistOrHost || "قسم التربية الموسيقية"}
+                                </span>
                               </p>
                             </div>
                           </div>
 
+                          {/* Song Lyric / Desc */}
+                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
+                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
+                          }`}>
+                            {song.description || "من إبداعات وألحان قسم التربية الموسيقية لمدارس العقيق."}
+                          </p>
+
                           {/* Action Bar */}
-                          <div className={`mt-2 flex items-center justify-between border-t pt-1.5 ${dark ? "border-white/10" : "border-slate-100"}`}>
+                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
                             {song.lyrics ? (
                               <button
                                 type="button"
                                 onClick={() => setSelectedLyricsSong(song)}
-                                className={`text-[9.5px] font-black flex items-center gap-1 ${
+                                className={`text-[10px] font-black flex items-center gap-1 ${
                                   dark ? "text-amber-400 hover:text-amber-300" : "text-amber-700 hover:text-amber-800"
                                 }`}
                               >
-                                <FileText size={10} />
-                                <span>كلمات</span>
+                                <FileText size={11} />
+                                <span>ديوان الكلمات</span>
                               </button>
                             ) : (
-                              <span className="text-[8.5px] text-slate-400 font-bold">نشيد رسمي</span>
+                              <span className="text-[9px] text-slate-400 font-bold">نشيد رسمي</span>
                             )}
 
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={(e) => handleLikeSong(song, e)}
-                                className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[8.5px] font-bold transition ${
+                                className={`flex items-center gap-0.5 rounded-lg border px-2 py-0.5 text-[9px] font-bold transition ${
                                   likedSongIds.includes(String(song.id || `song-${idx}`))
                                     ? "border-rose-500/40 bg-rose-500/20 text-rose-400"
                                     : dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
@@ -1015,7 +1035,7 @@ export default function AqeeqPodcastPage() {
                                 title="إعجاب بالنشيد"
                               >
                                 <Heart
-                                  size={9}
+                                  size={10}
                                   className={likedSongIds.includes(String(song.id || `song-${idx}`)) ? "fill-rose-500 text-rose-500" : "fill-rose-500/20"}
                                 />
                                 <span>{songLikes[String(song.id || `song-${idx}`)] || 98}</span>
@@ -1024,25 +1044,25 @@ export default function AqeeqPodcastPage() {
                               <button
                                 type="button"
                                 onClick={(e) => handleShare(song, e)}
-                                className={`grid h-5 w-5 place-items-center rounded-lg border transition ${
+                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
                                   dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-emerald-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
                                 }`}
                                 title="مشاركة"
                               >
-                                <Share2 size={9} />
+                                <Share2 size={10} />
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => playSong(song)}
-                                className={`inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[10px] font-black transition shadow-sm ${
+                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
                                     ? "bg-amber-400 text-slate-950 font-black shadow-amber-400/25"
                                     : dark ? "bg-amber-400/15 text-amber-300 hover:bg-amber-400 hover:text-slate-950" : "bg-amber-100 text-amber-900 hover:bg-amber-400 hover:text-slate-950"
                                 }`}
                               >
-                                {isThisPlaying ? <Pause size={9} /> : <Play size={9} className="mr-0.5 fill-current" />}
-                                <span>{isThisPlaying ? "إيقاف" : "تشغيل"}</span>
+                                {isThisPlaying ? <Pause size={10} /> : <Play size={10} className="mr-0.5 fill-current" />}
+                                <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
                               </button>
                             </div>
                           </div>
@@ -1053,7 +1073,7 @@ export default function AqeeqPodcastPage() {
                   </div>
                 ) : (
                   /* ==================== 2. COMPACT TRACKLIST PLAYLIST ==================== */
-                  <div className={`max-h-[350px] overflow-y-auto space-y-1.5 rounded-2xl border p-2.5 ${
+                  <div className={`overflow-y-auto space-y-2 rounded-2xl border p-3 h-full ${
                     dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                   }`}>
                     {(filteredSongs || []).map((song: any, idx: number) => {
@@ -1062,7 +1082,7 @@ export default function AqeeqPodcastPage() {
                         <div
                           key={song.id || idx}
                           onClick={() => playSong(song)}
-                          className={`group flex items-center justify-between gap-2.5 rounded-xl border p-2.5 cursor-pointer transition ${
+                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition ${
                             isThisPlaying
                               ? "border-amber-400 bg-amber-400/15 shadow-sm"
                               : dark
@@ -1082,15 +1102,15 @@ export default function AqeeqPodcastPage() {
                             </span>
 
                             <div className="min-w-0 flex-1">
-                              <h4 className={`text-xs font-black truncate transition ${
+                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
                                 isThisPlaying
                                   ? "text-amber-400"
                                   : dark ? "text-white group-hover:text-amber-300" : "text-slate-900 group-hover:text-amber-700"
                               }`}>
                                 {song.title}
                               </h4>
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {song.artistOrHost || "كورال ومدارس العقيق"}
+                              <p className="text-[10px] text-slate-500 font-bold truncate">
+                                {song.artistOrHost || "قسم التربية الموسيقية · مدارس العقيق"}
                               </p>
                             </div>
                           </div>
@@ -1147,7 +1167,7 @@ export default function AqeeqPodcastPage() {
         {videoPodcasts.length > 0 && (
           <section
             id="videos-pavilion"
-            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4.5 sm:p-7 transition ${
+            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
               dark
                 ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(99,102,241,0.1)]"
                 : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 shadow-lg"
@@ -1158,7 +1178,7 @@ export default function AqeeqPodcastPage() {
             <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
 
             {/* Pavilion Header */}
-            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-5 ${
+            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
               dark ? "border-indigo-500/20" : "border-indigo-200"
             }`}>
               <div className="flex items-center gap-3">
@@ -1173,6 +1193,11 @@ export default function AqeeqPodcastPage() {
                         : "bg-indigo-100 border-indigo-300 text-indigo-800"
                     }`}>
                       CINEMA 4K · {videoPodcasts.length} حلقات
+                    </span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20" : "bg-indigo-100/60 text-indigo-900 border-indigo-200"
+                    }`}>
+                      فريق التقديم والإعلام 🎬
                     </span>
                   </div>
                   <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
@@ -1254,10 +1279,10 @@ export default function AqeeqPodcastPage() {
             </div>
 
             {/* Split Grid */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
-              {/* Master 4K Video Screen Centerpiece (Sticky) */}
-              <div className={`lg:col-span-5 lg:sticky lg:top-24 text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl space-y-3 ${
+              {/* Master 4K Video Screen Centerpiece */}
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl ${
                 dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1271,7 +1296,7 @@ export default function AqeeqPodcastPage() {
                 </div>
 
                 {/* 16:9 Cinema Box */}
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto">
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
                     isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
                       <iframe
@@ -1345,17 +1370,17 @@ export default function AqeeqPodcastPage() {
                   )}
                 </div>
 
-                {/* Master Video Info & Action Controls */}
-                <div className="space-y-0.5 text-right">
+                {/* Master Video Info & Presenter Metadata */}
+                <div className="space-y-1 my-1 text-right">
                   <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
                     {currentActiveVideo ? currentActiveVideo.title : "حلقة مميزة تحت الضوء"}
                   </h3>
                   <p className={`text-[11px] font-bold ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
-                    {currentActiveVideo ? currentActiveVideo.hostName || "فريق الإذاعة والإعلام" : "لقاءات قيادات العقيق"}
+                    تقديم وإعداد: {currentActiveVideo?.hostName || "فريق التقديم والإعلام المدرسي"}
                   </p>
                 </div>
 
-                <div className={`rounded-xl border p-2.5 flex items-center justify-between gap-2 ${
+                <div className={`rounded-xl border p-2.5 flex items-center justify-between gap-2 mt-auto ${
                   dark ? "border-white/10 bg-white/5 text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700"
                 }`}>
                   <span className="text-[9.5px] font-black">
@@ -1400,13 +1425,13 @@ export default function AqeeqPodcastPage() {
 
               </div>
 
-              {/* Media Hub: 2-Row Carousel or List */}
-              <div className="lg:col-span-7">
+              {/* Media Hub: 2-Row Carousel (Height Matched) */}
+              <div className="lg:col-span-7 flex flex-col justify-between">
                 {videosViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={videosScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[270px] sm:auto-cols-[310px] gap-3 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
                   >
                     {videoPodcasts.map((video: any, idx: number) => {
                       const isThisActive = currentActiveVideo?.id === video.id;
@@ -1414,7 +1439,7 @@ export default function AqeeqPodcastPage() {
                       return (
                         <div
                           key={video.id}
-                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3 transition duration-300 hover:-translate-y-0.5 ${
+                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
                             isThisActive
                               ? "border-indigo-400 bg-indigo-500/15 ring-2 ring-indigo-400/40 shadow-[0_8px_20px_rgba(99,102,241,0.18)]"
                               : dark
@@ -1422,12 +1447,12 @@ export default function AqeeqPodcastPage() {
                               : "border-slate-200/90 bg-white hover:border-indigo-400 hover:shadow-md shadow-sm"
                           }`}
                         >
-                          <div className="flex items-start gap-2.5 text-right">
+                          <div className="flex items-start gap-3 text-right">
                             {/* Video Thumbnail */}
                             <button
                               type="button"
                               onClick={() => handlePlayVideoInline(video.id)}
-                              className={`relative h-12 w-18 shrink-0 rounded-xl overflow-hidden border group-hover:scale-105 transition ${
+                              className={`relative h-13 w-20 shrink-0 rounded-xl overflow-hidden border group-hover:scale-105 transition ${
                                 dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
                               }`}
                             >
@@ -1447,53 +1472,62 @@ export default function AqeeqPodcastPage() {
 
                             <div className="text-right min-w-0 flex-1">
                               <div className="flex items-center justify-between">
-                                <span className={`text-[8.5px] font-mono font-black uppercase ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
                                   حلقة #{String(idx + 1).padStart(2, "0")}
                                 </span>
-                                <span className="text-[8.5px] font-mono text-slate-400">{video.duration || "12:00"}</span>
+                                <span className="text-[9px] font-mono text-slate-400">{video.duration || "12:00"}</span>
                               </div>
 
                               <h4
                                 onClick={() => handlePlayVideoInline(video.id)}
-                                className={`mt-0.5 text-xs font-black cursor-pointer truncate transition ${
+                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
                                   dark ? "text-white hover:text-indigo-300" : "text-slate-900 hover:text-indigo-600"
                                 }`}
                               >
                                 {video.title}
                               </h4>
 
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {video.hostName || "فريق الإذاعة"}
+                              {/* Presenter Name */}
+                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
+                                <User size={10} className={dark ? "text-indigo-400" : "text-indigo-600"} />
+                                <span>تقديم: {video.hostName || "فريق الإعلام والتقديم"}</span>
                               </p>
                             </div>
                           </div>
 
+                          {/* Description */}
+                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
+                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
+                          }`}>
+                            {video.description || "تغطية وحوار خاص ضمن سلسلة برامج تحت الضوء."}
+                          </p>
+
                           {/* Action Bar */}
-                          <div className={`mt-2 flex items-center justify-between border-t pt-1.5 ${dark ? "border-white/10" : "border-slate-100"}`}>
-                            <span className={`text-[8.5px] font-black ${dark ? "text-indigo-400" : "text-indigo-700"}`}>مرئي 4K</span>
+                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
+                            <span className={`text-[9px] font-black ${dark ? "text-indigo-400" : "text-indigo-700"}`}>مرئي 4K</span>
 
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={(e) => handleShare(video, e)}
-                                className={`grid h-5 w-5 place-items-center rounded-lg border transition ${
+                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
                                   dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-indigo-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
                                 }`}
                                 title="مشاركة"
                               >
-                                <Share2 size={9} />
+                                <Share2 size={10} />
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handlePlayVideoInline(video.id)}
-                                className={`inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[10px] font-black transition shadow-sm ${
+                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
                                     ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
                                     : dark ? "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white" : "bg-indigo-100 text-indigo-900 hover:bg-indigo-600 hover:text-white"
                                 }`}
                               >
-                                <Play size={9} className="mr-0.5 fill-current" />
+                                <Play size={10} className="mr-0.5 fill-current" />
                                 <span>{isThisPlaying ? "جاري العرض" : "تشغيل"}</span>
                               </button>
                             </div>
@@ -1505,7 +1539,7 @@ export default function AqeeqPodcastPage() {
                   </div>
                 ) : (
                   /* ==================== 2. COMPACT EPISODES LIST ==================== */
-                  <div className={`max-h-[350px] overflow-y-auto space-y-1.5 rounded-2xl border p-2.5 ${
+                  <div className={`overflow-y-auto space-y-2 rounded-2xl border p-3 h-full ${
                     dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                   }`}>
                     {videoPodcasts.map((video: any, idx: number) => {
@@ -1514,7 +1548,7 @@ export default function AqeeqPodcastPage() {
                         <div
                           key={video.id}
                           onClick={() => handlePlayVideoInline(video.id)}
-                          className={`group flex items-center justify-between gap-2.5 rounded-xl border p-2.5 cursor-pointer transition ${
+                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition ${
                             isThisActive
                               ? "border-indigo-400 bg-indigo-500/15 shadow-sm"
                               : dark
@@ -1538,15 +1572,15 @@ export default function AqeeqPodcastPage() {
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <h4 className={`text-xs font-black truncate transition ${
+                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
                                 isThisActive
                                   ? "text-indigo-400"
                                   : dark ? "text-white group-hover:text-indigo-300" : "text-slate-900 group-hover:text-indigo-700"
                               }`}>
                                 {video.title}
                               </h4>
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {video.hostName || "فريق الإذاعة"} · {video.duration || "12:00"}
+                              <p className="text-[10px] text-slate-500 font-bold truncate">
+                                تقديم: {video.hostName || "فريق الإعلام"} · {video.duration || "12:00"}
                               </p>
                             </div>
                           </div>
@@ -1588,7 +1622,7 @@ export default function AqeeqPodcastPage() {
         {audioPodcasts.length > 0 && (
           <section
             id="audio-pavilion"
-            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4.5 sm:p-7 transition ${
+            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
               dark
                 ? "border-emerald-500/40 bg-gradient-to-b from-[#081814] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
                 : "border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 shadow-lg"
@@ -1599,7 +1633,7 @@ export default function AqeeqPodcastPage() {
             <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
 
             {/* Pavilion Header */}
-            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-5 ${
+            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
               dark ? "border-emerald-500/20" : "border-emerald-200"
             }`}>
               <div className="flex items-center gap-3">
@@ -1614,6 +1648,11 @@ export default function AqeeqPodcastPage() {
                         : "bg-emerald-100 border-emerald-300 text-emerald-800"
                     }`}>
                       AUDIO LOUNGE · {audioPodcasts.length} حلقات
+                    </span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20" : "bg-emerald-100/60 text-emerald-900 border-emerald-200"
+                    }`}>
+                      فريق الإذاعة المدرسية 🎙️
                     </span>
                   </div>
                   <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
@@ -1695,10 +1734,10 @@ export default function AqeeqPodcastPage() {
             </div>
 
             {/* Split Grid */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
-              {/* Master Acoustic Broadcasting Deck Centerpiece (Sticky) */}
-              <div className={`lg:col-span-5 lg:sticky lg:top-24 text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl space-y-3.5 ${
+              {/* Master Acoustic Broadcasting Deck Centerpiece */}
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl ${
                 dark ? "border-emerald-500/30 bg-black/60 text-white" : "border-emerald-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1711,61 +1750,63 @@ export default function AqeeqPodcastPage() {
                   </span>
                 </div>
 
-                {/* Turntable Centerpiece */}
-                <div className="relative mx-auto h-36 w-36 sm:h-40 sm:w-40 grid place-items-center">
-                  <div className={`absolute inset-0 rounded-full border-4 border-emerald-500/40 bg-[#040d0a] shadow-[0_0_30px_rgba(16,185,129,0.2)] transition ${
-                    isCurrentPlaying(currentActiveAudio?.id) ? "border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]" : ""
-                  }`} />
-                  <div className="absolute inset-2.5 rounded-full border border-white/10" />
-                  <div className="absolute inset-5 rounded-full border border-emerald-500/10" />
-                  <div className="absolute inset-7.5 rounded-full border border-white/10" />
+                {/* Turntable / Mic Centerpiece */}
+                <div className="relative mx-auto my-auto py-2 grid place-items-center">
+                  <div className="relative h-32 w-32 sm:h-36 sm:w-36 grid place-items-center">
+                    <div className={`absolute inset-0 rounded-full border-4 border-emerald-500/40 bg-[#040d0a] shadow-[0_0_30px_rgba(16,185,129,0.2)] transition ${
+                      isCurrentPlaying(currentActiveAudio?.id) ? "border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]" : ""
+                    }`} />
+                    <div className="absolute inset-2.5 rounded-full border border-white/10" />
+                    <div className="absolute inset-5 rounded-full border border-emerald-500/10" />
 
-                  <div
-                    onClick={() => {
-                      if (currentActiveAudio) {
-                        if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
-                        else playPodcast(currentActiveAudio);
-                      } else if (audioPodcasts[0]) {
-                        playPodcast(audioPodcasts[0]);
-                      }
-                    }}
-                    className={`relative cursor-pointer h-20 w-20 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
-                      isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
-                    }`}
-                  >
-                    {currentActiveAudio?.coverUrl ? (
-                      <img
-                        src={directDriveImage(currentActiveAudio.coverUrl) || currentActiveAudio.coverUrl}
-                        alt=""
-                        className="h-full w-full object-cover opacity-90"
-                      />
-                    ) : (
-                      <Mic size={28} className="text-slate-950" />
-                    )}
-                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-black/60 text-emerald-400 backdrop-blur-sm shadow-md">
-                        {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={15} /> : <Play size={15} className="fill-current mr-0.5" />}
+                    <div
+                      onClick={() => {
+                        if (currentActiveAudio) {
+                          if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
+                          else playPodcast(currentActiveAudio);
+                        } else if (audioPodcasts[0]) {
+                          playPodcast(audioPodcasts[0]);
+                        }
+                      }}
+                      className={`relative cursor-pointer h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
+                        isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
+                      }`}
+                    >
+                      {currentActiveAudio?.coverUrl ? (
+                        <img
+                          src={directDriveImage(currentActiveAudio.coverUrl) || currentActiveAudio.coverUrl}
+                          alt=""
+                          className="h-full w-full object-cover opacity-90"
+                        />
+                      ) : (
+                        <Mic size={24} className="text-slate-950" />
+                      )}
+                      <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                        <div className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-emerald-400 backdrop-blur-sm shadow-md">
+                          {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={13} /> : <Play size={13} className="fill-current mr-0.5" />}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Master Audio Info & Controls */}
-                <div className="space-y-0.5">
+                {/* Master Audio Info & Presenter Metadata */}
+                <div className="space-y-1 my-1">
                   <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
                     {currentActiveAudio ? currentActiveAudio.title : "حلقة بودكاست خلف المايك"}
                   </h3>
-                  <p className={`text-[11px] font-bold ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
-                    {currentActiveAudio ? currentActiveAudio.hostName || "فريق الإذاعة المدرسية" : "إذاعة الصباح"}
-                  </p>
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                    <span className={`text-[11px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                      تقديم: {currentActiveAudio?.hostName || "فريق الإذاعة المدرسية"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold">· إذاعة العقيق الرسمية</span>
+                  </div>
                 </div>
 
                 {/* Master Interactive Podcast Console */}
-                <div className={`rounded-xl border p-2.5 space-y-2 ${
+                <div className={`rounded-xl border p-2.5 space-y-2 mt-auto ${
                   dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                 }`}>
-                  
-                  {/* Progress Seek Scrubber */}
                   <div dir="ltr" className="space-y-0.5">
                     <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
                       <span>{formatAudioTime(currentTime)}</span>
@@ -1789,7 +1830,6 @@ export default function AqeeqPodcastPage() {
                     </div>
                   </div>
 
-                  {/* Transport Controls */}
                   <div className="flex items-center justify-between gap-1.5 pt-0.5">
                     <div className="flex items-center gap-1">
                       {currentActiveAudio && (
@@ -1875,20 +1915,18 @@ export default function AqeeqPodcastPage() {
                         className={`w-10 sm:w-12 h-1 accent-emerald-400 rounded-full cursor-pointer ${dark ? "bg-white/20" : "bg-slate-300"}`}
                       />
                     </div>
-
                   </div>
-
                 </div>
 
               </div>
 
-              {/* Media Hub: 2-Row Carousel or List */}
-              <div className="lg:col-span-7">
+              {/* Media Hub: 2-Row Carousel (Height Matched) */}
+              <div className="lg:col-span-7 flex flex-col justify-between">
                 {audioViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={audioScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[270px] sm:auto-cols-[310px] gap-3 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
                   >
                     {audioPodcasts.map((podcast: any, idx: number) => {
                       const isThisPlaying = isCurrentPlaying(podcast.id);
@@ -1896,7 +1934,7 @@ export default function AqeeqPodcastPage() {
                       return (
                         <div
                           key={podcast.id}
-                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3 transition duration-300 hover:-translate-y-0.5 ${
+                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
                             isThisPlaying || isThisActive
                               ? "border-emerald-400 bg-emerald-500/15 ring-2 ring-emerald-400/40 shadow-[0_8px_20px_rgba(16,185,129,0.18)]"
                               : dark
@@ -1904,14 +1942,14 @@ export default function AqeeqPodcastPage() {
                               : "border-slate-200/90 bg-white hover:border-emerald-400 hover:shadow-md shadow-sm"
                           }`}
                         >
-                          <div className="flex items-start gap-2.5 text-right">
+                          <div className="flex items-start gap-3 text-right">
                             <button
                               type="button"
                               onClick={() => {
                                 setSelectedAudioId(podcast.id);
                                 playPodcast(podcast);
                               }}
-                              className={`relative h-12 w-12 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
+                              className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
                                 dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
                               }`}
                             >
@@ -1921,16 +1959,16 @@ export default function AqeeqPodcastPage() {
                                 <Mic size={20} className="text-emerald-400" />
                               )}
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                {isThisPlaying ? <Pause size={12} className="text-white" /> : <Play size={12} className="text-white fill-current" />}
+                                {isThisPlaying ? <Pause size={13} className="text-white" /> : <Play size={13} className="text-white fill-current" />}
                               </div>
                             </button>
 
                             <div className="text-right min-w-0 flex-1">
                               <div className="flex items-center justify-between">
-                                <span className={`text-[8.5px] font-mono font-black uppercase ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
                                   حلقة #{String(idx + 1).padStart(2, "0")}
                                 </span>
-                                <span className="text-[8.5px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
+                                <span className="text-[9px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
                               </div>
 
                               <h4
@@ -1938,22 +1976,31 @@ export default function AqeeqPodcastPage() {
                                   setSelectedAudioId(podcast.id);
                                   playPodcast(podcast);
                                 }}
-                                className={`mt-0.5 text-xs font-black cursor-pointer line-clamp-1 transition ${
+                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer line-clamp-1 transition ${
                                   dark ? "text-white hover:text-emerald-300" : "text-slate-900 hover:text-emerald-600"
                                 }`}
                               >
                                 {podcast.title}
                               </h4>
 
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {podcast.hostName || "فريق الإذاعة المدرسية"}
+                              {/* Presenter Name */}
+                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
+                                <User size={10} className={dark ? "text-emerald-400" : "text-emerald-600"} />
+                                <span>تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"}</span>
                               </p>
                             </div>
                           </div>
 
+                          {/* Description */}
+                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
+                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
+                          }`}>
+                            {podcast.description || "حوار إذاعي تربوي ضمن سلسلة حلقات خلف المايك."}
+                          </p>
+
                           {/* Action Bar */}
-                          <div className={`mt-2 flex items-center justify-between border-t pt-1.5 ${dark ? "border-white/10" : "border-slate-100"}`}>
-                            <span className={`text-[8.5px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
+                            <span className={`text-[9px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
                               {isThisPlaying ? "🔴 بث مباشر" : "مسموع HD"}
                             </span>
 
@@ -1961,12 +2008,12 @@ export default function AqeeqPodcastPage() {
                               <button
                                 type="button"
                                 onClick={(e) => handleShare(podcast, e)}
-                                className={`grid h-5 w-5 place-items-center rounded-lg border transition ${
+                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
                                   dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-emerald-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
                                 }`}
                                 title="مشاركة"
                               >
-                                <Share2 size={9} />
+                                <Share2 size={10} />
                               </button>
 
                               <button
@@ -1975,13 +2022,13 @@ export default function AqeeqPodcastPage() {
                                   setSelectedAudioId(podcast.id);
                                   playPodcast(podcast);
                                 }}
-                                className={`inline-flex items-center gap-0.5 rounded-lg px-2 py-0.5 text-[10px] font-black transition shadow-sm ${
+                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
                                     ? "bg-emerald-500 text-slate-950 font-black shadow-emerald-500/25"
                                     : dark ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950" : "bg-emerald-100 text-emerald-900 hover:bg-emerald-500 hover:text-slate-950"
                                 }`}
                               >
-                                {isThisPlaying ? <Pause size={9} /> : <Play size={9} className="mr-0.5 fill-current" />}
+                                {isThisPlaying ? <Pause size={10} /> : <Play size={10} className="mr-0.5 fill-current" />}
                                 <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
                               </button>
                             </div>
@@ -1993,7 +2040,7 @@ export default function AqeeqPodcastPage() {
                   </div>
                 ) : (
                   /* ==================== 2. COMPACT EPISODES LIST ==================== */
-                  <div className={`max-h-[350px] overflow-y-auto space-y-1.5 rounded-2xl border p-2.5 ${
+                  <div className={`overflow-y-auto space-y-2 rounded-2xl border p-3 h-full ${
                     dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                   }`}>
                     {audioPodcasts.map((podcast: any, idx: number) => {
@@ -2006,7 +2053,7 @@ export default function AqeeqPodcastPage() {
                             setSelectedAudioId(podcast.id);
                             playPodcast(podcast);
                           }}
-                          className={`group flex items-center justify-between gap-2.5 rounded-xl border p-2.5 cursor-pointer transition ${
+                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition ${
                             isThisPlaying || isThisActive
                               ? "border-emerald-400 bg-emerald-500/15 shadow-sm"
                               : dark
@@ -2028,15 +2075,15 @@ export default function AqeeqPodcastPage() {
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <h4 className={`text-xs font-black truncate transition ${
+                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
                                 isThisPlaying || isThisActive
                                   ? "text-emerald-400"
                                   : dark ? "text-white group-hover:text-emerald-300" : "text-slate-900 group-hover:text-emerald-700"
                               }`}>
                                 {podcast.title}
                               </h4>
-                              <p className="text-[9.5px] text-slate-500 font-bold truncate">
-                                {podcast.hostName || "فريق الإذاعة المدرسية"} · {podcast.duration || "10:00"}
+                              <p className="text-[10px] text-slate-500 font-bold truncate">
+                                تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"} · {podcast.duration || "10:00"}
                               </p>
                             </div>
                           </div>
@@ -2058,7 +2105,7 @@ export default function AqeeqPodcastPage() {
                                 ? "bg-emerald-500 text-slate-950 font-black"
                                 : "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-slate-950"
                             }`}>
-                              {isThisPlaying ? <Pause size={11} /> : <Play size={11} className="fill-current mr-0.5" />}
+                              <Play size={11} className="fill-current mr-0.5" />
                             </div>
                           </div>
                         </div>
@@ -2145,7 +2192,9 @@ export default function AqeeqPodcastPage() {
                 <FileText size={13} /> كلمات النشيد الرسمي
               </span>
               <h3 className={`text-xl font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>{selectedLyricsSong.title}</h3>
-              <p className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>{selectedLyricsSong.artistOrHost}</p>
+              <p className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                {selectedLyricsSong.artistOrHost || "قسم التربية الموسيقية · مدارس العقيق"}
+              </p>
               <div className={`max-h-72 overflow-y-auto rounded-2xl border p-5 text-sm font-bold leading-8 whitespace-pre-line text-center ${
                 dark ? "bg-black/60 border-white/10 text-slate-200" : "bg-slate-50 border-slate-200 text-slate-800"
               }`}>
