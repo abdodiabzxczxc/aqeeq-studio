@@ -33,32 +33,32 @@ import {
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-type DesignStyle = "pavilions" | "master_console" | "luxury_3tier" | "signature_3d";
+type DesignStyle = "pavilions" | "aurora_console" | "golden_mic" | "royal_heritage";
 
 const DESIGN_STYLES = [
   {
     id: "pavilions" as DesignStyle,
     title: "🏛️ أروقة أثير العقيق الملكية",
     subtitle: "ديوان أسطوانات + مسرح سينما + صالون بودكاست",
-    tag: "الأكثر فخامة ⭐",
+    tag: "المعتمد والأفخم ⭐",
   },
   {
-    id: "master_console" as DesignStyle,
-    title: "🎛️ استوديو البث التفاعلي",
-    subtitle: "شاشة بث متغيرة + قائمة مسارات ذكية (Spotify)",
-    tag: "تفاعلي ذكي",
+    id: "aurora_console" as DesignStyle,
+    title: "🌌 منصة الأثير الأورورا (Dolby)",
+    subtitle: "أسطوانة هولوغرافية + سينما بانورامية + كبسولات زجاج",
+    tag: "إبهار بصري نيون",
   },
   {
-    id: "luxury_3tier" as DesignStyle,
-    title: "🎵 الرفوف الفاخرة المدمجة",
-    subtitle: "رف أسطوانات 4 كروت + سينما 16:9 + كبسولات",
-    tag: "مدمج وأنيق",
+    id: "golden_mic" as DesignStyle,
+    title: "🎙️ استوديو البث والميكروفون الذهبي",
+    subtitle: "كابينة تحكم إذاعية + رفوف خشبية + شاشات مراقبة",
+    tag: "طابع استوديو احترافي",
   },
   {
-    id: "signature_3d" as DesignStyle,
-    title: "💎 شبكة الكروت الملكية 3D",
-    subtitle: "كروت موحدة ثلاثية الأبعاد (نفس نمط المجلة)",
-    tag: "هوية موحدة",
+    id: "royal_heritage" as DesignStyle,
+    title: "👑 دار الأوبرا والديوان الملكي",
+    subtitle: "مخطوطات أناشيد مذهبة + مسرح مقوس + بطاقات حوارية",
+    tag: "هيبة ملكية تراثية",
   },
 ];
 
@@ -892,145 +892,343 @@ export default function AqeeqPodcastPage() {
         </div>
       )}
 
-      {/* ==================== STYLE 2: 🎛️ استوديو البث التفاعلي الموحد ==================== */}
-      {selectedStyle === "master_console" && (
-        <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* Live Master Stage (7 cols) */}
-            <div className="lg:col-span-7">
-              {selectedConsoleTrack ? (
-                <div className="rounded-3xl border border-amber-400/30 bg-[#0e111d] p-6 space-y-4 shadow-2xl">
-                  {selectedConsoleTrack.mediaType === "video" ? (
-                    <div className="space-y-3">
-                      <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black border border-white/10 shadow-2xl">
-                        {selectedConsoleTrack.mediaUrl?.includes("youtube.com") || selectedConsoleTrack.mediaUrl?.includes("youtu.be") ? (
-                          <iframe
-                            src={selectedConsoleTrack.mediaUrl.replace("watch?v=", "embed/")}
-                            title={selectedConsoleTrack.title}
-                            className="h-full w-full border-0"
-                            allowFullScreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          />
-                        ) : (
-                          <video src={selectedConsoleTrack.mediaUrl} controls autoPlay className="h-full w-full object-contain" />
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10px] font-black text-amber-400">{selectedConsoleTrack.category}</span>
-                        <h2 className="text-lg font-black text-white">{selectedConsoleTrack.title}</h2>
-                        <p className="text-xs text-slate-400 font-bold mt-1">{selectedConsoleTrack.description}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center p-6 space-y-4">
-                      <div className="relative mx-auto h-40 w-40 rounded-full bg-gradient-to-tr from-amber-400 to-amber-600 grid place-items-center shadow-2xl">
-                        <Disc size={60} className={`text-slate-950 ${isCurrentPlaying(selectedConsoleTrack.id) ? "animate-[spin_4s_linear_infinite]" : ""}`} />
-                      </div>
-                      <h2 className="text-xl font-black text-white">{selectedConsoleTrack.title}</h2>
-                      <p className="text-xs text-amber-400 font-bold">{selectedConsoleTrack.artistOrHost}</p>
-                      <button
-                        type="button"
-                        onClick={() => handlePlayOrOpen(selectedConsoleTrack)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-amber-400 text-slate-950 px-6 py-2.5 text-xs font-black shadow-lg"
-                      >
-                        {isCurrentPlaying(selectedConsoleTrack.id) ? <Pause size={16} /> : <Play size={16} className="fill-current" />}
-                        <span>{isCurrentPlaying(selectedConsoleTrack.id) ? "إيقاف مؤقت" : "تشغيل المسار"}</span>
-                      </button>
-                    </div>
-                  )}
+      {/* ==================== STYLE 2: 🌌 منصة الأثير الأورورا والكونسول الزجاجي ==================== */}
+      {selectedStyle === "aurora_console" && (
+        <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8 space-y-12">
+          
+          {/* Aurora Holographic Anthems Showcase */}
+          <section
+            className={`relative overflow-hidden rounded-3xl border p-6 sm:p-8 transition ${
+              dark
+                ? "border-amber-400/40 bg-gradient-to-br from-[#120a2a] via-[#090814] to-[#040e1a] shadow-[0_20px_60px_rgba(147,51,234,0.15)]"
+                : "border-purple-200 bg-gradient-to-br from-purple-50 via-white to-amber-50 shadow-xl"
+            }`}
+          >
+            <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-gradient-to-br from-purple-600/20 to-amber-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-gradient-to-tr from-cyan-600/20 to-pink-500/20 blur-3xl" />
+
+            <div className="relative flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 text-white shadow-lg">
+                  <Sparkles size={20} />
                 </div>
-              ) : null}
-            </div>
-
-            {/* Live Queue (5 cols) */}
-            <div className="lg:col-span-5 space-y-3">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-sm font-black text-white">قائمة المسارات والتسجيلات</h3>
-                <span className="text-[11px] font-mono text-slate-400">{consoleTracks.length} مسار</span>
+                <div>
+                  <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2.5 py-0.5 text-[9px] font-black text-purple-300">
+                    HOLOGRAPHIC SOUND DECK · DOLBY ATMOS
+                  </span>
+                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">المنظومة الصوتية الفضائية والأناشيد 🌌</h2>
+                </div>
               </div>
-              <div className="space-y-2 max-h-[550px] overflow-y-auto pr-1">
-                {consoleTracks.map((t, idx) => {
-                  const isSelected = selectedConsoleTrack?.id === t.id;
-                  const isPlayingThis = isCurrentPlaying(t.id);
-                  return (
-                    <div
-                      key={t.id || idx}
-                      onClick={() => {
-                        setSelectedConsoleTrack(t);
-                        handlePlayOrOpen(t);
-                      }}
-                      className={`flex items-center justify-between gap-3 rounded-2xl border p-3 cursor-pointer transition ${
-                        isSelected ? "border-amber-400 bg-amber-400/10" : "border-white/10 bg-black/40 hover:border-white/20"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0 text-right">
-                        <span className="text-xs font-mono font-black text-slate-500">{String(idx + 1).padStart(2, "0")}</span>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-black text-white truncate">{t.title}</h4>
-                          <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">{t.artistOrHost}</p>
-                        </div>
-                      </div>
-                      <span className="text-[9px] font-black rounded-md px-2 py-0.5 border border-white/10 bg-white/5">
-                        {t.mediaType === "song" ? "🎵 نشيد" : t.mediaType === "video" ? "🎬 فيديو" : "🎙️ بودكاست"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
 
-          </div>
-        </section>
-      )}
-
-      {/* ==================== STYLE 3: 🎵 الرفوف الفاخرة المدمجة ==================== */}
-      {selectedStyle === "luxury_3tier" && (
-        <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8 space-y-10">
-          {/* Songs 4-Column Vinyl Grid */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-lg font-black text-white">أناشيد وكورال العقيق الرسمية 🎵</h2>
               <button
                 type="button"
                 onClick={() => playSong(0)}
-                className="rounded-xl bg-amber-400 text-slate-950 px-3.5 py-1.5 text-xs font-black"
+                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:opacity-90 text-slate-950 px-5 py-2.5 text-xs font-black shadow-lg shadow-amber-400/30 transition active:scale-95"
               >
-                تشغيل الباقة كاملة 🎵
+                <Disc size={15} className="animate-[spin_3s_linear_infinite]" />
+                <span>تشغيل الأورورا ثلاثية الأبعاد 🎵</span>
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {(songs || []).map((s, idx) => (
-                <div key={s.id || idx} className="rounded-2xl border border-white/10 bg-[#0d0f17] p-3.5 text-right space-y-2">
+
+            {/* Aurora Cards Grid */}
+            <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {(songs || []).map((song, idx) => {
+                const isThisPlaying = isCurrentPlaying(song.id);
+                return (
                   <div
-                    onClick={() => playSong(s)}
-                    className="relative aspect-square w-full rounded-xl bg-gradient-to-tr from-black to-slate-900 grid place-items-center cursor-pointer border border-white/10"
+                    key={song.id || idx}
+                    className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 ${
+                      isThisPlaying
+                        ? "border-amber-400 bg-amber-400/15 ring-2 ring-amber-400/50 shadow-[0_16px_40px_rgba(248,202,20,0.25)]"
+                        : "border-white/10 bg-black/40 hover:border-purple-400/60 hover:bg-purple-950/20 shadow-lg"
+                    }`}
                   >
-                    <Disc size={40} className={`text-amber-400 ${isCurrentPlaying(s.id) ? "animate-[spin_4s_linear_infinite]" : ""}`} />
+                    <div
+                      onClick={() => playSong(song)}
+                      className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-tr from-slate-950 via-purple-950 to-slate-900 grid place-items-center cursor-pointer border border-white/10"
+                    >
+                      {/* Holographic Glowing Ring */}
+                      <div className={`absolute inset-3 rounded-full border border-dashed ${isThisPlaying ? "border-amber-400 animate-[spin_8s_linear_infinite]" : "border-purple-400/40"}`} />
+                      <div className={`absolute inset-7 rounded-full border ${isThisPlaying ? "border-amber-400/60" : "border-white/10"}`} />
+                      
+                      <Disc size={44} className={`${isThisPlaying ? "text-amber-400 animate-[spin_3s_linear_infinite]" : "text-purple-300 group-hover:text-amber-300"} transition`} />
+                      
+                      <div className="absolute top-2.5 right-2.5 rounded-lg bg-black/70 px-2 py-0.5 text-[9px] font-mono font-black text-amber-400 border border-white/10">
+                        #{String(idx + 1).padStart(2, "0")}
+                      </div>
+
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <div className="grid h-10 w-10 place-items-center rounded-full bg-amber-400 text-slate-950 shadow-xl">
+                          {isThisPlaying ? <Pause size={18} /> : <Play size={18} className="fill-current" />}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 text-right">
+                      <span className="text-[9px] font-black text-purple-400">نقاء استوديو 96kHz</span>
+                      <h4
+                        onClick={() => playSong(song)}
+                        className="mt-0.5 text-xs font-black text-white hover:text-amber-300 cursor-pointer truncate transition"
+                      >
+                        {song.title}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">{song.artistOrHost}</p>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5">
+                      {song.lyrics && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLyricsSong(song)}
+                          className="text-[10px] font-bold text-slate-400 hover:text-amber-400 flex items-center gap-1"
+                        >
+                          <FileText size={11} />
+                          <span>الكلمات</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => playSong(song)}
+                        className="inline-flex items-center gap-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-3 py-1 text-xs font-black transition"
+                      >
+                        {isThisPlaying ? <Pause size={11} /> : <Play size={11} className="fill-current" />}
+                        <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
+                      </button>
+                    </div>
                   </div>
-                  <h4 className="text-xs font-black text-white truncate">{s.title}</h4>
-                  <p className="text-[10px] text-slate-400 font-bold truncate">{s.artistOrHost}</p>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Panoramic Cinema Hall */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Video size={18} className="text-cyan-400" />
+                <h2 className="text-lg sm:text-xl font-black text-white">المسرح البانورامي فائق الوضوح 🎬 (Ultra-Wide)</h2>
+              </div>
+              <span className="text-xs font-mono text-cyan-400">4K HDR · 60FPS</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {rawPodcasts.filter((p) => p.mediaType === "video").map((v) => (
+                <div
+                  key={v.id}
+                  onClick={() => setWatchingVideoPodcast(v)}
+                  className="group relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-black/60 shadow-xl cursor-pointer transition duration-300 hover:-translate-y-1 hover:border-cyan-400"
+                >
+                  <div className="aspect-video w-full relative bg-black overflow-hidden">
+                    {v.coverUrl ? (
+                      <img src={directDriveImage(v.coverUrl) || v.coverUrl} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="grid h-full place-items-center bg-cyan-950/40">
+                        <Video size={36} className="text-cyan-400" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="grid h-12 w-12 place-items-center rounded-full bg-cyan-500 text-slate-950 shadow-[0_0_20px_rgba(6,182,212,0.6)] group-hover:scale-110 transition">
+                        <Play size={20} className="fill-current mr-0.5" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 text-right">
+                    <span className="text-[9px] font-black text-cyan-400 uppercase">{v.category}</span>
+                    <h4 className="text-sm font-black text-white group-hover:text-cyan-300 truncate mt-1">{v.title}</h4>
+                    <p className="text-xs text-slate-400 font-bold line-clamp-2 mt-1">{v.description}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* Videos Grid */}
+          {/* Frosted Glass Audio Pods */}
           <section className="space-y-4">
-            <h2 className="text-lg font-black text-white">المسرح المرئي 🎬</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Radio size={18} className="text-pink-400" />
+                <h2 className="text-lg sm:text-xl font-black text-white">كبسولات البودكاست الزجاجية الفضائية 🎙️</h2>
+              </div>
+              <span className="text-xs font-mono text-pink-400">Spatial Audio</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {rawPodcasts.filter((p) => p.mediaType !== "video").map((podcast) => {
+                const isThisPlaying = isCurrentPlaying(podcast.id);
+                return (
+                  <div
+                    key={podcast.id}
+                    className={`rounded-2xl border p-4 backdrop-blur-xl transition ${
+                      isThisPlaying
+                        ? "border-pink-500 bg-pink-500/15 ring-1 ring-pink-500/40"
+                        : "border-white/10 bg-[#0a0a14]/60 hover:border-pink-400/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 text-right">
+                      <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-white/10 bg-black grid place-items-center">
+                        {podcast.coverUrl ? (
+                          <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <Mic size={22} className="text-pink-400" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[9px] font-black text-pink-400">{podcast.category}</span>
+                        <h4
+                          onClick={() => playPodcast(podcast)}
+                          className="text-xs font-black text-white hover:text-pink-300 cursor-pointer truncate"
+                        >
+                          {podcast.title}
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">{podcast.hostName || "فريق الإذاعة"}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5">
+                      <span className="text-[10px] font-mono text-slate-400">{podcast.duration}</span>
+                      <button
+                        type="button"
+                        onClick={() => playPodcast(podcast)}
+                        className="inline-flex items-center gap-1 rounded-xl bg-pink-600 hover:bg-pink-500 text-white px-3 py-1 text-xs font-black transition"
+                      >
+                        {isThisPlaying ? <Pause size={11} /> : <Play size={11} className="fill-current" />}
+                        <span>{isThisPlaying ? "إيقاف" : "تشغيل"}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+        </div>
+      )}
+
+      {/* ==================== STYLE 3: 🎙️ استوديو البث والميكروفون الذهبي ==================== */}
+      {selectedStyle === "golden_mic" && (
+        <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8 space-y-12">
+          
+          {/* Studio Control Header Banner */}
+          <div className="rounded-3xl border border-amber-500/40 bg-gradient-to-r from-[#1c1300] via-[#0d0900] to-[#1a1100] p-6 text-right shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 shadow-xl">
+                <Mic size={32} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-500 animate-ping" />
+                  <span className="text-xs font-black text-rose-400">ON-AIR · غرفة البث المركزي المباشر</span>
+                </div>
+                <h2 className="mt-1 text-xl sm:text-2xl font-black text-white">استوديو العقيق الصوتي والمرئي الاحترافي</h2>
+                <p className="text-xs text-amber-200/70 font-bold mt-1">تجهيزات هندسة صوتية Master HD مع أرشيف الأناشيد الكلاسيكية</p>
+              </div>
+            </div>
+
+            {/* VU Meters Simulation */}
+            <div className="rounded-2xl border border-amber-400/20 bg-black/60 p-3.5 flex items-center gap-4">
+              <div className="text-left font-mono text-[10px] text-amber-400 font-bold space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span>CH 1 (L)</span>
+                  <div className="flex gap-0.5">
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-amber-400 rounded-sm animate-pulse" />
+                    <span className="h-3 w-1.5 bg-rose-500 rounded-sm" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span>CH 2 (R)</span>
+                  <div className="flex gap-0.5">
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                    <span className="h-3 w-1.5 bg-amber-400 rounded-sm animate-pulse" />
+                    <span className="h-3 w-1.5 bg-emerald-500 rounded-sm" />
+                  </div>
+                </div>
+              </div>
+              <span className="text-xs font-black text-white border-r border-white/10 pr-3">مستوى الإشارة 0dB</span>
+            </div>
+          </div>
+
+          {/* Jukebox Record Rack for Songs */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-amber-400/20 pb-3">
+              <h3 className="text-base sm:text-lg font-black text-amber-400 flex items-center gap-2">
+                <Disc size={18} />
+                <span>خزانة الأسطوانات الكلاسيكية الرسمية (Studio Vinyl Vault)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => playSong(0)}
+                className="rounded-xl bg-amber-400 text-slate-950 px-4 py-1.5 text-xs font-black hover:bg-amber-300"
+              >
+                تشغيل الخزانة كاملة 🎵
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(songs || []).map((song, idx) => {
+                const isThisPlaying = isCurrentPlaying(song.id);
+                return (
+                  <div
+                    key={song.id || idx}
+                    className={`rounded-2xl border p-4 text-right transition ${
+                      isThisPlaying
+                        ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400/40"
+                        : "border-white/10 bg-[#0d0903] hover:border-amber-400/40"
+                    }`}
+                  >
+                    <div
+                      onClick={() => playSong(song)}
+                      className="relative aspect-square w-full rounded-xl bg-black border border-amber-400/30 grid place-items-center cursor-pointer shadow-inner"
+                    >
+                      <Disc size={48} className={`text-amber-400 ${isThisPlaying ? "animate-[spin_3s_linear_infinite]" : ""}`} />
+                      <div className="absolute bottom-2 left-2 rounded bg-amber-400 text-slate-950 px-1.5 py-0.5 text-[9px] font-mono font-black">
+                        SIDE A - #{idx + 1}
+                      </div>
+                    </div>
+                    <h4
+                      onClick={() => playSong(song)}
+                      className="mt-3 text-xs font-black text-white hover:text-amber-300 cursor-pointer truncate"
+                    >
+                      {song.title}
+                    </h4>
+                    <p className="text-[10px] text-amber-200/60 font-bold truncate mt-0.5">{song.artistOrHost}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Suspended Studio Monitors for Video */}
+          <section className="space-y-4">
+            <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+              <Video size={18} className="text-amber-400" />
+              <span>شاشات المراقبة والبث المرئي (Studio Live Monitors)</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {rawPodcasts.filter((p) => p.mediaType === "video").map((v) => (
                 <div
                   key={v.id}
                   onClick={() => setWatchingVideoPodcast(v)}
-                  className="rounded-2xl border border-white/10 bg-black/40 overflow-hidden cursor-pointer"
+                  className="rounded-2xl border border-white/10 bg-[#0c0d14] overflow-hidden cursor-pointer hover:border-amber-400 transition"
                 >
-                  <div className="aspect-video bg-black relative grid place-items-center">
+                  <div className="aspect-video bg-black relative">
                     {v.coverUrl ? (
                       <img src={directDriveImage(v.coverUrl) || v.coverUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <Video size={30} className="text-indigo-400" />
+                      <div className="grid h-full place-items-center bg-slate-950">
+                        <Video size={30} className="text-slate-500" />
+                      </div>
                     )}
+                    <div className="absolute top-2 right-2 rounded bg-rose-600 px-2 py-0.5 text-[9px] font-black text-white flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
+                      <span>REC</span>
+                    </div>
                   </div>
                   <div className="p-3 text-right">
                     <h4 className="text-xs font-black text-white truncate">{v.title}</h4>
@@ -1042,77 +1240,126 @@ export default function AqeeqPodcastPage() {
         </div>
       )}
 
-      {/* ==================== STYLE 4: 💎 شبكة الكروت الملكية 3D ==================== */}
-      {selectedStyle === "signature_3d" && (
-        <section className="mx-auto max-w-[1360px] px-5 py-10 md:px-8 space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {filteredUnifiedItems.map((item, idx) => {
-              const isPlayingThis = isCurrentPlaying(item.id);
-              const cover = directDriveImage(item.coverUrl) || item.coverUrl;
-              return (
-                <article
-                  key={item.id || idx}
-                  className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 ${
-                    isPlayingThis
-                      ? "border-[#f8ca14] bg-[#121212] ring-2 ring-[#f8ca14]/40"
-                      : "border-[#f8ca14]/30 bg-[#080808] text-white hover:border-[#f8ca14]/60"
-                  }`}
-                >
-                  <div className="relative flex h-full flex-col gap-5 sm:flex-row">
-                    {/* 3D Tilted Cover */}
-                    <button
-                      type="button"
-                      onClick={() => handlePlayOrOpen(item)}
-                      className="relative min-h-[200px] w-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0c0c0c] sm:w-[42%] shrink-0"
-                    >
-                      <div
-                        className="absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border border-white/10 bg-[#141414]"
-                        style={{ transform: "rotate(-7deg)" }}
-                      >
-                        {cover ? <img src={cover} alt="" className="h-full w-full object-cover" /> : null}
-                      </div>
-                      <div
-                        className="absolute bottom-[6%] right-[10%] top-[6%] w-[62%] overflow-hidden rounded-[1rem] border border-[#f8ca14]/60 bg-[#141414] p-1.5"
-                        style={{ transform: "rotate(2deg)" }}
-                      >
-                        {cover ? (
-                          <img src={cover} alt="" className="h-full w-full rounded-[0.7rem] object-cover" />
-                        ) : (
-                          <div className="grid h-full place-items-center">
-                            <Mic size={24} className="text-[#f8ca14]" />
-                          </div>
-                        )}
-                      </div>
-                    </button>
+      {/* ==================== STYLE 4: 👑 دار الأوبرا والديوان الملكي ==================== */}
+      {selectedStyle === "royal_heritage" && (
+        <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8 space-y-12">
+          
+          {/* Grand Opera Header */}
+          <div className="rounded-3xl border border-amber-400/40 bg-gradient-to-b from-[#140f00] via-[#0a0700] to-black p-8 text-center space-y-3 shadow-2xl">
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#f8ca14] text-slate-950 shadow-xl">
+              <Sparkles size={24} />
+            </div>
+            <p className="text-[10px] font-black tracking-[0.2em] text-[#f8ca14] uppercase">ROYAL OPERA & HERITAGE ANTHOLOGY</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">ديوان العقيق الموسيقي والمسرح الملكي</h2>
+            <p className="max-w-xl mx-auto text-xs text-slate-300 font-bold leading-6">
+              سجل التميز والإنتاج الصوتي الرفيع لمدارس العقيق الأهلية والدولية — قصائد خالدة وتغطيات رسمية رفيعة المستوى
+            </p>
+          </div>
 
-                    {/* Info */}
-                    <div className="flex min-w-0 flex-1 flex-col text-right">
-                      <span className="text-[10px] font-black text-amber-400">{item.category}</span>
-                      <h3
-                        onClick={() => handlePlayOrOpen(item)}
-                        className="mt-2 text-base font-black text-white hover:text-amber-300 cursor-pointer truncate"
-                      >
-                        {item.title}
-                      </h3>
-                      <p className="mt-1 text-xs text-slate-400 font-bold line-clamp-2 leading-relaxed">{item.description}</p>
-                      
-                      <div className="mt-auto pt-3 border-t border-white/10 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-400 font-bold">{item.artistOrHost}</span>
+          {/* Opera Manuscript Gallery for Anthems */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between border-b border-amber-400/30 pb-3">
+              <h3 className="text-lg font-black text-amber-400">لوحات الأناشيد المذهبة (Manuscript Gallery) 🎵</h3>
+              <button
+                type="button"
+                onClick={() => playSong(0)}
+                className="rounded-xl bg-amber-400 text-slate-950 px-4 py-1.5 text-xs font-black"
+              >
+                الاستماع إلى كافة المخطوطات 🎵
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {(songs || []).map((song, idx) => {
+                const isThisPlaying = isCurrentPlaying(song.id);
+                return (
+                  <div
+                    key={song.id || idx}
+                    className={`rounded-3xl border p-5 text-right transition duration-300 ${
+                      isThisPlaying
+                        ? "border-amber-400 bg-amber-400/10 ring-2 ring-amber-400/40"
+                        : "border-amber-400/25 bg-gradient-to-br from-[#120e00] to-black hover:border-amber-400/60"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <span className="text-[9px] font-mono font-black text-amber-400 uppercase">النشيد الملكي #{idx + 1}</span>
+                        <h4
+                          onClick={() => playSong(song)}
+                          className="mt-1 text-base font-black text-white hover:text-amber-300 cursor-pointer"
+                        >
+                          {song.title}
+                        </h4>
+                        <p className="text-xs text-amber-200/70 font-bold mt-0.5">{song.artistOrHost}</p>
+                      </div>
+
+                      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/10 border border-amber-400/30 text-amber-400">
+                        <Music size={20} />
+                      </div>
+                    </div>
+
+                    <p className="mt-4 rounded-xl bg-black/40 border border-white/5 p-3 text-xs font-bold text-slate-300 leading-6 italic">
+                      {song.description || "صرح العقيق وفخر الأجيال... نداء المجد والمعرفة في سماء المدينة المنورة."}
+                    </p>
+
+                    <div className="mt-4 flex items-center justify-between border-t border-amber-400/15 pt-3">
+                      {song.lyrics && (
                         <button
                           type="button"
-                          onClick={() => handlePlayOrOpen(item)}
-                          className="rounded-xl bg-[#f8ca14] text-slate-950 px-3.5 py-1.5 text-xs font-black"
+                          onClick={() => setSelectedLyricsSong(song)}
+                          className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
                         >
-                          {isPlayingThis ? "إيقاف مؤقت" : "تشغيل"}
+                          <FileText size={13} />
+                          <span>عرض ديوان الكلمات</span>
                         </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => playSong(song)}
+                        className="rounded-xl bg-amber-400 text-slate-950 px-4 py-1.5 text-xs font-black hover:bg-amber-300"
+                      >
+                        {isThisPlaying ? "إيقاف" : "استماع للنشيد"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Arched Royal Amphitheater */}
+          <section className="space-y-4">
+            <h3 className="text-lg font-black text-white">المسرح الملكي المقوس للبرامج المرئية 🎬</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {rawPodcasts.filter((p) => p.mediaType === "video").map((v) => (
+                <div
+                  key={v.id}
+                  onClick={() => setWatchingVideoPodcast(v)}
+                  className="rounded-3xl border border-amber-400/30 bg-black/60 overflow-hidden cursor-pointer hover:border-amber-400 transition hover:-translate-y-1 shadow-2xl"
+                >
+                  <div className="aspect-video bg-black relative">
+                    {v.coverUrl ? (
+                      <img src={directDriveImage(v.coverUrl) || v.coverUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Video size={32} className="text-amber-400" />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-400 text-slate-950 shadow-xl">
+                        <Play size={20} className="fill-current mr-0.5" />
                       </div>
                     </div>
                   </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+                  <div className="p-4 text-right">
+                    <span className="text-[9px] font-black text-amber-400">{v.category}</span>
+                    <h4 className="text-sm font-black text-white truncate mt-1">{v.title}</h4>
+                    <p className="text-xs text-slate-400 font-bold line-clamp-2 mt-1">{v.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+        </div>
       )}
 
       {/* Video Modal Player */}
