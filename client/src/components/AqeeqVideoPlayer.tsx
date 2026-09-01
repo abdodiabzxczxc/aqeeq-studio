@@ -199,51 +199,18 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 2) Google Drive Video (Native HTML5 Streaming for Full Scrubber & Remote Control)
+  // 2) Google Drive Video
   if (isDrive) {
-    const streamUrl = `/api/drive-video-proxy/${driveId}`;
     return (
       <div className={className}>
-        <video
-          ref={videoRef}
+        <iframe
+          ref={iframeRef}
           key={key}
-          src={streamUrl}
+          src={previewUrl}
           title={title}
-          controls
-          autoPlay
-          playsInline
-          preload="metadata"
-          onPlay={() => {
-            window.dispatchEvent(
-              new CustomEvent("aqeeq-video-start", {
-                detail: {
-                  id: sourceUrl,
-                  title: title || "تغطية مرئية",
-                  coverUrl: resolvedPoster,
-                  hostName: "استوديو العقيق",
-                  mediaUrl: sourceUrl,
-                },
-              })
-            );
-          }}
-          onPause={() => {
-            window.dispatchEvent(new CustomEvent("aqeeq-video-pause"));
-          }}
-          onTimeUpdate={(e) => {
-            window.dispatchEvent(
-              new CustomEvent("aqeeq-video-progress", {
-                detail: {
-                  currentTime: e.currentTarget.currentTime,
-                  duration: e.currentTarget.duration || 0,
-                },
-              })
-            );
-          }}
-          onEnded={() => {
-            window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
-          }}
-          onError={() => setLoadError(true)}
-          className="h-full w-full bg-black object-contain"
+          className="h-full w-full border-0 rounded-2xl"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
         />
       </div>
     );
