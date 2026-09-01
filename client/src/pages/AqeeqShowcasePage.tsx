@@ -10,7 +10,8 @@ import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ChevronLeft, ChevronRight, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X } from "lucide-react";
+import { ArrowUpLeft, ChevronLeft, ChevronRight, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Video } from "lucide-react";
+import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -243,6 +244,250 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
   );
 }
 
+function getVideoEmbedUrl(url: string | undefined | null): string {
+  if (!url) return "";
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&enablejsapi=1`;
+  }
+  const driveMatch = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  if (driveMatch && driveMatch[1]) {
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  }
+  return url;
+}
+
+function isEmbeddableVideo(url: string | undefined | null): boolean {
+  if (!url) return false;
+  return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("drive.google.com");
+}
+
+function MasterMediaShowcaseBox({
+  post,
+  isPlaying,
+  onPlay,
+  onOpenModal,
+  dark,
+}: {
+  post: ShowcasePost;
+  isPlaying: boolean;
+  onPlay: () => void;
+  onOpenModal: () => void;
+  dark: boolean;
+}) {
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 4) + 12 : 45);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const groupItems = post.media?.length ? post.media : [post];
+  const hasMultipleImages = groupItems.length > 1;
+  const currentImage = groupItems[activeImageIndex] || groupItems[0];
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (liked) {
+      setLiked(false);
+      setLikeCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setLiked(true);
+      setLikeCount((prev) => prev + 1);
+      toast.success("شكراً لإعجابك بالتغطية! ❤️");
+    }
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: post.title || post.fileName,
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("تم نسخ رابط التغطية بنجاح 🔗");
+    }
+  };
+
+  const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
+  const isSocial = isSocialPost(post);
+
+  return (
+    <div className={`relative overflow-hidden rounded-[2.5rem] border p-5 sm:p-7 shadow-2xl transition duration-500 mb-10 ${
+      dark
+        ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] text-white shadow-[0_24px_70px_rgba(99,102,241,0.15)]"
+        : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 text-slate-900 shadow-xl"
+    }`}>
+      {/* Ambient Backlight Glow */}
+      <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-20 -bottom-20 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl" />
+
+      {/* Top Header Bar */}
+      <div className="relative flex items-center justify-between border-b border-white/10 pb-3.5 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-md">
+            <Sparkles size={14} />
+          </span>
+          <span className="text-xs font-black text-indigo-400">
+            {isVideo ? "شاشة العرض المركزية 4K · مسرح التغطيات المرئية 🎬" : isSocial ? "منشور رسمي موثق 📱" : "معرض الصور التفاعلي HD 📸"}
+          </span>
+        </div>
+        <span className="text-[11px] font-mono text-slate-400">
+          {isVideo ? "4K UHD CINEMA" : isSocial ? "SOCIAL FEED" : `${activeImageIndex + 1} / ${groupItems.length} صور`}
+        </span>
+      </div>
+
+      {/* 16:9 Cinema Box Screen */}
+      <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+        {isVideo ? (
+          isPlaying ? (
+            isEmbeddableVideo(post.mediaUrl) ? (
+              <iframe
+                src={getVideoEmbedUrl(post.mediaUrl)}
+                title={post.title || post.fileName}
+                className="h-full w-full border-0"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            ) : (
+              <video
+                src={post.mediaUrl}
+                controls
+                autoPlay
+                className="h-full w-full object-contain"
+              />
+            )
+          ) : (
+            <div
+              onClick={onPlay}
+              className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
+            >
+              <img
+                src={getAqeeqShowcaseDisplaySource(post)}
+                alt=""
+                className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
+              
+              <div className="absolute top-3 right-3 rounded-lg bg-indigo-600/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white shadow-md flex items-center gap-1">
+                <Video size={12} /> تغطية مرئية 4K
+              </div>
+
+              {/* Centered Luxury Play Button */}
+              <div className="absolute inset-0 grid place-items-center">
+                <div className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_35px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_50px_rgba(6,182,212,0.9)]">
+                  <Play size={26} className="mr-0.5 fill-current" />
+                </div>
+              </div>
+            </div>
+          )
+        ) : isSocial ? (
+          <div className="h-full w-full overflow-y-auto bg-black p-4">
+            {post.sourceType === "x" ? (
+              <XPostEmbed post={post} dark={dark} />
+            ) : post.sourceType === "instagram" ? (
+              <InstagramPostEmbed post={post} />
+            ) : (
+              <YouTubePostEmbed post={post} />
+            )}
+          </div>
+        ) : (
+          <div className="relative h-full w-full overflow-hidden bg-black flex items-center justify-center">
+            <img
+              src={getAqeeqShowcaseDisplaySource(currentImage as ShowcasePost)}
+              alt=""
+              className="h-full w-full object-contain"
+            />
+            {hasMultipleImages && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIndex((prev) => (prev - 1 + groupItems.length) % groupItems.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white hover:bg-black/90 transition"
+                  title="الصورة السابقة"
+                >
+                  <ChevronRight size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIndex((prev) => (prev + 1) % groupItems.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white hover:bg-black/90 transition"
+                  title="الصورة التالية"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Title & Description Below Box */}
+      <div className="mt-4 text-right space-y-1">
+        <h3 className={`text-base sm:text-lg font-black leading-snug truncate ${dark ? "text-white" : "text-slate-900"}`}>
+          {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+        </h3>
+        <p className="text-xs text-slate-400 font-bold truncate">
+          {post.description || "تغطية شاملة وموثقة من المركز الإعلامي لمدارس العقيق الأهلية والدولية."}
+        </p>
+      </div>
+
+      {/* Bottom Floating Action Capsule */}
+      <div className={`mt-4 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border p-2.5 backdrop-blur-md ${
+        dark ? "border-white/10 bg-black/50 text-white" : "border-slate-200 bg-white/80 text-slate-900 shadow-sm"
+      }`}>
+        <span className="text-[11px] font-black text-indigo-400 flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+          <span>{isVideo && isPlaying ? "🔴 جاري العرض السينمائي..." : isSocial ? "📱 منشور موثق..." : "📸 وضع استعراض الألبوم..."}</span>
+        </span>
+
+        <div className="flex items-center gap-2">
+          {/* Like Button with Count */}
+          <button
+            type="button"
+            onClick={handleLike}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 ${
+              liked
+                ? "border-rose-500/50 bg-rose-500/20 text-rose-400"
+                : dark
+                  ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:border-white/20"
+                  : "border-slate-200 bg-slate-100 text-slate-700 hover:text-slate-950"
+            }`}
+            title="إعجاب بالتغطية"
+          >
+            <Heart size={13} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+            <span>{likeCount}</span>
+          </button>
+
+          {/* Share Button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+              dark
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:border-white/20"
+                : "border-slate-200 bg-slate-100 text-slate-700 hover:text-slate-950"
+            }`}
+            title="مشاركة"
+          >
+            <Share2 size={13} />
+          </button>
+
+          {/* Expand Modal Button */}
+          <button
+            type="button"
+            onClick={onOpenModal}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-3.5 py-1.5 text-xs font-black shadow-md transition active:scale-95"
+            title="تكبير العرض"
+          >
+            <Maximize2 size={13} />
+            <span>تكبير</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function UnifiedShowcaseHero({
   showcase,
   posts,
@@ -384,9 +629,21 @@ export default function AqeeqShowcasePage() {
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
   const recordPostView = trpc.aqeeqShowcases.recordPostView.useMutation();
+  const [activeMasterPostId, setActiveMasterPostId] = useState<number | null>(null);
+  const [isMasterPlaying, setIsMasterPlaying] = useState(false);
   const isAdmin = isAuthenticated && user?.role === "admin";
+
   const posts = useMemo(() => (showcase?.posts || []) as ShowcasePost[], [showcase?.posts]);
   const visiblePosts = useMemo(() => searchAndSortAqeeqContent(posts.filter((post) => matchesContentType(post, contentType)), searchQuery, sort), [posts, contentType, searchQuery, sort]);
+
+  const activeMasterPost = useMemo(() => {
+    if (activeMasterPostId) {
+      const found = posts.find((p) => p.id === activeMasterPostId);
+      if (found) return found;
+    }
+    const videoPost = posts.find((p) => p.mediaType === "video" || isEmbeddableVideo(p.mediaUrl));
+    return videoPost || posts[0] || null;
+  }, [posts, activeMasterPostId]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -455,12 +712,26 @@ export default function AqeeqShowcasePage() {
         <div className={`mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
           <div>
             <p className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>THE AQEEQ FEED</p>
-            <h2 className={`mt-2 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>آخر <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>الأخبار والعروض.</span></h2>
+            <h2 className={`mt-2 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>آخر <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>الأخبار والتغطيات والوسائط.</span></h2>
           </div>
           <span className={`rounded-full border px-3 py-1.5 text-xs font-black ${
             dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
           }`}>{visiblePosts.length} من {posts.length} منشور</span>
         </div>
+
+        {/* Master 4K Cinema & Media Showcase Box */}
+        {activeMasterPost && (
+          <div id="master-showcase-box" className="max-w-4xl mx-auto">
+            <MasterMediaShowcaseBox
+              post={activeMasterPost}
+              isPlaying={isMasterPlaying}
+              onPlay={() => setIsMasterPlaying(true)}
+              onOpenModal={() => setSelected(activeMasterPost)}
+              dark={dark}
+            />
+          </div>
+        )}
+
         <AqeeqArchiveControls id="showcase-archive-controls" label="البحث وترتيب الأخبار والعروض" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} typeOptions={[...SHOWCASE_TYPE_OPTIONS]} activeType={contentType} onTypeChange={(value) => setContentType(value as ContentType)} />
         {visiblePosts.length ? (
           <div className="columns-1 gap-5 sm:columns-2 xl:columns-3">
@@ -470,7 +741,12 @@ export default function AqeeqShowcasePage() {
                   key={`post-${post.id}-${post.sourceType}`}
                   post={post}
                   dark={dark}
-                  onOpen={() => void recordPostView.mutateAsync({ id: post.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined)}
+                  onOpen={() => {
+                    setActiveMasterPostId(post.id);
+                    setIsMasterPlaying(true);
+                    document.getElementById("master-showcase-box")?.scrollIntoView({ behavior: "smooth" });
+                    void recordPostView.mutateAsync({ id: post.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined);
+                  }}
                 />
               ) : (
                 <MediaPostCard
@@ -480,7 +756,11 @@ export default function AqeeqShowcasePage() {
                   watermarkUrl={showcase.watermarkUrl}
                   watermarkScale={showcase.watermarkScale}
                   watermarkOpacity={showcase.watermarkOpacity}
-                  onOpen={() => setSelected(post)}
+                  onOpen={() => {
+                    setActiveMasterPostId(post.id);
+                    setIsMasterPlaying(true);
+                    document.getElementById("master-showcase-box")?.scrollIntoView({ behavior: "smooth" });
+                  }}
                 />
               )
             )}
