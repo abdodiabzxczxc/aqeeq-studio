@@ -60,6 +60,9 @@ function ArticleCard({
   dark: boolean;
 }) {
   const cover = directDriveImage(article.coverUrl) || article.coverUrl;
+  const readingTime = article.content
+    ? Math.max(1, Math.ceil(article.content.trim().split(/\s+/).length / 200))
+    : null;
   return (
     <article
       className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
@@ -73,20 +76,20 @@ function ArticleCard({
         {/* Visual Cover Preview Container */}
         <button
           onClick={onOpen}
-          className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+          className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
             dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${article.title}`}
         >
-          {/* Background tilted page */}
+          {/* Background tilted page — hidden on mobile */}
           <div
-            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 ${
+            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block ${
               dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
           >
             {cover ? (
-              <img src={cover} alt="" className="h-full w-full object-cover" />
+              <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-amber-500/20 to-transparent p-3 text-[9px] font-bold text-slate-500">
                 مقال العقيق
@@ -94,15 +97,15 @@ function ArticleCard({
             )}
           </div>
 
-          {/* Front cover */}
+          {/* Front cover — full width on mobile, partial on sm+ */}
           <div
-            className={`absolute bottom-[6%] right-[10%] top-[6%] w-[62%] overflow-hidden rounded-[1rem] border p-1.5 shadow-xl ${
+            className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[62%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
               dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
-            style={{ transform: "rotate(2deg)" }}
+            style={{ transform: "rotate(0deg)" }}
           >
             {cover ? (
-              <img src={cover} alt="" className="h-full w-full rounded-[0.7rem] object-cover" />
+              <img src={cover} alt="" className="h-full w-full rounded-[0.7rem] object-cover" loading="lazy" />
             ) : (
               <div
                 className={`flex h-full flex-col justify-between rounded-[0.7rem] p-3.5 text-right ${
@@ -176,6 +179,12 @@ function ArticleCard({
                 <Heart size={12} className="fill-rose-500/20" />
                 <span>{article.likesCount || 0}</span>
               </span>
+              {readingTime && (
+                <span className={`flex items-center gap-1 ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                  <Clock size={12} />
+                  <span>{readingTime} د قراءة</span>
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2">

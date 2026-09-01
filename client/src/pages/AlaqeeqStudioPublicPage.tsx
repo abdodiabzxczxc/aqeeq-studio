@@ -477,8 +477,37 @@ export default function AlaqeeqStudioPublicPage() {
 
   if (issuesLoading || albumsLoading || showcasesLoading) {
     return (
-      <main dir="rtl" className={"grid min-h-screen place-items-center " + (dark ? "bg-black text-white" : "bg-white text-black")}>
-        <Loader2 className="animate-spin text-[#f8ca14]" />
+      <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
+        {/* Skeleton Header */}
+        <div className={`h-[60px] border-b ${dark ? "border-white/[0.08] bg-[#050505]" : "border-black/[0.06] bg-white"}`} />
+        {/* Skeleton Hero */}
+        <div className={`border-b py-12 md:py-16 ${dark ? "border-white/[0.08]" : "border-black/[0.06]"}`}>
+          <div className="mx-auto max-w-[1380px] px-5 md:px-8">
+            <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+              <div className="space-y-4 animate-pulse">
+                <div className={`h-3 w-32 rounded-full ${dark ? "bg-white/10" : "bg-black/10"}`} />
+                <div className={`h-12 w-3/4 rounded-2xl ${dark ? "bg-white/10" : "bg-black/10"}`} />
+                <div className={`h-4 w-full rounded-xl ${dark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />
+                <div className={`h-4 w-5/6 rounded-xl ${dark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />
+                <div className="flex gap-3 mt-6">
+                  {[1,2,3].map(i => <div key={i} className={`h-16 flex-1 rounded-2xl ${dark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />)}
+                </div>
+              </div>
+              <div className={`h-[290px] sm:h-[360px] lg:h-[430px] rounded-[2rem] animate-pulse ${dark ? "bg-white/[0.05]" : "bg-black/[0.05]"}`} />
+            </div>
+          </div>
+        </div>
+        {/* Skeleton Bento Grid */}
+        <div className={`border-b py-14 md:py-20 ${dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]"}`}>
+          <div className="mx-auto max-w-[1380px] px-5 md:px-8">
+            <div className={`h-8 w-48 rounded-full mb-8 animate-pulse ${dark ? "bg-white/10" : "bg-black/10"}`} />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {[1,2,3,4].map(i => (
+                <div key={i} className={`rounded-[2rem] h-[200px] animate-pulse ${dark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />
+              ))}
+            </div>
+          </div>
+        </div>
       </main>
     );
   }
@@ -498,7 +527,7 @@ export default function AlaqeeqStudioPublicPage() {
           dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
           <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
-            <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 scrollbar-none">
+            <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 scrollbar-hide">
               {storiesList.map((story, index) => (
                 <button
                   key={story.id}

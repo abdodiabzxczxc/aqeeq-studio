@@ -33,17 +33,19 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
     }`}>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
-        <button onClick={onOpen} className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+        <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
           dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
         }`} aria-label={`فتح ${album.title}`}>
-          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 ${
+          {/* Back tilted image — hidden on mobile */}
+          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block ${
             dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
           }`} style={{ transform: "rotate(-7deg)" }}>
             {cover ? <VisualImage id={`albums-card-back-cover-${album.id}`} label="صورة خلفية بطاقة الألبوم" src={cover} alt="" className="h-full w-full object-cover" /> : null}
           </div>
-          <div className={`absolute bottom-[6%] right-[10%] top-[6%] w-[54%] overflow-hidden rounded-[1rem] border p-1.5 shadow-xl ${
+          {/* Front cover — full on mobile, partial on sm+ */}
+          <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
             dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
-          }`} style={{ transform: "rotate(2deg)" }}>
+          }`} style={{ transform: "rotate(0deg)" }}>
             {cover ? <VisualImage id={`albums-card-cover-${album.id}`} label="غلاف بطاقة الألبوم" src={cover} alt={`غلاف ${album.title}`} className="h-full w-full rounded-[.7rem] object-cover" /> : <div className={`grid h-full place-items-center ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}><Camera size={34} /></div>}
           </div>
         </button>
