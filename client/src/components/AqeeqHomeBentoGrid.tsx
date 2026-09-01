@@ -79,9 +79,10 @@ export function AqeeqHomeBentoGrid({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 auto-rows-[220px] sm:auto-rows-[280px]">
-        
-        {/* BIG TILE: Latest Album (2 cols, 2 rows — the hero of the grid) */}
+      {/* Mobile: tall hero then 3-card row. Desktop: bento grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Row 1 Mobile: Album hero tall card */}
+
         {latestAlbum && (
           <VisualEditable
             id="studio-highlights-album-card"
@@ -89,7 +90,7 @@ export function AqeeqHomeBentoGrid({
             label="بطاقة ألبوم البينتو"
             as="div"
             onClick={() => navigate(`/albums/${latestAlbum.slug}`)}
-            className={`col-span-1 md:col-span-2 lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-3xl cursor-pointer group shadow-xl transition-transform hover:-translate-y-1 ${dark ? "bg-emerald-950 border border-white/10" : "bg-emerald-50 border border-black/5"}`}
+            className={`h-[300px] sm:h-[360px] md:h-auto md:col-span-2 lg:col-span-2 lg:row-span-2 md:min-h-[560px] relative overflow-hidden rounded-3xl cursor-pointer group shadow-xl transition-transform hover:-translate-y-1 ${dark ? "bg-emerald-950 border border-white/10" : "bg-emerald-50 border border-black/5"}`}
           >
             <VisualImage
               id="studio-highlights-album-img"
@@ -137,7 +138,11 @@ export function AqeeqHomeBentoGrid({
           </VisualEditable>
         )}
 
-        {/* TILE 2: Latest Journal/News (wide) */}
+        {/* Row 2 Mobile: 3 small cards in a horizontal scroll row */}
+        {(latestIssue || latestPodcast || latestArticle) && (
+          <div className="grid grid-cols-3 md:contents gap-4 sm:gap-6">
+
+        {/* TILE 2: Latest Journal/News */}
         {latestIssue && (
           <VisualEditable
             id="studio-highlights-journal-card"
@@ -145,7 +150,7 @@ export function AqeeqHomeBentoGrid({
             label="بطاقة مجلة البينتو"
             as="div"
             onClick={() => navigate(`/journal/issue/${latestIssue.slug}`)}
-            className={`col-span-1 md:col-span-1 lg:col-span-2 relative overflow-hidden rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-amber-950/30 border border-amber-500/20" : "bg-amber-50 border border-amber-500/20"}`}
+            className={`h-[160px] sm:h-[200px] md:h-auto md:min-h-[280px] md:col-span-1 lg:col-span-2 relative overflow-hidden rounded-2xl sm:rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-amber-950/30 border border-amber-500/20" : "bg-amber-50 border border-amber-500/20"}`}
           >
             <VisualImage
               id="studio-highlights-journal-img"
@@ -154,16 +159,11 @@ export function AqeeqHomeBentoGrid({
               alt={latestIssue.title}
               className="absolute inset-0 w-full h-full object-cover object-top opacity-30 group-hover:opacity-40 transition-opacity"
             />
-            <div className="absolute inset-0 p-6 flex flex-col justify-between z-10">
-              <div className={`flex items-center gap-2 font-bold text-xs w-fit px-3 py-1.5 rounded-full ${dark ? "bg-amber-500/20 text-amber-400" : "bg-amber-50 text-amber-700"}`}>
-                <BookOpen size={14} />
-                <VisualEditable
-                  id="studio-highlights-journal-tag"
-                  tag="text"
-                  label="وسم مجلة البينتو"
-                  defaultText="أحدث الأعداد"
-                  as="span"
-                />
+            <div className="absolute inset-0 p-3 sm:p-6 flex flex-col justify-between z-10">
+              <div className={`flex items-center gap-1.5 font-bold text-[9px] sm:text-xs w-fit px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${dark ? "bg-amber-500/20 text-amber-400" : "bg-amber-50 text-amber-700"}`}>
+                <BookOpen size={10} className="sm:hidden" />
+                <BookOpen size={14} className="hidden sm:block" />
+                <VisualEditable id="studio-highlights-journal-tag" tag="text" label="وسم مجلة البينتو" defaultText="أحدث الأعداد" as="span" />
               </div>
               <div>
                 <VisualEditable
@@ -172,22 +172,15 @@ export function AqeeqHomeBentoGrid({
                   label="عنوان مجلة البينتو"
                   defaultText={latestIssue.title}
                   as="h3"
-                  className={`text-lg sm:text-xl font-black leading-snug mb-2 line-clamp-2 ${dark ? "text-white" : "text-black"}`}
+                  className={`text-xs sm:text-xl font-black leading-snug mb-1 sm:mb-2 line-clamp-2 ${dark ? "text-white" : "text-black"}`}
                 />
-                <VisualEditable
-                  id="studio-highlights-journal-sub"
-                  tag="text"
-                  label="وصف مجلة البينتو"
-                  defaultText="تصفح العدد التفاعلي"
-                  as="p"
-                  className={`text-xs font-bold ${dark ? "text-amber-200/70" : "text-amber-700/70"}`}
-                />
+                <VisualEditable id="studio-highlights-journal-sub" tag="text" label="وصف مجلة البينتو" defaultText="تصفح العدد" as="p" className={`hidden sm:block text-xs font-bold ${dark ? "text-amber-200/70" : "text-amber-700/70"}`} />
               </div>
             </div>
           </VisualEditable>
         )}
 
-        {/* TILE 3: Latest Podcast (small square) */}
+        {/* TILE 3: Latest Podcast */}
         {latestPodcast && (
           <VisualEditable
             id="studio-highlights-podcast-card"
@@ -195,7 +188,7 @@ export function AqeeqHomeBentoGrid({
             label="بطاقة بودكاست البينتو"
             as="div"
             onClick={() => playEpisode(latestPodcast)}
-            className={`col-span-1 relative overflow-hidden rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-slate-900 border border-white/10" : "bg-indigo-50 border border-black/5"}`}
+            className={`h-[160px] sm:h-[200px] md:h-auto md:min-h-[280px] md:col-span-1 relative overflow-hidden rounded-2xl sm:rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-slate-900 border border-white/10" : "bg-indigo-50 border border-black/5"}`}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 z-0" />
             <VisualImage
@@ -206,16 +199,11 @@ export function AqeeqHomeBentoGrid({
               className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity mix-blend-overlay"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
-            <div className="absolute inset-0 p-5 flex flex-col justify-end z-20 text-white">
-              <div className="flex items-center gap-1.5 text-indigo-300 font-bold text-[10px] sm:text-xs mb-1.5">
-                <Mic size={14} />
-                <VisualEditable
-                  id="studio-highlights-podcast-tag"
-                  tag="text"
-                  label="وسم بودكاست البينتو"
-                  defaultText="صوت العقيق"
-                  as="span"
-                />
+            <div className="absolute inset-0 p-3 sm:p-5 flex flex-col justify-end z-20 text-white">
+              <div className="flex items-center gap-1 text-indigo-300 font-bold text-[9px] sm:text-xs mb-1">
+                <Mic size={10} className="sm:hidden" />
+                <Mic size={14} className="hidden sm:block" />
+                <VisualEditable id="studio-highlights-podcast-tag" tag="text" label="وسم بودكاست البينتو" defaultText="صوت العقيق" as="span" className="hidden sm:inline" />
               </div>
               <VisualEditable
                 id="studio-highlights-podcast-title"
@@ -223,26 +211,18 @@ export function AqeeqHomeBentoGrid({
                 label="عنوان بودكاست البينتو"
                 defaultText={latestPodcast.title}
                 as="h3"
-                className="text-base sm:text-lg font-black leading-tight line-clamp-2"
+                className="text-xs sm:text-lg font-black leading-tight line-clamp-2"
               />
-              <button
-                type="button"
-                className="mt-2 bg-[#f8ca14] text-black font-black px-4 py-1.5 rounded-full flex items-center gap-1.5 text-xs hover:scale-105 transition-transform w-fit"
-              >
-                <Play size={14} className="fill-black" />
-                <VisualEditable
-                  id="studio-highlights-podcast-btn"
-                  tag="text"
-                  label="زر بودكاست البينتو"
-                  defaultText="استمع"
-                  as="span"
-                />
+              <button type="button" className="mt-1.5 sm:mt-2 bg-[#f8ca14] text-black font-black px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-xs hover:scale-105 transition-transform w-fit">
+                <Play size={10} className="fill-black sm:hidden" />
+                <Play size={14} className="fill-black hidden sm:block" />
+                <VisualEditable id="studio-highlights-podcast-btn" tag="text" label="زر بودكاست البينتو" defaultText="استمع" as="span" />
               </button>
             </div>
           </VisualEditable>
         )}
 
-        {/* TILE 4: Latest Article (small square) */}
+        {/* TILE 4: Latest Article */}
         {latestArticle && (
           <VisualEditable
             id="studio-highlights-article-card"
@@ -250,7 +230,7 @@ export function AqeeqHomeBentoGrid({
             label="بطاقة مقال البينتو"
             as="div"
             onClick={() => navigate(`/articles/${latestArticle.slug}`)}
-            className={`col-span-1 relative overflow-hidden rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-[#111] border border-white/10" : "bg-white border border-black/5"}`}
+            className={`h-[160px] sm:h-[200px] md:h-auto md:min-h-[280px] md:col-span-1 relative overflow-hidden rounded-2xl sm:rounded-3xl cursor-pointer group shadow-md transition-transform hover:-translate-y-1 ${dark ? "bg-[#111] border border-white/10" : "bg-white border border-black/5"}`}
           >
             <VisualImage
               id="studio-highlights-article-img"
@@ -259,16 +239,11 @@ export function AqeeqHomeBentoGrid({
               alt={latestArticle.title}
               className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
             />
-            <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
-              <div className={`flex items-center gap-2 font-bold text-[10px] w-fit px-3 py-1.5 rounded-full ${dark ? "bg-white/10 text-rose-400" : "bg-rose-50 text-rose-600"}`}>
-                <Newspaper size={12} />
-                <VisualEditable
-                  id="studio-highlights-article-tag"
-                  tag="text"
-                  label="وسم مقال البينتو"
-                  defaultText="مقال مميز"
-                  as="span"
-                />
+            <div className="absolute inset-0 p-3 sm:p-5 flex flex-col justify-between z-10">
+              <div className={`flex items-center gap-1 font-bold text-[9px] sm:text-[10px] w-fit px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${dark ? "bg-white/10 text-rose-400" : "bg-rose-50 text-rose-600"}`}>
+                <Newspaper size={10} className="sm:hidden" />
+                <Newspaper size={12} className="hidden sm:block" />
+                <VisualEditable id="studio-highlights-article-tag" tag="text" label="وسم مقال البينتو" defaultText="مقال" as="span" />
               </div>
               <div>
                 <VisualEditable
@@ -277,11 +252,14 @@ export function AqeeqHomeBentoGrid({
                   label="عنوان مقال البينتو"
                   defaultText={latestArticle.title}
                   as="h3"
-                  className={`text-base sm:text-lg font-black leading-snug line-clamp-3 ${dark ? "text-white" : "text-black"}`}
+                  className={`text-xs sm:text-base font-black leading-snug line-clamp-3 ${dark ? "text-white" : "text-black"}`}
                 />
               </div>
             </div>
           </VisualEditable>
+        )}
+
+          </div>
         )}
 
       </div>

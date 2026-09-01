@@ -121,7 +121,7 @@ function ArchiveCard({
       <button
         type="button"
         onClick={onOpen}
-        className={"aq-studio-share-media relative block h-[240px] w-full overflow-hidden border-b text-right " + (
+        className={"aq-studio-share-media relative block h-[180px] sm:h-[240px] w-full overflow-hidden border-b text-right " + (
           dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
         )}
       >

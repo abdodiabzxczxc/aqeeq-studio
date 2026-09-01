@@ -70,20 +70,20 @@ export function AqeeqNewsMarquee({
         >
           {/* 1. Fixed Luxury Badge on the Right */}
           <div
-            className={`shrink-0 z-20 flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1 font-black text-xs sm:text-sm border-l h-full ${
+            className={`shrink-0 z-20 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-1 font-black text-xs sm:text-sm border-l h-full ${
               dark
                 ? "bg-[#0f1422] text-[#f8ca14] border-amber-400/20 shadow-[10px_0_20px_rgba(0,0,0,0.6)]"
                 : "bg-amber-50 text-[#08467d] border-slate-200 shadow-[10px_0_20px_rgba(0,0,0,0.03)]"
             }`}
           >
-            <Sparkles size={15} className="animate-pulse text-[#f8ca14] shrink-0" />
+            <Sparkles size={13} className="animate-pulse text-[#f8ca14] shrink-0" />
             <VisualEditable
               id="studio-marquee-badge-text"
               tag="text"
               label="شارة شريط الأخبار"
               defaultText={badgeOverride || "آخر الأخبار"}
               as="span"
-              className="whitespace-nowrap tracking-wide font-black"
+              className="whitespace-nowrap tracking-wide font-black hidden sm:inline"
             />
           </div>
 

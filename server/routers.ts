@@ -213,7 +213,7 @@ export const appRouter = router({
   system: systemRouter,
 
   deploy: router({
-    syncToLive: publicProcedure.mutation(async () => {
+    syncToLive: adminProcedure.mutation(async () => {
       saveLocalDb();
       const { execSync } = await import("node:child_process");
       try {

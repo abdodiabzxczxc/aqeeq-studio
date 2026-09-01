@@ -52,9 +52,8 @@ import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
 import AqeeqArticlesStudioPage from "./pages/AqeeqArticlesStudioPage";
 import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
 import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
-import { PodcastPlayerProvider } from "./components/AqeeqFloatingPodcastPlayer";
+import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
-import { AqeeqGlobalRadio } from "./components/AqeeqGlobalRadio";
 
 function Router() {
   const [location] = useLocation();
@@ -129,6 +128,7 @@ function App() {
 function StudioAppShell() {
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
+  const { activeItem } = usePodcastPlayer();
   const brandStyle = {
     "--aq-gold": brand?.brand_primary || "#e5b84f",
     "--aq-ink": brand?.brand_surface || "#000000",
@@ -139,7 +139,7 @@ function StudioAppShell() {
   return (
     <PodcastPlayerProvider>
       <div style={brandStyle} className="aq-brand-shell">
-        <div className="min-h-screen">
+        <div className={`min-h-screen transition-[padding-bottom] duration-300 ${activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
           <AqeeqBroadcastBanner />
           <Router />
           <VisualGlobalSections />

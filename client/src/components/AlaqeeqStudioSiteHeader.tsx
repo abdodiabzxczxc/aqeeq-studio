@@ -220,6 +220,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <button
                 onClick={() => {
                   if (isDeploying) return;
+                  if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
                   setIsDeploying(true);
                   deployMutation.mutate();
                 }}
@@ -231,7 +232,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 }`}
                 title="نشر التعديلات على الموقع المباشر 🚀"
               >
-                <Rocket size={17} className={isDeploying ? "animate-bounce" : ""} />
+                <Rocket size={17} className={isDeploying ? "animate-spin" : ""} />
               </button>
             ) : null}
 
