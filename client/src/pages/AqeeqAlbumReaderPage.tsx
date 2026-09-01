@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
-import { AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
+import { AqeeqUnifiedVideoFrame, AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
 import AqeeqAlbumSocialEmbed from "@/components/AqeeqAlbumSocialEmbed";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
@@ -32,9 +32,17 @@ type AlbumItem = {
 };
 
 function AlbumMedia({ item }: { item: AlbumItem }) {
-  if (item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") return <AqeeqAlbumSocialEmbed source={item.sourceType} url={item.externalUrl || item.mediaUrl} title={item.caption || item.fileName} />;
+  if (item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") {
+    return <AqeeqAlbumSocialEmbed source={item.sourceType} url={item.externalUrl || item.mediaUrl} title={item.caption || item.fileName} />;
+  }
   if (item.mediaType === "video") {
-    return <AqeeqVideoPoster sourceUrl={item.mediaUrl} posterUrl={getAqeeqAlbumImageSource(item)} title={item.caption || item.fileName} playSize="large" />;
+    return (
+      <AqeeqUnifiedVideoFrame
+        sourceUrl={item.mediaUrl}
+        posterUrl={getAqeeqAlbumImageSource(item)}
+        title={item.caption || item.fileName}
+      />
+    );
   }
   return <VisualImage id={`album-reader-media-${item.id}`} label="صورة داخل الألبوم" src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-contain" />;
 }
@@ -494,9 +502,9 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         {mode === "scroll" ? (
           <div className="relative z-10 mx-auto max-w-4xl space-y-5 p-4 md:p-8">
             {(album.media as AlbumItem[]).map((item, mediaIndex) => (
-              <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.2rem] border ${dark ? "border-white/10 bg-black/20" : "border-slate-900/10 bg-white"}`}>
+              <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.8rem] border ${dark ? "border-indigo-500/30 bg-[#090b14]/80" : "border-slate-900/10 bg-white"}`}>
                 <button type="button" onClick={() => download(item.id)} className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button>
-                <div className={item.mediaType === "video" ? "aspect-video w-full bg-black" : "max-h-[88vh] bg-black"}>
+                <div className={item.mediaType === "video" ? "relative w-full h-[320px] sm:h-[440px] bg-black overflow-hidden" : "max-h-[88vh] bg-black"}>
                   <AlbumMedia item={item} />
                 </div>
                 {item.caption ? <figcaption className={`px-4 py-3 text-xs ${dark ? "text-slate-300" : "text-slate-600"}`}>{item.caption}</figcaption> : null}
@@ -518,9 +526,19 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             onTouchEnd={handleTouchEnd}
           >
             {active?.mediaType === "video" ? (
-              <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-amber-300/25 bg-black shadow-2xl">
-                <div className="aspect-video w-full">
-                  <AlbumMedia item={active} />
+              <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] p-4 sm:p-6 shadow-[0_16px_45px_rgba(99,102,241,0.25)]">
+                <div className="relative w-full h-[320px] sm:h-[480px] rounded-2xl overflow-hidden bg-black border border-indigo-500/30">
+                  <AqeeqUnifiedVideoFrame
+                    sourceUrl={active.mediaUrl}
+                    posterUrl={getAqeeqAlbumImageSource(active)}
+                    title={active.caption || active.fileName}
+                  />
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <h3 className="text-lg font-black text-white">{active.caption || active.fileName}</h3>
+                  <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black text-indigo-300 border border-indigo-500/30">
+                    🎬 تغطية مرئية 4K
+                  </span>
                 </div>
               </div>
             ) : (
