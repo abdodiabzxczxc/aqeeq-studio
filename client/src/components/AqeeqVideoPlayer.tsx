@@ -33,7 +33,15 @@ const playSizes = {
  * يغلّف معاينة Google Drive الرسمية بدون ظهور واجهات Drive المشوشة خارج الحدود،
  * أو يشغّل الفيديو المباشر عبر مشغل HTML5، مع توفير واجهة خطأ عربية وزر إعادة محاولة وزر فتح خارجي احتياطي.
  */
-export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string; title: string }) {
+export function AqeeqUnifiedVideoFrame({
+  sourceUrl,
+  title,
+  className = "relative h-full w-full overflow-hidden bg-black",
+}: {
+  sourceUrl: string;
+  title: string;
+  className?: string;
+}) {
   const [loadError, setLoadError] = useState(false);
   const [key, setKey] = useState(0);
   const isDrive = isAqeeqDriveVideo(sourceUrl);
@@ -48,7 +56,7 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
 
   if (loadError) {
     return (
-      <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 bg-[#05070c] p-6 text-center text-slate-200">
+      <div className={`flex aspect-video w-full flex-col items-center justify-center gap-4 bg-[#05070c] p-6 text-center text-slate-200 ${className}`}>
         <div className="grid h-12 w-12 place-items-center rounded-2xl border border-amber-300/30 bg-amber-300/10 text-amber-300">
           <Play size={22} className="rotate-180" />
         </div>
@@ -82,7 +90,7 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
 
   if (isDrive) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden bg-[#030507]">
+      <div className={className}>
         <iframe
           key={key}
           src={previewUrl}
@@ -98,7 +106,7 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
 
   if (isYouTube) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden bg-[#030507]">
+      <div className={className}>
         <iframe
           key={key}
           src={previewUrl}
@@ -113,17 +121,19 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
   }
 
   return (
-    <video
-      key={key}
-      src={sourceUrl}
-      title={title}
-      controls
-      autoPlay
-      playsInline
-      preload="metadata"
-      onError={() => setLoadError(true)}
-      className="aspect-video w-full bg-black object-contain"
-    />
+    <div className={className}>
+      <video
+        key={key}
+        src={sourceUrl}
+        title={title}
+        controls
+        autoPlay
+        playsInline
+        preload="metadata"
+        onError={() => setLoadError(true)}
+        className="h-full w-full bg-black object-contain"
+      />
+    </div>
   );
 }
 
