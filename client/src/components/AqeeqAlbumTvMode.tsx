@@ -130,26 +130,29 @@ export function AqeeqAlbumTvMode({ albumTitle, images, onClose }: AqeeqAlbumTvMo
 
       {/* Main Image with Ken Burns Effect */}
       <div className="absolute inset-0 z-10 flex items-center justify-center p-12 pb-32">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={`img-${currentIndex}`}
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ 
-              opacity: { duration: 1.5 },
-              scale: { duration: SLIDE_DURATION / 1000, ease: "linear" } 
+            transition={{
+              opacity: { duration: 1.2 },
+              scale: { duration: SLIDE_DURATION / 1000, ease: "linear" }
             }}
-            className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10"
+            className="absolute inset-0 flex items-center justify-center p-12 pb-32"
           >
-            <img 
-              src={currentImage.url} 
-              alt={currentImage.caption || ""} 
-              className="w-full h-full object-contain bg-black/50 backdrop-blur-sm"
-            />
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
+              <img
+                src={currentImage.url}
+                alt={currentImage.caption || ""}
+                className="w-full h-full object-contain bg-black/50 backdrop-blur-sm"
+              />
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
+
 
       {/* Top Bar: Golden Progress Line */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/10 z-50">
