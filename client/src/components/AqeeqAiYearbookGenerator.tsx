@@ -106,11 +106,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     }
     audioRef.current.play().catch(() => console.log("Audio blocked"));
     
-    // Faster, tighter cinematic timeline
-    setTimeout(() => setSceneIndex(1), 2000);  // 2s: text scene 2
-    setTimeout(() => setSceneIndex(2), 4000);  // 4s: photo montage starts
-    setTimeout(() => setSceneIndex(3), 20000); // 20s: climax logo (8 photos × 1.5s + buffer)
-
+    // Balanced cinematic timeline
+    setTimeout(() => setSceneIndex(1), 2500);  // 2.5s: text scene 2
+    setTimeout(() => setSceneIndex(2), 5000);  // 5.0s: continuous Ken Burns montage starts
+    setTimeout(() => setSceneIndex(3), 21500); // 21.5s: climax logo (8 photos × 2.0s + buffer)
   };
 
   const closeWrapped = () => {
@@ -230,8 +229,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               <AnimatePresence>
                 {sceneIndex === 0 && (
                   <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.8 }}
                     className="absolute inset-0 flex items-center justify-center text-center px-6"
                   >
                     <div>
@@ -246,8 +247,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               <AnimatePresence>
                 {sceneIndex === 1 && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 1 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.06 }}
+                    transition={{ duration: 0.8 }}
                     className="absolute inset-0 flex items-center justify-center text-center px-6"
                   >
                     <div>
@@ -258,34 +261,50 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                 )}
               </AnimatePresence>
 
-              {/* Scene 3: FULL PHOTOS MONTAGE */}
+              {/* Scene 3: CONTINUOUS KEN BURNS MONTAGE (Zero Freeze) */}
               <AnimatePresence>
                 {sceneIndex === 2 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-                    {/* 8 photos × 1.5s delay = 12s montage — cinematic pacing */}
-                    {matchedPhotos.slice(0, 8).map((url, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 1.08 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.8, delay: i * 1.5 }}
-                        className="absolute inset-0 bg-black"
-                        style={{ zIndex: i }}
-                      >
-                        <img
-                          src={url}
-                          className="w-full h-full object-cover"
-                          alt=""
-                          loading="eager"
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                        />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)] pointer-events-none" />
-                      </motion.div>
-                    ))}
+                    {/* 8 photos with continuous Ken Burns motion that NEVER stops while on screen */}
+                    {matchedPhotos.slice(0, 8).map((url, i) => {
+                      const zoomIn = i % 2 === 0;
+                      const slideInterval = 2.0; // 2 seconds between slides
+                      const motionDuration = 3.2; // 3.2s continuous motion — lasts past the next slide's entrance so it NEVER freezes!
+                      
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{
+                            opacity: 0,
+                            scale: zoomIn ? 1.0 : 1.14,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            scale: zoomIn ? 1.14 : 1.0,
+                          }}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            opacity: { duration: 0.6, delay: i * slideInterval, ease: "easeInOut" },
+                            scale: { duration: motionDuration, delay: i * slideInterval, ease: "linear" },
+                          }}
+                          className="absolute inset-0 bg-black"
+                          style={{ zIndex: i }}
+                        >
+                          <img
+                            src={url}
+                            className="w-full h-full object-cover"
+                            alt=""
+                            loading="eager"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                          />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)] pointer-events-none" />
+                        </motion.div>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
+
 
 
               {/* Scene 4: Climax (Logo) */}
