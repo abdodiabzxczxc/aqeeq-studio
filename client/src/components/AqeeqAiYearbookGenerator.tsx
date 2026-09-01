@@ -190,8 +190,16 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         }
       } catch {}
 
-      const mimeTypes = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
-      const supportedMime = mimeTypes.find((t) => MediaRecorder.isTypeSupported(t)) || "video/webm";
+      const mimeTypes = [
+        "video/mp4;codecs=avc1",
+        "video/mp4;codecs=h264",
+        "video/mp4",
+        "video/webm;codecs=h264",
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm",
+      ];
+      const supportedMime = mimeTypes.find((t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) || "video/mp4";
 
       const chunks: Blob[] = [];
       const recorder = new MediaRecorder(stream, { mimeType: supportedMime });
@@ -308,18 +316,18 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: supportedMime });
+        const blob = new Blob(chunks, { type: "video/mp4" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.webm`;
+        a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.mp4`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
 
         setExportProgress(100);
         setIsExportingVideo(false);
-        toast.success("تم تجهيز وتحميل الفيديو التوثيقي بنجاح! 🎬✨");
+        toast.success("تم تجهيز وتحميل الفيديو التوثيقي (MP4) بنجاح! 🎬✨");
       };
 
       renderLoop();
@@ -579,7 +587,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                         ) : (
                           <>
                             <Download size={20} className="text-black" />
-                            <span>تحميل الفيديو التوثيقي 🎬</span>
+                            <span>تحميل الفيديو التوثيقي (MP4) 🎬</span>
                           </>
                         )}
                       </Button>
