@@ -193,27 +193,6 @@ export default function AqeeqPodcastPage() {
       return true;
     });
   }, [unifiedItems, selectedCategory, searchQuery]);
-
-  // For Master Console
-  const consoleTracks = useMemo(() => {
-    return unifiedItems.filter((t) => {
-      if (consoleTab === "songs" && t.mediaType !== "song") return false;
-      if (consoleTab === "videos" && t.mediaType !== "video") return false;
-      if (consoleTab === "audio" && (t.mediaType !== "audio" || t.mediaType === "song")) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        return t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
-      }
-      return true;
-    });
-  }, [unifiedItems, consoleTab, searchQuery]);
-
-  useEffect(() => {
-    if (!selectedConsoleTrack && unifiedItems.length > 0) {
-      setSelectedConsoleTrack(unifiedItems.find((t) => t.mediaType === "video") || unifiedItems[0]);
-    }
-  }, [unifiedItems, selectedConsoleTrack]);
-
   const handlePlayOrOpen = (item: any) => {
     if (item.mediaType === "video") {
       setWatchingVideoPodcast(item.originalItem || item);
