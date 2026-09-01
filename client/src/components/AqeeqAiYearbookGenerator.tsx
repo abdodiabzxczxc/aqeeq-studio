@@ -135,14 +135,55 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
   };
 
-  // Export full cinematic sequence as real MP4/WebM video file with non-zero bytes and smooth playback
+  // Helper to pre-render 100% shaped Arabic title cards using SVG Base64 (Never taints canvas)
+  const createArabicTitleCard = (
+    title: string,
+    subtitle: string,
+    width: number,
+    height: number,
+    theme: "gold" | "blue" | "climax"
+  ): Promise<HTMLImageElement> => {
+    return new Promise((resolve) => {
+      const isPortrait = height > width;
+      const titleSize = isPortrait ? 38 : 52;
+      const subSize = isPortrait ? 42 : 58;
+      const glowColor = theme === "blue" ? "rgba(77,161,235,0.7)" : "rgba(229,184,79,0.7)";
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <defs>
+            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="4" stdDeviation="14" flood-color="${glowColor}" flood-opacity="0.8" />
+            </filter>
+          </defs>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@900&amp;family=Tajawal:wght@900&amp;display=swap');
+            .t1 { font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif; font-size: ${titleSize}px; font-weight: 900; fill: #ffffff; text-anchor: middle; }
+            .t2 { font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif; font-size: ${subSize}px; font-weight: 900; fill: #f8ca14; text-anchor: middle; }
+            .cap { font-size: ${isPortrait ? 60 : 80}px; text-anchor: middle; }
+          </style>
+          ${theme === "climax" ? `<text x="${width / 2}" y="${height / 2 - 75}" class="cap">🎓</text>` : ""}
+          <text x="${width / 2}" y="${theme === "climax" ? height / 2 : height / 2 - 30}" class="t1" filter="url(#glow)">${title}</text>
+          <text x="${width / 2}" y="${theme === "climax" ? height / 2 + 55 : height / 2 + 45}" class="t2" filter="url(#glow)">${subtitle}</text>
+        </svg>
+      `;
+
+      const encoded = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(img);
+      img.src = encoded;
+    });
+  };
+
+  // Export full cinematic sequence as butter-smooth 60 FPS MP4 video with connected Arabic text
   const handleExportVideo = async () => {
     if (isExportingVideo) return;
     setIsExportingVideo(true);
     setExportProgress(5);
 
     try {
-      // Ensure web fonts are completely ready before drawing
       if (typeof document !== "undefined" && (document as any).fonts) {
         await (document as any).fonts.ready;
       }
@@ -161,7 +202,16 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         return;
       }
 
-      // Preload student photos (served through our CORS-enabled proxy)
+      // 1. Preload Arabic title cards with joined Arabic script & glowing typography
+      const [scene1Card, scene2Card, scene4Card] = await Promise.all([
+        createArabicTitleCard("في كل عام،", "تُكتب قصة جديدة...", width, height, "gold"),
+        createArabicTitleCard("وهذا العام...", "كانت الكاميرا تبحث عنك!", width, height, "blue"),
+        createArabicTitleCard("مدارس العقيق تفخر بك", "أنت بطل قصتنا 🌟", width, height, "climax"),
+      ]);
+
+      setExportProgress(15);
+
+      // 2. Preload student photos (served through our CORS-enabled proxy)
       const photoUrls = matchedPhotos.slice(0, 8);
       const loadedImages: HTMLImageElement[] = [];
 
@@ -177,10 +227,12 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
           });
           if (img.naturalWidth > 0) loadedImages.push(img);
         } catch {}
-        setExportProgress(5 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 20));
+        setExportProgress(15 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 20));
       }
 
-      const stream = canvas.captureStream(30);
+      // 3. Setup 60 FPS high-frame-rate capture stream for 100% smooth butter motion
+      const fps = 60;
+      const stream = canvas.captureStream(fps);
 
       const mimeTypes = [
         "video/mp4;codecs=avc1",
@@ -194,41 +246,23 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       const supportedMime = mimeTypes.find((t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) || "video/webm";
 
       const chunks: Blob[] = [];
-      const recorder = new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 4000000 }); // 4 Mbps high quality
+      const recorder = new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 8000000 }); // 8 Mbps 60 FPS studio quality
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
 
       const intro1Duration = 2.5;
       const intro2Duration = 2.5;
-      const slideDuration = 2.0; // 2.0 seconds per photo
+      const slideDuration = 2.0;
       const photosTotalDuration = Math.max(1, loadedImages.length) * slideDuration;
       const outroDuration = 3.5;
       const totalSeconds = intro1Duration + intro2Duration + photosTotalDuration + outroDuration;
-      const fps = 30;
       const totalFrames = Math.floor(totalSeconds * fps);
 
-      // Start recording with periodic 500ms chunk delivery so buffers are always filled
       recorder.start(500);
 
       let currentFrame = 0;
       const frameStepMs = 1000 / fps;
-
-      // Draw function for Arabic typography directly on Canvas (100% connected Arabic + no canvas tainting)
-      const drawArabicText = (text: string, x: number, y: number, font: string, color: string, glowColor?: string) => {
-        ctx.save();
-        ctx.direction = "rtl";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = font;
-        if (glowColor) {
-          ctx.shadowColor = glowColor;
-          ctx.shadowBlur = 25;
-        }
-        ctx.fillStyle = color;
-        ctx.fillText(text, x, y);
-        ctx.restore();
-      };
 
       const renderLoop = async () => {
         while (currentFrame < totalFrames) {
@@ -239,7 +273,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
           ctx.fillRect(0, 0, width, height);
 
           if (currentTime < intro1Duration) {
-            // ── Scene 1: Intro 1 (Continuous Slow Zoom In) ──
+            // ── Scene 1: Intro 1 (Continuous 60FPS Ken Burns Zoom In) ──
             const t = currentTime / intro1Duration;
             const scale = 0.95 + t * 0.09;
             const alpha = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
@@ -249,18 +283,17 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.translate(width / 2, height / 2);
             ctx.scale(scale, scale);
 
-            // Ambient Glow Halo
-            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.4);
-            halo.addColorStop(0, "rgba(229,184,79,0.18)");
+            // Ambient Halo
+            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+            halo.addColorStop(0, "rgba(229,184,79,0.22)");
             halo.addColorStop(1, "rgba(0,0,0,0)");
             ctx.fillStyle = halo;
             ctx.fillRect(-width / 2, -height / 2, width, height);
 
-            drawArabicText("في كل عام،", 0, -35, `900 ${isPortrait ? 38 : 52}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
-            drawArabicText("تُكتب قصة جديدة...", 0, 35, `900 ${isPortrait ? 42 : 58}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.6)");
+            ctx.drawImage(scene1Card, -width / 2, -height / 2, width, height);
             ctx.restore();
           } else if (currentTime < intro1Duration + intro2Duration) {
-            // ── Scene 2: Intro 2 (Continuous Slow Zoom Out) ──
+            // ── Scene 2: Intro 2 (Continuous 60FPS Ken Burns Zoom Out) ──
             const t = (currentTime - intro1Duration) / intro2Duration;
             const scale = 1.05 - t * 0.07;
             const alpha = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
@@ -270,26 +303,25 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.translate(width / 2, height / 2);
             ctx.scale(scale, scale);
 
-            // Ambient Blue-Cyan Halo
+            // Ambient Blue Halo
             const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
-            halo.addColorStop(0, "rgba(77,161,235,0.22)");
+            halo.addColorStop(0, "rgba(77,161,235,0.25)");
             halo.addColorStop(1, "rgba(0,0,0,0)");
             ctx.fillStyle = halo;
             ctx.fillRect(-width / 2, -height / 2, width, height);
 
-            drawArabicText("وهذا العام...", 0, -40, `900 ${isPortrait ? 44 : 64}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
-            drawArabicText("كانت الكاميرا تبحث عنك!", 0, 40, `900 ${isPortrait ? 36 : 52}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.6)");
+            ctx.drawImage(scene2Card, -width / 2, -height / 2, width, height);
             ctx.restore();
           } else if (currentTime < intro1Duration + intro2Duration + photosTotalDuration) {
-            // ── Scene 3: Photos Montage with Seamless Cross-fade ──
+            // ── Scene 3: 60FPS Photos Montage with Sub-pixel Cross-fade ──
             const montageTime = currentTime - (intro1Duration + intro2Duration);
             const photoIdx = Math.min(loadedImages.length - 1, Math.floor(montageTime / slideDuration));
             const photoT = (montageTime % slideDuration) / slideDuration;
             const currImg = loadedImages[photoIdx];
             const prevImg = photoIdx > 0 ? loadedImages[photoIdx - 1] : null;
 
-            // Draw previous image if in cross-fade zone (first 0.6s)
-            const fadeZoneDuration = 0.6 / slideDuration; // 0.6s fade
+            // Draw previous image in 0.6s cross-fade window
+            const fadeZoneDuration = 0.6 / slideDuration;
             if (photoT < fadeZoneDuration && prevImg) {
               const prevZoomIn = (photoIdx - 1) % 2 === 0;
               const prevScale = prevZoomIn ? 1.10 + photoT * 0.04 : 1.04 - photoT * 0.04;
@@ -299,7 +331,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               ctx.restore();
             }
 
-            // Draw current image with cross-fade alpha
+            // Draw current image with smooth cross-fade alpha & continuous Ken Burns motion
             if (currImg) {
               const currZoomIn = photoIdx % 2 === 0;
               const currScale = currZoomIn ? 1.0 + photoT * 0.14 : 1.14 - photoT * 0.14;
@@ -320,7 +352,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               ctx.restore();
             }
           } else {
-            // ── Scene 4: Outro Climax ──
+            // ── Scene 4: Outro Climax (60FPS Breathing Scale) ──
             const t = (currentTime - (intro1Duration + intro2Duration + photosTotalDuration)) / outroDuration;
             const scale = 0.96 + t * 0.06;
             const alpha = t < 0.2 ? t / 0.2 : 1;
@@ -337,23 +369,15 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.fillStyle = halo;
             ctx.fillRect(-width / 2, -height / 2, width, height);
 
-            // Cap Icon
-            ctx.font = `${isPortrait ? 60 : 80}px sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("🎓", 0, -80);
-
-            drawArabicText("مدارس العقيق تفخر بك", 0, 0, `900 ${isPortrait ? 38 : 56}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
-            drawArabicText("أنت بطل قصتنا 🌟", 0, 65, `700 ${isPortrait ? 24 : 32}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.5)");
+            ctx.drawImage(scene4Card, -width / 2, -height / 2, width, height);
             ctx.restore();
           }
 
           currentFrame++;
-          setExportProgress(25 + Math.floor((currentFrame / totalFrames) * 70));
-          await new Promise((r) => setTimeout(r, frameStepMs)); // 1:1 real-time clock step
+          setExportProgress(35 + Math.floor((currentFrame / totalFrames) * 60));
+          await new Promise((r) => setTimeout(r, frameStepMs)); // 60 FPS clock step
         }
 
-        // Finish recording cleanly and ensure all chunks are flushed
         recorder.requestData();
         await new Promise((res) => {
           recorder.onstop = res;
@@ -385,8 +409,6 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       setIsExportingVideo(false);
     }
   };
-
-
 
   const closeWrapped = () => {
     if (audioRef.current) {
