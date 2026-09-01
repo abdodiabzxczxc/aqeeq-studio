@@ -271,6 +271,50 @@ export default function AqeeqPodcastPage() {
     }
   };
 
+  const [songLikes, setSongLikes] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem("aqeeq_song_likes");
+      return saved ? JSON.parse(saved) : { "song-0": 142, "song-1": 98, "song-2": 116, "song-3": 89 };
+    } catch {
+      return { "song-0": 142, "song-1": 98, "song-2": 116, "song-3": 89 };
+    }
+  });
+
+  const [likedSongIds, setLikedSongIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("aqeeq_liked_song_ids");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleLikeSong = (song: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const songId = String(song?.id || "song-0");
+    const alreadyLiked = likedSongIds.includes(songId);
+    
+    const nextLiked = alreadyLiked
+      ? likedSongIds.filter((id) => id !== songId)
+      : [...likedSongIds, songId];
+    
+    const nextLikes = {
+      ...songLikes,
+      [songId]: (songLikes[songId] || 100) + (alreadyLiked ? -1 : 1),
+    };
+
+    setLikedSongIds(nextLiked);
+    setSongLikes(nextLikes);
+    try {
+      localStorage.setItem("aqeeq_liked_song_ids", JSON.stringify(nextLiked));
+      localStorage.setItem("aqeeq_song_likes", JSON.stringify(nextLikes));
+    } catch {}
+
+    if (!alreadyLiked) {
+      toast.success(`شكراً لإعجابك بنشيد «${song?.title || "العقيق"}» ❤️`);
+    }
+  };
+
   const handleShare = (item: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     const url = window.location.origin + `/atheer#${item.id}`;
@@ -283,7 +327,7 @@ export default function AqeeqPodcastPage() {
     if (item.mediaType !== "song") {
       likeMutation.mutate({ id: item.id });
     } else {
-      toast.success("شكراً لإعجابك بنشيد مدارس العقيق! ❤️");
+      handleLikeSong(item, e);
     }
   };
 
@@ -732,8 +776,25 @@ export default function AqeeqPodcastPage() {
                   {/* Playback Transport, Share & Volume Controls in RTL */}
                   <div className="flex items-center justify-between gap-2 pt-1">
                     
-                    {/* 1. RIGHT: Share & Lyrics */}
+                    {/* 1. RIGHT: Like, Lyrics, Share */}
                     <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => handleLikeSong(activeItem || songs[0], e)}
+                        className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[11px] font-bold transition ${
+                          likedSongIds.includes(String((activeItem || songs[0])?.id || "song-0"))
+                            ? "border-rose-500/40 bg-rose-500/20 text-rose-400"
+                            : "border-white/10 hover:bg-rose-500/10 text-rose-400"
+                        }`}
+                        title="إعجاب بالنشيد"
+                      >
+                        <Heart
+                          size={12}
+                          className={likedSongIds.includes(String((activeItem || songs[0])?.id || "song-0")) ? "fill-rose-500 text-rose-500" : "fill-rose-500/20"}
+                        />
+                        <span>{songLikes[String((activeItem || songs[0])?.id || "song-0")] || 142}</span>
+                      </button>
+
                       {activeItem?.lyrics && (
                         <button
                           type="button"
@@ -880,6 +941,23 @@ export default function AqeeqPodcastPage() {
                         )}
 
                         <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => handleLikeSong(song, e)}
+                            className={`flex items-center gap-1 rounded-xl border px-2 py-1 text-[10px] font-bold transition ${
+                              likedSongIds.includes(String(song.id || `song-${idx}`))
+                                ? "border-rose-500/40 bg-rose-500/20 text-rose-400"
+                                : "border-white/10 hover:bg-rose-500/10 text-rose-400"
+                            }`}
+                            title="إعجاب بالنشيد"
+                          >
+                            <Heart
+                              size={11}
+                              className={likedSongIds.includes(String(song.id || `song-${idx}`)) ? "fill-rose-500 text-rose-500" : "fill-rose-500/20"}
+                            />
+                            <span>{songLikes[String(song.id || `song-${idx}`)] || 98}</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={(e) => handleShare(song, e)}
