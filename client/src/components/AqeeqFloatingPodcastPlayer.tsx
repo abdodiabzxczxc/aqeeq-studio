@@ -327,7 +327,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  // Play a song
+  // Play a song (or toggle pause if already playing)
   const playSong = (songOrIndex: UniversalAudioItem | number) => {
     pauseAllVideos();
     let targetSong: UniversalAudioItem;
@@ -336,6 +336,16 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     } else {
       targetSong = songOrIndex;
     }
+
+    // If clicking the same song that is currently playing, toggle pause!
+    if (activeItem && String(activeItem.id) === String(targetSong.id) && isPlaying) {
+      setIsPlaying(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      return;
+    }
+
     setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
     setLastSong(targetSong);
     setActiveItem(targetSong);
@@ -345,10 +355,20 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  // Play a podcast (swaps current song with the podcast!)
+  // Play a podcast (or toggle pause if already playing)
   const playPodcast = (podcast: any) => {
     if (!podcast) return;
     pauseAllVideos();
+
+    // If clicking the same podcast that is currently playing, toggle pause!
+    if (activeItem && String(activeItem.id) === String(podcast.id) && isPlaying) {
+      setIsPlaying(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      return;
+    }
+
     setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
 
     // If we were playing a song, remember it so we can return to it later

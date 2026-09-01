@@ -340,6 +340,23 @@ export default function AqeeqPodcastPage() {
     return isPlaying && (String(activeItem?.id) === String(id) || String(activePodcast?.id) === String(id));
   };
 
+  const handleSongToggle = (song: any) => {
+    if (isCurrentPlaying(song.id)) {
+      pausePodcast();
+    } else {
+      playSong(song);
+    }
+  };
+
+  const handleAudioToggle = (podcast: any) => {
+    if (isCurrentPlaying(podcast.id)) {
+      pausePodcast();
+    } else {
+      setSelectedAudioId(podcast.id);
+      playPodcast(podcast);
+    }
+  };
+
   return (
     <main
       dir="rtl"
@@ -1005,7 +1022,7 @@ export default function AqeeqPodcastPage() {
                           <div className="flex items-start gap-3 text-right">
                             <button
                               type="button"
-                              onClick={() => playSong(song)}
+                              onClick={() => handleSongToggle(song)}
                               className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
                                 dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
                               }`}
@@ -1025,7 +1042,7 @@ export default function AqeeqPodcastPage() {
                               </div>
 
                               <h4
-                                onClick={() => playSong(song)}
+                                onClick={() => handleSongToggle(song)}
                                 className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
                                   dark ? "text-white hover:text-amber-300" : "text-slate-900 hover:text-amber-600"
                                 }`}
@@ -1097,7 +1114,7 @@ export default function AqeeqPodcastPage() {
 
                               <button
                                 type="button"
-                                onClick={() => playSong(song)}
+                                onClick={() => handleSongToggle(song)}
                                 className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
                                     ? "bg-amber-400 text-slate-950 font-black shadow-amber-400/25"
@@ -1127,7 +1144,7 @@ export default function AqeeqPodcastPage() {
                       return (
                         <div
                           key={song.id || idx}
-                          onClick={() => playSong(song)}
+                          onClick={() => handleSongToggle(song)}
                           className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
                             isThisPlaying
                               ? "border-amber-400 bg-amber-400/15 shadow-sm"
@@ -2042,10 +2059,7 @@ export default function AqeeqPodcastPage() {
                           <div className="flex items-start gap-3 text-right">
                             <button
                               type="button"
-                              onClick={() => {
-                                setSelectedAudioId(podcast.id);
-                                playPodcast(podcast);
-                              }}
+                              onClick={() => handleAudioToggle(podcast)}
                               className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
                                 dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
                               }`}
@@ -2069,10 +2083,7 @@ export default function AqeeqPodcastPage() {
                               </div>
 
                               <h4
-                                onClick={() => {
-                                  setSelectedAudioId(podcast.id);
-                                  playPodcast(podcast);
-                                }}
+                                onClick={() => handleAudioToggle(podcast)}
                                 className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer line-clamp-1 transition ${
                                   dark ? "text-white hover:text-emerald-300" : "text-slate-900 hover:text-emerald-600"
                                 }`}
@@ -2115,10 +2126,7 @@ export default function AqeeqPodcastPage() {
 
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setSelectedAudioId(podcast.id);
-                                  playPodcast(podcast);
-                                }}
+                                onClick={() => handleAudioToggle(podcast)}
                                 className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
                                     ? "bg-emerald-500 text-slate-950 font-black shadow-emerald-500/25"
@@ -2149,10 +2157,7 @@ export default function AqeeqPodcastPage() {
                       return (
                         <div
                           key={podcast.id}
-                          onClick={() => {
-                            setSelectedAudioId(podcast.id);
-                            playPodcast(podcast);
-                          }}
+                          onClick={() => handleAudioToggle(podcast)}
                           className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
                             isThisPlaying || isThisActive
                               ? "border-emerald-400 bg-emerald-500/15 shadow-sm"
