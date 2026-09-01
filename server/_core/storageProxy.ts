@@ -207,26 +207,54 @@ export function registerStorageProxy(app: Express) {
 
       const driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders });
 
-      if (!driveRes.ok && driveRes.status !== 206) {
+      let finalRes = driveRes;
+      let contentType = finalRes.headers.get("content-type") || "";
+
+      // If Google returns HTML (virus warning page for large files), follow the confirmation link to get real video
+      if (contentType.includes("text/html")) {
+        const html = await driveRes.text();
+        const actionMatch = html.match(/action="([^"]+)"/);
+        const confirmMatch = html.match(/name="confirm" value="([^"]+)"/) || html.match(/confirm=([^&"]+)/);
+        const uuidMatch = html.match(/name="uuid" value="([^"]+)"/) || html.match(/uuid=([^&"]+)/);
+
+        let finalDownloadUrl = "";
+        if (actionMatch && actionMatch[1]) {
+          const actionUrl = actionMatch[1].replace(/&amp;/g, "&");
+          const confirmParam = confirmMatch ? `&confirm=${encodeURIComponent(confirmMatch[1])}` : "";
+          const uuidParam = uuidMatch ? `&uuid=${encodeURIComponent(uuidMatch[1])}` : "";
+          finalDownloadUrl = `${actionUrl}${actionUrl.includes("?") ? "" : "?"}${confirmParam}${uuidParam}`;
+        } else if (confirmMatch && confirmMatch[1]) {
+          finalDownloadUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download&confirm=${encodeURIComponent(confirmMatch[1])}`;
+        }
+
+        if (finalDownloadUrl) {
+          const cookies = driveRes.headers.get("set-cookie") || "";
+          const confirmHeaders: Record<string, string> = { ...fetchHeaders };
+          if (cookies) confirmHeaders.Cookie = cookies;
+
+          finalRes = await fetch(finalDownloadUrl, { headers: confirmHeaders });
+          contentType = finalRes.headers.get("content-type") || "video/mp4";
+        }
+      }
+
+      if (!finalRes.ok && finalRes.status !== 206) {
         return res.redirect(`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`);
       }
 
-      const rawContentType = driveRes.headers.get("content-type") || "video/mp4";
-      const contentLength = driveRes.headers.get("content-length");
-      const contentRange = driveRes.headers.get("content-range");
-      const acceptRanges = driveRes.headers.get("accept-ranges") || "bytes";
+      const contentLength = finalRes.headers.get("content-length");
+      const contentRange = finalRes.headers.get("content-range");
+      const acceptRanges = finalRes.headers.get("accept-ranges") || "bytes";
+      let finalContentType = contentType.includes("video") ? contentType : "video/mp4";
 
-      let finalContentType = rawContentType.includes("video") ? rawContentType : "video/mp4";
-
-      res.status(driveRes.status);
+      res.status(finalRes.status === 206 ? 206 : 200);
       res.setHeader("Content-Type", finalContentType);
       res.setHeader("Accept-Ranges", acceptRanges);
       res.setHeader("Cache-Control", "public, max-age=86400");
       if (contentLength) res.setHeader("Content-Length", contentLength);
       if (contentRange) res.setHeader("Content-Range", contentRange);
 
-      if (driveRes.body) {
-        const reader = driveRes.body.getReader();
+      if (finalRes.body) {
+        const reader = finalRes.body.getReader();
         const pump = async () => {
           try {
             while (true) {
@@ -243,7 +271,7 @@ export function registerStorageProxy(app: Express) {
         };
         await pump();
       } else {
-        const buf = Buffer.from(await driveRes.arrayBuffer());
+        const buf = Buffer.from(await finalRes.arrayBuffer());
         res.send(buf);
       }
     } catch (err) {
