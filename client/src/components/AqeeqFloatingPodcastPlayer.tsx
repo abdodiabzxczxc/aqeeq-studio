@@ -486,6 +486,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   };
 
   const togglePlay = () => {
+    if (!activeItem) {
+      if (lastSong) {
+        playSong(lastSong);
+      } else if (schoolSongs.length > 0) {
+        playSong(schoolSongs[0]);
+      }
+      return;
+    }
+
     if (activeItem?.type === "video") {
       const willPlay = !isPlaying;
       setIsPlaying(willPlay);

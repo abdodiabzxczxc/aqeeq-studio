@@ -37,14 +37,44 @@ function InstagramPostEmbed({ post }: { post: ShowcasePost }) {
   return <FastInstagramEmbed url={postUrl} title={post.title || post.fileName} />;
 }
 function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
+  const [isPlaying, setIsPlaying] = useState(false);
   const postUrl = post.externalUrl || post.mediaUrl;
+  const ytMatch = postUrl.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?.*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+  const ytThumbnail = ytMatch && ytMatch[1] ? `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg` : null;
+  const poster = getAqeeqShowcaseDisplaySource(post) || ytThumbnail;
+
+  if (isPlaying) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+        <AqeeqUnifiedVideoFrame
+          sourceUrl={postUrl}
+          title={post.title || post.fileName}
+          posterUrl={poster}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
-      <AqeeqUnifiedVideoFrame
-        sourceUrl={postUrl}
-        title={post.title || post.fileName}
-        posterUrl={getAqeeqShowcaseDisplaySource(post)}
-      />
+    <div
+      onClick={() => setIsPlaying(true)}
+      className="group/yt relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black"
+    >
+      {poster ? (
+        <img
+          src={poster}
+          alt={post.title || post.fileName}
+          className="h-full w-full object-cover transition duration-700 group-hover/yt:scale-105"
+        />
+      ) : (
+        <div className="h-full w-full bg-gradient-to-br from-red-950/40 via-black to-slate-950" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
+      <div className="absolute inset-0 grid place-items-center">
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-[0_0_30px_rgba(225,29,72,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/yt:scale-110 group-hover/yt:shadow-[0_0_45px_rgba(244,63,94,0.9)]">
+          <Play size={22} className="mr-0.5 fill-current" />
+        </div>
+      </div>
     </div>
   );
 }
