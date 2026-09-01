@@ -276,6 +276,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   }>({ visible: false, finishedPodcastTitle: "" });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasPlayingBeforeVideoRef = useRef(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -651,17 +652,25 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  // Video Sync Listeners (Passive Event Mirroring for 0 echo and 0 bugs)
+  // Video Sync Listeners — Bulletproof Auto-Pause on Any Video & Auto-Resume on Video End/Close
   useEffect(() => {
     const handleVideoStart = (e: any) => {
       const detail = e.detail || {};
+      if (isPlaying || (audioRef.current && !audioRef.current.paused)) {
+        wasPlayingBeforeVideoRef.current = true;
+      }
       if (audioRef.current) {
         audioRef.current.pause();
       }
+
+      if (activeItem && activeItem.type !== "video") {
+        setLastSong(activeItem);
+      }
+
       const vidItem: UniversalAudioItem = {
         id: detail.id || "active-video",
         type: "video",
-        title: detail.title || "حلقة مميزة تحت الضوء",
+        title: detail.title || "تغطية مرئية",
         artistOrHost: detail.hostName || "مسرح تحت الضوء",
         category: "تحت الضوء (مرئي)",
         mediaType: "video",
@@ -692,6 +701,46 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       if (activeItem?.type === "video") {
         setIsPlaying(false);
       }
+      if (wasPlayingBeforeVideoRef.current) {
+        wasPlayingBeforeVideoRef.current = false;
+        if (lastSong) {
+          playSong(lastSong);
+        } else if (schoolSongs.length > 0) {
+          playSong(schoolSongs[0]);
+        }
+      }
+    };
+
+    // DOM-level HTML5 Video Interceptor (covers ANY <video> tag on the entire site)
+    const handleDomVideoPlay = (e: Event) => {
+      const target = e.target;
+      if (target instanceof HTMLVideoElement && target !== audioRef.current) {
+        if (isPlaying || (audioRef.current && !audioRef.current.paused)) {
+          wasPlayingBeforeVideoRef.current = true;
+          if (audioRef.current) audioRef.current.pause();
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    const handleDomVideoPauseOrEnd = (e: Event) => {
+      const target = e.target;
+      if (target instanceof HTMLVideoElement && target !== audioRef.current) {
+        const otherPlaying = Array.from(document.querySelectorAll("video")).some(
+          (v) => v !== target && !v.paused && !v.ended && v.currentTime > 0
+        );
+        if (!otherPlaying && wasPlayingBeforeVideoRef.current) {
+          wasPlayingBeforeVideoRef.current = false;
+          if (lastSong) {
+            playSong(lastSong);
+          } else if (audioRef.current && activeItem && activeItem.mediaType === "audio") {
+            audioRef.current.play().catch(() => {});
+            setIsPlaying(true);
+          } else if (schoolSongs.length > 0) {
+            playSong(schoolSongs[0]);
+          }
+        }
+      }
     };
 
     window.addEventListener("aqeeq-video-start", handleVideoStart as EventListener);
@@ -699,13 +748,21 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     window.addEventListener("aqeeq-video-progress", handleVideoProgress as EventListener);
     window.addEventListener("aqeeq-video-ended", handleVideoEnded as EventListener);
 
+    document.addEventListener("play", handleDomVideoPlay, true);
+    document.addEventListener("pause", handleDomVideoPauseOrEnd, true);
+    document.addEventListener("ended", handleDomVideoPauseOrEnd, true);
+
     return () => {
       window.removeEventListener("aqeeq-video-start", handleVideoStart as EventListener);
       window.removeEventListener("aqeeq-video-pause", handleVideoPause as EventListener);
       window.removeEventListener("aqeeq-video-progress", handleVideoProgress as EventListener);
       window.removeEventListener("aqeeq-video-ended", handleVideoEnded as EventListener);
+
+      document.removeEventListener("play", handleDomVideoPlay, true);
+      document.removeEventListener("pause", handleDomVideoPauseOrEnd, true);
+      document.removeEventListener("ended", handleDomVideoPauseOrEnd, true);
     };
-  }, [activeItem]);
+  }, [activeItem, isPlaying, lastSong, schoolSongs]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // UNIFIED AUDIO ENGINE — one effect controls everything (load + play + pause)

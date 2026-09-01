@@ -143,6 +143,9 @@ export function AqeeqUnifiedVideoFrame({
       window.removeEventListener("aqeeq-video-toggle", handleRemoteToggle as EventListener);
       window.removeEventListener("aqeeq-video-seek", handleRemoteSeek as EventListener);
       window.removeEventListener("aqeeq-video-volume", handleRemoteVolume as EventListener);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
+      }
     };
   }, [sourceUrl, title, isYouTube, isDrive, resolvedPoster, isIframePaused]);
 

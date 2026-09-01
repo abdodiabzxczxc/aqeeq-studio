@@ -108,6 +108,9 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       audioRef.current.volume = 0.5;
     }
     audioRef.current.play().catch(() => console.log("Audio blocked"));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-start", { detail: { id: "yearbook-ai", title: "حصاد العقيق الذكي" } }));
+    }
     
     // Balanced cinematic timeline
     setTimeout(() => setSceneIndex(1), 2500);  // 2.5s: text scene 2
@@ -457,6 +460,9 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
     }
     onOpenChange(false);
     setTimeout(() => {
