@@ -44,7 +44,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
     if (issue) {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
       if (isMobile) {
-        setReaderMode(issue.readingMode === "single" ? "single" : "scroll");
+        setReaderMode("scroll");
       } else {
         setReaderMode(normalizeJournalReadingMode(issue.readingMode));
       }

@@ -6,7 +6,8 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
-import { Search, LayoutDashboard, PencilRuler, ScanFace, Plus, Grid, Sun, Moon, LogOut, Settings2, Headphones } from "lucide-react";
+import { Search, LayoutDashboard, PencilRuler, ScanFace, Plus, Grid, Sun, Moon, LogOut, Settings2, Headphones, Rocket } from "lucide-react";
+import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import {
@@ -38,9 +39,22 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const [searchOpen, setSearchOpen] = useState(false);
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const [creatorModalOpen, setCreatorModalOpen] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
   const dark = theme === "dark";
   const isAdmin = isAuthenticated && user?.role === "admin";
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   const go = (path: string) => { setMobileMenuOpen(false); navigate(path); };
+
+  const deployMutation = trpc.deploy.syncToLive.useMutation({
+    onSuccess: () => {
+      setIsDeploying(false);
+      toast.success("🚀 تم نشر التعديلات على الموقع المباشر بنجاح!");
+    },
+    onError: (err) => {
+      setIsDeploying(false);
+      toast.error(err.message || "فشل نشر التعديلات");
+    },
+  });
   const handleAuth = () => {
     if (isAuthenticated) {
       void logout();
@@ -198,6 +212,29 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 aria-label="إنشاء محتوى جديد"
               >
                 <Plus size={18} />
+              </button>
+            ) : null}
+
+            {/* 🚀 Deploy to Live — يظهر فقط على localhost للمشرف */}
+            {isAdmin && isLocalhost ? (
+              <button
+                onClick={() => {
+                  if (isDeploying) return;
+                  setIsDeploying(true);
+                  deployMutation.mutate();
+                }}
+                disabled={isDeploying}
+                className={`hidden sm:flex items-center gap-2 h-9 sm:h-11 px-3 sm:px-4 rounded-xl border font-black text-xs transition active:scale-95 shadow-lg ${
+                  isDeploying
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 cursor-wait opacity-70"
+                    : "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400 hover:shadow-emerald-500/20"
+                }`}
+                title="نشر التعديلات على الموقع المباشر"
+              >
+                <Rocket size={15} className={isDeploying ? "animate-bounce" : ""} />
+                <span className="hidden md:inline whitespace-nowrap">
+                  {isDeploying ? "جارٍ النشر..." : "نشر للموقع 🚀"}
+                </span>
               </button>
             ) : null}
 

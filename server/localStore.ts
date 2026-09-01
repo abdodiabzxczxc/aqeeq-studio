@@ -256,7 +256,11 @@ export function saveLocalDb() {
   if (!memoryState) return;
   ensureDataDir();
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(memoryState, null, 2), "utf-8");
+    const json = JSON.stringify(memoryState, null, 2);
+    fs.writeFileSync(DB_FILE, json, "utf-8");
+    if (fs.existsSync(path.dirname(SEED_FILE))) {
+      fs.writeFileSync(SEED_FILE, json, "utf-8");
+    }
   } catch (err) {
     console.error("[LocalDB] Save error:", err);
   }

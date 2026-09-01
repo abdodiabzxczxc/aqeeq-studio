@@ -6,6 +6,7 @@ import { sdk } from "./_core/sdk";
 import { ENV } from "./_core/env";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, adminAuditorProcedure, adminCoordinatorProcedure, adminCoordinatorAuditorProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { saveLocalDb } from "./localStore";
 import {
   getUserByUsernameOrEmail,
   verifyPassword,
@@ -210,6 +211,29 @@ const aqeeqShowcaseInput = z.object({
 
 export const appRouter = router({
   system: systemRouter,
+
+  deploy: router({
+    syncToLive: publicProcedure.mutation(async () => {
+      saveLocalDb();
+      const { execSync } = await import("node:child_process");
+      try {
+        execSync("git add data/local_db.json server/seedData.json", { stdio: "pipe" });
+        try {
+          execSync('git commit -m "chore(content): sync local edits to live production"', { stdio: "pipe" });
+        } catch {
+          // nothing to commit, continue to push
+        }
+        execSync("git push origin main", { stdio: "pipe" });
+        return { success: true, message: "تم نشر وتحديث موقع ريندر بنجاح!" };
+      } catch (error: any) {
+        console.error("[Deploy] Git sync error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "فشل مزامنة التعديلات مع Git",
+        });
+      }
+    }),
+  }),
 
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
