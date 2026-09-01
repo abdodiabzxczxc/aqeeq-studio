@@ -30,7 +30,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
-export type AudioTrackType = "song" | "podcast";
+export type AudioTrackType = "song" | "podcast" | "video";
 
 export type UniversalAudioItem = {
   id: string | number;
@@ -45,7 +45,7 @@ export type UniversalAudioItem = {
   sourceType?: "drive" | "youtube" | "direct";
   mediaUrl: string;
   coverUrl?: string | null;
-  duration?: string;
+  duration?: string | number;
 };
 
 // Direct Google Drive image proxy handler
@@ -160,6 +160,7 @@ type AudioPlayerContextType = {
   playSong: (song: UniversalAudioItem | number) => void;
   playPodcast: (podcast: any) => void;
   playEpisode: (podcast: any) => void;
+  playVideo: (video: any) => void;
   playNextSong: () => void;
   playPrevSong: () => void;
   playNextPodcast: () => void;
@@ -190,6 +191,7 @@ const PodcastPlayerContext = createContext<AudioPlayerContextType>({
   playSong: () => {},
   playPodcast: () => {},
   playEpisode: () => {},
+  playVideo: () => {},
   playNextSong: () => {},
   playPrevSong: () => {},
   playNextPodcast: () => {},
@@ -243,6 +245,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   const [activeItem, setActiveItem] = useState<UniversalAudioItem | null>(null);
   const currentTrackType = activeItem?.type || null;
   const isPodcast = currentTrackType === "podcast";
+  const isVideo = currentTrackType === "video" || activeItem?.type === "video";
   const [lastSong, setLastSong] = useState<UniversalAudioItem | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -279,8 +282,22 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
+  const pauseAllVideos = () => {
+    if (typeof document !== "undefined") {
+      document.querySelectorAll("video").forEach((v) => {
+        try {
+          v.pause();
+        } catch {}
+      });
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-pause"));
+    }
+  };
+
   // Play a song
   const playSong = (songOrIndex: UniversalAudioItem | number) => {
+    pauseAllVideos();
     let targetSong: UniversalAudioItem;
     if (typeof songOrIndex === "number") {
       targetSong = schoolSongs[songOrIndex] || schoolSongs[0];
@@ -299,6 +316,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   // Play a podcast (swaps current song with the podcast!)
   const playPodcast = (podcast: any) => {
     if (!podcast) return;
+    pauseAllVideos();
     setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
 
     // If we were playing a song, remember it so we can return to it later
@@ -326,6 +344,29 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     if (!isAtheerPage) {
       setIsExpanded(true);
     }
+  };
+
+  // Play a video in sync with the floating turntable
+  const playVideo = (video: any) => {
+    if (!video) return;
+    setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    const vidItem: UniversalAudioItem = {
+      id: video.id || "active-video",
+      type: "video",
+      title: video.title || "حلقة مميزة تحت الضوء",
+      artistOrHost: video.hostName || "مسرح تحت الضوء",
+      category: "تحت الضوء (مرئي)",
+      mediaType: "video",
+      sourceType: video.sourceType || "direct",
+      mediaUrl: video.mediaUrl || "",
+      coverUrl: video.coverUrl ? (directDriveImage(video.coverUrl) || video.coverUrl) : "/alaqeeq-logo.png",
+      duration: video.duration || "10:00",
+    };
+    setActiveItem(vidItem);
+    setIsPlaying(true);
   };
 
   const playEpisode = playPodcast;
@@ -380,6 +421,21 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   };
 
   const togglePlay = () => {
+    if (activeItem?.type === "video") {
+      if (isPlaying) {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: false } }));
+        }
+        setIsPlaying(false);
+      } else {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: true } }));
+        }
+        setIsPlaying(true);
+      }
+      return;
+    }
+
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
@@ -406,6 +462,62 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       audioRef.current.currentTime = 0;
     }
   };
+
+  // Video Sync Listeners (Passive Event Mirroring for 0 echo and 0 bugs)
+  useEffect(() => {
+    const handleVideoStart = (e: any) => {
+      const detail = e.detail || {};
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      const vidItem: UniversalAudioItem = {
+        id: detail.id || "active-video",
+        type: "video",
+        title: detail.title || "حلقة مميزة تحت الضوء",
+        artistOrHost: detail.hostName || "مسرح تحت الضوء",
+        category: "تحت الضوء (مرئي)",
+        mediaType: "video",
+        sourceType: detail.sourceType || "direct",
+        mediaUrl: detail.mediaUrl || "",
+        coverUrl: detail.coverUrl ? (directDriveImage(detail.coverUrl) || detail.coverUrl) : "/alaqeeq-logo.png",
+        duration: detail.duration || "10:00",
+      };
+      setActiveItem(vidItem);
+      setIsPlaying(true);
+    };
+
+    const handleVideoPause = () => {
+      if (activeItem?.type === "video") {
+        setIsPlaying(false);
+      }
+    };
+
+    const handleVideoProgress = (e: any) => {
+      if (activeItem?.type === "video") {
+        const { currentTime: c, duration: d } = e.detail || {};
+        if (typeof c === "number") setProgress(c);
+        if (typeof d === "number" && d > 0) setDuration(d);
+      }
+    };
+
+    const handleVideoEnded = () => {
+      if (activeItem?.type === "video") {
+        setIsPlaying(false);
+      }
+    };
+
+    window.addEventListener("aqeeq-video-start", handleVideoStart as EventListener);
+    window.addEventListener("aqeeq-video-pause", handleVideoPause as EventListener);
+    window.addEventListener("aqeeq-video-progress", handleVideoProgress as EventListener);
+    window.addEventListener("aqeeq-video-ended", handleVideoEnded as EventListener);
+
+    return () => {
+      window.removeEventListener("aqeeq-video-start", handleVideoStart as EventListener);
+      window.removeEventListener("aqeeq-video-pause", handleVideoPause as EventListener);
+      window.removeEventListener("aqeeq-video-progress", handleVideoProgress as EventListener);
+      window.removeEventListener("aqeeq-video-ended", handleVideoEnded as EventListener);
+    };
+  }, [activeItem]);
 
   // Audio source effect
   useEffect(() => {
@@ -518,6 +630,13 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   const isAtheerPage = location === "/atheer" || location.startsWith("/atheer");
 
   const seek = (time: number) => {
+    if (activeItem?.type === "video") {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-seek", { detail: { time } }));
+      }
+      setProgress(time);
+      return;
+    }
     if (audioRef.current) {
       audioRef.current.currentTime = time;
       setProgress(time);
@@ -532,32 +651,6 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       setIsMuted(clamped === 0);
     }
   };
-
-  // Global video auto-pause listener: pauses background audio whenever any video starts playing
-  useEffect(() => {
-    const handleVideoPlaying = () => {
-      if (isPlaying) {
-        pausePodcast();
-      }
-    };
-
-    const handleMediaPlay = (e: Event) => {
-      const target = e.target;
-      if (target instanceof HTMLVideoElement && target !== (audioRef.current as any)) {
-        if (isPlaying) {
-          pausePodcast();
-        }
-      }
-    };
-
-    window.addEventListener("aqeeq-video-playing", handleVideoPlaying);
-    document.addEventListener("play", handleMediaPlay, true);
-
-    return () => {
-      window.removeEventListener("aqeeq-video-playing", handleVideoPlaying);
-      document.removeEventListener("play", handleMediaPlay, true);
-    };
-  }, [isPlaying]);
 
   return (
     <PodcastPlayerContext.Provider
@@ -574,6 +667,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         playSong,
         playPodcast,
         playEpisode,
+        playVideo,
         playNextSong,
         playPrevSong,
         playNextPodcast,
@@ -672,35 +766,57 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               }
             }}
             className={`relative grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-full border-2 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 ${
-              isPodcast
+              isVideo
                 ? isDark
-                  ? "bg-gradient-to-tr from-[#0b0d1a] via-[#11142b] to-[#181d3d] border-indigo-400/60 shadow-[0_12px_36px_rgba(79,70,229,0.45)] ring-2 ring-indigo-400/30"
-                  : "bg-gradient-to-tr from-[#eef2ff] via-[#f8fafc] to-[#ffffff] border-indigo-300 shadow-[0_10px_30px_rgba(99,102,241,0.25)] ring-2 ring-indigo-400/40"
-                : isDark
-                  ? "bg-[#0a0c13] border-amber-400/50 shadow-[0_12px_36px_rgba(0,0,0,0.7)] ring-2 ring-amber-400/20 backdrop-blur-2xl"
-                  : "bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#ffffff] border-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.14)] ring-2 ring-amber-400/35 backdrop-blur-2xl"
+                  ? "bg-gradient-to-tr from-[#0b1022] via-[#0e1635] to-[#122046] border-cyan-400/60 shadow-[0_12px_36px_rgba(6,182,212,0.45)] ring-2 ring-cyan-400/30"
+                  : "bg-gradient-to-tr from-[#ecfeff] via-[#f8fafc] to-[#ffffff] border-cyan-400 shadow-[0_10px_30px_rgba(6,182,212,0.25)] ring-2 ring-cyan-400/40"
+                : isPodcast
+                  ? isDark
+                    ? "bg-gradient-to-tr from-[#0b0d1a] via-[#11142b] to-[#181d3d] border-indigo-400/60 shadow-[0_12px_36px_rgba(79,70,229,0.45)] ring-2 ring-indigo-400/30"
+                    : "bg-gradient-to-tr from-[#eef2ff] via-[#f8fafc] to-[#ffffff] border-indigo-300 shadow-[0_10px_30px_rgba(99,102,241,0.25)] ring-2 ring-indigo-400/40"
+                  : isDark
+                    ? "bg-[#0a0c13] border-amber-400/50 shadow-[0_12px_36px_rgba(0,0,0,0.7)] ring-2 ring-amber-400/20 backdrop-blur-2xl"
+                    : "bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#ffffff] border-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.14)] ring-2 ring-amber-400/35 backdrop-blur-2xl"
             } ${
               isPlaying
-                ? isPodcast
-                  ? "shadow-indigo-500/40 ring-indigo-400/60"
-                  : isDark
-                    ? "shadow-amber-400/25 ring-amber-400/40"
-                    : "shadow-amber-400/35 ring-amber-400/60"
+                ? isVideo
+                  ? "shadow-cyan-500/40 ring-cyan-400/60"
+                  : isPodcast
+                    ? "shadow-indigo-500/40 ring-indigo-400/60"
+                    : isDark
+                      ? "shadow-amber-400/25 ring-amber-400/40"
+                      : "shadow-amber-400/35 ring-amber-400/60"
                 : ""
             }`}
-            title={activeItem ? (isExpanded ? "انقر لإغلاق المشغل" : "انقر لتوسيع المشغل") : "تشغيل راديو وأناشيد العقيق"}
+            title={activeItem ? (isExpanded ? "انقر لإغلاق المشغل" : "انقر لتوسيع المشغل") : "تشغيل راديو وأناشيد وفيديوهات العقيق"}
           >
-            {/* If Song: Circular Vinyl CD Grooves | If Podcast: Radio Studio Pulse Waves */}
+            {/* If Song or Video: Circular Vinyl CD Grooves | If Podcast: Radio Studio Pulse Waves */}
             {!isPodcast ? (
               <>
-                {/* Outer Grooves (شفرات الاسطوانة الموسيقية) */}
-                <div className={`pointer-events-none absolute inset-1 rounded-full border ${isDark ? "border-white/10" : "border-slate-300/80"}`} />
-                <div className={`pointer-events-none absolute inset-2 rounded-full border ${isDark ? "border-white/5" : "border-slate-300/40"}`} />
-                <div className={`pointer-events-none absolute inset-3 rounded-full border ${isDark ? "border-white/10" : "border-slate-300/80"}`} />
+                {/* Outer Grooves */}
+                <div className={`pointer-events-none absolute inset-1 rounded-full border ${
+                  isVideo
+                    ? isDark ? "border-cyan-400/20" : "border-cyan-200"
+                    : isDark ? "border-white/10" : "border-slate-300/80"
+                }`} />
+                <div className={`pointer-events-none absolute inset-2 rounded-full border ${
+                  isVideo
+                    ? isDark ? "border-cyan-400/10" : "border-cyan-100"
+                    : isDark ? "border-white/5" : "border-slate-300/40"
+                }`} />
+                <div className={`pointer-events-none absolute inset-3 rounded-full border ${
+                  isVideo
+                    ? isDark ? "border-cyan-400/20" : "border-cyan-200"
+                    : isDark ? "border-white/10" : "border-slate-300/80"
+                }`} />
 
-                {/* Center Spinning Spindle Disc with Musical Note Artwork */}
+                {/* Center Spinning Spindle Disc with Musical Note / Video Artwork */}
                 <div
-                  className={`relative grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-black shadow-md overflow-hidden ${
+                  className={`relative grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full text-black shadow-md overflow-hidden ${
+                    isVideo
+                      ? "bg-gradient-to-tr from-cyan-500 to-indigo-600"
+                      : "bg-gradient-to-tr from-[#f8ca14] to-amber-600"
+                  } ${
                     isPlaying ? "animate-[spin_4s_linear_infinite]" : ""
                   }`}
                 >
@@ -715,16 +831,24 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   />
                   {/* Center Spindle Hole */}
                   <div className={`absolute h-2 w-2 rounded-full shadow-inner border ${
-                    isDark ? "bg-[#0a0c13] border-amber-300" : "bg-slate-100 border-slate-400"
+                    isVideo
+                      ? "bg-cyan-950 border-cyan-400"
+                      : isDark ? "bg-[#0a0c13] border-amber-300" : "bg-slate-100 border-slate-400"
                   }`} />
                 </div>
 
-                {/* Song Playing Pulsing Waves & Green Dot */}
+                {/* Playing Pulsing Waves & Corner Dot */}
                 {isPlaying && (
                   <>
-                    <span className="absolute -inset-1 rounded-full bg-amber-400/30 blur-sm animate-pulse pointer-events-none" />
-                    <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 ${isDark ? "border-[#0a0c13]" : "border-white"} animate-ping`} />
-                    <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 ${isDark ? "border-[#0a0c13]" : "border-white"}`} />
+                    <span className={`absolute -inset-1 rounded-full blur-sm animate-pulse pointer-events-none ${
+                      isVideo ? "bg-cyan-400/30" : "bg-amber-400/30"
+                    }`} />
+                    <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 ${isDark ? "border-[#0a0c13]" : "border-white"} animate-ping ${
+                      isVideo ? "bg-cyan-400" : "bg-emerald-400"
+                    }`} />
+                    <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 ${isDark ? "border-[#0a0c13]" : "border-white"} ${
+                      isVideo ? "bg-cyan-400" : "bg-emerald-400"
+                    }`} />
                   </>
                 )}
               </>
@@ -992,18 +1116,22 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 </div>
                 <div className="text-right truncate">
                   <span className={`block text-[11px] font-black leading-tight truncate ${
-                    isPodcast
-                      ? isDark ? "text-indigo-300" : "text-indigo-900"
-                      : isDark ? "text-amber-300" : "text-slate-900"
+                    isVideo
+                      ? isDark ? "text-cyan-300" : "text-cyan-900"
+                      : isPodcast
+                        ? isDark ? "text-indigo-300" : "text-indigo-900"
+                        : isDark ? "text-amber-300" : "text-slate-900"
                   }`}>
                     {activeItem ? activeItem.title : "راديو العقيق 🎵"}
                   </span>
                   <span className={`block text-[9px] font-mono leading-tight ${
-                    isPodcast
-                      ? isDark ? "text-indigo-300/80" : "text-indigo-600"
-                      : isDark ? "text-slate-400" : "text-slate-500"
+                    isVideo
+                      ? isDark ? "text-cyan-300/80" : "text-cyan-700"
+                      : isPodcast
+                        ? isDark ? "text-indigo-300/80" : "text-indigo-600"
+                        : isDark ? "text-slate-400" : "text-slate-500"
                   }`}>
-                    {isPodcast && "🎙️ "}{formatTime(progress)} / {formatTime(duration)}
+                    {isVideo ? "🎬 " : isPodcast ? "🎙️ " : ""}{formatTime(progress)} / {formatTime(duration)}
                   </span>
                 </div>
               </div>
@@ -1037,21 +1165,25 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   <div className={`relative w-full h-[2.5px] group-hover/bar:h-[4px] transition-all duration-150 overflow-visible ${
                     isDark ? "bg-white/15" : "bg-slate-200"
                   }`}>
-                    {/* Filled Active Line (Golden for Songs, Indigo for Podcasts) */}
+                    {/* Filled Active Line (Cyan for Videos, Indigo for Podcasts, Golden for Songs) */}
                     <div
                       className={`h-full transition-all duration-75 ${
-                        isPodcast
-                          ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-400"
-                          : "bg-gradient-to-r from-amber-400 to-yellow-300"
+                        isVideo
+                          ? "bg-gradient-to-r from-cyan-500 via-indigo-500 to-cyan-400"
+                          : isPodcast
+                            ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-400"
+                            : "bg-gradient-to-r from-amber-400 to-yellow-300"
                       }`}
                       style={{ width: `${progressPercent}%` }}
                     />
                     {/* Scrubber Dot / Thumb that appears on hover */}
                     <div
                       className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-3 w-3 rounded-full border-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-30 ${
-                        isPodcast
-                          ? "bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.9)]"
-                          : "bg-amber-400 shadow-[0_0_10px_rgba(248,202,20,0.9)]"
+                        isVideo
+                          ? "bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.9)]"
+                          : isPodcast
+                            ? "bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.9)]"
+                            : "bg-amber-400 shadow-[0_0_10px_rgba(248,202,20,0.9)]"
                       } ${isDark ? "border-[#090b10]" : "border-white"}`}
                       style={{ left: `${progressPercent}%` }}
                     />

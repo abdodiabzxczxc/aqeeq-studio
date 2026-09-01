@@ -182,9 +182,18 @@ export default function AqeeqPodcastPage() {
   }, [audioPodcasts, selectedAudioId, activePodcast]);
 
   const handlePlayVideoInline = (videoId: number) => {
+    const video = videoPodcasts.find((v) => v.id === videoId);
     pausePodcast();
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("aqeeq-video-playing"));
+      window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+        detail: {
+          id: video?.id || videoId,
+          title: video?.title || "حلقة مميزة تحت الضوء",
+          coverUrl: video?.coverUrl,
+          hostName: video?.hostName || "مسرح تحت الضوء",
+          mediaUrl: video?.mediaUrl,
+        }
+      }));
     }
     setSelectedVideoId(videoId);
     setInlinePlayingVideoId(videoId);
@@ -193,7 +202,15 @@ export default function AqeeqPodcastPage() {
   const handleOpenVideoModal = (video: any) => {
     pausePodcast();
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("aqeeq-video-playing"));
+      window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+        detail: {
+          id: video?.id,
+          title: video?.title || "حلقة مميزة تحت الضوء",
+          coverUrl: video?.coverUrl,
+          hostName: video?.hostName || "مسرح تحت الضوء",
+          mediaUrl: video?.mediaUrl,
+        }
+      }));
     }
     setWatchingVideoPodcast(video);
   };
@@ -1072,7 +1089,33 @@ export default function AqeeqPodcastPage() {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       />
                     ) : (
-                      <video src={currentActiveVideo.mediaUrl} controls autoPlay className="h-full w-full object-contain" />
+                      <video
+                        src={currentActiveVideo.mediaUrl}
+                        controls
+                        autoPlay
+                        onPlay={() => {
+                          window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                            detail: {
+                              id: currentActiveVideo.id,
+                              title: currentActiveVideo.title,
+                              coverUrl: currentActiveVideo.coverUrl,
+                              hostName: currentActiveVideo.hostName,
+                              mediaUrl: currentActiveVideo.mediaUrl,
+                            }
+                          }));
+                        }}
+                        onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                        onTimeUpdate={(e) => {
+                          window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                            detail: {
+                              currentTime: e.currentTarget.currentTime,
+                              duration: e.currentTarget.duration,
+                            }
+                          }));
+                        }}
+                        onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                        className="h-full w-full object-contain"
+                      />
                     )
                   ) : (
                     <div
@@ -1614,7 +1657,33 @@ export default function AqeeqPodcastPage() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
                 ) : (
-                  <video src={watchingVideoPodcast.mediaUrl} controls autoPlay className="h-full w-full object-contain" />
+                  <video
+                    src={watchingVideoPodcast.mediaUrl}
+                    controls
+                    autoPlay
+                    onPlay={() => {
+                      window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                        detail: {
+                          id: watchingVideoPodcast.id,
+                          title: watchingVideoPodcast.title,
+                          coverUrl: watchingVideoPodcast.coverUrl,
+                          hostName: watchingVideoPodcast.hostName,
+                          mediaUrl: watchingVideoPodcast.mediaUrl,
+                        }
+                      }));
+                    }}
+                    onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                    onTimeUpdate={(e) => {
+                      window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                        detail: {
+                          currentTime: e.currentTarget.currentTime,
+                          duration: e.currentTarget.duration,
+                        }
+                      }));
+                    }}
+                    onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                    className="h-full w-full object-contain"
+                  />
                 )}
               </div>
               <p className="text-xs sm:text-sm font-bold text-slate-400 leading-relaxed">{watchingVideoPodcast.description}</p>
