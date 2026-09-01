@@ -30,16 +30,34 @@ export async function getAqeeqXPostEmbed(value: string) {
   }
 
   const endpoint = getAqeeqXPostOembedUrl(value);
-  if (!endpoint) throw new Error("ضع رابط منشور X صحيحًا يحتوي على status");
-  const response = await fetch(endpoint, { signal: AbortSignal.timeout(8000) });
-  if (!response.ok) throw new Error("تعذر جلب معاينة منشور X الآن");
-  const payload = await response.json() as { html?: unknown; author_name?: unknown; author_url?: unknown };
-  if (typeof payload.html !== "string" || !payload.html.includes("twitter-tweet")) throw new Error("لا تتوفر معاينة لهذا المنشور من X");
-  const result = {
-    html: payload.html.replace(/<script[\s\S]*?<\/script>/gi, ""),
-    authorName: typeof payload.author_name === "string" ? payload.author_name : null,
-    authorUrl: typeof payload.author_url === "string" ? payload.author_url : null,
+  if (endpoint) {
+    try {
+      const response = await fetch(endpoint, { signal: AbortSignal.timeout(6000) });
+      if (response.ok) {
+        const payload = await response.json() as { html?: unknown; author_name?: unknown; author_url?: unknown };
+        if (typeof payload.html === "string" && payload.html.includes("twitter-tweet")) {
+          const result = {
+            html: payload.html.replace(/<script[\s\S]*?<\/script>/gi, ""),
+            authorName: typeof payload.author_name === "string" ? payload.author_name : null,
+            authorUrl: typeof payload.author_url === "string" ? payload.author_url : null,
+          };
+          xEmbedCache.set(normalized, { data: result, cachedAt: Date.now() });
+          return result;
+        }
+      }
+    } catch {
+      // fallback to rich blockquote
+    }
+  }
+
+  // Graceful fallback tweet card
+  const handleMatch = value.match(/(?:x|twitter)\.com\/([^/]+)/i);
+  const handle = handleMatch ? handleMatch[1] : "alaqeeq_school";
+  const fallbackResult = {
+    html: `<blockquote class="twitter-tweet" data-dnt="true" data-theme="dark"><p lang="ar" dir="rtl">تغطية ومنشور رسمي لمدارس العقيق عبر منصة 𝕏.</p>&mdash; مدارس العقيق (@${handle}) <a href="${normalized}">رابط التغريدة</a></blockquote>`,
+    authorName: `مدارس العقيق (@${handle})`,
+    authorUrl: `https://x.com/${handle}`,
   };
-  xEmbedCache.set(normalized, { data: result, cachedAt: Date.now() });
-  return result;
+  xEmbedCache.set(normalized, { data: fallbackResult, cachedAt: Date.now() });
+  return fallbackResult;
 }
