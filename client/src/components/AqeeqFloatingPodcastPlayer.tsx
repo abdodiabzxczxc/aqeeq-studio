@@ -650,63 +650,55 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     };
   }, [activeItem]);
 
-  // Audio source effect — loads and plays new track instantly using preload
-  useEffect(() => {
-    if (activeItem && activeItem.mediaType === "audio" && audioRef.current) {
-      const audio = audioRef.current;
-
-      // If same URL is already loaded (e.g., just unpaused), just resume
-      if (audio.src && audio.src.includes(activeItem.mediaUrl.replace(/^\//, "")) && !audio.ended) {
-        audio.play().catch(() => setIsPlaying(false));
-        return;
-      }
-
-      // Load new source
-      audio.preload = "auto";
-      audio.src = activeItem.mediaUrl;
-      audio.load();
-
-      const onCanPlay = () => {
-        audio.play().catch(() => setIsPlaying(false));
-        audio.removeEventListener("canplay", onCanPlay);
-      };
-      audio.addEventListener("canplay", onCanPlay);
-
-      setIsPlaying(true);
-
-      return () => {
-        audio.removeEventListener("canplay", onCanPlay);
-      };
-    }
-  }, [activeItem?.id, activeItem?.mediaUrl]);
-
-  // ✅ Sync isPlaying state → actual audio element play/pause
-  // This is the fix for "pause then play again doesn't work":
-  // When playSong is called on the same paused song, activeItem doesn't change (same id/url),
-  // so the source effect above doesn't run. This effect catches isPlaying changes and acts directly.
+  // ─────────────────────────────────────────────────────────────────────────
+  // UNIFIED AUDIO ENGINE — one effect controls everything (load + play + pause)
+  // Prevents double-play conflicts between source loading and isPlaying state
+  // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!audioRef.current || !activeItem || activeItem.mediaType !== "audio") return;
     const audio = audioRef.current;
-    if (isPlaying) {
-      // Only call play() if audio is actually paused (avoid double-play errors)
-      if (audio.paused && audio.readyState >= 2) {
-        audio.play().catch(() => setIsPlaying(false));
-      } else if (audio.paused && audio.readyState < 2) {
-        // Not ready yet — wait for canplay
-        const onCanPlay = () => {
-          audio.play().catch(() => setIsPlaying(false));
-          audio.removeEventListener("canplay", onCanPlay);
-        };
-        audio.addEventListener("canplay", onCanPlay);
-        return () => audio.removeEventListener("canplay", onCanPlay);
+    const targetUrl = activeItem.mediaUrl;
+    if (!targetUrl) return;
+
+    // Resolve current audio.src to comparable form (browser expands relative → absolute)
+    const isSameTrack = (() => {
+      if (!audio.src) return false;
+      // Relative URL (proxy): compare ending
+      if (targetUrl.startsWith("/api/")) {
+        return audio.src.endsWith(targetUrl) || audio.src.includes(targetUrl);
       }
-    } else {
-      if (!audio.paused) {
+      // Absolute URL: direct compare
+      return audio.src === targetUrl;
+    })();
+
+    if (isSameTrack && !audio.ended) {
+      // ── Same track: just play or pause based on isPlaying ──
+      if (isPlaying && audio.paused) {
+        if (audio.readyState >= 2) {
+          audio.play().catch(() => setIsPlaying(false));
+        } else {
+          const onReady = () => {
+            audio.play().catch(() => setIsPlaying(false));
+            audio.removeEventListener("canplay", onReady);
+          };
+          audio.addEventListener("canplay", onReady);
+          return () => audio.removeEventListener("canplay", onReady);
+        }
+      } else if (!isPlaying && !audio.paused) {
         audio.pause();
       }
+    } else if (isPlaying) {
+      // ── New track: load and play ──
+      audio.src = targetUrl;
+      audio.load();
+      const onReady = () => {
+        audio.play().catch(() => setIsPlaying(false));
+        audio.removeEventListener("canplay", onReady);
+      };
+      audio.addEventListener("canplay", onReady);
+      return () => audio.removeEventListener("canplay", onReady);
     }
-  }, [isPlaying]);
-
+  }, [activeItem?.id, activeItem?.mediaUrl, isPlaying]);
 
   const handleEnded = () => {
     if (activeItem?.type === "podcast") {
@@ -868,7 +860,6 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         preload="auto"
-        crossOrigin="anonymous"
         className="hidden"
       />
 
