@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Volume2, VolumeX, SlidersHorizontal } from "lucide-react";
+import { usePodcastPlayer } from "./AqeeqFloatingPodcastPlayer";
 
 type Props = {
   audioUrl?: string | null;
@@ -12,146 +13,54 @@ export function AqeeqReaderAudioController({
   audioUrl,
   trackTitle = "موسيقى العقيق",
   dark = true,
-  defaultVolume = 0.35,
 }: Props) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(defaultVolume);
+  const player = usePodcastPlayer();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [needsUserGesture, setNeedsUserGesture] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Initialize and handle playback across Desktop and Mobile
+  // Seamlessly hook into the unified audio player on mount & clean up on unmount
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !audioUrl) {
-      setIsPlaying(false);
-      return;
-    }
+    if (!audioUrl || !player.playReaderAudio) return;
 
-    audio.volume = isMuted ? 0 : volume;
-    audio.muted = isMuted;
-
-    // Direct touch gesture handler to unlock mobile audio
-    const unlockAndPlay = () => {
-      if (!audioRef.current || isMuted) return;
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setNeedsUserGesture(false);
-        })
-        .catch(() => {
-          setNeedsUserGesture(true);
-        });
-    };
-
-    // Attempt direct autoplay
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsPlaying(true);
-          setNeedsUserGesture(false);
-        })
-        .catch(() => {
-          // Mobile browser autoplay policy requires user gesture
-          setIsPlaying(false);
-          setNeedsUserGesture(true);
-
-          const events = ["touchstart", "touchend", "pointerdown", "click", "scroll"];
-          const handleFirstInteraction = () => {
-            unlockAndPlay();
-            events.forEach((evt) => window.removeEventListener(evt, handleFirstInteraction));
-          };
-
-          events.forEach((evt) => {
-            window.addEventListener(evt, handleFirstInteraction, { passive: true, once: true });
-          });
-        });
-    }
+    const unregister = player.playReaderAudio({
+      id: trackTitle,
+      title: trackTitle,
+      subtitle: "موسيقى قارئ العقيق التفاعلية",
+      category: "قارئ العقيق",
+      audioUrl: audioUrl,
+      autoPlay: true,
+    });
 
     return () => {
-      audio.pause();
-    };
-  }, [audioUrl]);
-
-  const toggleMuteOrPlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isMuted || !isPlaying) {
-      setIsMuted(false);
-      setNeedsUserGesture(false);
-      audio.muted = false;
-      audio.volume = volume > 0 ? volume : 0.35;
-      audio
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.warn("Audio play failed on mobile:", err);
-        });
-    } else {
-      setIsMuted(true);
-      audio.muted = true;
-      audio.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const handleVolumeChange = (newVol: number) => {
-    setVolume(newVol);
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = newVol;
-      if (newVol > 0 && (isMuted || !isPlaying)) {
-        setIsMuted(false);
-        setNeedsUserGesture(false);
-        audio.muted = false;
-        audio
-          .play()
-          .then(() => setIsPlaying(true))
-          .catch(() => {});
-      } else if (newVol === 0) {
-        setIsMuted(true);
-        audio.muted = true;
-        audio.pause();
-        setIsPlaying(false);
+      if (typeof unregister === "function") {
+        unregister();
       }
-    }
-  };
+    };
+  }, [audioUrl, trackTitle]);
 
   if (!audioUrl) return null;
 
+  const isPlaying = player.isPlaying && player.activeItem?.type === "reader";
+  const isMuted = player.isMuted;
+  const volume = player.volume;
+
+  const toggleMuteOrPlay = () => {
+    player.togglePlay();
+  };
+
+  const handleVolumeChange = (newVol: number) => {
+    player.setVolume(newVol);
+  };
+
   return (
     <div className="relative inline-flex items-center shrink-0">
-      {/* Real HTML5 Audio Element */}
-      <audio
-        ref={audioRef}
-        src={audioUrl}
-        loop
-        preload="auto"
-        playsInline
-        onPlay={() => {
-          setIsPlaying(true);
-          setNeedsUserGesture(false);
-        }}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
-      />
-
-      {/* Luxury Audio Pill */}
+      {/* Luxury Synchronized Audio Pill */}
       <div
         className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-xl border px-2 sm:px-3 shadow-sm transition-all select-none ${
           isPlaying && !isMuted
             ? "border-amber-300/50 bg-amber-300/15 text-amber-200 ring-1 ring-amber-300/20"
-            : needsUserGesture
-              ? "border-amber-400/90 bg-amber-400/25 text-amber-300 ring-2 ring-amber-400/50 animate-pulse"
-              : dark
-                ? "border-white/10 bg-black/40 text-slate-400 hover:border-white/20"
-                : "border-slate-900/10 bg-white text-slate-600 hover:border-slate-300 shadow-sm"
+            : dark
+              ? "border-white/10 bg-black/40 text-slate-400 hover:border-white/20"
+              : "border-slate-900/10 bg-white text-slate-600 hover:border-slate-300 shadow-sm"
         }`}
       >
         {/* Click / Tap to Play or Mute */}
@@ -159,8 +68,8 @@ export function AqeeqReaderAudioController({
           type="button"
           onClick={toggleMuteOrPlay}
           className="flex items-center gap-1.5 sm:gap-2 text-xs font-black transition active:scale-95 touch-manipulation"
-          title={isPlaying && !isMuted ? "كتم الموسيقى" : "تشغيل الموسيقى"}
-          aria-label={isPlaying && !isMuted ? "كتم الموسيقى" : "تشغيل الموسيقى"}
+          title={isPlaying && !isMuted ? "إيقاف الموسيقى مؤقتاً" : "تشغيل الموسيقى"}
+          aria-label={isPlaying && !isMuted ? "إيقاف الموسيقى مؤقتاً" : "تشغيل الموسيقى"}
         >
           {/* Animated Equalizer Wave Bars */}
           <div
@@ -176,11 +85,7 @@ export function AqeeqReaderAudioController({
 
           {/* Text visible on desktop, compact on mobile */}
           <span className="hidden sm:inline">
-            {isPlaying && !isMuted
-              ? "موسيقى نشطة"
-              : needsUserGesture
-                ? "تشغيل 🎵"
-                : "مكتومة"}
+            {isPlaying && !isMuted ? "موسيقى نشطة" : "مكتومة"}
           </span>
 
           {isPlaying && !isMuted ? (

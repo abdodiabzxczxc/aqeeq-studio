@@ -30,7 +30,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
-export type AudioTrackType = "song" | "podcast" | "video";
+export type AudioTrackType = "song" | "podcast" | "video" | "reader";
+
+export type ReaderAudioTrack = {
+  id: string | number;
+  title: string;
+  subtitle?: string;
+  category?: string;
+  coverUrl?: string | null;
+  audioUrl: string;
+  autoPlay?: boolean;
+};
 
 export type UniversalAudioItem = {
   id: string | number;
@@ -172,6 +182,8 @@ type AudioPlayerContextType = {
   seek: (time: number) => void;
   setVolume: (vol: number) => void;
   toggleMute: () => void;
+  playReaderAudio: (track: ReaderAudioTrack) => () => void;
+  restorePreviousAudio: () => void;
 
   // Song playlist
   songs: UniversalAudioItem[];
@@ -200,6 +212,8 @@ const PodcastPlayerContext = createContext<AudioPlayerContextType>({
   pausePodcast: () => {},
   stopPodcast: () => {},
   returnToSongs: () => {},
+  playReaderAudio: () => () => {},
+  restorePreviousAudio: () => {},
   seek: () => {},
   setVolume: () => {},
   toggleMute: () => {},
@@ -594,6 +608,49 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
+  const playReaderAudio = (track: ReaderAudioTrack) => {
+    pauseAllVideos();
+    if (activeItem && activeItem.type !== "reader") {
+      setLastSong(activeItem);
+    } else if (!lastSong && schoolSongs.length > 0) {
+      setLastSong(schoolSongs[0]);
+    }
+
+    const resolvedUrl = resolveAudioUrl(track.audioUrl);
+    const readerItem: UniversalAudioItem = {
+      id: `reader-${track.id}`,
+      type: "reader",
+      title: track.title,
+      artistOrHost: track.subtitle || "موسيقى تفاعلية",
+      category: track.category || "قارئ العقيق",
+      mediaType: "audio",
+      sourceType: "direct",
+      mediaUrl: resolvedUrl,
+      coverUrl: track.coverUrl ? (directDriveImage(track.coverUrl) || track.coverUrl) : null,
+    };
+
+    setActiveItem(readerItem);
+    setIsPlaying(track.autoPlay !== false);
+
+    return () => {
+      setActiveItem((current) => {
+        if (current && String(current.id) === `reader-${track.id}`) {
+          setIsPlaying(false);
+          return lastSong || schoolSongs[0] || null;
+        }
+        return current;
+      });
+    };
+  };
+
+  const restorePreviousAudio = () => {
+    if (lastSong) {
+      playSong(lastSong);
+    } else if (schoolSongs.length > 0) {
+      playSong(schoolSongs[0]);
+    }
+  };
+
   // Video Sync Listeners (Passive Event Mirroring for 0 echo and 0 bugs)
   useEffect(() => {
     const handleVideoStart = (e: any) => {
@@ -847,6 +904,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         pausePodcast,
         stopPodcast,
         returnToSongs,
+        playReaderAudio,
+        restorePreviousAudio,
         seek,
         setVolume: changeVolume,
         toggleMute,
