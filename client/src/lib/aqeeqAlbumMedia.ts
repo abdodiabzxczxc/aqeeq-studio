@@ -27,7 +27,7 @@ export function isAqeeqDriveVideo(mediaUrl: string): boolean {
 
 export function getAqeeqDrivePreviewUrl(mediaUrl: string): string {
   const id = getAqeeqDriveFileId(mediaUrl);
-  return id ? `https://drive.google.com/file/d/${id}/preview` : mediaUrl;
+  return id ? `https://drive.google.com/file/d/${id}/preview?rm=minimal` : mediaUrl;
 }
 
 export function getAqeeqDriveFallbackUrl(mediaUrl: string): string {
