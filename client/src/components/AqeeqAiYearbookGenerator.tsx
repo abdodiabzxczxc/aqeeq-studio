@@ -6,7 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
-import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
+import { getAqeeqAlbumImageSource, getAqeeqDriveFileId } from "@/lib/aqeeqAlbumMedia";
+
+/** تحوّل أي رابط Drive إلى البروكسي السريع */
+function resolveImageUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith("/api/drive-proxy/")) return url;
+  const fileId = getAqeeqDriveFileId(url);
+  if (fileId) return `/api/drive-proxy/${fileId}`;
+  return url;
+}
 
 export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const { theme } = useAqeeqStudioTheme();
@@ -18,7 +27,8 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
 
   // Fetch media for cinematic simulation (always enabled so it's ready when they click)
   const { data: allMediaDetails } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, { refetchOnWindowFocus: false });
-  const photos = (allMediaDetails || []).map(m => m.imageUrl);
+  // Always route through the fast proxy
+  const photos = (allMediaDetails || []).map(m => resolveImageUrl(m.imageUrl));
 
   // Cinematic State
   const [sceneIndex, setSceneIndex] = useState(0);
@@ -40,8 +50,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     setStage("processing");
     setProgress(10);
     
-    // Import dynamically to avoid breaking if not available
-    let finalPhotos = photos; // fallback to all photos
+    let finalPhotos = photos;
     
     try {
       if (photos.length > 0) {
@@ -50,47 +59,42 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         
         const mediaObjects = (allMediaDetails || []).map(m => ({
           id: m.id,
-          imageUrl: m.imageUrl
+          imageUrl: resolveImageUrl(m.imageUrl)
         }));
         
-        // Run actual AI match, update progress as it scans
         const matches = await matchSelfieAgainstPhotos(studentPhoto, mediaObjects, (scanned, total) => {
-          setProgress(30 + Math.floor((scanned / total) * 60)); // 30% to 90%
+          setProgress(30 + Math.floor((scanned / total) * 60));
         });
         
         if (matches && matches.length > 0) {
-          finalPhotos = matches.map(m => m.photo.imageUrl);
+          finalPhotos = matches.map(m => resolveImageUrl(m.photo.imageUrl));
         }
       }
     } catch (e) {
-      console.warn("AI Match failed or skipped, falling back to mock photos:", e);
+      console.warn("AI Match failed, using all photos:", e);
     }
     
-    setProgress(95);
+    setProgress(92);
     
-    // Determine orientation based on first few images
-    let vCount = 0;
-    let hCount = 0;
-    const checkPhotos = finalPhotos.slice(0, 8);
-    await Promise.all(checkPhotos.map(url => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          if (img.naturalHeight > img.naturalWidth) vCount++;
-          else hCount++;
-          resolve(null);
-        };
-        img.onerror = resolve;
-        img.src = url;
-      });
-    }));
-    
+    // Determine orientation from first few images
+    let vCount = 0, hCount = 0;
+    await Promise.all(finalPhotos.slice(0, 6).map(url => new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => { if (img.naturalHeight > img.naturalWidth) vCount++; else hCount++; resolve(null); };
+      img.onerror = resolve;
+      img.src = url;
+    })));
     setOrientation(vCount > hCount ? "portrait" : "landscape");
-    
+
+    // Preload first 12 cinematic photos so they appear instantly
+    const toPreload = (finalPhotos.length > 0 ? finalPhotos : photos).slice(0, 12);
+    await Promise.allSettled(toPreload.map(url => new Promise((resolve) => {
+      const img = new Image(); img.onload = resolve; img.onerror = resolve; img.src = url;
+    })));
+
     setProgress(100);
     setMatchedPhotos(finalPhotos.length > 0 ? finalPhotos : photos);
-    
-    setTimeout(() => startCinematic(), 500);
+    setTimeout(() => startCinematic(), 400);
   };
 
   const startCinematic = () => {
@@ -102,10 +106,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     }
     audioRef.current.play().catch(() => console.log("Audio blocked"));
     
-    // Timeline
-    setTimeout(() => setSceneIndex(1), 3000); // 3s: Intro 2
-    setTimeout(() => setSceneIndex(2), 6000); // 6s: Photos Montage
-    setTimeout(() => setSceneIndex(3), 22000); // 22s: Climax Logo
+    // Faster, tighter cinematic timeline
+    setTimeout(() => setSceneIndex(1), 2000);  // 2s: text scene 2
+    setTimeout(() => setSceneIndex(2), 4000);  // 4s: photo montage starts
+    setTimeout(() => setSceneIndex(3), 16000); // 16s: climax logo
   };
 
   const closeWrapped = () => {
@@ -245,25 +249,31 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               <AnimatePresence>
                 {sceneIndex === 2 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-                    {/* Show up to 15 photos from matchedPhotos in a rapid cinematic montage */}
-                    {matchedPhotos.slice(0, 15).map((url, i) => (
+                    {/* 12 photos, each showing for ~0.8s — totals ~9.6s before climax at 16s */}
+                    {matchedPhotos.slice(0, 12).map((url, i) => (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, scale: 1.2 }}
+                        initial={{ opacity: 0, scale: 1.08 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 2, delay: i * 1.5 }}
+                        transition={{ duration: 1.2, delay: i * 0.8 }}
                         className="absolute inset-0 bg-black"
                         style={{ zIndex: i }}
                       >
-                        <img src={url} className="w-full h-full object-contain md:object-cover" alt="" />
-                        {/* Dramatic vignette gradient over the photos */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
+                        <img
+                          src={url}
+                          className="w-full h-full object-cover"
+                          alt=""
+                          loading="eager"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                        />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)] pointer-events-none" />
                       </motion.div>
                     ))}
                   </motion.div>
                 )}
               </AnimatePresence>
+
 
               {/* Scene 4: Climax (Logo) */}
               <AnimatePresence>

@@ -6,15 +6,21 @@ export type AqeeqShowcaseMedia = {
   thumbnailUrl?: string | null;
 };
 
-/** يستخدم رابط بروكسي أو مصغر Drive للصور حتى لا يتعطل العرض داخل المتصفح. */
-export function getAqeeqShowcaseDisplaySource(media: AqeeqShowcaseMedia) {
-  const target = media.thumbnailUrl || media.mediaUrl;
-  if (!target) return "";
-  const fileId = getAqeeqDriveFileId(target) || getAqeeqDriveFileId(media.mediaUrl);
-  if (fileId && (target.includes("drive.google.com") || target.includes("googleusercontent.com"))) {
-    return `/api/drive-proxy/${fileId}`;
+/** يستخدم رابط بروكسي Drive للصور — يضمن التحميل السريع بدون CORS أو انتهاء صلاحية الرابط */
+export function getAqeeqShowcaseDisplaySource(media: AqeeqShowcaseMedia): string {
+  // Try thumbnailUrl first, then mediaUrl — extract Drive File ID from either
+  const sources = [media.thumbnailUrl, media.mediaUrl].filter(Boolean) as string[];
+
+  for (const src of sources) {
+    const fileId = getAqeeqDriveFileId(src);
+    if (fileId) {
+      // Always route Drive files through our fast in-memory proxy
+      return `/api/drive-proxy/${fileId}`;
+    }
   }
-  return target;
+
+  // Non-Drive URL (Unsplash, CDN, direct): use as-is
+  return sources[0] || "";
 }
 
 export function getAqeeqShowcaseVideoStreamPath(slug: string, postId: number) {
