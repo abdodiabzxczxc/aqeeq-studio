@@ -526,8 +526,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   };
 
   const pausePodcast = () => {
-    setIsPlaying(false);
     if (audioRef.current) audioRef.current.pause();
+    if (activeItem?.type !== "video") {
+      setIsPlaying(false);
+    }
   };
 
   const stopPodcast = () => {

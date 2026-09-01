@@ -58,6 +58,29 @@ function directDriveImage(url: string | null | undefined) {
   return id ? `/api/drive-proxy/${id}` : url;
 }
 
+function getVideoEmbedUrl(url: string | undefined | null): string {
+  if (!url) return "";
+  
+  // YouTube URLs
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&enablejsapi=1`;
+  }
+
+  // Google Drive URLs
+  const driveMatch = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  if (driveMatch && driveMatch[1]) {
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  }
+
+  return url;
+}
+
+function isEmbeddableVideo(url: string | undefined | null): boolean {
+  if (!url) return false;
+  return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("drive.google.com");
+}
+
 export default function AqeeqPodcastPage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
@@ -1095,9 +1118,9 @@ export default function AqeeqPodcastPage() {
                 {/* 16:9 Cinema Box */}
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
-                    currentActiveVideo.mediaUrl.includes("youtube.com") || currentActiveVideo.mediaUrl.includes("youtu.be") ? (
+                    isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
                       <iframe
-                        src={currentActiveVideo.mediaUrl.replace("watch?v=", "embed/").split("&")[0] + (currentActiveVideo.mediaUrl.includes("?") ? "&enablejsapi=1&autoplay=1" : "?enablejsapi=1&autoplay=1")}
+                        src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
                         title={currentActiveVideo.title}
                         className="h-full w-full border-0"
                         allowFullScreen
@@ -1663,9 +1686,9 @@ export default function AqeeqPodcastPage() {
                 <h3 className="text-base font-black truncate">{watchingVideoPodcast.title}</h3>
               </div>
               <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black border border-white/10 shadow-2xl">
-                {watchingVideoPodcast.mediaUrl.includes("youtube.com") || watchingVideoPodcast.mediaUrl.includes("youtu.be") ? (
+                {isEmbeddableVideo(watchingVideoPodcast.mediaUrl) ? (
                   <iframe
-                    src={watchingVideoPodcast.mediaUrl.replace("watch?v=", "embed/").split("&")[0] + (watchingVideoPodcast.mediaUrl.includes("?") ? "&enablejsapi=1&autoplay=1" : "?enablejsapi=1&autoplay=1")}
+                    src={getVideoEmbedUrl(watchingVideoPodcast.mediaUrl)}
                     title={watchingVideoPodcast.title}
                     className="h-full w-full border-0"
                     allowFullScreen
