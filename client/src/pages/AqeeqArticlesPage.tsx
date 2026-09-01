@@ -4,6 +4,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
+import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import {
   PenTool,
@@ -89,7 +90,13 @@ function ArticleCard({
             style={{ transform: "rotate(-7deg)" }}
           >
             {cover ? (
-              <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <VisualImage
+                id={`articles-card-back-cover-${article.id}`}
+                label="صورة خلفية بطاقة المقال"
+                src={cover}
+                alt=""
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-amber-500/20 to-transparent p-3 text-[9px] font-bold text-slate-500">
                 مقال العقيق
@@ -105,7 +112,13 @@ function ArticleCard({
             style={{ transform: "rotate(0deg)" }}
           >
             {cover ? (
-              <img src={cover} alt="" className="h-full w-full rounded-[0.7rem] object-cover" loading="lazy" />
+              <VisualImage
+                id={`articles-card-cover-${article.id}`}
+                label="غلاف بطاقة المقال"
+                src={cover}
+                alt={`غلاف ${article.title}`}
+                className="h-full w-full rounded-[0.7rem] object-cover"
+              />
             ) : (
               <div
                 className={`flex h-full flex-col justify-between rounded-[0.7rem] p-3.5 text-right ${
@@ -143,18 +156,26 @@ function ArticleCard({
             </span>
           </div>
 
-          <h3
+          <VisualEditable
+            id={`articles-card-title-${article.id}`}
+            tag="text"
+            label="عنوان المقال"
+            defaultText={article.title}
+            as="h3"
             onClick={onOpen}
             className={`mt-3 text-lg font-black line-clamp-2 cursor-pointer transition leading-snug ${
               dark ? "text-white group-hover:text-[#f8ca14]" : "text-black group-hover:text-[#08467d]"
             }`}
-          >
-            {article.title}
-          </h3>
+          />
 
-          <p className={`mt-2 text-xs leading-6 line-clamp-2 font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
-            {article.excerpt}
-          </p>
+          <VisualEditable
+            id={`articles-card-excerpt-${article.id}`}
+            tag="text"
+            label="ملخص المقال"
+            defaultText={article.excerpt}
+            as="p"
+            className={`mt-2 text-xs leading-6 line-clamp-2 font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+          />
 
           {/* Author Badge */}
           <div className="mt-3 flex items-center gap-2">
@@ -400,29 +421,46 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
           {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
           <div className="order-1 md:order-2 text-right">
-            <div
+            <VisualEditable
+              id="articles-hero-kicker"
+              tag="text"
+              label="شارة مقالات العقيق"
+              defaultText={orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}
+              as="div"
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
-              <Sparkles size={14} />
-              <span>{orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}</span>
-            </div>
+              {(text) => (
+                <>
+                  <Sparkles size={14} />
+                  <span>{text}</span>
+                </>
+              )}
+            </VisualEditable>
 
-            <h1
+            <VisualEditable
+              id="articles-hero-title"
+              tag="text"
+              label="عنوان صفحة المقالات"
+              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
+              as="h1"
               className={`mt-5 text-4xl font-black leading-[1.14] md:text-6xl ${
                 dark ? "text-white" : "text-black"
               }`}
-            >
-              {orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
-            </h1>
+            />
 
-            <p className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
-              {orchestration?.heroCovers?.articlesCustomDesc ||
+            <VisualEditable
+              id="articles-hero-desc"
+              tag="text"
+              label="وصف صفحة المقالات"
+              defaultText={orchestration?.heroCovers?.articlesCustomDesc ||
                 "رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."}
-            </p>
+              as="p"
+              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+            />
 
             {/* Stats pills */}
             <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">

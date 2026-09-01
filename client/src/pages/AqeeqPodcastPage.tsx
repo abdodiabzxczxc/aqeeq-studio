@@ -4,6 +4,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
+import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import {
   Play,
@@ -480,29 +481,46 @@ export default function AqeeqPodcastPage() {
 
           {/* Text Info */}
           <div className="order-1 md:order-2 text-right">
-            <div
+            <VisualEditable
+              id="podcast-hero-kicker"
+              tag="text"
+              label="شارة أثير العقيق"
+              defaultText={orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"}
+              as="div"
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
-              <Mic size={14} className="animate-pulse" />
-              <span>{orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"}</span>
-            </div>
+              {(text) => (
+                <>
+                  <Mic size={14} className="animate-pulse" />
+                  <span>{text}</span>
+                </>
+              )}
+            </VisualEditable>
 
-            <h1
+            <VisualEditable
+              id="podcast-hero-title"
+              tag="text"
+              label="عنوان صفحة البودكاست"
+              defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
+              as="h1"
               className={`mt-4 text-3xl font-black leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl ${
                 dark ? "text-white" : "text-black"
               }`}
-            >
-              {orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
-            </h1>
+            />
 
-            <p className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
-              {orchestration?.heroCovers?.podcastsCustomDesc ||
+            <VisualEditable
+              id="podcast-hero-desc"
+              tag="text"
+              label="وصف صفحة البودكاست"
+              defaultText={orchestration?.heroCovers?.podcastsCustomDesc ||
                 "استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية، والتغطيات الصوتية والمرئية لحفلات التخرج والبطولات المدرسية."}
-            </p>
+              as="p"
+              className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+            />
 
             {/* Stats pills */}
             <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-bold">
