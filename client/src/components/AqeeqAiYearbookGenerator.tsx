@@ -135,26 +135,6 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
   };
 
-  // Helper to draw image maintaining aspect ratio with object-fit: cover and zoom scale
-  const drawImageCover = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, scale: number) => {
-    const imgRatio = img.naturalWidth / img.naturalHeight;
-    const canvasRatio = w / h;
-    let renderW = w;
-    let renderH = h;
-    if (imgRatio > canvasRatio) {
-      renderH = h;
-      renderW = h * imgRatio;
-    } else {
-      renderW = w;
-      renderH = w / imgRatio;
-    }
-    renderW *= scale;
-    renderH *= scale;
-    const offsetX = (w - renderW) / 2;
-    const offsetY = (h - renderH) / 2;
-    ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
-  };
-
   // Helper to pre-render 1080p crisp Arabic title cards using SVG Base64 (Never taints canvas)
   const createArabicTitleCard = (
     title: string,
