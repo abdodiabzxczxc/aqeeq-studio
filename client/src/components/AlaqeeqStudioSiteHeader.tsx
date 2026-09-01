@@ -224,17 +224,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   deployMutation.mutate();
                 }}
                 disabled={isDeploying}
-                className={`hidden sm:flex items-center gap-2 h-9 sm:h-11 px-3 sm:px-4 rounded-xl border font-black text-xs transition active:scale-95 shadow-lg ${
+                className={`hidden sm:grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
                   isDeploying
                     ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 cursor-wait opacity-70"
                     : "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400 hover:shadow-emerald-500/20"
                 }`}
-                title="نشر التعديلات على الموقع المباشر"
+                title="نشر التعديلات على الموقع المباشر 🚀"
               >
-                <Rocket size={15} className={isDeploying ? "animate-bounce" : ""} />
-                <span className="hidden md:inline whitespace-nowrap">
-                  {isDeploying ? "جارٍ النشر..." : "نشر للموقع 🚀"}
-                </span>
+                <Rocket size={17} className={isDeploying ? "animate-bounce" : ""} />
               </button>
             ) : null}
 
