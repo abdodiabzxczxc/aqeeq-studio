@@ -67,6 +67,9 @@ export default function AqeeqPodcastPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [watchingVideoPodcast, setWatchingVideoPodcast] = useState<any | null>(null);
   const [selectedLyricsSong, setSelectedLyricsSong] = useState<any | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
+  const [inlinePlayingVideoId, setInlinePlayingVideoId] = useState<number | null>(null);
+  const [selectedAudioId, setSelectedAudioId] = useState<number | null>(null);
 
   // Hero custom covers
   const featuredPodcast = useMemo(() => {
@@ -128,6 +131,25 @@ export default function AqeeqPodcastPage() {
       return true;
     });
   }, [songs, selectedCategory, searchQuery]);
+
+  const currentActiveVideo = useMemo(() => {
+    if (selectedVideoId) {
+      const found = videoPodcasts.find((v) => v.id === selectedVideoId);
+      if (found) return found;
+    }
+    return videoPodcasts[0] || null;
+  }, [videoPodcasts, selectedVideoId]);
+
+  const currentActiveAudio = useMemo(() => {
+    if (activePodcast && activePodcast.mediaType !== "video") {
+      return activePodcast;
+    }
+    if (selectedAudioId) {
+      const found = audioPodcasts.find((a) => a.id === selectedAudioId);
+      if (found) return found;
+    }
+    return audioPodcasts[0] || null;
+  }, [audioPodcasts, selectedAudioId, activePodcast]);
 
   // Unified items list for Signature 3D & Master Console
   const unifiedItems = useMemo(() => {
@@ -776,16 +798,21 @@ export default function AqeeqPodcastPage() {
         {videoPodcasts.length > 0 && (
           <section
             id="videos-pavilion"
-            className={`rounded-[2.5rem] border p-6 sm:p-8 transition ${
+            className={`relative overflow-hidden rounded-[2.5rem] border p-6 sm:p-10 transition ${
               dark
-                ? "border-indigo-500/30 bg-gradient-to-b from-[#0e1022] to-[#070810] shadow-2xl"
-                : "border-slate-200 bg-white shadow-xl"
+                ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_24px_70px_rgba(99,102,241,0.12)]"
+                : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 shadow-xl"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
-                  <Video size={20} />
+            {/* Ambient Backlight */}
+            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+
+            {/* Pavilion Header */}
+            <div className="relative flex flex-wrap items-center justify-between gap-4 border-b border-indigo-500/20 pb-5 mb-8">
+              <div className="flex items-center gap-3.5">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-600/30">
+                  <Video size={22} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -794,87 +821,246 @@ export default function AqeeqPodcastPage() {
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{videoPodcasts.length} حلقات منشورة</span>
                   </div>
-                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">مسرح «تحت الضوء» وحلقات الفيديو المرئية 🎬</h2>
+                  <h2 className="mt-1 text-xl sm:text-2xl font-black text-white">مسرح «تحت الضوء» وحلقات الفيديو المرئية 🎬</h2>
+                  <p className="text-xs text-slate-300 font-bold mt-0.5">
+                    اللقاءات الحوارية والتغطيات المرئية الوثائقية بدقة فائقة 4K
+                  </p>
                 </div>
+              </div>
+
+              {/* Action Button: Play First Video */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (videoPodcasts[0]) {
+                      setSelectedVideoId(videoPodcasts[0].id);
+                      setInlinePlayingVideoId(videoPodcasts[0].id);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-5 py-2.5 text-xs font-black shadow-lg shadow-indigo-600/25 transition active:scale-95"
+                >
+                  <Play size={16} className="fill-current mr-0.5" />
+                  <span>مشاهدة أحدث حلقة مرئية 🎬</span>
+                </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videoPodcasts.map((video) => (
-                <div
-                  key={video.id}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/50 hover:border-indigo-400/60 transition duration-300 hover:-translate-y-1 shadow-xl"
-                >
-                  <div
-                    onClick={() => setWatchingVideoPodcast(video)}
-                    className="relative aspect-video w-full cursor-pointer overflow-hidden bg-black"
-                  >
-                    {video.coverUrl ? (
-                      <img
-                        src={directDriveImage(video.coverUrl) || video.coverUrl}
-                        alt=""
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            {/* Split Grid: Master 4K Video Screen (5 cols) + Video Episodes Cards Grid (7 cols) */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Master 4K Video Screen Centerpiece */}
+              <div className="lg:col-span-5 text-center p-5 sm:p-6 rounded-3xl border border-indigo-500/30 bg-black/60 backdrop-blur-xl shadow-2xl space-y-4">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <span className="text-[10px] font-black text-indigo-400 flex items-center gap-1.5">
+                    <Sparkles size={12} />
+                    <span>شاشة العرض المركزية 4K</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {currentActiveVideo ? currentActiveVideo.duration || "12:00" : "4K UHD"}
+                  </span>
+                </div>
+
+                {/* 16:9 Cinema Box */}
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+                  {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
+                    currentActiveVideo.mediaUrl.includes("youtube.com") || currentActiveVideo.mediaUrl.includes("youtu.be") ? (
+                      <iframe
+                        src={currentActiveVideo.mediaUrl.replace("watch?v=", "embed/") + "?autoplay=1"}
+                        title={currentActiveVideo.title}
+                        className="h-full w-full border-0"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       />
                     ) : (
-                      <div className="grid h-full place-items-center bg-indigo-950/40">
-                        <Video size={36} className="text-indigo-400" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
-                    
-                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                      <span className="rounded-lg bg-indigo-600/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white shadow-md flex items-center gap-1">
-                        <Video size={11} /> تحت الضوء 4K
-                      </span>
-                      <span className="rounded-lg bg-black/70 backdrop-blur-md px-2 py-1 text-[10px] font-mono text-slate-200 border border-white/10">
-                        {video.duration || "12:00"}
-                      </span>
-                    </div>
-
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="grid h-12 w-12 place-items-center rounded-full bg-indigo-600 text-white shadow-2xl group-hover:scale-115 transition duration-200">
-                        <Play size={20} className="mr-0.5 fill-current" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4.5 text-right">
-                    <span className="text-[9px] font-black text-amber-400">تحت الضوء · مرئي</span>
-                    <h4
-                      onClick={() => setWatchingVideoPodcast(video)}
-                      className="mt-1 text-sm font-black text-white hover:text-indigo-300 cursor-pointer line-clamp-1 transition"
+                      <video src={currentActiveVideo.mediaUrl} controls autoPlay className="h-full w-full object-contain" />
+                    )
+                  ) : (
+                    <div
+                      onClick={() => {
+                        if (currentActiveVideo) {
+                          setInlinePlayingVideoId(currentActiveVideo.id);
+                        }
+                      }}
+                      className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
                     >
-                      {video.title}
-                    </h4>
-                    <p className="text-xs text-slate-400 font-bold line-clamp-2 mt-1.5 leading-relaxed">{video.description}</p>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
-                        <Mic size={11} className="text-indigo-400" />
-                        <span>{video.hostName || "فريق الإذاعة"}</span>
+                      {currentActiveVideo?.coverUrl ? (
+                        <img
+                          src={directDriveImage(currentActiveVideo.coverUrl) || currentActiveVideo.coverUrl}
+                          alt=""
+                          className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center bg-indigo-950/40">
+                          <Video size={48} className="text-indigo-400" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+                      
+                      <div className="absolute top-3 right-3 rounded-lg bg-indigo-600/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white shadow-md flex items-center gap-1">
+                        <Video size={11} /> تحت الضوء · مرئي
                       </div>
 
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => handleLike(video, e)}
-                          className="flex items-center gap-1 text-[10px] font-bold text-rose-400 hover:scale-110 transition px-1.5 py-0.5"
-                        >
-                          <Heart size={11} className="fill-rose-500/20" />
-                          <span>{video.likesCount || 0}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setWatchingVideoPodcast(video)}
-                          className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 text-xs font-black transition"
-                        >
-                          مشاهدة الفيديو
-                        </button>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.6)] group-hover/screen:scale-115 transition duration-300">
+                          <Play size={26} className="fill-current mr-0.5" />
+                        </div>
                       </div>
                     </div>
+                  )}
+                </div>
+
+                {/* Master Video Info & Action Controls */}
+                <div className="space-y-1 text-right">
+                  <h3 className="text-base sm:text-lg font-black text-white line-clamp-1">
+                    {currentActiveVideo ? currentActiveVideo.title : "حلقة مميزة تحت الضوء"}
+                  </h3>
+                  <p className="text-xs text-indigo-400 font-bold">
+                    {currentActiveVideo ? currentActiveVideo.hostName || "فريق الإذاعة والإعلام" : "لقاءات قيادات العقيق"}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-black text-slate-300">
+                    {inlinePlayingVideoId === currentActiveVideo?.id ? "🔴 جاري العرض السينمائي..." : "جاهز للمشاهدة الفورية"}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    {currentActiveVideo && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleLike(currentActiveVideo, e)}
+                        className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-3 py-1 text-[11px] font-bold transition"
+                      >
+                        <Heart size={12} className="fill-rose-500/20" />
+                        <span>{currentActiveVideo.likesCount || 0}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleShare(currentActiveVideo, e)}
+                      className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
+                      title="مشاركة الفيديو"
+                    >
+                      <Share2 size={13} />
+                    </button>
+                    {inlinePlayingVideoId === currentActiveVideo?.id && (
+                      <button
+                        type="button"
+                        onClick={() => setWatchingVideoPodcast(currentActiveVideo)}
+                        className="rounded-xl border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-3 py-1 text-[11px] font-black transition flex items-center gap-1"
+                      >
+                        <Maximize2 size={12} />
+                        <span>تكبير</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
+
+              </div>
+
+              {/* 4 Video Episodes Cards Grid (7 cols) */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {videoPodcasts.map((video, idx) => {
+                  const isThisActive = currentActiveVideo?.id === video.id;
+                  const isThisPlaying = inlinePlayingVideoId === video.id;
+                  return (
+                    <div
+                      key={video.id}
+                      className={`group relative flex flex-col justify-between rounded-3xl border p-4 transition duration-300 hover:-translate-y-1 ${
+                        isThisActive
+                          ? "border-indigo-400 bg-indigo-500/15 ring-2 ring-indigo-400/40 shadow-[0_16px_40px_rgba(99,102,241,0.2)]"
+                          : "border-white/10 bg-black/40 hover:border-indigo-400/50 hover:bg-black/60 shadow-lg"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3.5 text-right">
+                        {/* Video Thumbnail */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedVideoId(video.id);
+                            setInlinePlayingVideoId(video.id);
+                          }}
+                          className="relative h-16 w-24 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-black group-hover:scale-105 transition"
+                        >
+                          {video.coverUrl ? (
+                            <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="grid h-full place-items-center bg-indigo-950/40">
+                              <Video size={20} className="text-indigo-400" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="grid h-7 w-7 place-items-center rounded-full bg-indigo-600 text-white shadow-md">
+                              <Play size={12} className="fill-current mr-0.5" />
+                            </div>
+                          </div>
+                        </button>
+
+                        <div className="text-right min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-mono font-black text-indigo-400 uppercase">حلقة #{String(idx + 1).padStart(2, "0")}</span>
+                            <span className="text-[9px] font-mono text-slate-400">{video.duration || "12:00"}</span>
+                          </div>
+
+                          <h4
+                            onClick={() => {
+                              setSelectedVideoId(video.id);
+                              setInlinePlayingVideoId(video.id);
+                            }}
+                            className="mt-1 text-xs sm:text-sm font-black text-white hover:text-indigo-300 cursor-pointer truncate transition"
+                          >
+                            {video.title}
+                          </h4>
+
+                          <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">
+                            {video.hostName || "فريق الإذاعة"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="mt-3 text-[11px] text-slate-300 font-bold line-clamp-2 leading-relaxed bg-white/5 border border-white/5 rounded-xl p-2 text-right">
+                        {video.description || "تغطية وحوار خاص ضمن سلسلة برامج تحت الضوء."}
+                      </p>
+
+                      {/* Action Bar */}
+                      <div className="mt-3.5 flex items-center justify-between border-t border-white/10 pt-2.5">
+                        <span className="text-[10px] font-black text-indigo-400">مرئي 4K</span>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => handleShare(video, e)}
+                            className="grid h-7 w-7 place-items-center rounded-lg border border-white/10 hover:bg-white/10 text-slate-400 hover:text-indigo-400 transition"
+                            title="مشاركة"
+                          >
+                            <Share2 size={11} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedVideoId(video.id);
+                              setInlinePlayingVideoId(video.id);
+                            }}
+                            className={`inline-flex items-center gap-1 rounded-xl px-3 py-1 text-xs font-black transition shadow-sm ${
+                              isThisPlaying
+                                ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
+                                : "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white"
+                            }`}
+                          >
+                            <Play size={11} className="mr-0.5 fill-current" />
+                            <span>{isThisPlaying ? "جاري العرض" : "تشغيل بالمربع"}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+
             </div>
           </section>
         )}
@@ -885,16 +1071,21 @@ export default function AqeeqPodcastPage() {
         {audioPodcasts.length > 0 && (
           <section
             id="audio-pavilion"
-            className={`rounded-[2.5rem] border p-6 sm:p-8 transition ${
+            className={`relative overflow-hidden rounded-[2.5rem] border p-6 sm:p-10 transition ${
               dark
-                ? "border-emerald-500/30 bg-gradient-to-b from-[#09161a] to-[#060e10] shadow-2xl"
-                : "border-slate-200 bg-white shadow-xl"
+                ? "border-emerald-500/40 bg-gradient-to-b from-[#081814] via-[#090b14] to-[#04060c] shadow-[0_24px_70px_rgba(16,185,129,0.12)]"
+                : "border-emerald-200/80 bg-gradient-to-b from-emerald-50/50 via-white to-slate-50 shadow-xl"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30">
-                  <Radio size={20} />
+            {/* Ambient Backlight */}
+            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
+
+            {/* Pavilion Header */}
+            <div className="relative flex flex-wrap items-center justify-between gap-4 border-b border-emerald-500/20 pb-5 mb-8">
+              <div className="flex items-center gap-3.5">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 via-emerald-400 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/30">
+                  <Radio size={22} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -903,91 +1094,233 @@ export default function AqeeqPodcastPage() {
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{audioPodcasts.length} حلقات مسموعة</span>
                   </div>
-                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">صالون «خلف المايك» والبودكاست المسموع 🎙️</h2>
+                  <h2 className="mt-1 text-xl sm:text-2xl font-black text-white">صالون «خلف المايك» والبودكاست المسموع 🎙️</h2>
+                  <p className="text-xs text-slate-300 font-bold mt-0.5">
+                    حوارات قيادات المدارس، البرامج الإذاعية الصباحية، واللقاءات التربوية المسموعة
+                  </p>
                 </div>
+              </div>
+
+              {/* Action Button: Play First Podcast */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (audioPodcasts[0]) {
+                      setSelectedAudioId(audioPodcasts[0].id);
+                      playPodcast(audioPodcasts[0]);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-5 py-2.5 text-xs font-black shadow-lg shadow-emerald-500/25 transition active:scale-95"
+                >
+                  <Disc size={16} className="animate-[spin_3s_linear_infinite]" />
+                  <span>تشغيل صالون البودكاست كاملاً 🎙️</span>
+                </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {audioPodcasts.map((podcast) => {
-                const isThisPlaying = isCurrentPlaying(podcast.id);
-                return (
+            {/* Split Grid: Master Broadcast Acoustic Deck (5 cols) + Audio Episodes Cards Grid (7 cols) */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Master Acoustic Broadcasting Deck Centerpiece */}
+              <div className="lg:col-span-5 text-center p-6 rounded-3xl border border-emerald-500/30 bg-black/60 backdrop-blur-xl shadow-2xl space-y-5">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <span className="text-[10px] font-black text-emerald-400 flex items-center gap-1.5">
+                    <Sparkles size={12} />
+                    <span>كابينة البث الإذاعي الحي</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {currentActiveAudio ? currentActiveAudio.duration || "10:00" : "Studio Audio"}
+                  </span>
+                </div>
+
+                {/* Interactive Acoustic Turntable / Mic Centerpiece */}
+                <div className="relative mx-auto h-48 w-48 sm:h-56 sm:w-56 grid place-items-center">
+                  <div className={`absolute inset-0 rounded-full border-4 border-emerald-500/40 bg-[#040d0a] shadow-[0_0_40px_rgba(16,185,129,0.2)] transition ${
+                    isCurrentPlaying(currentActiveAudio?.id) ? "border-emerald-400 shadow-[0_0_50px_rgba(16,185,129,0.35)]" : ""
+                  }`} />
+                  <div className="absolute inset-3 rounded-full border border-white/10" />
+                  <div className="absolute inset-6 rounded-full border border-emerald-500/10" />
+                  <div className="absolute inset-9 rounded-full border border-white/10" />
+                  <div className="absolute inset-12 rounded-full border border-white/5" />
+
                   <div
-                    key={podcast.id}
-                    className={`group relative flex flex-col justify-between rounded-3xl border p-4.5 transition duration-300 hover:-translate-y-1 ${
-                      isThisPlaying
-                        ? "border-emerald-400 bg-emerald-500/15 ring-2 ring-emerald-400/40 shadow-[0_16px_40px_rgba(16,185,129,0.2)]"
-                        : "border-white/10 bg-black/40 hover:border-emerald-400/50 hover:bg-black/60 shadow-lg"
+                    onClick={() => {
+                      if (currentActiveAudio) {
+                        if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
+                        else playPodcast(currentActiveAudio);
+                      } else if (audioPodcasts[0]) {
+                        playPodcast(audioPodcasts[0]);
+                      }
+                    }}
+                    className={`relative cursor-pointer h-24 w-24 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-2xl overflow-hidden grid place-items-center ${
+                      isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
                     }`}
                   >
-                    <div className="flex items-start gap-3.5 text-right">
+                    {currentActiveAudio?.coverUrl ? (
+                      <img
+                        src={directDriveImage(currentActiveAudio.coverUrl) || currentActiveAudio.coverUrl}
+                        alt=""
+                        className="h-full w-full object-cover opacity-90"
+                      />
+                    ) : (
+                      <Mic size={32} className="text-slate-950" />
+                    )}
+                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                      <div className="grid h-10 w-10 place-items-center rounded-full bg-black/60 text-emerald-400 backdrop-blur-sm shadow-md">
+                        {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={18} /> : <Play size={18} className="fill-current mr-0.5" />}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Master Audio Info & Controls */}
+                <div className="space-y-1">
+                  <h3 className="text-base sm:text-lg font-black text-white line-clamp-1">
+                    {currentActiveAudio ? currentActiveAudio.title : "حلقة بودكاست خلف المايك"}
+                  </h3>
+                  <p className="text-xs text-emerald-400 font-bold">
+                    {currentActiveAudio ? currentActiveAudio.hostName || "فريق الإذاعة المدرسية" : "إذاعة الصباح"}
+                  </p>
+                </div>
+
+                {/* Equalizer & Action Bar */}
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-end gap-1 h-5">
+                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.6s_infinite] h-5" : "h-2"}`} />
+                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.8s_infinite] h-3.5" : "h-2"}`} />
+                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.5s_infinite] h-4.5" : "h-2"}`} />
+                      <span className={`w-1 bg-emerald-400 rounded-full ${isCurrentPlaying(currentActiveAudio?.id) ? "animate-[bounce_0.9s_infinite] h-3" : "h-2"}`} />
+                    </div>
+                    <span className="text-[10px] font-black text-slate-300">
+                      {isCurrentPlaying(currentActiveAudio?.id) ? "🔴 جاري البث المباشر..." : "جاهز للاستماع"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {currentActiveAudio && (
                       <button
                         type="button"
-                        onClick={() => playPodcast(podcast)}
-                        className="relative h-16 w-16 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-black grid place-items-center group-hover:scale-105 transition"
+                        onClick={(e) => handleLike(currentActiveAudio, e)}
+                        className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-2.5 py-1 text-[11px] font-bold transition"
                       >
-                        {podcast.coverUrl ? (
-                          <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          <Mic size={24} className="text-emerald-400" />
-                        )}
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                          {isThisPlaying ? <Pause size={14} className="text-white" /> : <Play size={14} className="text-white fill-current" />}
-                        </div>
+                        <Heart size={12} className="fill-rose-500/20" />
+                        <span>{currentActiveAudio.likesCount || 0}</span>
                       </button>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-black">
-                            خلف المايك · مسموع
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
-                        </div>
-
-                        <h4
-                          onClick={() => playPodcast(podcast)}
-                          className="mt-1 text-xs sm:text-sm font-black text-white hover:text-emerald-300 cursor-pointer line-clamp-2 transition leading-snug"
-                        >
-                          {podcast.title}
-                        </h4>
-
-                        <p className="text-[11px] text-slate-400 font-bold truncate mt-1">{podcast.hostName || "فريق الإذاعة المدرسية"}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-400">
-                        {isThisPlaying ? (
-                          <span className="animate-pulse">🔴 بث حي</span>
-                        ) : (
-                          <span className="text-slate-500">بودكاست مسموع</span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => handleLike(podcast, e)}
-                          className="flex items-center gap-1 text-[10px] font-bold text-rose-400 hover:scale-110 transition px-1.5 py-0.5"
-                        >
-                          <Heart size={11} className="fill-rose-500/20" />
-                          <span>{podcast.likesCount || 0}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => playPodcast(podcast)}
-                          className="inline-flex items-center gap-1 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-3.5 py-1.5 text-xs font-black transition shadow-sm"
-                        >
-                          {isThisPlaying ? <Pause size={11} /> : <Play size={11} className="mr-0.5 fill-current" />}
-                          <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
-                        </button>
-                      </div>
-                    </div>
-
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleShare(currentActiveAudio, e)}
+                      className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
+                      title="مشاركة البودكاست"
+                    >
+                      <Share2 size={13} />
+                    </button>
                   </div>
-                );
-              })}
+                </div>
+
+              </div>
+
+              {/* 4 Audio Episodes Cards Grid (7 cols) */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {audioPodcasts.map((podcast, idx) => {
+                  const isThisPlaying = isCurrentPlaying(podcast.id);
+                  const isThisActive = currentActiveAudio?.id === podcast.id;
+                  return (
+                    <div
+                      key={podcast.id}
+                      className={`group relative flex flex-col justify-between rounded-3xl border p-4.5 transition duration-300 hover:-translate-y-1 ${
+                        isThisPlaying || isThisActive
+                          ? "border-emerald-400 bg-emerald-500/15 ring-2 ring-emerald-400/40 shadow-[0_16px_40px_rgba(16,185,129,0.2)]"
+                          : "border-white/10 bg-black/40 hover:border-emerald-400/50 hover:bg-black/60 shadow-lg"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3.5 text-right">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedAudioId(podcast.id);
+                            playPodcast(podcast);
+                          }}
+                          className="relative h-16 w-16 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-black grid place-items-center group-hover:scale-105 transition"
+                        >
+                          {podcast.coverUrl ? (
+                            <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <Mic size={24} className="text-emerald-400" />
+                          )}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            {isThisPlaying ? <Pause size={14} className="text-white" /> : <Play size={14} className="text-white fill-current" />}
+                          </div>
+                        </button>
+
+                        <div className="text-right min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-mono font-black text-emerald-400 uppercase">حلقة #{String(idx + 1).padStart(2, "0")}</span>
+                            <span className="text-[9px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
+                          </div>
+
+                          <h4
+                            onClick={() => {
+                              setSelectedAudioId(podcast.id);
+                              playPodcast(podcast);
+                            }}
+                            className="mt-1 text-xs sm:text-sm font-black text-white hover:text-emerald-300 cursor-pointer line-clamp-1 transition"
+                          >
+                            {podcast.title}
+                          </h4>
+
+                          <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">
+                            {podcast.hostName || "فريق الإذاعة المدرسية"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="mt-3 text-[11px] text-slate-300 font-bold line-clamp-2 leading-relaxed bg-white/5 border border-white/5 rounded-xl p-2 text-right">
+                        {podcast.description || "حوار إذاعي تربوي ضمن سلسلة حلقات خلف المايك."}
+                      </p>
+
+                      {/* Action Bar */}
+                      <div className="mt-3.5 flex items-center justify-between border-t border-white/10 pt-2.5">
+                        <span className="text-[10px] font-black text-emerald-400">
+                          {isThisPlaying ? "🔴 بث مباشر" : "مسموع HD"}
+                        </span>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => handleShare(podcast, e)}
+                            className="grid h-7 w-7 place-items-center rounded-lg border border-white/10 hover:bg-white/10 text-slate-400 hover:text-emerald-400 transition"
+                            title="مشاركة"
+                          >
+                            <Share2 size={11} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedAudioId(podcast.id);
+                              playPodcast(podcast);
+                            }}
+                            className={`inline-flex items-center gap-1 rounded-xl px-3 py-1 text-xs font-black transition shadow-sm ${
+                              isThisPlaying
+                                ? "bg-emerald-500 text-slate-950 font-black shadow-emerald-500/25"
+                                : "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950"
+                            }`}
+                          >
+                            {isThisPlaying ? <Pause size={11} /> : <Play size={11} className="mr-0.5 fill-current" />}
+                            <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+
             </div>
           </section>
         )}
