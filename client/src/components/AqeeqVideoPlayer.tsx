@@ -36,9 +36,15 @@ const playSizes = {
 export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string; title: string }) {
   const [loadError, setLoadError] = useState(false);
   const [key, setKey] = useState(0);
-  const isDrive = getAqeeqVideoOpenBehavior(sourceUrl) === "internal-drive";
-  const previewUrl = getAqeeqDrivePreviewUrl(sourceUrl);
-  const fallbackUrl = getAqeeqDriveFallbackUrl(sourceUrl);
+  const isDrive = isAqeeqDriveVideo(sourceUrl);
+  const ytMatch = sourceUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const isYouTube = Boolean(ytMatch && ytMatch[1]);
+  const previewUrl = isDrive
+    ? getAqeeqDrivePreviewUrl(sourceUrl)
+    : isYouTube
+    ? `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1`
+    : sourceUrl;
+  const fallbackUrl = isDrive ? getAqeeqDriveFallbackUrl(sourceUrl) : sourceUrl;
 
   if (loadError) {
     return (
@@ -67,7 +73,7 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-black text-amber-200 transition hover:border-amber-300 hover:bg-amber-300/10"
           >
-            <ExternalLink size={14} /> فتح في Google Drive
+            <ExternalLink size={14} /> فتح في {isDrive ? "Google Drive" : "المصدر"}
           </a>
         </div>
       </div>
@@ -81,13 +87,27 @@ export function AqeeqUnifiedVideoFrame({ sourceUrl, title }: { sourceUrl: string
           key={key}
           src={previewUrl}
           title={title}
-          className="absolute -left-2 -top-11 h-[calc(100%+4.5rem)] w-[calc(100%+1rem)] border-0"
+          className="h-full w-full border-0"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
           onError={() => setLoadError(true)}
         />
-        {/* شريط علوي أنيق يخفي ترويسة Drive خارج النافذة */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-4 bg-[#030507]" />
+      </div>
+    );
+  }
+
+  if (isYouTube) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden bg-[#030507]">
+        <iframe
+          key={key}
+          src={previewUrl}
+          title={title}
+          className="h-full w-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allowFullScreen
+          onError={() => setLoadError(true)}
+        />
       </div>
     );
   }

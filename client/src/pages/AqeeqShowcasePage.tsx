@@ -175,22 +175,7 @@ function MediaPostCard({
           {/* 16:9 Cinema Box Screen */}
           <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
             {isPlayingInline ? (
-              isEmbeddableVideo(post.mediaUrl) ? (
-                <iframe
-                  src={getVideoEmbedUrl(post.mediaUrl)}
-                  title={post.title || post.fileName}
-                  className="h-full w-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
-              ) : (
-                <video
-                  src={post.mediaUrl}
-                  controls
-                  autoPlay
-                  className="h-full w-full object-contain"
-                />
-              )
+              <AqeeqUnifiedVideoFrame sourceUrl={post.mediaUrl} title={post.title || post.fileName} />
             ) : (
               <div
                 onClick={() => setIsPlayingInline(true)}

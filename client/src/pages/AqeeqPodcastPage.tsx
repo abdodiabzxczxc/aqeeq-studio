@@ -68,9 +68,13 @@ function getVideoEmbedUrl(url: string | undefined | null): string {
   }
 
   // Google Drive URLs
-  const driveMatch = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
-  if (driveMatch && driveMatch[1]) {
-    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  const driveId =
+    url.match(/\/file\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    url.match(/[?&]id=([A-Za-z0-9_-]+)/)?.[1] ||
+    url.match(/\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    url.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/)?.[1];
+  if (driveId) {
+    return `https://drive.google.com/file/d/${driveId}/preview`;
   }
 
   return url;
@@ -78,7 +82,14 @@ function getVideoEmbedUrl(url: string | undefined | null): string {
 
 function isEmbeddableVideo(url: string | undefined | null): boolean {
   if (!url) return false;
-  return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("drive.google.com");
+  return (
+    url.includes("youtube.com") ||
+    url.includes("youtu.be") ||
+    url.includes("drive.google.com") ||
+    url.includes("googleusercontent.com") ||
+    url.includes("/file/d/") ||
+    url.includes("id=")
+  );
 }
 
 export default function AqeeqPodcastPage() {

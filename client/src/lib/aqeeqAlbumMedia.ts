@@ -5,27 +5,29 @@ export type AqeeqAlbumImageSource = {
 
 export function getAqeeqDriveFileId(mediaUrl: string): string | null {
   if (!mediaUrl) return null;
-  const match = mediaUrl.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/) ||
+  const match =
+    mediaUrl.match(/\/file\/d\/([A-Za-z0-9_-]+)/) ||
+    mediaUrl.match(/[?&]id=([A-Za-z0-9_-]+)/) ||
+    mediaUrl.match(/\/d\/([A-Za-z0-9_-]+)/) ||
     mediaUrl.match(/drive\.google\.com\/thumbnail\?id=([A-Za-z0-9_-]+)/) ||
-    mediaUrl.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/) ||
-    mediaUrl.match(/[?&]id=([A-Za-z0-9_-]+)/);
+    mediaUrl.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/);
   return match?.[1] || null;
 }
 
 export function isAqeeqDriveVideo(mediaUrl: string): boolean {
   if (!mediaUrl) return false;
   return Boolean(
-    mediaUrl.includes("drive.google.com/file/d/") ||
-    mediaUrl.includes("drive.google.com/thumbnail") ||
+    mediaUrl.includes("drive.google.com") ||
+    mediaUrl.includes("drive.usercontent.google.com") ||
     mediaUrl.includes("lh3.googleusercontent.com/d/") ||
-    (mediaUrl.includes("drive.google.com") && (mediaUrl.includes("preview") || mediaUrl.includes("id="))) ||
-    (mediaUrl.includes("drive.usercontent.google.com") && mediaUrl.includes("id="))
+    mediaUrl.includes("/file/d/") ||
+    mediaUrl.includes("id=")
   );
 }
 
 export function getAqeeqDrivePreviewUrl(mediaUrl: string): string {
   const id = getAqeeqDriveFileId(mediaUrl);
-  return id ? `https://drive.google.com/file/d/${id}/preview?rm=minimal` : mediaUrl;
+  return id ? `https://drive.google.com/file/d/${id}/preview` : mediaUrl;
 }
 
 export function getAqeeqDriveFallbackUrl(mediaUrl: string): string {
