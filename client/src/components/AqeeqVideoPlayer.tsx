@@ -106,39 +106,20 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 2) Google Drive Video (Native HTML5 Streaming for Full Timeline Scrubber & Controls)
-  if (isDrive && !useIframeFallback) {
-    const streamUrl = `/api/drive-video-proxy/${driveId}`;
+  // 2) Google Drive Video
+  if (isDrive) {
     return (
-      <div className={className}>
-        <video
-          key={key}
-          src={streamUrl}
-          title={title}
-          controls
-          autoPlay
-          playsInline
-          preload="metadata"
-          onError={() => setUseIframeFallback(true)}
-          className="h-full w-full bg-black object-contain"
-        />
-      </div>
-    );
-  }
-
-  // 3) Google Drive Fallback iframe
-  if (isDrive && useIframeFallback) {
-    return (
-      <div className={className}>
+      <div className={`${className} relative overflow-hidden bg-black`}>
         <iframe
           key={key}
           src={previewUrl}
           title={title}
-          className="h-full w-full border-0"
+          className="absolute -top-[48px] -left-1 h-[calc(100%+48px)] w-[calc(100%+8px)] border-0"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
           onError={() => setLoadError(true)}
         />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-black" />
       </div>
     );
   }
