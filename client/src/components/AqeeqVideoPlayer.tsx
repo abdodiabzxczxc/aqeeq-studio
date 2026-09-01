@@ -43,15 +43,14 @@ export function AqeeqUnifiedVideoFrame({
   className?: string;
 }) {
   const [loadError, setLoadError] = useState(false);
+  const [useIframeFallback, setUseIframeFallback] = useState(false);
   const [key, setKey] = useState(0);
-  const isDrive = isAqeeqDriveVideo(sourceUrl);
+
+  const driveId = getAqeeqDriveFileId(sourceUrl);
+  const isDrive = Boolean(driveId);
   const ytMatch = sourceUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   const isYouTube = Boolean(ytMatch && ytMatch[1]);
-  const previewUrl = isDrive
-    ? getAqeeqDrivePreviewUrl(sourceUrl)
-    : isYouTube
-    ? `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1`
-    : sourceUrl;
+  const previewUrl = isDrive ? getAqeeqDrivePreviewUrl(sourceUrl) : sourceUrl;
   const fallbackUrl = isDrive ? getAqeeqDriveFallbackUrl(sourceUrl) : sourceUrl;
 
   if (loadError) {
@@ -61,19 +60,20 @@ export function AqeeqUnifiedVideoFrame({
           <Play size={22} className="rotate-180" />
         </div>
         <div>
-          <p className="text-base font-black text-amber-50">تعذر تحميل الفيديو مباشرة</p>
-          <p className="mt-1 text-xs text-slate-400">يمكنك إعادة المحاولة أو فتح الفيديو مباشرة في Google Drive</p>
+          <p className="text-base font-black text-amber-50">تعذر تشغيل الفيديو مباشرة</p>
+          <p className="mt-1 text-xs text-slate-400">يمكنك تشغيل الفيديو عبر التضمين أو فتح الرابط مباشرة</p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => {
               setLoadError(false);
+              setUseIframeFallback(true);
               setKey((prev) => prev + 1);
             }}
             className="inline-flex items-center gap-2 rounded-xl bg-amber-300 px-4 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-200"
           >
-            <RefreshCw size={14} /> إعادة المحاولة
+            <RefreshCw size={14} /> تشغيل عبر التضمين
           </button>
           <a
             href={fallbackUrl}
@@ -88,7 +88,46 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  if (isDrive) {
+  // 1) YouTube Embed
+  if (isYouTube) {
+    const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1`;
+    return (
+      <div className={className}>
+        <iframe
+          key={key}
+          src={ytEmbedUrl}
+          title={title}
+          className="h-full w-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allowFullScreen
+          onError={() => setLoadError(true)}
+        />
+      </div>
+    );
+  }
+
+  // 2) Google Drive Video (Native HTML5 Streaming for Full Timeline Scrubber & Controls)
+  if (isDrive && !useIframeFallback) {
+    const streamUrl = `/api/drive-video-proxy/${driveId}`;
+    return (
+      <div className={className}>
+        <video
+          key={key}
+          src={streamUrl}
+          title={title}
+          controls
+          autoPlay
+          playsInline
+          preload="metadata"
+          onError={() => setUseIframeFallback(true)}
+          className="h-full w-full bg-black object-contain"
+        />
+      </div>
+    );
+  }
+
+  // 3) Google Drive Fallback iframe
+  if (isDrive && useIframeFallback) {
     return (
       <div className={className}>
         <iframe
@@ -104,22 +143,7 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  if (isYouTube) {
-    return (
-      <div className={className}>
-        <iframe
-          key={key}
-          src={previewUrl}
-          title={title}
-          className="h-full w-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-          onError={() => setLoadError(true)}
-        />
-      </div>
-    );
-  }
-
+  // 4) Direct Native Video
   return (
     <div className={className}>
       <video

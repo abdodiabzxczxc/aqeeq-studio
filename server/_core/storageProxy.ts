@@ -182,4 +182,73 @@ export function registerStorageProxy(app: Express) {
       res.status(500).send("Error streaming audio");
     }
   });
+
+  // Zero-Disk-Space High-Speed Google Drive Video Streamer with Range & All-Format Support
+  app.get("/api/drive-video-proxy/:fileId", async (req, res) => {
+    const { fileId } = req.params;
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      return res.status(400).send("Invalid file ID");
+    }
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+
+    try {
+      const googleDownloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
+      const rangeHeader = req.headers.range;
+
+      const fetchHeaders: Record<string, string> = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      };
+      if (rangeHeader) {
+        fetchHeaders.Range = rangeHeader;
+      }
+
+      const driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders });
+
+      if (!driveRes.ok && driveRes.status !== 206) {
+        return res.redirect(`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`);
+      }
+
+      const rawContentType = driveRes.headers.get("content-type") || "video/mp4";
+      const contentLength = driveRes.headers.get("content-length");
+      const contentRange = driveRes.headers.get("content-range");
+      const acceptRanges = driveRes.headers.get("accept-ranges") || "bytes";
+
+      let finalContentType = rawContentType.includes("video") ? rawContentType : "video/mp4";
+
+      res.status(driveRes.status);
+      res.setHeader("Content-Type", finalContentType);
+      res.setHeader("Accept-Ranges", acceptRanges);
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      if (contentLength) res.setHeader("Content-Length", contentLength);
+      if (contentRange) res.setHeader("Content-Range", contentRange);
+
+      if (driveRes.body) {
+        const reader = driveRes.body.getReader();
+        const pump = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                res.end();
+                break;
+              }
+              res.write(value);
+            }
+          } catch {
+            res.end();
+          }
+        };
+        await pump();
+      } else {
+        const buf = Buffer.from(await driveRes.arrayBuffer());
+        res.send(buf);
+      }
+    } catch (err) {
+      console.warn("[DriveVideoProxy] Video streaming error:", err);
+      res.redirect(`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`);
+    }
+  });
 }
