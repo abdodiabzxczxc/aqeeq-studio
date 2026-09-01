@@ -657,10 +657,10 @@ export default function AqeeqPodcastPage() {
                     }`}>
                       ROYAL DISCOGRAPHY · {filteredSongs.length} نشيداً
                     </span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                    <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold ${
                       dark ? "bg-amber-400/10 text-amber-300 border-amber-400/20" : "bg-amber-100/60 text-amber-900 border-amber-200"
                     }`}>
-                      إشراف: قسم التربية الموسيقية 🎼
+                      إشراف وتأليف: قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية 🎼
                     </span>
                   </div>
                   <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
@@ -797,10 +797,10 @@ export default function AqeeqPodcastPage() {
                   </h3>
                   <div className="flex items-center justify-center gap-1.5 flex-wrap">
                     <span className={`text-[11px] font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>
-                      {activeItem?.artistOrHost || "قسم التربية الموسيقية · كورال العقيق"}
+                      قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية
                     </span>
                     <span className="text-[10px] text-slate-400 font-bold">
-                      · {activeItem?.description ? "كلمات معتمدة" : "تأليف وألحان التربية الموسيقية"}
+                      · {activeItem?.description ? "إنتاج رسمي معتمد" : "تأليف وألحان التربية الموسيقية"}
                     </span>
                   </div>
                 </div>
@@ -993,7 +993,9 @@ export default function AqeeqPodcastPage() {
                               {/* Department of Music Authorship */}
                               <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
                                 <span className={dark ? "text-amber-400/90" : "text-amber-700"}>
-                                  {song.artistOrHost || "قسم التربية الموسيقية"}
+                                  {song.artistOrHost && song.artistOrHost !== "مدارس العقيق" && song.artistOrHost !== "مدارس العقيق الأهلية" && song.artistOrHost !== "قسم التربية الموسيقية"
+                                    ? song.artistOrHost
+                                    : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
                                 </span>
                               </p>
                             </div>
@@ -1003,7 +1005,7 @@ export default function AqeeqPodcastPage() {
                           <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
                             dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
                           }`}>
-                            {song.description || "من إبداعات وألحان قسم التربية الموسيقية لمدارس العقيق."}
+                            {song.description || "من إبداعات وتأليف قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية."}
                           </p>
 
                           {/* Action Bar */}
@@ -1110,7 +1112,9 @@ export default function AqeeqPodcastPage() {
                                 {song.title}
                               </h4>
                               <p className="text-[10px] text-slate-500 font-bold truncate">
-                                {song.artistOrHost || "قسم التربية الموسيقية · مدارس العقيق"}
+                                {song.artistOrHost && song.artistOrHost !== "مدارس العقيق" && song.artistOrHost !== "مدارس العقيق الأهلية" && song.artistOrHost !== "قسم التربية الموسيقية"
+                                  ? song.artistOrHost
+                                  : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
                               </p>
                             </div>
                           </div>
@@ -2193,7 +2197,9 @@ export default function AqeeqPodcastPage() {
               </span>
               <h3 className={`text-xl font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>{selectedLyricsSong.title}</h3>
               <p className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
-                {selectedLyricsSong.artistOrHost || "قسم التربية الموسيقية · مدارس العقيق"}
+                {selectedLyricsSong.artistOrHost && selectedLyricsSong.artistOrHost !== "مدارس العقيق" && selectedLyricsSong.artistOrHost !== "مدارس العقيق الأهلية" && selectedLyricsSong.artistOrHost !== "قسم التربية الموسيقية"
+                  ? selectedLyricsSong.artistOrHost
+                  : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
               </p>
               <div className={`max-h-72 overflow-y-auto rounded-2xl border p-5 text-sm font-bold leading-8 whitespace-pre-line text-center ${
                 dark ? "bg-black/60 border-white/10 text-slate-200" : "bg-slate-50 border-slate-200 text-slate-800"
