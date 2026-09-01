@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { getAqeeqDriveFallbackUrl, getAqeeqDriveFileId, getAqeeqDrivePreviewUrl, getAqeeqDriveThumbnailUrl, isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { ExternalLink, Play, RefreshCw, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
 export type AqeeqVideoOpenBehavior = "internal-drive" | "internal-native";
 
@@ -30,21 +30,24 @@ const playSizes = {
 
 /**
  * مشغل الفيديو الداخلي الموحد لاستوديو العقيق.
- * يغلّف معاينة Google Drive الرسمية بدون ظهور واجهات Drive المشوشة خارج الحدود،
- * أو يشغّل الفيديو المباشر عبر مشغل HTML5، مع توفير واجهة خطأ عربية وزر إعادة محاولة وزر فتح خارجي احتياطي.
+ * يربط تشغيل أي فيديو (يوتيوب أو جوجل درايف أو ملفات مباشرة) مباشرة مع مشغل الأسطوانة الدوارة (Floating CD Player)
+ * ويدعم التحكم عن بعد (تشغيل/إيقاف، تقديم/تأخير، التحكم في الصوت).
  */
 export function AqeeqUnifiedVideoFrame({
   sourceUrl,
   title,
+  posterUrl,
   className = "relative h-full w-full overflow-hidden bg-black",
 }: {
   sourceUrl: string;
   title: string;
+  posterUrl?: string | null;
   className?: string;
 }) {
   const [loadError, setLoadError] = useState(false);
-  const [useIframeFallback, setUseIframeFallback] = useState(false);
   const [key, setKey] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const driveId = getAqeeqDriveFileId(sourceUrl);
   const isDrive = Boolean(driveId);
@@ -52,6 +55,91 @@ export function AqeeqUnifiedVideoFrame({
   const isYouTube = Boolean(ytMatch && ytMatch[1]);
   const previewUrl = isDrive ? getAqeeqDrivePreviewUrl(sourceUrl) : sourceUrl;
   const fallbackUrl = isDrive ? getAqeeqDriveFallbackUrl(sourceUrl) : sourceUrl;
+
+  const resolvedPoster = posterUrl || (isDrive ? getAqeeqDriveThumbnailUrl(sourceUrl) : null);
+
+  // 1. مزامنة فورية مع مشغل الأسطوانة العائم في أسفل الموقع
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("aqeeq-video-start", {
+          detail: {
+            id: sourceUrl,
+            title: title || "تغطية مرئية",
+            coverUrl: resolvedPoster,
+            hostName: isYouTube ? "يوتيوب العقيق" : isDrive ? "جوجل درايف" : "استوديو العقيق",
+            mediaUrl: sourceUrl,
+            sourceType: isYouTube ? "youtube" : isDrive ? "drive" : "direct",
+          },
+        })
+      );
+    }
+
+    // مؤقت مزامنة للإطارات المضمنة (يوتيوب ودرايف) لتحديث شريط التمرير ودوران الأسطوانة
+    let interval: any = null;
+    if (isYouTube || isDrive) {
+      let currentProgress = 0;
+      interval = setInterval(() => {
+        currentProgress += 1;
+        window.dispatchEvent(
+          new CustomEvent("aqeeq-video-progress", {
+            detail: { currentTime: currentProgress, duration: 600 },
+          })
+        );
+      }, 1000);
+    }
+
+    // استقبال أوامر التحكم من الأسطوانة العائمة بالأسفل (تشغيل/إيقاف، تقديم/تأخير، صوت)
+    const handleRemoteToggle = (e: any) => {
+      const willPlay = e.detail?.play;
+      if (videoRef.current) {
+        if (willPlay) videoRef.current.play().catch(() => {});
+        else videoRef.current.pause();
+      }
+      if (iframeRef.current && isYouTube) {
+        try {
+          iframeRef.current.contentWindow?.postMessage(
+            JSON.stringify({ event: "command", func: willPlay ? "playVideo" : "pauseVideo" }),
+            "*"
+          );
+        } catch {}
+      }
+    };
+
+    const handleRemoteSeek = (e: any) => {
+      const time = e.detail?.time;
+      if (typeof time === "number" && videoRef.current) {
+        videoRef.current.currentTime = time;
+      }
+      if (typeof time === "number" && iframeRef.current && isYouTube) {
+        try {
+          iframeRef.current.contentWindow?.postMessage(
+            JSON.stringify({ event: "command", func: "seekTo", args: [time, true] }),
+            "*"
+          );
+        } catch {}
+      }
+    };
+
+    const handleRemoteVolume = (e: any) => {
+      const { volume, muted } = e.detail || {};
+      if (videoRef.current) {
+        if (typeof volume === "number") videoRef.current.volume = volume;
+        if (typeof muted === "boolean") videoRef.current.muted = muted;
+      }
+    };
+
+    window.addEventListener("aqeeq-video-toggle", handleRemoteToggle as EventListener);
+    window.addEventListener("aqeeq-video-seek", handleRemoteSeek as EventListener);
+    window.addEventListener("aqeeq-video-volume", handleRemoteVolume as EventListener);
+
+    return () => {
+      if (interval) clearInterval(interval);
+      window.removeEventListener("aqeeq-video-toggle", handleRemoteToggle as EventListener);
+      window.removeEventListener("aqeeq-video-seek", handleRemoteSeek as EventListener);
+      window.removeEventListener("aqeeq-video-volume", handleRemoteVolume as EventListener);
+    };
+  }, [sourceUrl, title, isYouTube, isDrive, resolvedPoster]);
 
   if (loadError) {
     return (
@@ -61,19 +149,18 @@ export function AqeeqUnifiedVideoFrame({
         </div>
         <div>
           <p className="text-base font-black text-amber-50">تعذر تشغيل الفيديو مباشرة</p>
-          <p className="mt-1 text-xs text-slate-400">يمكنك تشغيل الفيديو عبر التضمين أو فتح الرابط مباشرة</p>
+          <p className="mt-1 text-xs text-slate-400">يمكنك فتح الرابط مباشرة في Google Drive</p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => {
               setLoadError(false);
-              setUseIframeFallback(true);
               setKey((prev) => prev + 1);
             }}
             className="inline-flex items-center gap-2 rounded-xl bg-amber-300 px-4 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-200"
           >
-            <RefreshCw size={14} /> تشغيل عبر التضمين
+            <RefreshCw size={14} /> إعادة المحاولة
           </button>
           <a
             href={fallbackUrl}
@@ -94,6 +181,7 @@ export function AqeeqUnifiedVideoFrame({
     return (
       <div className={className}>
         <iframe
+          ref={iframeRef}
           key={key}
           src={ytEmbedUrl}
           title={title}
@@ -111,6 +199,7 @@ export function AqeeqUnifiedVideoFrame({
     return (
       <div className={`${className} relative overflow-hidden bg-black`}>
         <iframe
+          ref={iframeRef}
           key={key}
           src={previewUrl}
           title={title}
@@ -124,10 +213,11 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 4) Direct Native Video
+  // 3) Direct Native Video
   return (
     <div className={className}>
       <video
+        ref={videoRef}
         key={key}
         src={sourceUrl}
         title={title}
@@ -135,6 +225,35 @@ export function AqeeqUnifiedVideoFrame({
         autoPlay
         playsInline
         preload="metadata"
+        onPlay={() => {
+          window.dispatchEvent(
+            new CustomEvent("aqeeq-video-start", {
+              detail: {
+                id: sourceUrl,
+                title: title || "تغطية مرئية",
+                coverUrl: resolvedPoster,
+                hostName: "استوديو العقيق",
+                mediaUrl: sourceUrl,
+              },
+            })
+          );
+        }}
+        onPause={() => {
+          window.dispatchEvent(new CustomEvent("aqeeq-video-pause"));
+        }}
+        onTimeUpdate={(e) => {
+          window.dispatchEvent(
+            new CustomEvent("aqeeq-video-progress", {
+              detail: {
+                currentTime: e.currentTarget.currentTime,
+                duration: e.currentTarget.duration || 0,
+              },
+            })
+          );
+        }}
+        onEnded={() => {
+          window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
+        }}
         onError={() => setLoadError(true)}
         className="h-full w-full bg-black object-contain"
       />
