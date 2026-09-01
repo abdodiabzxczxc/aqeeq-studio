@@ -58,69 +58,77 @@ export function AqeeqNewsMarquee({
       tag="section"
       label="شريط الأخبار المتحرك"
       as="div"
-      className={`w-full overflow-hidden border-y py-2 sm:py-2.5 relative flex items-center select-none ${
-        dark ? "bg-[#0a0a0a] border-white/[0.08]" : "bg-slate-50 border-black/[0.06]"
-      }`}
+      className="w-full py-3 sm:py-4 select-none"
     >
-      {/* 1. Fixed Non-Overlapping Badge on the Right */}
-      <div
-        className={`shrink-0 z-20 flex items-center gap-2 px-4 sm:px-6 py-1 font-black text-xs sm:text-sm border-l ${
-          dark
-            ? "bg-[#0a0a0a] text-[#f8ca14] border-white/[0.08] shadow-[12px_0_20px_rgba(0,0,0,0.7)]"
-            : "bg-slate-50 text-[#08467d] border-black/[0.06] shadow-[12px_0_20px_rgba(0,0,0,0.04)]"
-        }`}
-      >
-        <Sparkles size={14} className="animate-pulse text-[#f8ca14]" />
-        <VisualEditable
-          id="studio-marquee-badge-text"
-          tag="text"
-          label="شارة شريط الأخبار"
-          defaultText={badgeOverride || "آخر الأخبار"}
-          as="span"
-          className="whitespace-nowrap tracking-wide"
-        />
-      </div>
-
-      {/* 2. Scrolling Viewport with Soft Fade Gradients */}
-      <div className="relative flex-1 overflow-hidden">
-        {/* Soft edge gradient masks */}
+      <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
         <div
-          className={`absolute right-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-l ${
-            dark ? "from-[#0a0a0a] to-transparent" : "from-slate-50 to-transparent"
+          className={`relative flex items-center overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 h-11 sm:h-13 ${
+            dark
+              ? "border-amber-400/25 bg-[#0a0d14]/90 shadow-[0_8px_30px_rgba(0,0,0,0.5)] ring-1 ring-white/5"
+              : "border-slate-200/90 bg-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ring-1 ring-black/5"
           }`}
-        />
-        <div
-          className={`absolute left-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-r ${
-            dark ? "from-[#0a0a0a] to-transparent" : "from-slate-50 to-transparent"
-          }`}
-        />
+        >
+          {/* 1. Fixed Luxury Badge on the Right */}
+          <div
+            className={`shrink-0 z-20 flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1 font-black text-xs sm:text-sm border-l h-full ${
+              dark
+                ? "bg-[#0f1422] text-[#f8ca14] border-amber-400/20 shadow-[10px_0_20px_rgba(0,0,0,0.6)]"
+                : "bg-amber-50 text-[#08467d] border-slate-200 shadow-[10px_0_20px_rgba(0,0,0,0.03)]"
+            }`}
+          >
+            <Sparkles size={15} className="animate-pulse text-[#f8ca14] shrink-0" />
+            <VisualEditable
+              id="studio-marquee-badge-text"
+              tag="text"
+              label="شارة شريط الأخبار"
+              defaultText={badgeOverride || "آخر الأخبار"}
+              as="span"
+              className="whitespace-nowrap tracking-wide font-black"
+            />
+          </div>
 
-        {/* 3. Pure CSS RTL Seamless Marquee Track */}
-        <div className="animate-marquee-rtl flex items-center">
-          {marqueeTrack.map((item, idx) => (
-            <div key={`${item.id}-${idx}`} className="flex items-center shrink-0">
-              <button
-                type="button"
-                onClick={() => navigate(item.url)}
-                className={`flex items-center gap-2 px-3 py-1 rounded-full shrink-0 whitespace-nowrap text-xs sm:text-sm font-bold transition-colors ${
-                  dark
-                    ? "text-slate-300 hover:text-white hover:bg-white/[0.06]"
-                    : "text-slate-700 hover:text-[#08467d] hover:bg-black/[0.04]"
-                }`}
-              >
-                <span className="shrink-0">{iconMap[item.icon]}</span>
-                <span className="shrink-0">{item.title}</span>
-              </button>
+          {/* 2. Scrolling Viewport with Soft Fade Gradients */}
+          <div className="relative flex-1 overflow-hidden h-full flex items-center">
+            {/* Soft edge gradient masks */}
+            <div
+              className={`absolute right-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-l ${
+                dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
+              }`}
+            />
+            <div
+              className={`absolute left-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-r ${
+                dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
+              }`}
+            />
 
-              <span
-                className={`mx-3 sm:mx-5 text-[11px] shrink-0 ${
-                  dark ? "text-[#f8ca14]/40" : "text-[#08467d]/30"
-                }`}
-              >
-                ✦
-              </span>
+            {/* 3. Pure CSS RTL Seamless Marquee Track */}
+            <div className="animate-marquee-rtl flex items-center active:[animation-play-state:paused]">
+              {marqueeTrack.map((item, idx) => (
+                <div key={`${item.id}-${idx}`} className="flex items-center shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => navigate(item.url)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
+                      dark
+                        ? "text-slate-200 hover:text-amber-300 hover:bg-white/[0.08]"
+                        : "text-slate-800 hover:text-[#08467d] hover:bg-black/[0.05]"
+                    }`}
+                  >
+                    <span className="shrink-0">{iconMap[item.icon]}</span>
+                    <span className="shrink-0 leading-none">{item.title}</span>
+                  </button>
+
+                  <span
+                    className={`mx-3 sm:mx-5 text-[10px] shrink-0 ${
+                      dark ? "text-amber-400/40" : "text-[#08467d]/35"
+                    }`}
+                  >
+                    ✦
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </VisualEditable>

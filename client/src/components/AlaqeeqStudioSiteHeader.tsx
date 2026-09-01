@@ -86,7 +86,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       <header className={`aq-studio-share-header sticky top-0 z-40 border-b backdrop-blur-xl transition duration-200 ${
         dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
       }`}>
-        <div className="relative mx-auto h-[66px] sm:h-[80px] max-w-[1360px] px-3.5 sm:px-6 md:px-8">
+        <div className="relative mx-auto h-[66px] sm:h-[80px] max-w-[1380px] px-3.5 sm:px-6 md:px-8">
           {/* Logo with responsive max-width to prevent any collision */}
           <button
             onClick={() => go("/")}

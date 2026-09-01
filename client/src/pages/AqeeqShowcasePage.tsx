@@ -626,7 +626,7 @@ function UnifiedShowcaseHero({
       dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
     }`}>
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
-      <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:px-8 md:py-16 lg:gap-16">
+      <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
         <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
           {previousPost ? (
             <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
@@ -791,7 +791,7 @@ export default function AqeeqShowcasePage() {
         onOpenStudio={() => navigate("/offers/manage")}
         dark={dark}
       />
-      <section id="aqeeq-showcase-feed" className="mx-auto max-w-[1360px] px-5 py-12 md:px-8 md:py-16">
+      <section id="aqeeq-showcase-feed" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
         <div className={`mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
           <div>
             <p className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>THE AQEEQ FEED</p>

@@ -419,7 +419,7 @@ export default function AqeeqPodcastPage() {
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
 
-        <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:px-8 md:py-16 lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
           {/* 3D Tilted Dual-Cover */}
           <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
             {secondPodcast ? (
@@ -636,7 +636,7 @@ export default function AqeeqPodcastPage() {
       </section>
 
       {/* ==================== 🌟 2. MAIN IMPERIAL PAVILIONS (أروقة أثير العقيق الملكية) ==================== */}
-      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-8 space-y-14">
+      <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-10 space-y-14">
         
         {/* Universal Filter & Search Deck */}
         <div

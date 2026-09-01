@@ -40,7 +40,7 @@ export function AqeeqHomeBentoGrid({
       tag="section"
       label="قسم جديد الاستوديو (Bento Grid)"
       as="div"
-      className="w-full max-w-[1340px] mx-auto px-5 md:px-8 py-14 md:py-20"
+      className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8 py-12 md:py-16"
     >
       {/* Unified Section Header */}
       <div className="mb-8 sm:mb-10 text-right">

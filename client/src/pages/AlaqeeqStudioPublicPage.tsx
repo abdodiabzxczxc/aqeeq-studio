@@ -553,7 +553,7 @@ export default function AlaqeeqStudioPublicPage() {
         )}
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
-        <div className="relative mx-auto grid max-w-[1360px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
             <VisualEditable
               id="studio-hero-kicker"

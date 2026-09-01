@@ -162,7 +162,7 @@ export function AqeeqHomeTabsLibrary({
       as="section"
       className={`w-full py-14 md:py-20 ${dark ? "bg-[#050505]" : "bg-white"}`}
     >
-      <div className="max-w-[1340px] mx-auto px-5 md:px-8">
+      <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* Unified Section Header */}
         <div className="mb-8 sm:mb-10 text-right">
