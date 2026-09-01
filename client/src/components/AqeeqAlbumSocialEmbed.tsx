@@ -1,276 +1,243 @@
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ExternalLink, Instagram, Loader2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUpLeft, ExternalLink, Instagram, Loader2, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPoster";
 
 type Source = "x" | "instagram" | "youtube";
 type XWidgetsWindow = Window & { twttr?: { widgets?: { load: (element?: HTMLElement) => Promise<unknown> | void } } };
 
-function getYouTubeEmbedUrl(url: string) {
-  try {
-    const parsed = new URL(url);
-    const id =
-      parsed.searchParams.get("v") ||
-      parsed.pathname.match(/^\/(?:shorts|embed|live)\/([A-Za-z0-9_-]+)/)?.[1] ||
-      (parsed.hostname === "youtu.be" ? parsed.pathname.split("/").filter(Boolean)[0] : "");
-    return id ? "https://www.youtube-nocookie.com/embed/" + id + "?rel=0&playsinline=1" : null;
-  } catch {
-    return null;
-  }
-}
+// ─── X Embed ─────────────────────────────────────────────────────────────────
 
-export function XEmbed({
-  url,
-  title,
-  dark = false,
-}: {
-  url: string;
-  title?: string;
-  dark?: boolean;
-}) {
+export function XEmbed({ url, title, dark = false }: { url: string; title?: string; dark?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data, isLoading } = trpc.aqeeqShowcases.xEmbed.useQuery(
-    { xPostUrl: url },
-    { enabled: Boolean(url), retry: 1, refetchOnWindowFocus: false, staleTime: 1000 * 60 * 60 * 12 }
-  );
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [widgetMounted, setWidgetMounted] = useState(false);
 
-  const [widgetRendered, setWidgetRendered] = useState(false);
-
-  // Extract handle from URL e.g. @alaqeeq_school
-  const handleMatch = url.match(/x\.com\/([^/]+)/i) || url.match(/twitter\.com\/([^/]+)/i);
+  const handleMatch = url.match(/(?:x|twitter)\.com\/([^/]+)/i);
   const handle = handleMatch ? "@" + handleMatch[1] : "@alaqeeq_school";
 
-  const themeAdjustedHtml = useMemo(() => {
-    if (!data?.html) return null;
-    return dark
-      ? data.html.replace(/data-theme="light"/g, "data-theme=\"dark\"")
-      : data.html.replace(/data-theme="dark"/g, "data-theme=\"light\"");
-  }, [data?.html, dark]);
+  const { data, isLoading, isError } = trpc.aqeeqShowcases.xEmbed.useQuery(
+    { xPostUrl: url },
+    { enabled: Boolean(url) && visible, retry: 1, refetchOnWindowFocus: false, staleTime: 1000 * 60 * 60 * 12 }
+  );
 
+  // Only start fetching when element enters viewport
   useEffect(() => {
-    if (!themeAdjustedHtml || !containerRef.current) return;
+    if (!rootRef.current) return;
+    const obs = new IntersectionObserver(
+      (entries) => { if (entries[0]?.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin: "400px" }
+    );
+    obs.observe(rootRef.current);
+    return () => obs.disconnect();
+  }, []);
 
-    let timeoutId1: ReturnType<typeof setTimeout>;
-    let timeoutId2: ReturnType<typeof setTimeout>;
+  // Inject HTML + call widget.load() once (no flaky setTimeouts)
+  useEffect(() => {
+    if (!data?.html || !containerRef.current) return;
+    const themed = dark
+      ? data.html.replace(/data-theme="light"/g, 'data-theme="dark"')
+      : data.html.replace(/data-theme="dark"/g, 'data-theme="light"');
+    containerRef.current.innerHTML = themed;
 
-    const render = () => {
-      if (containerRef.current && (window as XWidgetsWindow).twttr?.widgets) {
-        try {
-          const res = (window as XWidgetsWindow).twttr?.widgets?.load(containerRef.current);
-          if (res && typeof (res as Promise<unknown>).then === "function") {
-            (res as Promise<unknown>)
-              .then(() => setWidgetRendered(true))
-              .catch(() => setWidgetRendered(false));
-          } else {
-            setWidgetRendered(true);
-          }
-        } catch {
-          setWidgetRendered(false);
+    const mountWidget = () => {
+      const twttr = (window as XWidgetsWindow).twttr;
+      if (!twttr?.widgets || !containerRef.current) return;
+      try {
+        const res = twttr.widgets.load(containerRef.current);
+        if (res && typeof (res as Promise<unknown>).then === "function") {
+          (res as Promise<unknown>).then(() => setWidgetMounted(true)).catch(() => {});
+        } else {
+          setWidgetMounted(true);
         }
-      }
+      } catch {}
     };
 
-    const scheduleRenders = () => {
-      render();
-      requestAnimationFrame(render);
-      timeoutId1 = setTimeout(render, 80);
-      timeoutId2 = setTimeout(render, 300);
-    };
-
-    const existing = document.getElementById("aqeeq-x-widget") as HTMLScriptElement | null;
+    const existing = document.getElementById("aqeeq-x-widget");
     if (existing) {
-      if ((window as XWidgetsWindow).twttr?.widgets) {
-        scheduleRenders();
-      } else {
-        existing.addEventListener("load", scheduleRenders, { once: true });
-      }
-      return () => {
-        clearTimeout(timeoutId1);
-        clearTimeout(timeoutId2);
-      };
+      (window as XWidgetsWindow).twttr?.widgets
+        ? mountWidget()
+        : existing.addEventListener("load", mountWidget, { once: true });
+      return;
     }
-
     const script = document.createElement("script");
     script.id = "aqeeq-x-widget";
     script.async = true;
+    script.defer = true;
     script.src = "https://platform.x.com/widgets.js";
-    script.onload = scheduleRenders;
+    script.onload = () => requestAnimationFrame(mountWidget);
     document.body.appendChild(script);
-
-    return () => {
-      clearTimeout(timeoutId1);
-      clearTimeout(timeoutId2);
-    };
-  }, [themeAdjustedHtml, url]);
+  }, [data?.html, dark]);
 
   return (
-    <div
-      className={"relative min-h-[200px] w-full overflow-hidden transition-all duration-300 " + (
-        dark ? "bg-[#090909] text-white" : "bg-[#f8f9fa] text-black"
-      )}
-    >
-      {/* 1. Official Twitter Widget if active */}
-      {themeAdjustedHtml ? (
+    <div ref={rootRef} className={"relative w-full overflow-hidden rounded-2xl " + (dark ? "bg-[#090909]" : "bg-[#f8f9fa]")}>
+      {/* Official widget container */}
+      {data?.html && (
         <div
           ref={containerRef}
-          className={"w-full px-3 py-2 flex justify-center [&_.twitter-tweet]:!my-0 [&_.twitter-tweet]:!max-w-full " + (
-            widgetRendered ? "block" : "hidden"
-          )}
-          dangerouslySetInnerHTML={{ __html: themeAdjustedHtml }}
+          className={"w-full px-2 py-2 flex justify-center [&_.twitter-tweet]:!my-0 [&_.twitter-tweet]:!max-w-full " + (widgetMounted ? "block" : "hidden")}
         />
-      ) : null}
+      )}
 
-      {/* 2. Sleek Dual-Theme Native X Card (Displayed gracefully while loading or if iframe unrendered) */}
-      {!widgetRendered ? (
-        <div className="flex flex-col justify-between p-6 sm:p-7 min-h-[200px]">
-          <div>
-            {/* Header: X Icon Badge + Author Handle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className={"grid h-11 w-11 place-items-center rounded-2xl border shadow-sm " + (
-                    dark
-                      ? "border-white/15 bg-black text-white"
-                      : "border-black/10 bg-white text-black shadow-md"
-                  )}
-                >
-                  <span className="text-xl font-black">𝕏</span>
-                </div>
-                <div>
-                  <p className={"text-sm font-black " + (dark ? "text-white" : "text-black")}>
-                    {data?.authorName || handle}
-                  </p>
-                  <span className={"text-[11px] font-bold " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                    منشور رسمي على منصة 𝕏
-                  </span>
-                </div>
+      {/* Fallback card while loading or if widget fails */}
+      {!widgetMounted && (
+        <div className="flex flex-col gap-4 p-5 sm:p-6 min-h-[160px]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={"grid h-10 w-10 shrink-0 place-items-center rounded-2xl border " + (dark ? "border-white/15 bg-black text-white" : "border-black/10 bg-white text-black shadow-md")}>
+                <span className="text-lg font-black">𝕏</span>
               </div>
-
-              <span
-                className={"rounded-full border px-2.5 py-1 text-[9px] font-black " + (
-                  dark
-                    ? "border-white/10 bg-white/5 text-slate-400"
-                    : "border-black/10 bg-slate-100 text-slate-600"
-                )}
-              >
-                𝕏 POST
-              </span>
+              <div>
+                <p className={"text-sm font-black " + (dark ? "text-white" : "text-black")}>{data?.authorName || handle}</p>
+                <span className={"text-[11px] font-bold " + (dark ? "text-slate-400" : "text-slate-500")}>منشور على منصة 𝕏</span>
+              </div>
             </div>
-
-            {/* Post Title / Content */}
-            <div className="mt-4">
-              <p
-                className={"text-base font-black leading-relaxed " + (
-                  dark ? "text-slate-100" : "text-slate-900"
-                )}
-              >
-                {title || (isLoading ? "جاري تحميل المنشور من 𝕏…" : "عرض تفاصيل المنشور")}
-              </p>
-            </div>
+            <span className={"rounded-full border px-2.5 py-1 text-[9px] font-black " + (dark ? "border-white/10 bg-white/5 text-slate-400" : "border-black/10 bg-slate-100 text-slate-500")}>𝕏 POST</span>
           </div>
 
-          {/* Action CTA */}
-          <div className={"mt-5 pt-3 border-t flex items-center justify-between " + (
-            dark ? "border-white/[0.08]" : "border-black/[0.08]"
-          )}>
-            <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className={"inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition active:scale-95 " + (
-                dark
-                  ? "bg-white/10 text-white hover:bg-[#f8ca14] hover:text-black"
-                  : "bg-black/5 text-black hover:bg-[#08467d] hover:text-white"
-              )}
-            >
-              <span>فتح المنشور في تطبيق 𝕏</span>
-              <ArrowUpLeft size={14} />
-            </a>
+          <p className={"text-sm font-bold leading-relaxed line-clamp-3 " + (dark ? "text-slate-200" : "text-slate-800")}>
+            {isLoading ? "جاري تحميل المنشور…" : isError ? (title || "تعذّر تحميل المنشور من 𝕏") : (title || "منشور من 𝕏")}
+          </p>
 
-            {isLoading ? (
+          <div className={"mt-auto flex items-center justify-between border-t pt-3 " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
+            <a href={url} target="_blank" rel="noreferrer noopener"
+              className={"inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition active:scale-95 " + (dark ? "bg-white/10 text-white hover:bg-[#f8ca14] hover:text-black" : "bg-black/5 text-black hover:bg-[#08467d] hover:text-white")}>
+              <span>فتح في تطبيق 𝕏</span>
+              <ArrowUpLeft size={13} />
+            </a>
+            {isLoading && (
               <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                <Loader2 size={12} className="animate-spin text-[#f8ca14]" />
+                <Loader2 size={11} className="animate-spin text-[#f8ca14]" />
                 مزامنة...
               </span>
-            ) : null}
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
 
+// ─── Instagram Embed ─────────────────────────────────────────────────────────
+/**
+ * Instagram iframes are blocked by Safari ITP, Firefox, and Brave.
+ * Strategy:
+ *   1. Show a beautiful preview card immediately
+ *   2. User can tap "عرض المنشور" to load the iframe on demand
+ *   3. 8-second timeout — if iframe doesn't load, show "open in app" fallback
+ */
 export function FastInstagramEmbed({ url, title }: { url: string; title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  const embedUrl = url.replace(/\/?$/, "/") + "embed/captioned/";
+  const [timedOut, setTimedOut] = useState(false);
 
+  const codeMatch = url.match(/\/(p|reel|tv)\/([A-Za-z0-9_-]+)/i);
+  const isReel = codeMatch?.[1]?.toLowerCase() === "reel";
+  const embedUrl = url.replace(/\/?$/, "/") + "embed/";
+
+  // Intersection observer — lazy init
   useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "300px" }
+    if (!rootRef.current) return;
+    const obs = new IntersectionObserver(
+      (entries) => { if (entries[0]?.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin: "500px" }
     );
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    obs.observe(rootRef.current);
+    return () => obs.disconnect();
   }, []);
 
+  // 8s timeout if iframe doesn't fire onLoad
+  useEffect(() => {
+    if (!expanded || iframeLoaded || timedOut) return;
+    const t = setTimeout(() => setTimedOut(true), 8000);
+    return () => clearTimeout(t);
+  }, [expanded, iframeLoaded, timedOut]);
+
   return (
-    <div ref={containerRef} className="relative min-h-[480px] w-full overflow-hidden bg-slate-900">
-      {!iframeLoaded ? (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-[#181818] to-[#0c0c0c] text-white">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] p-0.5 shadow-xl">
+    <div ref={rootRef} className="relative w-full overflow-hidden rounded-2xl bg-[#0e0e0e]">
+
+      {/* Always show the preview card until iframe is confirmed loaded */}
+      {!iframeLoaded && (
+        <div className="flex flex-col items-center justify-center gap-4 px-6 py-8 text-center min-h-[200px]">
+          {/* Instagram gradient icon */}
+          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-0.5 shadow-xl">
             <div className="grid h-full w-full place-items-center rounded-[0.85rem] bg-black">
-              <Instagram size={26} className="text-white" />
+              <Instagram size={24} className="text-white" />
             </div>
           </div>
-          <p className="mt-4 text-xs font-black text-white">{title || "منشور Instagram"}</p>
-          <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400 font-bold">
-            <Loader2 size={13} className="animate-spin text-[#f8ca14]" />
-            جاري تحضير المعاينة السريعة…
-          </div>
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-5 inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-[11px] font-black text-slate-200 transition hover:bg-white/10"
-          >
-            فتح في تطبيق Instagram <ExternalLink size={13} />
-          </a>
-        </div>
-      ) : null}
 
-      {isVisible ? (
+          <div className="space-y-1">
+            <p className="text-sm font-black text-white leading-snug">
+              {isReel ? "🎬 " : "📸 "}{title || "منشور Instagram"}
+            </p>
+            <p className="text-[11px] text-slate-400 font-bold">
+              {isReel ? "Instagram Reel" : "Instagram Post"}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-2 mt-1">
+            {/* Always-available: open in app */}
+            <a href={url} target="_blank" rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-black text-slate-200 transition hover:bg-white/10 hover:border-white/30">
+              <ExternalLink size={13} />
+              فتح في Instagram
+            </a>
+
+            {/* Load embed button — only shown after intersection + not yet expanded */}
+            {visible && !expanded && !timedOut && (
+              <button onClick={() => setExpanded(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-tr from-[#ee2a7b] to-[#6228d7] px-4 py-2.5 text-xs font-black text-white shadow-lg transition hover:opacity-90 active:scale-95">
+                <Play size={13} className="fill-current" />
+                عرض المنشور هنا
+              </button>
+            )}
+
+            {/* Loading indicator */}
+            {expanded && !iframeLoaded && !timedOut && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                <Loader2 size={12} className="animate-spin text-[#ee2a7b]" />
+                جاري التحميل…
+              </span>
+            )}
+
+            {/* Timeout fallback message */}
+            {timedOut && (
+              <span className="text-[11px] font-bold text-slate-400 max-w-[180px] text-center leading-relaxed">
+                المتصفح قد يمنع المعاينة — افتح الرابط مباشرةً
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Actual iframe — mounted only after user clicks, hidden until loaded */}
+      {expanded && !timedOut && (
         <iframe
           src={embedUrl}
           title={title}
           onLoad={() => setIframeLoaded(true)}
-          className="h-[540px] w-full border-0 bg-white"
+          onError={() => setTimedOut(true)}
+          className={"w-full border-0 " + (iframeLoaded ? "block" : "hidden")}
+          style={{ height: iframeLoaded ? (isReel ? "600px" : "480px") : "0" }}
           loading="lazy"
-          allow="encrypted-media; picture-in-picture"
+          allow="encrypted-media; picture-in-picture; autoplay"
           referrerPolicy="strict-origin-when-cross-origin"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
         />
-      ) : null}
+      )}
     </div>
   );
 }
 
+// ─── Unified Social Embed ─────────────────────────────────────────────────────
+
 export default function AqeeqAlbumSocialEmbed({
-  source,
-  url,
-  title,
-  dark = false,
+  source, url, title, dark = false,
 }: {
-  source: Source;
-  url: string;
-  title: string;
-  dark?: boolean;
+  source: Source; url: string; title: string; dark?: boolean;
 }) {
   if (source === "x") return <XEmbed url={url} title={title} dark={dark} />;
   if (source === "instagram") return <FastInstagramEmbed url={url} title={title} />;
