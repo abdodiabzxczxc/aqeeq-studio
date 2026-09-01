@@ -279,7 +279,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           {/* Luxury Slide-Down Mobile Menu Drawer */}
           {mobileMenuOpen && (
-            <div className={`absolute inset-x-3.5 sm:inset-x-5 top-[70px] overflow-hidden rounded-2xl border p-3.5 shadow-2xl backdrop-blur-2xl md:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            <div className={`absolute inset-x-3.5 sm:inset-x-5 top-[70px] max-h-[calc(100vh-85px)] overflow-y-auto scrollbar-none rounded-2xl border p-3.5 shadow-2xl backdrop-blur-2xl md:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
               dark
                 ? "border-[#f8ca14]/30 bg-black/95 shadow-[0_24px_55px_rgba(0,0,0,0.9)] text-white"
                 : "border-black/[0.08] bg-white/98 shadow-[0_24px_55px_rgba(0,0,0,0.15)] text-black"

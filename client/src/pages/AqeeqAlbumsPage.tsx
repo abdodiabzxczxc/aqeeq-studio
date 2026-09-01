@@ -178,9 +178,13 @@ export default function AqeeqAlbumsPage() {
                   
                   {/* Aqeeq Wrapped Button (For everyone) */}
                   <button onClick={() => setIsWrappedOpen(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:scale-105 ${
-                    dark ? "border-purple-500/50 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 text-purple-300 hover:border-purple-400" : "border-purple-300 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-900 hover:border-purple-400"
+                    dark
+                      ? "border-amber-400/50 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-transparent text-amber-300 hover:border-amber-400 hover:shadow-[0_0_25px_rgba(248,202,20,0.3)] ring-1 ring-amber-400/20"
+                      : "border-amber-500/40 bg-gradient-to-r from-amber-100 via-amber-50 to-white text-amber-950 hover:border-amber-500 shadow-md"
                   }`}>
-                    <Sparkles size={16} className="animate-pulse" />حصاد العقيق الذكي 🎬
+                    <Sparkles size={16} className="animate-pulse text-amber-400" />
+                    <span>حصاد العقيق الذكي 🎬</span>
+                    <span className="rounded-md bg-amber-400 px-1.5 py-0.5 text-[9px] font-black text-slate-950">AI VIDEO</span>
                   </button>
                   
                   {isAdmin ? (

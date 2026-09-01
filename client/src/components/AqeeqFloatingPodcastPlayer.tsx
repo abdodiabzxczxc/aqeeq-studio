@@ -1457,7 +1457,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         <div
           ref={playlistSheetRef}
           dir="rtl"
-          className={`fixed bottom-20 sm:bottom-24 right-4 sm:right-6 w-[350px] sm:w-[410px] max-h-[540px] flex flex-col rounded-3xl backdrop-blur-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-none ${
+          className={`fixed bottom-20 sm:bottom-24 right-3 sm:right-6 w-[calc(100vw-1.5rem)] sm:w-[410px] max-h-[75vh] sm:max-h-[540px] flex flex-col rounded-3xl backdrop-blur-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-none ${
             isDark
               ? "bg-[#090b11]/98 border border-amber-400/40 shadow-[0_24px_70px_rgba(0,0,0,0.9)] ring-1 ring-amber-400/20 text-white"
               : "bg-white/98 border border-slate-200/90 shadow-[0_24px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30 text-slate-900"
