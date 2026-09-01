@@ -218,25 +218,6 @@ export function AlaqeeqSpotlightSearch({
             </button>
           ) : null}
 
-          {/* Embedded AI Face Search Lens Button inside Search Bar */}
-          <button
-            type="button"
-            onClick={() => {
-              onOpenChange(false);
-              setFaceSearchOpen(true);
-            }}
-            className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 shadow-sm ${
-              dark
-                ? "border-amber-400/40 bg-amber-400/15 text-amber-300 hover:bg-amber-400 hover:text-black ring-1 ring-amber-400/20"
-                : "border-amber-500/30 bg-amber-100 text-amber-950 hover:bg-amber-400 hover:text-black"
-            }`}
-            title="البحث عن صوري بالذكاء الاصطناعي (AI Face Recognition)"
-            aria-label="البحث عن صوري بالذكاء الاصطناعي"
-          >
-            <ScanFace size={16} className={dark ? "text-amber-400" : "text-amber-700"} />
-            <span className="hidden sm:inline">البحث بالوجه 🤳</span>
-          </button>
-
           <button
             onClick={() => onOpenChange(false)}
             className={"rounded-xl border px-2.5 py-1 text-[11px] font-black transition " + (
@@ -249,7 +230,7 @@ export function AlaqeeqSpotlightSearch({
           </button>
         </div>
 
-        {/* Categories Bar */}
+        {/* Categories Bar with Single Prominent AI Face Search Pill */}
         <div className={"flex items-center gap-2 border-b px-5 py-2.5 overflow-x-auto scrollbar-none " + (
           dark ? "border-white/[0.06] bg-white/[0.02]" : "border-black/[0.04] bg-slate-50"
         )}>
@@ -284,15 +265,20 @@ export function AlaqeeqSpotlightSearch({
               </button>
             );
           })}
+
           <button
             type="button"
             onClick={() => {
               onOpenChange(false);
               setFaceSearchOpen(true);
             }}
-            className="mr-auto inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/15 px-3 py-1.5 text-xs font-black text-amber-300 hover:bg-amber-400 hover:text-black transition shadow-sm"
+            className={`mr-auto inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 shadow-sm ${
+              dark
+                ? "border-amber-400/40 bg-amber-400/15 text-amber-300 hover:bg-amber-400 hover:text-black"
+                : "border-amber-500/40 bg-amber-100 text-amber-950 hover:bg-amber-400 hover:text-black"
+            }`}
           >
-            <ScanFace size={14} className="text-amber-400" />
+            <ScanFace size={14} className={dark ? "text-amber-400" : "text-amber-700"} />
             <span>البحث بالوجه 🤳</span>
           </button>
         </div>
@@ -309,7 +295,7 @@ export function AlaqeeqSpotlightSearch({
               className={`cursor-pointer rounded-2xl border p-3.5 mb-2.5 transition flex items-center justify-between gap-3 ${
                 dark
                   ? "border-amber-400/30 bg-gradient-to-r from-amber-400/[0.12] via-amber-400/[0.04] to-transparent hover:border-amber-400/60"
-                  : "border-amber-500/30 bg-amber-50/80 hover:bg-amber-100/80 shadow-sm"
+                  : "border-amber-400/40 bg-gradient-to-r from-amber-100/70 via-amber-50/40 to-transparent hover:border-amber-500 shadow-sm"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -317,10 +303,10 @@ export function AlaqeeqSpotlightSearch({
                   <ScanFace size={20} />
                 </div>
                 <div>
-                  <span className="text-xs font-black text-amber-300">
+                  <span className={`text-xs font-black ${dark ? "text-amber-300" : "text-amber-950"}`}>
                     هل تبحث عن صورك أو صور ابنك في الحفلات؟ 🤳
                   </span>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className={`text-[11px] mt-0.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>
                     استخدم تقنية التعرف البيومتري على ملامح الوجه للبحث الفوري في كافة ألبومات المدارس
                   </p>
                 </div>

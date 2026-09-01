@@ -414,8 +414,8 @@ function MediaPostCard({
       {/* Lightbox / Group Modal */}
       <Dialog open={groupOpen} onOpenChange={setGroupOpen}>
         <DialogContent
-          className={`max-h-[94svh] max-w-5xl overflow-y-auto p-0 text-right ${
-            dark ? "border-amber-500/30 bg-black text-white" : "border-black/10 bg-white text-black"
+          className={`w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-5xl max-h-[94svh] overflow-y-auto p-0 text-right rounded-[1.6rem] sm:rounded-[2rem] border shadow-[0_32px_100px_rgba(0,0,0,0.9)] backdrop-blur-2xl ${
+            dark ? "border-amber-500/30 bg-[#070a10] text-white" : "border-black/10 bg-white text-black"
           }`}
         >
           <DialogTitle className="sr-only">{post.title || "مجموعة وسائط"}</DialogTitle>

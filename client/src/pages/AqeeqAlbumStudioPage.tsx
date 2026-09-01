@@ -801,8 +801,8 @@ export default function AqeeqAlbumStudioPage() {
 
       {/* Create Album Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent dir="rtl" className={"border p-6 max-w-xl " + (
-          dark ? "border-[#f8ca14]/30 bg-[#080808] text-white" : "border-black/10 bg-white text-black"
+        <DialogContent dir="rtl" className={"border p-6 max-w-xl rounded-[2rem] shadow-2xl backdrop-blur-xl " + (
+          dark ? "border-[#f8ca14]/30 bg-[#080808]/95 text-white" : "border-black/10 bg-white/95 text-black"
         )}>
           <DialogHeader>
             <DialogTitle className={"text-right font-black " + (dark ? "text-white" : "text-black")}>
