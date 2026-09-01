@@ -38,29 +38,14 @@ function InstagramPostEmbed({ post }: { post: ShowcasePost }) {
 }
 function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
   const postUrl = post.externalUrl || post.mediaUrl;
-  let videoId = "";
-  try {
-    videoId = new URL(postUrl).searchParams.get("v") || "";
-  } catch {
-    /* fallback below */
-  }
-  if (!videoId) {
-    return (
-      <a href={postUrl} target="_blank" rel="noreferrer" className="grid aspect-video place-items-center bg-black p-6 text-center text-sm font-black text-amber-100">
-        تعذر تجهيز الفيديو — افتح الرابط الأصلي من YouTube
-      </a>
-    );
-  }
   return (
-    <iframe
-      src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1`}
-      title={post.title || post.fileName}
-      className="aspect-video w-full border-0 bg-black"
-      loading="lazy"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowFullScreen
-      referrerPolicy="strict-origin-when-cross-origin"
-    />
+    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+      <AqeeqUnifiedVideoFrame
+        sourceUrl={postUrl}
+        title={post.title || post.fileName}
+        posterUrl={getAqeeqShowcaseDisplaySource(post)}
+      />
+    </div>
   );
 }
 

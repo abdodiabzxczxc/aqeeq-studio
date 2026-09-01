@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, ExternalLink, Instagram, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPoster";
 
 type Source = "x" | "instagram" | "youtube";
 type XWidgetsWindow = Window & { twttr?: { widgets?: { load: (element?: HTMLElement) => Promise<unknown> | void } } };
@@ -273,25 +274,12 @@ export default function AqeeqAlbumSocialEmbed({
 }) {
   if (source === "x") return <XEmbed url={url} title={title} dark={dark} />;
   if (source === "instagram") return <FastInstagramEmbed url={url} title={title} />;
-  const embedUrl = getYouTubeEmbedUrl(url);
-  return embedUrl ? (
-    <iframe
-      src={embedUrl}
-      title={title}
-      className="aspect-video w-full border-0 bg-black"
-      loading="lazy"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowFullScreen
-      referrerPolicy="strict-origin-when-cross-origin"
-    />
-  ) : (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      className="grid aspect-video place-items-center bg-black p-6 text-center text-sm font-black text-white hover:text-[#f8ca14]"
-    >
-      افتح الفيديو الأصلي من YouTube
-    </a>
-  );
+  if (source === "youtube") {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+        <AqeeqUnifiedVideoFrame sourceUrl={url} title={title} />
+      </div>
+    );
+  }
+  return null;
 }
