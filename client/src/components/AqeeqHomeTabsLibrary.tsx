@@ -110,7 +110,7 @@ export function AqeeqHomeTabsLibrary({
             title: al.title,
             coverUrl: directDriveImage(al.coverUrl),
             badge: "ألبوم صور",
-            dateOrMeta: al.eventDate || (al.publishedAt ? new Date(al.publishedAt).toLocaleDateString("ar-SA") : "أرشيف مصور"),
+            dateOrMeta: (al as any).eventDate || (al.publishedAt ? new Date(al.publishedAt).toLocaleDateString("ar-SA") : "أرشيف مصور"),
             href: `/albums/${al.slug}`,
           }))
         };

@@ -684,19 +684,19 @@ export default function AlaqeeqStudioPublicPage() {
       {/* ========================================================================= */}
       {/* 3. NEW MEDIA DASHBOARD */}
       {/* ========================================================================= */}
-      {orchestration?.sections?.marqueeEnabled !== false && (
-        <AqeeqNewsMarquee badgeOverride={orchestration?.sections?.marqueeBadge} />
+      {(orchestration?.sections as any)?.marqueeEnabled !== false && (
+        <AqeeqNewsMarquee badgeOverride={(orchestration?.sections as any)?.marqueeBadge} />
       )}
-      {orchestration?.sections?.studioHighlightsEnabled !== false && (
+      {(orchestration?.sections as any)?.studioHighlightsEnabled !== false && (
         <AqeeqHomeBentoGrid
-          titleOverride={orchestration?.sections?.studioHighlightsTitle}
-          descOverride={orchestration?.sections?.studioHighlightsDesc}
+          titleOverride={(orchestration?.sections as any)?.studioHighlightsTitle}
+          descOverride={(orchestration?.sections as any)?.studioHighlightsDesc}
         />
       )}
-      {orchestration?.sections?.libraryEnabled !== false && (
+      {(orchestration?.sections as any)?.libraryEnabled !== false && (
         <AqeeqHomeTabsLibrary
-          titleOverride={orchestration?.sections?.libraryTitle}
-          descOverride={orchestration?.sections?.libraryDesc}
+          titleOverride={(orchestration?.sections as any)?.libraryTitle}
+          descOverride={(orchestration?.sections as any)?.libraryDesc}
         />
       )}
 

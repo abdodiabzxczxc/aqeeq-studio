@@ -13,7 +13,7 @@ export function AqeeqGlobalRadio() {
   // Fetch all podcasts/audio tracks
   const { data: podcasts } = trpc.podcasts.list.useQuery(undefined, { refetchOnWindowFocus: false });
   
-  const audioTracks = (podcasts || []).filter(p => p.mediaType === "audio" && p.status === "published");
+  const audioTracks = (podcasts || []).filter(p => p.mediaType === "audio");
   
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);

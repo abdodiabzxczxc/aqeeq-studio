@@ -223,8 +223,8 @@ export default function AqeeqPodcastPage() {
     }
   };
 
-  const isCurrentPlaying = (id: string) => {
-    return isPlaying && (activeItem?.id === id || activePodcast?.id === id);
+  const isCurrentPlaying = (id: string | number) => {
+    return isPlaying && (String(activeItem?.id) === String(id) || String(activePodcast?.id) === String(id));
   };
 
   return (

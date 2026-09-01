@@ -741,10 +741,10 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         />
       ) : null}
 
-      {isTvMode && (
+      {isTvMode && album && (
         <AqeeqAlbumTvMode 
           albumTitle={album.title}
-          images={media.filter(m => m.mediaType === "image").map(m => ({
+          images={(album.media || []).filter((m: any) => m.mediaType === "image").map((m: any) => ({
             id: m.id,
             url: getAqeeqAlbumImageSource(m),
             caption: m.caption

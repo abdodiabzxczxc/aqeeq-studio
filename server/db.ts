@@ -563,6 +563,8 @@ export type SiteOrchestrationConfig = {
     journalLabel: string;
     albumsLabel: string;
     showcaseLabel: string;
+    articlesLabel?: string | null;
+    podcastLabel?: string | null;
     logoUrl?: string | null;
   };
   heroCovers: {

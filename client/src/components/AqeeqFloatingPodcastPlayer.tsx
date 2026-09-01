@@ -37,6 +37,9 @@ export type UniversalAudioItem = {
   title: string;
   artistOrHost?: string;
   category?: string;
+  description?: string;
+  lyrics?: string;
+  audioUrl?: string;
   mediaType: "audio" | "video";
   sourceType?: "drive" | "youtube" | "direct";
   mediaUrl: string;
