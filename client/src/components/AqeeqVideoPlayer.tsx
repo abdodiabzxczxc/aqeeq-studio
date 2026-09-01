@@ -23,15 +23,15 @@ export type AqeeqVideoPlayerProps = {
 };
 
 const playSizes = {
-  compact: "h-11 w-11 [&_svg]:h-4 [&_svg]:w-4",
-  regular: "h-14 w-14 [&_svg]:h-5 [&_svg]:w-5",
+  compact: "h-10 w-10 [&_svg]:h-4 [&_svg]:w-4",
+  regular: "h-14 w-14 [&_svg]:h-6 [&_svg]:w-6",
   large: "h-16 w-16 [&_svg]:h-7 [&_svg]:w-7",
 };
 
 /**
- * مشغل الفيديو الداخلي الموحد لاستوديو العقيق.
- * يربط تشغيل أي فيديو (يوتيوب أو جوجل درايف أو ملفات مباشرة) مباشرة مع مشغل الأسطوانة الدوارة (Floating CD Player)
- * ويدعم التحكم عن بعد (تشغيل/إيقاف، تقديم/تأخير، التحكم في الصوت).
+ * مشغل الفيديو الموحد لاستوديو العقيق.
+ * يدعم تشغيل فيديوهات Drive و YouTube والفيديوهات المباشرة
+ * مع المزامنة مع مشغل الصوت/الأسطوانة العائمة.
  */
 export function AqeeqUnifiedVideoFrame({
   sourceUrl,
@@ -62,7 +62,7 @@ export function AqeeqUnifiedVideoFrame({
 
   const resolvedPoster = posterUrl || ytThumbnail || (isDrive ? getAqeeqDriveThumbnailUrl(sourceUrl) : null);
 
-  // 1. مزامنة فورية مع مشغل الأسطوانة العائم في أسفل الموقع
+  // ─── مزامنة مع المشغل العائم ──────────────────────────────────────────────
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.dispatchEvent(
@@ -79,7 +79,6 @@ export function AqeeqUnifiedVideoFrame({
       );
     }
 
-    // مؤقت مزامنة للإطارات المضمنة لتحديث شريط التمرير ودوران الأسطوانة
     let interval: any = null;
     if ((isYouTube || isDrive) && !isIframePaused) {
       let currentProgress = 0;
@@ -93,7 +92,6 @@ export function AqeeqUnifiedVideoFrame({
       }, 1000);
     }
 
-    // استقبال أوامر التحكم من الأسطوانة العائمة بالأسفل (تشغيل/إيقاف، تقديم/تأخير، صوت)
     const handleRemoteToggle = (e: any) => {
       const willPlay = e.detail?.play;
       if (typeof willPlay === "boolean") {
@@ -185,7 +183,7 @@ export function AqeeqUnifiedVideoFrame({
   // 1) YouTube Embed
   if (isYouTube) {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+    const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1&playsinline=1&origin=${encodeURIComponent(origin)}`;
     return (
       <div className={className}>
         <iframe
@@ -211,7 +209,7 @@ export function AqeeqUnifiedVideoFrame({
           key={key}
           src={previewUrl}
           title={title}
-          className="h-full w-full border-0 rounded-2xl"
+          className="h-full w-full border-0"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
         />
@@ -276,7 +274,6 @@ function VideoPosterCardBody({
   badge,
   footer,
 }: Pick<AqeeqVideoPlayerProps, "posterUrl" | "sourceUrl" | "title" | "playSize" | "imageClassName" | "badge" | "footer">) {
-  // استخدام مصغرة Drive الفعلية إن لم تكن متوفرة
   const directPoster = posterUrl || (isAqeeqDriveVideo(sourceUrl) ? getAqeeqDriveThumbnailUrl(sourceUrl) : null);
 
   return (
@@ -291,19 +288,19 @@ function VideoPosterCardBody({
       ) : (
         <div className="h-full w-full bg-[radial-gradient(circle_at_50%_25%,#344155,transparent_35%),linear-gradient(135deg,#111827,#020617)]" />
       )}
-      <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/30" />
-      
+      <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/30" />
+
       {/* زر تشغيل موحد وأنيق */}
       <span className="absolute inset-0 grid place-items-center">
         <span
-          className={`grid place-items-center rounded-full border border-amber-300/50 bg-black/60 text-amber-300 shadow-[0_12px_30px_rgba(0,0,0,0.6)] backdrop-blur-md transition duration-300 group-hover:scale-110 group-hover:bg-amber-300 group-hover:text-slate-950 ${playSizes[playSize]}`}
+          className={`grid place-items-center rounded-full border border-amber-300/60 bg-black/65 text-amber-300 shadow-[0_12px_30px_rgba(0,0,0,0.7)] backdrop-blur-md transition duration-300 group-hover:scale-110 group-hover:bg-amber-300 group-hover:text-slate-950 group-active:scale-95 ${playSizes[playSize]}`}
         >
           <Play fill="currentColor" className="translate-x-[-1px]" />
         </span>
       </span>
 
       {/* شارة العنوان أو الوسم */}
-      <span className="absolute bottom-3 right-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-black/70 px-3 py-1.5 text-[10px] font-black text-amber-100 shadow-lg backdrop-blur-md">
+      <span className="absolute bottom-3 right-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-black/75 px-3 py-1.5 text-[10px] font-black text-amber-100 shadow-lg backdrop-blur-md border border-white/10">
         {badge ? <span className="ml-1.5 text-amber-300">{badge} ·</span> : null}
         {title}
       </span>
@@ -315,6 +312,7 @@ function VideoPosterCardBody({
 /**
  * مكوّن مشغل الفيديو الموحد لاستوديو العقيق (AqeeqVideoPlayer).
  * يستخدم في جميع أقسام الموقع: الألبومات، المجلة، الأخبار والعروض، واستوديوهات الإدارة.
+ * عند الضغط عليه يفتح نافذة مشغل سينمائي (Tube Modal) نظيفة بدون تشويه على الموبايل والكمبيوتر.
  */
 export function AqeeqVideoPlayer({
   sourceUrl,
@@ -367,15 +365,18 @@ export function AqeeqVideoPlayer({
         {cardBody}
       </button>
 
+      {/* Tube Modal Player — سينما عقيق المنبثقة */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-[calc(100vw-1.5rem)] max-w-5xl overflow-hidden rounded-[1.8rem] border border-amber-300/30 bg-[#070a10] p-0 text-right text-white shadow-[0_32px_100px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-5xl overflow-hidden rounded-[1.6rem] sm:rounded-[2rem] border border-amber-300/30 bg-[#070a10] p-0 text-right text-white shadow-[0_32px_100px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
           <DialogTitle className="sr-only">{title}</DialogTitle>
           <div dir="rtl">
-            <AqeeqUnifiedVideoFrame sourceUrl={sourceUrl} title={title} />
-            <div className="flex items-center justify-between gap-4 border-t border-white/[.08] bg-[#0c101a] px-4 py-3.5 sm:px-6">
+            <div className="relative aspect-video w-full overflow-hidden bg-black">
+              <AqeeqUnifiedVideoFrame sourceUrl={sourceUrl} title={title} posterUrl={posterUrl} />
+            </div>
+            <div className="flex items-center justify-between gap-4 border-t border-white/[.08] bg-[#0c101a] px-4 py-3 sm:px-6 sm:py-4">
               <div className="min-w-0">
                 <p className="truncate text-sm font-black text-amber-50 md:text-base">{title}</p>
-                <p className="mt-0.5 text-[10px] font-bold text-amber-300/70">مشغل استوديو العقيق الموحد</p>
+                <p className="mt-0.5 text-[10px] font-bold text-amber-300/70">مشغل استوديو العقيق السينمائي</p>
               </div>
               <div className="flex items-center gap-2">
                 {isAqeeqDriveVideo(sourceUrl) ? (
@@ -392,7 +393,7 @@ export function AqeeqVideoPlayer({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.16] text-slate-200 transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.16] text-slate-200 transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950 active:scale-95"
                   aria-label="إغلاق"
                 >
                   <X size={17} />

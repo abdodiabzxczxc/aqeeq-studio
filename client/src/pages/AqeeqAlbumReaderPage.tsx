@@ -37,10 +37,11 @@ function AlbumMedia({ item }: { item: AlbumItem }) {
   }
   if (item.mediaType === "video") {
     return (
-      <AqeeqUnifiedVideoFrame
+      <AqeeqVideoPoster
         sourceUrl={item.mediaUrl}
         posterUrl={getAqeeqAlbumImageSource(item)}
         title={item.caption || item.fileName}
+        className="h-full w-full"
       />
     );
   }
@@ -533,10 +534,11 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             {active?.mediaType === "video" ? (
               <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] p-4 sm:p-6 shadow-[0_16px_45px_rgba(99,102,241,0.25)]">
                 <div className="relative w-full h-[320px] sm:h-[480px] rounded-2xl overflow-hidden bg-black border border-indigo-500/30">
-                  <AqeeqUnifiedVideoFrame
+                  <AqeeqVideoPoster
                     sourceUrl={active.mediaUrl}
                     posterUrl={getAqeeqAlbumImageSource(active)}
                     title={active.caption || active.fileName}
+                    className="h-full w-full"
                   />
                 </div>
                 <div className="mt-4 flex items-center justify-between">

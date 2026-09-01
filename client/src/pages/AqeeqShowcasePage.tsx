@@ -6,11 +6,12 @@ import { VisualBackground, VisualEditable, VisualIcon, VisualImage } from "@/com
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
+import { getAqeeqDriveFallbackUrl, isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ChevronLeft, ChevronRight, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Video } from "lucide-react";
+import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -204,38 +205,25 @@ function MediaPostCard({
             </span>
           </div>
 
-          {/* 16:9 Cinema Box Screen with Dynamic Height for Full Controls */}
+          {/* 16:9 Cinema Box Screen */}
           <div
-            className={`relative w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-500 ${
-              isPlayingInline ? "h-[290px] sm:h-[330px]" : "aspect-video"
-            }`}
+            onClick={openPost}
+            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)]"
           >
-            {isPlayingInline ? (
-              <AqeeqUnifiedVideoFrame
-                sourceUrl={post.mediaUrl}
-                title={post.title || post.fileName}
-                posterUrl={getAqeeqShowcaseDisplaySource(post)}
-              />
-            ) : (
-              <div
-                onClick={() => setIsPlayingInline(true)}
-                className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
-              >
-                <img
-                  src={getAqeeqShowcaseDisplaySource(post)}
-                  alt=""
-                  className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
+            <img
+              src={getAqeeqShowcaseDisplaySource(post)}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
 
-                {/* Centered Glowing Play Button */}
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(6,182,212,0.9)]">
-                    <Play size={22} className="mr-0.5 fill-current" />
-                  </div>
-                </div>
+            {/* Centered Glowing Play Button */}
+            <div className="absolute inset-0 grid place-items-center">
+              <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(6,182,212,0.9)] group-active:scale-95">
+                <Play size={22} className="mr-0.5 fill-current" />
               </div>
-            )}
+            </div>
           </div>
 
           {/* Title & Description */}
@@ -849,22 +837,41 @@ export default function AqeeqShowcasePage() {
         )}
       </section>
       <Dialog open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelected(null); }}>
-        <DialogContent className={`max-h-[94svh] max-w-5xl overflow-y-auto p-0 text-right ${
-          dark ? "border-[#f8ca14]/30 bg-black text-white" : "border-black/10 bg-white text-black"
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-5xl max-h-[94svh] overflow-y-auto p-0 text-right rounded-[1.6rem] sm:rounded-[2rem] border shadow-[0_32px_100px_rgba(0,0,0,0.9)] backdrop-blur-2xl ${
+          dark ? "border-amber-300/30 bg-[#070a10] text-white" : "border-black/10 bg-white text-black"
         }`}>
           <DialogTitle className="sr-only">{selected?.title || selected?.fileName || "عرض الوسيط"}</DialogTitle>
           {selected ? (
             <div dir="rtl">
-              <div className="relative bg-black">
-                {selected.mediaType === "video" ? <ShowcaseMedia post={selected} className="aspect-video object-contain" playing /> : <ShowcaseMedia post={selected} className="max-h-[74svh] object-contain" />}
+              <div className="relative bg-black aspect-video w-full overflow-hidden">
+                {selected.mediaType === "video" ? (
+                  <AqeeqUnifiedVideoFrame sourceUrl={selected.mediaUrl} title={selected.title || selected.fileName} posterUrl={getAqeeqShowcaseDisplaySource(selected)} />
+                ) : (
+                  <ShowcaseMedia post={selected} className="max-h-[74svh] object-contain" />
+                )}
               </div>
-              <div className="p-5 sm:p-7">
+              <div className={`p-4 sm:p-6 border-t ${dark ? "bg-[#0c101a] border-white/[.08]" : "bg-slate-50 border-black/[.06]"}`}>
                 <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className={`text-xl font-black ${dark ? "text-white" : "text-black"}`}>{selected.title || selected.fileName.replace(/\.[^.]+$/, "")}</h3>
-                    {selected.description ? <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
+                  <div className="min-w-0">
+                    <h3 className={`text-base sm:text-xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{selected.title || selected.fileName.replace(/\.[^.]+$/, "")}</h3>
+                    {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
                   </div>
-                  <button onClick={() => setSelected(null)} className={`rounded-xl border p-2 ${dark ? "border-white/[0.15] text-slate-300" : "border-black/[0.12] text-slate-700"}`} aria-label="إغلاق"><X size={18} /></button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {selected.mediaType === "video" && isAqeeqDriveVideo(selected.mediaUrl) ? (
+                      <a
+                        href={getAqeeqDriveFallbackUrl(selected.mediaUrl)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                          dark ? "border-white/10 text-slate-300 hover:border-amber-300 hover:text-amber-200" : "border-black/10 text-slate-700 hover:border-[#08467d] hover:text-[#08467d]"
+                        }`}
+                      >
+                        <ExternalLink size={13} />
+                        Drive
+                      </a>
+                    ) : null}
+                    <button onClick={() => setSelected(null)} className={`grid h-9 w-9 place-items-center rounded-xl border transition active:scale-95 ${dark ? "border-white/[0.15] text-slate-300 hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" : "border-black/[0.12] text-slate-700 hover:bg-slate-200"}`} aria-label="إغلاق"><X size={17} /></button>
+                  </div>
                 </div>
               </div>
             </div>
