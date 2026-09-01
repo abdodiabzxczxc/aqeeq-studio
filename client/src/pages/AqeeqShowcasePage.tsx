@@ -105,7 +105,7 @@ function getVideoEmbedUrl(url: string | undefined | null): string {
   }
   const driveMatch = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
   if (driveMatch && driveMatch[1]) {
-    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview?rm=minimal`;
   }
   return url;
 }

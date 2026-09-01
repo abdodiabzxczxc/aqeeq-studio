@@ -65,14 +65,14 @@ function IssueCard({
         {/* Magazine Cover Preview Container */}
         <button
           onClick={onOpen}
-          className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+          className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
             dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${issue.title}`}
         >
-          {/* Background tilted page */}
+          {/* Background tilted page — hidden on mobile */}
           <div
-            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 ${
+            className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block ${
               dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
@@ -88,12 +88,12 @@ function IssueCard({
             ) : null}
           </div>
 
-          {/* Front cover */}
+          {/* Front cover — full on mobile, partial on desktop */}
           <div
-            className={`absolute bottom-[6%] right-[10%] top-[6%] w-[60%] overflow-hidden rounded-[1rem] border p-1.5 shadow-xl ${
+            className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[60%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
               dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
-            style={{ transform: "rotate(2deg)" }}
+            style={{ transform: "rotate(0deg)" }}
           >
             {issue.coverUrl ? (
               <VisualImage

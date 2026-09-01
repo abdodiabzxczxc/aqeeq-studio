@@ -67,7 +67,7 @@ function Router() {
       <Route path="/admin" component={AqeeqAdminDashboardPage} />
       <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
       <Route path="/articles" component={AqeeqArticlesPage} />
-      <Route path="/articles/:slug" component={AqeeqArticlesPage} />
+      <Route path="/articles/:slug" component={({ params }: { params: { slug: string } }) => <AqeeqArticlesPage params={params} />} />
       <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
       <Route path="/atheer" component={AqeeqPodcastPage} />
       <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />

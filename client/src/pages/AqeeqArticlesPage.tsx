@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -214,7 +214,7 @@ function ArticleCard({
   );
 }
 
-export default function AqeeqArticlesPage() {
+export default function AqeeqArticlesPage({ params }: { params?: { slug?: string } } = {}) {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
   const { user, isAuthenticated } = useAuth();
@@ -232,6 +232,15 @@ export default function AqeeqArticlesPage() {
     category: selectedCategory,
     search: searchQuery,
   });
+
+  useEffect(() => {
+    if (params?.slug && rawArticles.length > 0) {
+      const match = rawArticles.find((a) => a.slug === params.slug);
+      if (match) {
+        setReadingArticle(match);
+      }
+    }
+  }, [params?.slug, rawArticles]);
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     refetchOnMount: true,
@@ -277,18 +286,19 @@ export default function AqeeqArticlesPage() {
 
   const handleShare = (art: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const url = window.location.origin + `/articles#${art.slug}`;
+    const url = window.location.origin + `/articles/${art.slug}`;
     const text = `مقال رائع بمدارس العقيق: «${art.title}» بقلم: ${art.authorName}\n${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const handleCopyLink = (art: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const url = window.location.origin + `/articles#${art.slug}`;
-    navigator.clipboard.writeText(url);
-    setCopiedId(art.id);
-    toast.success("تم نسخ رابط المقال بنجاح!");
-    setTimeout(() => setCopiedId(null), 2500);
+    const url = window.location.origin + `/articles/${art.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(art.id);
+      toast.success("تم نسخ رابط المقال بنجاح 📋");
+      setTimeout(() => setCopiedId(null), 2000);
+    });
   };
 
   return (
