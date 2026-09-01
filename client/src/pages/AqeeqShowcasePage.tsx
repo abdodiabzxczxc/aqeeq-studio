@@ -172,8 +172,12 @@ function MediaPostCard({
             </span>
           </div>
 
-          {/* 16:9 Cinema Box Screen */}
-          <div className="relative aspect-[16/10] sm:aspect-video min-h-[220px] sm:min-h-[240px] w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+          {/* 16:9 Cinema Box Screen with Dynamic Height for Full Controls */}
+          <div
+            className={`relative w-full rounded-2xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-500 ${
+              isPlayingInline ? "h-[290px] sm:h-[330px]" : "aspect-video"
+            }`}
+          >
             {isPlayingInline ? (
               <AqeeqUnifiedVideoFrame
                 sourceUrl={post.mediaUrl}
