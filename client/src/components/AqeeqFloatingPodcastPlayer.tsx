@@ -659,7 +659,34 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   }, [activeItem?.id, activeItem?.mediaUrl]);
 
-  // When audio finishes (Podcast vs Song behavior)
+  // ✅ Sync isPlaying state → actual audio element play/pause
+  // This is the fix for "pause then play again doesn't work":
+  // When playSong is called on the same paused song, activeItem doesn't change (same id/url),
+  // so the source effect above doesn't run. This effect catches isPlaying changes and acts directly.
+  useEffect(() => {
+    if (!audioRef.current || !activeItem || activeItem.mediaType !== "audio") return;
+    const audio = audioRef.current;
+    if (isPlaying) {
+      // Only call play() if audio is actually paused (avoid double-play errors)
+      if (audio.paused && audio.readyState >= 2) {
+        audio.play().catch(() => setIsPlaying(false));
+      } else if (audio.paused && audio.readyState < 2) {
+        // Not ready yet — wait for canplay
+        const onCanPlay = () => {
+          audio.play().catch(() => setIsPlaying(false));
+          audio.removeEventListener("canplay", onCanPlay);
+        };
+        audio.addEventListener("canplay", onCanPlay);
+        return () => audio.removeEventListener("canplay", onCanPlay);
+      }
+    } else {
+      if (!audio.paused) {
+        audio.pause();
+      }
+    }
+  }, [isPlaying]);
+
+
   const handleEnded = () => {
     if (activeItem?.type === "podcast") {
       setIsPlaying(false);
