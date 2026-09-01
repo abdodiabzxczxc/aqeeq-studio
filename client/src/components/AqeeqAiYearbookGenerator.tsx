@@ -135,37 +135,18 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
   };
 
-  // Helper to create pixel-perfect connected Arabic text overlays using SVG ForeignObject
-  const createArabicSvgImage = (htmlContent: string, width: number, height: number): Promise<HTMLImageElement> => {
-    return new Promise((resolve) => {
-      const svgString = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-          <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml" dir="rtl" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Tajawal','Cairo','Segoe UI',Tahoma,sans-serif;text-align:center;color:white;">
-              ${htmlContent}
-            </div>
-          </foreignObject>
-        </svg>
-      `;
-      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(svgBlob);
-      const img = new Image();
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        resolve(img);
-      };
-      img.onerror = () => resolve(img);
-      img.src = url;
-    });
-  };
-
-  // Export full cinematic sequence as MP4 video with real-time speed, cross-fade and connected Arabic text
+  // Export full cinematic sequence as real MP4/WebM video file with non-zero bytes and smooth playback
   const handleExportVideo = async () => {
     if (isExportingVideo) return;
     setIsExportingVideo(true);
     setExportProgress(5);
 
     try {
+      // Ensure web fonts are completely ready before drawing
+      if (typeof document !== "undefined" && (document as any).fonts) {
+        await (document as any).fonts.ready;
+      }
+
       const isPortrait = orientation === "portrait";
       const width = isPortrait ? 720 : 1280;
       const height = isPortrait ? 1280 : 720;
@@ -180,32 +161,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         return;
       }
 
-      // 1. Pre-render Arabic text scenes as SVG images for 100% connected Arabic ligatures
-      const [scene1TextImg, scene2TextImg, scene4TextImg] = await Promise.all([
-        createArabicSvgImage(
-          `<h2 style="font-size:${isPortrait ? "38px" : "56px"};font-weight:900;color:#ffffff;margin:0;letter-spacing:1px;text-shadow:0 4px 20px rgba(0,0,0,0.8);">في كل عام،</h2>
-           <h2 style="font-size:${isPortrait ? "42px" : "60px"};font-weight:900;color:#f8ca14;margin:12px 0 0 0;letter-spacing:1px;text-shadow:0 0 30px rgba(248,202,20,0.5);">تُكتب قصة جديدة...</h2>`,
-          width,
-          height
-        ),
-        createArabicSvgImage(
-          `<h2 style="font-size:${isPortrait ? "44px" : "68px"};font-weight:900;color:#ffffff;margin:0;letter-spacing:1px;text-shadow:0 0 35px rgba(255,255,255,0.4);">وهذا العام...</h2>
-           <h2 style="font-size:${isPortrait ? "36px" : "52px"};font-weight:900;color:#f8ca14;margin:14px 0 0 0;text-shadow:0 0 30px rgba(248,202,20,0.5);">كانت الكاميرا تبحث عنك!</h2>`,
-          width,
-          height
-        ),
-        createArabicSvgImage(
-          `<div style="font-size:70px;margin-bottom:15px;filter:drop-shadow(0 0 25px rgba(229,184,79,0.7));">🎓</div>
-           <h1 style="font-size:${isPortrait ? "40px" : "62px"};font-weight:900;color:#ffffff;margin:0;text-shadow:0 0 30px rgba(255,255,255,0.4);">مدارس العقيق تفخر بك</h1>
-           <p style="font-size:${isPortrait ? "24px" : "32px"};font-weight:700;color:#f8ca14;margin:15px 0 0 0;letter-spacing:2px;text-shadow:0 0 20px rgba(248,202,20,0.5);">أنت بطل قصتنا 🌟</p>`,
-          width,
-          height
-        ),
-      ]);
-
-      setExportProgress(15);
-
-      // 2. Preload student photos for canvas
+      // Preload student photos (served through our CORS-enabled proxy)
       const photoUrls = matchedPhotos.slice(0, 8);
       const loadedImages: HTMLImageElement[] = [];
 
@@ -221,23 +177,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
           });
           if (img.naturalWidth > 0) loadedImages.push(img);
         } catch {}
-        setExportProgress(15 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 20));
+        setExportProgress(5 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 20));
       }
 
       const stream = canvas.captureStream(30);
-
-      // 3. Mix background soundtrack if available
-      try {
-        if (audioRef.current && audioRef.current.src) {
-          const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-          const audioSource = audioCtx.createMediaElementSource(audioRef.current);
-          const audioDest = audioCtx.createMediaStreamDestination();
-          audioSource.connect(audioDest);
-          audioSource.connect(audioCtx.destination);
-          const audioTrack = audioDest.stream.getAudioTracks()[0];
-          if (audioTrack) stream.addTrack(audioTrack);
-        }
-      } catch {}
 
       const mimeTypes = [
         "video/mp4;codecs=avc1",
@@ -248,10 +191,10 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         "video/webm;codecs=vp8",
         "video/webm",
       ];
-      const supportedMime = mimeTypes.find((t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) || "video/mp4";
+      const supportedMime = mimeTypes.find((t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) || "video/webm";
 
       const chunks: Blob[] = [];
-      const recorder = new MediaRecorder(stream, { mimeType: supportedMime });
+      const recorder = new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 4000000 }); // 4 Mbps high quality
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
@@ -265,16 +208,33 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       const fps = 30;
       const totalFrames = Math.floor(totalSeconds * fps);
 
-      recorder.start();
+      // Start recording with periodic 500ms chunk delivery so buffers are always filled
+      recorder.start(500);
 
       let currentFrame = 0;
       const frameStepMs = 1000 / fps;
+
+      // Draw function for Arabic typography directly on Canvas (100% connected Arabic + no canvas tainting)
+      const drawArabicText = (text: string, x: number, y: number, font: string, color: string, glowColor?: string) => {
+        ctx.save();
+        ctx.direction = "rtl";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = font;
+        if (glowColor) {
+          ctx.shadowColor = glowColor;
+          ctx.shadowBlur = 25;
+        }
+        ctx.fillStyle = color;
+        ctx.fillText(text, x, y);
+        ctx.restore();
+      };
 
       const renderLoop = async () => {
         while (currentFrame < totalFrames) {
           const currentTime = currentFrame / fps;
 
-          // Clear
+          // Clear frame
           ctx.fillStyle = "#000000";
           ctx.fillRect(0, 0, width, height);
 
@@ -288,7 +248,16 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
             ctx.translate(width / 2, height / 2);
             ctx.scale(scale, scale);
-            ctx.drawImage(scene1TextImg, -width / 2, -height / 2, width, height);
+
+            // Ambient Glow Halo
+            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.4);
+            halo.addColorStop(0, "rgba(229,184,79,0.18)");
+            halo.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = halo;
+            ctx.fillRect(-width / 2, -height / 2, width, height);
+
+            drawArabicText("في كل عام،", 0, -35, `900 ${isPortrait ? 38 : 52}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
+            drawArabicText("تُكتب قصة جديدة...", 0, 35, `900 ${isPortrait ? 42 : 58}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.6)");
             ctx.restore();
           } else if (currentTime < intro1Duration + intro2Duration) {
             // ── Scene 2: Intro 2 (Continuous Slow Zoom Out) ──
@@ -300,7 +269,16 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
             ctx.translate(width / 2, height / 2);
             ctx.scale(scale, scale);
-            ctx.drawImage(scene2TextImg, -width / 2, -height / 2, width, height);
+
+            // Ambient Blue-Cyan Halo
+            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+            halo.addColorStop(0, "rgba(77,161,235,0.22)");
+            halo.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = halo;
+            ctx.fillRect(-width / 2, -height / 2, width, height);
+
+            drawArabicText("وهذا العام...", 0, -40, `900 ${isPortrait ? 44 : 64}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
+            drawArabicText("كانت الكاميرا تبحث عنك!", 0, 40, `900 ${isPortrait ? 36 : 52}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.6)");
             ctx.restore();
           } else if (currentTime < intro1Duration + intro2Duration + photosTotalDuration) {
             // ── Scene 3: Photos Montage with Seamless Cross-fade ──
@@ -342,7 +320,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               ctx.restore();
             }
           } else {
-            // ── Scene 4: Outro Climax (Continuous Slow Breathing Motion) ──
+            // ── Scene 4: Outro Climax ──
             const t = (currentTime - (intro1Duration + intro2Duration + photosTotalDuration)) / outroDuration;
             const scale = 0.96 + t * 0.06;
             const alpha = t < 0.2 ? t / 0.2 : 1;
@@ -351,40 +329,63 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
             ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
             ctx.translate(width / 2, height / 2);
             ctx.scale(scale, scale);
-            ctx.drawImage(scene4TextImg, -width / 2, -height / 2, width, height);
+
+            // Golden Halo
+            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+            halo.addColorStop(0, "rgba(229,184,79,0.25)");
+            halo.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = halo;
+            ctx.fillRect(-width / 2, -height / 2, width, height);
+
+            // Cap Icon
+            ctx.font = `${isPortrait ? 60 : 80}px sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("🎓", 0, -80);
+
+            drawArabicText("مدارس العقيق تفخر بك", 0, 0, `900 ${isPortrait ? 38 : 56}px 'Tajawal', 'Cairo', sans-serif`, "#ffffff", "rgba(255,255,255,0.4)");
+            drawArabicText("أنت بطل قصتنا 🌟", 0, 65, `700 ${isPortrait ? 24 : 32}px 'Tajawal', 'Cairo', sans-serif`, "#f8ca14", "rgba(248,202,20,0.5)");
             ctx.restore();
           }
 
           currentFrame++;
-          setExportProgress(35 + Math.floor((currentFrame / totalFrames) * 60));
+          setExportProgress(25 + Math.floor((currentFrame / totalFrames) * 70));
           await new Promise((r) => setTimeout(r, frameStepMs)); // 1:1 real-time clock step
         }
 
-        recorder.stop();
-      };
+        // Finish recording cleanly and ensure all chunks are flushed
+        recorder.requestData();
+        await new Promise((res) => {
+          recorder.onstop = res;
+          recorder.stop();
+        });
 
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/mp4" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.mp4`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const fileBlob = new Blob(chunks, { type: supportedMime });
+        if (fileBlob.size > 0) {
+          const url = URL.createObjectURL(fileBlob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.mp4`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
 
-        setExportProgress(100);
-        setIsExportingVideo(false);
-        toast.success("تم تجهيز وتحميل الفيديو التوثيقي (MP4) بنجاح! 🎬✨");
+          setExportProgress(100);
+          setIsExportingVideo(false);
+          toast.success("تم تجهيز وتحميل الفيديو التوثيقي (MP4) بنجاح! 🎬✨");
+        } else {
+          throw new Error("Empty video blob");
+        }
       };
 
       renderLoop();
     } catch (err) {
       console.error("Video export error:", err);
-      toast.error("حدث خطأ أثناء تصدير الفيديو");
+      toast.error("حدث خطأ أثناء تصدير الفيديو، يرجى المحاولة مرة أخرى");
       setIsExportingVideo(false);
     }
   };
+
 
 
   const closeWrapped = () => {
