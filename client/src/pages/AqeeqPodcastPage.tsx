@@ -705,8 +705,8 @@ export default function AqeeqPodcastPage() {
                 {/* Master Interactive Player Console */}
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 space-y-3">
                   
-                  {/* Progress Seek Scrubber */}
-                  <div className="space-y-1">
+                  {/* Progress Seek Scrubber (Left-to-Right: 0:00 on Left, Total on Right) */}
+                  <div dir="ltr" className="space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
                       <span>{formatAudioTime(currentTime)}</span>
                       <span>{formatAudioTime(duration)}</span>
@@ -729,64 +729,10 @@ export default function AqeeqPodcastPage() {
                     </div>
                   </div>
 
-                  {/* Playback Transport & Volume Controls */}
+                  {/* Playback Transport, Share & Volume Controls in RTL */}
                   <div className="flex items-center justify-between gap-2 pt-1">
                     
-                    {/* Volume Slider & Mute */}
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        className="text-slate-400 hover:text-amber-400 transition p-1"
-                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
-                      >
-                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-amber-400" />}
-                      </button>
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={isMuted ? 0 : volume}
-                        onChange={(e) => setVolume(Number(e.target.value))}
-                        className="w-12 sm:w-16 h-1 bg-white/20 accent-amber-400 rounded-full cursor-pointer"
-                      />
-                    </div>
-
-                    {/* Transport Buttons: Prev | Play/Pause | Next */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={playPrevSong}
-                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
-                        title="النشيد السابق"
-                      >
-                        <SkipBack size={14} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (activeItem) togglePlay();
-                          else playSong(0);
-                        }}
-                        className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-400/30 transition active:scale-95"
-                        title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
-                      >
-                        {isPlaying ? <Pause size={18} /> : <Play size={18} className="fill-current mr-0.5" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={playNextSong}
-                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
-                        title="النشيد التالي"
-                      >
-                        <SkipForward size={14} />
-                      </button>
-                    </div>
-
-                    {/* Lyrics / Share */}
+                    {/* 1. RIGHT: Share & Lyrics */}
                     <div className="flex items-center gap-1.5">
                       {activeItem?.lyrics && (
                         <button
@@ -806,6 +752,60 @@ export default function AqeeqPodcastPage() {
                       >
                         <Share2 size={13} />
                       </button>
+                    </div>
+
+                    {/* 2. CENTER: Transport Buttons (السابق | تشغيل/إيقاف | التالي) */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={playNextSong}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="النشيد التالي"
+                      >
+                        <SkipForward size={14} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (activeItem) togglePlay();
+                          else playSong(0);
+                        }}
+                        className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-400/30 transition active:scale-95"
+                        title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
+                      >
+                        {isPlaying ? <Pause size={18} /> : <Play size={18} className="fill-current mr-0.5" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={playPrevSong}
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-300 transition active:scale-95"
+                        title="النشيد السابق"
+                      >
+                        <SkipBack size={14} />
+                      </button>
+                    </div>
+
+                    {/* 3. LEFT: Volume Slider & Mute (dir="ltr": Left = 0, Right = 100) */}
+                    <div dir="ltr" className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        className="text-slate-400 hover:text-amber-400 transition p-1"
+                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
+                      >
+                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-amber-400" />}
+                      </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                        className="w-12 sm:w-16 h-1 bg-white/20 accent-amber-400 rounded-full cursor-pointer"
+                      />
                     </div>
 
                   </div>
@@ -1299,8 +1299,8 @@ export default function AqeeqPodcastPage() {
                 {/* Master Interactive Podcast Console */}
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 space-y-3">
                   
-                  {/* Progress Seek Scrubber */}
-                  <div className="space-y-1">
+                  {/* Progress Seek Scrubber (Left-to-Right: 0:00 on Left, Total on Right) */}
+                  <div dir="ltr" className="space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
                       <span>{formatAudioTime(currentTime)}</span>
                       <span>{formatAudioTime(duration)}</span>
@@ -1323,39 +1323,40 @@ export default function AqeeqPodcastPage() {
                     </div>
                   </div>
 
-                  {/* Playback Transport & Volume Controls */}
+                  {/* Playback Transport, Share & Volume Controls in RTL */}
                   <div className="flex items-center justify-between gap-2 pt-1">
                     
-                    {/* Volume Slider & Mute */}
+                    {/* 1. RIGHT: Like & Share */}
                     <div className="flex items-center gap-1.5">
+                      {currentActiveAudio && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleLike(currentActiveAudio, e)}
+                          className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-2.5 py-1 text-[11px] font-bold transition"
+                        >
+                          <Heart size={12} className="fill-rose-500/20" />
+                          <span>{currentActiveAudio.likesCount || 0}</span>
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={toggleMute}
-                        className="text-slate-400 hover:text-emerald-400 transition p-1"
-                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
+                        onClick={(e) => handleShare(currentActiveAudio, e)}
+                        className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
+                        title="مشاركة البودكاست"
                       >
-                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-emerald-400" />}
+                        <Share2 size={13} />
                       </button>
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={isMuted ? 0 : volume}
-                        onChange={(e) => setVolume(Number(e.target.value))}
-                        className="w-12 sm:w-16 h-1 bg-white/20 accent-emerald-400 rounded-full cursor-pointer"
-                      />
                     </div>
 
-                    {/* Transport Buttons: Prev | Play/Pause | Next */}
+                    {/* 2. CENTER: Transport Buttons (السابق | تشغيل/إيقاف | التالي) */}
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={handlePrevOrRestart}
+                        onClick={playNextPodcast}
                         className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 transition active:scale-95"
-                        title="الحلقة السابقة"
+                        title="الحلقة التالية"
                       >
-                        <SkipBack size={14} />
+                        <SkipForward size={14} />
                       </button>
 
                       <button
@@ -1376,34 +1377,33 @@ export default function AqeeqPodcastPage() {
 
                       <button
                         type="button"
-                        onClick={playNextPodcast}
+                        onClick={handlePrevOrRestart}
                         className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 transition active:scale-95"
-                        title="الحلقة التالية"
+                        title="الحلقة السابقة"
                       >
-                        <SkipForward size={14} />
+                        <SkipBack size={14} />
                       </button>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5">
-                      {currentActiveAudio && (
-                        <button
-                          type="button"
-                          onClick={(e) => handleLike(currentActiveAudio, e)}
-                          className="flex items-center gap-1 rounded-xl border border-white/10 hover:bg-rose-500/10 text-rose-400 px-2.5 py-1 text-[11px] font-bold transition"
-                        >
-                          <Heart size={12} className="fill-rose-500/20" />
-                          <span>{currentActiveAudio.likesCount || 0}</span>
-                        </button>
-                      )}
+                    {/* 3. LEFT: Volume Slider & Mute (dir="ltr": Left = 0, Right = 100) */}
+                    <div dir="ltr" className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={(e) => handleShare(currentActiveAudio, e)}
-                        className="rounded-xl border border-white/10 hover:bg-white/10 text-slate-300 p-1.5 transition"
-                        title="مشاركة البودكاست"
+                        onClick={toggleMute}
+                        className="text-slate-400 hover:text-emerald-400 transition p-1"
+                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
                       >
-                        <Share2 size={13} />
+                        {isMuted || volume === 0 ? <VolumeX size={15} className="text-rose-400" /> : <Volume2 size={15} className="text-emerald-400" />}
                       </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                        className="w-12 sm:w-16 h-1 bg-white/20 accent-emerald-400 rounded-full cursor-pointer"
+                      />
                     </div>
 
                   </div>
