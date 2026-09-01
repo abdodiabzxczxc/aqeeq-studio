@@ -4,10 +4,11 @@ export function shouldOpenVisualEditorFromLocation(location: string, browserSear
 }
 
 export function isAqeeqStudioVisualPath(path: string) {
-  return /^\/(?:studio|journal|albums|offers)$/.test(path)
-    || /^\/(?:news|albums|offers)\/manage$/.test(path)
-    || /^\/journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2})$/.test(path)
-    || /^\/albums\/[a-z0-9-]+$/.test(path);
+  return /^\/(?:|studio|journal|albums|offers|showcase|articles|atheer|podcast)$/.test(path)
+    || /^\/(?:news|albums|offers|articles|atheer|podcast|journal)\/manage$/.test(path)
+    || /^\/journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2}|archive|[a-z0-9-]+)$/.test(path)
+    || /^\/albums\/[a-z0-9-]+$/.test(path)
+    || /^\/articles\/[a-z0-9-]+$/.test(path);
 }
 
 export function visualImageWrapperClassName(className: string, isBrandMark: boolean) {

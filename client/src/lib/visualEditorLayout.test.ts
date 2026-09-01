@@ -22,7 +22,28 @@ describe("visual editor studio routing and image layout", () => {
   });
 
   it("recognizes every public studio archive and reader route", () => {
-    expect(["/studio", "/journal", "/journal/issue/weekly-2026", "/journal/month/2026-08", "/news/manage", "/albums", "/albums/graduation-2026", "/albums/manage", "/offers", "/offers/manage"].every(isAqeeqStudioVisualPath)).toBe(true);
-    expect(isAqeeqStudioVisualPath("/dashboard")).toBe(false);
+    expect([
+      "/",
+      "/studio",
+      "/journal",
+      "/journal/issue/weekly-2026",
+      "/journal/month/2026-08",
+      "/journal/archive",
+      "/news/manage",
+      "/albums",
+      "/albums/graduation-2026",
+      "/albums/manage",
+      "/offers",
+      "/offers/manage",
+      "/showcase",
+      "/articles",
+      "/articles/my-slug",
+      "/articles/manage",
+      "/atheer",
+      "/atheer/manage",
+      "/podcast",
+      "/podcast/manage",
+    ].every(isAqeeqStudioVisualPath)).toBe(true);
+    expect(isAqeeqStudioVisualPath("/unknown-random-path")).toBe(false);
   });
 });
