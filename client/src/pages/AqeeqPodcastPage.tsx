@@ -215,6 +215,21 @@ export default function AqeeqPodcastPage() {
     setWatchingVideoPodcast(video);
   };
 
+  // Sync video changes from the floating player
+  useEffect(() => {
+    const handleVideoChange = (e: any) => {
+      const vidId = e.detail?.id;
+      if (vidId) {
+        setSelectedVideoId(vidId);
+        setInlinePlayingVideoId(vidId);
+      }
+    };
+    window.addEventListener("aqeeq-video-change", handleVideoChange as EventListener);
+    return () => {
+      window.removeEventListener("aqeeq-video-change", handleVideoChange as EventListener);
+    };
+  }, []);
+
   // Unified items list for Signature 3D & Master Console
   const unifiedItems = useMemo(() => {
     const list: any[] = [];
@@ -1082,7 +1097,7 @@ export default function AqeeqPodcastPage() {
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
                     currentActiveVideo.mediaUrl.includes("youtube.com") || currentActiveVideo.mediaUrl.includes("youtu.be") ? (
                       <iframe
-                        src={currentActiveVideo.mediaUrl.replace("watch?v=", "embed/") + "?autoplay=1"}
+                        src={currentActiveVideo.mediaUrl.replace("watch?v=", "embed/").split("&")[0] + (currentActiveVideo.mediaUrl.includes("?") ? "&enablejsapi=1&autoplay=1" : "?enablejsapi=1&autoplay=1")}
                         title={currentActiveVideo.title}
                         className="h-full w-full border-0"
                         allowFullScreen
@@ -1650,7 +1665,7 @@ export default function AqeeqPodcastPage() {
               <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black border border-white/10 shadow-2xl">
                 {watchingVideoPodcast.mediaUrl.includes("youtube.com") || watchingVideoPodcast.mediaUrl.includes("youtu.be") ? (
                   <iframe
-                    src={watchingVideoPodcast.mediaUrl.replace("watch?v=", "embed/")}
+                    src={watchingVideoPodcast.mediaUrl.replace("watch?v=", "embed/").split("&")[0] + (watchingVideoPodcast.mediaUrl.includes("?") ? "&enablejsapi=1&autoplay=1" : "?enablejsapi=1&autoplay=1")}
                     title={watchingVideoPodcast.title}
                     className="h-full w-full border-0"
                     allowFullScreen

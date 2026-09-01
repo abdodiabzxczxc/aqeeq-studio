@@ -268,17 +268,44 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
   const isDockVisible = isHovered || isExpanded;
 
-  const toggleMute = () => {
+  const changeVolume = (newVol: number) => {
+    const clamped = Math.max(0, Math.min(1, newVol));
+    setVolume(clamped);
+    const muted = clamped === 0;
+    setIsMuted(muted);
     if (audioRef.current) {
-      if (volume > 0) {
-        audioRef.current.volume = 0;
-        setVolume(0);
-        setIsMuted(true);
-      } else {
-        audioRef.current.volume = 1;
-        setVolume(1);
-        setIsMuted(false);
-      }
+      audioRef.current.volume = clamped;
+      audioRef.current.muted = muted;
+    }
+    // Directly apply to all active HTML5 videos and iframes
+    if (typeof document !== "undefined") {
+      document.querySelectorAll("video").forEach((v) => {
+        try {
+          v.volume = clamped;
+          v.muted = muted;
+        } catch {}
+      });
+      document.querySelectorAll("iframe").forEach((f) => {
+        try {
+          f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [Math.round(clamped * 100)] }), "*");
+          if (muted) {
+            f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "mute" }), "*");
+          } else {
+            f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "unMute" }), "*");
+          }
+        } catch {}
+      });
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("aqeeq-video-volume", { detail: { volume: clamped, muted } }));
+    }
+  };
+
+  const toggleMute = () => {
+    if (isMuted || volume === 0) {
+      changeVolume(1);
+    } else {
+      changeVolume(0);
     }
   };
 
@@ -287,6 +314,11 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       document.querySelectorAll("video").forEach((v) => {
         try {
           v.pause();
+        } catch {}
+      });
+      document.querySelectorAll("iframe").forEach((f) => {
+        try {
+          f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo" }), "*");
         } catch {}
       });
     }
@@ -384,6 +416,37 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     playSong(schoolSongs[prevIndex]);
   };
 
+  // Next / Prev Videos
+  const videoList = useMemo(() => {
+    return podcastsList.filter((p) => p.mediaType === "video");
+  }, [podcastsList]);
+
+  const playNextVideo = () => {
+    if (videoList.length === 0) return;
+    const currentIndex = videoList.findIndex((v) => v.id === activeItem?.id);
+    const nextIndex = (currentIndex + 1) % videoList.length;
+    const nextVid = videoList[nextIndex];
+    if (nextVid) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-change", { detail: { id: nextVid.id } }));
+      }
+      playVideo(nextVid);
+    }
+  };
+
+  const playPrevVideo = () => {
+    if (videoList.length === 0) return;
+    const currentIndex = videoList.findIndex((v) => v.id === activeItem?.id);
+    const prevIndex = (currentIndex - 1 + videoList.length) % videoList.length;
+    const prevVid = videoList[prevIndex];
+    if (prevVid) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-change", { detail: { id: prevVid.id } }));
+      }
+      playVideo(prevVid);
+    }
+  };
+
   // Next Podcast
   const playNextPodcast = () => {
     if (podcastsList.length === 0) return;
@@ -398,7 +461,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       audioRef.current.currentTime = 0;
       setProgress(0);
     } else {
-      if (activeItem?.type === "podcast") {
+      if (activeItem?.type === "video") {
+        playPrevVideo();
+      } else if (activeItem?.type === "podcast") {
         if (podcastsList.length > 0) {
           const currentIndex = podcastsList.findIndex((p) => p.id === activeItem?.id);
           const prevIndex = (currentIndex - 1 + podcastsList.length) % podcastsList.length;
@@ -422,16 +487,30 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
   const togglePlay = () => {
     if (activeItem?.type === "video") {
-      if (isPlaying) {
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: false } }));
-        }
-        setIsPlaying(false);
-      } else {
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: true } }));
-        }
-        setIsPlaying(true);
+      const willPlay = !isPlaying;
+      setIsPlaying(willPlay);
+      if (typeof document !== "undefined") {
+        document.querySelectorAll("video").forEach((v) => {
+          try {
+            if (willPlay) {
+              v.play().catch(() => {});
+            } else {
+              v.pause();
+            }
+          } catch {}
+        });
+        document.querySelectorAll("iframe").forEach((f) => {
+          try {
+            if (willPlay) {
+              f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "playVideo" }), "*");
+            } else {
+              f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo" }), "*");
+            }
+          } catch {}
+        });
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: willPlay } }));
       }
       return;
     }
@@ -558,12 +637,35 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  const skipTime = (seconds: number) => {
-    if (audioRef.current) {
-      const newTime = Math.min(Math.max(0, audioRef.current.currentTime + seconds), duration || Infinity);
-      audioRef.current.currentTime = newTime;
-      setProgress(newTime);
+  const seek = (time: number) => {
+    setProgress(time);
+    if (activeItem?.type === "video") {
+      if (typeof document !== "undefined") {
+        document.querySelectorAll("video").forEach((v) => {
+          try {
+            v.currentTime = time;
+          } catch {}
+        });
+        document.querySelectorAll("iframe").forEach((f) => {
+          try {
+            f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "seekTo", args: [time, true] }), "*");
+          } catch {}
+        });
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("aqeeq-video-seek", { detail: { time } }));
+      }
+      return;
     }
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+    }
+  };
+
+  const skipTime = (seconds: number) => {
+    const currentT = activeItem?.type === "video" ? progress : (audioRef.current?.currentTime || 0);
+    const newTime = Math.min(Math.max(0, currentT + seconds), duration || Infinity);
+    seek(newTime);
   };
 
   const formatTime = (secs: number) => {
@@ -628,29 +730,6 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
   const [location] = useLocation();
   const isAtheerPage = location === "/atheer" || location.startsWith("/atheer");
-
-  const seek = (time: number) => {
-    if (activeItem?.type === "video") {
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("aqeeq-video-seek", { detail: { time } }));
-      }
-      setProgress(time);
-      return;
-    }
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setProgress(time);
-    }
-  };
-
-  const changeVolume = (newVol: number) => {
-    const clamped = Math.max(0, Math.min(1, newVol));
-    setVolume(clamped);
-    if (audioRef.current) {
-      audioRef.current.volume = clamped;
-      setIsMuted(clamped === 0);
-    }
-  };
 
   return (
     <PodcastPlayerContext.Provider
@@ -959,7 +1038,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     {volume === 0 || isMuted ? (
                       <VolumeX size={14} className="text-rose-500" />
                     ) : (
-                      <Volume2 size={14} className={isPodcast ? (isDark ? "text-indigo-300" : "text-indigo-600") : (isDark ? "text-amber-300" : "text-amber-600")} />
+                      <Volume2 size={14} className={isVideo ? (isDark ? "text-cyan-300" : "text-cyan-600") : isPodcast ? (isDark ? "text-indigo-300" : "text-indigo-600") : (isDark ? "text-amber-300" : "text-amber-600")} />
                     )}
                   </button>
                   <div dir="ltr" className="flex items-center">
@@ -971,28 +1050,100 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       value={isMuted ? 0 : volume}
                       onChange={(e) => {
                         const val = Number(e.target.value);
-                        setVolume(val);
-                        if (isMuted) setIsMuted(false);
-                        if (audioRef.current) {
-                          audioRef.current.volume = val;
-                          audioRef.current.muted = false;
-                        }
+                        changeVolume(val);
                       }}
                       style={{
-                        background: `linear-gradient(to right, ${isPodcast ? "#6366f1" : "#f8ca14"} 0%, ${isPodcast ? "#6366f1" : "#f8ca14"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} 100%)`,
+                        background: `linear-gradient(to right, ${isVideo ? "#06b6d4" : isPodcast ? "#6366f1" : "#f8ca14"} 0%, ${isVideo ? "#06b6d4" : isPodcast ? "#6366f1" : "#f8ca14"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} 100%)`,
                       }}
-                      className={`h-1.5 w-14 sm:w-16 cursor-pointer appearance-none rounded-full ${isPodcast ? "accent-indigo-500" : "accent-[#f8ca14]"}`}
+                      className={`h-1.5 w-14 sm:w-16 cursor-pointer appearance-none rounded-full ${isVideo ? "accent-cyan-500" : isPodcast ? "accent-indigo-500" : "accent-[#f8ca14]"}`}
                       title={`مستوى الصوت: ${volumePercent}% (شمال واطي / يمين عالي)`}
                     />
                   </div>
                 </div>
               )}
 
-              {/* 3. Playback Controls (تختلف تلقائياً ما بين الأغنية والبودكاست) */}
+              {/* 3. Playback Controls (تختلف تلقائياً ما بين الفيديو والبودكاست والأغنية) */}
               <div className={`flex items-center gap-1 border-r pr-1.5 shrink-0 ${
                 isDark ? "border-white/10" : "border-slate-200"
               }`}>
-                {isPodcast ? (
+                {isVideo ? (
+                  <>
+                    {/* VIDEO: Next Video Track */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playNextVideo();
+                      }}
+                      className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                      }`}
+                      title="الفيديو التالي 🎬"
+                    >
+                      <SkipForward size={14} />
+                    </button>
+
+                    {/* VIDEO: Skip Forward 15s */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipTime(15);
+                      }}
+                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                      }`}
+                      title="تقديم 15 ثانية ⏩"
+                    >
+                      <RotateCw size={14} />
+                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                    </button>
+
+                    {/* VIDEO: Play / Pause Button in Cyan to Indigo Gradient */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePlay();
+                      }}
+                      className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white hover:from-cyan-400 hover:to-indigo-500 transition shadow-md active:scale-95 mx-0.5 font-black"
+                      title={isPlaying ? "إيقاف مؤقت للفيديو" : "تشغيل الفيديو"}
+                    >
+                      {isPlaying ? <Pause size={14} /> : <Play size={14} className="mr-0.5 fill-current" />}
+                    </button>
+
+                    {/* VIDEO: Skip Backward 15s */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        skipTime(-15);
+                      }}
+                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                      }`}
+                      title="تأخير 15 ثانية ⏪"
+                    >
+                      <RotateCcw size={14} />
+                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                    </button>
+
+                    {/* VIDEO: Prev Video Track */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playPrevVideo();
+                      }}
+                      className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                      }`}
+                      title="الفيديو السابق 🎬"
+                    >
+                      <SkipBack size={14} />
+                    </button>
+                  </>
+                ) : isPodcast ? (
                   <>
                     {/* PODCAST: Skip Forward 15s */}
                     <button
