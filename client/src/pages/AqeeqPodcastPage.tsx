@@ -33,12 +33,10 @@ import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const ATHEER_CATEGORIES = [
-  { id: "all", label: "🌟 الكل" },
+  { id: "all", label: "🌟 جميع الأروقة" },
   { id: "songs", label: "🎵 أناشيد وكورال العقيق" },
-  { id: "videos", label: "🎬 المسرح المرئي" },
-  { id: "بودكاست قيادات", label: "🎙️ بودكاست قيادات" },
-  { id: "إذاعة الصباح", label: "🎤 إذاعة الصباح" },
-  { id: "تغطيات صوتية", label: "📻 تغطيات ولقاءات" },
+  { id: "videos", label: "🎬 تحت الضوء (مرئي)" },
+  { id: "audio", label: "🎙️ خلف المايك (مسموع)" },
 ] as const;
 
 function directDriveImage(url: string | null | undefined) {
@@ -99,8 +97,7 @@ export default function AqeeqPodcastPage() {
   const videoPodcasts = useMemo(() => {
     return rawPodcasts.filter((p) => {
       if (p.mediaType !== "video") return false;
-      if (selectedCategory === "songs") return false;
-      if (selectedCategory !== "all" && selectedCategory !== "videos" && p.category !== selectedCategory) return false;
+      if (selectedCategory === "songs" || selectedCategory === "audio") return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
@@ -113,7 +110,6 @@ export default function AqeeqPodcastPage() {
     return rawPodcasts.filter((p) => {
       if (p.mediaType === "video") return false;
       if (selectedCategory === "songs" || selectedCategory === "videos") return false;
-      if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
@@ -123,8 +119,7 @@ export default function AqeeqPodcastPage() {
   }, [rawPodcasts, selectedCategory, searchQuery]);
 
   const filteredSongs = useMemo(() => {
-    if (selectedCategory === "videos") return [];
-    if (selectedCategory !== "all" && selectedCategory !== "songs") return [];
+    if (selectedCategory === "videos" || selectedCategory === "audio") return [];
     return (songs || []).filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -776,7 +771,7 @@ export default function AqeeqPodcastPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* ================= PAVILION 2: 🎬 مسرح العقيق السينمائي ================== */}
+        {/* ================= PAVILION 2: 🎬 مسرح تحت الضوء (المرئي) ================== */}
         {/* ========================================================================= */}
         {videoPodcasts.length > 0 && (
           <section
@@ -795,11 +790,11 @@ export default function AqeeqPodcastPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-indigo-500/20 border border-indigo-400/40 px-2.5 py-0.5 text-[9px] font-black text-indigo-300">
-                      CINEMA THEATER 4K
+                      CINEMA THEATER 4K · تحت الضوء
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{videoPodcasts.length} حلقات منشورة</span>
                   </div>
-                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">مسرح العقيق السينمائي وحلقات الفيديو 🎬</h2>
+                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">مسرح «تحت الضوء» وحلقات الفيديو المرئية 🎬</h2>
                 </div>
               </div>
             </div>
@@ -829,7 +824,7 @@ export default function AqeeqPodcastPage() {
                     
                     <div className="absolute top-3 right-3 flex items-center gap-1.5">
                       <span className="rounded-lg bg-indigo-600/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-black text-white shadow-md flex items-center gap-1">
-                        <Video size={11} /> مرئي 4K
+                        <Video size={11} /> تحت الضوء 4K
                       </span>
                       <span className="rounded-lg bg-black/70 backdrop-blur-md px-2 py-1 text-[10px] font-mono text-slate-200 border border-white/10">
                         {video.duration || "12:00"}
@@ -844,7 +839,7 @@ export default function AqeeqPodcastPage() {
                   </div>
 
                   <div className="p-4.5 text-right">
-                    <span className="text-[9px] font-black text-amber-400">{video.category}</span>
+                    <span className="text-[9px] font-black text-amber-400">تحت الضوء · مرئي</span>
                     <h4
                       onClick={() => setWatchingVideoPodcast(video)}
                       className="mt-1 text-sm font-black text-white hover:text-indigo-300 cursor-pointer line-clamp-1 transition"
@@ -885,7 +880,7 @@ export default function AqeeqPodcastPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* ================= PAVILION 3: 🎙️ صالون البودكاست وإذاعة الصباح =========== */}
+        {/* ================= PAVILION 3: 🎙️ صالون خلف المايك (المسموع) ============== */}
         {/* ========================================================================= */}
         {audioPodcasts.length > 0 && (
           <section
@@ -904,11 +899,11 @@ export default function AqeeqPodcastPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-0.5 text-[9px] font-black text-emerald-300">
-                      LIVE AUDIO LOUNGE · استوديو الإذاعة
+                      LIVE AUDIO LOUNGE · خلف المايك
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{audioPodcasts.length} حلقات مسموعة</span>
                   </div>
-                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">صالون البودكاست وكابينة الإذاعة الصباحية 🎙️</h2>
+                  <h2 className="mt-0.5 text-lg sm:text-2xl font-black text-white">صالون «خلف المايك» والبودكاست المسموع 🎙️</h2>
                 </div>
               </div>
             </div>
@@ -944,7 +939,7 @@ export default function AqeeqPodcastPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
                           <span className="rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-black">
-                            {podcast.category}
+                            خلف المايك · مسموع
                           </span>
                           <span className="text-[10px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
                         </div>
