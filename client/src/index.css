@@ -1812,7 +1812,7 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: marquee-rtl 45s linear infinite;
+  animation: marquee-rtl 20s linear infinite;
 }
 
 .animate-marquee-rtl:hover {
