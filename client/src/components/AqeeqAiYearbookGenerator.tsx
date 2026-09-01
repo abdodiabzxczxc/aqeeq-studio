@@ -135,7 +135,27 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
   };
 
-  // Helper to pre-render 100% shaped Arabic title cards using SVG Base64 (Never taints canvas)
+  // Helper to draw image maintaining aspect ratio with object-fit: cover and zoom scale
+  const drawImageCover = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, scale: number) => {
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const canvasRatio = w / h;
+    let renderW = w;
+    let renderH = h;
+    if (imgRatio > canvasRatio) {
+      renderH = h;
+      renderW = h * imgRatio;
+    } else {
+      renderW = w;
+      renderH = w / imgRatio;
+    }
+    renderW *= scale;
+    renderH *= scale;
+    const offsetX = (w - renderW) / 2;
+    const offsetY = (h - renderH) / 2;
+    ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
+  };
+
+  // Helper to pre-render 1080p crisp Arabic title cards using SVG Base64 (Never taints canvas)
   const createArabicTitleCard = (
     title: string,
     subtitle: string,
@@ -145,26 +165,26 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
   ): Promise<HTMLImageElement> => {
     return new Promise((resolve) => {
       const isPortrait = height > width;
-      const titleSize = isPortrait ? 38 : 52;
-      const subSize = isPortrait ? 42 : 58;
-      const glowColor = theme === "blue" ? "rgba(77,161,235,0.7)" : "rgba(229,184,79,0.7)";
+      const titleSize = isPortrait ? 52 : 72;
+      const subSize = isPortrait ? 58 : 82;
+      const glowColor = theme === "blue" ? "rgba(77,161,235,0.8)" : "rgba(229,184,79,0.8)";
 
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <defs>
             <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="4" stdDeviation="14" flood-color="${glowColor}" flood-opacity="0.8" />
+              <feDropShadow dx="0" dy="6" stdDeviation="20" flood-color="${glowColor}" flood-opacity="0.9" />
             </filter>
           </defs>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@900&amp;family=Tajawal:wght@900&amp;display=swap');
             .t1 { font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif; font-size: ${titleSize}px; font-weight: 900; fill: #ffffff; text-anchor: middle; }
             .t2 { font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif; font-size: ${subSize}px; font-weight: 900; fill: #f8ca14; text-anchor: middle; }
-            .cap { font-size: ${isPortrait ? 60 : 80}px; text-anchor: middle; }
+            .cap { font-size: ${isPortrait ? 90 : 120}px; text-anchor: middle; }
           </style>
-          ${theme === "climax" ? `<text x="${width / 2}" y="${height / 2 - 75}" class="cap">🎓</text>` : ""}
-          <text x="${width / 2}" y="${theme === "climax" ? height / 2 : height / 2 - 30}" class="t1" filter="url(#glow)">${title}</text>
-          <text x="${width / 2}" y="${theme === "climax" ? height / 2 + 55 : height / 2 + 45}" class="t2" filter="url(#glow)">${subtitle}</text>
+          ${theme === "climax" ? `<text x="${width / 2}" y="${height / 2 - 110}" class="cap">🎓</text>` : ""}
+          <text x="${width / 2}" y="${theme === "climax" ? height / 2 : height / 2 - 50}" class="t1" filter="url(#glow)">${title}</text>
+          <text x="${width / 2}" y="${theme === "climax" ? height / 2 + 80 : height / 2 + 65}" class="t2" filter="url(#glow)">${subtitle}</text>
         </svg>
       `;
 
@@ -177,7 +197,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     });
   };
 
-  // Export full cinematic sequence as butter-smooth 60 FPS MP4 video with connected Arabic text
+  // Export 1080p Full HD Studio Video with seamless overlapping timeline (Zero cuts, Zero freeze)
   const handleExportVideo = async () => {
     if (isExportingVideo) return;
     setIsExportingVideo(true);
@@ -188,21 +208,25 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         await (document as any).fonts.ready;
       }
 
+      // 1080p Full HD Resolution (1920x1080 or 1080x1920)
       const isPortrait = orientation === "portrait";
-      const width = isPortrait ? 720 : 1280;
-      const height = isPortrait ? 1280 : 720;
+      const width = isPortrait ? 1080 : 1920;
+      const height = isPortrait ? 1920 : 1080;
 
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { alpha: false });
       if (!ctx) {
         toast.error("تعذر إنشاء بيئة تصدير الفيديو");
         setIsExportingVideo(false);
         return;
       }
 
-      // 1. Preload Arabic title cards with joined Arabic script & glowing typography
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      // 1. Preload 1080p HD title cards
       const [scene1Card, scene2Card, scene4Card] = await Promise.all([
         createArabicTitleCard("في كل عام،", "تُكتب قصة جديدة...", width, height, "gold"),
         createArabicTitleCard("وهذا العام...", "كانت الكاميرا تبحث عنك!", width, height, "blue"),
@@ -211,7 +235,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
 
       setExportProgress(15);
 
-      // 2. Preload student photos (served through our CORS-enabled proxy)
+      // 2. Preload student photos
       const photoUrls = matchedPhotos.slice(0, 8);
       const loadedImages: HTMLImageElement[] = [];
 
@@ -230,7 +254,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
         setExportProgress(15 + Math.floor(((idx + 1) / Math.max(1, photoUrls.length)) * 20));
       }
 
-      // 3. Setup 60 FPS high-frame-rate capture stream for 100% smooth butter motion
+      // 3. Setup 60 FPS 1080p stream at 16 Mbps high bitrate
       const fps = 60;
       const stream = canvas.captureStream(fps);
 
@@ -246,17 +270,128 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       const supportedMime = mimeTypes.find((t) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) || "video/webm";
 
       const chunks: Blob[] = [];
-      const recorder = new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 8000000 }); // 8 Mbps 60 FPS studio quality
+      const recorder = new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 16000000 }); // 16 Mbps 1080p
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
 
-      const intro1Duration = 2.5;
-      const intro2Duration = 2.5;
-      const slideDuration = 2.0;
-      const photosTotalDuration = Math.max(1, loadedImages.length) * slideDuration;
-      const outroDuration = 3.5;
-      const totalSeconds = intro1Duration + intro2Duration + photosTotalDuration + outroDuration;
+      // 4. Build Continuous Multi-Track Overlapping Timeline
+      type TimelineTrack = {
+        startTime: number;
+        endTime: number;
+        fadeInDuration: number;
+        fadeOutDuration: number;
+        zoomIn: boolean;
+        render: (ctx: CanvasRenderingContext2D, alpha: number, scale: number) => void;
+      };
+
+      const tracks: TimelineTrack[] = [];
+      let cursor = 0;
+
+      // Track 1: Intro Scene 1 (0.0s to 3.0s, fade in 0.6s, fade out 0.8s)
+      tracks.push({
+        startTime: cursor,
+        endTime: cursor + 3.0,
+        fadeInDuration: 0.6,
+        fadeOutDuration: 0.8,
+        zoomIn: true,
+        render: (c, a, s) => {
+          c.save();
+          c.globalAlpha = a;
+          c.translate(width / 2, height / 2);
+          c.scale(s, s);
+          const halo = c.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+          halo.addColorStop(0, "rgba(229,184,79,0.25)");
+          halo.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = halo;
+          c.fillRect(-width / 2, -height / 2, width, height);
+          c.drawImage(scene1Card, -width / 2, -height / 2, width, height);
+          c.restore();
+        },
+      });
+
+      // Track 2: Intro Scene 2 (starts at 2.4s, overlaps 0.6s with Intro 1, lasts to 5.4s)
+      cursor = 2.4;
+      tracks.push({
+        startTime: cursor,
+        endTime: cursor + 3.0,
+        fadeInDuration: 0.8,
+        fadeOutDuration: 0.8,
+        zoomIn: false,
+        render: (c, a, s) => {
+          c.save();
+          c.globalAlpha = a;
+          c.translate(width / 2, height / 2);
+          c.scale(s, s);
+          const halo = c.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+          halo.addColorStop(0, "rgba(77,161,235,0.28)");
+          halo.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = halo;
+          c.fillRect(-width / 2, -height / 2, width, height);
+          c.drawImage(scene2Card, -width / 2, -height / 2, width, height);
+          c.restore();
+        },
+      });
+
+      // Photo Tracks: each photo lasts 2.8s, with 0.8s overlap with next photo
+      cursor = 4.8;
+      const photoSlideInterval = 2.0; // Next photo starts every 2.0s
+      const photoLifespan = 2.8; // 2.8s total lifespan = 0.8s overlap with next!
+
+      loadedImages.forEach((img, idx) => {
+        const pStart = cursor + idx * photoSlideInterval;
+        const pEnd = pStart + photoLifespan;
+        const zoomIn = idx % 2 === 0;
+
+        tracks.push({
+          startTime: pStart,
+          endTime: pEnd,
+          fadeInDuration: 0.8,
+          fadeOutDuration: idx === loadedImages.length - 1 ? 0.9 : 0.8,
+          zoomIn,
+          render: (c, a, s) => {
+            c.save();
+            c.globalAlpha = a;
+            drawImageCover(c, img, width, height, s);
+
+            // Ambient Cinema Vignette
+            const grad = c.createRadialGradient(width / 2, height / 2, width * 0.2, width / 2, height / 2, width * 0.75);
+            grad.addColorStop(0, "rgba(0,0,0,0)");
+            grad.addColorStop(1, "rgba(0,0,0,0.7)");
+            c.fillStyle = grad;
+            c.fillRect(0, 0, width, height);
+            c.restore();
+          },
+        });
+      });
+
+      // Climax Scene: starts overlapping 0.8s before the last photo finishes
+      const lastPhotoEnd = cursor + Math.max(1, loadedImages.length - 1) * photoSlideInterval + photoLifespan;
+      const climaxStart = lastPhotoEnd - 0.8;
+      const climaxDuration = 4.0;
+
+      tracks.push({
+        startTime: climaxStart,
+        endTime: climaxStart + climaxDuration,
+        fadeInDuration: 0.9,
+        fadeOutDuration: 0.5,
+        zoomIn: true,
+        render: (c, a, s) => {
+          c.save();
+          c.globalAlpha = a;
+          c.translate(width / 2, height / 2);
+          c.scale(s, s);
+          const halo = c.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
+          halo.addColorStop(0, "rgba(229,184,79,0.3)");
+          halo.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = halo;
+          c.fillRect(-width / 2, -height / 2, width, height);
+          c.drawImage(scene4Card, -width / 2, -height / 2, width, height);
+          c.restore();
+        },
+      });
+
+      const totalSeconds = climaxStart + climaxDuration;
       const totalFrames = Math.floor(totalSeconds * fps);
 
       recorder.start(500);
@@ -264,118 +399,45 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       let currentFrame = 0;
       const frameStepMs = 1000 / fps;
 
+      // Smooth cosine interpolation function (no linear robotic cuts)
+      const smoothEase = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, t)));
+
       const renderLoop = async () => {
         while (currentFrame < totalFrames) {
           const currentTime = currentFrame / fps;
 
-          // Clear frame
+          // Clear frame to deep black
           ctx.fillStyle = "#000000";
           ctx.fillRect(0, 0, width, height);
 
-          if (currentTime < intro1Duration) {
-            // ── Scene 1: Intro 1 (Continuous 60FPS Ken Burns Zoom In) ──
-            const t = currentTime / intro1Duration;
-            const scale = 0.95 + t * 0.09;
-            const alpha = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
+          // Render all active tracks in z-order
+          for (let i = 0; i < tracks.length; i++) {
+            const track = tracks[i];
+            if (currentTime >= track.startTime && currentTime <= track.endTime) {
+              const age = currentTime - track.startTime;
+              const lifespan = track.endTime - track.startTime;
 
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-            ctx.translate(width / 2, height / 2);
-            ctx.scale(scale, scale);
+              // Calculate smooth continuous alpha with cosine ease
+              let alpha = 1.0;
+              if (age < track.fadeInDuration) {
+                alpha = smoothEase(age / track.fadeInDuration);
+              } else if (age > lifespan - track.fadeOutDuration) {
+                alpha = smoothEase((lifespan - age) / track.fadeOutDuration);
+              }
 
-            // Ambient Halo
-            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
-            halo.addColorStop(0, "rgba(229,184,79,0.22)");
-            halo.addColorStop(1, "rgba(0,0,0,0)");
-            ctx.fillStyle = halo;
-            ctx.fillRect(-width / 2, -height / 2, width, height);
+              // Calculate continuous smooth scale (moves for the entire lifespan)
+              const progress = age / lifespan;
+              const scale = track.zoomIn ? 1.0 + progress * 0.14 : 1.14 - progress * 0.14;
 
-            ctx.drawImage(scene1Card, -width / 2, -height / 2, width, height);
-            ctx.restore();
-          } else if (currentTime < intro1Duration + intro2Duration) {
-            // ── Scene 2: Intro 2 (Continuous 60FPS Ken Burns Zoom Out) ──
-            const t = (currentTime - intro1Duration) / intro2Duration;
-            const scale = 1.05 - t * 0.07;
-            const alpha = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
-
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-            ctx.translate(width / 2, height / 2);
-            ctx.scale(scale, scale);
-
-            // Ambient Blue Halo
-            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
-            halo.addColorStop(0, "rgba(77,161,235,0.25)");
-            halo.addColorStop(1, "rgba(0,0,0,0)");
-            ctx.fillStyle = halo;
-            ctx.fillRect(-width / 2, -height / 2, width, height);
-
-            ctx.drawImage(scene2Card, -width / 2, -height / 2, width, height);
-            ctx.restore();
-          } else if (currentTime < intro1Duration + intro2Duration + photosTotalDuration) {
-            // ── Scene 3: 60FPS Photos Montage with Sub-pixel Cross-fade ──
-            const montageTime = currentTime - (intro1Duration + intro2Duration);
-            const photoIdx = Math.min(loadedImages.length - 1, Math.floor(montageTime / slideDuration));
-            const photoT = (montageTime % slideDuration) / slideDuration;
-            const currImg = loadedImages[photoIdx];
-            const prevImg = photoIdx > 0 ? loadedImages[photoIdx - 1] : null;
-
-            // Draw previous image in 0.6s cross-fade window
-            const fadeZoneDuration = 0.6 / slideDuration;
-            if (photoT < fadeZoneDuration && prevImg) {
-              const prevZoomIn = (photoIdx - 1) % 2 === 0;
-              const prevScale = prevZoomIn ? 1.10 + photoT * 0.04 : 1.04 - photoT * 0.04;
-              ctx.save();
-              ctx.globalAlpha = 1.0;
-              drawImageCover(ctx, prevImg, width, height, prevScale);
-              ctx.restore();
+              if (alpha > 0.001) {
+                track.render(ctx, alpha, scale);
+              }
             }
-
-            // Draw current image with smooth cross-fade alpha & continuous Ken Burns motion
-            if (currImg) {
-              const currZoomIn = photoIdx % 2 === 0;
-              const currScale = currZoomIn ? 1.0 + photoT * 0.14 : 1.14 - photoT * 0.14;
-              const currAlpha = prevImg && photoT < fadeZoneDuration ? photoT / fadeZoneDuration : 1.0;
-
-              ctx.save();
-              ctx.globalAlpha = Math.max(0, Math.min(1, currAlpha));
-              drawImageCover(ctx, currImg, width, height, currScale);
-              ctx.restore();
-
-              // Ambient Radial Vignette
-              ctx.save();
-              const grad = ctx.createRadialGradient(width / 2, height / 2, width * 0.2, width / 2, height / 2, width * 0.75);
-              grad.addColorStop(0, "rgba(0,0,0,0)");
-              grad.addColorStop(1, "rgba(0,0,0,0.75)");
-              ctx.fillStyle = grad;
-              ctx.fillRect(0, 0, width, height);
-              ctx.restore();
-            }
-          } else {
-            // ── Scene 4: Outro Climax (60FPS Breathing Scale) ──
-            const t = (currentTime - (intro1Duration + intro2Duration + photosTotalDuration)) / outroDuration;
-            const scale = 0.96 + t * 0.06;
-            const alpha = t < 0.2 ? t / 0.2 : 1;
-
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-            ctx.translate(width / 2, height / 2);
-            ctx.scale(scale, scale);
-
-            // Golden Halo
-            const halo = ctx.createRadialGradient(0, 0, 10, 0, 0, width * 0.45);
-            halo.addColorStop(0, "rgba(229,184,79,0.25)");
-            halo.addColorStop(1, "rgba(0,0,0,0)");
-            ctx.fillStyle = halo;
-            ctx.fillRect(-width / 2, -height / 2, width, height);
-
-            ctx.drawImage(scene4Card, -width / 2, -height / 2, width, height);
-            ctx.restore();
           }
 
           currentFrame++;
           setExportProgress(35 + Math.floor((currentFrame / totalFrames) * 60));
-          await new Promise((r) => setTimeout(r, frameStepMs)); // 60 FPS clock step
+          await new Promise((r) => setTimeout(r, frameStepMs));
         }
 
         recorder.requestData();
@@ -389,14 +451,14 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
           const url = URL.createObjectURL(fileBlob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `حصاد-العقيق-الذكي-${new Date().getFullYear()}.mp4`;
+          a.download = `حصاد-العقيق-الذكي-1080p-${new Date().getFullYear()}.mp4`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
 
           setExportProgress(100);
           setIsExportingVideo(false);
-          toast.success("تم تجهيز وتحميل الفيديو التوثيقي (MP4) بنجاح! 🎬✨");
+          toast.success("تم تجهيز وتحميل الفيديو التوثيقي بجودة 1080p Full HD بنجاح! 🎬✨");
         } else {
           throw new Error("Empty video blob");
         }
@@ -409,6 +471,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
       setIsExportingVideo(false);
     }
   };
+
 
   const closeWrapped = () => {
     if (audioRef.current) {
