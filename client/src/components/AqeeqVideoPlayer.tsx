@@ -45,6 +45,7 @@ export function AqeeqUnifiedVideoFrame({
   className?: string;
 }) {
   const [loadError, setLoadError] = useState(false);
+  const [isIframePaused, setIsIframePaused] = useState(false);
   const [key, setKey] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -75,9 +76,9 @@ export function AqeeqUnifiedVideoFrame({
       );
     }
 
-    // مؤقت مزامنة للإطارات المضمنة (يوتيوب ودرايف) لتحديث شريط التمرير ودوران الأسطوانة
+    // مؤقت مزامنة للإطارات المضمنة لتحديث شريط التمرير ودوران الأسطوانة
     let interval: any = null;
-    if (isYouTube || isDrive) {
+    if ((isYouTube || isDrive) && !isIframePaused) {
       let currentProgress = 0;
       interval = setInterval(() => {
         currentProgress += 1;
@@ -92,17 +93,20 @@ export function AqeeqUnifiedVideoFrame({
     // استقبال أوامر التحكم من الأسطوانة العائمة بالأسفل (تشغيل/إيقاف، تقديم/تأخير، صوت)
     const handleRemoteToggle = (e: any) => {
       const willPlay = e.detail?.play;
-      if (videoRef.current) {
-        if (willPlay) videoRef.current.play().catch(() => {});
-        else videoRef.current.pause();
-      }
-      if (iframeRef.current && isYouTube) {
-        try {
-          iframeRef.current.contentWindow?.postMessage(
-            JSON.stringify({ event: "command", func: willPlay ? "playVideo" : "pauseVideo" }),
-            "*"
-          );
-        } catch {}
+      if (typeof willPlay === "boolean") {
+        setIsIframePaused(!willPlay);
+        if (videoRef.current) {
+          if (willPlay) videoRef.current.play().catch(() => {});
+          else videoRef.current.pause();
+        }
+        if (iframeRef.current && isYouTube) {
+          try {
+            iframeRef.current.contentWindow?.postMessage(
+              JSON.stringify({ event: "command", func: willPlay ? "playVideo" : "pauseVideo" }),
+              "*"
+            );
+          } catch {}
+        }
       }
     };
 
@@ -139,7 +143,7 @@ export function AqeeqUnifiedVideoFrame({
       window.removeEventListener("aqeeq-video-seek", handleRemoteSeek as EventListener);
       window.removeEventListener("aqeeq-video-volume", handleRemoteVolume as EventListener);
     };
-  }, [sourceUrl, title, isYouTube, isDrive, resolvedPoster]);
+  }, [sourceUrl, title, isYouTube, isDrive, resolvedPoster, isIframePaused]);
 
   if (loadError) {
     return (
@@ -177,7 +181,8 @@ export function AqeeqUnifiedVideoFrame({
 
   // 1) YouTube Embed
   if (isYouTube) {
-    const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1`;
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
     return (
       <div className={className}>
         <iframe
@@ -196,6 +201,36 @@ export function AqeeqUnifiedVideoFrame({
 
   // 2) Google Drive Video
   if (isDrive) {
+    if (isIframePaused) {
+      return (
+        <div
+          onClick={() => {
+            setIsIframePaused(false);
+            window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: true } }));
+          }}
+          className={`${className} group/screen relative cursor-pointer overflow-hidden bg-black`}
+        >
+          {resolvedPoster ? (
+            <img
+              src={resolvedPoster}
+              alt=""
+              className="h-full w-full object-cover opacity-60 transition duration-500 group-hover/screen:scale-105"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-slate-900 to-black" />
+          )}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110">
+              <Play size={24} className="mr-0.5 fill-current" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 bg-black/60 px-3 py-1 rounded-full border border-white/10">
+              موقوف مؤقتاً - اضغط للاستئناف
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className={`${className} relative overflow-hidden bg-black`}>
         <iframe
