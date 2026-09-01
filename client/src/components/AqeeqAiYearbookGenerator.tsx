@@ -109,7 +109,8 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
     // Faster, tighter cinematic timeline
     setTimeout(() => setSceneIndex(1), 2000);  // 2s: text scene 2
     setTimeout(() => setSceneIndex(2), 4000);  // 4s: photo montage starts
-    setTimeout(() => setSceneIndex(3), 16000); // 16s: climax logo
+    setTimeout(() => setSceneIndex(3), 20000); // 20s: climax logo (8 photos × 1.5s + buffer)
+
   };
 
   const closeWrapped = () => {
@@ -261,14 +262,14 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
               <AnimatePresence>
                 {sceneIndex === 2 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-                    {/* 12 photos, each showing for ~0.8s — totals ~9.6s before climax at 16s */}
-                    {matchedPhotos.slice(0, 12).map((url, i) => (
+                    {/* 8 photos × 1.5s delay = 12s montage — cinematic pacing */}
+                    {matchedPhotos.slice(0, 8).map((url, i) => (
                       <motion.div
                         key={i}
                         initial={{ opacity: 0, scale: 1.08 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1.2, delay: i * 0.8 }}
+                        transition={{ duration: 1.8, delay: i * 1.5 }}
                         className="absolute inset-0 bg-black"
                         style={{ zIndex: i }}
                       >
