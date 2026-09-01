@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { getAqeeqDriveFallbackUrl, getAqeeqDrivePreviewUrl, getAqeeqDriveThumbnailUrl, isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
+import { getAqeeqDriveFallbackUrl, getAqeeqDriveFileId, getAqeeqDrivePreviewUrl, getAqeeqDriveThumbnailUrl, isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { ExternalLink, Play, RefreshCw, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
