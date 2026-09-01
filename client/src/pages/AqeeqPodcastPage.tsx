@@ -650,7 +650,7 @@ export default function AqeeqPodcastPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
+                    <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-black ${
                       dark
                         ? "bg-amber-400/20 border-amber-400/40 text-amber-300"
                         : "bg-amber-100 border-amber-300 text-amber-800"
@@ -658,9 +658,14 @@ export default function AqeeqPodcastPage() {
                       ROYAL DISCOGRAPHY · {filteredSongs.length} نشيداً
                     </span>
                     <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold ${
-                      dark ? "bg-amber-400/10 text-amber-300 border-amber-400/20" : "bg-amber-100/60 text-amber-900 border-amber-200"
+                      dark ? "bg-white/5 text-slate-300 border-white/10" : "bg-slate-100 text-slate-700 border-slate-200"
                     }`}>
-                      إشراف وتأليف: قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية 🎼
+                      مدارس العقيق الأهلية والدولية
+                    </span>
+                    <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-amber-400/10 text-amber-300 border-amber-400/30" : "bg-amber-100/70 text-amber-900 border-amber-300"
+                    }`}>
+                      إنتاج: قسم التربية الموسيقية 🎼
                     </span>
                   </div>
                   <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
@@ -795,12 +800,12 @@ export default function AqeeqPodcastPage() {
                   <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
                     {activeItem ? activeItem.title : songs[0]?.title || "نشيد صرح العقيق"}
                   </h3>
-                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                  <div className="flex flex-col items-center justify-center gap-0.5">
                     <span className={`text-[11px] font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>
-                      قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية
+                      إنتاج: قسم التربية الموسيقية 🎼
                     </span>
                     <span className="text-[10px] text-slate-400 font-bold">
-                      · {activeItem?.description ? "إنتاج رسمي معتمد" : "تأليف وألحان التربية الموسيقية"}
+                      مدارس العقيق الأهلية والدولية
                     </span>
                   </div>
                 </div>
@@ -992,10 +997,8 @@ export default function AqeeqPodcastPage() {
 
                               {/* Department of Music Authorship */}
                               <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
-                                <span className={dark ? "text-amber-400/90" : "text-amber-700"}>
-                                  {song.artistOrHost && song.artistOrHost !== "مدارس العقيق" && song.artistOrHost !== "مدارس العقيق الأهلية" && song.artistOrHost !== "قسم التربية الموسيقية"
-                                    ? song.artistOrHost
-                                    : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
+                                <span className={dark ? "text-amber-400 font-black" : "text-amber-700 font-black"}>
+                                  إنتاج: قسم التربية الموسيقية
                                 </span>
                               </p>
                             </div>
@@ -1005,7 +1008,7 @@ export default function AqeeqPodcastPage() {
                           <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
                             dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
                           }`}>
-                            {song.description || "من إبداعات وتأليف قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية."}
+                            {song.description || "نشيد رسمي معتمد ضمن ديوان أسطوانات العقيق."}
                           </p>
 
                           {/* Action Bar */}
@@ -1112,9 +1115,7 @@ export default function AqeeqPodcastPage() {
                                 {song.title}
                               </h4>
                               <p className="text-[10px] text-slate-500 font-bold truncate">
-                                {song.artistOrHost && song.artistOrHost !== "مدارس العقيق" && song.artistOrHost !== "مدارس العقيق الأهلية" && song.artistOrHost !== "قسم التربية الموسيقية"
-                                  ? song.artistOrHost
-                                  : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
+                                إنتاج: قسم التربية الموسيقية
                               </p>
                             </div>
                           </div>
@@ -2196,11 +2197,14 @@ export default function AqeeqPodcastPage() {
                 <FileText size={13} /> كلمات النشيد الرسمي
               </span>
               <h3 className={`text-xl font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>{selectedLyricsSong.title}</h3>
-              <p className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
-                {selectedLyricsSong.artistOrHost && selectedLyricsSong.artistOrHost !== "مدارس العقيق" && selectedLyricsSong.artistOrHost !== "مدارس العقيق الأهلية" && selectedLyricsSong.artistOrHost !== "قسم التربية الموسيقية"
-                  ? selectedLyricsSong.artistOrHost
-                  : "قسم التربية الموسيقية بمدارس العقيق الأهلية والدولية"}
-              </p>
+              <div className="flex flex-col items-center justify-center gap-0.5">
+                <span className={`text-xs font-black ${dark ? "text-amber-400" : "text-amber-700"}`}>
+                  إنتاج: قسم التربية الموسيقية 🎼
+                </span>
+                <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                  مدارس العقيق الأهلية والدولية
+                </span>
+              </div>
               <div className={`max-h-72 overflow-y-auto rounded-2xl border p-5 text-sm font-bold leading-8 whitespace-pre-line text-center ${
                 dark ? "bg-black/60 border-white/10 text-slate-200" : "bg-slate-50 border-slate-200 text-slate-800"
               }`}>
