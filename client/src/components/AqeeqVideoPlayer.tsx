@@ -199,51 +199,52 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 2) Google Drive Video
+  // 2) Google Drive Video (Native HTML5 Streaming for Full Scrubber & Remote Control)
   if (isDrive) {
-    if (isIframePaused) {
-      return (
-        <div
-          onClick={() => {
-            setIsIframePaused(false);
-            window.dispatchEvent(new CustomEvent("aqeeq-video-toggle", { detail: { play: true } }));
-          }}
-          className={`${className} group/screen relative cursor-pointer overflow-hidden bg-black`}
-        >
-          {resolvedPoster ? (
-            <img
-              src={resolvedPoster}
-              alt=""
-              className="h-full w-full object-cover opacity-60 transition duration-500 group-hover/screen:scale-105"
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-slate-900 to-black" />
-          )}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110">
-              <Play size={24} className="mr-0.5 fill-current" />
-            </div>
-            <span className="text-xs font-bold text-slate-200 bg-black/60 px-3 py-1 rounded-full border border-white/10">
-              موقوف مؤقتاً - اضغط للاستئناف
-            </span>
-          </div>
-        </div>
-      );
-    }
-
+    const streamUrl = `/api/drive-video-proxy/${driveId}`;
     return (
-      <div className={`${className} relative overflow-hidden bg-black`}>
-        <iframe
-          ref={iframeRef}
+      <div className={className}>
+        <video
+          ref={videoRef}
           key={key}
-          src={previewUrl}
+          src={streamUrl}
           title={title}
-          className="absolute -top-[48px] -left-1 h-[calc(100%+48px)] w-[calc(100%+8px)] border-0"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
+          controls
+          autoPlay
+          playsInline
+          preload="metadata"
+          onPlay={() => {
+            window.dispatchEvent(
+              new CustomEvent("aqeeq-video-start", {
+                detail: {
+                  id: sourceUrl,
+                  title: title || "تغطية مرئية",
+                  coverUrl: resolvedPoster,
+                  hostName: "استوديو العقيق",
+                  mediaUrl: sourceUrl,
+                },
+              })
+            );
+          }}
+          onPause={() => {
+            window.dispatchEvent(new CustomEvent("aqeeq-video-pause"));
+          }}
+          onTimeUpdate={(e) => {
+            window.dispatchEvent(
+              new CustomEvent("aqeeq-video-progress", {
+                detail: {
+                  currentTime: e.currentTarget.currentTime,
+                  duration: e.currentTarget.duration || 0,
+                },
+              })
+            );
+          }}
+          onEnded={() => {
+            window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
+          }}
           onError={() => setLoadError(true)}
+          className="h-full w-full bg-black object-contain"
         />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-black" />
       </div>
     );
   }

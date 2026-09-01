@@ -195,7 +195,7 @@ export function registerStorageProxy(app: Express) {
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     try {
-      const googleDownloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
+      const googleDownloadUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download&confirm=t`;
       const rangeHeader = req.headers.range;
 
       const fetchHeaders: Record<string, string> = {
@@ -205,7 +205,13 @@ export function registerStorageProxy(app: Express) {
         fetchHeaders.Range = rangeHeader;
       }
 
-      const driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders });
+      let driveRes = await fetch(googleDownloadUrl, { headers: fetchHeaders, redirect: "follow" });
+
+      // Fallback to uc?export=download if needed
+      if (!driveRes.ok && driveRes.status !== 206) {
+        const altUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
+        driveRes = await fetch(altUrl, { headers: fetchHeaders, redirect: "follow" });
+      }
 
       let finalRes = driveRes;
       let contentType = finalRes.headers.get("content-type") || "";
@@ -232,7 +238,7 @@ export function registerStorageProxy(app: Express) {
           const confirmHeaders: Record<string, string> = { ...fetchHeaders };
           if (cookies) confirmHeaders.Cookie = cookies;
 
-          finalRes = await fetch(finalDownloadUrl, { headers: confirmHeaders });
+          finalRes = await fetch(finalDownloadUrl, { headers: confirmHeaders, redirect: "follow" });
           contentType = finalRes.headers.get("content-type") || "video/mp4";
         }
       }
