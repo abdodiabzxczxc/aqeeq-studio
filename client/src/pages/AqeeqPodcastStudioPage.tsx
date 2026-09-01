@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Mic,
   Radio,
@@ -34,6 +34,10 @@ import {
   Sparkles,
   Volume2,
   ExternalLink,
+  Music,
+  ListMusic,
+  FolderSync,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -63,7 +67,39 @@ export default function AqeeqPodcastStudioPage() {
   const isAdmin = isAuthenticated && user?.role === "admin";
   const utils = trpc.useUtils();
 
-  const { activePodcast, isPlaying, playPodcast, pausePodcast } = usePodcastPlayer();
+  const { activePodcast, isPlaying, playPodcast, pausePodcast, playSong } = usePodcastPlayer();
+
+  const [mainStudioTab, setMainStudioTab] = useState<"podcasts" | "songs">("podcasts");
+
+  // School Songs Orchestration Queries & Mutations
+  const { data: orchestrationData, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    enabled: Boolean(isAdmin),
+  });
+
+  const [orchestrationForm, setOrchestrationForm] = useState<any>(null);
+
+  useEffect(() => {
+    if (orchestrationData) {
+      setOrchestrationForm(orchestrationData);
+    }
+  }, [orchestrationData]);
+
+  const setOrchestrationMutation = trpc.executiveAdmin.setSiteOrchestration.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ ونشر قائمة الأناشيد المدرسية بنجاح! 🎵");
+      void refetchOrchestration();
+      void utils.executiveAdmin.getSiteOrchestration.invalidate();
+    },
+    onError: (err) => toast.error(err.message || "تعذر حفظ الأناشيد"),
+  });
+
+  // Song creation state
+  const [newSongTitle, setNewSongTitle] = useState("");
+  const [newSongArtist, setNewSongArtist] = useState("");
+  const [newSongUrl, setNewSongUrl] = useState("");
+  const [newSongCategory, setNewSongCategory] = useState("النشيد المدرسي");
+  const [newSongCover, setNewSongCover] = useState("");
+  const [isAddSongOpen, setIsAddSongOpen] = useState(false);
 
   const { data: podcasts = [], isLoading, refetch } = trpc.podcasts.list.useQuery(
     {},
@@ -77,9 +113,9 @@ export default function AqeeqPodcastStudioPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const [isAiImageOpen, setIsAiImageOpen] = useState(false);
-  const [aiImageTarget, setAiImageTarget] = useState<"editCover" | "newCover">("editCover");
+  const [aiImageTarget, setAiImageTarget] = useState<"editCover" | "newCover" | "songCover">("editCover");
   const [aiImagePrompt, setAiImagePrompt] = useState("");
-  const [mediaTarget, setMediaTarget] = useState<"editCover" | "newCover" | "editMedia" | "newMedia">("editCover");
+  const [mediaTarget, setMediaTarget] = useState<"editCover" | "newCover" | "editMedia" | "newMedia" | "songCover">("editCover");
 
   // Form State for editing
   const [editTitle, setEditTitle] = useState("");
@@ -219,6 +255,37 @@ export default function AqeeqPodcastStudioPage() {
             </div>
           </div>
 
+          {/* Studio Navigation Tabs */}
+          <div className={`flex items-center gap-1.5 rounded-2xl border p-1.5 shadow-sm ${
+            dark ? "border-white/10 bg-white/5" : "border-black/10 bg-slate-100"
+          }`}>
+            <button
+              type="button"
+              onClick={() => setMainStudioTab("podcasts")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                mainStudioTab === "podcasts"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Radio size={14} />
+              <span>حلقات البودكاست ({podcasts.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMainStudioTab("songs")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                mainStudioTab === "songs"
+                  ? "bg-[#f8ca14] text-slate-950 shadow-md shadow-[#f8ca14]/30"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Music size={14} />
+              <span>أناشيد وكورال العقيق ({(orchestrationForm?.schoolSongs || []).length})</span>
+            </button>
+          </div>
+
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => navigate("/atheer")}
@@ -227,26 +294,57 @@ export default function AqeeqPodcastStudioPage() {
               }`}
             >
               <ArrowUpLeft size={14} />
-              <span>معاينة منصة أثير العقيق</span>
+              <span>معاينة منصة أثير</span>
             </button>
 
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-purple-600/30 transition"
-            >
-              <Plus size={16} />
-              <span>إضافة حلقة جديدة 🎙️</span>
-            </button>
+            {mainStudioTab === "podcasts" ? (
+              <button
+                onClick={() => setIsCreateOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-purple-600/30 transition"
+              >
+                <Plus size={16} />
+                <span>إضافة حلقة جديدة 🎙️</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewSongTitle("");
+                    setNewSongArtist("");
+                    setNewSongUrl("");
+                    setNewSongCategory("النشيد المدرسي");
+                    setNewSongCover("");
+                    setIsAddSongOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 px-4 py-2 text-xs font-black text-black shadow-lg shadow-[#f8ca14]/30 transition"
+                >
+                  <Plus size={16} />
+                  <span>إضافة نشيد جديد 🎵</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                  disabled={setOrchestrationMutation.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-emerald-600/30 transition disabled:opacity-50"
+                >
+                  <CheckCircle2 size={16} />
+                  <span>{setOrchestrationMutation.isPending ? "جاري النشر..." : "حفظ ونشر الأناشيد"}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Two-Column Studio Layout */}
+      {/* Main Studio Body */}
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Right Column: Episodes Directory & Filters (4 cols) */}
-          <div className="space-y-4 lg:col-span-4">
-            <div className={`rounded-3xl border p-5 space-y-4 shadow-sm ${
+        {mainStudioTab === "podcasts" ? (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* Right Column: Episodes Directory & Filters (4 cols) */}
+            <div className="space-y-4 lg:col-span-4">
+              <div className={`rounded-3xl border p-5 space-y-4 shadow-sm ${
               dark ? "border-white/10 bg-[#101010]" : "border-black/10 bg-white"
             }`}>
               <div className="flex items-center justify-between">
@@ -616,7 +714,274 @@ export default function AqeeqPodcastStudioPage() {
             )}
           </div>
         </div>
+        ) : (
+          /* ==================== TAB: SCHOOL SONGS (أناشيد وكورال العقيق) ==================== */
+          <div className="space-y-6 animate-in fade-in duration-300">
+            <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white"}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 border-current/10">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-black font-black shadow-lg shadow-amber-400/20">
+                    <Headphones size={26} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-black font-cairo">أناشيد وكورال العقيق المدرسية 🎵</h2>
+                    <p className="text-xs sm:text-sm font-bold text-slate-400">إدارة الأناشيد والمقطوعات الرسمية المعروضة في أثير والمشغل الموحد</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewSongTitle("");
+                      setNewSongArtist("");
+                      setNewSongUrl("");
+                      setNewSongCategory("النشيد المدرسي");
+                      setNewSongCover("");
+                      setIsAddSongOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#f8ca14] text-black font-black text-xs hover:bg-yellow-400 transition shadow-lg shadow-[#f8ca14]/20 active:scale-95"
+                  >
+                    <Plus size={16} />
+                    <span>إضافة نشيد جديد 🎵</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                    disabled={setOrchestrationMutation.isPending}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>{setOrchestrationMutation.isPending ? "جاري النشر..." : "حفظ ونشر التعديلات"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Songs List Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(orchestrationForm?.schoolSongs || []).map((song: any, idx: number) => {
+                  const isCurrentSongPlaying = isPlaying && String(activePodcast?.id) === String(song.id);
+                  return (
+                    <div
+                      key={song.id || idx}
+                      className={`flex items-center justify-between p-4 rounded-2xl border transition ${
+                        dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-md group/img">
+                          <img
+                            src={
+                              (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
+                                ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
+                                : (directDriveImage(song.coverUrl) || song.coverUrl)
+                            }
+                            alt=""
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isCurrentSongPlaying) {
+                                pausePodcast();
+                              } else {
+                                playSong(song);
+                              }
+                            }}
+                            className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
+                            title="تشغيل تجريبي"
+                          >
+                            {isCurrentSongPlaying ? <Pause size={18} className="text-[#f8ca14]" /> : <Play size={18} className="text-white fill-current" />}
+                          </button>
+                        </div>
+                        <div className="min-w-0">
+                          <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-1">
+                            {song.category || "نشيد مدرسي"}
+                          </span>
+                          <h4 className="text-sm font-black truncate">{song.title}</h4>
+                          <p className="text-xs text-slate-400 truncate">{song.artist || "مدارس العقيق"}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isCurrentSongPlaying) {
+                              pausePodcast();
+                            } else {
+                              playSong(song);
+                            }
+                          }}
+                          className={`grid h-9 w-9 place-items-center rounded-xl transition ${
+                            isCurrentSongPlaying
+                              ? "bg-amber-400 text-black shadow-md"
+                              : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-200 border"
+                          }`}
+                          title={isCurrentSongPlaying ? "إيقاف مؤقت" : "تشغيل تجريبي"}
+                        >
+                          {isCurrentSongPlaying ? <Pause size={16} /> : <Play size={16} className="fill-current mr-0.5" />}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
+                            setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                            toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
+                          }}
+                          className="grid h-9 w-9 place-items-center rounded-xl text-rose-400 hover:bg-rose-500/10 transition"
+                          title="حذف"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {(!orchestrationForm?.schoolSongs || orchestrationForm.schoolSongs.length === 0) && (
+                  <div className="col-span-full text-center py-12 text-slate-400 font-bold text-sm">
+                    لا توجد أناشيد أو أغاني مضافة حالياً. اضغط زر "إضافة نشيد جديد" للبدء.
+                  </div>
+                )}
+              </div>
+
+              {/* Instructions Callout */}
+              <div className={`p-5 rounded-2xl border ${dark ? "border-amber-400/20 bg-amber-400/5 text-amber-200" : "border-amber-300 bg-amber-50 text-amber-900"}`}>
+                <h4 className="text-xs font-black mb-1 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span>مزامنة مباشرة مع أثير العقيق والمشغل الطافي</span>
+                </h4>
+                <p className="text-[11px] leading-relaxed opacity-90">
+                  تظهر هذه الأناشيد فورياً في صفحة أثير العقيق في ركن "أناشيد وكورال العقيق"، كما تُدرج في قائمة تشغيل المشغل الطافي في أسفل الشاشة لجميع الزوار.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Modal for Adding New School Song */}
+      <Dialog open={isAddSongOpen} onOpenChange={setIsAddSongOpen}>
+        <DialogContent
+          className={`max-w-md rounded-[2.5rem] border p-6 sm:p-8 text-right shadow-2xl ${
+            dark ? "border-amber-400/40 bg-[#0a0a0a] text-white" : "border-amber-600/30 bg-white text-slate-900"
+          }`}
+          dir="rtl"
+        >
+          <DialogHeader className="text-right border-b border-current/10 pb-4">
+            <DialogTitle className="text-lg font-black flex items-center gap-2">
+              <Music size={18} className="text-amber-400" />
+              <span>إضافة نشيد مدرسي / كورال جديد</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">اسم النشيد / الأغنية *</Label>
+              <Input
+                value={newSongTitle}
+                onChange={(e) => setNewSongTitle(e.target.value)}
+                placeholder="مثال: نشيد العقيق الخالد 2026..."
+                className={`font-black text-sm rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">المؤدي / الفريق</Label>
+              <Input
+                value={newSongArtist}
+                onChange={(e) => setNewSongArtist(e.target.value)}
+                placeholder="مثال: كورال طلاب مدارس العقيق"
+                className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">تصنيف النشيد</Label>
+              <Input
+                value={newSongCategory}
+                onChange={(e) => setNewSongCategory(e.target.value)}
+                placeholder="مثال: النشيد المدرسي، كورال التخرج، وطني..."
+                className={`text-xs rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">رابط الملف الصوتي المباشر أو Google Drive *</Label>
+              <Input
+                value={newSongUrl}
+                onChange={(e) => setNewSongUrl(e.target.value)}
+                placeholder="https://drive.google.com/... أو https://.../song.mp3"
+                className={`text-xs font-mono rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs font-black text-slate-300 mb-1.5 block">رابط صورة الغلاف (اختياري)</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={newSongCover}
+                  onChange={(e) => setNewSongCover(e.target.value)}
+                  placeholder="https://... أو اختر من الوسائط"
+                  className={`text-xs font-mono rounded-xl ${dark ? "bg-black/50 border-white/10" : "bg-slate-50 border-black/10"}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaTarget("songCover");
+                    setIsMediaLibraryOpen(true);
+                  }}
+                  className="px-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold shrink-0 flex items-center gap-1"
+                >
+                  <ImageIcon size={14} />
+                  <span>المكتبة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t border-current/10">
+            <button
+              type="button"
+              onClick={() => setIsAddSongOpen(false)}
+              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400"
+            >
+              إلغاء
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!newSongTitle.trim() || !newSongUrl.trim()) {
+                  toast.error("يرجى إدخال اسم النشيد ورابط الملف الصوتي");
+                  return;
+                }
+                const newSong = {
+                  id: `song-${Date.now()}`,
+                  title: newSongTitle.trim(),
+                  artist: newSongArtist.trim() || "مدارس العقيق",
+                  category: newSongCategory.trim() || "النشيد المدرسي",
+                  url: newSongUrl.trim(),
+                  coverUrl: newSongCover.trim() || undefined,
+                };
+                const existing = orchestrationForm?.schoolSongs || [];
+                const updated = [...existing, newSong];
+                setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                setIsAddSongOpen(false);
+                toast.success("تمت إضافة النشيد! اضغط 'حفظ ونشر التعديلات' لتثبيته في الموقع.");
+              }}
+              className="rounded-xl bg-[#f8ca14] px-5 py-2 text-xs font-black text-black hover:bg-yellow-400 transition shadow-md"
+            >
+              إضافة للقائمة
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal for Creating New Episode */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -825,6 +1190,7 @@ export default function AqeeqPodcastStudioPage() {
         onSelect={(item) => {
           if (mediaTarget === "editCover") setEditCoverUrl(item.url);
           else if (mediaTarget === "newCover") setNewCoverUrl(item.url);
+          else if (mediaTarget === "songCover") setNewSongCover(item.url);
           else if (mediaTarget === "editMedia") {
             setEditMediaUrl(item.url);
             try {
