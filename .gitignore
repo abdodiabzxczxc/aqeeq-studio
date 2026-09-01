@@ -13,8 +13,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
-data/
-data/*.json
+data/local_db.json
 
 # IDE and editor files
 .vscode/

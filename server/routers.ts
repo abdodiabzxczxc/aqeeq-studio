@@ -217,11 +217,11 @@ export const appRouter = router({
       saveLocalDb();
       const { execSync } = await import("node:child_process");
       try {
-        execSync("git add data/local_db.json server/seedData.json", { stdio: "pipe" });
+        execSync("git add server/seedData.json .gitignore", { stdio: "pipe" });
         try {
           execSync('git commit -m "chore(content): sync local edits to live production"', { stdio: "pipe" });
         } catch {
-          // nothing to commit, continue to push
+          // nothing to commit — already up to date
         }
         execSync("git push origin main", { stdio: "pipe" });
         return { success: true, message: "تم نشر وتحديث موقع ريندر بنجاح!" };
