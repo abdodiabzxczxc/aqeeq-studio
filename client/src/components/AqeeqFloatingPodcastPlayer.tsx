@@ -355,6 +355,21 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
+  // Resolve a podcast/song Drive URL to the fast server proxy
+  const resolveAudioUrl = (url: string, sourceType?: string): string => {
+    if (!url) return url;
+    // Already using our proxy
+    if (url.startsWith("/api/drive-audio-proxy/")) return url;
+    // Known Drive URL patterns — extract file ID and route through proxy
+    if (sourceType === "drive" || url.includes("drive.google.com") || url.includes("drive.usercontent.google.com")) {
+      const m =
+        url.match(/\/d\/([\w-]+)/) ||
+        url.match(/[?&]id=([\w-]+)/);
+      if (m?.[1]) return `/api/drive-audio-proxy/${m[1]}?ext=mp3`;
+    }
+    return url;
+  };
+
   // Play a podcast (or toggle pause if already playing)
   const playPodcast = (podcast: any) => {
     if (!podcast) return;
@@ -378,6 +393,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       setLastSong(schoolSongs[0]);
     }
 
+    const resolvedUrl = podcast.mediaType === "audio"
+      ? resolveAudioUrl(podcast.mediaUrl, podcast.sourceType)
+      : podcast.mediaUrl;
+
     const podItem: UniversalAudioItem = {
       id: podcast.id,
       type: "podcast",
@@ -386,7 +405,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       category: podcast.category || "بودكاست",
       mediaType: podcast.mediaType || "audio",
       sourceType: podcast.sourceType || "direct",
-      mediaUrl: podcast.mediaUrl,
+      mediaUrl: resolvedUrl,
       coverUrl: podcast.coverUrl ? (directDriveImage(podcast.coverUrl) || podcast.coverUrl) : "/alaqeeq-logo.png",
       duration: podcast.duration,
     };
@@ -397,6 +416,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       setIsExpanded(true);
     }
   };
+
+
 
   // Play a video in sync with the floating turntable
   const playVideo = (video: any) => {

@@ -4052,17 +4052,75 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
                   </div>
 
+
+                  {/* Source Type Selector */}
                   <div>
-                    <label className="block text-xs font-black text-amber-200 mb-1">رابط الصوت أو الفيديو (درايف / يوتيوب / مباشر) *</label>
+                    <label className="block text-xs font-black text-amber-200 mb-1">نوع المصدر</label>
+                    <div className="flex gap-2">
+                      {(["drive", "direct", "youtube"] as const).map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setNewPodcastSource(s)}
+                          className={`flex-1 rounded-xl py-2.5 text-xs font-black transition ${
+                            newPodcastSource === s
+                              ? "bg-amber-400 text-black shadow-md"
+                              : "bg-white/5 text-slate-400 hover:bg-white/10"
+                          }`}
+                        >
+                          {s === "drive" ? "☁️ Google Drive" : s === "direct" ? "🔗 رابط مباشر" : "▶️ يوتيوب"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* URL / File ID field — smart by source */}
+                  <div>
+                    <label className="block text-xs font-black text-amber-200 mb-1">
+                      {newPodcastSource === "drive"
+                        ? "رابط Google Drive أو File ID المباشر *"
+                        : newPodcastSource === "youtube"
+                        ? "رابط يوتيوب *"
+                        : "رابط الملف الصوتي المباشر *"}
+                    </label>
                     <input
-                      type="url"
+                      type="text"
                       required
                       value={newPodcastUrl}
                       onChange={(e) => setNewPodcastUrl(e.target.value)}
-                      placeholder="https://drive.google.com/... أو https://youtube.com/..."
+                      placeholder={
+                        newPodcastSource === "drive"
+                          ? "https://drive.google.com/file/d/1ABC.../view  أو  1ABC..."
+                          : newPodcastSource === "youtube"
+                          ? "https://youtube.com/watch?v=..."
+                          : "https://.../podcast.mp3"
+                      }
                       className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-mono outline-none focus:border-amber-400"
                     />
+                    {/* Drive: show extracted File ID preview */}
+                    {newPodcastSource === "drive" && newPodcastType === "audio" && newPodcastUrl.trim() && (() => {
+                      const m =
+                        newPodcastUrl.match(/\/d\/([\w-]+)/) ||
+                        newPodcastUrl.match(/[?&]id=([\w-]+)/) ||
+                        (newPodcastUrl.match(/^[\w-]{25,}$/) ? [null, newPodcastUrl] : null);
+                      const fid = m?.[1];
+                      return fid ? (
+                        <div className="mt-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-mono flex items-center gap-2">
+                          <span className="text-emerald-400 text-base">✅</span>
+                          <div>
+                            <span className="text-emerald-200 font-black text-xs">Drive File ID: </span>
+                            <span className="opacity-80">{fid}</span>
+                            <div className="text-emerald-400/70 mt-0.5">سيُشغَّل عبر البروكسي السريع تلقائياً 🚀</div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2 p-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-[11px]">
+                          ⚠️ تعذّر استخراج File ID — تأكد من نسخ رابط الملف أو ID المباشر من Google Drive
+                        </div>
+                      );
+                    })()}
                   </div>
+
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>

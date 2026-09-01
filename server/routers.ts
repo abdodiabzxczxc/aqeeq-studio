@@ -1475,8 +1475,21 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        return createPodcast(input);
+        // Auto-resolve Drive audio URLs to the high-speed RAM-cached proxy
+        let resolvedMediaUrl = input.mediaUrl;
+        if (input.mediaType === "audio" && input.sourceType === "drive") {
+          const driveFileIdMatch =
+            input.mediaUrl.match(/\/d\/([\w-]+)/) ||
+            input.mediaUrl.match(/[?&]id=([\w-]+)/) ||
+            (input.mediaUrl.match(/^[\w-]{25,}$/) && [null, input.mediaUrl]);
+          const fileId = driveFileIdMatch?.[1];
+          if (fileId) {
+            resolvedMediaUrl = `/api/drive-audio-proxy/${fileId}?ext=mp3`;
+          }
+        }
+        return createPodcast({ ...input, mediaUrl: resolvedMediaUrl });
       }),
+
 
     update: adminProcedure
       .input(
