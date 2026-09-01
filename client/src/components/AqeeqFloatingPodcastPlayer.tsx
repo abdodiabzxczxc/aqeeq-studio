@@ -291,7 +291,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     setLastSong(targetSong);
     setActiveItem(targetSong);
     setIsPlaying(true);
-    setIsExpanded(true);
+    if (!isAtheerPage) {
+      setIsExpanded(true);
+    }
   };
 
   // Play a podcast (swaps current song with the podcast!)
@@ -321,7 +323,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
     setActiveItem(podItem);
     setIsPlaying(true);
-    setIsExpanded(true);
+    if (!isAtheerPage) {
+      setIsExpanded(true);
+    }
   };
 
   const playEpisode = playPodcast;
@@ -594,15 +598,14 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       />
 
       {/* ========================================================================= */}
-      {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK (Hidden on /atheer) */}
+      {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK */}
       {/* ========================================================================= */}
-      {!isAtheerPage && (
-        <div
-          dir="rtl"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 select-none"
-        >
+      <div
+        dir="rtl"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 select-none"
+      >
           <div className="relative flex items-center gap-3">
 
             {completionPrompt.visible && (
@@ -1070,12 +1073,11 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
         </div>
       </div>
-      )}
 
       {/* ========================================================================= */}
       {/* 2. LUXURY FLOATING PLAYLIST SHEET (Anchored right above the Vinyl Dock) */}
       {/* ========================================================================= */}
-      {playlistDrawerOpen && !isAtheerPage && (
+      {playlistDrawerOpen && (
         <div
           ref={playlistSheetRef}
           dir="rtl"
