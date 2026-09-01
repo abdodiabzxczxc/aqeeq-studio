@@ -269,7 +269,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                         initial={{ opacity: 0, scale: 1.08 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1.8, delay: i * 1.5 }}
+                        transition={{ duration: 0.8, delay: i * 1.5 }}
                         className="absolute inset-0 bg-black"
                         style={{ zIndex: i }}
                       >
