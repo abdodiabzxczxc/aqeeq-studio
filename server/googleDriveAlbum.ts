@@ -151,3 +151,206 @@ export async function readGoogleDriveAlbum(folderUrl: string, request: typeof fe
   if (!media.length) throw new Error("لم نجد صورًا أو فيديوهات ظاهرة في الفولدر. تأكد من أن الملفات داخل الفولدر نفسه ومفتوحة للمشاهدة.");
   return media.slice(0, MAX_IMPORTED_MEDIA);
 }
+
+export const SUPPORTED_AUDIO_EXTENSIONS = new Set([
+  "mp3",
+  "m4a",
+  "wav",
+  "aac",
+  "ogg",
+  "oga",
+  "opus",
+  "flac",
+  "weba",
+  "webm",
+  "wma",
+  "aiff",
+  "aif",
+  "mid",
+  "midi",
+  "amr",
+  "ac3",
+  "mka",
+  "caf",
+]);
+
+export type DriveAudioTrack = {
+  driveFileId: string;
+  fileName: string;
+  title: string;
+  artist: string;
+  category: string;
+  mediaUrl: string;
+  coverUrl: string;
+  extension: string;
+  mimeType: string;
+};
+
+export function getAudioMimeType(fileNameOrExt: string): string {
+  const ext = fileNameOrExt.split(".").pop()?.toLowerCase() || "";
+  const map: Record<string, string> = {
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    wav: "audio/wav",
+    aac: "audio/aac",
+    ogg: "audio/ogg",
+    oga: "audio/ogg",
+    opus: "audio/opus",
+    flac: "audio/flac",
+    weba: "audio/webm",
+    webm: "audio/webm",
+    wma: "audio/x-ms-wma",
+    aiff: "audio/aiff",
+    aif: "audio/aiff",
+    mid: "audio/midi",
+    midi: "audio/midi",
+    amr: "audio/amr",
+    ac3: "audio/ac3",
+    mka: "audio/x-matroska",
+    caf: "audio/x-caf",
+  };
+  return map[ext] || "audio/mpeg";
+}
+
+export function formatSongMetadata(fileName: string): {
+  title: string;
+  artist: string;
+  category: string;
+  coverUrl: string;
+} {
+  // Remove file extension
+  let clean = fileName.replace(/\.[^/.]+$/, "").trim();
+
+  // Replace underscores and multiple dashes/spaces
+  clean = clean.replace(/[_]+/g, " ").replace(/\s+/g, " ");
+
+  // Strip leading track numbers like "01 - ", "01. ", "1 - ", "(1) "
+  clean = clean.replace(/^(\(?\d+[\).\-\s]+)+/g, "").trim();
+
+  let title = clean;
+  let artist = "مدارس العقيق الأهلية";
+
+  // Check if there is an artist separator: "Artist - Title" or "Title - Artist"
+  if (clean.includes(" - ") || clean.includes(" — ") || clean.includes(" | ")) {
+    const delimiter = clean.includes(" — ") ? " — " : clean.includes(" | ") ? " | " : " - ";
+    const parts = clean.split(delimiter).map((p) => p.trim());
+    if (parts.length >= 2) {
+      const part0 = parts[0];
+      const part1 = parts[1];
+      const isArtist0 = /كورال|منشد|إنشاد|فرقة|أداء|صوت|طلاب|طالبات/i.test(part0);
+      const isArtist1 = /كورال|منشد|إنشاد|فرقة|أداء|صوت|طلاب|طالبات/i.test(part1);
+
+      if (isArtist0) {
+        artist = part0;
+        title = part1;
+      } else if (isArtist1) {
+        title = part0;
+        artist = part1;
+      } else {
+        title = part0;
+        artist = part1 || "مدارس العقيق الأهلية";
+      }
+    }
+  }
+
+  // Detect category based on title & clean name
+  const text = (title + " " + clean).toLowerCase();
+  let category = "النشيد المدرسي";
+
+  if (text.includes("تخرج") || text.includes("نجاح") || text.includes("وداع")) {
+    category = "حفل تخرج";
+  } else if (text.includes("وطن") || text.includes("سعودي") || text.includes("المملكة") || text.includes("فخر")) {
+    category = "أغنية وطنية";
+  } else if (text.includes("بيانو") || text.includes("موسيقى") || text.includes("هدوء") || text.includes("عزف")) {
+    category = "بيانو وهدوء";
+  } else if (text.includes("صباح") || text.includes("طابور") || text.includes("إذاعة")) {
+    category = "طابور الصباح";
+  } else if (text.includes("احتفال") || text.includes("فرح") || text.includes("مهرجان") || text.includes("بهجة")) {
+    category = "احتفالي";
+  }
+
+  return { title: title || fileName, artist, category, coverUrl: "" };
+}
+
+export function parsePublicDriveFolderAudioHtml(html: string): DriveAudioTrack[] {
+  const results: DriveAudioTrack[] = [];
+  const seen = new Set<string>();
+
+  const processCandidate = (rawLabel: string, driveFileId: string) => {
+    if (!driveFileId || seen.has(driveFileId)) return;
+    const label = decodeDriveText(rawLabel || "");
+    const cleanedName = label
+      .replace(/\s+(?:Audio|Video|Image)?\s*(?:Shared|not shared)$/i, "")
+      .trim();
+
+    const ext = cleanedName.split(".").pop()?.toLowerCase() || "";
+    if (!SUPPORTED_AUDIO_EXTENSIONS.has(ext)) return;
+
+    seen.add(driveFileId);
+
+    const { title, artist, category, coverUrl } = formatSongMetadata(cleanedName);
+    const id = encodeURIComponent(driveFileId);
+
+    results.push({
+      driveFileId,
+      fileName: cleanedName,
+      title,
+      artist,
+      category,
+      mediaUrl: `/api/drive-audio-proxy/${id}?ext=${ext}`,
+      coverUrl,
+      extension: ext,
+      mimeType: getAudioMimeType(cleanedName),
+    });
+  };
+
+  // Pattern 1: aria-label with ssk
+  const sskEntry = /aria-label="([^"]+)"[^>]*\bssk=['"][^'"]*?:([A-Za-z0-9_-]{20,})-0-\d+['"]/g;
+  for (const match of Array.from(html.matchAll(sskEntry))) {
+    processCandidate(match[1], match[2]);
+  }
+
+  // Pattern 2: reverse ssk then aria-label
+  const sskReverse = /ssk=['"][^'"]*?:([A-Za-z0-9_-]{20,})-0-\d+['"][^>]*aria-label="([^"]+)"/g;
+  for (const match of Array.from(html.matchAll(sskReverse))) {
+    processCandidate(match[2], match[1]);
+  }
+
+  // Pattern 3: data-id with aria-label
+  const dataIdEntry = /data-id="([A-Za-z0-9_-]{20,})"[^>]*aria-label="([^"]+)"/g;
+  for (const match of Array.from(html.matchAll(dataIdEntry))) {
+    processCandidate(match[2], match[1]);
+  }
+
+  const ariaDataId = /aria-label="([^"]+)"[^>]*data-id="([A-Za-z0-9_-]{20,})"/g;
+  for (const match of Array.from(html.matchAll(ariaDataId))) {
+    processCandidate(match[1], match[2]);
+  }
+
+  // Pattern 4: embedded JSON array items
+  const jsonRegex = /\["([A-Za-z0-9_-]{25,})",\s*(?:\[\s*)?"([^"]+\.(?:mp3|m4a|wav|aac|ogg|oga|opus|flac|weba|webm|wma|aiff|aif|mid|midi|amr|ac3|mka|caf))"/gi;
+  for (const match of Array.from(html.matchAll(jsonRegex))) {
+    processCandidate(match[2], match[1]);
+  }
+
+  return results;
+}
+
+export async function readGoogleDriveAudioFolder(folderUrl: string, request: typeof fetch = fetch): Promise<DriveAudioTrack[]> {
+  const folderId = getGoogleDriveFolderId(folderUrl);
+  const response = await request(`https://drive.google.com/drive/folders/${encodeURIComponent(folderId)}?usp=sharing`, {
+    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+  });
+  if (!response.ok) {
+    throw new Error("تعذر قراءة مجلد Google Drive. تأكد أن مشاركة الرابط مضبوطة على «أي شخص لديه الرابط - مشاهد» (Anyone with link - Viewer).");
+  }
+
+  const html = await response.text();
+  const tracks = parsePublicDriveFolderAudioHtml(html);
+
+  if (!tracks.length) {
+    throw new Error("لم نتمكن من العثور على ملفات صوتية داخل هذا المجلد. تأكد من وجود ملفات صوتية (MP3, WAV, M4A, FLAC, AAC, OGG...) داخل المجلد نفسه وأن الصلاحية عامة.");
+  }
+
+  return tracks.slice(0, MAX_IMPORTED_MEDIA);
+}

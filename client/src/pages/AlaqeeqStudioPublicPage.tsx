@@ -38,6 +38,9 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
+import { AqeeqNewsMarquee } from "@/components/AqeeqNewsMarquee";
+import { AqeeqHomeBentoGrid } from "@/components/AqeeqHomeBentoGrid";
+import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -678,47 +681,24 @@ export default function AlaqeeqStudioPublicPage() {
         </div>
       </VisualEditable>
 
-      {/* 3. نظرة عامة سريعة (Quick Overview Cards) */}
-      <section className={"border-b py-12 md:py-16 " + (dark ? "border-white/[0.08] bg-[#050505]" : "border-black/[0.06] bg-[#fafafa]")}>
-        <div className="mx-auto grid max-w-[1340px] gap-6 px-5 sm:grid-cols-2 md:px-8 lg:grid-cols-3">
-          <ArchiveCard
-            id="studio-journal-card"
-            title="مجلة العقيق"
-            label="WEEKLY JOURNAL · 01"
-            body="أعداد دورية موثقة بتقليب تفاعلي وتنسيق صحفي يواكب كل جديد في مسيرة المدارس."
-            imageUrl={journalCovers.front}
-            previousImageUrl={journalCovers.back}
-            onOpen={() => navigate("/journal")}
-            icon="book"
-            count={issues.length}
-            dark={dark}
-          />
-          <ArchiveCard
-            id="studio-albums-card"
-            title="ألبوم العقيق"
-            label="EVENT ARCHIVE · 02"
-            body="صور وفيديوهات الفعاليات في تجربة واحدة تحفظ المشاهد كما عاشت."
-            imageUrl={albumCovers.front}
-            previousImageUrl={albumCovers.back}
-            onOpen={() => navigate("/albums")}
-            icon="camera"
-            count={albums.length}
-            dark={dark}
-          />
-          <ArchiveCard
-            id="studio-showcase-card"
-            title="الأخبار والعروض"
-            label="AQEEQ LIVE FEED · 03"
-            body="خلاصة مباشرة للصور والفيديوهات، تجمع كل جديد من حياة العقيق وعروضها."
-            imageUrl={showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl}
-            previousImageUrl={showcaseCovers.back || showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl}
-            onOpen={() => navigate("/offers")}
-            icon="clapperboard"
-            count={totalPosts}
-            dark={dark}
-          />
-        </div>
-      </section>
+      {/* ========================================================================= */}
+      {/* 3. NEW MEDIA DASHBOARD */}
+      {/* ========================================================================= */}
+      {orchestration?.sections?.marqueeEnabled !== false && (
+        <AqeeqNewsMarquee badgeOverride={orchestration?.sections?.marqueeBadge} />
+      )}
+      {orchestration?.sections?.studioHighlightsEnabled !== false && (
+        <AqeeqHomeBentoGrid
+          titleOverride={orchestration?.sections?.studioHighlightsTitle}
+          descOverride={orchestration?.sections?.studioHighlightsDesc}
+        />
+      )}
+      {orchestration?.sections?.libraryEnabled !== false && (
+        <AqeeqHomeTabsLibrary
+          titleOverride={orchestration?.sections?.libraryTitle}
+          descOverride={orchestration?.sections?.libraryDesc}
+        />
+      )}
 
       {/* ========================================================================= */}
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
@@ -733,20 +713,20 @@ export default function AlaqeeqStudioPublicPage() {
         className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]")}
       >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
-          <div className="mb-8">
+          <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-bento-kicker"
               tag="text"
               label="شارة إنجازات الأسبوع"
-              defaultText="WEEKLY HIGHLIGHTS · SPOTLIGHT"
+              defaultText="WEEKLY SPOTLIGHT · ACHIEVEMENTS"
               as="span"
-              className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
+              className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
                 dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               )}
             >
               {(text) => (
                 <>
-                  <Trophy size={11} />
+                  <Trophy size={12} />
                   {text}
                 </>
               )}
@@ -757,8 +737,11 @@ export default function AlaqeeqStudioPublicPage() {
               label="عنوان إنجازات وأحداث الأسبوع"
               defaultText="أبرز أحداث وإنجازات الأسبوع"
               as="h2"
-              className={"mt-1 text-2xl font-black sm:text-3xl " + (dark ? "text-white" : "text-black")}
+              className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}
             />
+            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}>
+              محطات النجاح، التكريمات، والفعاليات الأبرز التي شهدتها المدارس هذا الأسبوع.
+            </p>
           </div>
 
           <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-4">
@@ -967,24 +950,30 @@ export default function AlaqeeqStudioPublicPage() {
         className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]")}
       >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
-          <div className="mb-6">
+          <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-editorial-kicker"
               tag="text"
               label="شارة صوت العقيق"
               defaultText="EDITORIAL · LEADERSHIP MESSAGE"
               as="span"
-              className={"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-black tracking-widest " + (
+              className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
                 dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               )}
             >
               {(text) => (
                 <>
-                  <Quote size={11} />
+                  <Quote size={12} />
                   {text}
                 </>
               )}
             </VisualEditable>
+            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}>
+              صوت العقيق والكلمة التربوية
+            </h2>
+            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}>
+              رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق.
+            </p>
           </div>
 
           <div className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
@@ -1069,21 +1058,32 @@ export default function AlaqeeqStudioPublicPage() {
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
             <div>
-              <VisualEditable
-                id="studio-memory-kicker"
-                tag="text"
-                label="شارة ذاكرة العقيق"
-                defaultText="VISUAL MEMORY"
-                as="p"
-                className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
-              />
+              <div className="mb-2">
+                <VisualEditable
+                  id="studio-memory-kicker"
+                  tag="text"
+                  label="شارة ذاكرة العقيق"
+                  defaultText="VISUAL MEMORY · SPOTLIGHT"
+                  as="span"
+                  className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
+                    dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                  )}
+                >
+                  {(text) => (
+                    <>
+                      <Camera size={12} />
+                      {text}
+                    </>
+                  )}
+                </VisualEditable>
+              </div>
               <VisualEditable
                 id="studio-memory-title"
                 tag="text"
                 label="عنوان قسم ذاكرة العقيق"
-                defaultText="ذاكرة العقيق الحية."
+                defaultText="ذاكرة العقيق الحية"
                 as="h2"
-                className={"mt-1 text-3xl font-black md:text-4xl " + (dark ? "text-white" : "text-black")}
+                className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}
               />
               <VisualEditable
                 id="studio-memory-body"
@@ -1091,7 +1091,7 @@ export default function AlaqeeqStudioPublicPage() {
                 label="وصف ذاكرة العقيق"
                 defaultText="كل عدد يوثّق قصة، وكل ألبوم يحفظ لحظة. لقطات حقيقية من أرشيف مدارس العقيق المتجدد."
                 as="p"
-                className={"mt-4 max-w-md text-sm leading-8 " + (dark ? "text-slate-400" : "text-slate-600")}
+                className={"mt-2 max-w-md text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}
               />
               <VisualEditable
                 id="studio-memory-action"
@@ -1160,16 +1160,22 @@ export default function AlaqeeqStudioPublicPage() {
             ? "border-[#f8ca14]/25 bg-[#080808] text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
             : "border-[#08467d]/20 bg-[#fbfbfb] text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
         )}>
-          <div className="max-w-2xl">
-            <VisualEditable
-              id="studio-archive-kicker"
-              tag="text"
-              label="شارة الأرشيف"
-              defaultText="THE OPEN ARCHIVE & LIVE FEED"
-              as="p"
-              className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
-            />
-            <h2 className={"mt-2 text-3xl font-black md:text-4xl " + (dark ? "text-white" : "text-black")}>
+          <div className="max-w-2xl text-right">
+            <div className="mb-2">
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              }`}>
+                <Sparkles size={12} />
+                <VisualEditable
+                  id="studio-archive-kicker"
+                  tag="text"
+                  label="شارة الأرشيف"
+                  defaultText="OPEN ARCHIVE · LIVE STATS"
+                  as="span"
+                />
+              </div>
+            </div>
+            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}>
               <VisualEditable id="studio-archive-title" tag="text" label="عنوان الأرشيف" defaultText="أرشيف العقيق" as="span" />{" "}
               <VisualEditable
                 id="studio-archive-accent"
@@ -1186,7 +1192,7 @@ export default function AlaqeeqStudioPublicPage() {
               label="وصف الأرشيف"
               defaultText="ذاكرة رقمية متكاملة تنمو يومياً مع كل خبر وعرض مباشر، وكل عدد جديد من المجلة، وكل ألبوم فعالية، متاحة بالكامل للجمهور والزوار."
               as="p"
-              className={"mt-3 text-sm leading-8 " + (dark ? "text-slate-400" : "text-slate-600")}
+              className={"mt-2 max-w-xl text-xs sm:text-sm leading-relaxed " + (dark ? "text-slate-400" : "text-slate-600")}
             />
           </div>
 

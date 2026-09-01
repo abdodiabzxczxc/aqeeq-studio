@@ -112,7 +112,7 @@ import {
   type SiteBroadcast,
 } from "./db";
 import { generateAiNewsStory, generateAiAlbumDescription } from "./aiStoryService";
-import { readGoogleDriveAlbum, getDrivePdfFileId } from "./googleDriveAlbum";
+import { readGoogleDriveAlbum, getDrivePdfFileId, readGoogleDriveAudioFolder } from "./googleDriveAlbum";
 import { invitationRouter } from "./routers/invitation";
 import { settingsRouter } from "./routers/settings";
 import { controlCenterRouter } from "./routers/controlCenter";
@@ -1229,6 +1229,19 @@ export const appRouter = router({
         return updated;
       }),
 
+    scanGoogleDriveAudioFolder: adminProcedure
+      .input(z.object({ folderUrl: z.string().min(1).max(1024) }))
+      .mutation(async ({ input, ctx }) => {
+        const tracks = await readGoogleDriveAudioFolder(input.folderUrl);
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: "admin.scan_drive_audio_folder",
+          details: JSON.stringify({ folderUrl: input.folderUrl, count: tracks.length }),
+        });
+        return { tracks, count: tracks.length };
+      }),
+
     hideStory: adminProcedure
       .input(z.object({ storyId: z.string() }))
       .mutation(async ({ input, ctx }) => {
@@ -1253,6 +1266,22 @@ export const appRouter = router({
           details: JSON.stringify({ storyId: input.storyId }),
         });
         return { success: true, hiddenList };
+      }),
+  }),
+
+  // ==================== Admin Audio & Folder Utilities ====================
+  admin: router({
+    scanGoogleDriveAudioFolder: adminProcedure
+      .input(z.object({ folderUrl: z.string().min(1).max(1024) }))
+      .mutation(async ({ input, ctx }) => {
+        const tracks = await readGoogleDriveAudioFolder(input.folderUrl);
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: "admin.scan_drive_audio_folder",
+          details: JSON.stringify({ folderUrl: input.folderUrl, count: tracks.length }),
+        });
+        return { tracks, count: tracks.length };
       }),
   }),
 

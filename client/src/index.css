@@ -1798,3 +1798,24 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   animation: none !important;
   transform: scaleY(0.3) !important;
 }
+
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-rtl 45s linear infinite;
+}
+
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
+

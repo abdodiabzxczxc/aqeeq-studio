@@ -6,8 +6,18 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
-import { Search, LayoutDashboard, PencilRuler, ScanFace } from "lucide-react";
+import { Search, LayoutDashboard, PencilRuler, ScanFace, Plus, Grid, Sun, Moon, LogOut, Settings2, Headphones } from "lucide-react";
+import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { AqeeqCreatorStudioModal } from "./AqeeqCreatorStudioModal";
 
 export type Section = "studio" | "journal" | "albums" | "showcase" | "articles" | "podcast";
 
@@ -23,9 +33,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnWindowFocus: false });
   const editor = useVisualEditorState();
   const { theme, toggleTheme } = useAqeeqStudioTheme();
+  const { activeItem, isPlaying, playSong, togglePlay } = usePodcastPlayer();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
+  const [creatorModalOpen, setCreatorModalOpen] = useState(false);
   const dark = theme === "dark";
   const isAdmin = isAuthenticated && user?.role === "admin";
   const go = (path: string) => { setMobileMenuOpen(false); navigate(path); };
@@ -102,26 +114,90 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           {/* Left Action Buttons (Compact & Zero Collision on Mobile) */}
           <div dir="ltr" className="absolute left-3.5 sm:left-6 md:left-8 top-1/2 flex -translate-y-1/2 items-center gap-1.5 sm:gap-2.5 md:gap-3">
-            {/* Desktop-only Auth Button (Moved into drawer on mobile) */}
-            <div className="hidden md:block">
+            
+            {/* 1. Options Dropdown Menu OR Login Button (Far Left edge) */}
+            {isAuthenticated ? (
+              <DropdownMenu dir="rtl">
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
+                      dark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                        : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                    }`}
+                    aria-label="قائمة الخيارات"
+                    title="قائمة الخيارات"
+                  >
+                    <Settings2 size={17} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className={`w-56 mt-2 rounded-2xl border ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
+                  <DropdownMenuLabel className="font-black text-xs text-center py-2">
+                    {user?.name || "المشرف العام"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
+                  
+                  {/* Admin Only Actions */}
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem onClick={() => editor.toggleEditing()} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
+                        <PencilRuler size={15} className="text-emerald-500" />
+                        <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => navigate("/admin")} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
+                        <LayoutDashboard size={15} className="text-blue-500" />
+                        <span>لوحة التحكم للإدارة</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  
+                  <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
+                  
+                  {/* Auth Logout */}
+                  <DropdownMenuItem onClick={handleAuth} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"} rounded-xl`}>
+                    <LogOut size={15} />
+                    <span>تسجيل الخروج</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
               <VisualEditable
                 id="aqeeq-studio-auth-action"
                 tag="button"
-                label="زر تسجيل الدخول أو الخروج"
-                defaultText={isAuthenticated ? "تسجيل الخروج" : "تسجيل الدخول"}
+                label="زر تسجيل الدخول"
+                defaultText="تسجيل الدخول"
                 as="button"
                 onAction={handleAuth}
-                className={`grid h-11 w-11 place-items-center rounded-xl border transition ${
+                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
                   dark
-                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                    : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                    ? "border-[#08467d]/30 bg-[#08467d]/10 text-slate-300 hover:bg-[#08467d]/30 hover:text-white"
+                    : "border-[#08467d]/20 bg-[#08467d]/5 text-slate-700 hover:bg-[#08467d]/10 hover:text-black"
                 }`}
+                title="تسجيل الدخول"
+                aria-label="تسجيل الدخول"
               >
-                <VisualIcon id="aqeeq-studio-auth-icon" label="أيقونة تسجيل الدخول أو الخروج" icon={isAuthenticated ? "logout" : "login"} size={20} />
+                <VisualIcon id="aqeeq-studio-login-icon" label="أيقونة الدخول" icon="login" size={17} />
               </VisualEditable>
-            </div>
+            )}
 
-            {/* Theme Toggle (Always Outside on both Mobile & Desktop) */}
+            {/* 2. Unified Creator Studio Button (Icon Only) */}
+            {isAdmin ? (
+              <button
+                onClick={() => setCreatorModalOpen(true)}
+                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
+                  dark
+                    ? "border-[#e5b84f]/50 bg-[#e5b84f]/10 text-[#e5b84f] hover:bg-[#e5b84f] hover:text-black hover:shadow-[#e5b84f]/30"
+                    : "border-[#e5b84f]/60 bg-[#e5b84f]/10 text-[#c59c3a] hover:bg-[#e5b84f] hover:text-white"
+                }`}
+                title="إنشاء محتوى جديد"
+                aria-label="إنشاء محتوى جديد"
+              >
+                <Plus size={18} />
+              </button>
+            ) : null}
+
+            {/* 3. Theme Toggle (Always Outside on both Mobile & Desktop) */}
             <button
               onClick={toggleTheme}
               className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
@@ -134,7 +210,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={17} />
             </button>
 
-            {/* Spotlight Search Trigger */}
+            {/* 4. Spotlight Search Trigger (Closest to center) */}
             <button
               onClick={() => setSearchOpen(true)}
               className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
@@ -148,39 +224,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <Search size={17} />
             </button>
 
-            {/* Visual Editor Icon-only Button (Zero text to save space) */}
-            {isAdmin ? (
-              <button
-                onClick={() => editor.toggleEditing()}
-                className={`grid h-9 w-9 sm:h-11 sm:w-11 place-items-center rounded-xl border transition active:scale-95 ${
-                  editor.isEditing
-                    ? "border-rose-400 bg-rose-500/30 text-rose-100 ring-2 ring-rose-400/50 animate-pulse shadow-lg"
-                    : dark
-                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                      : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
-                }`}
-                title={editor.isEditing ? "إنهاء التعديل البصري (وضع التحرير نشط الآن)" : "تفعيل المحرر البصري لتعديل النصوص والصور والخلفيات"}
-                aria-label="المحرر البصري"
-              >
-                <PencilRuler size={17} />
-              </button>
-            ) : null}
-
-            {/* Desktop-only Admin Button */}
-            {isAdmin ? (
-              <button
-                onClick={() => navigate("/admin")}
-                className={`hidden md:grid h-11 w-11 place-items-center rounded-xl border transition active:scale-95 ${
-                  dark
-                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black shadow-lg shadow-[#f8ca14]/10"
-                    : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white shadow-sm"
-                }`}
-                title="لوحة تحكم المشرف العام (Admin Command Center)"
-                aria-label="لوحة تحكم المشرف العام"
-              >
-                <LayoutDashboard size={18} />
-              </button>
-            ) : null}
 
             {/* Mobile Hamburger Menu Button */}
             <button
@@ -278,6 +321,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
       {/* Global AI Face Recognition Modal */}
       <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
+      <AqeeqCreatorStudioModal open={creatorModalOpen} onOpenChange={setCreatorModalOpen} />
     </div>
   );
 }

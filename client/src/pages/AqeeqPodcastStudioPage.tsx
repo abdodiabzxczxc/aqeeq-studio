@@ -17,6 +17,7 @@ import {
   Headphones,
   Video,
   Play,
+  Palette,
   Pause,
   Plus,
   Trash2,
@@ -546,8 +547,8 @@ export default function AqeeqPodcastStudioPage() {
                             }}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
                           >
-                            <Sparkles size={14} />
-                            <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                            <Palette size={14} />
+                            <span>استوديو وتصميم الأغلفة الإذاعية 🎙️</span>
                           </button>
 
                           <button
@@ -765,8 +766,8 @@ export default function AqeeqPodcastStudioPage() {
                   }}
                   className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
                 >
-                  <Sparkles size={14} />
-                  <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                  <Palette size={14} />
+                  <span>استوديو وتصميم الأغلفة الإذاعية 🎙️</span>
                 </button>
 
                 <button
@@ -824,8 +825,36 @@ export default function AqeeqPodcastStudioPage() {
         onSelect={(item) => {
           if (mediaTarget === "editCover") setEditCoverUrl(item.url);
           else if (mediaTarget === "newCover") setNewCoverUrl(item.url);
-          else if (mediaTarget === "editMedia") setEditMediaUrl(item.url);
-          else if (mediaTarget === "newMedia") setNewMediaUrl(item.url);
+          else if (mediaTarget === "editMedia") {
+            setEditMediaUrl(item.url);
+            try {
+              const audio = new Audio(item.url);
+              audio.onloadedmetadata = () => {
+                if (audio.duration && isFinite(audio.duration)) {
+                  const m = Math.floor(audio.duration / 60);
+                  const s = Math.floor(audio.duration % 60);
+                  const formatted = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+                  setEditDuration(formatted);
+                  toast.success(`تم استخراج مدة الحلقة تلقائياً: ${formatted}`);
+                }
+              };
+            } catch (e) {}
+          }
+          else if (mediaTarget === "newMedia") {
+            setNewMediaUrl(item.url);
+            try {
+              const audio = new Audio(item.url);
+              audio.onloadedmetadata = () => {
+                if (audio.duration && isFinite(audio.duration)) {
+                  const m = Math.floor(audio.duration / 60);
+                  const s = Math.floor(audio.duration % 60);
+                  const formatted = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+                  setNewDuration(formatted);
+                  toast.success(`تم استخراج مدة الحلقة تلقائياً: ${formatted}`);
+                }
+              };
+            } catch (e) {}
+          }
           setIsMediaLibraryOpen(false);
           toast.success("تم تحديد الملف بنجاح!");
         }}
@@ -837,6 +866,9 @@ export default function AqeeqPodcastStudioPage() {
         onOpenChange={setIsAiImageOpen}
         type="podcast"
         defaultPrompt={aiImagePrompt}
+        defaultAuthor={aiImageTarget === "newCover" ? newHostName : editHostName}
+        defaultQuote={aiImageTarget === "newCover" ? newDescription : editDescription}
+        defaultDuration={aiImageTarget === "newCover" ? newDuration : editDuration}
         dark={dark}
         onSelectCover={(url) => {
           if (aiImageTarget === "newCover") {

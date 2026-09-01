@@ -216,6 +216,8 @@ const DEFAULT_STATE: LocalDbState = {
 
 let memoryState: LocalDbState | null = null;
 
+const SEED_FILE = path.resolve(process.cwd(), "server", "seedData.json");
+
 export function getLocalDb(): LocalDbState {
   if (memoryState) return memoryState;
 
@@ -223,10 +225,25 @@ export function getLocalDb(): LocalDbState {
   if (fs.existsSync(DB_FILE)) {
     try {
       const content = fs.readFileSync(DB_FILE, "utf-8");
-      memoryState = JSON.parse(content);
-      return memoryState!;
+      const parsed = JSON.parse(content);
+      if (parsed && (parsed.albums?.length > 0 || parsed.issues?.length > 0 || parsed.showcases?.length > 0)) {
+        memoryState = parsed;
+        return memoryState!;
+      }
     } catch (e) {
       console.warn("[LocalDB] Corrupted DB file, reinitializing", e);
+    }
+  }
+
+  // Load from bundled seedData.json so Render is NEVER empty out-of-the-box!
+  if (fs.existsSync(SEED_FILE)) {
+    try {
+      const seedContent = fs.readFileSync(SEED_FILE, "utf-8");
+      memoryState = JSON.parse(seedContent);
+      saveLocalDb();
+      return memoryState!;
+    } catch (e) {
+      console.warn("[LocalDB] Failed to load seed file:", e);
     }
   }
 

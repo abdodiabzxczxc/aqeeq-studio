@@ -9,6 +9,7 @@ function directDriveImage(url: string | null | undefined) {
   return match ? `/api/drive-proxy/${match[1]}` : url;
 }
 import { AqeeqUniversalMediaPickerModal, MediaPickerItem } from "@/components/AqeeqUniversalMediaPickerModal";
+import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -48,6 +49,13 @@ import {
   Sun,
   Moon,
   Clock,
+  Wand2,
+  Music,
+  Headphones,
+  Play,
+  Pause,
+  ListMusic,
+  FolderSync,
 } from "lucide-react";
 import {
   Dialog,
@@ -73,7 +81,7 @@ function SnapchatIcon({ size = 14, className = "" }: { size?: number; className?
   );
 }
 
-type TabKey = "radar" | "orchestration" | "users" | "content" | "broadcast" | "articles" | "podcast" | "whatsapp";
+type TabKey = "radar" | "orchestration" | "users" | "content" | "broadcast" | "articles" | "podcast" | "music" | "whatsapp";
 
 export default function AqeeqAdminDashboardPage() {
   const [, navigate] = useLocation();
@@ -82,6 +90,7 @@ export default function AqeeqAdminDashboardPage() {
   const dark = theme === "dark";
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
+  const [isYearbookOpen, setIsYearbookOpen] = useState(false);
   const utils = trpc.useUtils();
 
   // Admin Overview Queries
@@ -175,6 +184,14 @@ const DEFAULT_ORCHESTRATION = {
   },
   sections: {
     storiesEnabled: true,
+    marqueeEnabled: true,
+    marqueeBadge: "آخر الأخبار",
+    studioHighlightsEnabled: true,
+    studioHighlightsTitle: "جديد الاستوديو",
+    studioHighlightsDesc: "أحدث ما تم نشره وتوثيقه عبر استوديوهات العقيق من وسائط وإصدارات رقمية.",
+    libraryEnabled: true,
+    libraryTitle: "استكشف المكتبة",
+    libraryDesc: "تصفح متكامل وشامل لجميع أرشيفات البودكاست، المقالات، الألبومات والمجلات المدرسية.",
     pathwaysEnabled: true,
     bentoEnabled: true,
     quoteEnabled: true,
@@ -198,6 +215,40 @@ const DEFAULT_ORCHESTRATION = {
     authorTitle: "المشرف العام على مدارس العقيق",
     audioUrl: null,
   },
+  schoolSongs: [
+    {
+      id: "song-1",
+      title: "نشيد مدارس العقيق الرسمي",
+      artist: "كورال طلاب مدارس العقيق الأهلية",
+      category: "النشيد المدرسي",
+      mediaUrl: "/audio/aqeeq-royal.mp3",
+      coverUrl: "",
+    },
+    {
+      id: "song-2",
+      title: "أغنية فخر التميز والريادة",
+      artist: "فرقة المدارس الاحتفالية",
+      category: "احتفالي",
+      mediaUrl: "/audio/aqeeq-celebration.mp3",
+      coverUrl: "",
+    },
+    {
+      id: "song-3",
+      title: "معزوفة إلهام العقيق (بيانو)",
+      artist: "استوديو العقيق الموسيقي",
+      category: "بيانو وهدوء",
+      mediaUrl: "/audio/aqeeq-piano.mp3",
+      coverUrl: "",
+    },
+    {
+      id: "song-4",
+      title: "أنغام العقيق الملكية",
+      artist: "وتريات العقيق",
+      category: "أجواء ملكية",
+      mediaUrl: "/audio/aqeeq-ambient.mp3",
+      coverUrl: "",
+    },
+  ],
   social: {
     xUrl: "https://x.com/alaqeeq_schools",
     instagramUrl: "https://instagram.com/alaqeeq_schools",
@@ -262,6 +313,7 @@ const DEFAULT_ORCHESTRATION = {
         social: { ...DEFAULT_ORCHESTRATION.social, ...(orchestrationData.social || {}) },
         footer: { ...DEFAULT_ORCHESTRATION.footer, ...(orchestrationData.footer || {}) },
         location: { ...DEFAULT_ORCHESTRATION.location, ...(orchestrationData.location || {}) },
+        schoolSongs: (orchestrationData as any).schoolSongs || DEFAULT_ORCHESTRATION.schoolSongs,
       });
     }
   }, [orchestrationData]);
@@ -278,6 +330,20 @@ const DEFAULT_ORCHESTRATION = {
 
   // Hero Covers Sub-tab State
   const [heroActiveCoverTab, setHeroActiveCoverTab] = useState<"home" | "journal" | "albums" | "showcase" | "articles" | "podcasts">("home");
+
+  // School Songs State
+  const [newSongTitle, setNewSongTitle] = useState("");
+  const [newSongArtist, setNewSongArtist] = useState("");
+  const [newSongUrl, setNewSongUrl] = useState("");
+  const [newSongCategory, setNewSongCategory] = useState("النشيد المدرسي");
+  const [newSongCover, setNewSongCover] = useState("");
+  const [isAddSongOpen, setIsAddSongOpen] = useState(false);
+  const [isImportAudioFolderOpen, setIsImportAudioFolderOpen] = useState(false);
+  const [driveAudioFolderUrl, setDriveAudioFolderUrl] = useState("");
+  const [scannedAudioTracks, setScannedAudioTracks] = useState<any[]>([]);
+  const [selectedTrackIds, setSelectedTrackIds] = useState<Record<string, boolean>>({});
+
+  const scanDriveAudioFolderMutation = trpc.admin.scanGoogleDriveAudioFolder.useMutation();
 
   // User Management State
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -657,6 +723,7 @@ const DEFAULT_ORCHESTRATION = {
             { key: "broadcast", label: "شريط التنبيهات العاجل", icon: Megaphone, alert: broadcastEnabled },
             { key: "articles", label: "مراجعة المقالات ✍️", icon: BookOpen, badge: allAdminArticles.filter((a) => a.status === "pending").length || undefined },
             { key: "podcast", label: "الإذاعة والبودكاست 🎙️", icon: Radio, badge: allAdminPodcasts.length },
+            { key: "music", label: "أغاني وراديو العقيق 🎵", icon: Headphones, badge: (orchestrationForm.schoolSongs || []).length },
             { key: "whatsapp", label: "مُولّد حملات الواتساب وQR", icon: Share2 },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -2124,6 +2191,114 @@ const DEFAULT_ORCHESTRATION = {
                 </div>
               </div>
 
+              {/* 4.5. SCHOOL ANTHEMS & SPOTIFY AUDIO PLAYLIST */}
+              <div
+                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
+                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
+                )}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-current/10">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-black font-black">
+                      <Headphones size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black">مكتبة أغاني وأناشيد العقيق (Spotify Audio)</h3>
+                      <p className="text-xs font-bold text-slate-400">إدارة الأغاني والأناشيد والموسيقى للمشغل الصوتي الموحد</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDriveAudioFolderUrl("");
+                        setScannedAudioTracks([]);
+                        setSelectedTrackIds({});
+                        setIsImportAudioFolderOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-xs hover:from-emerald-400 hover:to-teal-400 transition shadow-md shrink-0"
+                      title="استيراد مجلد أغانٍ كامل من Google Drive"
+                    >
+                      <FolderSync size={15} />
+                      <span>استيراد فولدر من Drive</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewSongTitle("");
+                        setNewSongArtist("");
+                        setNewSongUrl("");
+                        setNewSongCategory("النشيد المدرسي");
+                        setNewSongCover("");
+                        setIsAddSongOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 text-black font-black text-xs hover:bg-amber-300 transition shrink-0"
+                    >
+                      <Plus size={15} />
+                      <span>إضافة نشيد منفرد</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* List of Current Songs */}
+                <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                  {(orchestrationForm.schoolSongs || []).map((song: any, idx: number) => (
+                    <div
+                      key={song.id || idx}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition ${
+                        dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="relative h-11 w-11 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-sm">
+                          <img
+                            src={
+                              (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
+                                ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
+                                : (directDriveImage(song.coverUrl) || song.coverUrl)
+                            }
+                            alt=""
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
+                            }}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black truncate">{song.title}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{song.artist || "مدارس العقيق"} · {song.category || "نشيد"}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
+                            setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                            toast.info("تم حذف الأغنية من القائمة مؤقتاً، اضغط حفظ التعديلات لتأكيد الحفظ.");
+                          }}
+                          className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition"
+                          title="حذف الأغنية"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {(!orchestrationForm.schoolSongs || orchestrationForm.schoolSongs.length === 0) && (
+                    <p className="text-center py-6 text-xs text-slate-400 font-bold">لا توجد أغاني مضافة حالياً. أضف أول نشيد الآن!</p>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  💡 <strong>ملاحظة:</strong> المشغل الذكي في الموقع يقوم تلقائياً بتشغيل الأغاني والانتقال بينها، وإذا قام الزائر بتشغيل بودكاست، يتم إيقاف الأغنية مؤقتاً، وبعد انتهاء البودكاست يُسأل الزائر فوراً إن كان يود العودة للأغنية أو البودكاست التالي.
+                </p>
+              </div>
+
               {/* 5. SECTIONS VISIBILITY & TITLES */}
               <div
                 className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md lg:col-span-2 " + (
@@ -2141,6 +2316,80 @@ const DEFAULT_ORCHESTRATION = {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 1. News Marquee */}
+                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black">شريط الأخبار المتحرك</span>
+                      <input
+                        type="checkbox"
+                        checked={orchestrationForm.sections.marqueeEnabled !== false}
+                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, marqueeEnabled: e.target.checked } })}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={orchestrationForm.sections.marqueeBadge || ""}
+                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, marqueeBadge: e.target.value } })}
+                      placeholder="شارة شريط الأخبار (مثل: آخر الأخبار)..."
+                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
+                    />
+                    <p className="text-[11px] text-slate-400">شريط متحرك يعرض أحدث العناوين من المقالات والبودكاست والألبومات والمجلات تلقائياً.</p>
+                  </div>
+
+                  {/* 2. Studio Highlights Bento */}
+                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black">سيكشن جديد الاستوديو (Bento Grid)</span>
+                      <input
+                        type="checkbox"
+                        checked={orchestrationForm.sections.studioHighlightsEnabled !== false}
+                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsEnabled: e.target.checked } })}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={orchestrationForm.sections.studioHighlightsTitle || ""}
+                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsTitle: e.target.value } })}
+                      placeholder="عنوان جديد الاستوديو..."
+                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
+                    />
+                    <textarea
+                      rows={2}
+                      value={orchestrationForm.sections.studioHighlightsDesc || ""}
+                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsDesc: e.target.value } })}
+                      placeholder="وصف جديد الاستوديو..."
+                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
+                    />
+                  </div>
+
+                  {/* 3. Explore Library Tabs */}
+                  <div className="space-y-2 rounded-2xl border border-current/10 p-4 md:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black">سيكشن استكشف المكتبة (Tabs Library)</span>
+                      <input
+                        type="checkbox"
+                        checked={orchestrationForm.sections.libraryEnabled !== false}
+                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryEnabled: e.target.checked } })}
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={orchestrationForm.sections.libraryTitle || ""}
+                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryTitle: e.target.value } })}
+                        placeholder="عنوان استكشف المكتبة..."
+                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
+                      />
+                      <input
+                        type="text"
+                        value={orchestrationForm.sections.libraryDesc || ""}
+                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryDesc: e.target.value } })}
+                        placeholder="وصف استكشف المكتبة..."
+                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
+                      />
+                    </div>
+                  </div>
+
                   {/* Journal Section */}
                   <div className="space-y-2 rounded-2xl border border-current/10 p-4">
                     <div className="flex items-center justify-between">
@@ -2392,6 +2641,36 @@ const DEFAULT_ORCHESTRATION = {
         {/* ==================== TAB 1: RADAR & STATS ==================== */}
         {activeTab === "radar" && (
           <div className="space-y-8 animate-in fade-in duration-300">
+            {/* AI Yearbook Super Feature Banner */}
+            <div className={`relative overflow-hidden rounded-3xl p-8 sm:p-10 shadow-2xl ${
+              dark 
+                ? "bg-gradient-to-r from-[#111] via-[#1a1508] to-[#111] border border-[#e5b84f]/20" 
+                : "bg-gradient-to-r from-slate-50 via-amber-50 to-slate-50 border border-[#e5b84f]/30"
+            }`}>
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="text-right max-w-2xl">
+                  <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold bg-[#e5b84f]/10 text-[#e5b84f] mb-4">
+                    <Sparkles size={14} />
+                    <span>ميزة تجريبية خارقة (Beta)</span>
+                  </div>
+                  <h3 className="text-3xl sm:text-4xl font-black font-['Tajawal'] mb-3">
+                    السجل السنوي المخصص بالذكاء الاصطناعي 🎓
+                  </h3>
+                  <p className={`text-sm sm:text-base font-bold leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                    أول نظام في الشرق الأوسط يقوم بتوليد "مجلة تخرج" أو "سجل سنوي" فردي وحصري لكل طالب بناءً على بصمته الرقمية، إنجازاته، وصوره من نظام التعرف على الوجوه.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsYearbookOpen(true)}
+                  className="shrink-0 flex items-center justify-center gap-2 h-14 px-8 rounded-2xl bg-gradient-to-l from-[#e5b84f] to-[#c59c3a] text-black font-black text-lg shadow-[0_0_40px_rgba(229,184,79,0.4)] hover:scale-105 hover:shadow-[0_0_60px_rgba(229,184,79,0.6)] transition-all"
+                >
+                  <Wand2 size={24} />
+                  <span>توليد السجلات الذكية</span>
+                </button>
+              </div>
+            </div>
+
             {/* Top KPI Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* 1. Views */}
@@ -3833,6 +4112,121 @@ const DEFAULT_ORCHESTRATION = {
           </div>
         )}
 
+        {/* ==================== TAB: MUSIC & ANTHEMS ==================== */}
+        {activeTab === "music" && (
+          <div className="space-y-6">
+            <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white"}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 border-current/10">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-black font-black shadow-lg shadow-amber-400/20">
+                    <Headphones size={26} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-black font-cairo">أغاني وراديو العقيق 🎵 (Spotify Engine)</h2>
+                    <p className="text-xs sm:text-sm font-bold text-slate-400">إدارة الأناشيد والأغاني المدرسية التي تعمل في المشغل الصوتي الموحد</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewSongTitle("");
+                      setNewSongArtist("");
+                      setNewSongUrl("");
+                      setNewSongCategory("النشيد المدرسي");
+                      setNewSongCover("");
+                      setIsAddSongOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#f8ca14] text-black font-black text-xs hover:bg-yellow-400 transition shadow-lg shadow-[#f8ca14]/20 active:scale-95"
+                  >
+                    <Plus size={16} />
+                    <span>إضافة أغنية / نشيد جديد</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                    disabled={setOrchestrationMutation.isPending}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر التعديلات"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Songs List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(orchestrationForm.schoolSongs || []).map((song: any, idx: number) => (
+                  <div
+                    key={song.id || idx}
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition ${
+                      dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-md">
+                        <img
+                          src={
+                            (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
+                              ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
+                              : (directDriveImage(song.coverUrl) || song.coverUrl)
+                          }
+                          alt=""
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-1">
+                          {song.category || "نشيد مدرسي"}
+                        </span>
+                        <h4 className="text-sm font-black truncate">{song.title}</h4>
+                        <p className="text-xs text-slate-400 truncate">{song.artist || "مدارس العقيق"}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
+                          setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                          toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
+                        }}
+                        className="grid h-9 w-9 place-items-center rounded-xl text-rose-400 hover:bg-rose-500/10 transition"
+                        title="حذف"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {(!orchestrationForm.schoolSongs || orchestrationForm.schoolSongs.length === 0) && (
+                  <div className="col-span-full text-center py-12 text-slate-400 font-bold text-sm">
+                    لا توجد أناشيد أو أغاني مضافة حالياً. اضغط زر "إضافة أغنية / نشيد جديد" للبدء.
+                  </div>
+                )}
+              </div>
+
+              {/* Instructions Callout */}
+              <div className={`p-5 rounded-2xl border ${dark ? "border-amber-400/20 bg-amber-400/5 text-amber-200" : "border-amber-300 bg-amber-50 text-amber-900"}`}>
+                <h4 className="text-xs font-black mb-1 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span>كيف يعمل نظام مشغل سبوتيفاي الذكي في الموقع؟</span>
+                </h4>
+                <p className="text-[11px] leading-relaxed opacity-90">
+                  المشغل العائم متاح للزوار في أسفل الشاشة ومن الهيدر العلوي عبر أيقونة السماعة 🎧. يستمع الزائر لأناشيد المدارس، وإذا ضغط على أي حلقة بودكاست، يُبدل المشغل تلقائياً إلى البودكاست، وعند انتهاء الحلقة يخير الزائر تلقائياً بالعودة للنشيد أو الانتقال للبودكاست التالي!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ==================== TAB 5: WHATSAPP CAMPAIGN ==================== */}
         {activeTab === "whatsapp" && (
           <div className="max-w-3xl space-y-6 animate-in fade-in duration-300">
@@ -4135,6 +4529,350 @@ const DEFAULT_ORCHESTRATION = {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ==================== MODAL: ADD SCHOOL SONG ==================== */}
+      <Dialog open={isAddSongOpen} onOpenChange={setIsAddSongOpen}>
+        <DialogContent
+          dir="rtl"
+          className={"sm:max-w-[480px] rounded-3xl " + (
+            dark ? "bg-[#121212] text-white border-white/15" : "bg-white text-slate-900 border-black/10"
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black flex items-center gap-2">
+              <Headphones size={20} className="text-amber-400" />
+              <span>إضافة أغنية أو نشيد جديد</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              أدخل بيانات الملف الصوتي ليظهر في قائمة مشغل العقيق الصوتي الموحد.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-3">
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 mb-1">اسم الأغنية / النشيد *</label>
+              <input
+                type="text"
+                value={newSongTitle}
+                onChange={(e) => setNewSongTitle(e.target.value)}
+                placeholder="مثال: نشيد مدارس العقيق الرسمي"
+                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
+                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
+                )}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 mb-1">المؤدي / المنشد / الكورال</label>
+              <input
+                type="text"
+                value={newSongArtist}
+                onChange={(e) => setNewSongArtist(e.target.value)}
+                placeholder="مثال: كورال طلاب مدارس العقيق"
+                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
+                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
+                )}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 mb-1">رابط الملف الصوتي (Audio URL / Drive) *</label>
+              <input
+                type="text"
+                value={newSongUrl}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setNewSongUrl(val);
+                  if (val.includes("/folders/")) {
+                    setDriveAudioFolderUrl(val);
+                  }
+                }}
+                placeholder="رابط ملف Drive المباشر أو https://.../song.mp3"
+                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (
+                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
+                )}
+              />
+              {newSongUrl.includes("/folders/") && (
+                <div className="mt-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
+                  <span>💡 هذا الرابط يشير لمجلد Google Drive كامل!</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDriveAudioFolderUrl(newSongUrl);
+                      setIsAddSongOpen(false);
+                      setIsImportAudioFolderOpen(true);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-black text-[11px] hover:bg-emerald-400 transition"
+                  >
+                    استيراد المجلد كاملاً
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-black text-slate-400 mb-1">التصنيف</label>
+                <select
+                  value={newSongCategory}
+                  onChange={(e) => setNewSongCategory(e.target.value)}
+                  className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
+                    dark ? "border-white/10 bg-[#1a1a1a] text-white" : "border-black/10 bg-slate-50 text-black"
+                  )}
+                >
+                  <option value="النشيد المدرسي">النشيد المدرسي</option>
+                  <option value="احتفالي">احتفالي</option>
+                  <option value="أغنية وطنية">أغنية وطنية</option>
+                  <option value="حفل تخرج">حفل تخرج</option>
+                  <option value="بيانو وهدوء">بيانو وهدوء</option>
+                </select>
+              </div>
+
+            {/* Pure Audio Mode Banner (No images needed) */}
+            <div className={`p-3 rounded-2xl border text-xs flex items-center gap-2.5 ${
+              dark ? "bg-amber-400/5 border-amber-400/20 text-amber-300/90" : "bg-amber-50/80 border-amber-200 text-amber-900"
+            }`}>
+              <Music size={16} className="shrink-0 text-amber-500" />
+              <span>يتم عرض النشيد تلقائياً بهوية النوتة الموسيقية المينيمال الموحدة المتكيفة بين الوضع الفاتح والداكن دون الحاجة لرفع صور.</span>
+            </div>
+          </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <button
+              onClick={() => setIsAddSongOpen(false)}
+              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400"
+            >
+              إلغاء
+            </button>
+            <button
+              onClick={() => {
+                if (!newSongTitle.trim()) {
+                  toast.error("يرجى إدخال اسم الأغنية أو النشيد");
+                  return;
+                }
+                if (!newSongUrl.trim()) {
+                  toast.error("يرجى إدخال رابط الملف الصوتي");
+                  return;
+                }
+                const newSong = {
+                  id: `song-${Date.now()}`,
+                  title: newSongTitle.trim(),
+                  artist: newSongArtist.trim() || "مدارس العقيق",
+                  mediaUrl: newSongUrl.trim(),
+                  category: newSongCategory,
+                  coverUrl: "",
+                };
+                const updatedList = [...(orchestrationForm.schoolSongs || []), newSong];
+                setOrchestrationForm({ ...orchestrationForm, schoolSongs: updatedList });
+                setIsAddSongOpen(false);
+                toast.success("تمت إضافة النشيد بنجاح! اضغط 'حفظ ونشر التعديلات' لنشره على الموقع.");
+              }}
+              className="rounded-xl bg-amber-400 px-5 py-2 text-xs font-black text-black hover:bg-amber-300 transition"
+            >
+              إضافة للقائمة
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* GOOGLE DRIVE AUDIO FOLDER BATCH IMPORT MODAL */}
+      {/* ========================================================================= */}
+      <Dialog open={isImportAudioFolderOpen} onOpenChange={setIsImportAudioFolderOpen}>
+        <DialogContent className={`max-w-2xl rounded-3xl ${dark ? "bg-[#0d0f15] border-white/10 text-white" : "bg-white border-black/10 text-slate-900"}`} dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2.5 text-base font-black">
+              <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black grid place-items-center shadow-md">
+                <FolderSync size={18} />
+              </div>
+              <div>
+                <span>استيراد مكتبة صوتية كاملة من Google Drive</span>
+                <p className="text-xs font-bold text-slate-400 mt-0.5">يدعم جميع صيغ الصوت: MP3, WAV, M4A, FLAC, OGG, AAC, OPUS, WMA, WEBA...</p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            {/* Input URL & Scan Button */}
+            <div>
+              <label className="block text-xs font-black text-slate-400 mb-1.5">رابط مجلد Google Drive (يجب أن يكون «أي شخص لديه الرابط - مشاهد»)</label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={driveAudioFolderUrl}
+                  onChange={(e) => setDriveAudioFolderUrl(e.target.value)}
+                  placeholder="https://drive.google.com/drive/folders/1aBcDeFgHiJkLmNoPqRsTuVwXyZ..."
+                  className={`flex-1 rounded-2xl border px-3.5 py-2.5 text-xs font-mono font-bold outline-none transition ${
+                    dark ? "border-white/10 bg-black/50 focus:border-emerald-400/50" : "border-black/10 bg-slate-50 focus:border-emerald-500"
+                  }`}
+                />
+                <button
+                  type="button"
+                  disabled={scanDriveAudioFolderMutation.isPending || !driveAudioFolderUrl.trim()}
+                  onClick={async () => {
+                    if (!driveAudioFolderUrl.trim()) return;
+                    try {
+                      const res = await scanDriveAudioFolderMutation.mutateAsync({ folderUrl: driveAudioFolderUrl.trim() });
+                      setScannedAudioTracks(res.tracks);
+                      const initialSelected: Record<string, boolean> = {};
+                      res.tracks.forEach((t: any) => {
+                        initialSelected[t.driveFileId] = true;
+                      });
+                      setSelectedTrackIds(initialSelected);
+                      toast.success(`تم بنجاح العثور على ${res.count} ملف صوتي في المجلد!`);
+                    } catch (err: any) {
+                      toast.error(err.message || "تعذر قراءة المجلد. تأكد من صحة الرابط وأن الصلاحية عامة.");
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition flex items-center gap-1.5 shrink-0 shadow-md disabled:opacity-50"
+                >
+                  {scanDriveAudioFolderMutation.isPending ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>جاري الفحص...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search size={14} />
+                      <span>فحص المجلد</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
+                💡 <strong>نصيحة:</strong> قم بوضع ملفات الأناشيد في مجلد في درايف، واجعل المشاركة «Anyone with the link can view». سيقوم النظام تلقائياً بتنظيف الأسماء، وتحديد الصيغة، وتعيين أغلفة أنيقة جاهزة للعزف.
+              </p>
+            </div>
+
+            {/* Scanned Audio List Preview */}
+            {scannedAudioTracks.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs font-black">
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={14} />
+                    <span>تم اكتشاف ({scannedAudioTracks.length}) مقطع صوتي:</span>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const all: Record<string, boolean> = {};
+                        scannedAudioTracks.forEach((t: any) => { all[t.driveFileId] = true; });
+                        setSelectedTrackIds(all);
+                      }}
+                      className="text-[11px] text-slate-400 hover:text-white"
+                    >
+                      تحديد الكل
+                    </button>
+                    <span>·</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTrackIds({})}
+                      className="text-[11px] text-slate-400 hover:text-white"
+                    >
+                      إلغاء التحديد
+                    </button>
+                  </div>
+                </div>
+
+                <div className="max-h-[260px] overflow-y-auto space-y-1.5 pr-1">
+                  {scannedAudioTracks.map((track: any) => {
+                    const isChecked = !!selectedTrackIds[track.driveFileId];
+                    return (
+                      <div
+                        key={track.driveFileId}
+                        onClick={() => {
+                          setSelectedTrackIds((prev) => ({
+                            ...prev,
+                            [track.driveFileId]: !prev[track.driveFileId],
+                          }));
+                        }}
+                        className={`flex items-center justify-between p-2.5 rounded-2xl border cursor-pointer transition ${
+                          isChecked
+                            ? dark ? "bg-emerald-500/10 border-emerald-500/40 text-white" : "bg-emerald-50 border-emerald-300 text-slate-900"
+                            : dark ? "bg-white/[0.02] border-white/5 opacity-50" : "bg-slate-50 border-black/5 opacity-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {}}
+                            className="rounded accent-emerald-500 h-4 w-4"
+                          />
+                          <div className="h-9 w-9 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black">
+                            <img
+                              src={track.coverUrl || (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")}
+                              alt=""
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
+                              }}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-black truncate">{track.title}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{track.artist} · {track.fileName}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                            {track.extension}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-slate-400">
+                            {track.category}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-white/10">
+            <button
+              type="button"
+              onClick={() => setIsImportAudioFolderOpen(false)}
+              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400 hover:text-white"
+            >
+              إغلاق
+            </button>
+            <button
+              type="button"
+              disabled={scannedAudioTracks.length === 0 || Object.values(selectedTrackIds).filter(Boolean).length === 0}
+              onClick={() => {
+                const toAdd = scannedAudioTracks
+                  .filter((t: any) => selectedTrackIds[t.driveFileId])
+                  .map((t: any, idx: number) => ({
+                    id: `song-drive-${t.driveFileId}-${Date.now()}-${idx}`,
+                    title: t.title,
+                    artist: t.artist,
+                    mediaUrl: t.mediaUrl,
+                    category: t.category,
+                    coverUrl: t.coverUrl,
+                  }));
+
+                if (toAdd.length === 0) {
+                  toast.error("يرجى اختيار نشيد واحد على الأقل للاستيراد");
+                  return;
+                }
+
+                const updated = [...(orchestrationForm.schoolSongs || []), ...toAdd];
+                setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                setIsImportAudioFolderOpen(false);
+                toast.success(`تم استيراد ${toAdd.length} نشيد بنجاح! اضغط 'حفظ ونشر التعديلات' بالأعلى لتثبيتها في الموقع.`);
+              }}
+              className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 px-5 py-2 text-xs font-black text-black hover:from-emerald-400 hover:to-teal-300 transition shadow-md disabled:opacity-50"
+            >
+              استيراد الأناشيد المحددة ({Object.values(selectedTrackIds).filter(Boolean).length})
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Universal Media & Cover Picker Modal */}
       <AqeeqUniversalMediaPickerModal
         open={mediaPickerConfig.open}
@@ -4144,6 +4882,8 @@ const DEFAULT_ORCHESTRATION = {
         onSelect={mediaPickerConfig.onSelect}
         dark={dark}
       />
+
+      <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
     </div>
   );
 }

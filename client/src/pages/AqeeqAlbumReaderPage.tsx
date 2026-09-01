@@ -7,13 +7,14 @@ import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
+import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqAlbumSpreadWatermark } from "@/lib/aqeeqAlbumReaderTheme";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, Moon, Printer, RotateCcw, ScanFace, Settings2, Share2, Sparkles, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
+import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, MonitorPlay, Moon, Printer, RotateCcw, ScanFace, Settings2, Share2, Sparkles, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -55,6 +56,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const [index, setIndex] = useState(0);
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
+  const [isTvMode, setIsTvMode] = useState(false);
 
   useEffect(() => {
     if (!album) return;
@@ -359,6 +361,19 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             aria-label="البحث عن صوري بالذكاء الاصطناعي"
           >
             <ScanFace size={18} className="text-amber-400" />
+          </button>
+          
+          <button
+            onClick={() => setIsTvMode(true)}
+            className={`grid h-9 w-9 place-items-center rounded-xl border transition active:scale-95 touch-manipulation ${
+              dark
+                ? "border-emerald-400/40 bg-emerald-400/15 text-emerald-300 hover:bg-emerald-400/25 ring-1 ring-emerald-400/20"
+                : "border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 shadow-sm"
+            }`}
+            title="تشغيل كشاشة عرض سينمائية 📺"
+            aria-label="تشغيل كشاشة عرض"
+          >
+            <MonitorPlay size={18} className="text-emerald-400" />
           </button>
           <VisualEditable id="album-reader-theme-action" tag="button" label="زر مظهر قارئ الألبوم" defaultText={dark ? "وايت مود" : "دارك مود"} as="button" onAction={toggleTheme} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-theme-icon" label="أيقونة مظهر قارئ الألبوم" icon={dark ? "sun" : "moon"} size={16} /></VisualEditable>
           <VisualEditable id="album-reader-archive-action" tag="button" label="زر كل الألبومات" defaultText="كل الألبومات" as="button" onAction={() => navigate("/albums")} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-archive-icon" label="أيقونة أرشيف الألبومات" icon="archive" size={16} /></VisualEditable>
@@ -725,6 +740,18 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           dark={dark}
         />
       ) : null}
+
+      {isTvMode && (
+        <AqeeqAlbumTvMode 
+          albumTitle={album.title}
+          images={media.filter(m => m.mediaType === "image").map(m => ({
+            id: m.id,
+            url: getAqeeqAlbumImageSource(m),
+            caption: m.caption
+          }))}
+          onClose={() => setIsTvMode(false)}
+        />
+      )}
     </div>
   </main>;
 }

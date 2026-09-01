@@ -5,9 +5,12 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video } from "lucide-react";
+import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
+import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
+import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
 
@@ -78,6 +81,8 @@ export default function AqeeqAlbumsPage() {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<AqeeqSortOption>("newest");
+  const [isTvMode, setIsTvMode] = useState(false);
+  const [isWrappedOpen, setIsWrappedOpen] = useState(false);
   const isAdmin = isAuthenticated && user?.role === "admin";
   const { data: albums = [], isLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: journalIssues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -100,6 +105,11 @@ export default function AqeeqAlbumsPage() {
     }
     return albums.find((a) => a.id !== featuredAlbum.id) as PublicAlbum | undefined;
   }, [albums, featuredAlbum, orchestration?.heroCovers?.albumsSecondaryAlbumId]);
+
+  const { data: allMediaDetails, isLoading: isAllMediaLoading } = trpc.aqeeqAlbums.allPublicMedia.useQuery(
+    undefined,
+    { enabled: isTvMode }
+  );
 
   if (isLoading) return <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}><Loader2 className="animate-spin text-[#f8ca14]" /></div>;
 
@@ -163,12 +173,27 @@ export default function AqeeqAlbumsPage() {
                   }`}>
                     <ArrowUpLeft size={16} />ابدأ بالألبوم الحالي
                   </VisualEditable>
+                  
+                  {/* Aqeeq Wrapped Button (For everyone) */}
+                  <button onClick={() => setIsWrappedOpen(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:scale-105 ${
+                    dark ? "border-purple-500/50 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 text-purple-300 hover:border-purple-400" : "border-purple-300 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-900 hover:border-purple-400"
+                  }`}>
+                    <Sparkles size={16} className="animate-pulse" />حصاد العقيق الذكي 🎬
+                  </button>
+                  
                   {isAdmin ? (
-                    <button onClick={() => navigate("/albums/manage")} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
-                      dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
-                    }`}>
-                      <Settings2 size={16} />دخول استوديو الألبومات
-                    </button>
+                    <>
+                      <button onClick={() => navigate("/albums/manage")} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                        dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                      }`}>
+                        <Settings2 size={16} />دخول استوديو الألبومات
+                      </button>
+                      <button onClick={() => setIsTvMode(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                        dark ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20" : "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 hover:bg-emerald-600/20"
+                      }`}>
+                        <MonitorPlay size={16} />تشغيل كشاشة عرض 📺
+                      </button>
+                    </>
                   ) : null}
                 </div>
               </div>
@@ -202,6 +227,26 @@ export default function AqeeqAlbumsPage() {
           {isAdmin ? <button onClick={() => navigate("/albums/manage")} className={`mt-6 rounded-xl px-4 py-3 text-xs font-black ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}>إنشاء أول ألبوم</button> : null}
         </section>
       )}
+
+      {isTvMode && isAllMediaLoading && (
+        <div className="fixed inset-0 z-[100] bg-black text-white flex items-center justify-center">
+          <Loader2 className="animate-spin text-[#f8ca14]" size={48} />
+        </div>
+      )}
+
+      {isTvMode && allMediaDetails && (
+        <AqeeqAlbumTvMode 
+          albumTitle="حصاد العقيق الشامل"
+          images={(allMediaDetails || []).map((m: any) => ({
+            id: m.id,
+            url: m.imageUrl,
+            caption: m.caption || m.albumTitle
+          }))}
+          onClose={() => setIsTvMode(false)}
+        />
+      )}
+
+      <AqeeqAiYearbookGenerator open={isWrappedOpen} onOpenChange={setIsWrappedOpen} />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import {
   Bot,
   Sparkles,
@@ -64,22 +65,26 @@ const INITIAL_MESSAGE: ChatMsg = {
   ],
 };
 
-function renderFormattedMessage(text: string) {
+function renderFormattedMessage(text: string, isDark: boolean = true) {
   const lines = text.split("\n");
   return lines.map((line, idx) => {
     let formatted = line;
 
     if (formatted.startsWith("### ")) {
       return (
-        <h4 key={idx} className="text-xs sm:text-sm font-black text-amber-300 mt-2.5 mb-1 flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+        <h4 key={idx} className={`text-xs sm:text-sm font-black mt-2.5 mb-1 flex items-center gap-1 ${
+          isDark ? "text-amber-300" : "text-amber-700"
+        }`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${isDark ? "bg-amber-400" : "bg-amber-500"}`} />
           <span>{formatted.replace("### ", "")}</span>
         </h4>
       );
     }
     if (formatted.startsWith("## ")) {
       return (
-        <h3 key={idx} className="text-sm sm:text-base font-black text-amber-400 mt-3 mb-1.5 border-b border-white/10 pb-1">
+        <h3 key={idx} className={`text-sm sm:text-base font-black mt-3 mb-1.5 pb-1 border-b ${
+          isDark ? "text-amber-400 border-white/10" : "text-amber-800 border-slate-200"
+        }`}>
           {formatted.replace("## ", "")}
         </h3>
       );
@@ -87,9 +92,11 @@ function renderFormattedMessage(text: string) {
     if (formatted.startsWith("• ") || formatted.startsWith("- ")) {
       const bulletContent = formatted.replace(/^[•\-]\s*/, "");
       return (
-        <div key={idx} className="flex items-start gap-2 my-1 text-slate-200 leading-relaxed">
-          <span className="text-amber-400 text-sm shrink-0 leading-none mt-1">✦</span>
-          <span className="flex-1">{renderInlineBoldAndLinks(bulletContent)}</span>
+        <div key={idx} className={`flex items-start gap-2 my-1 leading-relaxed ${
+          isDark ? "text-slate-200" : "text-slate-700"
+        }`}>
+          <span className={`text-sm shrink-0 leading-none mt-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>✦</span>
+          <span className="flex-1">{renderInlineBoldAndLinks(bulletContent, isDark)}</span>
         </div>
       );
     }
@@ -99,19 +106,19 @@ function renderFormattedMessage(text: string) {
     }
 
     return (
-      <p key={idx} className="my-1 leading-relaxed">
-        {renderInlineBoldAndLinks(formatted)}
+      <p key={idx} className={`my-1 leading-relaxed ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+        {renderInlineBoldAndLinks(formatted, isDark)}
       </p>
     );
   });
 }
 
-function renderInlineBoldAndLinks(str: string) {
+function renderInlineBoldAndLinks(str: string, isDark: boolean = true) {
   const parts = str.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={index} className="font-black text-amber-300">
+        <strong key={index} className={`font-black ${isDark ? "text-amber-300" : "text-amber-800"}`}>
           {part.slice(2, -2)}
         </strong>
       );
@@ -125,7 +132,9 @@ function renderInlineBoldAndLinks(str: string) {
           href={url}
           target={url.startsWith("http") ? "_blank" : undefined}
           rel="noreferrer"
-          className="text-amber-300 font-black underline hover:text-white inline-flex items-center gap-0.5 mx-0.5"
+          className={`font-black underline inline-flex items-center gap-0.5 mx-0.5 ${
+            isDark ? "text-amber-300 hover:text-white" : "text-amber-700 hover:text-amber-900"
+          }`}
         >
           <span>{label}</span>
           <ArrowUpLeft size={11} />
@@ -137,6 +146,8 @@ function renderInlineBoldAndLinks(str: string) {
 }
 
 export function AqeeqAiAssistantWidget() {
+  const { theme } = useAqeeqStudioTheme();
+  const isDark = theme === "dark";
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
@@ -237,21 +248,27 @@ export function AqeeqAiAssistantWidget() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-3 rounded-full border border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] p-2.5 sm:px-4 sm:py-3 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
+          className={`group relative flex items-center gap-3 rounded-full border p-2.5 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
+            isDark
+              ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
+              : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
+          }`}
         >
           <div className="relative grid h-11 w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
             <Bot size={24} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-slate-950 animate-pulse ${
+            <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+              isDark ? "border-slate-950" : "border-white"
+            } animate-pulse ${
               aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"
             }`} />
           </div>
 
           <div className="hidden sm:block text-right">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-amber-300">مساعد العقيق الذكي</span>
-              <Sparkles size={12} className="text-amber-400" />
+              <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>مساعد العقيق الذكي</span>
+              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
             </div>
-            <p className="text-[10px] text-slate-300 font-bold">
+            <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
               {aiStatus?.hasLiveGemini ? "Gemini Live AI متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
             </p>
           </div>
@@ -261,31 +278,43 @@ export function AqeeqAiAssistantWidget() {
       {/* Interactive Luxury Chat Window */}
       {isOpen && (
         <div
-          className={`flex flex-col transition-all duration-300 rounded-[2rem] border border-amber-400/40 bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl ring-1 ring-amber-400/20 animate-in zoom-in-95 overflow-hidden ${
+          className={`flex flex-col transition-all duration-300 rounded-[2rem] border shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 overflow-hidden ${
+            isDark
+              ? "border-amber-400/40 bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-amber-400/20"
+              : "border-slate-200/90 bg-white/98 text-slate-900 shadow-[0_25px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30"
+          } ${
             isExpanded
               ? "w-[96vw] sm:w-[720px] h-[85vh] max-h-[820px]"
               : "w-[94vw] sm:w-[460px] h-[600px] max-h-[88vh]"
           }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0d1424] via-[#101b33] to-[#0a101d] px-4 py-3.5">
+          <div className={`flex items-center justify-between border-b px-4 py-3.5 transition-colors ${
+            isDark
+              ? "border-white/10 bg-gradient-to-r from-[#0d1424] via-[#101b33] to-[#0a101d] text-white"
+              : "border-slate-200 bg-gradient-to-r from-slate-50 via-amber-50/40 to-white text-slate-900"
+          }`}>
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md">
                 <Bot size={22} />
-                <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-[#0f1424] ${
+                <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ${
+                  isDark ? "ring-[#0f1424]" : "ring-white"
+                } ${
                   aiStatus?.hasLiveGemini ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
                 }`} />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-xs sm:text-sm font-black text-white">مساعد مدارس العقيق الذكي</h3>
+                  <h3 className={`text-xs sm:text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>مساعد مدارس العقيق الذكي</h3>
                   <button
                     type="button"
                     onClick={() => setIsKeyModalOpen(true)}
                     className={`rounded-md px-1.5 py-0.5 text-[9px] font-mono font-black flex items-center gap-1 transition ${
                       aiStatus?.hasLiveGemini
-                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
-                        : "bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400 hover:text-black"
+                        ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/40 hover:bg-emerald-500/30"
+                        : isDark
+                          ? "bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400 hover:text-black"
+                          : "bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-400 hover:text-black"
                     }`}
                     title="إعدادات وربط مفتاح الذكاء الاصطناعي"
                   >
@@ -293,8 +322,8 @@ export function AqeeqAiAssistantWidget() {
                     <span>{aiStatus?.hasLiveGemini ? "GEMINI LIVE ⚡" : "تفعيل الذكاء الحي 🔑"}</span>
                   </button>
                 </div>
-                <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
                   <span>{aiStatus?.hasLiveGemini ? "متصل بنموذج Gemini 3.6 Flash الذكي ⚡" : "جاهز للرد والمساعدة التربوية"}</span>
                 </p>
               </div>
@@ -304,7 +333,9 @@ export function AqeeqAiAssistantWidget() {
               <button
                 type="button"
                 onClick={() => setIsKeyModalOpen(true)}
-                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:text-amber-300 hover:bg-white/10 transition"
+                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                  isDark ? "text-slate-400 hover:text-amber-300 hover:bg-white/10" : "text-slate-500 hover:text-amber-700 hover:bg-black/5"
+                }`}
                 title="ربط مفتاح الذكاء الاصطناعي (Gemini Key)"
               >
                 <Settings size={15} />
@@ -312,7 +343,9 @@ export function AqeeqAiAssistantWidget() {
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
+                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                  isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                }`}
                 title={isExpanded ? "تصغير الحجم" : "تكبير الشاشة"}
               >
                 {isExpanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
@@ -320,7 +353,9 @@ export function AqeeqAiAssistantWidget() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
+                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                  isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                }`}
                 title="إعادة بدء المحادثة"
               >
                 <RotateCcw size={14} />
@@ -328,7 +363,9 @@ export function AqeeqAiAssistantWidget() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
+                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                  isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                }`}
                 title="تصغير النافذة"
               >
                 <ChevronDown size={20} />
@@ -337,7 +374,9 @@ export function AqeeqAiAssistantWidget() {
           </div>
 
           {/* Quick Shortcuts Bar */}
-          <div className="flex items-center gap-1.5 border-b border-white/5 bg-black/40 px-3 py-2 overflow-x-auto scrollbar-none">
+          <div className={`flex items-center gap-1.5 border-b px-3 py-2 overflow-x-auto scrollbar-none transition-colors ${
+            isDark ? "border-white/5 bg-black/40" : "border-slate-200/80 bg-slate-100/80"
+          }`}>
             {[
               { label: "📖 المجلة", url: "/journal" },
               { label: "📸 الألبومات والبحث بالوجه", url: "/albums" },
@@ -349,7 +388,11 @@ export function AqeeqAiAssistantWidget() {
                 key={i}
                 type="button"
                 onClick={() => handleShortcutClick(sc.url)}
-                className="shrink-0 rounded-lg border border-white/10 bg-white/5 hover:bg-[#f8ca14] hover:text-black px-2.5 py-1 text-[10px] font-black text-slate-300 transition"
+                className={`shrink-0 rounded-lg border px-2.5 py-1 text-[10px] font-black transition ${
+                  isDark
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-[#f8ca14] hover:text-black hover:border-amber-400 shadow-xs"
+                }`}
               >
                 {sc.label}
               </button>
@@ -357,23 +400,31 @@ export function AqeeqAiAssistantWidget() {
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 text-right scrollbar-thin">
+          <div className={`flex-1 overflow-y-auto p-4 space-y-4 text-right scrollbar-thin transition-colors ${
+            isDark ? "bg-[#04060b]/90" : "bg-slate-50/80"
+          }`}>
             {messages.map((msg, i) => (
               <div key={i} className={`flex flex-col ${msg.role === "user" ? "items-start" : "items-end"}`}>
                 <div
                   className={`group relative max-w-[92%] rounded-2xl p-4 text-xs sm:text-[13px] font-medium leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-bold rounded-br-none shadow-lg"
-                      : "bg-[#111728] text-slate-100 border border-white/10 rounded-bl-none shadow-md"
+                      ? "bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-bold rounded-br-none shadow-md"
+                      : isDark
+                        ? "bg-[#111728] text-slate-100 border border-white/10 rounded-bl-none shadow-md"
+                        : "bg-white text-slate-800 border border-slate-200/90 rounded-bl-none shadow-sm"
                   }`}
                 >
-                  {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content)}
+                  {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
 
                   {msg.role === "assistant" && (
                     <button
                       type="button"
                       onClick={() => handleCopy(msg.content, i)}
-                      className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-amber-300 transition p-1 rounded-lg bg-black/40"
+                      className={`absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition p-1 rounded-lg ${
+                        isDark
+                          ? "text-slate-400 hover:text-amber-300 bg-black/40"
+                          : "text-slate-500 hover:text-amber-700 bg-slate-100"
+                      }`}
                       title="نسخ الرد"
                     >
                       {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
@@ -389,7 +440,11 @@ export function AqeeqAiAssistantWidget() {
                         key={ai}
                         type="button"
                         onClick={() => handleShortcutClick(act.url)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-[11px] font-black text-amber-300 hover:bg-amber-400 hover:text-slate-950 transition shadow-sm"
+                        className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-black transition shadow-xs ${
+                          isDark
+                            ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
+                            : "border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
+                        }`}
                       >
                         <span>{act.label}</span>
                         <ArrowUpLeft size={12} />
@@ -406,7 +461,11 @@ export function AqeeqAiAssistantWidget() {
                         key={qi}
                         type="button"
                         onClick={() => handleSend(q)}
-                        className="rounded-xl border border-white/10 bg-black/60 px-3 py-1.5 text-[11px] font-bold text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 transition shadow-sm text-right"
+                        className={`rounded-xl border px-3 py-1.5 text-[11px] font-bold transition shadow-xs text-right ${
+                          isDark
+                            ? "border-white/10 bg-black/60 text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950"
+                            : "border-slate-200 bg-white text-amber-800 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 shadow-xs"
+                        }`}
                       >
                         {q}
                       </button>
@@ -417,8 +476,12 @@ export function AqeeqAiAssistantWidget() {
             ))}
 
             {askAiMutation.isPending && (
-              <div className="flex items-center gap-2.5 text-amber-300 text-xs font-black bg-[#111728] border border-amber-400/30 p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse">
-                <Sparkles size={16} className="text-amber-400 animate-spin" />
+              <div className={`flex items-center gap-2.5 text-xs font-black p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse ${
+                isDark
+                  ? "bg-[#111728] border border-amber-400/30 text-amber-300"
+                  : "bg-white border border-amber-400/50 text-amber-800 shadow-sm"
+              }`}>
+                <Sparkles size={16} className={`${isDark ? "text-amber-400" : "text-amber-600"} animate-spin`} />
                 <span>المساعد الذكي يفكر ويصيغ الإجابة الحية...</span>
               </div>
             )}
@@ -432,7 +495,9 @@ export function AqeeqAiAssistantWidget() {
               e.preventDefault();
               handleSend();
             }}
-            className="border-t border-white/10 bg-[#0a0e1a] p-3 flex items-center gap-2"
+            className={`border-t p-3 flex items-center gap-2 transition-colors ${
+              isDark ? "border-white/10 bg-[#0a0e1a]" : "border-slate-200 bg-white"
+            }`}
           >
             <input
               ref={inputRef}
@@ -440,7 +505,11 @@ export function AqeeqAiAssistantWidget() {
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
               placeholder="اكتب سؤالك هنا (مثلاً: قارن بين الدبلومة الأمريكية والمسار الوطني)..."
-              className="flex-1 rounded-2xl border border-white/15 bg-black/70 px-4 py-2.5 text-xs sm:text-sm font-bold text-white placeholder-slate-500 outline-none focus:border-amber-400 transition"
+              className={`flex-1 rounded-2xl border px-4 py-2.5 text-xs sm:text-sm font-bold outline-none transition ${
+                isDark
+                  ? "border-white/15 bg-black/70 text-white placeholder-slate-500 focus:border-amber-400"
+                  : "border-slate-300 bg-slate-50 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:bg-white"
+              }`}
             />
             <Button
               type="submit"
@@ -456,28 +525,34 @@ export function AqeeqAiAssistantWidget() {
       {/* Google Gemini Key Setup Dialog */}
       <Dialog open={isKeyModalOpen} onOpenChange={setIsKeyModalOpen}>
         <DialogContent
-          className="max-w-lg rounded-[2.5rem] border border-amber-400/40 bg-[#0a0d18] text-white p-6 sm:p-8 text-right shadow-2xl"
+          className={`max-w-lg rounded-[2.5rem] border p-6 sm:p-8 text-right shadow-2xl ${
+            isDark
+              ? "border-amber-400/40 bg-[#0a0d18] text-white"
+              : "border-slate-200 bg-white text-slate-900"
+          }`}
           dir="rtl"
         >
-          <DialogHeader className="text-right border-b border-white/10 pb-4">
-            <DialogTitle className="text-lg font-black flex items-center gap-2 text-amber-300">
+          <DialogHeader className={`text-right border-b pb-4 ${isDark ? "border-white/10" : "border-slate-200"}`}>
+            <DialogTitle className={`text-lg font-black flex items-center gap-2 ${isDark ? "text-amber-300" : "text-amber-800"}`}>
               <Sparkles size={20} className="text-amber-400" />
               <span>ربط الذكاء الاصطناعي الحي (Google Gemini 3.6 Flash)</span>
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 pt-2 text-xs leading-relaxed">
-            <p className="text-slate-300">
+            <p className={isDark ? "text-slate-300" : "text-slate-600"}>
               لجعل المساعد يتحدث معك بحرية وذكاء فائق تماماً مثل النماذج العالمية وبدون أي إجابات محفوظة مسبقاً، يمكنك ربط مفتاح API مجاني من Google:
             </p>
 
-            <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-3.5 space-y-2">
-              <p className="font-bold text-amber-300 flex items-center gap-1.5">
+            <div className={`rounded-2xl border p-3.5 space-y-2 ${
+              isDark ? "border-amber-400/20 bg-amber-400/5" : "border-amber-300/40 bg-amber-50/60"
+            }`}>
+              <p className={`font-bold flex items-center gap-1.5 ${isDark ? "text-amber-300" : "text-amber-800"}`}>
                 <Key size={14} />
                 <span>كيف تحصل على المفتاح المجاني في 10 ثوانٍ؟</span>
               </p>
-              <ol className="list-decimal list-inside space-y-1 text-slate-300 text-[11px]">
-                <li>افتح موقع Google AI Studio: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-amber-400 font-bold underline">aistudio.google.com/app/apikey ↗</a></li>
+              <ol className={`list-decimal list-inside space-y-1 text-[11px] ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                <li>افتح موقع Google AI Studio: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-amber-500 font-bold underline">aistudio.google.com/app/apikey ↗</a></li>
                 <li>سجل دخول بحساب Google واضغط على <strong>Create API Key</strong>.</li>
                 <li>انسخ المفتاح والصقه في الحقل أدناه واضغط <strong>تفعيل وحفظ</strong>.</li>
               </ol>
@@ -490,14 +565,18 @@ export function AqeeqAiAssistantWidget() {
                 value={geminiApiKeyInput}
                 onChange={(e) => setGeminiApiKeyInput(e.target.value)}
                 placeholder="AIzaSy..."
-                className="font-mono text-xs rounded-xl bg-black/60 border-white/15 text-white"
+                className={`font-mono text-xs rounded-xl ${
+                  isDark
+                    ? "bg-black/60 border-white/15 text-white"
+                    : "bg-slate-50 border-slate-300 text-slate-900"
+                }`}
               />
             </div>
 
             <div className="flex items-center justify-between pt-2">
               <div className="text-[11px] text-slate-400">
                 {aiStatus?.hasLiveGemini ? (
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="text-emerald-500 font-bold flex items-center gap-1">
                     <ShieldCheck size={14} />
                     <span>الذكاء الاصطناعي الحي مفعّل حالياً بنجاح!</span>
                   </span>

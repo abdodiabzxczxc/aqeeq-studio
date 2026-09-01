@@ -1,0 +1,289 @@
+import { useState, useEffect, useRef } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Sparkles, GraduationCap, Play, Download, X, Film, Image as ImageIcon, CheckCircle, ChevronLeft } from "lucide-react";
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { motion, AnimatePresence } from "framer-motion";
+import { trpc } from "@/lib/trpc";
+import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
+
+export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
+  
+  const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
+  const [stage, setStage] = useState<"input" | "processing" | "cinematic">("input");
+  const [progress, setProgress] = useState(0);
+
+  // Fetch media for cinematic simulation (always enabled so it's ready when they click)
+  const { data: allMediaDetails } = trpc.aqeeqAlbums.allPublicMedia.useQuery(undefined, { refetchOnWindowFocus: false });
+  const photos = (allMediaDetails || []).map(m => m.imageUrl);
+
+  // Cinematic State
+  const [sceneIndex, setSceneIndex] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Matched photos state for the cinematic video
+  const [matchedPhotos, setMatchedPhotos] = useState<string[]>([]);
+  const [orientation, setOrientation] = useState<"landscape" | "portrait">("landscape");
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setStudentPhoto(url);
+  };
+
+  const handleStartSearch = async () => {
+    if (!studentPhoto) return;
+    setStage("processing");
+    setProgress(10);
+    
+    // Import dynamically to avoid breaking if not available
+    let finalPhotos = photos; // fallback to all photos
+    
+    try {
+      if (photos.length > 0) {
+        const { matchSelfieAgainstPhotos } = await import("@/lib/aqeeqFaceRecognition");
+        setProgress(30);
+        
+        const mediaObjects = (allMediaDetails || []).map(m => ({
+          id: m.id,
+          imageUrl: m.imageUrl
+        }));
+        
+        // Run actual AI match, update progress as it scans
+        const matches = await matchSelfieAgainstPhotos(studentPhoto, mediaObjects, (scanned, total) => {
+          setProgress(30 + Math.floor((scanned / total) * 60)); // 30% to 90%
+        });
+        
+        if (matches && matches.length > 0) {
+          finalPhotos = matches.map(m => m.photo.imageUrl);
+        }
+      }
+    } catch (e) {
+      console.warn("AI Match failed or skipped, falling back to mock photos:", e);
+    }
+    
+    setProgress(95);
+    
+    // Determine orientation based on first few images
+    let vCount = 0;
+    let hCount = 0;
+    const checkPhotos = finalPhotos.slice(0, 8);
+    await Promise.all(checkPhotos.map(url => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.naturalHeight > img.naturalWidth) vCount++;
+          else hCount++;
+          resolve(null);
+        };
+        img.onerror = resolve;
+        img.src = url;
+      });
+    }));
+    
+    setOrientation(vCount > hCount ? "portrait" : "landscape");
+    
+    setProgress(100);
+    setMatchedPhotos(finalPhotos.length > 0 ? finalPhotos : photos);
+    
+    setTimeout(() => startCinematic(), 500);
+  };
+
+  const startCinematic = () => {
+    setStage("cinematic");
+    setSceneIndex(0);
+    if (!audioRef.current) {
+      audioRef.current = new Audio("https://cdn.pixabay.com/download/audio/2022/10/25/audio_24a242488a.mp3?filename=cinematic-epic-122933.mp3");
+      audioRef.current.volume = 0.5;
+    }
+    audioRef.current.play().catch(() => console.log("Audio blocked"));
+    
+    // Timeline
+    setTimeout(() => setSceneIndex(1), 3000); // 3s: Intro 2
+    setTimeout(() => setSceneIndex(2), 6000); // 6s: Photos Montage
+    setTimeout(() => setSceneIndex(3), 22000); // 22s: Climax Logo
+  };
+
+  const closeWrapped = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    onOpenChange(false);
+    setTimeout(() => {
+      setStage("input");
+      setStudentPhoto(null);
+      setProgress(0);
+    }, 500);
+  };
+
+  // Determine dynamic classes based on stage and orientation
+  // We MUST use sm:max-w-* to override the default sm:max-w-lg in shadcn DialogContent!
+  let dialogShapeClasses = "max-w-4xl sm:max-w-4xl w-[95vw] sm:w-full h-[90vh] md:h-[85vh]"; // Default for input/processing
+  if (stage === "cinematic") {
+    if (orientation === "portrait") {
+      dialogShapeClasses = "max-w-[450px] sm:max-w-[450px] w-[95vw] sm:w-full h-[90vh] md:h-[85vh]"; // Tall phone shape
+    } else {
+      dialogShapeClasses = "max-w-6xl sm:max-w-6xl w-[95vw] sm:w-full aspect-[16/9] h-auto max-h-[90vh] md:h-[85vh]"; // Wide cinematic shape
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if(!v) closeWrapped(); }}>
+      <DialogContent 
+        className={`${dialogShapeClasses} border-0 p-0 overflow-hidden rounded-[32px] shadow-2xl transition-all duration-1000 ease-in-out ${
+          dark 
+            ? "bg-[#050505] text-white shadow-[0_0_80px_rgba(229,184,79,0.15)]" 
+            : "bg-white text-black shadow-[0_30px_80px_rgba(0,0,0,0.15)]"
+        }`}
+        dir="rtl"
+      >
+        <button onClick={closeWrapped} className="absolute top-6 left-6 z-[100] text-white/50 hover:text-white bg-black/20 p-2 rounded-full backdrop-blur-sm">
+          <X size={24} />
+        </button>
+
+        <AnimatePresence mode="wait">
+          {/* STAGE 1: INPUT */}
+          {stage === "input" && (
+            <motion.div 
+              key="input"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+              className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"
+            >
+              <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_50%_0%,#e5b84f_0%,transparent_70%)] pointer-events-none" />
+              
+              <div className="relative z-10 text-center max-w-lg w-full">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-[#e5b84f] to-[#c59c3a] text-black shadow-2xl shadow-[#e5b84f]/30 mb-8 transform hover:scale-105 transition-transform duration-500">
+                  <Sparkles size={48} strokeWidth={1.5} />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight font-['Tajawal'] mb-4 bg-clip-text text-transparent bg-gradient-to-l from-[#f8ca14] to-[#f8ca14]/70">
+                  حصاد العقيق الذكي
+                </h1>
+                <p className={`text-lg mb-12 ${dark ? "text-white/60" : "text-black/60"}`}>
+                  ارفع صورة للطالب، وسيقوم الذكاء الاصطناعي بالبحث في آلاف الصور، ليجمع كل لحظاته وإنجازاته في رحلة سينمائية مذهلة.
+                </p>
+                
+                <div className="flex flex-col gap-4 items-center">
+                  {!studentPhoto ? (
+                    <label className="cursor-pointer group relative overflow-hidden rounded-2xl bg-black/5 dark:bg-white/5 border border-dashed border-black/20 dark:border-white/20 hover:border-[#e5b84f] transition-colors w-full h-32 flex flex-col items-center justify-center">
+                      <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+                      <ImageIcon size={32} className="text-[#e5b84f] mb-3 group-hover:scale-110 transition-transform" />
+                      <span className="font-bold text-lg">التقط أو ارفع صورة للطالب</span>
+                    </label>
+                  ) : (
+                    <div className="w-full flex flex-col sm:flex-row gap-3">
+                      <div className="relative h-16 w-16 sm:w-20 rounded-2xl overflow-hidden shrink-0 border-2 border-[#e5b84f]">
+                        <img src={studentPhoto} className="w-full h-full object-cover" alt="Student" />
+                        <button 
+                          onClick={() => setStudentPhoto(null)} 
+                          className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                      <Button 
+                        onClick={handleStartSearch}
+                        className="flex-1 h-16 rounded-2xl bg-gradient-to-r from-[#e5b84f] to-[#c59c3a] hover:from-[#f0c35f] hover:to-[#d0a74b] text-black font-black text-xl shadow-xl shadow-[#e5b84f]/25 transition-all active:scale-95"
+                      >
+                        ابدأ الرحلة السينمائية
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STAGE 2: PROCESSING */}
+          {stage === "processing" && (
+            <motion.div 
+              key="processing"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-black text-white"
+            >
+              <GraduationCap size={64} className="text-[#e5b84f] mb-8 animate-pulse" />
+              <h2 className="text-2xl font-black mb-8 font-['Tajawal']">جارِ البحث باستخدام الذكاء الاصطناعي...</h2>
+              <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-l from-[#e5b84f] to-[#e5b84f]/50 transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="mt-4 text-white/50 text-sm">{progress < 40 ? "مسح آلاف الصور في قاعدة البيانات..." : progress < 80 ? "تحليل الوجوه ومطابقة الطالب..." : "تجهيز رحلة العمر..."}</p>
+            </motion.div>
+          )}
+
+          {/* STAGE 5: CINEMATIC */}
+          {stage === "cinematic" && (
+            <motion.div 
+              key="cinematic"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black text-white flex items-center justify-center overflow-hidden"
+            >
+              {/* Scene 1: Intro Text 1 */}
+              <AnimatePresence>
+                {sceneIndex === 0 && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1 }} className="text-center px-6">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed">في كل عام،</h2>
+                    <h2 className="text-4xl md:text-6xl font-black tracking-wider leading-relaxed text-[#e5b84f]">تُكتب قصة جديدة...</h2>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Scene 2: Intro Text 2 */}
+              <AnimatePresence>
+                {sceneIndex === 1 && (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} transition={{ duration: 1 }} className="text-center px-6">
+                    <h2 className="text-5xl md:text-8xl font-black drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">وهذا العام...</h2>
+                    <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#08467d] to-[#4da1eb] mt-4">كانت الكاميرا تبحث عنك!</h2>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Scene 3: FULL PHOTOS MONTAGE */}
+              <AnimatePresence>
+                {sceneIndex === 2 && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
+                    {/* Show up to 15 photos from matchedPhotos in a rapid cinematic montage */}
+                    {matchedPhotos.slice(0, 15).map((url, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 1.2 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 2, delay: i * 1.5 }}
+                        className="absolute inset-0 bg-black"
+                        style={{ zIndex: i }}
+                      >
+                        <img src={url} className="w-full h-full object-contain md:object-cover" alt="" />
+                        {/* Dramatic vignette gradient over the photos */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Scene 4: Climax (Logo) */}
+              <AnimatePresence>
+                {sceneIndex === 3 && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
+                    <GraduationCap size={100} className="text-[#e5b84f] mb-8 animate-pulse" />
+                    <h1 className="text-4xl md:text-7xl font-black font-['Tajawal'] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-300 to-white drop-shadow-lg mb-4 text-center">
+                      مدارس العقيق تفخر بك
+                    </h1>
+                    <p className="text-[#e5b84f] text-xl md:text-2xl font-bold tracking-widest mb-12">أنت بطل قصتنا</p>
+                    <Button onClick={closeWrapped} className="rounded-full h-14 px-10 bg-white/10 hover:bg-white/20 text-white font-bold backdrop-blur-md border border-white/20 transition-all">
+                      إنهاء العرض
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </DialogContent>
+    </Dialog>
+  );
+}

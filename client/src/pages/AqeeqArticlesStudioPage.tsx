@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   PenTool,
   Sparkles,
+  Palette,
   Search,
   Plus,
   Trash2,
@@ -100,6 +101,25 @@ export default function AqeeqArticlesStudioPage() {
     setEditCategory(art.category as any);
     setEditCoverUrl(art.coverUrl || null);
   };
+
+  useEffect(() => {
+    if (selectedArticle && !editTitle && !editContent) {
+      setEditTitle(selectedArticle.title || "");
+      setEditContent(selectedArticle.content || "");
+      setEditExcerpt(selectedArticle.excerpt || "");
+      setEditCategory((selectedArticle.category as any) || "تربوي");
+      setEditCoverUrl(selectedArticle.coverUrl || null);
+    }
+  }, [selectedArticle]);
+
+  const activeWordCount = useMemo(() => {
+    if (aiImageTarget === "new") {
+      const text = newContent.trim();
+      return text ? text.split(/\s+/).filter(Boolean).length : 350;
+    }
+    const text = (editContent || selectedArticle?.content || "").trim();
+    return text ? text.split(/\s+/).filter(Boolean).length : 520;
+  }, [aiImageTarget, newContent, editContent, selectedArticle]);
 
   const filteredArticles = useMemo(() => {
     return articles.filter((a) => {
@@ -382,20 +402,6 @@ export default function AqeeqArticlesStudioPage() {
 
                   {/* Actions (Publish / Reject / AI Polish / Delete) */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        aiPolishMutation.mutate({
-                          title: editTitle || selectedArticle.title,
-                          content: editContent || selectedArticle.content,
-                        })
-                      }
-                      disabled={aiPolishMutation.isPending}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-purple-400/40 bg-purple-500/15 hover:bg-purple-500/30 text-purple-300 px-3.5 py-2 text-xs font-black transition shadow-sm"
-                    >
-                      <Sparkles size={14} className="text-purple-300" />
-                      <span>{aiPolishMutation.isPending ? "جاري التحسين..." : "تحسين بالذكاء الاصطناعي"}</span>
-                    </button>
 
                     {selectedArticle.status !== "published" && (
                       <button
@@ -491,20 +497,38 @@ export default function AqeeqArticlesStudioPage() {
                     />
                   </div>
 
-                  <div>
+                  <div className="relative">
                     <div className="flex items-center justify-between mb-1.5">
                       <Label className="text-xs font-black text-slate-300">نص المقال الكامل</Label>
                       <span className="text-[10px] text-slate-400 font-mono">{editContent.length} حرف</span>
                     </div>
-                    <Textarea
-                      rows={12}
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      placeholder="اكتب أو عدّل نص المقال كاملاً هنا..."
-                      className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl ${
-                        dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
-                      }`}
-                    />
+                    <div className="relative">
+                      <Textarea
+                        rows={12}
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        placeholder="اكتب أو عدّل نص المقال كاملاً هنا..."
+                        className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl pb-12 ${
+                          dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
+                        }`}
+                      />
+                      <div className="absolute bottom-3 left-3 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            aiPolishMutation.mutate({
+                              title: editTitle || selectedArticle.title,
+                              content: editContent || selectedArticle.content,
+                            })
+                          }
+                          disabled={aiPolishMutation.isPending}
+                          className="flex items-center gap-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm"
+                        >
+                          {aiPolishMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+                          <span>{aiPolishMutation.isPending ? "المساعد التحريري يكتب..." : "المساعد التحريري (تحسين وصياغة)"}</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Cover Selector */}
@@ -536,8 +560,8 @@ export default function AqeeqArticlesStudioPage() {
                             }}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black px-3 py-1.5 text-xs font-black transition shadow-md shadow-amber-500/20"
                           >
-                            <Sparkles size={14} />
-                            <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                            <Palette size={14} />
+                            <span>استوديو وتصميم الأغلفة الفاخرة 🏛️</span>
                           </button>
 
                           <button
@@ -674,17 +698,35 @@ export default function AqeeqArticlesStudioPage() {
               />
             </div>
 
-            <div>
+            <div className="relative">
               <Label className="text-xs font-black text-slate-300 mb-1.5 block">نص المقال الكامل</Label>
-              <Textarea
-                rows={8}
-                value={newContent}
-                onChange={(e) => setNewContent(e.target.value)}
-                placeholder="اكتب نص المقال الكامل هنا..."
-                className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl ${
-                  dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
-                }`}
-              />
+              <div className="relative">
+                <Textarea
+                  rows={8}
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder="اكتب نص المقال الكامل هنا..."
+                  className={`font-[Tajawal,sans-serif] text-base leading-8 rounded-2xl pb-12 ${
+                    dark ? "bg-black/50 border-white/10 text-white" : "bg-slate-50 border-black/10 text-black"
+                  }`}
+                />
+                <div className="absolute bottom-3 left-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      aiPolishMutation.mutate({
+                        title: newTitle || "بدون عنوان",
+                        content: newContent || "بدون محتوى",
+                      })
+                    }
+                    disabled={aiPolishMutation.isPending || !newContent}
+                    className="flex items-center gap-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm disabled:opacity-50"
+                  >
+                    {aiPolishMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+                    <span>{aiPolishMutation.isPending ? "المساعد التحريري يكتب..." : "المساعد التحريري (تحسين وصياغة)"}</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-2xl border border-current/10 p-3.5 space-y-2">
@@ -705,8 +747,8 @@ export default function AqeeqArticlesStudioPage() {
                   }}
                   className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#f8ca14] hover:opacity-90 text-black px-3 py-1.5 text-xs font-black transition shadow-md shadow-amber-500/20"
                 >
-                  <Sparkles size={14} />
-                  <span>توليد غلاف بالذكاء الاصطناعي (AI Cover)</span>
+                  <Palette size={14} />
+                  <span>استوديو وتصميم الأغلفة الفاخرة 🏛️</span>
                 </button>
 
                 <button
@@ -871,6 +913,9 @@ export default function AqeeqArticlesStudioPage() {
         onOpenChange={setIsAiImageOpen}
         type="article"
         defaultPrompt={aiImagePrompt}
+        defaultAuthor={aiImageTarget === "new" ? newAuthorName : (selectedArticle?.authorName || "إدارة التحرير")}
+        defaultQuote={aiImageTarget === "new" ? newExcerpt : editExcerpt}
+        articleWordCount={activeWordCount}
         dark={dark}
         onSelectCover={(url) => {
           if (aiImageTarget === "new") {

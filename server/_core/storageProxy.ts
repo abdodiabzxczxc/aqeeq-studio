@@ -88,12 +88,16 @@ export function registerStorageProxy(app: Express) {
     }
   });
 
-  // Zero-Disk-Space High-Speed Google Drive Audio Streamer with Range Support
+  // Zero-Disk-Space High-Speed Google Drive Audio Streamer with Range & All-Format Support
   app.get("/api/drive-audio-proxy/:fileId", async (req, res) => {
     const { fileId } = req.params;
     if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
       return res.status(400).send("Invalid file ID");
     }
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     try {
       const googleDownloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
@@ -112,13 +116,41 @@ export function registerStorageProxy(app: Express) {
         return res.status(driveRes.status).send("Failed to stream audio from Google Drive");
       }
 
-      const contentType = driveRes.headers.get("content-type") || "audio/mpeg";
+      const rawContentType = driveRes.headers.get("content-type") || "";
       const contentLength = driveRes.headers.get("content-length");
       const contentRange = driveRes.headers.get("content-range");
       const acceptRanges = driveRes.headers.get("accept-ranges") || "bytes";
 
+      const requestedExt = (req.query.ext as string)?.toLowerCase();
+      const mimeMap: Record<string, string> = {
+        mp3: "audio/mpeg",
+        m4a: "audio/mp4",
+        wav: "audio/wav",
+        aac: "audio/aac",
+        ogg: "audio/ogg",
+        oga: "audio/ogg",
+        opus: "audio/opus",
+        flac: "audio/flac",
+        weba: "audio/webm",
+        webm: "audio/webm",
+        wma: "audio/x-ms-wma",
+        aiff: "audio/aiff",
+        aif: "audio/aiff",
+        mid: "audio/midi",
+        midi: "audio/midi",
+        amr: "audio/amr",
+        ac3: "audio/ac3",
+        mka: "audio/x-matroska",
+        caf: "audio/x-caf",
+      };
+
+      let finalContentType = (requestedExt && mimeMap[requestedExt]) || rawContentType;
+      if (!finalContentType || !finalContentType.includes("audio")) {
+        finalContentType = "audio/mpeg";
+      }
+
       res.status(driveRes.status);
-      res.setHeader("Content-Type", contentType.includes("audio") ? contentType : "audio/mpeg");
+      res.setHeader("Content-Type", finalContentType);
       res.setHeader("Accept-Ranges", acceptRanges);
       res.setHeader("Cache-Control", "public, max-age=86400");
       if (contentLength) res.setHeader("Content-Length", contentLength);

@@ -54,7 +54,7 @@ import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
 import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
 import { PodcastPlayerProvider } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
-import { AqeeqStaffWalkieCapsule } from "./components/AqeeqStaffWalkieCapsule";
+import { AqeeqGlobalRadio } from "./components/AqeeqGlobalRadio";
 
 function Router() {
   const [location] = useLocation();
@@ -69,27 +69,19 @@ function Router() {
       <Route path="/articles" component={AqeeqArticlesPage} />
       <Route path="/articles/:slug" component={AqeeqArticlesPage} />
       <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
-      <Route path="/broadcast/manage" component={AqeeqPodcastStudioPage} />
       <Route path="/podcast" component={AqeeqPodcastPage} />
-      <Route path="/broadcast" component={AqeeqPodcastPage} />
       <Route path="/journal" component={SchoolNewsPage} />
       <Route path="/journal/archive" component={JournalArchivePage} />
       <Route path="/journal/manage" component={JournalStudioPage} />
       <Route path="/journal/month/:monthKey" component={({ params }: { params: { monthKey: string } }) => <SchoolNewsMonthlyPage monthKey={params.monthKey} standalone />} />
       <Route path="/journal/issue/:slug" component={({ params }: { params: { slug: string } }) => <SchoolNewsReaderPage slug={params.slug} standalone />} />
       <Route path="/journal/:slug" component={({ params }: { params: { slug: string } }) => <SchoolNewsReaderPage slug={params.slug} standalone />} />
-      <Route path="/news/manage" component={JournalStudioPage} />
-      <Route path="/news/month/:monthKey" component={({ params }: { params: { monthKey: string } }) => <SchoolNewsMonthlyPage monthKey={params.monthKey} />} />
-      <Route path="/news/:slug" component={({ params }: { params: { slug: string } }) => <SchoolNewsReaderPage slug={params.slug} />} />
-      <Route path="/news" component={SchoolNewsPage} />
       <Route path="/albums/manage" component={AqeeqAlbumStudioPage} />
       <Route path="/albums/:slug" component={({ params }: { params: { slug: string } }) => <AqeeqAlbumReaderPage slug={params.slug} />} />
       <Route path="/albums" component={AqeeqAlbumsPage} />
       <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
       <Route path="/offers" component={AqeeqShowcasePage} />
       <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
-      <Route path="/analytics" component={AqeeqAnalyticsDashboardPage} />
-      <Route path="/dashboard" component={AqeeqAdminDashboardPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -151,7 +143,7 @@ function StudioAppShell() {
           <VisualGlobalSections />
           <PwaInstallBanner />
           <AqeeqAiAssistantWidget />
-          <AqeeqStaffWalkieCapsule />
+          <AqeeqGlobalRadio />
         </div>
       </div>
     </PodcastPlayerProvider>
