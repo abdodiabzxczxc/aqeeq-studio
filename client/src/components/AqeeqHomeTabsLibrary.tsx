@@ -201,8 +201,8 @@ export function AqeeqHomeTabsLibrary({
           />
         </div>
 
-        {/* Tab Switcher Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
+        {/* Tab Switcher Buttons — horizontal scroll on mobile */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-8 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -210,7 +210,7 @@ export function AqeeqHomeTabsLibrary({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-200 ${
+                className={`flex shrink-0 items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-200 ${
                   isActive
                     ? dark
                       ? "bg-[#f8ca14] text-black shadow-[0_0_20px_rgba(248,202,20,0.25)] scale-105"
@@ -224,8 +224,8 @@ export function AqeeqHomeTabsLibrary({
                 <span>{tab.label}</span>
                 {tab.count > 0 && (
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                    isActive 
-                      ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white" 
+                    isActive
+                      ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white"
                       : dark ? "bg-white/10 text-slate-400" : "bg-black/10 text-slate-600"
                   }`}>
                     {tab.count}
@@ -293,8 +293,8 @@ export function AqeeqHomeTabsLibrary({
             </button>
           </div>
 
-          {/* Frame Cards Body with Smooth Tab Transition */}
-          <div className="p-6 sm:p-8 min-h-[380px]">
+          {/* Frame Cards Body — horizontal scroll on mobile, grid on desktop */}
+          <div className="p-4 sm:p-6 md:p-8 min-h-[260px] sm:min-h-[380px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -304,7 +304,7 @@ export function AqeeqHomeTabsLibrary({
                 transition={{ duration: 0.22, ease: "easeOut" }}
               >
                 {currentConfig.items.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
                     <div className={`p-4 rounded-full mb-3 opacity-30 ${dark ? "text-white bg-white/5" : "text-black bg-black/5"}`}>
                       {currentConfig.icon}
                     </div>
@@ -313,61 +313,58 @@ export function AqeeqHomeTabsLibrary({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  /* Mobile: horizontal scroll / Desktop: 4-col grid */
+                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-5 sm:overflow-visible sm:pb-0">
                     {currentConfig.items.map((item) => (
                       <div
                         key={item.id}
                         onClick={() => navigate(item.href)}
-                        className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col h-[320px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
-                          dark 
-                            ? "border-white/[0.08] bg-[#141414] hover:border-white/20" 
+                        className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col shrink-0 w-[200px] sm:w-auto h-[280px] sm:h-[320px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
+                          dark
+                            ? "border-white/[0.08] bg-[#141414] hover:border-white/20"
                             : "border-black/[0.08] bg-white hover:border-black/20"
                         }`}
                       >
-                        {/* Unified Image Container: 180px fixed height */}
-                        <div className="relative h-[180px] w-full shrink-0 overflow-hidden bg-slate-900/30">
+                        {/* Image Container */}
+                        <div className="relative h-[140px] sm:h-[180px] w-full shrink-0 overflow-hidden bg-slate-900/30">
                           {item.coverUrl ? (
                             <img
                               src={item.coverUrl}
                               alt={item.title}
                               className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
                             />
                           ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center opacity-30">
                               {currentConfig.icon}
                             </div>
                           )}
-
-                          {/* Gradient Overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                          {/* Top Badge */}
-                          <div className="absolute top-3 right-3">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border backdrop-blur-md ${currentConfig.badgeColor}`}>
+                          <div className="absolute top-2.5 right-2.5">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black border backdrop-blur-md ${currentConfig.badgeColor}`}>
                               {item.badge}
                             </span>
                           </div>
                         </div>
 
-                        {/* Card Info Content: Flexible fill */}
-                        <div className="p-4 flex flex-col justify-between flex-1">
-                          <h4 className={`text-sm font-black line-clamp-2 leading-snug transition-colors group-hover:text-amber-400 ${
+                        {/* Card Info */}
+                        <div className="p-3 sm:p-4 flex flex-col justify-between flex-1">
+                          <h4 className={`text-xs sm:text-sm font-black line-clamp-2 leading-snug transition-colors group-hover:text-amber-400 ${
                             dark ? "text-white" : "text-black"
                           }`}>
                             {item.title}
                           </h4>
-
-                          <div className={`mt-auto pt-3 border-t flex items-center justify-between text-[11px] font-bold ${
+                          <div className={`mt-auto pt-2 sm:pt-3 border-t flex items-center justify-between text-[10px] sm:text-[11px] font-bold ${
                             dark ? "border-white/[0.06] text-slate-400" : "border-black/[0.05] text-slate-500"
                           }`}>
                             <span className="flex items-center gap-1">
-                              <Calendar size={12} className="opacity-60" />
+                              <Calendar size={10} className="opacity-60" />
                               <span>{item.dateOrMeta}</span>
                             </span>
-                            <span className={`text-[10px] font-black flex items-center gap-1 group-hover:underline ${
+                            <span className={`font-black flex items-center gap-1 group-hover:underline ${
                               dark ? "text-[#f8ca14]" : "text-[#08467d]"
                             }`}>
-                              <span>استعراض</span>
+                              <span>عرض</span>
                               <ArrowLeft size={10} />
                             </span>
                           </div>
