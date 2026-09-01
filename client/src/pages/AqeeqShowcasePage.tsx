@@ -40,8 +40,24 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const postUrl = post.externalUrl || post.mediaUrl;
   const ytMatch = postUrl.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?.*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
-  const ytThumbnail = ytMatch && ytMatch[1] ? `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg` : null;
-  const poster = getAqeeqShowcaseDisplaySource(post) || ytThumbnail;
+  const ytId = ytMatch?.[1];
+
+  // Fallback chain: maxres → sd → hq → mq
+  const ytThumbs = ytId ? [
+    `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${ytId}/sddefault.jpg`,
+    `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+    `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`,
+  ] : [];
+
+  const poster = getAqeeqShowcaseDisplaySource(post) || ytThumbs[0] || null;
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const currentIdx = ytThumbs.indexOf(img.src);
+    const next = ytThumbs[currentIdx + 1];
+    if (next) img.src = next;
+  };
 
   if (isPlaying) {
     return (
@@ -65,6 +81,7 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
           src={poster}
           alt={post.title || post.fileName}
           className="h-full w-full object-cover transition duration-700 group-hover/yt:scale-105"
+          onError={handleImgError}
         />
       ) : (
         <div className="h-full w-full bg-gradient-to-br from-red-950/40 via-black to-slate-950" />

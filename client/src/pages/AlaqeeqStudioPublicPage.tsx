@@ -348,7 +348,7 @@ export default function AlaqeeqStudioPublicPage() {
           id: "story-post-" + post.id,
           title: post.title || post.fileName || "فيديو YouTube",
           category: "فيديو YouTube",
-          imageUrl: ytId ? "https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg" : null,
+          imageUrl: ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : null,
           time: label || "الآن",
           sourceType: "youtube",
           targetUrl: postUrl || "/offers",

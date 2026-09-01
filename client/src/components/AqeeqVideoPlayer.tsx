@@ -54,7 +54,9 @@ export function AqeeqUnifiedVideoFrame({
   const isDrive = Boolean(driveId);
   const ytMatch = sourceUrl.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?.*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
   const isYouTube = Boolean(ytMatch && ytMatch[1]);
-  const ytThumbnail = isYouTube ? `https://img.youtube.com/vi/${ytMatch![1]}/hqdefault.jpg` : null;
+  const ytThumbnail = isYouTube && ytMatch?.[1]
+    ? `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`
+    : null;
   const previewUrl = isDrive ? getAqeeqDrivePreviewUrl(sourceUrl) : sourceUrl;
   const fallbackUrl = isDrive ? getAqeeqDriveFallbackUrl(sourceUrl) : sourceUrl;
 
