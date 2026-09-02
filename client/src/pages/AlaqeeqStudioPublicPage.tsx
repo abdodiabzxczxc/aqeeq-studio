@@ -1612,9 +1612,23 @@ export default function AlaqeeqStudioPublicPage() {
               <VisualImage
                 id="studio-footer-logo"
                 label="شعار الفوتر"
-                src={logoUrl || "/alaqeeq-logo.png"}
+                src={
+                  isNationalDay
+                    ? dark
+                      ? "/alaqeeq-logo-national-dark.png"
+                      : "/alaqeeq-logo-national-light.png"
+                    : logoUrl || "/alaqeeq-logo.png"
+                }
                 alt="مدارس العقيق"
-                className={`h-9 w-auto object-contain transition ${dark ? "brightness-0 invert opacity-90" : "opacity-90"}`}
+                className={`h-9 w-auto object-contain transition ${
+                  isNationalDay
+                    ? dark
+                      ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                      : "drop-shadow-[0_1px_3px_rgba(0,90,54,0.15)]"
+                    : dark
+                    ? "brightness-0 invert opacity-90"
+                    : "opacity-90"
+                }`}
               />
               <VisualEditable
                 id="studio-footer-title"
@@ -1622,8 +1636,17 @@ export default function AlaqeeqStudioPublicPage() {
                 label="اسم الاستوديو في الفوتر"
                 defaultText="استوديو العقيق الرقمي"
                 as="span"
-                className={`text-xs font-black tracking-wide ${dark ? "text-slate-300" : "text-slate-700"}`}
+                className={`text-xs font-black tracking-wide ${
+                  isNationalDay
+                    ? dark
+                      ? "text-emerald-300"
+                      : "text-[#005A36]"
+                    : dark
+                    ? "text-slate-300"
+                    : "text-slate-700"
+                }`}
               />
+
             </div>
 
             {/* Location Tag (فكرة 5: وسم المدينة المنورة) */}

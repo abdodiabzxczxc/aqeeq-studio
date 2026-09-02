@@ -115,12 +115,25 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               className="flex h-[44px] sm:h-[60px] w-auto max-w-[160px] sm:max-w-[220px] items-center justify-end transition hover:opacity-90"
             >
               <img
-                src="/alaqeeq-logo.png"
+                src={
+                  isNationalDay
+                    ? dark
+                      ? "/alaqeeq-logo-national-dark.png"
+                      : "/alaqeeq-logo-national-light.png"
+                    : activeLogo
+                }
                 alt="شعار مدارس العقيق الأهلية والدولية"
                 className={`max-h-full max-w-full object-contain transition duration-200 ${
-                  dark ? "brightness-0 invert opacity-95" : ""
+                  isNationalDay
+                    ? dark
+                      ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+                      : "drop-shadow-[0_1px_4px_rgba(0,90,54,0.12)]"
+                    : dark
+                    ? "brightness-0 invert opacity-95"
+                    : ""
                 }`}
               />
+
             </button>
 
             {isNationalDay && (
