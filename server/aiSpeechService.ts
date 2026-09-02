@@ -1,11 +1,13 @@
 import crypto from "node:crypto";
+import path from "node:path";
+import { spawn } from "node:child_process";
 
 // Memory cache for instant 0ms audio retrieval
 const audioCache = new Map<string, { buffer: Buffer; createdAt: number }>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * Preprocess and clean Arabic text for natural voice pronunciation
+ * Preprocess and clean Arabic text for natural human voice pronunciation
  */
 export function cleanArabicTextForSpeech(text: string): string {
   return text
@@ -28,74 +30,59 @@ export function cleanArabicTextForSpeech(text: string): string {
 }
 
 /**
- * Split text into natural spoken phrases (max ~150 chars per chunk)
+ * Synthesizes via Microsoft Neural Engine in Python worker (ar-SA-HamedNeural / ar-SA-ZariyahNeural)
  */
-function splitIntoNaturalPhrases(text: string, maxChunkLen: number = 150): string[] {
-  const sentences = text.split(/(?<=[.،؟!:\n])/).map((s) => s.trim()).filter(Boolean);
-  const phrases: string[] = [];
+function synthesizeWithNeuralWorker(text: string, voice: string = "ar-SA-HamedNeural"): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const workerScript = path.resolve(process.cwd(), "server/tts_worker.py");
+    const py = spawn("python3", [workerScript, voice, "-2%", "-1Hz"], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
-  for (const sentence of sentences) {
-    if (sentence.length <= maxChunkLen) {
-      phrases.push(sentence);
-    } else {
-      // Split by words if sentence is long
-      const words = sentence.split(" ");
-      let current = "";
-      for (const w of words) {
-        if ((current + " " + w).length <= maxChunkLen) {
-          current = current ? current + " " + w : w;
-        } else {
-          if (current) phrases.push(current);
-          current = w;
-        }
+    const chunks: Buffer[] = [];
+    let errorOutput = "";
+
+    py.stdout.on("data", (c) => chunks.push(c));
+    py.stderr.on("data", (c) => (errorOutput += c.toString()));
+
+    const timeout = setTimeout(() => {
+      py.kill();
+      reject(new Error("NEURAL_TTS_TIMEOUT"));
+    }, 15000);
+
+    py.on("close", (code) => {
+      clearTimeout(timeout);
+      if (code === 0 && chunks.length > 0) {
+        resolve(Buffer.concat(chunks));
+      } else {
+        reject(new Error(`Worker exited with code ${code}: ${errorOutput}`));
       }
-      if (current) phrases.push(current);
-    }
-  }
+    });
 
-  return phrases.filter((p) => p.trim().length > 0);
+    py.stdin.write(text);
+    py.stdin.end();
+  });
 }
 
 /**
- * Synthesizes high quality Arabic voice audio and returns base64 MP3 data
+ * Fallback multi-chunk generator
  */
-export async function synthesizeArabicVoice(rawText: string): Promise<{
-  audioBase64: string;
-  durationEstimateSeconds: number;
-}> {
-  const cleaned = cleanArabicTextForSpeech(rawText);
-  if (!cleaned) {
-    throw new Error("لا يوجد نص قابل للنطق");
-  }
-
-  // Check in-memory cache
-  const cacheKey = crypto.createHash("md5").update(cleaned).digest("hex");
-  const cached = audioCache.get(cacheKey);
-  if (cached && Date.now() - cached.createdAt < CACHE_TTL_MS) {
-    return {
-      audioBase64: cached.buffer.toString("base64"),
-      durationEstimateSeconds: Math.ceil(cleaned.length / 15),
-    };
-  }
-
-  // Natural phrase chunking
-  // Cap at ~600 chars for optimal performance and rapid audio response
-  const phrases = splitIntoNaturalPhrases(cleaned.slice(0, 700));
+async function fallbackGoogleTts(text: string): Promise<Buffer> {
+  const sentences = text.split(/(?<=[.،؟!:\n])/).map((s) => s.trim()).filter(Boolean);
   const audioChunks: Buffer[] = [];
 
-  for (const phrase of phrases) {
+  for (const phrase of sentences.slice(0, 10)) {
     try {
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-        phrase
+        phrase.slice(0, 150)
       )}&tl=ar&client=tw-ob`;
 
       const res = await fetch(url, {
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-          Accept: "*/*",
         },
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(5000),
       });
 
       if (res.ok) {
@@ -105,24 +92,75 @@ export async function synthesizeArabicVoice(rawText: string): Promise<{
         }
       }
     } catch (e) {
-      console.warn("TTS chunk fetch error:", e);
+      // Non-blocking
     }
   }
 
   if (audioChunks.length === 0) {
+    throw new Error("فشل الصوت الاحتياطي");
+  }
+
+  return Buffer.concat(audioChunks);
+}
+
+/**
+ * Synthesizes high quality Arabic voice audio and returns base64 MP3 data
+ * Uses HamedNeural (Saudi Arabian warm human male broadcaster voice) by default!
+ */
+export async function synthesizeArabicVoice(
+  rawText: string,
+  voiceType: "male" | "female" = "male"
+): Promise<{
+  audioBase64: string;
+  durationEstimateSeconds: number;
+  voiceUsed: string;
+}> {
+  const cleaned = cleanArabicTextForSpeech(rawText);
+  if (!cleaned) {
+    throw new Error("لا يوجد نص قابل للنطق");
+  }
+
+  const voiceName = voiceType === "female" ? "ar-SA-ZariyahNeural" : "ar-SA-HamedNeural";
+
+  // Check in-memory cache
+  const cacheKey = crypto.createHash("md5").update(`${voiceName}:${cleaned}`).digest("hex");
+  const cached = audioCache.get(cacheKey);
+  if (cached && Date.now() - cached.createdAt < CACHE_TTL_MS) {
+    return {
+      audioBase64: cached.buffer.toString("base64"),
+      durationEstimateSeconds: Math.ceil(cleaned.length / 14),
+      voiceUsed: voiceName,
+    };
+  }
+
+  let finalBuffer: Buffer | null = null;
+
+  // 1. Primary Engine: Ultra-realistic Neural Male Voice (ar-SA-HamedNeural)
+  try {
+    finalBuffer = await synthesizeWithNeuralWorker(cleaned.slice(0, 900), voiceName);
+  } catch (err: any) {
+    console.warn("Neural TTS worker failed, falling back to secondary engine:", err?.message);
+    // 2. Secondary fallback
+    try {
+      finalBuffer = await fallbackGoogleTts(cleaned.slice(0, 500));
+    } catch (fallbackErr) {
+      throw new Error("تعذر توليد الصوت");
+    }
+  }
+
+  if (!finalBuffer || finalBuffer.length === 0) {
     throw new Error("تعذر توليد الصوت");
   }
 
-  const mergedBuffer = Buffer.concat(audioChunks);
-
   // Save in cache
   audioCache.set(cacheKey, {
-    buffer: mergedBuffer,
+    buffer: finalBuffer,
     createdAt: Date.now(),
   });
 
   return {
-    audioBase64: mergedBuffer.toString("base64"),
-    durationEstimateSeconds: Math.ceil(cleaned.length / 15),
+    audioBase64: finalBuffer.toString("base64"),
+    durationEstimateSeconds: Math.ceil(cleaned.length / 14),
+    voiceUsed: voiceName,
   };
 }

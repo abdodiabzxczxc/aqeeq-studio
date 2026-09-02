@@ -1545,10 +1545,11 @@ export const appRouter = router({
       .input(
         z.object({
           text: z.string().min(1).max(2000),
+          voice: z.enum(["male", "female"]).default("male").optional(),
         })
       )
       .mutation(async ({ input }) => {
-        return synthesizeArabicVoice(input.text);
+        return synthesizeArabicVoice(input.text, input.voice || "male");
       }),
 
     getAiStatus: publicProcedure.query(async () => {

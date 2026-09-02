@@ -288,7 +288,7 @@ export function AqeeqAiAssistantWidget() {
     setSpeakingIndex(index ?? null);
 
     try {
-      const data = await synthesizeMutation.mutateAsync({ text: cleaned });
+      const data = await synthesizeMutation.mutateAsync({ text: cleaned, voice: "male" });
       if (data?.audioBase64) {
         const audio = new Audio(`data:audio/mp3;base64,${data.audioBase64}`);
         audioPlayerRef.current = audio;
