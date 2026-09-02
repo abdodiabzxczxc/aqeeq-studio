@@ -833,199 +833,326 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* TWO FLOATING ICONS ON THE ACTUAL WEBSITE (Direct choice live on the site) */}
+      {/* Unified Apple Intelligence Trigger (Single luxury spatial button) */}
       {!isOpen && (
-        <div className="flex items-center gap-2 sm:gap-2.5 p-1 rounded-full backdrop-blur-xl border border-white/15 bg-black/50 shadow-2xl animate-in fade-in slide-in-from-bottom-3 duration-300">
-          {/* Icon 1: Siri Ambient Ribbon */}
-          <button
-            type="button"
-            onClick={() => openWithStyle("siri")}
-            className={`group relative flex items-center gap-2 rounded-full border-2 aq-siri-glow px-3 py-2 sm:px-3.5 sm:py-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-              isDark
-                ? "bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(6,182,212,0.35)]"
-                : "bg-white/95 text-slate-900 shadow-[0_10px_30px_rgba(6,182,212,0.25)]"
-            }`}
-            title="التصميم 1: شريط سيري المحيطي (لا يغطي الموقع)"
-          >
-            <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow-md shrink-0">
-              <span className="text-sm sm:text-base">🌌</span>
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 border border-slate-900 animate-ping" />
-            </div>
-            <div className="text-right">
-              <span className="text-[11px] sm:text-xs font-black block text-cyan-400 leading-tight">1. شريط سيري</span>
-              <span className="text-[9px] text-slate-400 font-bold hidden sm:block">محيطي • حي</span>
-            </div>
-          </button>
-
-          {/* Icon 2: Swiss Luxury Glass Card */}
-          <button
-            type="button"
-            onClick={() => openWithStyle("swiss")}
-            className={`group relative flex items-center gap-2 rounded-full border-2 px-3 py-2 sm:px-3.5 sm:py-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-              isDark
-                ? "border-amber-400/60 bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(248,202,20,0.35)]"
-                : "border-amber-400/70 bg-white/95 text-slate-900 shadow-[0_10px_30px_rgba(248,202,20,0.25)]"
-            }`}
-            title="التصميم 2: الكارت السويسري الفاخر (شات فندقي نقي)"
-          >
-            <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
-              <Bot size={17} className="group-hover:rotate-12 transition-transform" />
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 border border-slate-900 animate-pulse" />
-            </div>
-            <div className="text-right">
-              <span className="text-[11px] sm:text-xs font-black block text-amber-500 leading-tight">2. كارت سويسري</span>
-              <span className="text-[9px] text-slate-400 font-bold hidden sm:block">منظم • فندقي</span>
-            </div>
-          </button>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 1. SIRI AMBIENT RIBBON VIEW (Option 1)                                    */}
-      {/* ========================================================================= */}
-      {isOpen && activeUiStyle === "siri" && (
-        <div className="fixed bottom-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-full sm:max-w-xl animate-in slide-in-from-bottom-5 duration-300 select-none">
-          {/* Floating Subtitle Pill above the ribbon */}
-          <div className={`mb-3 rounded-2xl border backdrop-blur-2xl p-3.5 shadow-2xl transition-all text-right ${
+        <button
+          type="button"
+          onClick={() => {
+            setIsOpen(true);
+            setActiveUiStyle("siri");
+            enterLiveVoiceMode();
+          }}
+          className={`group relative flex items-center gap-3 rounded-full border-2 aq-siri-glow p-2 sm:px-4 sm:py-2.5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
             isDark
-              ? "border-cyan-500/30 bg-[#080d1a]/90 text-white shadow-[0_10px_40px_rgba(0,0,0,0.85)]"
-              : "border-cyan-500/40 bg-white/95 text-slate-900 shadow-xl"
-          }`}>
-            <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-current/10">
-              <span className="text-[11px] font-black text-cyan-400 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
-                <span>🌌 شريط سيري المحيطي • مدارس العقيق</span>
+              ? "bg-[#070b16]/95 text-white shadow-[0_15px_45px_rgba(0,0,0,0.85)]"
+              : "bg-white/95 text-slate-900 shadow-[0_15px_45px_rgba(248,202,20,0.25)]"
+          }`}
+          title="مستشار العقيق الذكي (Apple Intelligence)"
+        >
+          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-lg shrink-0">
+            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+            <span
+              className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+                isDark ? "border-slate-950" : "border-white"
+              } animate-pulse bg-emerald-400`}
+            />
+          </div>
+
+          <div className="hidden sm:block text-right">
+            <div className="flex items-center gap-1.5">
+              <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                مستشار العقيق الصوتي
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveUiStyle("swiss");
-                  localStorage.setItem("aqeeq_ai_ui_style", "swiss");
-                }}
-                className="text-[10px] font-black px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 hover:bg-yellow-300 transition shadow-sm flex items-center gap-1"
-              >
-                <span>🔁 التبديل للكارت السويسري</span>
-              </button>
+              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
             </div>
-            <p className="text-xs sm:text-sm font-medium leading-relaxed">
-              {interimSpeech
-                ? `🎙️ أنت: "${interimSpeech}"`
-                : lastAssistantVoiceTranscript ||
-                  "أهلاً بك! يمكنك تصفح الموقع بحرية وسأرد عليك صوتياً فوراً دون حجب أي شيء 🎙️✨"}
+            <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+              تحدث بالصوت وتصفح الموقع بحرية 🎙️
             </p>
           </div>
 
-          {/* Text Input Drawer for Siri (if user clicks keyboard) */}
-          {isSiriTextOpen && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (inputPrompt.trim()) {
-                  handleSend();
-                  setIsSiriTextOpen(false);
-                }
-              }}
-              className={`mb-2 rounded-2xl border p-1.5 flex items-center gap-2 backdrop-blur-2xl shadow-xl animate-in fade-in slide-in-from-bottom-2 ${
-                isDark ? "border-white/20 bg-black/90 text-white" : "border-slate-300 bg-white/95 text-slate-900"
-              }`}
-            >
-              <input
-                type="text"
-                value={inputPrompt}
-                onChange={(e) => setInputPrompt(e.target.value)}
-                placeholder="اكتب استفسارك هنا..."
-                className="flex-1 bg-transparent px-3 py-1.5 text-xs font-bold outline-none"
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="px-4 py-1.5 rounded-xl bg-cyan-400 text-black text-xs font-black shadow hover:bg-cyan-300 transition"
-              >
-                إرسال
-              </button>
-            </form>
-          )}
+          {/* Dynamic Island Mini Equalizer Waveform */}
+          <div className="hidden sm:flex items-center gap-1 h-5 px-1 shrink-0">
+            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-emerald-400" style={{ animationDelay: "0.3s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-cyan-400" style={{ animationDelay: "0.5s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.2s" }} />
+          </div>
+        </button>
+      )}
 
-          {/* The Siri Liquid Wave Ribbon */}
-          <div className={`aq-siri-ribbon rounded-full border-2 p-2 sm:px-4 sm:py-2.5 flex items-center justify-between shadow-2xl backdrop-blur-3xl transition-all ${
+      {/* ========================================================================= */}
+      {/* NEXT-GEN ALL-IN-ONE SIRI AMBIENT SPATIAL CAPSULE (Option 1)               */}
+      {/* ========================================================================= */}
+      {isOpen && activeUiStyle === "siri" && (
+        <div className="fixed bottom-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-full sm:max-w-xl animate-in slide-in-from-bottom-5 duration-300 select-none">
+          <div className={`rounded-[2.4rem] border-2 aq-siri-glow backdrop-blur-3xl p-4 sm:p-5 shadow-2xl transition-all relative overflow-hidden ${
             isDark
-              ? "border-cyan-400/70 bg-gradient-to-r from-[#070b16]/95 via-[#0a1224]/95 to-[#070b16]/95 text-white shadow-[0_0_40px_rgba(6,182,212,0.4)]"
-              : "border-cyan-400/80 bg-gradient-to-r from-white/98 via-cyan-50/90 to-white/98 text-slate-900 shadow-[0_10px_40px_rgba(6,182,212,0.3)]"
+              ? "bg-[#070b16]/95 text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
+              : "bg-white/95 text-slate-900 shadow-[0_25px_80px_rgba(248,202,20,0.18)]"
           }`}>
-            {/* Right: Bot Icon & State */}
-            <div className="flex items-center gap-2.5">
-              <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow shrink-0">
-                <span className="text-sm">🌌</span>
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 border border-slate-900 animate-pulse" />
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-black block leading-none">
-                  {liveVoiceState === "speaking" ? "المستشار يتحدث..." : liveVoiceState === "listening" ? "يستمع لصوتك..." : "جاهز للمساعدة"}
-                </span>
-                <span className="text-[10px] text-cyan-500 font-bold">ذكاء محيطي حي</span>
-              </div>
-            </div>
+            {/* Top Ambient Fluid Mesh Ribbon Background Glow */}
+            <div className="aq-fluid-mesh absolute top-0 left-0 right-0 h-1.5 opacity-80" />
 
-            {/* Center: Glowing Animated Equalizer Waveform */}
-            <div className="flex items-center gap-1 sm:gap-1.5 h-6 sm:h-7 px-2">
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-yellow-400" style={{ animationDelay: "0.3s" }} />
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-emerald-400" style={{ animationDelay: "0.5s" }} />
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-teal-300" style={{ animationDelay: "0.2s" }} />
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-cyan-400" style={{ animationDelay: "0.4s" }} />
-              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-amber-400" style={{ animationDelay: "0.25s" }} />
-            </div>
+            {/* Top Header & Status Row */}
+            <div className="flex items-center justify-between pb-3 border-b border-current/10">
+              {/* Right: Bot Brand & Live Status */}
+              <div className="flex items-center gap-2.5">
+                <div className="relative grid h-9 w-9 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow shrink-0">
+                  <Bot size={18} />
+                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-slate-900 animate-pulse" />
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black">مستشار العقيق الذكي</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      liveVoiceState === "speaking"
+                        ? "bg-amber-400/20 text-amber-500 border-amber-400/30"
+                        : liveVoiceState === "listening"
+                        ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30 animate-pulse"
+                        : "bg-cyan-500/20 text-cyan-500 border-cyan-500/30"
+                    }`}>
+                      {liveVoiceState === "speaking" && "يتحدث الآن 🔊"}
+                      {liveVoiceState === "listening" && "يستمع لصوتك 🎙️"}
+                      {liveVoiceState === "thinking" && "يفكر ويصيغ الرد... ⚡"}
+                      {liveVoiceState === "idle" && "جاهز للمحادثة"}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Left: Action Controls */}
-            <div className="flex items-center gap-1.5">
-              {liveVoiceState === "speaking" ? (
+              {/* Left: Quick Controls */}
+              <div className="flex items-center gap-1.5">
+                {/* Switch to Full Swiss Chat Modal */}
                 <button
                   type="button"
                   onClick={() => {
-                    stopSpeaking();
-                    startLiveVoiceListening();
+                    setActiveUiStyle("swiss");
+                    localStorage.setItem("aqeeq_ai_ui_style", "swiss");
                   }}
-                  className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 text-black px-3.5 sm:px-4 py-1.5 text-xs font-black shadow hover:scale-105 transition flex items-center gap-1"
+                  className={`hidden sm:inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-[10px] font-black transition border ${
+                    isDark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
+                      : "border-slate-200 bg-slate-100 text-slate-700 hover:text-black"
+                  }`}
+                  title="فتح نافذة الشات الكاملة"
                 >
-                  <Square size={11} className="fill-current" />
-                  <span>مقاطعة</span>
+                  <MessageSquare size={11} />
+                  <span>الشات الكامل</span>
                 </button>
-              ) : (
+
+                {/* Voice Mute Toggle */}
                 <button
                   type="button"
-                  onClick={startLiveVoiceListening}
-                  className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-black px-3.5 sm:px-4 py-1.5 text-xs font-black shadow hover:scale-105 transition flex items-center gap-1"
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    setIsVoiceEnabled(!isVoiceEnabled);
+                    toast.info(!isVoiceEnabled ? "تم تفعيل الصوت الطبيعي 🔊" : "تم كتم الصوت 🔈");
+                  }}
+                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                    isVoiceEnabled
+                      ? isDark
+                        ? "text-amber-300 bg-amber-400/10 hover:bg-amber-400/20"
+                        : "text-amber-700 bg-amber-50 hover:bg-amber-100"
+                      : isDark
+                      ? "text-slate-500 hover:text-white hover:bg-white/10"
+                      : "text-slate-400 hover:text-slate-900 hover:bg-black/5"
+                  }`}
+                  title={isVoiceEnabled ? "الصوت مفعل" : "الصوت مكتوم"}
                 >
-                  <Mic size={13} />
-                  <span>تحدث</span>
+                  {isVoiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
                 </button>
-              )}
 
-              <button
-                type="button"
-                onClick={() => setIsSiriTextOpen(!isSiriTextOpen)}
-                className={`grid h-8 w-8 place-items-center rounded-full border transition ${
-                  isDark ? "border-white/10 bg-white/5 text-slate-300 hover:text-white" : "border-slate-300 bg-slate-100 text-slate-700 hover:text-black"
-                }`}
-                title="كتابة استفسار"
-              >
-                <Keyboard size={14} />
-              </button>
+                {/* Keyboard Spotlight Input Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsSiriTextOpen(!isSiriTextOpen)}
+                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                    isSiriTextOpen
+                      ? "bg-amber-400 text-slate-950 font-black"
+                      : isDark
+                      ? "border border-white/10 bg-white/5 text-slate-300 hover:text-white"
+                      : "border border-slate-200 bg-slate-100 text-slate-700 hover:text-black"
+                  }`}
+                  title="كتابة سؤالك بالكيبورد"
+                >
+                  <Keyboard size={15} />
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (isSpeaking) stopSpeaking();
-                  if (isListening) stopListening();
-                  setIsOpen(false);
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    if (isListening) stopListening();
+                    setIsOpen(false);
+                  }}
+                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                    isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                  }`}
+                  title="تصغير / إغلاق"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Middle Section: Spotlight Input Mode OR Live Voice & Subtitles Stage */}
+            {isSiriTextOpen ? (
+              /* Spotlight Command Input Morph */
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (inputPrompt.trim()) {
+                    handleSend();
+                    setIsSiriTextOpen(false);
+                  }
                 }}
-                className={`grid h-8 w-8 place-items-center rounded-full border transition ${
-                  isDark ? "border-white/10 bg-white/5 text-slate-400 hover:text-white" : "border-slate-300 bg-slate-100 text-slate-500 hover:text-black"
-                }`}
-                title="إغلاق"
+                className="py-3 animate-in fade-in zoom-in-95 duration-200"
               >
-                <X size={15} />
-              </button>
+                <div className={`flex items-center gap-2 rounded-2xl border p-2 transition shadow-inner ${
+                  isDark
+                    ? "border-white/15 bg-black/70 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/20"
+                    : "border-slate-300 bg-slate-50 focus-within:border-amber-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20"
+                }`}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputPrompt}
+                    onChange={(e) => setInputPrompt(e.target.value)}
+                    placeholder="اكتب استفسارك هنا، وسأجيبك فوراً بالصوت..."
+                    className="flex-1 bg-transparent px-2 py-1 text-xs sm:text-sm font-bold outline-none"
+                    autoFocus
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!inputPrompt.trim() || askAiMutation.isPending}
+                    className="rounded-xl bg-[#f8ca14] text-slate-950 font-black px-4 py-1.5 text-xs hover:bg-yellow-300 transition shadow"
+                  >
+                    <span>إرسال</span>
+                    <Send size={13} className="mr-1" />
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              /* Live Voice Subtitles & Visualizer Stage */
+              <div className="py-3 sm:py-4 space-y-3">
+                {/* Live Transcript Bubble */}
+                <div className={`rounded-2xl border p-3.5 text-right transition-all ${
+                  isDark
+                    ? "border-white/10 bg-white/[0.04]"
+                    : "border-amber-200/80 bg-amber-50/40"
+                }`}>
+                  {interimSpeech ? (
+                    <div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-500 text-[10px] font-black">
+                        🎙️ أنت تتحدث:
+                      </span>
+                      <p className={`mt-1.5 text-xs sm:text-sm font-bold leading-relaxed ${isDark ? "text-emerald-200" : "text-emerald-900"}`}>
+                        "{interimSpeech}"
+                      </p>
+                    </div>
+                  ) : lastAssistantVoiceTranscript ? (
+                    <div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-500 text-[10px] font-black">
+                        💎 المستشار:
+                      </span>
+                      <p className={`mt-1.5 text-xs sm:text-sm font-medium leading-relaxed ${isDark ? "text-white" : "text-slate-900"}`}>
+                        {lastAssistantVoiceTranscript}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className={`text-xs sm:text-sm font-medium text-center py-0.5 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                      أنا أسمعك الآن.. تفضل بالسؤال أو تصفح الموقع وسأجيبك فوراً 🎙️✨
+                    </p>
+                  )}
+                </div>
+
+                {/* Siri Multi-Colored Fluid Equalizer Waveform */}
+                <div className="flex items-center justify-center gap-1.5 h-8">
+                  {[25, 60, 40, 90, 70, 100, 80, 50, 30].map((h, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        animationDelay: `${0.1 * idx}s`,
+                      }}
+                      className={`aq-wave-bar w-1.5 sm:w-2 rounded-full transition-all duration-200 ${
+                        idx % 3 === 0
+                          ? "bg-gradient-to-t from-amber-500 to-yellow-300 shadow-[0_0_10px_rgba(248,202,20,0.5)]"
+                          : idx % 3 === 1
+                          ? "bg-gradient-to-t from-emerald-500 to-teal-300 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                          : "bg-gradient-to-t from-cyan-500 to-blue-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Controls & Contextual Action Chips */}
+            <div className="pt-2 border-t border-current/10 flex flex-wrap items-center justify-between gap-2">
+              {/* Primary Glowing Action Pill */}
+              <div className="flex items-center gap-2">
+                {liveVoiceState === "speaking" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      stopSpeaking();
+                      startLiveVoiceListening();
+                    }}
+                    className="rounded-full bg-gradient-to-r from-amber-400 via-[#f8ca14] to-yellow-300 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(248,202,20,0.5)] hover:scale-105 transition"
+                  >
+                    <Square size={11} className="fill-current" />
+                    <span>مقاطعة والتحدث 🎙️</span>
+                  </button>
+                ) : liveVoiceState === "listening" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (interimSpeech) {
+                        sendLiveVoiceTurn(interimSpeech);
+                      } else {
+                        stopListening();
+                      }
+                    }}
+                    className="rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-300 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-105 transition"
+                  >
+                    <Square size={11} className="fill-current" />
+                    <span>أستمع لصوتك.. (إنهاء وإرسال)</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={startLiveVoiceListening}
+                    className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-105 transition"
+                  >
+                    <Mic size={13} />
+                    <span>تحدث الآن 🎙️</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Contextual Smart Site Chips */}
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                {[
+                  { label: "القبول والرسوم", url: "https://aqeeq.edu.sa", isExt: true },
+                  { label: "صوري بالوجه", url: "/albums", isExt: false },
+                  { label: "البودكاست", url: "/podcast", isExt: false },
+                ].map((chip, ci) => (
+                  <button
+                    key={ci}
+                    type="button"
+                    onClick={() => handleShortcutClick(chip.url)}
+                    className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition hover:scale-105 ${
+                      isDark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:border-amber-400/50 hover:bg-amber-400/10 hover:text-amber-300"
+                        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-900"
+                    }`}
+                  >
+                    <span>{chip.label}</span>
+                    <ArrowUpLeft size={10} />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
