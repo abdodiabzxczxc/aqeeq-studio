@@ -1014,7 +1014,6 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]"
         )}
       >
-        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
@@ -1268,7 +1267,6 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]"
         )}
       >
-        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
@@ -1384,7 +1382,6 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.08] bg-black" : "border-black/[0.06] bg-white"
         )}
       >
-        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
             <div>

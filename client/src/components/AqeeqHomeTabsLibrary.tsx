@@ -170,7 +170,6 @@ export function AqeeqHomeTabsLibrary({
           : dark ? "bg-[#050505]" : "bg-white"
       }`}
     >
-      {isNationalDay && <div className="snd-gold-divider" />}
       <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* Unified Section Header */}

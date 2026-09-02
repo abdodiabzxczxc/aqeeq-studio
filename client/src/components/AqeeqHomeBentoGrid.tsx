@@ -50,7 +50,6 @@ export function AqeeqHomeBentoGrid({
       )}
     >
       <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
-      {isNationalDay && <div className="snd-gold-divider mb-10" />}
       {/* Unified Section Header */}
       <div className="mb-8 sm:mb-10 text-right">
         <VisualEditable
