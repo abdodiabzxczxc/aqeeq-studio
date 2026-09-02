@@ -127,11 +127,24 @@ export function AqeeqNewsMarquee({
   const isPausedRef = useRef(false);
   isPausedRef.current = isPaused;
 
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const batchRef = useRef<HTMLDivElement | null>(null);
   const offsetRef = useRef<number>(0);
   const batchWidthRef = useRef<number>(0);
   const animFrameIdRef = useRef<number | null>(null);
+  const hasInitializedRef = useRef<boolean>(false);
+
+  // Initialize offset so the first news item (أول وأحدث خبر) starts from the far left edge of the bar
+  useEffect(() => {
+    if (!viewportRef.current || singleBatch.length === 0 || hasInitializedRef.current) return;
+    const vpWidth = viewportRef.current.offsetWidth || 1000;
+    offsetRef.current = -vpWidth + 24;
+    hasInitializedRef.current = true;
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    }
+  }, [singleBatch]);
 
   // Measure batch width accurately
   useEffect(() => {
@@ -278,7 +291,7 @@ export function AqeeqNewsMarquee({
           </div>
 
           {/* 2. Scrolling Viewport with Soft Fade Gradients */}
-          <div className="relative flex-1 overflow-hidden h-full flex items-center">
+          <div ref={viewportRef} className="relative flex-1 overflow-hidden h-full flex items-center">
             {/* Soft edge gradient masks */}
             <div
               className={`absolute right-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-l ${
@@ -299,6 +312,7 @@ export function AqeeqNewsMarquee({
               {renderBatch(singleBatch, "b1", true)}
               {renderBatch(singleBatch, "b2")}
               {renderBatch(singleBatch, "b3")}
+              {renderBatch(singleBatch, "b4")}
             </div>
           </div>
         </div>
