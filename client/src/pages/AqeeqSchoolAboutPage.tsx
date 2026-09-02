@@ -361,14 +361,28 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
               </div>
 
-              <div className={`flex items-center justify-between pt-4 border-t ${dark ? "border-white/10" : "border-slate-200/70"}`}>
-                <a
-                  href={`tel:${campus.phone.replace(/\s+/g, "")}`}
-                  className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-emerald-400" : "text-[#015a37]"}`}
-                >
-                  <Phone size={14} />
-                  <span>{campus.phone}</span>
-                </a>
+              <div className={`flex flex-wrap items-center justify-between gap-3 pt-4 border-t ${dark ? "border-white/10" : "border-slate-200/70"}`}>
+                <div className="flex items-center gap-3">
+                  <a
+                    href={`tel:${campus.phone.replace(/\s+/g, "")}`}
+                    className={`inline-flex items-center gap-1.5 text-xs font-black hover:underline ${dark ? "text-emerald-400" : "text-[#015a37]"}`}
+                  >
+                    <Phone size={13} />
+                    <span>{campus.phone}</span>
+                  </a>
+
+                  <a
+                    href={idx === 0 ? "https://maps.google.com/?q=Al-Aqeeq+Schools+Boys+Madinah" : "https://maps.google.com/?q=Al-Aqeeq+Schools+Girls+Baqdo+Madinah"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                      dark ? "bg-white/10 text-slate-200 hover:bg-white/20" : "bg-emerald-50 text-[#015a37] hover:bg-emerald-100"
+                    }`}
+                  >
+                    <MapPin size={12} />
+                    <span>موقع Google Maps 📍</span>
+                  </a>
+                </div>
 
                 <Button
                   size="sm"

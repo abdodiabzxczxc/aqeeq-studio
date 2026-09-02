@@ -29,6 +29,14 @@ import {
   PhoneCall,
   Percent,
   Play,
+  LayoutGrid,
+  Table as TableIcon,
+  Minus,
+  Plus,
+  ArrowLeft,
+  ArrowUpRight,
+  BookOpen,
+  Check,
 } from "lucide-react";
 
 type TrackType = "national" | "international";
@@ -39,6 +47,10 @@ export default function AqeeqSchoolAdmissionsPage() {
   const dark = theme === "dark";
 
   const [activeTrack, setActiveTrack] = useState<TrackType>("national");
+  const [feesViewMode, setFeesViewMode] = useState<"cards" | "table">("cards");
+  const [calcGradeIndex, setCalcGradeIndex] = useState<number>(1);
+  const [calcSiblingsCount, setCalcSiblingsCount] = useState<number>(1);
+  const [showDocsModal, setShowDocsModal] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     studentName: "",
     guardianName: "",
@@ -85,20 +97,147 @@ export default function AqeeqSchoolAdmissionsPage() {
   };
 
   const feesNational = [
-    { grade: "مرحلة رياض الأطفال (KG1 - KG3)", fee: "14,500", term: "7,250", notes: "شامل الأنشطة اللامنهجية وتأسيس اللغة والقرآن" },
-    { grade: "المرحلة الابتدائية (الصفوف 1 - 6)", fee: "16,800", term: "8,400", notes: "شامل مسار البرمجة والروبوت والأنشطة الإثرائية" },
-    { grade: "المرحلة المتوسطة (الصفوف 7 - 9)", fee: "18,900", term: "9,450", notes: "شامل برامج القدرات والتحصيلي ومعامل العلوم المتطورة" },
-    { grade: "المرحلة الثانوية (الصفوف 10 - 12)", fee: "21,500", term: "10,750", notes: "تأهيل متكامل لاختبارات قياس والقبول الجامعي" },
+    {
+      grade: "مرحلة رياض الأطفال (KG1 - KG3)",
+      badge: "مرحلة التأسيس والاكتشاف",
+      fee: "14,500",
+      rawFee: 14500,
+      term: "4,833",
+      notes: "شامل الأنشطة اللامنهجية وتأسيس اللغة والقرآن وتطوير الحواس والذكاء",
+      perks: [
+        "تأسيس لغوي وقرآني بمعايير متقدمة",
+        "أركان منتسوري تفاعلية لتطوير الحواس",
+        "رعاية نهارية متكاملة وبيئة تربوية آمنة",
+        "أنشطة رياضية وفنية ومسرح عرائس",
+      ],
+      targetGrade: "kindergarten",
+    },
+    {
+      grade: "المرحلة الابتدائية (الصفوف 1 - 6)",
+      badge: "مرحلة البناء والمهارات",
+      fee: "16,800",
+      rawFee: 16800,
+      term: "5,600",
+      notes: "شامل مسار البرمجة والروبوت والأنشطة الإثرائية ومعامل الذكاء الاصطناعي",
+      perks: [
+        "معامل الذكاء الاصطناعي وأكاديمية الروبوت",
+        "تأهيل مستمر لمسابقات نافس وموهبة",
+        "مناهج إثرائية متقدمة في اللغة والرياضيات",
+        "متابعة يومية حية عبر تطبيق أولياء الأمور",
+      ],
+      targetGrade: "primary",
+    },
+    {
+      grade: "المرحلة المتوسطة (الصفوف 7 - 9)",
+      badge: "مرحلة التميز والقدرات",
+      fee: "18,900",
+      rawFee: 18900,
+      term: "6,300",
+      notes: "شامل برامج القدرات والتحصيلي ومعامل العلوم المتطورة وأندية الابتكار",
+      perks: [
+        "مختبرات STEM تطبيقية ومشاريع متقدمة",
+        "نوادي المناظرات والقيادة الطلابية",
+        "إعداد مبكر لاختبارات قياس والقدرات",
+        "صالات رياضية متطورة ومسبح شبه أولمبي",
+      ],
+      targetGrade: "middle",
+    },
+    {
+      grade: "المرحلة الثانوية (الصفوف 10 - 12)",
+      badge: "مرحلة الإعداد للجامعة",
+      fee: "21,500",
+      rawFee: 21500,
+      term: "7,166",
+      notes: "تأهيل متكامل لاختبارات قياس والتحصيلي والقبول الجامعي الأكاديمي المرموق",
+      perks: [
+        "برامج تدريب مكثفة لاجتياز القدرات والتحصيلي 90+",
+        "إرشاد أكاديمي متكامل للقبول في كبرى الجامعات",
+        "مراكز اختبارات دولية معتمدة داخل المدارس",
+        "مشاريع بحثية وتطوعية معتمدة في المسارات",
+      ],
+      targetGrade: "high",
+    },
   ];
 
   const feesInternational = [
-    { grade: "Kindergarten (KG1 - KG3)", fee: "18,500", term: "9,250", notes: "American Curriculum + Cognia Accredited Standards" },
-    { grade: "Elementary School (Grades 1 - 6)", fee: "22,000", term: "11,000", notes: "STEM Curriculum + Native English Educators" },
-    { grade: "Middle School (Grades 7 - 9)", fee: "25,500", term: "12,750", notes: "Advanced Placement Preparation & SAT Foundations" },
-    { grade: "High School (Grades 10 - 12)", fee: "29,000", term: "14,500", notes: "College Board SAT & ACT Center + IELTS Training" },
+    {
+      grade: "Kindergarten (KG1 - KG3)",
+      badge: "Early Discovery & Phonics",
+      fee: "18,500",
+      rawFee: 18500,
+      term: "6,166",
+      notes: "American Curriculum + Cognia Accredited Standards",
+      perks: [
+        "Full Native English Immersion & Phonics",
+        "Cognia USA Accredited Global Framework",
+        "Hands-on STEM & Early Robotics Explorations",
+        "Safe, Modern & Nurturing Environment",
+      ],
+      targetGrade: "kindergarten",
+    },
+    {
+      grade: "Elementary School (Grades 1 - 6)",
+      badge: "Foundations & Critical Thinking",
+      fee: "22,000",
+      rawFee: 22000,
+      term: "7,333",
+      notes: "STEM Curriculum + Native English Educators",
+      perks: [
+        "American Common Core Standards",
+        "Advanced Coding & Artificial Intelligence",
+        "WRO Robotics Championship Preparation",
+        "1:1 Smart Classroom Technology & Labs",
+      ],
+      targetGrade: "primary",
+    },
+    {
+      grade: "Middle School (Grades 7 - 9)",
+      badge: "Innovation & Global Leadership",
+      fee: "25,500",
+      rawFee: 25500,
+      term: "8,500",
+      notes: "Advanced Placement Preparation & SAT Foundations",
+      perks: [
+        "Pre-AP Academic Excellence Track",
+        "Model United Nations & Global Debates",
+        "IELTS Official Foundation Training",
+        "Comprehensive Science & Innovation Labs",
+      ],
+      targetGrade: "middle",
+    },
+    {
+      grade: "High School (Grades 10 - 12)",
+      badge: "College Readiness & AP Programs",
+      fee: "29,000",
+      rawFee: 29000,
+      term: "9,666",
+      notes: "College Board SAT & ACT Center + IELTS Training",
+      perks: [
+        "Official SAT & ACT Test Center on Campus",
+        "Advanced Placement (AP) University Credits",
+        "Ivy League & Top Global University Counseling",
+        "Recognized American High School Diploma",
+      ],
+      targetGrade: "high",
+    },
   ];
 
   const activeFees = activeTrack === "national" ? feesNational : feesInternational;
+
+  // Calculation logic for siblings and instalments
+  const selectedTier = activeFees[calcGradeIndex] || activeFees[0];
+  const baseFee = selectedTier.rawFee;
+  const totalBaseFee = baseFee * calcSiblingsCount;
+  let siblingDiscountAmount = 0;
+  if (calcSiblingsCount >= 2) {
+    siblingDiscountAmount += baseFee * 0.10; // 10% on 2nd child
+  }
+  if (calcSiblingsCount >= 3) {
+    siblingDiscountAmount += baseFee * 0.15 * (calcSiblingsCount - 2); // 15% on 3rd+ child
+  }
+  const netTotalAnnual = totalBaseFee - siblingDiscountAmount;
+  const netTermTotal = Math.round(netTotalAnnual / 3);
+  const tabbyFourInstallments = Math.round(netTotalAnnual / 4);
 
   return (
     <main
@@ -261,23 +400,23 @@ export default function AqeeqSchoolAdmissionsPage() {
         </div>
       </section>
 
-      {/* Tuition Fees Section */}
+      {/* Tuition Fees & Calculator Section */}
       <section id="tuition-fees-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
             <Calculator size={14} />
-            <span>الشفافية والمرونة المالية</span>
+            <span>الشفافية والمرونة المالية والخصومات</span>
           </div>
           <VisualEditable
             id="tuition-fees-title"
             tag="text"
             label="عنوان جدول الرسوم"
-            defaultText="جدول الرسوم الدراسية للعام الدراسي"
+            defaultText="جدول الرسوم الدراسية وحاسبة خصومات الإخوة"
             as="h2"
             className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
           />
           <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-            رسوم تنافسية تشمل أحدث المناهج المتطورة، والأنشطة الصفية واللاصفية، ومعامل الذكاء الاصطناعي وSTEM.
+            رسوم تنافسية تشمل أحدث المناهج المتطورة، والأنشطة الصفية واللاصفية، ومعامل الذكاء الاصطناعي وSTEM مع تسهيلات سداد مرنة.
           </p>
 
           {/* Track Switcher Tabs */}
@@ -313,145 +452,485 @@ export default function AqeeqSchoolAdmissionsPage() {
           </div>
         </div>
 
-        {/* Fees Table Card */}
-        <div className={`overflow-hidden rounded-[2rem] border shadow-2xl backdrop-blur-xl ${
-          dark ? "border-white/10 bg-[#0c1218]/90" : "border-emerald-950/10 bg-white/95"
+        {/* 1. Interactive Tuition & Sibling Discounts Calculator */}
+        <div className={`mb-14 rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition ${
+          dark
+            ? "border-emerald-500/30 bg-gradient-to-br from-[#0c1218] via-[#091016] to-[#05080c] shadow-black/80"
+            : "border-emerald-700/20 bg-gradient-to-br from-white via-[#f7faf7] to-[#eef5ef] shadow-xl"
         }`}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-right border-collapse">
-              <thead>
-                <tr className={`border-b text-xs sm:text-sm font-black ${
-                  dark ? "border-white/10 bg-white/5 text-[#f8ca14]" : "border-emerald-600/20 bg-[#015a37]/5 text-[#015a37]"
-                }`}>
-                  <th className="p-4 sm:p-6">المرحلة الدراسية</th>
-                  <th className="p-4 sm:p-6">الرسوم السنوية (ر.س)</th>
-                  <th className="p-4 sm:p-6">القسط الفصلي (ر.س)</th>
-                  <th className="p-4 sm:p-6">المزايا والمخرجات</th>
-                  <th className="p-4 sm:p-6 text-center">الإجراء</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200/60 dark:divide-white/5 text-xs sm:text-sm">
-                {activeFees.map((row, idx) => (
-                  <tr key={idx} className={`transition hover:bg-emerald-500/5 ${
-                    idx % 2 === 0 ? (dark ? "bg-white/[0.01]" : "bg-slate-50/70") : ""
-                  }`}>
-                    <td className="p-4 sm:p-6 font-black text-sm sm:text-base">
-                      {row.grade}
-                    </td>
-                    <td className="p-4 sm:p-6 font-black text-base sm:text-lg text-emerald-700 dark:text-emerald-400">
-                      {row.fee} <span className="text-xs font-normal">ر.س</span>
-                    </td>
-                    <td className="p-4 sm:p-6 font-bold text-slate-600 dark:text-slate-400">
-                      {row.term} <span className="text-xs font-normal">ر.س</span>
-                    </td>
-                    <td className="p-4 sm:p-6 text-slate-700 dark:text-slate-300">
-                      {row.notes}
-                    </td>
-                    <td className="p-4 sm:p-6 text-center">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            track: activeTrack,
-                            gradeLevel: idx === 0 ? "kindergarten" : idx === 1 ? "primary" : idx === 2 ? "middle" : "high",
-                          }));
-                          scrollToSection("admission-form-section");
-                        }}
-                        className={`rounded-xl text-xs font-bold ${
-                          dark ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-[#015a37] hover:bg-emerald-800 text-white"
-                        }`}
-                      >
-                        سجّل بهذه المرحلة
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Discounts & Financial Facilities Banner */}
-          <div className={`p-6 sm:p-8 border-t flex flex-wrap items-center justify-between gap-4 ${
-            dark ? "border-white/10 bg-emerald-950/20" : "border-emerald-200/70 bg-[#f0f7f3]"
-          }`}>
-            <div className="flex items-center gap-4">
-              <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${dark ? "bg-emerald-500/10 text-[#f8ca14]" : "bg-emerald-600/10 text-[#c59b27]"}`}>
-                <Percent size={24} />
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Calculator Controls (7 cols) */}
+            <div className="lg:col-span-7">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <Calculator size={17} />
+                </span>
+                <h3 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  حاسبة الرسوم وخصومات الإخوة التفاعلية 🧮
+                </h3>
               </div>
+              <p className={`text-xs sm:text-sm mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
+                اختر المرحلة وعدد الأبناء المراد تسجيلهم لمعرفة إجمالي الخصم المتاح والأقساط الفورية:
+              </p>
+
+              {/* Stage Selector Pills */}
+              <div className="mb-6">
+                <label className="block text-xs font-black mb-2 text-slate-500">1. اختر المرحلة الدراسية:</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {activeFees.map((tier, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCalcGradeIndex(idx)}
+                      className={`p-3 rounded-2xl border text-right transition active:scale-95 ${
+                        calcGradeIndex === idx
+                          ? dark
+                            ? "border-emerald-500 bg-emerald-500/20 text-white shadow-md ring-1 ring-emerald-500/30"
+                            : "border-emerald-600 bg-[#015a37] text-white shadow-md"
+                          : dark
+                          ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="block text-xs font-black truncate">{tier.grade.split("(")[0]}</span>
+                      <span className={`text-[10px] mt-0.5 block ${calcGradeIndex === idx ? "text-emerald-200" : "text-slate-500"}`}>
+                        {tier.fee} ر.س
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Siblings Stepper */}
               <div>
-                <h4 className="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-300">
-                  خصومات الإخوة والسداد المبكر
-                </h4>
-                <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">
-                  خصم 10% للابن الثاني، و 15% للابن الثالث فأكثر. بالإضافة إلى خصم إضافي عند سداد الرسوم كاملة قبل بداية العام.
-                </p>
+                <label className="block text-xs font-black mb-2 text-slate-500">2. عدد الأبناء المسجلين في المدارس:</label>
+                <div className="flex items-center gap-4">
+                  <div className={`inline-flex items-center gap-3 rounded-2xl border p-1.5 ${
+                    dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => setCalcSiblingsCount((prev) => Math.max(1, prev - 1))}
+                      disabled={calcSiblingsCount <= 1}
+                      className="grid h-10 w-10 place-items-center rounded-xl bg-slate-200/50 dark:bg-white/10 disabled:opacity-40 hover:bg-slate-300/50 transition"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span className="w-12 text-center text-lg font-black">{calcSiblingsCount}</span>
+                    <button
+                      type="button"
+                      onClick={() => setCalcSiblingsCount((prev) => Math.min(6, prev + 1))}
+                      disabled={calcSiblingsCount >= 6}
+                      className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  <span className="text-xs font-bold text-slate-500">
+                    {calcSiblingsCount === 1
+                      ? "طالب واحد (الرسوم الأساسية)"
+                      : calcSiblingsCount === 2
+                      ? "طالبان (خصم 10% على الابن الثاني)"
+                      : `خصم 10% على الثاني و 15% على باقي الأبناء (${calcSiblingsCount} طلاب)`}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <CreditCard size={18} className="text-emerald-700 dark:text-emerald-400" />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-400">إمكانية التقسيط الميسر عبر تابي وتمارا والبطاقات الائتمانية</span>
+
+            {/* Instant Calculation Result Card (5 cols) */}
+            <div className="lg:col-span-5">
+              <div className={`rounded-3xl border p-6 shadow-xl relative overflow-hidden ${
+                dark
+                  ? "border-emerald-500/40 bg-black/70 ring-1 ring-emerald-500/20"
+                  : "border-emerald-700/25 bg-white ring-1 ring-emerald-900/5"
+              }`}>
+                <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-4">
+                  <span className="text-xs font-black text-slate-500">المرحلة المختارة:</span>
+                  <span className={`text-xs font-black ${dark ? "text-emerald-400" : "text-[#015a37]"}`}>
+                    {selectedTier.grade}
+                  </span>
+                </div>
+
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center text-slate-500">
+                    <span>إجمالي الرسوم قبل الخصم:</span>
+                    <span className="line-through">{totalBaseFee.toLocaleString()} ر.س</span>
+                  </div>
+
+                  {siblingDiscountAmount > 0 && (
+                    <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-black">
+                      <span className="inline-flex items-center gap-1">
+                        <Percent size={13} />
+                        وفر خصم الإخوة المطبق:
+                      </span>
+                      <span>- {siblingDiscountAmount.toLocaleString()} ر.س</span>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-dashed border-slate-200 dark:border-white/10 flex justify-between items-baseline">
+                    <span className="font-black text-sm">الصافي السنوي المستحق:</span>
+                    <div className="text-left">
+                      <span className={`text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                        {netTotalAnnual.toLocaleString()}
+                      </span>
+                      <span className="text-xs mr-1 font-bold">ر.س / سنوي</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-2">
+                    <div className={`p-2.5 rounded-xl border text-center ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                      <span className="block text-[10px] text-slate-500 font-bold">القسط الفصلي (3 فصول):</span>
+                      <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                        {netTermTotal.toLocaleString()} ر.س
+                      </span>
+                    </div>
+                    <div className={`p-2.5 rounded-xl border text-center ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                      <span className="block text-[10px] text-slate-500 font-bold">قسط تابي/تمارا (4 دفعات):</span>
+                      <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">
+                        {tabbyFourInstallments.toLocaleString()} ر.س
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      track: activeTrack,
+                      gradeLevel: selectedTier.targetGrade as any,
+                    }));
+                    scrollToSection("admission-form-section");
+                    toast.success("تم تثبيت المرحلة في نموذج التسجيل! يُرجى إكمال بيانات الطالب.");
+                  }}
+                  className={`w-full mt-5 rounded-2xl h-12 text-xs font-black shadow-lg transition active:scale-95 ${
+                    dark
+                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95"
+                      : "bg-gradient-to-r from-[#015a37] to-[#027a4b] text-white hover:opacity-95 shadow-[#015a37]/20"
+                  }`}
+                >
+                  <span>سجّل الآن بهذا التقدير ✦</span>
+                  <ArrowDown size={14} className="mr-1.5" />
+                </Button>
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* View Mode Switcher Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <h3 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+            تفاصيل الرسوم لكل مرحلة تعليمية
+          </h3>
+
+          <div className={`inline-flex items-center rounded-xl border p-1 ${
+            dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
+          }`}>
+            <button
+              onClick={() => setFeesViewMode("cards")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-black transition ${
+                feesViewMode === "cards"
+                  ? dark
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#015a37] text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <LayoutGrid size={13} />
+              <span>بطاقات المراحل (مفصل)</span>
+            </button>
+            <button
+              onClick={() => setFeesViewMode("table")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-black transition ${
+                feesViewMode === "table"
+                  ? dark
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#015a37] text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <TableIcon size={13} />
+              <span>جدول المقارنة (موجز)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* View Option 1: VIP Academic Cards View */}
+        {feesViewMode === "cards" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {activeFees.map((tier, idx) => (
+              <div
+                key={idx}
+                className={`rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 hover:-translate-y-1 shadow-lg ${
+                  dark
+                    ? "border-white/10 bg-[#0c1218]/90 hover:border-emerald-500/40"
+                    : "border-emerald-950/10 bg-white hover:border-emerald-700/30 hover:shadow-xl"
+                }`}
+              >
+                <div>
+                  <div className="inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-600 dark:text-emerald-400 mb-3">
+                    {tier.badge}
+                  </div>
+                  <h4 className={`text-base font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    {tier.grade}
+                  </h4>
+
+                  <div className="mb-4 pb-4 border-b border-slate-200 dark:border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-3xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                        {tier.fee}
+                      </span>
+                      <span className="text-xs font-bold text-slate-500">ر.س / سنوياً</span>
+                    </div>
+                    <div className="mt-1.5 inline-block rounded-lg bg-slate-100 dark:bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                      القسط الفصلي: {tier.term} ر.س
+                    </div>
+                  </div>
+
+                  {/* Perks list */}
+                  <div className="space-y-2 mb-6">
+                    <span className="text-[11px] font-black text-slate-400 block mb-1">المزايا المشمولة:</span>
+                    {tier.perks.map((perk, pIdx) => (
+                      <div key={pIdx} className="flex items-start gap-2 text-xs">
+                        <Check size={14} className="text-emerald-600 shrink-0 mt-0.5" />
+                        <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>{perk}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      track: activeTrack,
+                      gradeLevel: tier.targetGrade as any,
+                    }));
+                    scrollToSection("admission-form-section");
+                  }}
+                  className={`w-full rounded-xl text-xs font-black shadow transition active:scale-95 ${
+                    dark
+                      ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                      : "bg-[#015a37] hover:bg-emerald-800 text-white"
+                  }`}
+                >
+                  <span>احجز مقعداً بهذه المرحلة</span>
+                  <ArrowLeft size={14} className="mr-1" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* View Option 2: Full Comparison Table */
+          <div className={`overflow-hidden rounded-[2rem] border shadow-2xl backdrop-blur-xl mb-8 ${
+            dark ? "border-white/10 bg-[#0c1218]/90" : "border-emerald-950/10 bg-white/95"
+          }`}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-right border-collapse">
+                <thead>
+                  <tr className={`border-b text-xs sm:text-sm font-black ${
+                    dark ? "border-white/10 bg-white/5 text-[#f8ca14]" : "border-emerald-600/20 bg-[#015a37]/5 text-[#015a37]"
+                  }`}>
+                    <th className="p-4 sm:p-6">المرحلة الدراسية</th>
+                    <th className="p-4 sm:p-6">الرسوم السنوية (ر.س)</th>
+                    <th className="p-4 sm:p-6">القسط الفصلي (ر.س)</th>
+                    <th className="p-4 sm:p-6">المزايا والمخرجات</th>
+                    <th className="p-4 sm:p-6 text-center">الإجراء</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200/60 dark:divide-white/5 text-xs sm:text-sm">
+                  {activeFees.map((row, idx) => (
+                    <tr key={idx} className={`transition hover:bg-emerald-500/5 ${
+                      idx % 2 === 0 ? (dark ? "bg-white/[0.01]" : "bg-slate-50/70") : ""
+                    }`}>
+                      <td className="p-4 sm:p-6 font-black text-sm sm:text-base">
+                        {row.grade}
+                      </td>
+                      <td className="p-4 sm:p-6 font-black text-base sm:text-lg text-emerald-700 dark:text-emerald-400">
+                        {row.fee} <span className="text-xs font-normal">ر.س</span>
+                      </td>
+                      <td className="p-4 sm:p-6 font-bold text-slate-600 dark:text-slate-400">
+                        {row.term} <span className="text-xs font-normal">ر.س</span>
+                      </td>
+                      <td className="p-4 sm:p-6 text-slate-700 dark:text-slate-300">
+                        {row.notes}
+                      </td>
+                      <td className="p-4 sm:p-6 text-center">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              track: activeTrack,
+                              gradeLevel: row.targetGrade as any,
+                            }));
+                            scrollToSection("admission-form-section");
+                          }}
+                          className={`rounded-xl text-xs font-bold ${
+                            dark ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-[#015a37] hover:bg-emerald-800 text-white"
+                          }`}
+                        >
+                          سجّل بهذه المرحلة
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Discounts & Financial Facilities Banner */}
+        <div className={`p-6 sm:p-8 rounded-3xl border flex flex-wrap items-center justify-between gap-4 ${
+          dark ? "border-white/10 bg-emerald-950/20" : "border-emerald-200/70 bg-[#f0f7f3]"
+        }`}>
+          <div className="flex items-center gap-4">
+            <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${dark ? "bg-emerald-500/10 text-[#f8ca14]" : "bg-emerald-600/10 text-[#c59b27]"}`}>
+              <Percent size={24} />
+            </div>
+            <div>
+              <h4 className="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-300">
+                خصومات الإخوة والسداد المبكر
+              </h4>
+              <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">
+                خصم 10% للابن الثاني، و 15% للابن الثالث فأكثر. بالإضافة إلى خصم إضافي عند سداد الرسوم كاملة قبل بداية العام.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <CreditCard size={18} className="text-emerald-700 dark:text-emerald-400" />
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-400">إمكانية التقسيط الميسر عبر تابي وتمارا والبطاقات الائتمانية</span>
           </div>
         </div>
       </section>
 
-      {/* Admission Steps & Requirements */}
-      <section className={`py-16 border-y ${
+      {/* Interactive Admission Steps & Journey Roadmap */}
+      <section className={`py-20 border-y relative overflow-hidden ${
         dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h3 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>خطوات ومستندات القبول</h3>
-            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>عملية قبول سلسة وواضحة تضمن أفضل توجيه أكاديمي وتربوي لابنك</p>
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
+              <Sparkles size={14} />
+              <span>رحلة القبول الميسرة</span>
+            </div>
+            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              خريطة طريق القبول والتسجيل 🗺️
+            </h3>
+            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              4 خطوات سهلة ومدروسة تضمن انتقالاً سلساً ورعاية أكاديمية متكاملة لابنك
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Connected Steps Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
             {[
               {
                 step: "01",
                 icon: FileText,
                 title: "تقديم الطلب الإلكتروني",
-                desc: "تعبئة بيانات الطالب وولي الأمر في النموذج أدناه في أقل من دقيقتين.",
+                desc: "تعبئة بيانات الطالب وولي الأمر في النموذج أدناه في أقل من دقيقتين لتأكيد حجز المقعد المبدئي.",
+                pill: "يستغرق دقيقتين",
               },
               {
                 step: "02",
                 icon: Users,
                 title: "المقابلة وتحديد المستوى",
-                desc: "جلسة ودية هادفة مع المرشد الأكاديمي والتربوي لتحديد مستوى الطالب واحتياجاته.",
+                desc: "جلسة ودية هادفة مع المرشد الأكاديمي والتربوي لتحديد مستوى الطالب وميوله واحتياجاته.",
+                pill: "لقاء ودي وإرشادي",
               },
               {
                 step: "03",
                 icon: CheckCircle2,
                 title: "استكمال الوثائق الرسمية",
-                desc: "رفع شهادة الميلاد، كارت التطعيمات، الهوية/الإقامة، وآخر شهادة دراسية في منصة نور.",
+                desc: "رفع شهادة الميلاد، كارت التطعيمات، الهوية/الإقامة، وآخر شهادة دراسية في منصة نور الإلكترونية.",
+                pill: "اعتماد نور الوزاري",
               },
               {
                 step: "04",
                 icon: Award,
                 title: "اعتماد القبول وتفعيل التطبيق",
-                desc: "إصدار الرقم الأكاديمي وتفعيل حساب ولي الأمر في تطبيق مدارس العقيق للبدء فوراً.",
+                desc: "إصدار الرقم الأكاديمي وتفعيل حساب ولي الأمر في تطبيق مدارس العقيق لمتابعة الخطة الدراسية.",
+                pill: "انطلاق الرحلة",
               },
             ].map((card, idx) => {
               const Icon = card.icon;
               return (
                 <div
                   key={idx}
-                  className={`relative rounded-3xl border p-6 transition duration-300 hover:-translate-y-1 ${
-                    dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white shadow-md hover:shadow-lg"
+                  className={`relative rounded-[2rem] border p-6 sm:p-7 flex flex-col justify-between transition duration-300 hover:-translate-y-1 shadow-md ${
+                    dark ? "border-white/10 bg-[#0c1218] hover:border-emerald-500/40" : "border-emerald-950/10 bg-white hover:shadow-xl"
                   }`}
                 >
-                  <span className="text-3xl font-black text-emerald-500/20 absolute top-4 left-5">
-                    {card.step}
-                  </span>
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-4">
-                    <Icon size={22} />
+                  <div>
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        <Icon size={22} />
+                      </div>
+                      <span className={`text-xs font-black px-3 py-1 rounded-full border ${
+                        dark ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-emerald-700/20 bg-emerald-50 text-[#015a37]"
+                      }`}>
+                        الخطوة {card.step}
+                      </span>
+                    </div>
+
+                    <h4 className={`font-black text-base mb-2.5 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                      {card.title}
+                    </h4>
+                    <p className={`text-xs leading-relaxed mb-4 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
+                      {card.desc}
+                    </p>
                   </div>
-                  <h4 className={`font-black text-base mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>{card.title}</h4>
-                  <p className={`text-xs leading-relaxed ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>{card.desc}</p>
+
+                  <div className={`mt-2 pt-3 border-t text-[11px] font-bold ${dark ? "border-white/10 text-emerald-400" : "border-slate-100 text-[#015a37]"}`}>
+                    ✦ {card.pill}
+                  </div>
                 </div>
               );
             })}
+          </div>
+
+          {/* Required Documents Interactive Expander */}
+          <div className="mt-12 text-center">
+            <button
+              type="button"
+              onClick={() => setShowDocsModal(!showDocsModal)}
+              className={`inline-flex items-center gap-2 rounded-2xl border px-6 py-3 text-xs font-black transition active:scale-95 shadow-sm ${
+                dark
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                  : "border-emerald-700/20 bg-white text-[#015a37] hover:bg-emerald-50"
+              }`}
+            >
+              <FileText size={15} />
+              <span>{showDocsModal ? "إخفاء قائمة المستندات المطلوبة" : "عرض قائمة المستندات والوثائق المطلوبة للتسجيل 📄"}</span>
+            </button>
+
+            {showDocsModal && (
+              <div className={`mt-6 max-w-2xl mx-auto text-right p-6 sm:p-8 rounded-3xl border shadow-xl animate-in fade-in ${
+                dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
+              }`}>
+                <h5 className={`font-black text-sm mb-4 ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  المستندات الرسمية اللازمة لإتمام ملف الطالب:
+                </h5>
+                <ul className="space-y-2.5 text-xs">
+                  {[
+                    "أصل شهادة الميلاد وصورة واضحة منها.",
+                    "كارت التطعيمات المحدث للطالب (خاص بمرحلتي رياض الأطفال والابتدائي).",
+                    "صورة من سجل الأسرة أو الهوية الوطنية للسعوديين، أو الإقامة سارية المفعول لغير السعوديين.",
+                    "صورة من شهادة آخر مؤهل دراسي منجز في نظام (نور) للطلاب المنقولين.",
+                    "عدد 4 صور شخصية حديثة ملونة للطالب مقاس (4×6).",
+                  ].map((doc, dIdx) => (
+                    <li key={dIdx} className="flex items-start gap-2.5">
+                      <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                      <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>{doc}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </section>
