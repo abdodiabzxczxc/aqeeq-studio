@@ -25,6 +25,7 @@ import {
   Disc,
   ListMusic,
   Maximize2,
+  Minimize2,
   SlidersHorizontal,
   Flame,
   FileText,
@@ -137,6 +138,25 @@ export default function AqeeqPodcastPage() {
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
   const [inlinePlayingVideoId, setInlinePlayingVideoId] = useState<number | null>(null);
   const [selectedAudioId, setSelectedAudioId] = useState<number | null>(null);
+
+  const pavilionVideoContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isPavilionFullscreen, setIsPavilionFullscreen] = useState(false);
+
+  const togglePavilionFullscreen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+      pavilionVideoContainerRef.current?.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const onFs = () => setIsPavilionFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
 
   // View Modes: Carousel 2-Rows (default) vs Compact List
   const [songsViewMode, setSongsViewMode] = useState<"carousel" | "list">("carousel");
@@ -1349,45 +1369,60 @@ export default function AqeeqPodcastPage() {
                 </div>
 
                 {/* 16:9 Cinema Box */}
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto">
+                <div
+                  ref={pavilionVideoContainerRef}
+                  className="group/pavilion relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto"
+                >
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
-                    isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
-                      <iframe
-                        src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
-                        title={currentActiveVideo.title}
-                        className="h-full w-full border-0"
-                        allowFullScreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      />
-                    ) : (
-                      <video
-                        src={currentActiveVideo.mediaUrl}
-                        controls
-                        autoPlay
-                        onPlay={() => {
-                          window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
-                            detail: {
-                              id: currentActiveVideo.id,
-                              title: currentActiveVideo.title,
-                              coverUrl: currentActiveVideo.coverUrl,
-                              hostName: currentActiveVideo.hostName,
-                              mediaUrl: currentActiveVideo.mediaUrl,
-                            }
-                          }));
-                        }}
-                        onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
-                        onTimeUpdate={(e) => {
-                          window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
-                            detail: {
-                              currentTime: e.currentTarget.currentTime,
-                              duration: e.currentTarget.duration,
-                            }
-                          }));
-                        }}
-                        onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
-                        className="h-full w-full object-contain"
-                      />
-                    )
+                    <>
+                      <button
+                        type="button"
+                        onClick={togglePavilionFullscreen}
+                        className="absolute top-2.5 left-2.5 z-30 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/75 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:border-indigo-400 hover:bg-black/90 hover:text-indigo-300 active:scale-95 touch-manipulation opacity-85 hover:opacity-100"
+                        title={isPavilionFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
+                        aria-label="ملء الشاشة بالكامل"
+                      >
+                        {isPavilionFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                        <span className="hidden sm:inline">{isPavilionFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+                      </button>
+                      {isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
+                        <iframe
+                          src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
+                          title={currentActiveVideo.title}
+                          className="h-full w-full border-0"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      ) : (
+                        <video
+                          src={currentActiveVideo.mediaUrl}
+                          controls
+                          autoPlay
+                          onPlay={() => {
+                            window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                              detail: {
+                                id: currentActiveVideo.id,
+                                title: currentActiveVideo.title,
+                                coverUrl: currentActiveVideo.coverUrl,
+                                hostName: currentActiveVideo.hostName,
+                                mediaUrl: currentActiveVideo.mediaUrl,
+                              }
+                            }));
+                          }}
+                          onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                          onTimeUpdate={(e) => {
+                            window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                              detail: {
+                                currentTime: e.currentTarget.currentTime,
+                                duration: e.currentTarget.duration,
+                              }
+                            }));
+                          }}
+                          onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                          className="h-full w-full object-contain"
+                        />
+                      )}
+                    </>
                   ) : (
                     <div
                       onClick={() => {

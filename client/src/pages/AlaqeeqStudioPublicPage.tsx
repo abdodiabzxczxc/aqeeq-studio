@@ -3,6 +3,7 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { resolveStudioCardCovers } from "@/lib/studioCardCovers";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import {
   ArrowUp,
@@ -1519,13 +1520,10 @@ export default function AlaqeeqStudioPublicPage() {
                   <FastInstagramEmbed url={storiesList[activeStoryIndex].targetUrl} title={storiesList[activeStoryIndex].title} />
                 </div>
               ) : storiesList[activeStoryIndex].sourceType === "youtube" && storiesList[activeStoryIndex].youtubeId ? (
-                <div className="w-full aspect-video">
-                  <iframe
-                    src={"https://www.youtube-nocookie.com/embed/" + storiesList[activeStoryIndex].youtubeId + "?autoplay=1&rel=0&playsinline=1"}
+                <div className="w-full aspect-video overflow-hidden rounded-2xl">
+                  <AqeeqUnifiedVideoFrame
+                    sourceUrl={"https://www.youtube.com/watch?v=" + storiesList[activeStoryIndex].youtubeId}
                     title={storiesList[activeStoryIndex].title}
-                    className="h-full w-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
                   />
                 </div>
               ) : storiesList[activeStoryIndex].imageUrl ? (

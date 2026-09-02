@@ -38,17 +38,37 @@ export function AqeeqUnifiedVideoFrame({
   title,
   posterUrl,
   className = "relative h-full w-full overflow-hidden bg-black",
+  showFullscreenButton = true,
 }: {
   sourceUrl: string;
   title: string;
   posterUrl?: string | null;
   className?: string;
+  showFullscreenButton?: boolean;
 }) {
   const [loadError, setLoadError] = useState(false);
   const [isIframePaused, setIsIframePaused] = useState(false);
   const [key, setKey] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const frameContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isFrameFullscreen, setIsFrameFullscreen] = useState(false);
+
+  const toggleFrameFullscreen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+      frameContainerRef.current?.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const onFs = () => setIsFrameFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
 
   const driveId = getAqeeqDriveFileId(sourceUrl);
   const isDrive = Boolean(driveId);
@@ -183,12 +203,26 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
+  const fullscreenButtonNode = showFullscreenButton ? (
+    <button
+      type="button"
+      onClick={toggleFrameFullscreen}
+      className="absolute top-2.5 left-2.5 z-30 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/75 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:border-amber-400 hover:bg-black/90 hover:text-amber-300 active:scale-95 touch-manipulation opacity-85 hover:opacity-100"
+      title={isFrameFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
+      aria-label="ملء الشاشة بالكامل"
+    >
+      {isFrameFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+      <span className="hidden sm:inline">{isFrameFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+    </button>
+  ) : null;
+
   // 1) YouTube Embed
   if (isYouTube) {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const ytEmbedUrl = `https://www.youtube.com/embed/${ytMatch![1]}?autoplay=1&enablejsapi=1&playsinline=1&origin=${encodeURIComponent(origin)}`;
     return (
-      <div className={className}>
+      <div ref={frameContainerRef} className={`group/frame relative ${className}`}>
+        {fullscreenButtonNode}
         <iframe
           ref={iframeRef}
           key={key}
@@ -206,7 +240,8 @@ export function AqeeqUnifiedVideoFrame({
   // 2) Google Drive Video
   if (isDrive) {
     return (
-      <div className={className}>
+      <div ref={frameContainerRef} className={`group/frame relative ${className}`}>
+        {fullscreenButtonNode}
         <iframe
           ref={iframeRef}
           key={key}
@@ -222,7 +257,8 @@ export function AqeeqUnifiedVideoFrame({
 
   // 3) Direct Native Video
   return (
-    <div className={className}>
+    <div ref={frameContainerRef} className={`group/frame relative ${className}`}>
+      {fullscreenButtonNode}
       <video
         ref={videoRef}
         key={key}

@@ -837,8 +837,8 @@ export default function AqeeqShowcasePage() {
         )}
       </section>
       <Dialog open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelected(null); }}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-5xl max-h-[94svh] overflow-y-auto p-0 text-right rounded-[1.6rem] sm:rounded-[2rem] border shadow-[0_32px_100px_rgba(0,0,0,0.9)] backdrop-blur-2xl ${
-          dark ? "border-amber-300/30 bg-[#070a10] text-white" : "border-black/10 bg-white text-black"
+        <DialogContent className={`w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-y-auto p-0 text-right rounded-[1.4rem] sm:rounded-[2.4rem] border shadow-[0_32px_120px_rgba(0,0,0,0.95)] backdrop-blur-3xl flex flex-col ${
+          dark ? "border-amber-400/30 bg-[#070a12]/98 text-white" : "border-black/10 bg-white text-black"
         }`}>
           <DialogTitle className="sr-only">{selected?.title || selected?.fileName || "عرض الوسيط"}</DialogTitle>
           {selected ? (
