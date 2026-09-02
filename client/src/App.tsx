@@ -55,9 +55,9 @@ import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
 import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
 import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
-import { BackToTopButton } from "./components/BackToTopButton";
 
 function Router() {
+
   const [location] = useLocation();
   return (
     <RouteMotion routeKey={location}>
@@ -168,8 +168,8 @@ function StudioAppShell() {
           <VisualGlobalSections />
           <PwaInstallBanner />
           <AqeeqAiAssistantWidget />
-          <BackToTopButton />
         </div>
+
       </div>
     </PodcastPlayerProvider>
   );
