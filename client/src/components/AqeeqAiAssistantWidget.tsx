@@ -194,7 +194,11 @@ export function AqeeqAiAssistantWidget() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const speechRecognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -203,6 +207,24 @@ export function AqeeqAiAssistantWidget() {
   const utils = trpc.useUtils();
   const { data: aiStatus, refetch: refetchAiStatus } = trpc.schoolAi.getAiStatus.useQuery(undefined, {
     refetchOnWindowFocus: false,
+  });
+
+  const transcribeMutation = trpc.schoolAi.transcribeVoiceAudio.useMutation({
+    onSuccess: (data) => {
+      setIsTranscribing(false);
+      const text = data.text?.trim();
+      if (text) {
+        setInputPrompt(text);
+        handleSend(text);
+        toast.success(`تم التقاط صوتك: "${text}"`);
+      } else {
+        toast.error("لم نتمكن من تمييز الكلام، يرجى إعادة المحاولة والتحدث بوضوح");
+      }
+    },
+    onError: (err) => {
+      setIsTranscribing(false);
+      toast.error(err.message || "تعذر تفريغ الصوت المسجل");
+    },
   });
 
   const stopSpeaking = () => {
@@ -215,7 +237,6 @@ export function AqeeqAiAssistantWidget() {
 
   const speakText = (text: string, index?: number) => {
     if (typeof window === "undefined" || !window.speechSynthesis) {
-      toast.error("ميزة النطق غير مدعومة في هذا المتصفح");
       return;
     }
     window.speechSynthesis.cancel();
@@ -249,21 +270,33 @@ export function AqeeqAiAssistantWidget() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const toggleListening = () => {
-    if (isListening) {
-      if (speechRecognitionRef.current) {
-        try {
-          speechRecognitionRef.current.stop();
-        } catch (e) {}
-      }
-      setIsListening(false);
-      return;
+  const stopListening = () => {
+    setIsListening(false);
+
+    if (speechRecognitionRef.current) {
+      try {
+        speechRecognitionRef.current.stop();
+      } catch (e) {}
+      speechRecognitionRef.current = null;
     }
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      toast.error("المتصفح لا يدعم ميزة المايكروفون المباشر. استخدم متصفح Chrome أو Edge.");
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {}
+    }
+
+    if (mediaStreamRef.current) {
+      try {
+        mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      } catch (e) {}
+      mediaStreamRef.current = null;
+    }
+  };
+
+  const toggleListening = async () => {
+    if (isListening) {
+      stopListening();
       return;
     }
 
@@ -272,42 +305,109 @@ export function AqeeqAiAssistantWidget() {
       stopSpeaking();
     } catch (e) {}
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "ar-SA";
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast.error("المتصفح لا يدعم الوصول للمايكروفون");
+      return;
+    }
 
-    recognition.onstart = () => {
-      setIsListening(true);
-      toast.info("المساعد يستمع إليك الآن.. تفضل بالتحدث 🎙️", { duration: 2500 });
-    };
-
-    recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript;
-      if (transcript && transcript.trim()) {
-        setInputPrompt(transcript.trim());
-        handleSend(transcript.trim());
-        toast.success(`تم استلام صوتك: "${transcript.trim()}"`);
-      }
-      setIsListening(false);
-    };
-
-    recognition.onerror = (event: any) => {
-      setIsListening(false);
-      if (event.error !== "no-speech") {
-        toast.error("تعذر التقاط الصوت، يرجى التأكد من إذن المايك في المتصفح");
-      }
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    speechRecognitionRef.current = recognition;
     try {
-      recognition.start();
-    } catch (e) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      setIsListening(true);
+      audioChunksRef.current = [];
+
+      // Setup MediaRecorder as bulletproof fallback/primary recorder
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+        ? "audio/mp4"
+        : "audio/ogg";
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (evt) => {
+        if (evt.data && evt.data.size > 0) {
+          audioChunksRef.current.push(evt.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        setIsListening(false);
+        const tracks = stream.getTracks();
+        tracks.forEach((t) => t.stop());
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (audioBlob.size > 1500) {
+          setIsTranscribing(true);
+          toast.info("جاري تحليل صوتك بدقة ذكية عالية... ⏳");
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Audio = (reader.result as string)?.split(",")[1];
+            if (base64Audio) {
+              transcribeMutation.mutate({
+                audioBase64: base64Audio,
+                mimeType: mimeType.split(";")[0],
+              });
+            } else {
+              setIsTranscribing(false);
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        }
+      };
+
+      recorder.start(250);
+      toast.info("🎙️ المساعد يستمع لصوتك الآن.. تحدث ثم اضغط على المايك مجدداً للإرسال", { duration: 4000 });
+
+      // In parallel: try Web Speech Recognition for instant zero-latency recognition
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.lang = "ar-SA";
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          recognition.onresult = (event: any) => {
+            const transcript = event.results?.[0]?.[0]?.transcript;
+            if (transcript && transcript.trim()) {
+              audioChunksRef.current = []; // avoid duplicate fallback
+              stopListening();
+              setInputPrompt(transcript.trim());
+              handleSend(transcript.trim());
+              toast.success(`تم استلام صوتك: "${transcript.trim()}"`);
+            }
+          };
+
+          recognition.onerror = () => {
+            // Silently allow MediaRecorder to finish on user stop
+          };
+
+          recognition.onend = () => {
+            // If user stopped, MediaRecorder handles it
+          };
+
+          speechRecognitionRef.current = recognition;
+          recognition.start();
+        } catch (e) {
+          // Ignored, MediaRecorder is recording
+        }
+      }
+    } catch (err: any) {
       setIsListening(false);
+      if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
+        toast.error("يرجى الضغط على أيقونة القفل أو المايكروفون في شريط المتصفح والسماح بالمايكروفون");
+      } else if (err?.name === "NotFoundError" || err?.name === "DevicesNotFoundError") {
+        toast.error("لم يتم العثور على مايكروفون متصل بالجهاز");
+      } else {
+        toast.error("تعذر فتح المايكروفون: " + (err?.message || ""));
+      }
     }
   };
 
@@ -773,16 +873,31 @@ export function AqeeqAiAssistantWidget() {
             <Button
               type="button"
               onClick={toggleListening}
+              disabled={isTranscribing}
               className={`grid h-10 w-10 place-items-center rounded-2xl transition shadow-md shrink-0 p-0 ${
                 isListening
                   ? "bg-red-500 text-white animate-bounce ring-4 ring-red-500/40"
-                  : isDark
-                    ? "border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
-                    : "border border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-[#f8ca14] hover:text-black"
+                  : isTranscribing
+                    ? "bg-amber-500 text-black animate-pulse"
+                    : isDark
+                      ? "border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
+                      : "border border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-[#f8ca14] hover:text-black"
               }`}
-              title={isListening ? "جاري الاستماع لصوتك.. (اضغط للإيقاف)" : "تحدث بالصوت 🎙️"}
+              title={
+                isListening
+                  ? "جاري الاستماع.. اضغط للإرسال"
+                  : isTranscribing
+                    ? "جاري تفريغ الصوت..."
+                    : "تحدث بالصوت 🎙️"
+              }
             >
-              {isListening ? <MicOff size={18} className="animate-pulse" /> : <Mic size={18} />}
+              {isListening ? (
+                <Square size={16} className="fill-current text-white animate-pulse" />
+              ) : isTranscribing ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Mic size={18} />
+              )}
             </Button>
 
             <input

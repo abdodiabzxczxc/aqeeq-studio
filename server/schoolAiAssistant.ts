@@ -547,3 +547,51 @@ function generateActionShortcuts(prompt: string, reply: string): ActionShortcut[
 
   return shortcuts.slice(0, 3);
 }
+
+export async function transcribeAudioWithGemini(
+  audioBase64: string,
+  mimeType: string = "audio/webm"
+): Promise<{ text: string }> {
+  const apiKey = await getEffectiveGeminiApiKey();
+  if (!apiKey) {
+    throw new Error("لا يوجد مفتاح Gemini مفعل لتفريغ الصوت");
+  }
+
+  const ai = getAiClient(apiKey);
+  const models = ["gemini-3.5-flash-lite", "gemini-3.6-flash"];
+
+  for (const model of models) {
+    try {
+      const res = await ai.models.generateContent({
+        model,
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType,
+                  data: audioBase64,
+                },
+              },
+              {
+                text: "قم بتفريغ هذا الصوت العربي إلى نص مكتوب بدقة 100% وبدون أي تعليق أو مقدمات أو شرح. أعد النص المنطوق فقط باللغة العربية:",
+              },
+            ],
+          },
+        ],
+        config: {
+          temperature: 0.1,
+          maxOutputTokens: 500,
+        },
+      });
+
+      const text = res.text?.trim();
+      if (text) return { text };
+    } catch (err: any) {
+      console.warn(`Audio transcription with ${model} failed:`, err?.message);
+    }
+  }
+
+  throw new Error("تعذر تفريغ الصوت، يرجى المحاولة مرة أخرى");
+}

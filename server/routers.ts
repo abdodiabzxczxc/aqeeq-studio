@@ -140,7 +140,7 @@ import {
   deletePodcast,
   likePodcast,
 } from "./podcastDb";
-import { askSchoolAiAssistant, getEffectiveGeminiApiKey } from "./schoolAiAssistant";
+import { askSchoolAiAssistant, getEffectiveGeminiApiKey, transcribeAudioWithGemini } from "./schoolAiAssistant";
 import { generateAiVisualCover, searchRealGlobalPhotos } from "./aiVisualService";
 import {
   getLiveEvent,
@@ -1527,6 +1527,17 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         return askSchoolAiAssistant(input.history || [], input.prompt);
+      }),
+
+    transcribeVoiceAudio: publicProcedure
+      .input(
+        z.object({
+          audioBase64: z.string().min(10),
+          mimeType: z.string().default("audio/webm"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return transcribeAudioWithGemini(input.audioBase64, input.mimeType);
       }),
 
     getAiStatus: publicProcedure.query(async () => {
