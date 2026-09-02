@@ -854,7 +854,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Master Acoustic Broadcasting Deck Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
                 dark ? "border-emerald-500/30 bg-black/60 text-white" : "border-emerald-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1038,12 +1038,12 @@ export default function AqeeqPodcastPage() {
               </div>
 
               {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
-              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
+              <div className="lg:col-span-7 h-[395px] sm:h-[405px] overflow-hidden">
                 {audioViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={audioScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-2.5 pt-0.5 custom-scroll-x scroll-emerald snap-x snap-mandatory h-full"
                   >
                     {audioPodcasts.map((podcast: any, idx: number) => {
                       const isThisPlaying = isCurrentPlaying(podcast.id);
@@ -1150,7 +1150,7 @@ export default function AqeeqPodcastPage() {
                   /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
                   <div
                     ref={audioListScrollRef}
-                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
+                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 custom-scroll-y scroll-emerald snap-y snap-mandatory ${
                       dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                     }`}
                   >
@@ -1371,7 +1371,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Master 4K Video Screen Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
                 dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1519,12 +1519,12 @@ export default function AqeeqPodcastPage() {
               </div>
 
               {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
-              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
+              <div className="lg:col-span-7 h-[395px] sm:h-[405px] overflow-hidden">
                 {videosViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={videosScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-2.5 pt-0.5 custom-scroll-x scroll-indigo snap-x snap-mandatory h-full"
                   >
                     {videoPodcasts.map((video: any, idx: number) => {
                       const isThisActive = currentActiveVideo?.id === video.id;
@@ -1634,7 +1634,7 @@ export default function AqeeqPodcastPage() {
                   /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
                   <div
                     ref={videosListScrollRef}
-                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
+                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 custom-scroll-y scroll-indigo snap-y snap-mandatory ${
                       dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                     }`}
                   >
@@ -1857,7 +1857,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Grand Dynamic Vinyl Deck Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
                 dark ? "border-amber-400/30 bg-black/60 text-white" : "border-amber-200 bg-white/95 text-slate-900"
               }`}>
                 
@@ -2055,12 +2055,12 @@ export default function AqeeqPodcastPage() {
               </div>
 
               {/* Media Hub: 2-Row Carousel OR Vertical List Slider (Both occupy EXACT SAME space) */}
-              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
+              <div className="lg:col-span-7 h-[395px] sm:h-[405px] overflow-hidden">
                 {songsViewMode === "carousel" ? (
                   /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
                   <div
                     ref={songsScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-2.5 pt-0.5 custom-scroll-x scroll-amber snap-x snap-mandatory h-full"
                   >
                     {(filteredSongs || []).map((song: any, idx: number) => {
                       const isThisPlaying = isCurrentPlaying(song.id);
@@ -2192,7 +2192,7 @@ export default function AqeeqPodcastPage() {
                   /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
                   <div
                     ref={songsListScrollRef}
-                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
+                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 custom-scroll-y scroll-amber snap-y snap-mandatory ${
                       dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
                     }`}
                   >
