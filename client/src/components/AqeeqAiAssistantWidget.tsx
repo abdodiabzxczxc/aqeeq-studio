@@ -833,72 +833,35 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-6 z-50 font-[Tajawal,sans-serif]">
-      {/* ── 1. Both Trigger Options Side-by-Side on the Live Site ─────────── */}
+      {/* ── 1. Permanent Luxury Spatial Morphing Orb (When Closed) ── */}
       {!isOpen && (
-        <div className="flex items-center gap-2 sm:gap-3 p-1.5 rounded-full backdrop-blur-2xl border border-white/15 bg-black/50 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {/* 🌟 Option 1: The Spatial Morphing Orb (الدائرة الفضائية المدمجة الفاخرة) */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(true);
-              stopSpeaking();
-            }}
-            className={`group relative flex items-center rounded-full border-2 p-1.5 sm:p-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-              isDark
-                ? "border-amber-400/70 bg-[#070b16]/95 text-white shadow-[0_8px_30px_rgba(248,202,20,0.35)]"
-                : "border-amber-400/80 bg-white/95 text-slate-900 shadow-[0_8px_30px_rgba(248,202,20,0.25)]"
-            }`}
-            title="الخيار 1: الأيقونة الفضائية الدائرية المدمجة (تتوسع بنعومة)"
-          >
-            <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
-              <Bot size={21} className="group-hover:rotate-12 transition-transform duration-300" />
-              <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-950 animate-pulse bg-emerald-400" />
-            </div>
+        <button
+          type="button"
+          onClick={() => {
+            setIsOpen(true);
+            stopSpeaking();
+          }}
+          className={`group relative flex items-center rounded-full border-2 p-1.5 sm:p-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+            isDark
+              ? "border-amber-400/60 bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(248,202,20,0.35)]"
+              : "border-amber-400/80 bg-white/95 text-slate-900 shadow-[0_10px_35px_rgba(248,202,20,0.25)]"
+          }`}
+          title="مستشار العقيق الذكي"
+        >
+          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
+            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+            <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-950 animate-pulse bg-emerald-400" />
+          </div>
 
-            {/* Dynamic Morphing Expansion on Hover */}
-            <div className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-[140px] group-hover:opacity-100 group-hover:px-2.5 transition-all duration-300 whitespace-nowrap text-right hidden sm:block">
-              <span className="text-[11px] font-black block text-amber-500 leading-tight">1. أيقونة دائرية</span>
-              <span className="text-[9px] text-slate-400 font-bold">فندقية هادئة 🎙️</span>
+          {/* Dynamic Morphing Expansion on Hover */}
+          <div className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-[170px] group-hover:opacity-100 group-hover:px-2.5 transition-all duration-300 whitespace-nowrap text-right hidden sm:block">
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-black block text-amber-500 leading-tight">مستشار العقيق الذكي</span>
+              <Sparkles size={11} className="text-amber-400" />
             </div>
-          </button>
-
-          {/* 💎 Option 2: Ultra-Slim Dynamic Island Pill (كبسولة الدايناميك آيلاند النحيفة) */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(true);
-              stopSpeaking();
-            }}
-            className={`group relative flex items-center gap-2 rounded-full border-2 px-3 py-2 sm:px-3.5 sm:py-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-              isDark
-                ? "border-cyan-400/70 bg-[#070b16]/95 text-white shadow-[0_8px_30px_rgba(6,182,212,0.35)]"
-                : "border-cyan-500/70 bg-white/95 text-slate-900 shadow-[0_8px_30px_rgba(6,182,212,0.25)]"
-            }`}
-            title="الخيار 2: كبسولة الدايناميك آيلاند النحيفة"
-          >
-            <div className="relative grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow-md shrink-0">
-              <Bot size={16} />
-              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-slate-950 animate-ping bg-cyan-400" />
-            </div>
-
-            <div className="text-right">
-              <div className="flex items-center gap-1">
-                <span className="text-[11px] sm:text-xs font-black text-cyan-400 leading-tight">2. كبسولة نحيفة</span>
-                <span className="text-[9px] text-slate-400 font-bold hidden sm:inline">• سطر واحد</span>
-              </div>
-              <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 leading-tight">
-                مدمجة ومصقولة 🎙️
-              </p>
-            </div>
-
-            {/* Mini Equalizer Waves */}
-            <div className="hidden sm:flex items-center gap-1 h-3.5 px-0.5 shrink-0">
-              <span className="aq-wave-bar w-1 rounded-full bg-cyan-400" style={{ animationDelay: "0.1s" }} />
-              <span className="aq-wave-bar w-1 rounded-full bg-teal-400" style={{ animationDelay: "0.3s" }} />
-              <span className="aq-wave-bar w-1 rounded-full bg-emerald-400" style={{ animationDelay: "0.5s" }} />
-            </div>
-          </button>
-        </div>
+            <span className="text-[10px] text-slate-400 font-bold block leading-tight">تحدث بالصوت أو اكتب 🎙️</span>
+          </div>
+        </button>
       )}
 
       {/* ── 2. Compact Unified Chat & Voice Spatial Card (When Open) ─── */}
