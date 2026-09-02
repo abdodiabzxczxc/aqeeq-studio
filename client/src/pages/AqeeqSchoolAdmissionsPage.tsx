@@ -104,34 +104,40 @@ export default function AqeeqSchoolAdmissionsPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        isNationalDay
-          ? dark
-            ? "bg-[#01140c] text-white"
-            : "bg-[#f8faf9] text-slate-900"
-          : dark
-          ? "bg-black text-white"
-          : "bg-white text-black"
+        dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />
 
-      {/* Hero Section */}
-      <section
-        className={`relative isolate overflow-hidden border-b py-20 sm:py-28 ${
-          isNationalDay
-            ? dark
-              ? "snd-hero-dark border-emerald-500/25 text-white"
-              : "snd-hero-light border-emerald-200/80 text-slate-900"
-            : dark
-            ? "border-white/[0.08] bg-black text-white"
-            : "border-black/[0.06] bg-white text-black"
-        }`}
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(1,90,55,0.18),transparent_60%)]" />
+      {/* Hero Section with Cinematic Cover Banner */}
+      <section className="relative isolate overflow-hidden border-b border-black/[0.08] dark:border-white/[0.08]">
+        {/* Background Cover Image with Gradient Masking */}
+        <div className="absolute inset-0 z-0 select-none overflow-hidden">
+          <VisualImage
+            id="admissions-hero-cover"
+            label="صورة كفر القبول والتسجيل"
+            src="/covers/cover-admissions.jpg"
+            alt="كفر القبول والتسجيل بمدارس العقيق"
+            className="h-full w-full object-cover object-center scale-105 transition duration-700 hover:scale-100"
+          />
+          {/* Multi-layered cinematic gradient overlays for perfect contrast in dark & light */}
+          <div className={`absolute inset-0 transition-colors ${
+            dark
+              ? "bg-gradient-to-b from-[#02130b]/92 via-[#031d11]/88 to-[#05080c]"
+              : "bg-gradient-to-b from-[#fbfaf8]/95 via-[#f5f8f5]/90 to-[#fbfaf8]"
+          }`} />
+          {/* Subtle Royal Radial Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(1,90,55,0.14),transparent_65%)]" />
+        </div>
 
-        <div className="container relative mx-auto px-4 sm:px-6 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-black text-emerald-700 dark:text-emerald-300 backdrop-blur-md mb-6 animate-in fade-in">
-            <Sparkles size={14} className="text-[#f8ca14]" />
+        {/* Foreground Content */}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-14 sm:pb-20 text-center max-w-4xl">
+          <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 animate-in fade-in shadow-sm ${
+            dark
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              : "border-emerald-700/25 bg-white/90 text-[#015a37]"
+          }`}>
+            <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />
             <span>بوابة القبول للعام الدراسي الجديد 2026 - 2027</span>
           </div>
 
@@ -141,7 +147,9 @@ export default function AqeeqSchoolAdmissionsPage() {
             label="عنوان هيرو القبول والتسجيل"
             defaultText="استثمر في مستقبل أبنائك في صرح العقيق الرائد"
             as="h1"
-            className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6"
+            className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
+              dark ? "text-white" : "text-[#0a192f]"
+            }`}
           />
 
           <VisualEditable
@@ -151,7 +159,7 @@ export default function AqeeqSchoolAdmissionsPage() {
             defaultText="نفتح أبواب التميز لأبنائنا وبناتنا في المدينة المنورة. بيئة تعليمية عالمية معتمدة من كوجنيا، تجمع بين أصالة القيم وأحدث علوم العصر، مع أنظمة سداد مرنة وخدمات ذكية لأولياء الأمور."
             as="p"
             className={`text-base sm:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-10 ${
-              dark ? "text-slate-300" : "text-slate-600"
+              dark ? "text-slate-300" : "text-slate-700"
             }`}
           />
 
@@ -161,7 +169,7 @@ export default function AqeeqSchoolAdmissionsPage() {
               className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
                 dark
                   ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                  : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-95 shadow-[#015a37]/25"
+                  : "bg-gradient-to-r from-[#015a37] to-[#027a4b] text-white hover:opacity-95 shadow-[#015a37]/25"
               }`}
             >
               <Send size={18} className="ml-2" />
@@ -171,10 +179,10 @@ export default function AqeeqSchoolAdmissionsPage() {
             <Button
               variant="outline"
               onClick={() => scrollToSection("tuition-fees-section")}
-              className={`rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 ${
+              className={`rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 shadow-sm ${
                 dark
                   ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
-                  : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
+                  : "border-slate-300 bg-white/90 text-slate-900 hover:bg-white"
               }`}
             >
               <Calculator size={18} className="ml-2" />
@@ -182,22 +190,26 @@ export default function AqeeqSchoolAdmissionsPage() {
             </Button>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-10 border-t border-emerald-500/20">
-            <div className="text-center p-3">
+          {/* Quick Metrics Floating Bar */}
+          <div className={`mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-3xl border backdrop-blur-xl shadow-lg transition ${
+            dark
+              ? "border-white/10 bg-black/40 shadow-black/40"
+              : "border-emerald-950/10 bg-white/85 shadow-emerald-950/5"
+          }`}>
+            <div className="text-center p-2">
               <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>+10,000</span>
               <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ولي أمر يثقون بنا</span>
             </div>
-            <div className="text-center p-3">
-              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#5aba1c]" : "text-emerald-700"}`}>Cognia</span>
+            <div className="text-center p-2">
+              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#5aba1c]" : "text-[#08467d]"}`}>Cognia</span>
               <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد دولي أمريكي</span>
             </div>
-            <div className="text-center p-3">
-              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>IELTS & SAT</span>
+            <div className="text-center p-2">
+              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>IELTS & SAT</span>
               <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>مراكز اختبارات رسمية</span>
             </div>
-            <div className="text-center p-3">
-              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#5aba1c]" : "text-emerald-700"}`}>100%</span>
+            <div className="text-center p-2">
+              <span className={`block text-2xl sm:text-3xl font-black ${dark ? "text-[#5aba1c]" : "text-[#015a37]"}`}>100%</span>
               <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>خدمات ذكية عبر التطبيق</span>
             </div>
           </div>
@@ -207,7 +219,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       {/* Tuition Fees Section */}
       <section id="tuition-fees-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#f8ca14] mb-2">
+          <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
             <Calculator size={14} />
             <span>الشفافية والمرونة المالية</span>
           </div>
@@ -217,14 +229,14 @@ export default function AqeeqSchoolAdmissionsPage() {
             label="عنوان جدول الرسوم"
             defaultText="جدول الرسوم الدراسية للعام الدراسي"
             as="h2"
-            className="text-2xl sm:text-4xl font-black"
+            className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
           />
-          <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-600"}`}>
+          <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
             رسوم تنافسية تشمل أحدث المناهج المتطورة، والأنشطة الصفية واللاصفية، ومعامل الذكاء الاصطناعي وSTEM.
           </p>
 
           {/* Track Switcher Tabs */}
-          <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-emerald-500/5">
+          <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">
             <button
               onClick={() => setActiveTrack("national")}
               className={`rounded-xl px-6 py-2.5 text-sm font-black transition ${
@@ -234,7 +246,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                     : "bg-[#015a37] text-white shadow-md shadow-emerald-800/30"
                   : dark
                   ? "text-slate-400 hover:text-white"
-                  : "text-slate-600 hover:text-black"
+                  : "text-slate-700 hover:text-black"
               }`}
             >
               🇸🇦 المدارس الأهلية (بنين وبنات)
@@ -248,7 +260,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                     : "bg-[#015a37] text-white shadow-md shadow-emerald-800/30"
                   : dark
                   ? "text-slate-400 hover:text-white"
-                  : "text-slate-600 hover:text-black"
+                  : "text-slate-700 hover:text-black"
               }`}
             >
               🌐 المدارس الدولية (International)
@@ -258,13 +270,13 @@ export default function AqeeqSchoolAdmissionsPage() {
 
         {/* Fees Table Card */}
         <div className={`overflow-hidden rounded-[2rem] border shadow-2xl backdrop-blur-xl ${
-          dark ? "border-white/10 bg-[#0c1218]/90" : "border-black/10 bg-white/90"
+          dark ? "border-white/10 bg-[#0c1218]/90" : "border-emerald-950/10 bg-white/95"
         }`}>
           <div className="overflow-x-auto">
             <table className="w-full text-right border-collapse">
               <thead>
                 <tr className={`border-b text-xs sm:text-sm font-black ${
-                  dark ? "border-white/10 bg-white/5 text-[#f8ca14]" : "border-black/5 bg-slate-50 text-[#015a37]"
+                  dark ? "border-white/10 bg-white/5 text-[#f8ca14]" : "border-emerald-600/20 bg-[#015a37]/5 text-[#015a37]"
                 }`}>
                   <th className="p-4 sm:p-6">المرحلة الدراسية</th>
                   <th className="p-4 sm:p-6">الرسوم السنوية (ر.س)</th>
@@ -273,21 +285,21 @@ export default function AqeeqSchoolAdmissionsPage() {
                   <th className="p-4 sm:p-6 text-center">الإجراء</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-xs sm:text-sm">
+              <tbody className="divide-y divide-slate-200/60 dark:divide-white/5 text-xs sm:text-sm">
                 {activeFees.map((row, idx) => (
                   <tr key={idx} className={`transition hover:bg-emerald-500/5 ${
-                    idx % 2 === 0 ? (dark ? "bg-white/[0.01]" : "bg-slate-50/50") : ""
+                    idx % 2 === 0 ? (dark ? "bg-white/[0.01]" : "bg-slate-50/70") : ""
                   }`}>
                     <td className="p-4 sm:p-6 font-black text-sm sm:text-base">
                       {row.grade}
                     </td>
-                    <td className="p-4 sm:p-6 font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
+                    <td className="p-4 sm:p-6 font-black text-base sm:text-lg text-emerald-700 dark:text-emerald-400">
                       {row.fee} <span className="text-xs font-normal">ر.س</span>
                     </td>
-                    <td className="p-4 sm:p-6 font-bold text-slate-500 dark:text-slate-400">
+                    <td className="p-4 sm:p-6 font-bold text-slate-600 dark:text-slate-400">
                       {row.term} <span className="text-xs font-normal">ر.س</span>
                     </td>
-                    <td className="p-4 sm:p-6 text-slate-600 dark:text-slate-300">
+                    <td className="p-4 sm:p-6 text-slate-700 dark:text-slate-300">
                       {row.notes}
                     </td>
                     <td className="p-4 sm:p-6 text-center">
@@ -316,24 +328,24 @@ export default function AqeeqSchoolAdmissionsPage() {
 
           {/* Discounts & Financial Facilities Banner */}
           <div className={`p-6 sm:p-8 border-t flex flex-wrap items-center justify-between gap-4 ${
-            dark ? "border-white/10 bg-emerald-950/20" : "border-emerald-100 bg-emerald-50/50"
+            dark ? "border-white/10 bg-emerald-950/20" : "border-emerald-200/70 bg-[#f0f7f3]"
           }`}>
             <div className="flex items-center gap-4">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/10 text-[#f8ca14]">
+              <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${dark ? "bg-emerald-500/10 text-[#f8ca14]" : "bg-emerald-600/10 text-[#c59b27]"}`}>
                 <Percent size={24} />
               </div>
               <div>
-                <h4 className="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300">
+                <h4 className="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-300">
                   خصومات الإخوة والسداد المبكر
                 </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">
                   خصم 10% للابن الثاني، و 15% للابن الثالث فأكثر. بالإضافة إلى خصم إضافي عند سداد الرسوم كاملة قبل بداية العام.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <CreditCard size={18} className="text-emerald-600" />
-              <span className="text-xs font-bold text-slate-500">إمكانية التقسيط الميسر عبر تابي وتمارا والبطاقات الائتمانية</span>
+              <CreditCard size={18} className="text-emerald-700 dark:text-emerald-400" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-400">إمكانية التقسيط الميسر عبر تابي وتمارا والبطاقات الائتمانية</span>
             </div>
           </div>
         </div>
@@ -341,12 +353,12 @@ export default function AqeeqSchoolAdmissionsPage() {
 
       {/* Admission Steps & Requirements */}
       <section className={`py-16 border-y ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-black/5 bg-slate-50"
+        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h3 className="text-2xl sm:text-3xl font-black">خطوات ومستندات القبول</h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-2">عملية قبول سلسة وواضحة تضمن أفضل توجيه أكاديمي وتربوي لابنك</p>
+            <h3 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>خطوات ومستندات القبول</h3>
+            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>عملية قبول سلسة وواضحة تضمن أفضل توجيه أكاديمي وتربوي لابنك</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -381,7 +393,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                 <div
                   key={idx}
                   className={`relative rounded-3xl border p-6 transition duration-300 hover:-translate-y-1 ${
-                    dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white shadow-sm"
+                    dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white shadow-md hover:shadow-lg"
                   }`}
                 >
                   <span className="text-3xl font-black text-emerald-500/20 absolute top-4 left-5">
@@ -390,8 +402,8 @@ export default function AqeeqSchoolAdmissionsPage() {
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-4">
                     <Icon size={22} />
                   </div>
-                  <h4 className="font-black text-base mb-2">{card.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">{card.desc}</p>
+                  <h4 className={`font-black text-base mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>{card.title}</h4>
+                  <p className={`text-xs leading-relaxed ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>{card.desc}</p>
                 </div>
               );
             })}
@@ -403,15 +415,15 @@ export default function AqeeqSchoolAdmissionsPage() {
       <section id="admission-form-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl backdrop-blur-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-600/15 bg-white"
+            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}>
             <div className="text-center max-w-xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 text-xs font-black text-[#015a37] dark:text-[#f8ca14] mb-2">
+              <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"} mb-2`}>
                 <Send size={14} />
                 <span>التسجيل الإلكتروني السريع</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black">نموذج حجز مقعد دراسي</h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-2">
+              <h2 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>نموذج حجز مقعد دراسي</h2>
+              <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
                 املأ النموذج وسيتصل بك أحد مسؤولي القبول خلال 24 ساعة للرد على استفساراتكم وتأكيد المقابلة.
               </p>
             </div>
@@ -582,24 +594,26 @@ export default function AqeeqSchoolAdmissionsPage() {
 
       {/* Parents Mobile App Section */}
       <section className={`py-20 border-t ${
-        dark ? "border-white/10 bg-gradient-to-b from-[#0c1218] to-[#06080d]" : "border-black/5 bg-gradient-to-b from-slate-50 to-white"
+        dark ? "border-white/10 bg-gradient-to-b from-[#0c1218] to-[#06080d]" : "border-emerald-950/10 bg-gradient-to-b from-[#f5f8f5] to-[#fbfaf8]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6">
           <div className={`rounded-[3rem] border p-8 sm:p-14 overflow-hidden relative ${
-            dark ? "border-emerald-500/20 bg-black/60 shadow-2xl" : "border-emerald-600/15 bg-emerald-50/40 shadow-xl"
+            dark ? "border-emerald-500/20 bg-black/60 shadow-2xl" : "border-emerald-700/20 bg-white/95 shadow-2xl"
           }`}>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7">
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-black text-emerald-600 dark:text-emerald-300 mb-4">
+                <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black mb-4 shadow-sm ${
+                  dark ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-emerald-700/25 bg-emerald-50 text-[#015a37]"
+                }`}>
                   <Smartphone size={14} />
                   <span>تطبيق أولياء الأمور الرسمي</span>
                 </div>
 
-                <h3 className="text-2xl sm:text-4xl font-black tracking-tight leading-snug mb-4">
+                <h3 className={`text-2xl sm:text-4xl font-black tracking-tight leading-snug mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
                   كل ما يخص ابنك الدراسي والمالي في جيبك 📱
                 </h3>
 
-                <p className={`text-sm sm:text-base leading-relaxed mb-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                <p className={`text-sm sm:text-base leading-relaxed mb-8 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
                   طوّرت مدارس العقيق تطبيقاً متكاملاً للهواتف الذكية يمنح أولياء الأمور راحة بال مطلقة، وتجربة سلسة لإدارة شؤون أبنائهم في ثوانٍ معدودة.
                 </p>
 
@@ -618,8 +632,8 @@ export default function AqeeqSchoolAdmissionsPage() {
                           <Icon size={18} />
                         </div>
                         <div>
-                          <h5 className="text-xs font-black">{feat.title}</h5>
-                          <p className="text-[11px] text-slate-500 mt-0.5">{feat.desc}</p>
+                          <h5 className={`text-xs font-black ${dark ? "text-white" : "text-slate-900"}`}>{feat.title}</h5>
+                          <p className={`text-[11px] mt-0.5 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>{feat.desc}</p>
                         </div>
                       </div>
                     );
@@ -662,7 +676,9 @@ export default function AqeeqSchoolAdmissionsPage() {
 
                   <a
                     href="tel:+966531896000"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-white/10 px-5 py-3.5 text-xs font-bold text-slate-400 hover:text-white"
+                    className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-bold transition ${
+                      dark ? "border-white/10 text-slate-400 hover:text-white" : "border-slate-300 bg-white/80 text-slate-700 hover:text-slate-900 shadow-sm"
+                    }`}
                   >
                     <PhoneCall size={15} />
                     <span>الدعم الفني للتطبيق: 966531896000+</span>
@@ -673,7 +689,7 @@ export default function AqeeqSchoolAdmissionsPage() {
               {/* QR Code & Mockup Card */}
               <div className="lg:col-span-5 text-center">
                 <div className={`inline-block p-6 sm:p-8 rounded-[2rem] border shadow-2xl backdrop-blur-xl ${
-                  dark ? "border-white/15 bg-black/80" : "border-black/10 bg-white"
+                  dark ? "border-white/15 bg-black/80" : "border-emerald-950/10 bg-slate-50/90 shadow-xl"
                 }`}>
                   <div className="bg-white p-4 rounded-2xl inline-block shadow-md">
                     <img
@@ -682,8 +698,8 @@ export default function AqeeqSchoolAdmissionsPage() {
                       className="h-36 w-36 sm:h-44 sm:w-44 object-contain"
                     />
                   </div>
-                  <h4 className="font-black text-sm mt-4">امسح الكود بكاميرا الجوال</h4>
-                  <p className="text-xs text-slate-500 mt-1">متاح مجاناً على App Store و Google Play</p>
+                  <h4 className={`font-black text-sm mt-4 ${dark ? "text-white" : "text-slate-900"}`}>امسح الكود بكاميرا الجوال</h4>
+                  <p className={`text-xs mt-1 ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>متاح مجاناً على App Store و Google Play</p>
                 </div>
               </div>
             </div>

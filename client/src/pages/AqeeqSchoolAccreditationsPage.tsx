@@ -32,34 +32,40 @@ export default function AqeeqSchoolAccreditationsPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        isNationalDay
-          ? dark
-            ? "bg-[#01140c] text-white"
-            : "bg-[#f8faf9] text-slate-900"
-          : dark
-          ? "bg-black text-white"
-          : "bg-white text-black"
+        dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="الاعتمادات الدولية ومراكز الاختبارات" active="accreditations" />
 
-      {/* Hero Section */}
-      <section
-        className={`relative isolate overflow-hidden border-b py-20 sm:py-28 ${
-          isNationalDay
-            ? dark
-              ? "snd-hero-dark border-emerald-500/25 text-white"
-              : "snd-hero-light border-emerald-200/80 text-slate-900"
-            : dark
-            ? "border-white/[0.08] bg-black text-white"
-            : "border-black/[0.06] bg-white text-black"
-        }`}
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(1,90,55,0.18),transparent_60%)]" />
+      {/* Hero Section with Cinematic Cover Banner */}
+      <section className="relative isolate overflow-hidden border-b border-black/[0.08] dark:border-white/[0.08]">
+        {/* Background Cover Image with Gradient Masking */}
+        <div className="absolute inset-0 z-0 select-none overflow-hidden">
+          <VisualImage
+            id="accreditations-hero-cover"
+            label="صورة كفر الاعتمادات الدولية"
+            src="/covers/cover-accreditations.jpg"
+            alt="كفر الاعتمادات ومراكز الاختبارات بمدارس العقيق"
+            className="h-full w-full object-cover object-center scale-105 transition duration-700 hover:scale-100"
+          />
+          {/* Multi-layered cinematic gradient overlays */}
+          <div className={`absolute inset-0 transition-colors ${
+            dark
+              ? "bg-gradient-to-b from-[#02130b]/92 via-[#031d11]/88 to-[#05080c]"
+              : "bg-gradient-to-b from-[#fbfaf8]/95 via-[#f5f8f5]/90 to-[#fbfaf8]"
+          }`} />
+          {/* Subtle Royal Radial Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(1,90,55,0.14),transparent_65%)]" />
+        </div>
 
-        <div className="container relative mx-auto px-4 sm:px-6 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-black text-emerald-700 dark:text-emerald-300 backdrop-blur-md mb-6 animate-in fade-in">
-            <Award size={14} className="text-[#f8ca14]" />
+        {/* Foreground Content */}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-14 sm:pb-20 text-center max-w-4xl">
+          <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 animate-in fade-in shadow-sm ${
+            dark
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              : "border-emerald-700/25 bg-white/90 text-[#015a37]"
+          }`}>
+            <Award size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />
             <span>معايير عالمية في قلب المدينة المنورة</span>
           </div>
 
@@ -69,7 +75,9 @@ export default function AqeeqSchoolAccreditationsPage() {
             label="عنوان هيرو الاعتمادات"
             defaultText="اعتمادات دولية مرموقة ومراكز اختبارات عالمية معتمدة"
             as="h1"
-            className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6"
+            className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
+              dark ? "text-white" : "text-[#0a192f]"
+            }`}
           />
 
           <VisualEditable
@@ -79,7 +87,7 @@ export default function AqeeqSchoolAccreditationsPage() {
             defaultText="الجودة في مدارس العقيق ليست مجرد شعار، بل أسلوب حياة ومنهج عمل مؤسسي. نفتخر بحصولنا على اعتماد كوجنيا الأمريكية (Cognia)، واعتماد مدارسنا كمراكز رسمية لاختبارات IELTS و SAT و ACT بالمدينة المنورة."
             as="p"
             className={`text-base sm:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-10 ${
-              dark ? "text-slate-300" : "text-slate-600"
+              dark ? "text-slate-300" : "text-slate-700"
             }`}
           />
 
@@ -89,7 +97,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
                 dark
                   ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                  : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-95 shadow-[#015a37]/25"
+                  : "bg-gradient-to-r from-[#015a37] to-[#027a4b] text-white hover:opacity-95 shadow-[#015a37]/25"
               }`}
             >
               <Send size={18} className="ml-2" />
@@ -98,10 +106,10 @@ export default function AqeeqSchoolAccreditationsPage() {
 
             <a
               href="#cognia-section"
-              className={`inline-flex items-center justify-center rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 ${
+              className={`inline-flex items-center justify-center rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 shadow-sm ${
                 dark
                   ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
-                  : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
+                  : "border-slate-300 bg-white/90 text-slate-900 hover:bg-white"
               }`}
             >
               <ShieldCheck size={18} className="ml-2" />
@@ -116,14 +124,14 @@ export default function AqeeqSchoolAccreditationsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           {/* Cognia Accreditation Card */}
           <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition duration-300 shadow-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-600/15 bg-white"
+            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}>
             <div className="flex items-center justify-between gap-4 mb-6">
               <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck size={16} />
                 <span>الاعتماد الأكاديمي الدولي</span>
               </div>
-              <span className="text-xs font-bold text-slate-400">USA Accredited</span>
+              <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>USA Accredited</span>
             </div>
 
             <div className="flex items-center gap-6 mb-6">
@@ -135,12 +143,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                 />
               </div>
               <div>
-                <h3 className="text-2xl font-black mb-1">اعتماد كوجنيا الأمريكية (Cognia)</h3>
-                <p className="text-xs text-slate-500">أكبر وأعرق هيئة اعتماد تربوي ومدرسي في العالم</p>
+                <h3 className={`text-2xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>اعتماد كوجنيا الأمريكية (Cognia)</h3>
+                <p className={`text-xs ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>أكبر وأعرق هيئة اعتماد تربوي ومدرسي في العالم</p>
               </div>
             </div>
 
-            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
               يضمن اعتماد كوجنيا التزام مدارس العقيق بأعلى معايير الحوكمة التعليمية، وتطوير أداء المعلمين، وتقديم بيئة تعليمية محفزة للابتكار تضاهي أرقى المدارس العالمية في الولايات المتحدة ودول العالم.
             </p>
 
@@ -152,7 +160,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-xs font-bold">
                   <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
-                  <span>{item}</span>
+                  <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
                 </div>
               ))}
             </div>
@@ -161,7 +169,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               href="https://www.cognia.org/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-xs font-black text-[#f8ca14] hover:underline"
+              className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-[#f8ca14]" : "text-[#b8860b]"}`}
             >
               <span>زيارة الموقع الرسمي لمنظمة كوجنيا العالمية</span>
               <ExternalLink size={13} />
@@ -170,14 +178,14 @@ export default function AqeeqSchoolAccreditationsPage() {
 
           {/* IELTS Official Test Centre Card */}
           <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition duration-300 shadow-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-600/15 bg-white"
+            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}>
             <div className="flex items-center justify-between gap-4 mb-6">
               <div className="inline-flex items-center gap-2 rounded-xl bg-blue-500/10 px-3.5 py-1.5 text-xs font-black text-blue-600 dark:text-blue-400">
                 <Globe2 size={16} />
                 <span>مركز اختبارات معتمد بالمدينة المنورة</span>
               </div>
-              <span className="text-xs font-bold text-slate-400">IDP Official Centre</span>
+              <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>IDP Official Centre</span>
             </div>
 
             <div className="flex items-center gap-6 mb-6">
@@ -189,12 +197,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                 />
               </div>
               <div>
-                <h3 className="text-2xl font-black mb-1">مركز اختبارات IELTS (الآيلتس)</h3>
-                <p className="text-xs text-slate-500">بالشراكة الرسمية مع منظمة IDP التعليمية العالمية</p>
+                <h3 className={`text-2xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز اختبارات IELTS (الآيلتس)</h3>
+                <p className={`text-xs ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>بالشراكة الرسمية مع منظمة IDP التعليمية العالمية</p>
               </div>
             </div>
 
-            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
               تستضيف مدارس العقيق مركز الاختبارات المعتمد لاختبار اللغة الإنجليزية الدولي (IELTS)، ليخدم طلاب المدارس وكافة أفراد المجتمع بالمدينة المنورة في بيئة احترافية ومجهزة بأحدث التجهيزات التقنية.
             </p>
 
@@ -206,7 +214,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-xs font-bold">
                   <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
-                  <span>{item}</span>
+                  <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
                 </div>
               ))}
             </div>
@@ -215,7 +223,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               href="https://ielts.idp.com/saudiarabia/test-centre/alaqeeq-holding-national-and-international-school"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-xs font-black text-blue-500 hover:underline"
+              className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-blue-400" : "text-blue-700"}`}
             >
               <span>حجز موعد اختبار الآيلتس في مركز مدارس العقيق</span>
               <ExternalLink size={13} />
@@ -227,7 +235,7 @@ export default function AqeeqSchoolAccreditationsPage() {
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
           {/* SAT */}
           <div className={`rounded-[2rem] border p-6 sm:p-8 flex items-start gap-5 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white"
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
           }`}>
             <div className="bg-white p-3 rounded-2xl shrink-0 shadow-sm border border-black/5">
               <img
@@ -237,8 +245,8 @@ export default function AqeeqSchoolAccreditationsPage() {
               />
             </div>
             <div>
-              <h4 className="text-lg font-black mb-1">مركز معتمد لاختبارات SAT الدولية</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-3">
+              <h4 className={`text-lg font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز معتمد لاختبارات SAT الدولية</h4>
+              <p className={`text-xs leading-relaxed mb-3 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
                 مدارس العقيق مركز معتمد من College Board لتقديم اختبارات SAT الرقمية المؤهلة للقبول في كبرى الجامعات العالمية والبرامج المرموقة.
               </p>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
@@ -249,7 +257,7 @@ export default function AqeeqSchoolAccreditationsPage() {
 
           {/* ACT */}
           <div className={`rounded-[2rem] border p-6 sm:p-8 flex items-start gap-5 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white"
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
           }`}>
             <div className="bg-white p-3 rounded-2xl shrink-0 shadow-sm border border-black/5">
               <img
@@ -259,8 +267,8 @@ export default function AqeeqSchoolAccreditationsPage() {
               />
             </div>
             <div>
-              <h4 className="text-lg font-black mb-1">مركز معتمد لاختبارات ACT الأمريكية</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-3">
+              <h4 className={`text-lg font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز معتمد لاختبارات ACT الأمريكية</h4>
+              <p className={`text-xs leading-relaxed mb-3 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
                 مركز اختبارات ACT المعتمد لتقييم مهارات الطلاب في اللغة الإنجليزية والرياضيات والعلوم والتفكير النقدي للالتحاق بالتعليم الجامعي.
               </p>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
@@ -273,16 +281,16 @@ export default function AqeeqSchoolAccreditationsPage() {
 
       {/* Advanced Educational Tracks (AI, STEM, Talent) */}
       <section className={`py-20 border-t ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-black/5 bg-slate-50"
+        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 text-xs font-black text-[#f8ca14] mb-2">
+            <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
               <Sparkles size={14} />
               <span>مهارات المستقبل ورؤية 2030</span>
             </div>
-            <h3 className="text-2xl sm:text-4xl font-black">البرامج النوعية ومسارات الإبداع</h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-2">
+            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>البرامج النوعية ومسارات الإبداع</h3>
+            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
               نصنع قادة الغد عبر مناهج نوعية وتجارب تعليمية تعزز التفكير التحليلي والابتكار
             </p>
           </div>
@@ -290,16 +298,16 @@ export default function AqeeqSchoolAccreditationsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* AI & Coding */}
             <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white shadow-sm"
+              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
             }`}>
               <div className="grid h-14 w-14 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-6">
                 <Brain size={28} />
               </div>
-              <h4 className="text-xl font-black mb-3">مسار البرمجة والذكاء الاصطناعي</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>مسار البرمجة والذكاء الاصطناعي</h4>
+              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
                 تعليم لغات البرمجة (Python, Scratch) وأساسيات الخوارزميات وتطبيقات الذكاء الاصطناعي لكافة المراحل، لتمكين الطلاب من أدوات المستقبل.
               </p>
-              <ul className="space-y-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> معامل حاسوبية متطورة 1:1</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> مشاريع برمجية واقعية وحلول ذكية</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> تأهيل للمسابقات الوطنية والدولية</li>
@@ -308,16 +316,16 @@ export default function AqeeqSchoolAccreditationsPage() {
 
             {/* STEM & Robotics */}
             <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white shadow-sm"
+              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
             }`}>
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-amber-500/10 text-[#f8ca14] mb-6">
+              <div className={`grid h-14 w-14 place-items-center rounded-2xl ${dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/10 text-[#c59b27]"} mb-6`}>
                 <Cpu size={28} />
               </div>
-              <h4 className="text-xl font-black mb-3">مناهج STEM والروبوت والابتكار</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>مناهج STEM والروبوت والابتكار</h4>
+              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
                 تطبيق منهجية التعليم المتكامل (العلوم، التقنية، الهندسة، الرياضيات) عبر أندية الروبوت وتحديات WRO العالمية وبطولة الوورد منيا.
               </p>
-              <ul className="space-y-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> أندية روبوت وأردوينو تفاعلية</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> المركز الخامس في مسابقة WRO العالمية</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> تجارب معملية ومشاريع تطبيقية</li>
@@ -326,16 +334,16 @@ export default function AqeeqSchoolAccreditationsPage() {
 
             {/* Talent & Public Speaking */}
             <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-black/10 bg-white shadow-sm"
+              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
             }`}>
               <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 mb-6">
                 <Trophy size={28} />
               </div>
-              <h4 className="text-xl font-black mb-3">رعاية الموهوبين وفنون الخطابة</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>رعاية الموهوبين وفنون الخطابة</h4>
+              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
                 برامج متخصصة لاكتشاف ورعاية الطلبة الموهوبين، وبناء الثقة في النفس من خلال مسارات الإلقاء والخطابة باللغتين العربية والإنجليزية.
               </p>
-              <ul className="space-y-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> شراكة مع مؤسسة موهبة ومسار أسبار</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> ملتقيات سنوية لفنون الخطابة (Public Speaking)</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> ورش عمل في التفكير الناقد والإبداع</li>
@@ -348,12 +356,12 @@ export default function AqeeqSchoolAccreditationsPage() {
       {/* CTA Footer Banner */}
       <section className="py-20 container mx-auto px-4 sm:px-6 text-center">
         <div className={`rounded-[3rem] border p-8 sm:p-14 relative overflow-hidden ${
-          dark ? "border-emerald-500/20 bg-gradient-to-r from-emerald-950/40 via-[#01140c] to-emerald-950/40 shadow-2xl" : "border-emerald-600/15 bg-emerald-50/50 shadow-xl"
+          dark ? "border-emerald-500/20 bg-gradient-to-r from-emerald-950/40 via-[#01140c] to-emerald-950/40 shadow-2xl" : "border-emerald-700/20 bg-white shadow-xl"
         }`}>
-          <h3 className="text-2xl sm:text-4xl font-black mb-4">
+          <h3 className={`text-2xl sm:text-4xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
             امنح ابنك تعليماً بمعايير عالمية
           </h3>
-          <p className="text-sm sm:text-base text-slate-500 max-w-xl mx-auto mb-8">
+          <p className={`text-sm sm:text-base max-w-xl mx-auto mb-8 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
             فريق القبول والتسجيل بمدارس العقيق جاهز للإجابة عن كافة استفساراتكم ومساعدتكم في اختيار المسار الأنسب لقدرات وطموحات ابنكم.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -362,7 +370,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
                 dark
                   ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                  : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-95 shadow-[#015a37]/25"
+                  : "bg-gradient-to-r from-[#015a37] to-[#027a4b] text-white hover:opacity-95 shadow-[#015a37]/25"
               }`}
             >
               <span>التقديم والقبول الإلكتروني</span>
@@ -372,7 +380,9 @@ export default function AqeeqSchoolAccreditationsPage() {
             <Button
               variant="outline"
               onClick={() => navigate("/about")}
-              className="rounded-2xl px-8 py-6 text-base font-black"
+              className={`rounded-2xl px-8 py-6 text-base font-black border transition ${
+                dark ? "border-white/10 text-white hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+              }`}
             >
               <span>تعرف على فروع ومرافق المدارس</span>
             </Button>
