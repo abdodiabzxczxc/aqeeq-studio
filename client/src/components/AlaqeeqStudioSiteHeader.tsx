@@ -251,8 +251,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             )}
           </div>
 
-          {/* Center 3 Executive Core Navigation Menus (Desktop) */}
-          <nav dir="rtl" className="hidden md:flex items-center gap-6 lg:gap-8 whitespace-nowrap text-xs font-black">
+          {/* Center 8 Core Navigation Links (Desktop) */}
+          <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-xs font-black">
             {/* Home */}
             <button
               onClick={() => go("/")}
@@ -260,6 +260,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             >
               الرئيسية
             </button>
+
 
             {/* 1. مدارسنا ▾ */}
             <DropdownMenu dir="rtl">
@@ -345,38 +346,58 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* 3. استوديو العقيق (المركز الإعلامي) ▾ */}
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <button className={`aq-studio-toplink flex items-center gap-1.5 outline-none ${["journal", "albums", "showcase", "articles", "podcast"].includes(currentActive || "") ? "aq-studio-toplink--active" : ""}`}>
-                  <span>استوديو العقيق</span>
-                  <ChevronDown size={13} className="opacity-70" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className={`w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-2xl ${dark ? "bg-[#0c1218]/95 border-white/15 text-white" : "bg-white/95 border-black/10 text-slate-900"}`}>
-                <DropdownMenuItem onClick={() => go("/journal")} className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer font-bold text-xs">
-                  <BookOpen size={16} className="text-emerald-500" />
-                  <span>مجلة العقيق الرقمية</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => go("/albums")} className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer font-bold text-xs">
-                  <Camera size={16} className="text-amber-500" />
-                  <span>ألبومات الصور والفعاليات</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => go("/atheer")} className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer font-bold text-xs">
-                  <Radio size={16} className="text-purple-500" />
-                  <span>بودكاست أثير العقيق</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => go("/articles")} className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer font-bold text-xs">
-                  <FileText size={16} className="text-blue-500" />
-                  <span>مقالات وأقلام العقيق</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => go("/offers")} className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer font-bold text-xs">
-                  <Clapperboard size={16} className="text-rose-500" />
-                  <span>الأخبار والعروض التفاعلية</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* 3. عناصر استوديو العقيق المباشرة في الهيدر */}
+            <VisualEditable
+              id="aqeeq-studio-nav-journal"
+              tag="button"
+              label="اسم رابط المجلة"
+              defaultText={orchestration?.nav?.journalLabel || "مجلة العقيق"}
+              as="button"
+              onAction={() => go("/journal")}
+              className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
+            />
+
+            <VisualEditable
+              id="aqeeq-studio-nav-albums"
+              tag="button"
+              label="اسم رابط الألبوم"
+              defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"}
+              as="button"
+              onAction={() => go("/albums")}
+              className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
+            />
+
+            <VisualEditable
+              id="aqeeq-studio-nav-podcast"
+              tag="button"
+              label="اسم رابط أثير العقيق"
+              defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق 🎙️"}
+              as="button"
+              onAction={() => go("/atheer")}
+              className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
+            />
+
+            <VisualEditable
+              id="aqeeq-studio-nav-articles"
+              tag="button"
+              label="اسم رابط المقالات"
+              defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات ✍️"}
+              as="button"
+              onAction={() => go("/articles")}
+              className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
+            />
+
+            <VisualEditable
+              id="aqeeq-studio-nav-showcase"
+              tag="button"
+              label="اسم رابط الأخبار والعروض"
+              defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"}
+              as="button"
+              onAction={() => go("/offers")}
+              className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
+            />
           </nav>
+
 
           {/* Left Action Buttons & Primary CTA */}
           <div dir="ltr" className="flex items-center gap-2 sm:gap-3">
@@ -510,7 +531,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* Mobile Hamburger Menu Button */}
             <button
               onClick={() => setMobileMenuOpen((open) => !open)}
-              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition md:hidden active:scale-95 ${
+              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition lg:hidden active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#015a37]/30 bg-[#015a37]/10 text-[#015a37]"
@@ -523,11 +544,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           {/* Luxury Slide-Down Mobile Menu Drawer */}
           {mobileMenuOpen && (
-            <div className={`absolute inset-x-3.5 sm:inset-x-5 top-[70px] max-h-[calc(100vh-85px)] overflow-y-auto scrollbar-none rounded-2xl border p-4 shadow-2xl backdrop-blur-2xl md:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            <div className={`absolute inset-x-3.5 sm:inset-x-5 top-[70px] max-h-[calc(100vh-85px)] overflow-y-auto scrollbar-none rounded-2xl border p-4 shadow-2xl backdrop-blur-2xl lg:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
               dark
                 ? "border-[#f8ca14]/30 bg-black/95 shadow-[0_24px_55px_rgba(0,0,0,0.9)] text-white"
                 : "border-black/[0.08] bg-white/98 shadow-[0_24px_55px_rgba(0,0,0,0.15)] text-black"
             }`}>
+
               {/* User Bar / Status inside Drawer */}
               <div className="flex items-center justify-between border-b pb-3 mb-3 border-current/10">
                 <div className="flex items-center gap-2">
