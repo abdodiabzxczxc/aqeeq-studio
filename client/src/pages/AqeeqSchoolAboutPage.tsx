@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -22,6 +23,11 @@ import {
   HeartHandshake,
   Lightbulb,
   BookOpen,
+  CheckCircle2,
+  MessageCircle,
+  Milestone,
+  Check,
+  ExternalLink,
 } from "lucide-react";
 
 export default function AqeeqSchoolAboutPage() {
@@ -29,6 +35,9 @@ export default function AqeeqSchoolAboutPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+
+  const [activeCampusTab, setActiveCampusTab] = useState<"boys" | "girls">("boys");
+  const [activeTimelineIndex, setActiveTimelineIndex] = useState<number>(3);
 
   const pillars = [
     {
@@ -234,41 +243,397 @@ export default function AqeeqSchoolAboutPage() {
         </div>
       </section>
 
-      {/* Vision & Mission Cards */}
+      {/* The 30-Year Legacy Interactive Timeline (1994 - 2026) */}
       <section className="py-20 container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Vision */}
-          <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition shadow-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-          }`}>
-            <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-6">
-              <Compass size={16} />
-              <span>الرؤية الاستراتيجية (Vision)</span>
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
+            <Sparkles size={14} />
+            <span>ثلاثة عقود من العطاء التربوي بطيبة الطيبة</span>
+          </div>
+          <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+            مسيرة العقيق المضيئة عبر الزمن (1994 - 2026) 📜
+          </h2>
+          <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+            رحلة تربوية رائدة خطت خطواتها الأولى في المدينة المنورة قبل أكثر من 30 عاماً لتغدو اليوم منارة تعليمية بمعايير عالمية.
+          </p>
+
+          {/* Interactive Era Buttons */}
+          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">
+            {[
+              { year: "1994", label: "التأسيس والانطلاقة", index: 0 },
+              { year: "2010", label: "المجمعات والمسابح", index: 1 },
+              { year: "2018", label: "اعتماد كوجنيا (Cognia)", index: 2 },
+              { year: "2026", label: "مراكز الاختبارات والـ AI", index: 3 },
+            ].map((era) => (
+              <button
+                key={era.year}
+                type="button"
+                onClick={() => setActiveTimelineIndex(era.index)}
+                className={`p-3 rounded-xl text-center transition active:scale-95 ${
+                  activeTimelineIndex === era.index
+                    ? dark
+                      ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
+                      : "bg-[#015a37] text-white shadow-md ring-1 ring-emerald-900/30"
+                    : dark
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 hover:text-black hover:bg-white/70"
+                }`}
+              >
+                <span className={`block text-base font-black ${activeTimelineIndex === era.index ? "text-[#f8ca14]" : ""}`}>
+                  {era.year}
+                </span>
+                <span className="text-[11px] font-bold truncate block">{era.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Dynamic Active Timeline Era Card */}
+        <div className={`max-w-4xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+          dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+        }`}>
+          {[
+            {
+              year: "1994 م — 1415 هـ",
+              title: "غراس البدايات وتأسيس أول مجمع تعليمي بالمدينة المنورة",
+              desc: "انطلقت مدارس العقيق برؤية واضحة لتكون نموذجاً تعليمياً وتربوياً فريداً بطيبة الطيبة. بدأت المدارس بتأسيس المراحل التأسيسية وتخريج أجيال متمكنة في القرآن الكريم واللغة والعلوم، وتكريس منظومة القيم الأخلاقية الأصيلة.",
+              highlight: "نواة التميز والانطلاقة الأولى بالمدينة المنورة",
+              stats: "أكثر من 30 دفعة تخرجت منذ التأسيس",
+            },
+            {
+              year: "2010 م — 1431 هـ",
+              title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
+              desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل على طريق الملك عبدالله الدائري ومجمع البنات بحي باقدو، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
+              highlight: "مجمعات صرحية مستقلة بمواصفات هندسية وتعليمية قياسية",
+              stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
+            },
+            {
+              year: "2018 م — 1439 هـ",
+              title: "الاعتماد الأكاديمي الأمريكي من منظمة كوجنيا (Cognia USA)",
+              desc: "توجت مسيرة الجودة بحصول مدارس العقيق على الاعتماد الدولي الأمريكي من كوجنيا، ليصبح خريجو المدارس مؤهلين للحصول على شهادة الدبلومة الأمريكية المعتمدة دولياً، بالتزامن مع إطلاق نوادي وأكاديميات الروبوت والابتكار.",
+              highlight: "الريادة في التعليم الدولي والحوكمة الأكاديمية",
+              stats: "تقييم جودة معتمد عالمياً بنسبة تفوق 98%",
+            },
+            {
+              year: "2024 - 2026 م",
+              title: "اعتماد مراكز IELTS و SAT الدولية ومنظومة الذكاء الاصطناعي",
+              desc: "العصر الرقمي والريادة العالمية: اعتماد مدارس العقيق كمركز رسمي لاختبارات IELTS IDP و SAT بالمدينة المنورة، مع تتويج الطلاب بالمركز الخامس عالمياً في أولمبياد الروبوت WRO، وتكامل المناهج مع الذكاء الاصطناعي والتحول الرقمي.",
+              highlight: "مركز اختبارات دولي معتمد وحضور عالمي في منافسات الـ AI",
+              stats: "المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO",
+            },
+          ].filter((_, idx) => idx === activeTimelineIndex).map((era, iIdx) => (
+            <div key={iIdx} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    محطة تاريخية بارزة ✦
+                  </span>
+                  <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                    {era.year}
+                  </span>
+                </div>
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  {era.title}
+                </h3>
+                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  {era.desc}
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-xs font-black">
+                  <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 size={16} />
+                    {era.highlight}
+                  </span>
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 text-center">
+                <div className={`p-6 rounded-3xl border shadow-inner ${
+                  dark ? "border-white/10 bg-black/40" : "border-emerald-950/10 bg-emerald-50/50"
+                }`}>
+                  <Milestone size={32} className={`mx-auto mb-3 ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`} />
+                  <span className={`block text-xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    أثر ملموس
+                  </span>
+                  <p className="text-xs text-slate-500 font-bold">{era.stats}</p>
+                </div>
+              </div>
             </div>
-            <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              صرح تعليمي رائد عالمياً بتمثل القيم الإسلامية
-            </h3>
-            <p className={`text-sm sm:text-base leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-              أن تكون مدارس العقيق الأهلية والدولية نموذجاً تعليمياً وتربوياً رائداً على مستوى المملكة والعالم الإسلامي، يُخرج قادة للمستقبل متسلحين بالعلم النافع، والأخلاق الفاضلة، والمهارات التنافسية العالمية.
+          ))}
+        </div>
+      </section>
+
+      {/* Interactive Campus Explorer (مستكشف المجمعات التفاعلي) */}
+      <section className={`py-20 border-y ${
+        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
+      }`}>
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
+              <Building2 size={14} />
+              <span>الصروح والمجمعات التعليمية النموذجية</span>
+            </div>
+            <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              استكشف مجمعاتنا بالمدينة المنورة 🏫
+            </h2>
+            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              مبانٍ مدرسية صرحية مستقلة مصممة بأعلى المواصفات لتوفير بيئة تعليمية وتربوية ورياضية متكاملة
             </p>
+
+            {/* Campus Switcher Tabs */}
+            <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-white/60 dark:bg-black/40 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setActiveCampusTab("boys")}
+                className={`rounded-xl px-6 py-2.5 text-xs sm:text-sm font-black transition ${
+                  activeCampusTab === "boys"
+                    ? "bg-[#015a37] text-white shadow-md"
+                    : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
+                }`}
+              >
+                مجمع البنين (طريق الملك عبدالله الدائري)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCampusTab("girls")}
+                className={`rounded-xl px-6 py-2.5 text-xs sm:text-sm font-black transition ${
+                  activeCampusTab === "girls"
+                    ? "bg-[#015a37] text-white shadow-md"
+                    : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
+                }`}
+              >
+                مجمع البنات (حي باقدو)
+              </button>
+            </div>
           </div>
 
-          {/* Mission */}
-          <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition shadow-xl ${
-            dark ? "border-amber-500/20 bg-[#0c1218]/90" : "border-amber-600/20 bg-white/95"
-          }`}>
-            <div className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-black mb-6 ${
-              dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/15 text-[#c59b27]"
+          {/* Active Campus Panoramic Card */}
+          {activeCampusTab === "boys" && (
+            <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl animate-in fade-in transition duration-500 ${
+              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
             }`}>
-              <Target size={16} />
-              <span>الرسالة التربوية (Mission)</span>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                      مجمع البنين النموذجي
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">القسم الأهلي والدولي</span>
+                  </div>
+
+                  <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    مجمع البنين — طريق الملك عبدالله الدائري
+                  </h3>
+
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    يقع المجمع في موقع استراتيجي حيوي على الدائري، ويضم مباني أكاديمية مستقلة للمراحل الابتدائية والمتوسطة والثانوية، مزوداً بأحدث الصالات الرياضية والمسابح والمعامل التقنية.
+                  </p>
+
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-xs font-bold">
+                    {[
+                      { title: "المسبح الأولمبي المغطى", sub: "تدريب سباحة احترافي بإشراف مدربين" },
+                      { title: "صالات الجمباز وملاعب العشب", sub: "ملاعب كرة قدم وصالات كاراتيه ولياقة" },
+                      { title: "معامل الذكاء الاصطناعي والروبوت", sub: "تجهيزات حاسوبية 1:1 لبطولات WRO" },
+                      { title: "قاعات IELTS & SAT الدولية", sub: "مركز الاختبارات المعتمد بالمدينة" },
+                    ].map((f, fIdx) => (
+                      <div key={fIdx} className={`p-3 rounded-xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                        <span className="block font-black text-emerald-600 dark:text-emerald-400">✦ {f.title}</span>
+                        <span className="text-[11px] text-slate-500 mt-0.5 block">{f.sub}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href="https://maps.google.com/?q=Al-Aqeeq+Schools+Boys+Madinah"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
+                    >
+                      <MapPin size={15} />
+                      <span>فتح الموقع في Google Maps 📍</span>
+                    </a>
+
+                    <a
+                      href="tel:+966531896000"
+                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
+                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                      }`}
+                    >
+                      <Phone size={14} />
+                      <span>الاتصال بالمجمع: 966531896000+</span>
+                    </a>
+
+                    <Button
+                      onClick={() => navigate("/admissions")}
+                      variant="outline"
+                      className="rounded-2xl text-xs font-black"
+                    >
+                      حجز مقعد بمجمع البنين ✦
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                    <img
+                      src="/covers/student-lab-admissions.jpg"
+                      alt="مرافق مجمع البنين بمدارس العقيق"
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 right-4 left-4 text-white">
+                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنين — الدائري</span>
+                      <p className="text-[11px] text-slate-300">معامل الابتكار والمسابح والمراكز الدولية</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              تقديم تعليم متميز لأبنائنا بتطبيق معايير عالمية
+          )}
+
+          {activeCampusTab === "girls" && (
+            <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl animate-in fade-in transition duration-500 ${
+              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+            }`}>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="rounded-xl bg-pink-500/10 px-3 py-1 text-xs font-black text-pink-600 dark:text-pink-400">
+                      مجمع البنات النموذجي
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">من الروضة إلى الثانوي</span>
+                  </div>
+
+                  <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    مجمع البنات — حي باقدو
+                  </h3>
+
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    صرح تربوي متميز يجمع بين الخصوصية العالية وتوفير أرقى المرافق، يضم أقسام الطفولة المبكرة ورياض الأطفال، والمراحل الابتدائية والمتوسطة والثانوية بقاعاتها ومسارحها المجهزة.
+                  </p>
+
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-xs font-bold">
+                    {[
+                      { title: "أقسام الطفولة المبكرة والروضة", sub: "بيئة مرحة ومحفزة لتنمية المهارات الحسية" },
+                      { title: "المسرح المدرسي وقاعات الأنشطة", sub: "احتفالات الخطابة وملتقيات الإبداع واللغات" },
+                      { title: "معامل العلوم واللغات المتطورة", sub: "تجارب معملية ومناهج دولية مكثفة" },
+                      { title: "ملاعب آمنة ومظللة بالكامل", sub: "ساحات أنشطة وفسحة رياضية مريحة وآمنة" },
+                    ].map((f, fIdx) => (
+                      <div key={fIdx} className={`p-3 rounded-xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                        <span className="block font-black text-emerald-600 dark:text-emerald-400">✦ {f.title}</span>
+                        <span className="text-[11px] text-slate-500 mt-0.5 block">{f.sub}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href="https://maps.google.com/?q=Al-Aqeeq+Schools+Girls+Baqdo+Madinah"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
+                    >
+                      <MapPin size={15} />
+                      <span>فتح الموقع في Google Maps 📍</span>
+                    </a>
+
+                    <a
+                      href="tel:+966531896000"
+                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
+                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                      }`}
+                    >
+                      <Phone size={14} />
+                      <span>الاتصال بالمجمع: 966531896000+</span>
+                    </a>
+
+                    <Button
+                      onClick={() => navigate("/admissions")}
+                      variant="outline"
+                      className="rounded-2xl text-xs font-black"
+                    >
+                      حجز مقعد بمجمع البنات ✦
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                    <img
+                      src="/covers/student-excellence-about.jpg"
+                      alt="مرافق مجمع البنات بمدارس العقيق"
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 right-4 left-4 text-white">
+                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنات — باقدو</span>
+                      <p className="text-[11px] text-slate-300">الطفولة المبكرة، المراحل التعليمية، والمسارح</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Royal Strategic Document: Vision & Mission */}
+      <section className="py-20 container mx-auto px-4 sm:px-6">
+        <div className={`max-w-5xl mx-auto rounded-[3rem] border p-8 sm:p-14 shadow-2xl relative overflow-hidden ${
+          dark
+            ? "border-emerald-500/30 bg-gradient-to-b from-[#0c141a] to-[#060a0e] ring-1 ring-emerald-500/20"
+            : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8] ring-1 ring-emerald-900/10 shadow-xl"
+        }`}>
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-3 border border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]">
+              <Compass size={14} />
+              <span>المرتكزات الاستراتيجية للصرح</span>
+            </div>
+            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              الرؤية والرسالة المؤسسية
             </h3>
-            <p className={`text-sm sm:text-base leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-              توفير بيئة تعليمية وتربوية محفزة وجاذبة، تضم نخبة من الكفاءات التعليمية المؤهلة، وتطبق أحدث المعايير الدولية والاعتمادات العالمية، لبناء شخصية متكاملة للطالب تعتز بهويتها وتسهم في نهضة وطنها.
-            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Vision Plaque */}
+            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 ${
+              dark ? "border-emerald-500/20 bg-white/5" : "border-emerald-950/10 bg-emerald-50/40"
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <Compass size={20} />
+                </div>
+                <div>
+                  <h4 className={`text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>الرؤية الاستراتيجية (Vision)</h4>
+                  <span className="text-[11px] text-slate-500">أصالة القيم وريادة المستقبل</span>
+                </div>
+              </div>
+              <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                أن تكون مدارس العقيق الأهلية والدولية نموذجاً تعليمياً وتربوياً رائداً على مستوى المملكة والعالم الإسلامي، يُخرج قادة للمستقبل متسلحين بالعلم النافع، والأخلاق الفاضلة، والمهارات التنافسية العالمية التي تواكب مستهدفات رؤية 2030.
+              </p>
+            </div>
+
+            {/* Mission Plaque */}
+            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 ${
+              dark ? "border-amber-500/20 bg-white/5" : "border-amber-950/10 bg-amber-50/30"
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`grid h-10 w-10 place-items-center rounded-xl ${dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/15 text-[#c59b27]"}`}>
+                  <Target size={20} />
+                </div>
+                <div>
+                  <h4 className={`text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>الرسالة التربوية (Mission)</h4>
+                  <span className="text-[11px] text-slate-500">جودة التعليم وبناء الشخصية</span>
+                </div>
+              </div>
+              <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                توفير بيئة تعليمية وتربوية محفزة وجاذبة، تضم نخبة من الكفاءات التعليمية المؤهلة، وتطبق أحدث المعايير الدولية والاعتمادات العالمية، لبناء شخصية متكاملة للطالب تعتز بهويتها وتسهم في نهضة وطنها.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -318,145 +683,60 @@ export default function AqeeqSchoolAboutPage() {
         </div>
       </section>
 
-      {/* Campuses & Facilities */}
+      {/* Careers & Contact Section */}
       <section className="py-20 container mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
-            <Building2 size={14} />
-            <span>الصروح والمجمعات التعليمية</span>
-          </div>
-          <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>مجمعاتنا في المدينة المنورة</h2>
-          <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-            مبانٍ مدرسية نموذجية مصممة وفق أحدث المعايير الهندسية والتربوية العالمية
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {campuses.map((campus, idx) => (
-            <div
-              key={idx}
-              className={`rounded-[2.5rem] border p-8 sm:p-10 transition shadow-xl hover:shadow-2xl ${
-                dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          {/* Careers */}
+          <div className={`rounded-3xl border p-8 ${
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+          }`}>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-500/10 text-blue-500 mb-4">
+              <Briefcase size={22} />
+            </div>
+            <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>انضم إلى فريق مدارس العقيق</h3>
+            <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              نستقطب باستمرار أفضل الكفاءات التعليمية والإدارية والتقنية الشغوفة بصناعة الأثر في حياة الأجيال.
+            </p>
+            <a
+              href="https://live.aqeeq.edu.sa/jobs"
+              target="_blank"
+              rel="noreferrer"
+              className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black transition ${
+                dark ? "bg-blue-600 hover:bg-blue-500 text-white" : "bg-blue-700 hover:bg-blue-800 text-white"
               }`}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <GraduationCap size={20} />
-                </div>
-                <h3 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>{campus.name}</h3>
-              </div>
+              <span>بوابة التوظيف الرسمية</span>
+              <ArrowRight size={14} />
+            </a>
+          </div>
 
-              <div className={`space-y-3 mb-6 text-xs ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                <div className="flex items-center gap-2">
-                  <MapPin size={16} className="text-emerald-600 shrink-0" />
-                  <span className="font-bold">{campus.location}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen size={16} className="text-emerald-600 shrink-0" />
-                  <span>المراحل: {campus.stages}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Sparkles size={16} className="text-emerald-600 shrink-0" />
-                  <span>المرافق: {campus.facilities}</span>
-                </div>
-              </div>
-
-              <div className={`flex flex-wrap items-center justify-between gap-3 pt-4 border-t ${dark ? "border-white/10" : "border-slate-200/70"}`}>
-                <div className="flex items-center gap-3">
-                  <a
-                    href={`tel:${campus.phone.replace(/\s+/g, "")}`}
-                    className={`inline-flex items-center gap-1.5 text-xs font-black hover:underline ${dark ? "text-emerald-400" : "text-[#015a37]"}`}
-                  >
-                    <Phone size={13} />
-                    <span>{campus.phone}</span>
-                  </a>
-
-                  <a
-                    href={idx === 0 ? "https://maps.google.com/?q=Al-Aqeeq+Schools+Boys+Madinah" : "https://maps.google.com/?q=Al-Aqeeq+Schools+Girls+Baqdo+Madinah"}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
-                      dark ? "bg-white/10 text-slate-200 hover:bg-white/20" : "bg-emerald-50 text-[#015a37] hover:bg-emerald-100"
-                    }`}
-                  >
-                    <MapPin size={12} />
-                    <span>موقع Google Maps 📍</span>
-                  </a>
-                </div>
-
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/admissions")}
-                  className={`rounded-xl text-xs font-bold ${
-                    dark ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-[#015a37] hover:bg-emerald-800 text-white"
-                  }`}
-                >
-                  تقديم طلب بالمجمع
-                </Button>
-              </div>
+          {/* Quick Contact Info */}
+          <div className={`rounded-3xl border p-8 ${
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+          }`}>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4">
+              <Phone size={22} />
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Careers & Contact Section */}
-      <section className={`py-20 border-t ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
-      }`}>
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* Careers */}
-            <div className={`rounded-3xl border p-8 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-            }`}>
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-500/10 text-blue-500 mb-4">
-                <Briefcase size={22} />
+            <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>تواصل معنا مباشرة</h3>
+            <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              يسعدنا الرد على كافة استفساراتكم واستقبالكم في مجمعاتنا خلال أوقات الدوام الرسمي.
+            </p>
+            <div className={`space-y-3 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
+              <div className="flex items-center gap-2">
+                <Phone size={15} className="text-emerald-500" />
+                <span>الهاتف الموحد: <a href="tel:+966531896000" className="hover:underline">966531896000+</a></span>
               </div>
-              <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>انضم إلى فريق مدارس العقيق</h3>
-              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-                نستقطب باستمرار أفضل الكفاءات التعليمية والإدارية والتقنية الشغوفة بصناعة الأثر في حياة الأجيال.
-              </p>
-              <a
-                href="https://live.aqeeq.edu.sa/jobs"
-                target="_blank"
-                rel="noreferrer"
-                className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black transition ${
-                  dark ? "bg-blue-600 hover:bg-blue-500 text-white" : "bg-blue-700 hover:bg-blue-800 text-white"
-                }`}
-              >
-                <span>بوابة التوظيف الرسمية</span>
-                <ArrowRight size={14} />
-              </a>
-            </div>
-
-            {/* Quick Contact Info */}
-            <div className={`rounded-3xl border p-8 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-            }`}>
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4">
-                <Phone size={22} />
+              <div className="flex items-center gap-2">
+                <Mail size={15} className="text-emerald-500" />
+                <span>البريد الرسمي: <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a></span>
               </div>
-              <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>تواصل معنا مباشرة</h3>
-              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-                يسعدنا الرد على كافة استفساراتكم واستقبالكم في مجمعاتنا خلال أوقات الدوام الرسمي.
-              </p>
-              <div className={`space-y-3 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
-                <div className="flex items-center gap-2">
-                  <Phone size={15} className="text-emerald-500" />
-                  <span>الهاتف الموحد: <a href="tel:+966531896000" className="hover:underline">966531896000+</a></span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail size={15} className="text-emerald-500" />
-                  <span>البريد الرسمي: <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a></span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={15} className="text-emerald-500" />
-                  <span>أوقات العمل: الأحد - الخميس | 7:00 ص - 2:30 م</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sky-500">📢</span>
-                  <span>قناة تيليجرام المدرسية: <a href="https://t.me/alaqeeqschools" target="_blank" rel="noreferrer" className="text-sky-500 hover:underline">t.me/alaqeeqschools</a></span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Clock size={15} className="text-emerald-500" />
+                <span>أوقات العمل: الأحد - الخميس | 7:00 ص - 2:30 م</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sky-500">📢</span>
+                <span>قناة تيليجرام المدرسية: <a href="https://t.me/alaqeeqschools" target="_blank" rel="noreferrer" className="text-sky-500 hover:underline">t.me/alaqeeqschools</a></span>
               </div>
             </div>
           </div>
@@ -465,3 +745,4 @@ export default function AqeeqSchoolAboutPage() {
     </main>
   );
 }
+
