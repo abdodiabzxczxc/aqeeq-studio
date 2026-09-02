@@ -262,109 +262,38 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
 
 
-            {/* 1. مدارسنا ▾ */}
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none ${
-                    currentActive === "about" || currentActive === "accreditations"
-                      ? dark
-                        ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
-                        : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
-                      : dark
-                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
-                      : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
-                  }`}
-                >
-                  <span>مدارسنا</span>
-                  <ChevronDown size={12} className="opacity-70" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className={`w-72 p-2 rounded-2xl border shadow-2xl backdrop-blur-2xl ${dark ? "bg-[#0c1218]/95 border-white/15 text-white" : "bg-white/95 border-black/10 text-slate-900"}`}>
-                <DropdownMenuItem onClick={() => go("/about")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer font-bold text-xs">
-                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
-                    <Building2 size={16} />
-                  </div>
-                  <div>
-                    <div className="font-black text-sm">عن مدارس العقيق</div>
-                    <div className="text-[10px] text-slate-400">الرؤية والرسالة، الركائز، والمجمعات</div>
-                  </div>
-                </DropdownMenuItem>
+            {/* 1. مدارسنا (رابط مباشر فوري) */}
+            <button
+              onClick={() => go("/about")}
+              className={`flex items-center px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none cursor-pointer ${
+                currentActive === "about" || currentActive === "accreditations"
+                  ? dark
+                    ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
+                    : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
+                  : dark
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
+                  : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
+              }`}
+            >
+              <span>مدارسنا</span>
+            </button>
 
-                <DropdownMenuItem onClick={() => go("/accreditations")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer font-bold text-xs">
-                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
-                    <Award size={16} />
-                  </div>
-                  <div>
-                    <div className="font-black text-sm">الاعتمادات ومراكز الاختبارات</div>
-                    <div className="text-[10px] text-slate-400">كوجنيا الأمريكية، ومراكز IELTS و SAT و ACT</div>
-                  </div>
-                </DropdownMenuItem>
+            {/* 2. القبول والتسجيل (رابط مباشر فوري) */}
+            <button
+              onClick={() => go("/admissions")}
+              className={`flex items-center px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none cursor-pointer ${
+                currentActive === "admissions"
+                  ? dark
+                    ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
+                    : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
+                  : dark
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
+                  : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
+              }`}
+            >
+              <span>القبول والتسجيل</span>
+            </button>
 
-                <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/5"} />
-
-                <DropdownMenuItem onClick={() => go("/about")} className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer text-xs font-bold text-slate-500 hover:text-emerald-500">
-                  <MapPin size={14} />
-                  <span>فروعنا ومجمعاتنا بالمدينة المنورة</span>
-                </DropdownMenuItem>
-
-                <a href="https://live.aqeeq.edu.sa/jobs" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold text-slate-500 hover:text-emerald-500">
-                  <div className="flex items-center gap-2.5">
-                    <Briefcase size={14} />
-                    <span>بوابة التوظيف الرسمية</span>
-                  </div>
-                  <ExternalLink size={12} className="opacity-50" />
-                </a>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* 2. القبول والتسجيل ▾ */}
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none ${
-                    currentActive === "admissions"
-                      ? dark
-                        ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
-                        : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
-                      : dark
-                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
-                      : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
-                  }`}
-                >
-                  <span>القبول والتسجيل</span>
-                  <ChevronDown size={12} className="opacity-70" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className={`w-72 p-2 rounded-2xl border shadow-2xl backdrop-blur-2xl ${dark ? "bg-[#0c1218]/95 border-white/15 text-white" : "bg-white/95 border-black/10 text-slate-900"}`}>
-                <DropdownMenuItem onClick={() => go("/admissions")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer font-bold text-xs">
-                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
-                    <Calculator size={16} />
-                  </div>
-                  <div>
-                    <div className="font-black text-sm">جدول الرسوم الدراسية</div>
-                    <div className="text-[10px] text-slate-400">لكافة المراحل أهلي ودولي مع الخصومات</div>
-                  </div>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => go("/admissions#admission-form-section")} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer font-bold text-xs">
-                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
-                    <Send size={16} />
-                  </div>
-                  <div>
-                    <div className="font-black text-sm">تقديم طلب تسجيل إلكتروني</div>
-                    <div className="text-[10px] text-slate-400">حجز مقعد دراسي والتواصل مع القبول</div>
-                  </div>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/5"} />
-
-                <DropdownMenuItem onClick={() => go("/admissions#tuition-fees-section")} className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer text-xs font-bold text-slate-500 hover:text-emerald-500">
-                  <Smartphone size={14} />
-                  <span>تطبيق أولياء الأمور (سداد ونداء)</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             {/* 3. عناصر استوديو العقيق المباشرة في الهيدر */}
             <VisualEditable
