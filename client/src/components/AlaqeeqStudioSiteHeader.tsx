@@ -124,17 +124,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 }
                 alt="شعار مدارس العقيق الأهلية والدولية"
                 className={`max-h-full max-w-full object-contain transition duration-200 ${
-                  isNationalDay
-                    ? dark
-                      ? "drop-shadow-[0_2px_12px_rgba(90,186,28,0.25)]"
-                      : "drop-shadow-[0_1px_3px_rgba(1,90,55,0.18)]"
-                    : dark
-
-
+                  dark
                     ? "brightness-0 invert opacity-95"
+                    : isNationalDay
+                    ? "drop-shadow-[0_1px_3px_rgba(1,90,55,0.18)]"
                     : ""
                 }`}
               />
+
 
             </button>
 

@@ -1621,12 +1621,10 @@ export default function AlaqeeqStudioPublicPage() {
                 }
                 alt="مدارس العقيق"
                 className={`h-9 w-auto object-contain transition ${
-                  isNationalDay
-                    ? dark
-                      ? "drop-shadow-[0_2px_8px_rgba(90,186,28,0.2)]"
-                      : "drop-shadow-[0_1px_3px_rgba(96,124,79,0.15)]"
-                    : dark
+                  dark
                     ? "brightness-0 invert opacity-90"
+                    : isNationalDay
+                    ? "drop-shadow-[0_1px_3px_rgba(1,90,55,0.15)]"
                     : "opacity-90"
                 }`}
               />
@@ -1637,15 +1635,14 @@ export default function AlaqeeqStudioPublicPage() {
                 defaultText="استوديو العقيق الرقمي"
                 as="span"
                 className={`text-xs font-black tracking-wide ${
-                  isNationalDay
-                    ? dark
-                      ? "text-[#5aba1c]"
-                      : "text-[#015a37]"
-                    : dark
+                  dark
                     ? "text-slate-300"
+                    : isNationalDay
+                    ? "text-[#015a37]"
                     : "text-slate-700"
                 }`}
               />
+
 
 
 
