@@ -71,7 +71,7 @@ export function AqeeqUnifiedVideoFrame({
             id: sourceUrl,
             title: title || "تغطية مرئية",
             coverUrl: resolvedPoster,
-            hostName: isYouTube ? "يوتيوب العقيق" : isDrive ? "جوجل درايف" : "استوديو العقيق",
+            hostName: isYouTube ? "يوتيوب العقيق" : isDrive ? "جوجل درايف" : "مدارس العقيق",
             mediaUrl: sourceUrl,
             sourceType: isYouTube ? "youtube" : isDrive ? "drive" : "direct",
           },
@@ -239,7 +239,7 @@ export function AqeeqUnifiedVideoFrame({
                 id: sourceUrl,
                 title: title || "تغطية مرئية",
                 coverUrl: resolvedPoster,
-                hostName: "استوديو العقيق",
+                hostName: "مدارس العقيق",
                 mediaUrl: sourceUrl,
               },
             })
@@ -410,7 +410,7 @@ export function AqeeqVideoPlayer({
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                   <p className="text-[10px] sm:text-xs font-bold text-amber-300/80 truncate">
-                    مشغل استوديو العقيق السينمائي 🎬
+                    تغطيات مدارس العقيق المرئية 🎬
                   </p>
                 </div>
               </div>

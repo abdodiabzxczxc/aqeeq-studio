@@ -150,7 +150,7 @@ export default function AqeeqArticlesStudioPage() {
 
   const createMutation = trpc.articles.createAdminArticle.useMutation({
     onSuccess: () => {
-      toast.success("تم نشر المقال بنجاح في استوديو العقيق!");
+      toast.success("تم نشر المقال بنجاح في بوابة المدارس!");
       setIsCreateOpen(false);
       setNewTitle("");
       setNewContent("");
@@ -220,7 +220,7 @@ export default function AqeeqArticlesStudioPage() {
       <div className={`min-h-screen grid place-items-center p-6 text-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
         <div className="max-w-md space-y-4">
           <BookOpen className="mx-auto text-amber-400" size={48} />
-          <h2 className="text-xl font-black">استوديو إدارة المقالات مخصص للمشرفين فقط</h2>
+          <h2 className="text-xl font-black">إدارة المقالات مخصصة للمشرفين فقط</h2>
           <p className="text-xs text-slate-400">يرجى تسجيل الدخول بحساب مسؤول للوصول إلى غرفة التحكم بالمقالات.</p>
           <Button onClick={() => navigate("/login")} className="bg-[#f8ca14] text-black font-black">
             تسجيل الدخول
@@ -233,7 +233,7 @@ export default function AqeeqArticlesStudioPage() {
   return (
     <div dir="rtl" className={`min-h-screen font-[Tajawal,sans-serif] ${dark ? "bg-[#080808] text-white" : "bg-[#f8f9fc] text-slate-900"}`}>
       {/* Site Header */}
-      <AlaqeeqStudioSiteHeader title="استوديو إدارة المقالات" active="articles" />
+      <AlaqeeqStudioSiteHeader title="إدارة المقالات" active="articles" />
 
       {/* Studio Command Bar */}
       <header className={`sticky top-[66px] sm:top-[80px] z-30 border-b backdrop-blur-xl transition ${
@@ -246,9 +246,9 @@ export default function AqeeqArticlesStudioPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black">استوديو تحرير ومراجعة المقالات</h1>
+                <h1 className="text-lg font-black">تحرير ومراجعة مقالات مدارس العقيق</h1>
                 <span className="rounded-full bg-[#f8ca14]/20 border border-[#f8ca14]/40 px-2.5 py-0.5 text-[10px] font-black text-[#f8ca14]">
-                  STUDIO PRO
+                  MANAGEMENT
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-bold">التحكم المركزي بمقالات الطلاب والمعلمين والافتتاحيات الرسمية</p>
@@ -648,7 +648,7 @@ export default function AqeeqArticlesStudioPage() {
           <DialogHeader className="text-right border-b border-current/10 pb-4">
             <DialogTitle className="text-lg font-black flex items-center gap-2">
               <PenTool size={18} className="text-[#f8ca14]" />
-              <span>كتابة مقال رسمي جديد للاستوديو</span>
+              <span>كتابة مقال رسمي جديد</span>
             </DialogTitle>
           </DialogHeader>
 

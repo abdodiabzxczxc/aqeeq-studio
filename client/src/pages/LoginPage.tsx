@@ -32,7 +32,7 @@ export default function LoginPage() {
         password,
       });
       toast.success("تم تسجيل الدخول بنجاح", {
-        description: "مرحبًا بك في استوديو العقيق",
+        description: "مرحبًا بك في بوابة مدارس العقيق الأهلية والدولية",
       });
       navigate("/");
     } catch (err: any) {
@@ -67,7 +67,7 @@ export default function LoginPage() {
             className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 transition hover:text-amber-200"
           >
             <ArrowRight size={15} />
-            العودة إلى استوديو العقيق
+            العودة إلى بوابة مدارس العقيق
           </button>
           <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-300/80">
             <Sparkles size={13} />
@@ -86,7 +86,7 @@ export default function LoginPage() {
               تسجيل الدخول
             </h1>
             <p className="mt-2 text-xs leading-6 text-slate-400">
-              أدخل بيانات حسابك للوصول إلى لوحة التحكم واستوديوهات النشر.
+              أدخل بيانات حسابك للوصول إلى لوحة التحكم وإدارة المنصة.
             </p>
           </div>
 

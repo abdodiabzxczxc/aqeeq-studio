@@ -335,7 +335,7 @@ export default function AqeeqShowcaseStudioPage() {
   if (!showcase) {
     return (
       <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-        <AlaqeeqStudioSiteHeader title="استوديو الأخبار والعروض" active="showcase" logoUrl={issues[0]?.headerLogoUrl} />
+        <AlaqeeqStudioSiteHeader title="إدارة الأخبار والعروض" active="showcase" logoUrl={issues[0]?.headerLogoUrl} />
         <section className="mx-auto max-w-3xl px-5 py-24 text-center">
           <Sparkles className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={50} />
           <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>جهّز الأخبار والعروض</h1>
@@ -357,7 +357,7 @@ export default function AqeeqShowcaseStudioPage() {
 
   return (
     <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-      <AlaqeeqStudioSiteHeader title="استوديو الأخبار والعروض" active="showcase" logoUrl={form.headerLogoUrl || issues[0]?.headerLogoUrl} />
+      <AlaqeeqStudioSiteHeader title="إدارة الأخبار والعروض" active="showcase" logoUrl={form.headerLogoUrl || issues[0]?.headerLogoUrl} />
 
       {/* Hero Header Bar */}
       <section className={`relative overflow-hidden border-b transition ${
@@ -367,10 +367,10 @@ export default function AqeeqShowcaseStudioPage() {
         <div className="relative mx-auto flex max-w-[1360px] flex-col gap-6 px-5 py-10 md:flex-row md:items-end md:justify-between md:px-8">
           <div>
             <p className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-              AQEEQ STUDIO · LIVE FEED
+              ALAQEEQ SCHOOLS · NEWS DESK
             </p>
             <h1 className={`mt-2 text-3xl font-black md:text-4xl ${dark ? "text-white" : "text-black"}`}>
-              استوديو <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>الأخبار والعروض.</span>
+              إدارة <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>الأخبار والعروض.</span>
             </h1>
             <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-400" : "text-slate-600"}`}>
               هنا تتحكم في الصفحة ومصدرها وكل منشور جديد قبل عرضه للزوار.

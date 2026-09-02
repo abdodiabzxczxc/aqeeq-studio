@@ -36,7 +36,7 @@ type AqeeqUniversalMediaPickerModalProps = {
 export function AqeeqUniversalMediaPickerModal({
   open,
   onOpenChange,
-  title = "اختيار صورة أو غلاف من محتوى الاستوديو",
+  title = "اختيار صورة أو غلاف من مكتبة وسائط المدارس",
   currentSelectedUrl,
   onSelect,
   dark = true,

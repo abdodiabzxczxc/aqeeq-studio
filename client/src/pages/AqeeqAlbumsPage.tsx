@@ -254,7 +254,7 @@ export default function AqeeqAlbumsPage() {
                       <button onClick={() => navigate("/albums/manage")} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
                         dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                       }`}>
-                        <Settings2 size={16} />دخول استوديو الألبومات
+                        <Settings2 size={16} />إدارة ألبومات المدارس
                       </button>
                       <button onClick={() => setIsTvMode(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
                         dark ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20" : "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 hover:bg-emerald-600/20"
@@ -291,7 +291,7 @@ export default function AqeeqAlbumsPage() {
         <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
           <Camera className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={48} />
           <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>أول ألبوم في الطريق</h1>
-          <p className={`mx-auto mt-3 max-w-md text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}>بعد نشر أول ألبوم من الاستوديو، ستظهر هنا ذاكرة الفعالية.</p>
+          <p className={`mx-auto mt-3 max-w-md text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}>بعد نشر أول ألبوم، ستظهر هنا فعاليات وذكريات مدارس العقيق.</p>
           {isAdmin ? <button onClick={() => navigate("/albums/manage")} className={`mt-6 rounded-xl px-4 py-3 text-xs font-black ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}>إنشاء أول ألبوم</button> : null}
         </section>
       )}

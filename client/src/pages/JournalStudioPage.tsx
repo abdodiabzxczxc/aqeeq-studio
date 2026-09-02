@@ -293,7 +293,7 @@ export default function JournalStudioPage() {
 
   return (
     <main dir="rtl" className={"min-h-screen aq-public-shell " + (dark ? "bg-black text-white" : "bg-white text-black")}>
-      <AlaqeeqStudioSiteHeader title="استوديو مجلة العقيق" active="journal" logoUrl={headerLogoUrl || issues[0]?.headerLogoUrl} />
+      <AlaqeeqStudioSiteHeader title="إدارة مجلة العقيق" active="journal" logoUrl={headerLogoUrl || issues[0]?.headerLogoUrl} />
 
       {/* Hero Header Bar */}
       <section className={"relative overflow-hidden border-b transition " + (
@@ -303,10 +303,10 @@ export default function JournalStudioPage() {
         <div className="relative mx-auto flex max-w-[1360px] flex-col gap-6 px-5 py-10 md:flex-row md:items-end md:justify-between md:px-8">
           <div>
             <p className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-              AQEEQ STUDIO · JOURNAL DESK
+              ALAQEEQ SCHOOLS · JOURNAL MANAGEMENT
             </p>
             <h1 className={"mt-2 text-3xl font-black md:text-4xl " + (dark ? "text-white" : "text-black")}>
-              استوديو <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>مجلة العقيق.</span>
+              إدارة وتحرير <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>مجلة العقيق.</span>
             </h1>
             <p className={"mt-3 max-w-2xl text-sm leading-8 " + (dark ? "text-slate-400" : "text-slate-600")}>
               إدارة الأعداد الدورية، ترتيب الصفحات، الاستيراد التلقائي من Drive أو PDF ونشر المحتوى.

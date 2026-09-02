@@ -453,7 +453,7 @@ export function AqeeqFaceSearchModal({
                         className="w-full sm:flex-1 flex items-center justify-center gap-2 cursor-pointer rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 py-3 px-4 text-xs font-black text-slate-950 shadow-md transition hover:scale-[1.02] active:scale-95"
                       >
                         <ImageIcon size={16} />
-                        <span>اختيار من استوديو الصور</span>
+                        <span>اختيار من أرشيف الصور</span>
                       </label>
 
                       <label

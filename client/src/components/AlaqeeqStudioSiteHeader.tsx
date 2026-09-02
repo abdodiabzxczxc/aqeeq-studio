@@ -501,7 +501,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               }`}
               aria-label="قائمة الموقع"
             >
-              <VisualIcon id="aqeeq-studio-mobile-menu-icon" label="أيقونة قائمة الاستوديو" icon={mobileMenuOpen ? "close" : "menu"} size={18} />
+              <VisualIcon id="aqeeq-studio-mobile-menu-icon" label="أيقونة القائمة" icon={mobileMenuOpen ? "close" : "menu"} size={18} />
             </button>
           </div>
 
@@ -586,11 +586,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   </div>
                 </div>
 
-                {/* 3. استوديو العقيق */}
+                {/* 3. المركز الإعلامي */}
                 <div className="rounded-xl border border-current/10 p-2.5">
                   <div className="text-[11px] font-black text-blue-500 mb-2 flex items-center gap-1.5">
                     <BookOpen size={13} />
-                    <span>استوديو العقيق (المركز الإعلامي)</span>
+                    <span>المركز الإعلامي والمحتوى</span>
                   </div>
                   <div className="space-y-1">
                     <button onClick={() => go("/journal")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">

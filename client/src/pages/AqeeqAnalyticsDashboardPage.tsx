@@ -126,10 +126,10 @@ export default function AqeeqAnalyticsDashboardPage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/studio")}
+              onClick={() => navigate("/")}
               className="border-white/15 text-xs font-black hover:bg-white/10"
             >
-              العودة للاستوديو
+              العودة للرئيسية
             </Button>
           </div>
         </div>

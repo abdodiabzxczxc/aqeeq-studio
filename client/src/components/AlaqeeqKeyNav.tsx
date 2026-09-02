@@ -51,9 +51,9 @@ export default function AlaqeeqKeyNav({ collapsed, onCollapsedChange }: { collap
       { label: "٥. احفظ", path: paths.reports, icon: Archive, hint: "النتائج والذكرى" },
     ] },
     { label: "المحتوى والذكريات", icon: PencilRuler, items: [
-      { label: "Alaqeeq Live", path: "/live", icon: MonitorPlay, hint: "الاستوديو والمسرح" },
+      { label: "Alaqeeq Live", path: "/live", icon: MonitorPlay, hint: "البث المباشر والمسرح" },
       { label: "دار العقيق", path: paths.maison, icon: Crown, hint: "الغلاف والإطلاق" },
-      { label: "استوديو العقيق", path: "/studio", icon: LibraryBig, hint: "المجلة والألبومات والاستوديوهات" },
+      { label: "بوابة المدارس", path: "/", icon: LibraryBig, hint: "المجلة والألبومات والمقالات" },
     ] },
     { label: "التصميم والهوية", icon: Palette, items: [
       { label: "حرّر الموقع", path: "/control?tab=identity", icon: Globe2, hint: "الصفحات والشعارات" },

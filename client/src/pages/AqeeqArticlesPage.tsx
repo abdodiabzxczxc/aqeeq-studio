@@ -612,7 +612,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                   }`}
                 >
                   <Sparkles size={15} />
-                  <span>دخول استوديو المقالات ✍️</span>
+                  <span>إدارة وتحرير المقالات ✍️</span>
                 </button>
               )}
             </div>

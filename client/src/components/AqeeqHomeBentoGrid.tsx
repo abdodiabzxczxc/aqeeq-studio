@@ -41,7 +41,7 @@ export function AqeeqHomeBentoGrid({
     <VisualEditable
       id="studio-highlights-section"
       tag="section"
-      label="قسم جديد الاستوديو (Bento Grid)"
+      label="قسم جديد مدارس العقيق (Bento Grid)"
       as="div"
       className={"w-full py-12 md:py-16 " + (
         isNationalDay
@@ -55,8 +55,8 @@ export function AqeeqHomeBentoGrid({
         <VisualEditable
           id="studio-highlights-kicker"
           tag="text"
-          label="شارة جديد الاستوديو"
-          defaultText={isNationalDay ? "🇸🇦 إبداعات العقيق في اليوم الوطني" : "STUDIO HIGHLIGHTS · LATEST"}
+          label="شارة جديد المدارس"
+          defaultText={isNationalDay ? "🇸🇦 إبداعات العقيق في اليوم الوطني" : "ALAQEEQ SCHOOLS · LATEST HIGHLIGHTS"}
           as="span"
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
             isNationalDay
@@ -75,19 +75,26 @@ export function AqeeqHomeBentoGrid({
         <VisualEditable
           id="studio-highlights-title"
           tag="text"
-          label="عنوان جديد الاستوديو"
-          defaultText={titleOverride || "جديد الاستوديو"}
+          label="عنوان جديد المدارس"
+          defaultText={
+            titleOverride === "جديد الاستوديو"
+              ? "جديد مدارس العقيق"
+              : titleOverride || "جديد مدارس العقيق"
+          }
           as="h2"
           className={`text-2xl sm:text-4xl font-black font-cairo ${
             dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
           }`}
         />
         <VisualEditable
-
           id="studio-highlights-desc"
           tag="text"
-          label="وصف جديد الاستوديو"
-          defaultText={descOverride || "أحدث ما تم نشره وتوثيقه عبر استوديوهات العقيق من وسائط وإصدارات رقمية."}
+          label="وصف جديد المدارس"
+          defaultText={
+            descOverride?.includes("استوديوهات العقيق")
+              ? "أحدث ما تم نشره وتوثيقه في مدارس العقيق من فعاليات وإصدارات رقمية."
+              : descOverride || "أحدث ما تم نشره وتوثيقه في مدارس العقيق من فعاليات وإصدارات رقمية."
+          }
           as="p"
           className={`mt-2 max-w-xl text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}
         />

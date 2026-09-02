@@ -681,7 +681,7 @@ export default function AlaqeeqStudioPublicPage() {
         </div>
       )}
 
-      <AlaqeeqStudioSiteHeader title="استوديو العقيق" active="studio" logoUrl={logoUrl} />
+      <AlaqeeqStudioSiteHeader title="مدارس العقيق الأهلية والدولية" active="studio" logoUrl={logoUrl} />
 
       {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) */}
       {storiesList.length > 0 ? (
@@ -764,11 +764,11 @@ export default function AlaqeeqStudioPublicPage() {
         </section>
       ) : null}
 
-      {/* 2. غلاف استوديو العقيق الرئيسي (Hero Section مع الكفرات المتداخلة) */}
+      {/* 2. غلاف واجهة مدارس العقيق الرئيسية (Hero Section مع الكفرات المتداخلة) */}
       <VisualEditable
         id="studio-hero-section"
         tag="section"
-        label="غلاف استوديو العقيق"
+        label="غلاف واجهة مدارس العقيق"
         as="section"
         className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
           isNationalDay
@@ -803,8 +803,8 @@ export default function AlaqeeqStudioPublicPage() {
               <VisualEditable
                 id="studio-hero-kicker"
                 tag="text"
-                label="شارة غلاف الاستوديو"
-                defaultText="AQEEQ STUDIO · DIGITAL ARCHIVE"
+                label="شارة الغلاف الرئيسي"
+                defaultText="ALAQEEQ SCHOOLS · OFFICIAL PORTAL"
                 as="p"
                 className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
               />
@@ -815,13 +815,13 @@ export default function AlaqeeqStudioPublicPage() {
                 ? dark ? "text-white" : "text-[#032e1d]"
                 : dark ? "text-white" : "text-black"
             )}>
-              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="ذاكرة العقيق" as="span" />
+              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي" defaultText="ذاكرة العقيق" as="span" />
               <br />
               <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
                 <VisualEditable
                   id="studio-hero-accent"
                   tag="text"
-                  label="تكملة عنوان الاستوديو"
+                  label="تكملة العنوان"
                   defaultText="في مكان واحد."
                   as="span"
                 />
@@ -831,8 +831,8 @@ export default function AlaqeeqStudioPublicPage() {
             <VisualEditable
               id="studio-hero-description"
               tag="text"
-              label="وصف غلاف الاستوديو"
-              defaultText="منصة مدارس العقيق الرقمية المتكاملة لتوثيق الفعاليات المدرسية، إصدارات المجلات الدورية، وأحدث الأخبار والعروض في تجربة تفاعلية فاخرة."
+              label="الوصف الرئيسي"
+              defaultText="الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - نلهم الأجيال ونصنع الأثر من خلال بيئة تعليمية رائدة ومعتمدة عالمياً."
               as="p"
               className={"mt-5 max-w-xl text-sm leading-8 " + (
                 isNationalDay
@@ -940,7 +940,7 @@ export default function AlaqeeqStudioPublicPage() {
             )}>
               <VisualImage
                 id="studio-hero-showcase-image"
-                label="صورة أخبار وعروض غلاف الاستوديو"
+                label="صورة غلاف الأخبار"
                 src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "")}
                 alt="غلاف الأخبار والعروض"
                 className="h-full w-full object-cover"
@@ -970,7 +970,7 @@ export default function AlaqeeqStudioPublicPage() {
             >
               <VisualImage
                 id="studio-hero-album-image"
-                label="صورة ألبوم غلاف الاستوديو"
+                label="صورة غلاف الألبومات"
                 src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : (albumCovers.front || "")}
                 alt="غلاف ألبوم العقيق"
                 className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
@@ -1003,7 +1003,7 @@ export default function AlaqeeqStudioPublicPage() {
 
               <VisualImage
                 id="studio-hero-journal-image"
-                label="صورة مجلة غلاف الاستوديو"
+                label="صورة غلاف المجلة"
                 src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : (journalCovers.front || "")}
                 alt="غلاف مجلة العقيق"
                 className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
@@ -1683,7 +1683,7 @@ export default function AlaqeeqStudioPublicPage() {
         </div>
       </VisualEditable>
 
-      {/* 9. فوتر استوديو العقيق الفاخر المنمق والأنيق */}
+      {/* 9. فوتر مدارس العقيق الفاخر المنمق والأنيق */}
       <VisualEditable
         id="studio-footer-section"
         tag="section"
@@ -1721,8 +1721,8 @@ export default function AlaqeeqStudioPublicPage() {
               <VisualEditable
                 id="studio-footer-title"
                 tag="text"
-                label="اسم الاستوديو في الفوتر"
-                defaultText="استوديو العقيق الرقمي"
+                label="اسم المدارس في الفوتر"
+                defaultText="مدارس العقيق الأهلية والدولية"
                 as="span"
                 className={`text-xs font-black tracking-wide ${
                   dark

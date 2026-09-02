@@ -226,8 +226,8 @@ const DEFAULT_ORCHESTRATION = {
     marqueeEnabled: true,
     marqueeBadge: "آخر الأخبار",
     studioHighlightsEnabled: true,
-    studioHighlightsTitle: "جديد الاستوديو",
-    studioHighlightsDesc: "أحدث ما تم نشره وتوثيقه عبر استوديوهات العقيق من وسائط وإصدارات رقمية.",
+    studioHighlightsTitle: "جديد مدارس العقيق",
+    studioHighlightsDesc: "أحدث ما تم نشره وتوثيقه في مدارس العقيق من فعاليات وإصدارات رقمية.",
     libraryEnabled: true,
     libraryTitle: "استكشف المكتبة",
     libraryDesc: "تصفح متكامل وشامل لجميع أرشيفات البودكاست، المقالات، الألبومات والمجلات المدرسية.",
@@ -274,7 +274,7 @@ const DEFAULT_ORCHESTRATION = {
     {
       id: "song-3",
       title: "معزوفة إلهام العقيق (بيانو)",
-      artist: "استوديو العقيق الموسيقي",
+      artist: "كورال مدارس العقيق",
       category: "بيانو وهدوء",
       mediaUrl: "/audio/aqeeq-piano.mp3",
       coverUrl: "",
@@ -703,7 +703,7 @@ const DEFAULT_ORCHESTRATION = {
     const fullUrl = window.location.origin + campaignItemData.viewUrl;
     return [
       "✨ *مدارس العقيق الأهلية والدولية* ✨",
-      "📌 يسعدنا مشاركتكم جديد الاستوديو الرقمي:",
+      "📌 يسعدنا مشاركتكم جديد مدارس العقيق:",
       "",
       "📖 *" + campaignItemData.title + "*",
       "🏷️ التصنيف: " + campaignItemData.typeLabel,
@@ -761,7 +761,7 @@ const DEFAULT_ORCHESTRATION = {
             <div className="hidden sm:block border-r pr-4 border-current/10">
               <div className="flex items-center gap-2">
                 <span className="grid h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                <h1 className="text-base font-black">غرفة قيادة استوديو العقيق</h1>
+                <h1 className="text-base font-black">غرفة قيادة مدارس العقيق</h1>
               </div>
               <p className="text-[11px] font-bold text-slate-400">Executive Admin Command Center</p>
             </div>
@@ -1176,7 +1176,7 @@ const DEFAULT_ORCHESTRATION = {
                       <BookOpen size={18} />
                     </div>
                     <div>
-                      <h3 className="text-base font-black">استوديو كفرات وأغلفة الهيرو (Hero Covers Studio)</h3>
+                      <h3 className="text-base font-black">أغلفة وكفرات الواجهة الرئيسية (Hero Covers)</h3>
                       <p className="text-xs font-bold text-slate-400">التحكم في كفرات الهيرو بالرئيسية وصفحات (المجلة، الألبومات، الأخبار)</p>
                     </div>
                   </div>
@@ -2692,10 +2692,10 @@ const DEFAULT_ORCHESTRATION = {
                     <p className="text-[11px] text-slate-400">شريط متحرك يعرض أحدث العناوين من المقالات والبودكاست والألبومات والمجلات تلقائياً.</p>
                   </div>
 
-                  {/* 2. Studio Highlights Bento */}
+                  {/* 2. School Highlights Bento */}
                   <div className="space-y-2 rounded-2xl border border-current/10 p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن جديد الاستوديو (Bento Grid)</span>
+                      <span className="text-xs font-black">قسم جديد مدارس العقيق (Bento Grid)</span>
                       <input
                         type="checkbox"
                         checked={orchestrationForm.sections.studioHighlightsEnabled !== false}
@@ -2706,14 +2706,14 @@ const DEFAULT_ORCHESTRATION = {
                       type="text"
                       value={orchestrationForm.sections.studioHighlightsTitle || ""}
                       onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsTitle: e.target.value } })}
-                      placeholder="عنوان جديد الاستوديو..."
+                      placeholder="عنوان جديد المدارس..."
                       className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
                     />
                     <textarea
                       rows={2}
                       value={orchestrationForm.sections.studioHighlightsDesc || ""}
                       onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsDesc: e.target.value } })}
-                      placeholder="وصف جديد الاستوديو..."
+                      placeholder="وصف جديد المدارس..."
                       className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
                     />
                   </div>
@@ -3332,8 +3332,8 @@ const DEFAULT_ORCHESTRATION = {
                     <Sparkles size={18} />
                   </div>
                   <div>
-                    <h3 className="text-base font-black">الوصول السريع للاستوديوهات</h3>
-                    <p className="text-xs font-bold text-slate-400">إدارة الأقسام المتخصصة</p>
+                    <h3 className="text-base font-black">إدارة المحتوى والإصدارات</h3>
+                    <p className="text-xs font-bold text-slate-400">إدارة الأقسام والوسائط المدرسية</p>
                   </div>
                 </div>
 
@@ -3346,7 +3346,7 @@ const DEFAULT_ORCHESTRATION = {
                   >
                     <div className="flex items-center gap-3">
                       <BookOpen size={18} className="text-[#f8ca14]" />
-                      <span className="text-xs font-black">استوديو المجلات الدورية</span>
+                      <span className="text-xs font-black">إدارة المجلات الدورية</span>
                     </div>
                     <ArrowUpLeft size={14} className="text-slate-400" />
                   </button>
@@ -3359,7 +3359,7 @@ const DEFAULT_ORCHESTRATION = {
                   >
                     <div className="flex items-center gap-3">
                       <Camera size={18} className="text-emerald-400" />
-                      <span className="text-xs font-black">استوديو ألبومات الفعاليات</span>
+                      <span className="text-xs font-black">إدارة ألبومات الفعاليات</span>
                     </div>
                     <ArrowUpLeft size={14} className="text-slate-400" />
                   </button>
@@ -3372,7 +3372,7 @@ const DEFAULT_ORCHESTRATION = {
                   >
                     <div className="flex items-center gap-3">
                       <Clapperboard size={18} className="text-rose-400" />
-                      <span className="text-xs font-black">استوديو الأخبار والعروض</span>
+                      <span className="text-xs font-black">إدارة الأخبار والعروض</span>
                     </div>
                     <ArrowUpLeft size={14} className="text-slate-400" />
                   </button>
@@ -3700,7 +3700,7 @@ const DEFAULT_ORCHESTRATION = {
                                   : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
                               )}
                             >
-                              <span>الاستوديو</span>
+                              <span>إدارة المحتوى</span>
                               <ArrowUpLeft size={13} />
                             </button>
                           </div>

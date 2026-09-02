@@ -1625,7 +1625,7 @@ aside[data-aq-editor-properties]::before {
 .aq-album-reader-theme-light .aq-album-flipbook .aq-reference-flip-previous:hover,
 .aq-album-reader-theme-light .aq-album-flipbook .aq-reference-flip-next:hover { background: #d6b96a; color: #111820; }
 
-/* الرفوف العامة تتبع الاختيار الموحد المحفوظ من استوديو العقيق */
+/* الرفوف العامة تتبع الاختيار الموحد المحفوظ من مدارس العقيق */
 :root[data-aqeeq-theme="light"] .aq-public-shell,
 :root[data-aqeeq-theme="light"] main.bg-\[\#080b12\] { background: #ffffff !important; color: #000000 !important; }
 :root[data-aqeeq-theme="light"] .aq-public-shell .bg-\[\#10131d\],
@@ -1637,7 +1637,7 @@ aside[data-aq-editor-properties]::before {
 :root[data-aqeeq-theme="light"] .aq-public-shell .text-slate-300,
 :root[data-aqeeq-theme="light"] main.bg-\[\#080b12\] .text-slate-300 { color: #4b5563 !important; }
 
-/* Aqeeq studio identity bridge: the two editor surfaces share one dark-and-gold language. */
+/* Aqeeq school identity bridge: the two editor surfaces share one dark-and-gold language. */
 main:has(.aq-journal-studio-preview) {
   background:
     radial-gradient(circle at 78% -10%, rgba(229,184,79,.12), transparent 22rem),
@@ -1653,7 +1653,7 @@ main:has(.aq-journal-studio-preview) [class*="border-emerald"] { border-color: r
 main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: rgba(229,184,79,.11) !important; }
 main:has(.aq-journal-studio-preview) [class*="bg-emerald-300"] { background-color: #e5b84f !important; color: #17120a !important; }
 
-/* استوديو العقيق يعمل كواجهة موقع مستقلة مع وضعين متماسكين للهوية. */
+/* منصة مدارس العقيق تعمل كواجهة موقع متكاملة مع وضعين متماسكين للهوية. */
 .aq-studio-site {
   --aq-studio-ink: #000000;
   --aq-studio-panel: #0a0a0a;
