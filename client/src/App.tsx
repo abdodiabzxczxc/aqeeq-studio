@@ -53,6 +53,9 @@ import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
 import AqeeqArticlesStudioPage from "./pages/AqeeqArticlesStudioPage";
 import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
 import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
+import AqeeqSchoolAboutPage from "./pages/AqeeqSchoolAboutPage";
+import AqeeqSchoolAdmissionsPage from "./pages/AqeeqSchoolAdmissionsPage";
+import AqeeqSchoolAccreditationsPage from "./pages/AqeeqSchoolAccreditationsPage";
 import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
 
@@ -64,7 +67,15 @@ function Router() {
     <Switch>
       <Route path="/" component={AlaqeeqStudioPage} />
       <Route path="/studio" component={AlaqeeqStudioPage} />
+      <Route path="/about" component={AqeeqSchoolAboutPage} />
+      <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
+      <Route path="/admission" component={AqeeqSchoolAdmissionsPage} />
+      <Route path="/fees" component={AqeeqSchoolAdmissionsPage} />
+      <Route path="/prices" component={AqeeqSchoolAdmissionsPage} />
+      <Route path="/accreditations" component={AqeeqSchoolAccreditationsPage} />
+      <Route path="/quality" component={AqeeqSchoolAccreditationsPage} />
       <Route path="/login" component={LoginPage} />
+
       <Route path="/admin" component={AqeeqAdminDashboardPage} />
       <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
       <Route path="/articles" component={AqeeqArticlesPage} />

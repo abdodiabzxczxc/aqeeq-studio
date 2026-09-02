@@ -37,7 +37,13 @@ import {
   Newspaper,
   Mic,
   Video,
+  Globe2,
+  Users,
+  Send,
+  GraduationCap,
+  Calculator,
 } from "lucide-react";
+
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -809,14 +815,14 @@ export default function AlaqeeqStudioPublicPage() {
                 ? dark ? "text-white" : "text-[#032e1d]"
                 : dark ? "text-white" : "text-black"
             )}>
-              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="ذاكرة العقيق" as="span" />
+              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="مدارس العقيق الأهلية والدولية" as="span" />
               <br />
-              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
+              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#015a37]")}>
                 <VisualEditable
                   id="studio-hero-accent"
                   tag="text"
                   label="تكملة عنوان الاستوديو"
-                  defaultText="في مكان واحد."
+                  defaultText="نلهم الأجيال.. ونصنع الأثر."
                   as="span"
                 />
               </span>
@@ -826,7 +832,7 @@ export default function AlaqeeqStudioPublicPage() {
               id="studio-hero-description"
               tag="text"
               label="وصف غلاف الاستوديو"
-              defaultText="منصة مدارس العقيق الرقمية المتكاملة لتوثيق الفعاليات المدرسية، إصدارات المجلات الدورية، وأحدث الأخبار والعروض في تجربة تفاعلية فاخرة."
+              defaultText="صرح تعليمي رائد للبنين والبنات بالمدينة المنورة يجمع بين أصالة القيم الإسلامية وأحدث المعايير الدولية المعتمدة من كوجنيا ومراكز اختبارات SAT و IELTS."
               as="p"
               className={"mt-5 max-w-xl text-sm leading-8 " + (
                 isNationalDay
@@ -834,6 +840,36 @@ export default function AlaqeeqStudioPublicPage() {
                   : dark ? "text-slate-300" : "text-slate-600"
               )}
             />
+
+            {/* Quick Action CTA Buttons */}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/admissions")}
+                className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black shadow-lg transition active:scale-95 ${
+                  dark
+                    ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
+                    : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white shadow-[#015a37]/25 hover:opacity-95"
+                }`}
+              >
+                <Send size={15} />
+                <span>القبول والتسجيل والرسوم ✦</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/accreditations")}
+                className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
+                  dark
+                    ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
+                    : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
+                }`}
+              >
+                <Award size={15} className="text-[#f8ca14]" />
+                <span>الاعتمادات الدولية</span>
+              </button>
+            </div>
+
 
             {/* Stats Bar */}
             <div className={"mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-4 " + (
@@ -982,8 +1018,61 @@ export default function AlaqeeqStudioPublicPage() {
         </div>
       </VisualEditable>
 
+      {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
+      <section className={`border-b py-3.5 sm:py-4 backdrop-blur-md transition ${
+        dark ? "border-white/10 bg-[#06080d]/90 text-white" : "border-black/5 bg-slate-50/90 text-slate-800"
+      }`}>
+        <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+          <div className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
+            <button
+              type="button"
+              onClick={() => navigate("/accreditations")}
+              className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                <Award size={16} />
+              </span>
+              <span>معتمدة من كوجنيا الأمريكية (Cognia)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/accreditations")}
+              className="hidden sm:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500">
+                <Globe2 size={16} />
+              </span>
+              <span>مركز اختبارات IELTS المعتمد بالمدينة المنورة</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/accreditations")}
+              className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
+                <CheckCircle2 size={16} />
+              </span>
+              <span>مراكز معتمدة لاختبارات SAT و ACT</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/about")}
+              className="hidden md:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
+                <Users size={16} />
+              </span>
+              <span>+10,000 ولي أمر يثقون بمدارسنا</span>
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* ========================================================================= */}
+
       {/* 3. NEW MEDIA DASHBOARD */}
       {/* ========================================================================= */}
       {(orchestration?.sections as any)?.marqueeEnabled !== false && (

@@ -156,11 +156,27 @@ export type LocalMediaAsset = {
   createdAt: Date;
 };
 
+export type LocalAdmissionLead = {
+  id: number;
+  studentName: string;
+  guardianName: string;
+  phone: string;
+  email?: string | null;
+  gradeLevel: string; // "kindergarten" | "primary" | "middle" | "high"
+  track: string; // "national" | "international"
+  gender: string; // "boys" | "girls"
+  notes?: string | null;
+  status: "new" | "contacted" | "admitted" | "rejected";
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type LocalDbState = {
   issues: StoredIssue[];
   albums: StoredAlbum[];
   showcases: StoredShowcase[];
   mediaAssets: LocalMediaAsset[];
+  admissions?: LocalAdmissionLead[];
   settings: Record<string, string>;
   overrides: Record<string, any>;
   nextId: {
@@ -172,6 +188,7 @@ export type LocalDbState = {
     showcasePost: number;
     showcasePostMedia: number;
     mediaAsset: number;
+    admission?: number;
   };
 };
 
@@ -200,6 +217,7 @@ const DEFAULT_STATE: LocalDbState = {
     },
   ],
   mediaAssets: [],
+  admissions: [],
   settings: {},
   overrides: {},
   nextId: {
@@ -211,8 +229,10 @@ const DEFAULT_STATE: LocalDbState = {
     showcasePost: 1,
     showcasePostMedia: 1,
     mediaAsset: 1,
+    admission: 1,
   },
 };
+
 
 let memoryState: LocalDbState | null = null;
 
@@ -1088,4 +1108,45 @@ export const localSettings = {
     saveLocalDb();
   },
 };
+
+export const localAdmissions = {
+  list(): LocalAdmissionLead[] {
+    const db = getLocalDb();
+    if (!db.admissions) db.admissions = [];
+    return [...db.admissions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+  create(data: Omit<LocalAdmissionLead, "id" | "createdAt" | "updatedAt" | "status">): LocalAdmissionLead {
+    const db = getLocalDb();
+    if (!db.admissions) db.admissions = [];
+    if (!db.nextId.admission) db.nextId.admission = (db.admissions.length || 0) + 1;
+    const item: LocalAdmissionLead = {
+      id: db.nextId.admission++,
+      ...data,
+      status: "new",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    db.admissions.unshift(item);
+    saveLocalDb();
+    return item;
+  },
+  updateStatus(id: number, status: LocalAdmissionLead["status"]): LocalAdmissionLead | null {
+    const db = getLocalDb();
+    if (!db.admissions) db.admissions = [];
+    const item = db.admissions.find((a: LocalAdmissionLead) => a.id === id);
+    if (!item) return null;
+    item.status = status;
+    item.updatedAt = new Date();
+    saveLocalDb();
+    return item;
+  },
+  delete(id: number): boolean {
+    const db = getLocalDb();
+    if (!db.admissions) db.admissions = [];
+    db.admissions = db.admissions.filter((a: LocalAdmissionLead) => a.id !== id);
+    saveLocalDb();
+    return true;
+  },
+};
+
 

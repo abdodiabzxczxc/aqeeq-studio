@@ -1114,6 +1114,23 @@
     "showcase": 2,
     "showcasePost": 21,
     "showcasePostMedia": 1,
-    "mediaAsset": 15
-  }
+    "mediaAsset": 15,
+    "admission": 2
+  },
+  "admissions": [
+    {
+      "id": 1,
+      "studentName": "فهد بن خالد الحربي",
+      "guardianName": "خالد الحربي",
+      "phone": "0551234567",
+      "email": "fahad@example.com",
+      "gradeLevel": "primary",
+      "track": "international",
+      "gender": "boys",
+      "notes": "طالب متميز في الرياضيات",
+      "status": "new",
+      "createdAt": "2026-09-02T13:52:26.696Z",
+      "updatedAt": "2026-09-02T13:52:26.696Z"
+    }
+  ]
 }

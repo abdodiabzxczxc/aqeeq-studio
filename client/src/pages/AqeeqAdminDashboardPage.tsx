@@ -59,7 +59,14 @@ import {
   Newspaper,
   Mic,
   Video,
+  GraduationCap,
+  PhoneCall,
+  MessageCircle,
+  FileSpreadsheet,
+  UserCheck,
+  Building2,
 } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -84,7 +91,7 @@ function SnapchatIcon({ size = 14, className = "" }: { size?: number; className?
   );
 }
 
-type TabKey = "radar" | "orchestration" | "users" | "content" | "broadcast" | "articles" | "podcast" | "music" | "whatsapp";
+type TabKey = "radar" | "orchestration" | "admissions" | "users" | "content" | "broadcast" | "articles" | "podcast" | "music" | "whatsapp";
 
 export default function AqeeqAdminDashboardPage() {
   const [, navigate] = useLocation();
@@ -94,7 +101,10 @@ export default function AqeeqAdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
+  const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
+  const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const utils = trpc.useUtils();
+
 
   // Admin Overview Queries
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = trpc.executiveAdmin.getOverviewStats.useQuery(undefined, {
@@ -127,6 +137,32 @@ export default function AqeeqAdminDashboardPage() {
     { slug: "news-offers" },
     { enabled: Boolean(isAuthenticated && user?.role === "admin") }
   );
+
+  const { data: admissionsList = [], refetch: refetchAdmissions } = trpc.admissions.list.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+    refetchInterval: 15000,
+  });
+
+  const updateAdmissionStatusMutation = trpc.admissions.updateStatus.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث حالة طلب القبول بنجاح");
+      refetchAdmissions();
+    },
+    onError: (err) => {
+      toast.error(err.message || "فشل تحديث حالة الطلب");
+    },
+  });
+
+  const deleteAdmissionMutation = trpc.admissions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("تم حذف الطلب بنجاح");
+      refetchAdmissions();
+    },
+    onError: (err) => {
+      toast.error(err.message || "فشل حذف الطلب");
+    },
+  });
+
 
 const DEFAULT_ORCHESTRATION = {
   nav: {
@@ -789,6 +825,7 @@ const DEFAULT_ORCHESTRATION = {
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-5 sm:px-8 overflow-x-auto scrollbar-none pb-2">
           {[
             { key: "radar", label: "مركز القيادة والرادار", icon: LayoutDashboard },
+            { key: "admissions", label: "طلبات القبول والتسجيل 📥", icon: GraduationCap, badge: admissionsList.filter((a: any) => a.status === "new").length || undefined },
             { key: "orchestration", label: "تخصيص الواجهة والسكاشن والكفرات", icon: Palette, alert: false },
             { key: "users", label: "إدارة المشرفين والصلاحيات", icon: Users, badge: usersList.length },
             { key: "content", label: "الجدول الموحد للمحتوى", icon: Layers, badge: masterContent.length },
@@ -798,6 +835,7 @@ const DEFAULT_ORCHESTRATION = {
             { key: "music", label: "أغاني وراديو العقيق 🎵", icon: Headphones, badge: (orchestrationForm.schoolSongs || []).length },
             { key: "whatsapp", label: "مُولّد حملات الواتساب وQR", icon: Share2 },
           ].map((tab) => {
+
             const Icon = tab.icon;
             const active = activeTab === tab.key;
             return (
@@ -4738,7 +4776,306 @@ const DEFAULT_ORCHESTRATION = {
             </div>
           </div>
         )}
+
+        {/* ==================== TAB: ADMISSIONS INBOX ==================== */}
+        {activeTab === "admissions" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Header & Actions */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
+              <div>
+                <h2 className="text-xl font-black flex items-center gap-2">
+                  <GraduationCap size={22} className="text-[#f8ca14]" />
+                  <span>صندوق طلبات القبول والتسجيل الإلكتروني</span>
+                </h2>
+                <p className="text-xs font-bold text-slate-400 mt-1">
+                  إدارة طلبات أولياء الأمور وحجز المقاعد، وتحديث الحالات، والتواصل المباشر عبر الواتساب والهاتف
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const csvRows = [
+                      ["المعرف", "اسم الطالب", "اسم ولي الأمر", "رقم الجوال", "البريد", "المرحلة", "المسار", "الفرع", "الحالة", "تاريخ التقديم"],
+                      ...admissionsList.map((a: any) => [
+                        a.id,
+                        `"${a.studentName}"`,
+                        `"${a.guardianName}"`,
+                        `"${a.phone}"`,
+                        `"${a.email || ''}"`,
+                        `"${a.gradeLevel}"`,
+                        `"${a.track}"`,
+                        `"${a.gender}"`,
+                        `"${a.status}"`,
+                        `"${new Date(a.createdAt).toLocaleString('ar-SA')}"`,
+                      ]),
+                    ];
+                    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.map((e) => e.join(",")).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `aqeeq-admissions-${new Date().toISOString().slice(0, 10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    toast.success("تم تصدير ملف الطلبات بنجاح!");
+                  }}
+                  className="rounded-xl text-xs font-bold gap-1.5"
+                >
+                  <FileSpreadsheet size={15} />
+                  <span>تصدير Excel (CSV)</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => refetchAdmissions()}
+                  className="rounded-xl text-xs font-bold gap-1.5"
+                >
+                  <RefreshCw size={14} />
+                  <span>تحديث</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Metrics Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className={`p-5 rounded-2xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
+                <span className="text-xs font-bold text-slate-400">إجمالي طلبات التسجيل</span>
+                <p className="text-2xl font-black mt-2">{admissionsList.length}</p>
+              </div>
+
+              <div className={`p-5 rounded-2xl border ${dark ? "border-amber-500/20 bg-amber-500/5" : "border-amber-200 bg-amber-50/50"}`}>
+                <span className="text-xs font-black text-amber-600 dark:text-amber-400">طلبات جديدة (بانتظار التواصل)</span>
+                <p className="text-2xl font-black mt-2 text-amber-600 dark:text-amber-400">
+                  {admissionsList.filter((a: any) => a.status === "new").length}
+                </p>
+              </div>
+
+              <div className={`p-5 rounded-2xl border ${dark ? "border-blue-500/20 bg-blue-500/5" : "border-blue-200 bg-blue-50/50"}`}>
+                <span className="text-xs font-black text-blue-600 dark:text-blue-400">تم التواصل معهم</span>
+                <p className="text-2xl font-black mt-2 text-blue-600 dark:text-blue-400">
+                  {admissionsList.filter((a: any) => a.status === "contacted").length}
+                </p>
+              </div>
+
+              <div className={`p-5 rounded-2xl border ${dark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-200 bg-emerald-50/50"}`}>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">تم اعتماد القبول ✅</span>
+                <p className="text-2xl font-black mt-2 text-emerald-600 dark:text-emerald-400">
+                  {admissionsList.filter((a: any) => a.status === "admitted").length}
+                </p>
+              </div>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-4 ${
+              dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"
+            }`}>
+              <div className="flex items-center gap-2 overflow-x-auto">
+                {[
+                  { key: "all", label: "كافة الطلبات" },
+                  { key: "new", label: "جديد 🟡" },
+                  { key: "contacted", label: "تم التواصل 📞" },
+                  { key: "admitted", label: "تم القبول ✅" },
+                  { key: "rejected", label: "مرفوض ❌" },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setAdmissionsFilter(tab.key)}
+                    className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition shrink-0 ${
+                      admissionsFilter === tab.key
+                        ? dark ? "bg-[#f8ca14] text-black" : "bg-[#015a37] text-white"
+                        : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative min-w-[240px] flex-1 sm:flex-none">
+                <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="بحث باسم الطالب أو الجوال..."
+                  value={admissionsSearch}
+                  onChange={(e) => setAdmissionsSearch(e.target.value)}
+                  className={`w-full rounded-xl border py-2 pr-9 pl-3 text-xs outline-none ${
+                    dark ? "border-white/10 bg-black/50 text-white" : "border-black/10 bg-slate-50 text-slate-900"
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Leads Table */}
+            {(() => {
+              const filtered = admissionsList.filter((item: any) => {
+                const matchesFilter = admissionsFilter === "all" || item.status === admissionsFilter;
+                const matchesSearch =
+                  !admissionsSearch ||
+                  item.studentName?.toLowerCase().includes(admissionsSearch.toLowerCase()) ||
+                  item.guardianName?.toLowerCase().includes(admissionsSearch.toLowerCase()) ||
+                  item.phone?.includes(admissionsSearch);
+                return matchesFilter && matchesSearch;
+              });
+
+              if (filtered.length === 0) {
+                return (
+                  <div className={`text-center py-16 rounded-3xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white"}`}>
+                    <GraduationCap size={40} className="mx-auto text-slate-400 mb-3 opacity-50" />
+                    <h4 className="font-black text-sm">لا توجد طلبات قبول تطابق هذا البحث</h4>
+                    <p className="text-xs text-slate-500 mt-1">الطلبات الجديدة التي يقدمها أولياء الأمور ستظهر هنا فوراً</p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className={`rounded-3xl border overflow-hidden shadow-lg ${
+                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
+                }`}>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right border-collapse text-xs">
+                      <thead>
+                        <tr className={`border-b font-black ${
+                          dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/5 bg-slate-50 text-slate-700"
+                        }`}>
+                          <th className="p-4">تاريخ التقديم</th>
+                          <th className="p-4">اسم الطالب</th>
+                          <th className="p-4">المرحلة والمسار</th>
+                          <th className="p-4">ولي الأمر والجوال</th>
+                          <th className="p-4 text-center">التواصل المباشر</th>
+                          <th className="p-4">حالة الطلب</th>
+                          <th className="p-4">ملاحظات</th>
+                          <th className="p-4 text-center">إجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-current/5">
+                        {filtered.map((lead: any) => {
+                          const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
+                          const waMessage = encodeURIComponent(
+                            `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
+                          );
+                          const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
+
+                          return (
+                            <tr key={lead.id} className="hover:bg-current/5 transition">
+                              <td className="p-4 text-slate-400 font-mono whitespace-nowrap">
+                                {new Date(lead.createdAt).toLocaleDateString("ar-SA", {
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </td>
+
+                              <td className="p-4 font-black text-sm">
+                                {lead.studentName}
+                              </td>
+
+                              <td className="p-4 space-y-1">
+                                <span className="inline-block rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
+                                  {lead.track === "international" ? "🌐 مسار دولي" : "🇸🇦 مسار أهلي"}
+                                </span>
+                                <div className="text-[11px] text-slate-500">
+                                  {lead.gradeLevel === "kindergarten"
+                                    ? "رياض الأطفال (KG)"
+                                    : lead.gradeLevel === "primary"
+                                    ? "المرحلة الابتدائية"
+                                    : lead.gradeLevel === "middle"
+                                    ? "المرحلة المتوسطة"
+                                    : "المرحلة الثانوية"}
+                                  {" · "}
+                                  {lead.gender === "girls" ? "مجمع البنات" : "مجمع البنين"}
+                                </div>
+                              </td>
+
+                              <td className="p-4">
+                                <div className="font-bold">{lead.guardianName}</div>
+                                <div className="text-slate-400 font-mono text-[11px]" dir="ltr">{lead.phone}</div>
+                              </td>
+
+                              <td className="p-4 text-center">
+                                <div className="inline-flex items-center gap-2">
+                                  <a
+                                    href={`tel:${lead.phone}`}
+                                    className="grid h-8 w-8 place-items-center rounded-xl bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition"
+                                    title="اتصال هاتفي"
+                                  >
+                                    <PhoneCall size={14} />
+                                  </a>
+
+                                  <a
+                                    href={waUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 hover:bg-emerald-600 hover:text-white transition"
+                                    title="محادثة واتساب مباشرة"
+                                  >
+                                    <MessageCircle size={14} />
+                                  </a>
+                                </div>
+                              </td>
+
+                              <td className="p-4">
+                                <select
+                                  value={lead.status}
+                                  onChange={(e) =>
+                                    updateAdmissionStatusMutation.mutate({
+                                      id: lead.id,
+                                      status: e.target.value as any,
+                                    })
+                                  }
+                                  className={`rounded-lg border px-2.5 py-1 text-[11px] font-black outline-none ${
+                                    lead.status === "new"
+                                      ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
+                                      : lead.status === "contacted"
+                                      ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
+                                      : lead.status === "admitted"
+                                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                                      : "border-red-500/30 bg-red-500/10 text-red-500"
+                                  }`}
+                                >
+                                  <option value="new">جديد 🟡</option>
+                                  <option value="contacted">تم التواصل 📞</option>
+                                  <option value="admitted">تم القبول ✅</option>
+                                  <option value="rejected">مرفوض ❌</option>
+                                </select>
+                              </td>
+
+                              <td className="p-4 text-slate-400 text-[11px] max-w-xs truncate">
+                                {lead.notes || "—"}
+                              </td>
+
+                              <td className="p-4 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (window.confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) {
+                                      deleteAdmissionMutation.mutate({ id: lead.id });
+                                    }
+                                  }}
+                                  className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition"
+                                  title="حذف الطلب"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
       </main>
+
 
       {/* ==================== MODAL: ADD ADMIN USER ==================== */}
       <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>

@@ -6,7 +6,8 @@ import { sdk } from "./_core/sdk";
 import { ENV } from "./_core/env";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, adminAuditorProcedure, adminCoordinatorProcedure, adminCoordinatorAuditorProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { saveLocalDb } from "./localStore";
+import { saveLocalDb, localAdmissions } from "./localStore";
+
 import {
   getUserByUsernameOrEmail,
   verifyPassword,
@@ -2034,6 +2035,58 @@ export const appRouter = router({
         return sendWalkieDispatch(input);
       }),
   }),
+
+  // ==================== 6. Admissions & Registration Leads ====================
+  admissions: router({
+    submit: publicProcedure
+      .input(
+        z.object({
+          studentName: z.string().min(2, "اسم الطالب مطلوب"),
+          guardianName: z.string().min(2, "اسم ولي الأمر مطلوب"),
+          phone: z.string().min(8, "رقم الجوال مطلوب"),
+          email: z.string().email().optional().or(z.literal("")),
+          gradeLevel: z.string(),
+          track: z.string(),
+          gender: z.string(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const lead = localAdmissions.create({
+          studentName: input.studentName,
+          guardianName: input.guardianName,
+          phone: input.phone,
+          email: input.email || null,
+          gradeLevel: input.gradeLevel,
+          track: input.track,
+          gender: input.gender,
+          notes: input.notes || null,
+        });
+        return { success: true, lead };
+      }),
+
+    list: adminProcedure.query(async () => {
+      return localAdmissions.list();
+    }),
+
+    updateStatus: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["new", "contacted", "admitted", "rejected"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return localAdmissions.updateStatus(input.id, input.status);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return localAdmissions.delete(input.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
+
