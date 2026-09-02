@@ -252,8 +252,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           </div>
 
           {/* Center 8 Core Navigation Links (Desktop) */}
-          <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-xs font-black">
-            {/* Home */}
+          {/* Center 8 Core Navigation Links (Desktop) */}
+          <nav dir="rtl" className="hidden lg:flex items-center gap-3.5 xl:gap-6 whitespace-nowrap text-xs font-black">
+            {/* 1. الرئيسية */}
             <button
               onClick={() => go("/")}
               className={`aq-studio-toplink ${currentActive === "studio" ? "aq-studio-toplink--active" : ""}`}
@@ -261,92 +262,104 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               الرئيسية
             </button>
 
-
-            {/* 1. مدارسنا (رابط مباشر فوري) */}
+            {/* 2. مدارسنا */}
             <button
               onClick={() => go("/about")}
-              className={`flex items-center px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none cursor-pointer ${
-                currentActive === "about" || currentActive === "accreditations"
-                  ? dark
-                    ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
-                    : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
-                  : dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
-                  : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
-              }`}
+              className={`aq-studio-toplink ${
+                currentActive === "about" || currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
+              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
-              <span>مدارسنا</span>
+              مدارسنا
             </button>
 
-            {/* 2. القبول والتسجيل (رابط مباشر فوري) */}
+            {/* 3. القبول والتسجيل */}
             <button
               onClick={() => go("/admissions")}
-              className={`flex items-center px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none cursor-pointer ${
-                currentActive === "admissions"
-                  ? dark
-                    ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
-                    : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
-                  : dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
-                  : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
-              }`}
+              className={`aq-studio-toplink ${
+                currentActive === "admissions" ? "aq-studio-toplink--active" : ""
+              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
-              <span>القبول والتسجيل</span>
+              القبول والتسجيل
             </button>
 
-
-            {/* 3. عناصر استوديو العقيق المباشرة في الهيدر */}
+            {/* 4. المجلة */}
             <VisualEditable
               id="aqeeq-studio-nav-journal"
               tag="button"
               label="اسم رابط المجلة"
-              defaultText={orchestration?.nav?.journalLabel || "مجلة العقيق"}
+              defaultText={
+                orchestration?.nav?.journalLabel === "مجلة العقيق"
+                  ? "المجلة"
+                  : orchestration?.nav?.journalLabel || "المجلة"
+              }
               as="button"
               onAction={() => go("/journal")}
               className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
             />
 
+            {/* 5. الألبومات */}
             <VisualEditable
               id="aqeeq-studio-nav-albums"
               tag="button"
               label="اسم رابط الألبوم"
-              defaultText={orchestration?.nav?.albumsLabel || "ألبوم العقيق"}
+              defaultText={
+                orchestration?.nav?.albumsLabel === "ألبوم العقيق"
+                  ? "الألبومات"
+                  : orchestration?.nav?.albumsLabel || "الألبومات"
+              }
               as="button"
               onAction={() => go("/albums")}
               className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
             />
 
+            {/* 6. أثير */}
             <VisualEditable
               id="aqeeq-studio-nav-podcast"
               tag="button"
-              label="اسم رابط أثير العقيق"
-              defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق"}
+              label="اسم رابط أثير"
+              defaultText={
+                (orchestration?.nav as any)?.podcastLabel === "أثير العقيق" ||
+                (orchestration?.nav as any)?.podcastLabel === "أثير العقيق 🎙️"
+                  ? "أثير"
+                  : (orchestration?.nav as any)?.podcastLabel || "أثير"
+              }
               as="button"
               onAction={() => go("/atheer")}
               className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
             />
 
+            {/* 7. المقالات */}
             <VisualEditable
               id="aqeeq-studio-nav-articles"
               tag="button"
               label="اسم رابط المقالات"
-              defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات"}
+              defaultText={
+                (orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" ||
+                (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق"
+                  ? "المقالات"
+                  : (orchestration?.nav as any)?.articlesLabel || "المقالات"
+              }
               as="button"
               onAction={() => go("/articles")}
               className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
             />
 
-
+            {/* 8. الأخبار */}
             <VisualEditable
               id="aqeeq-studio-nav-showcase"
               tag="button"
-              label="اسم رابط الأخبار والعروض"
-              defaultText={orchestration?.nav?.showcaseLabel || "الأخبار والعروض"}
+              label="اسم رابط الأخبار"
+              defaultText={
+                orchestration?.nav?.showcaseLabel === "الأخبار والعروض"
+                  ? "الأخبار"
+                  : orchestration?.nav?.showcaseLabel || "الأخبار"
+              }
               as="button"
               onAction={() => go("/offers")}
               className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
             />
           </nav>
+
 
 
           {/* Left Action Buttons & Primary CTA */}
@@ -581,26 +594,27 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   </div>
                   <div className="space-y-1">
                     <button onClick={() => go("/journal")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>مجلة العقيق</span>
+                      <span>المجلة</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                     <button onClick={() => go("/albums")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>ألبوم الصور والفعاليات</span>
+                      <span>الألبومات</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                     <button onClick={() => go("/atheer")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>أثير العقيق (بودكاست)</span>
+                      <span>أثير (البودكاست)</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                     <button onClick={() => go("/articles")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>مقالات وأقلام العقيق</span>
+                      <span>المقالات</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                     <button onClick={() => go("/offers")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>الأخبار والعروض</span>
+                      <span>الأخبار</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                   </div>
+
                 </div>
               </div>
             </div>
