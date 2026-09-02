@@ -855,7 +855,9 @@ export function AqeeqAiAssistantWidget() {
       {isOpen && (
         <div
           className={`flex flex-col transition-all duration-300 border shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2rem] w-full sm:w-[460px] h-[100dvh] sm:h-[600px] max-h-none sm:max-h-[88vh] z-50 ${
-            isDark
+            isLiveVoiceMode
+              ? "border-amber-400/40 bg-[#070b16] text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)] ring-1 ring-amber-400/30"
+              : isDark
               ? "border-amber-400/40 bg-[#070a12] sm:bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-amber-400/20"
               : "border-slate-200/90 bg-white sm:bg-white/98 text-slate-900 shadow-[0_25px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30"
           } ${
@@ -866,7 +868,9 @@ export function AqeeqAiAssistantWidget() {
         >
           {/* Header */}
           <div className={`flex items-center justify-between border-b px-4 py-3.5 transition-colors ${
-            isDark
+            isLiveVoiceMode
+              ? "border-white/10 bg-[#050811] text-white"
+              : isDark
               ? "border-white/10 bg-gradient-to-r from-[#0d1424] via-[#101b33] to-[#0a101d] text-white"
               : "border-slate-200 bg-gradient-to-r from-slate-50 via-amber-50/40 to-white text-slate-900"
           }`}>
@@ -902,28 +906,28 @@ export function AqeeqAiAssistantWidget() {
             </div>
 
             <div className="flex items-center gap-1">
-              {/* Voice Mode Toggle Button (ChatGPT Voice Style) */}
+              {/* Voice Mode Toggle Button (Sleek & Non-wrapping) */}
               <button
                 type="button"
                 onClick={isLiveVoiceMode ? exitLiveVoiceMode : enterLiveVoiceMode}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-black shadow-md transition hover:scale-105 mr-1 ${
+                className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-black shadow-md transition hover:scale-105 mr-1 whitespace-nowrap shrink-0 ${
                   isLiveVoiceMode
-                    ? "bg-amber-400 text-slate-950 hover:bg-yellow-300"
+                    ? "bg-amber-400 text-slate-950 hover:bg-yellow-300 ring-2 ring-amber-400/30"
                     : isDark
                     ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/30"
                     : "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100"
                 }`}
-                title={isLiveVoiceMode ? "الرجوع للشات المكتوب" : "بدء محادثة صوتية تفاعلية (ChatGPT Voice)"}
+                title={isLiveVoiceMode ? "الرجوع للشات المكتوب" : "بدء محادثة صوتية تفاعلية"}
               >
                 {isLiveVoiceMode ? (
                   <>
                     <MessageSquare size={13} />
-                    <span className="hidden sm:inline">الشات المكتوب</span>
+                    <span>الشات المكتوب</span>
                   </>
                 ) : (
                   <>
                     <Mic size={13} className="animate-pulse text-emerald-500" />
-                    <span className="hidden sm:inline">محادثة صوتية 🎙️</span>
+                    <span>فويس حي 🎙️</span>
                   </>
                 )}
               </button>
@@ -1025,38 +1029,25 @@ export function AqeeqAiAssistantWidget() {
             </div>
           )}
 
-          {/* MAIN BODY: Either ChatGPT Voice Interface OR Written Chat History */}
+          {/* MAIN BODY: Either Gemini Live Aurora Studio OR Written Chat History */}
           {isLiveVoiceMode ? (
             /* ========================================================================= */
-            /* CHATGPT VOICE MODE VIEW (الهالة الصوتية المتفاعلة مع الترجمة اللحظية)     */
+            /* GEMINI LIVE AURORA STUDIO (استوديو الفويس الحي الأورورا ثلاثي الأبعاد)    */
             /* ========================================================================= */
-            <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none">
-              {/* Radial ambient lighting */}
-              <div
-                className={`absolute inset-0 pointer-events-none transition-all duration-700 ${
-                  liveVoiceState === "speaking"
-                    ? "bg-gradient-to-b from-amber-500/15 via-transparent to-transparent"
-                    : liveVoiceState === "listening"
-                    ? "bg-gradient-to-b from-emerald-500/15 via-transparent to-transparent"
-                    : "bg-transparent"
-                }`}
-              />
+            <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none bg-gradient-to-b from-[#070b16] via-[#091124] to-[#04060e] text-white">
+              {/* Multidimensional Cosmic Aurora Background Blobs */}
+              <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl pointer-events-none animate-pulse" />
+              <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-teal-500/15 blur-3xl pointer-events-none animate-pulse" />
 
-              {/* Status Header Badge */}
-              <div className="relative z-10 flex items-center justify-between">
+              {/* Status Header Badge (Single - No duplicate buttons!) */}
+              <div className="relative z-10 flex items-center justify-center">
                 <div
-                  className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-black border shadow-xs transition ${
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black border backdrop-blur-xl shadow-lg transition ${
                     liveVoiceState === "speaking"
-                      ? isDark
-                        ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
-                        : "border-amber-300 bg-amber-50 text-amber-800"
+                      ? "border-amber-400/50 bg-amber-400/15 text-amber-300 shadow-[0_0_20px_rgba(248,202,20,0.2)]"
                       : liveVoiceState === "listening"
-                      ? isDark
-                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                        : "border-emerald-300 bg-emerald-50 text-emerald-800"
-                      : isDark
-                      ? "border-white/10 bg-white/5 text-slate-300"
-                      : "border-slate-200 bg-slate-100 text-slate-700"
+                      ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                      : "border-cyan-400/40 bg-cyan-500/10 text-cyan-300"
                   }`}
                 >
                   <span
@@ -1069,112 +1060,124 @@ export function AqeeqAiAssistantWidget() {
                     }`}
                   />
                   <span>
-                    {liveVoiceState === "speaking" && "المستشار يتحدث إليك بصوته 🔊"}
+                    {liveVoiceState === "speaking" && "المستشار يتحدث بصوت بشري طبيعي 🔊"}
                     {liveVoiceState === "listening" && "أستمع إليك الآن.. تفضل بالتحدث 🎙️"}
-                    {liveVoiceState === "thinking" && "المستشار يفكر ويجهز الإجابة... ⚡"}
-                    {liveVoiceState === "idle" && "جاهز للمحادثة الصوتية"}
+                    {liveVoiceState === "thinking" && "المستشار يفكر ويصيغ الرد... ⚡"}
+                    {liveVoiceState === "idle" && "جاهز للاستماع"}
                   </span>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={exitLiveVoiceMode}
-                  className={`rounded-xl px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 transition ${
-                    isDark
-                      ? "bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-black"
-                  }`}
-                  title="الرجوع للشات المكتوب"
-                >
-                  <MessageSquare size={13} />
-                  <span>الشات المكتوب</span>
-                </button>
               </div>
 
-              {/* Center: The Futuristic Glowing ChatGPT Orb */}
-              <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-4">
+              {/* Center: The Futuristic Living Aurora Plasma Orb */}
+              <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-3">
                 <div className="relative flex items-center justify-center">
-                  {/* Outer Ambient Bloom */}
+                  {/* Outer Concentric Sonic Ripples */}
                   <div
-                    className={`absolute h-44 w-44 sm:h-56 sm:w-56 rounded-full blur-3xl transition-all duration-700 ${
+                    className={`absolute h-56 w-56 sm:h-72 sm:w-72 rounded-full blur-3xl transition-all duration-700 ${
                       liveVoiceState === "speaking"
-                        ? "bg-gradient-to-tr from-amber-500/50 via-yellow-400/40 to-amber-600/50 scale-125 animate-pulse"
+                        ? "bg-gradient-to-tr from-amber-500/40 via-yellow-400/30 to-rose-500/30 scale-125 animate-pulse"
                         : liveVoiceState === "listening"
-                        ? "bg-gradient-to-tr from-emerald-500/50 via-teal-400/40 to-cyan-500/50 scale-115 animate-pulse"
-                        : liveVoiceState === "thinking"
-                        ? "bg-gradient-to-tr from-cyan-500/40 via-blue-500/30 to-indigo-500/40 scale-100 animate-spin"
-                        : "bg-slate-500/15 scale-90"
+                        ? "bg-gradient-to-tr from-emerald-500/40 via-teal-400/30 to-cyan-500/35 scale-120 animate-pulse"
+                        : "bg-gradient-to-tr from-blue-600/30 via-indigo-600/25 to-purple-600/30 scale-100 animate-spin"
                     }`}
                   />
 
-                  {/* Glass Ring with Sonic Glow */}
+                  {/* Glass Outer Ambient Ring */}
                   <div
-                    className={`relative grid h-32 w-32 sm:h-44 sm:w-44 place-items-center rounded-full border-2 transition-all duration-500 shadow-2xl backdrop-blur-md ${
+                    className={`relative grid h-44 w-44 sm:h-56 sm:w-56 place-items-center rounded-full border border-white/20 transition-all duration-500 shadow-2xl backdrop-blur-md ${
                       liveVoiceState === "speaking"
-                        ? "border-amber-400 bg-gradient-to-tr from-amber-500/25 via-yellow-500/15 to-transparent shadow-[0_0_50px_rgba(248,202,20,0.6)] scale-105"
+                        ? "border-amber-400/60 bg-gradient-to-tr from-amber-500/20 via-yellow-500/10 to-transparent shadow-[0_0_60px_rgba(248,202,20,0.5)] scale-105"
                         : liveVoiceState === "listening"
-                        ? "border-emerald-400 bg-gradient-to-tr from-emerald-500/25 via-teal-500/15 to-transparent shadow-[0_0_50px_rgba(16,185,129,0.6)] scale-105"
-                        : liveVoiceState === "thinking"
-                        ? "border-cyan-400 bg-gradient-to-tr from-cyan-500/20 via-blue-500/10 to-transparent shadow-[0_0_40px_rgba(6,182,212,0.4)] animate-pulse"
-                        : "border-white/15 bg-white/5"
+                        ? "border-emerald-400/60 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent shadow-[0_0_60px_rgba(16,185,129,0.5)] scale-105"
+                        : "border-cyan-400/40 bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-transparent shadow-[0_0_50px_rgba(6,182,212,0.4)] animate-pulse"
                     }`}
                   >
-                    {/* Core Fluid Sphere */}
+                    {/* Middle Acoustic Layer */}
                     <div
-                      className={`grid h-24 w-24 sm:h-32 sm:w-32 place-items-center rounded-full transition-all duration-300 shadow-inner ${
+                      className={`grid h-36 w-36 sm:h-44 sm:w-44 place-items-center rounded-full border border-white/25 transition-all duration-300 ${
                         liveVoiceState === "speaking"
-                          ? "bg-gradient-to-tr from-amber-400 via-[#f8ca14] to-yellow-200 text-slate-950 scale-105 shadow-[inset_0_0_20px_rgba(255,255,255,0.6)]"
+                          ? "bg-amber-400/10 shadow-[0_0_30px_rgba(248,202,20,0.3)]"
                           : liveVoiceState === "listening"
-                          ? "bg-gradient-to-tr from-emerald-400 via-teal-400 to-emerald-200 text-slate-950 animate-pulse shadow-[inset_0_0_20px_rgba(255,255,255,0.6)]"
-                          : liveVoiceState === "thinking"
-                          ? "bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.4)]"
-                          : "bg-slate-800 text-slate-300"
+                          ? "bg-emerald-400/10 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
+                          : "bg-blue-500/10"
                       }`}
                     >
-                      {liveVoiceState === "speaking" ? (
-                        <WaveformIcon size={40} className="animate-pulse" />
-                      ) : liveVoiceState === "listening" ? (
-                        <Mic size={40} className="animate-bounce" />
-                      ) : liveVoiceState === "thinking" ? (
-                        <Sparkles size={40} className="animate-spin" />
-                      ) : (
-                        <Mic size={36} />
-                      )}
+                      {/* Fluid Radiant Core with 3D Depth */}
+                      <div
+                        className={`grid h-28 w-28 sm:h-36 sm:w-36 place-items-center rounded-full transition-all duration-300 shadow-2xl relative overflow-hidden ${
+                          liveVoiceState === "speaking"
+                            ? "bg-gradient-to-tr from-amber-500 via-[#f8ca14] to-yellow-200 shadow-[0_0_50px_rgba(248,202,20,0.8),inset_0_0_25px_rgba(255,255,255,0.8)] scale-105"
+                            : liveVoiceState === "listening"
+                            ? "bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-200 shadow-[0_0_50px_rgba(16,185,129,0.8),inset_0_0_25px_rgba(255,255,255,0.8)] animate-pulse"
+                            : "bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-600 shadow-[0_0_40px_rgba(6,182,212,0.7),inset_0_0_20px_rgba(255,255,255,0.5)]"
+                        }`}
+                      >
+                        {/* Interactive Sound Wave Spectrum inside the Orb */}
+                        <div className="flex items-center gap-1.5 h-10 z-10">
+                          {[35, 75, 55, 100, 80, 95, 60, 85, 40].map((barHeight, idx) => (
+                            <span
+                              key={idx}
+                              style={{
+                                height:
+                                  liveVoiceState === "speaking" || liveVoiceState === "listening"
+                                    ? `${Math.max(25, barHeight * (idx % 2 === 0 ? 1 : 0.75))}%`
+                                    : "25%",
+                                animationDuration: `${0.35 + (idx % 4) * 0.15}s`,
+                              }}
+                              className={`w-1 sm:w-1.5 rounded-full transition-all duration-150 ${
+                                liveVoiceState === "speaking"
+                                  ? "bg-slate-950 animate-pulse shadow-sm"
+                                  : liveVoiceState === "listening"
+                                  ? "bg-slate-950 animate-pulse shadow-sm"
+                                  : "bg-white/90"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Subtitles Capsule (Dynamic Captions) */}
-                <div
-                  className={`mt-6 w-full max-w-sm rounded-2xl border p-3.5 text-right text-xs leading-relaxed transition shadow-inner backdrop-blur-md ${
-                    isDark ? "border-white/10 bg-black/50 text-slate-200" : "border-slate-200 bg-white/90 text-slate-800"
-                  }`}
-                >
+                {/* Real-time Subtitles Capsule (100% High-Contrast, Crystal Clear!) */}
+                <div className="mt-6 w-full max-w-sm rounded-2xl border border-white/20 bg-white/[0.08] p-4 text-right backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-all">
                   {interimSpeech ? (
-                    <div className="text-emerald-400 font-bold flex items-start gap-1.5">
-                      <span className="shrink-0 text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30">أنت:</span>
-                      <span>"{interimSpeech}"</span>
+                    <div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-300 border border-emerald-400/40 text-[11px] font-black">
+                        🎙️ أنت تتحدث الآن:
+                      </span>
+                      <p className="mt-2 text-sm text-emerald-100 font-bold leading-relaxed">
+                        "{interimSpeech}"
+                      </p>
                     </div>
                   ) : lastAssistantVoiceTranscript ? (
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 font-bold">المستشار:</span>
-                      <span className="line-clamp-3 font-medium text-slate-100">{lastAssistantVoiceTranscript}</span>
+                    <div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/25 text-amber-300 border border-amber-400/40 text-[11px] font-black">
+                        💎 المستشار:
+                      </span>
+                      <p className="mt-2 text-sm text-white font-medium leading-relaxed line-clamp-4">
+                        {lastAssistantVoiceTranscript}
+                      </p>
                     </div>
                   ) : lastUserVoiceTranscript ? (
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30 font-bold">أنت:</span>
-                      <span className="line-clamp-2 font-medium">"{lastUserVoiceTranscript}"</span>
+                    <div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-300 border border-emerald-400/40 text-[11px] font-black">
+                        🎙️ آخر ما قلته:
+                      </span>
+                      <p className="mt-2 text-sm text-slate-200 font-medium leading-relaxed line-clamp-3">
+                        "{lastUserVoiceTranscript}"
+                      </p>
                     </div>
                   ) : (
-                    <p className="text-slate-400 text-center text-[11px] font-medium py-1">
-                      تحدث بحرية وبدون لمس أي زر.. سأسمعك وأرد فوراً بصوت بشري 🎙️
+                    <p className="text-slate-300 text-center text-xs font-medium py-1">
+                      تحدث بحرية.. سأسمعك وأرد فوراً بدون لمس أي زر 🎙️✨
                     </p>
                   )}
                 </div>
               </div>
 
-              {/* Bottom Quick Voice Controls */}
-              <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-white/5">
+              {/* Bottom Floating Control Bar */}
+              <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-white/10">
                 {liveVoiceState === "speaking" ? (
                   <button
                     type="button"
@@ -1182,9 +1185,9 @@ export function AqeeqAiAssistantWidget() {
                       stopSpeaking();
                       startLiveVoiceListening();
                     }}
-                    className="rounded-full bg-amber-400 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-yellow-300 transition hover:scale-105"
+                    className="rounded-full bg-gradient-to-r from-amber-400 to-[#f8ca14] text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-[0_0_25px_rgba(248,202,20,0.5)] hover:scale-105 transition"
                   >
-                    <Square size={14} className="fill-current" />
+                    <Square size={13} className="fill-current" />
                     <span>مقاطعة والتحدث 🎙️</span>
                   </button>
                 ) : liveVoiceState === "listening" ? (
