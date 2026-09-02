@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, BookOpen, CalendarDays, ChevronLeft, FolderArchive, Layers, Loader2, Newspaper, Settings2, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 type NewsIssue = {
   id: number;
@@ -54,9 +55,12 @@ function IssueCard({
   onOpen: () => void;
   dark: boolean;
 }) {
+  const { isNationalDay } = useSiteTheme();
   return (
     <article className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
-      dark
+      isNationalDay
+        ? dark ? "snd-bento-card-dark text-white" : "snd-bento-card-light text-slate-900"
+        : dark
         ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
         : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
     }`}>
@@ -66,17 +70,22 @@ function IssueCard({
         <button
           onClick={onOpen}
           className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
-            dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
+            isNationalDay
+              ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/15 bg-emerald-50/50"
+              : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${issue.title}`}
         >
           {/* Background tilted page — hidden on mobile */}
           <div
             className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block ${
-              dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
+              isNationalDay
+                ? dark ? "border-emerald-500/20 bg-[#002617]" : "border-emerald-500/20 bg-emerald-100/60"
+                : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
           >
+
             {issue.coverUrl ? (
               <VisualImage
                 id={`journal-card-back-cover-${issue.id}`}
@@ -91,7 +100,9 @@ function IssueCard({
           {/* Front cover — full on mobile, partial on desktop */}
           <div
             className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[60%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
-              dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
+              isNationalDay
+                ? dark ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]" : "border-emerald-600/50 bg-white"
+                : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
             style={{ transform: "rotate(0deg)" }}
           >
@@ -104,7 +115,7 @@ function IssueCard({
                 className="h-full w-full rounded-[.7rem] object-cover"
               />
             ) : (
-              <div className={`grid h-full place-items-center ${dark ? "bg-[#161616] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"}`}>
+              <div className={`grid h-full place-items-center ${dark ? "bg-[#161616] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
                 <Newspaper size={34} />
               </div>
             )}
@@ -115,12 +126,16 @@ function IssueCard({
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-3">
             <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
-              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              isNationalDay
+                ? dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
+                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}>
               <BookOpen size={18} />
             </div>
-            <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-              ISSUE · {String(index + 1).padStart(2, "0")}
+            <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${
+              isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")
+            }`}>
+              {isNationalDay ? "NATIONAL ISSUE" : "ISSUE"} · {String(index + 1).padStart(2, "0")}
             </p>
           </div>
 
@@ -130,7 +145,7 @@ function IssueCard({
             label="عنوان العدد"
             defaultText={issue.title}
             as="h3"
-            className={`mt-4 text-2xl font-black ${dark ? "text-white" : "text-black"}`}
+            className={`mt-4 text-2xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
           />
 
           <VisualEditable
@@ -142,22 +157,22 @@ function IssueCard({
               "عدد أسبوعي من مجلة العقيق، يوثق أنشطة وفعاليات مدارس العقيق بتجربة قراءة تفاعلية."
             }
             as="p"
-            className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-950/80" : "text-slate-600"}`}
           />
 
           <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${
-            dark ? "border-white/[0.08]" : "border-black/[0.08]"
+            isNationalDay ? (dark ? "border-[#5aba1c]/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
           }`}>
             <div>
-              <b className={`block text-xl font-black ${dark ? "text-white" : "text-black"}`}>
+              <b className={`block text-xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>
                 {String(issue.pageCount || 0).padStart(2, "0")}
               </b>
-              <span className={`text-[9px] font-black tracking-[.16em] ${dark ? "text-slate-500" : "text-slate-400"}`}>
+              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? (dark ? "text-[#5aba1c]" : "text-emerald-700") : (dark ? "text-slate-500" : "text-slate-400")}`}>
                 PAGES
               </span>
             </div>
 
-            <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : "text-slate-500"}`}>
+            <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-800/80" : "text-slate-500"}`}>
               <CalendarDays size={13} />
               {issue.issueDate}
             </span>
@@ -165,7 +180,9 @@ function IssueCard({
             <button
               onClick={onOpen}
               className={`inline-flex items-center gap-2 text-xs font-black transition ${
-                dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
+                isNationalDay
+                  ? dark ? "text-[#f8ca14] hover:text-[#5aba1c]" : "text-[#005A36] hover:text-[#003822]"
+                  : dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
               }`}
             >
               اقرأ العدد <ArrowUpLeft size={15} />
@@ -174,6 +191,7 @@ function IssueCard({
         </div>
       </div>
     </article>
+
   );
 }
 
@@ -239,8 +257,14 @@ export default function SchoolNewsPage() {
     );
   }
 
+  const { isNationalDay } = useSiteTheme();
+
   return (
-    <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+    <main dir="rtl" className={`min-h-screen aq-public-shell ${
+      isNationalDay
+        ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
+        : dark ? "bg-black text-white" : "bg-white text-black"
+    }`}>
       {/* Top Header Bar */}
       <AlaqeeqStudioSiteHeader
         title="مجلة العقيق"
@@ -252,9 +276,18 @@ export default function SchoolNewsPage() {
         <>
           {/* Hero Section */}
           <section className={`relative isolate overflow-hidden border-b ${
-            dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+            isNationalDay
+              ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+              : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
           }`}>
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+            {isNationalDay ? (
+              <>
+                <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
+                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+              </>
+            ) : (
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+            )}
 
             <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:px-8 md:py-16 lg:gap-16">
               {/* Cover perspective on left in RTL */}
@@ -263,7 +296,9 @@ export default function SchoolNewsPage() {
                   <button
                     onClick={() => navigate(`/journal/${secondIssue.slug}`)}
                     className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl ${
-                      dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                      isNationalDay
+                        ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                        : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
                     }`}
                     style={{ transform: "rotate(-7deg)" }}
                     aria-label={`العدد السابق: ${secondIssue.title}`}
@@ -283,7 +318,11 @@ export default function SchoolNewsPage() {
                 <button
                   onClick={() => navigate(`/journal/${featuredIssue.slug}`)}
                   className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
-                    dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                    isNationalDay
+                      ? dark
+                        ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                        : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                      : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
                   }`}
                   style={{ transform: "rotate(3deg)" }}
                   aria-label={`العدد الحالي: ${featuredIssue.title}`}
@@ -298,7 +337,7 @@ export default function SchoolNewsPage() {
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                       />
                     ) : (
-                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"}`}>
+                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
                         <Newspaper size={42} />
                       </div>
                     )}
@@ -322,19 +361,30 @@ export default function SchoolNewsPage() {
 
               {/* Text info */}
               <div className="order-1 md:order-2">
-                <VisualEditable
-                  id="journal-hero-kicker"
-                  tag="text"
-                  label="شارة غلاف المجلة"
-                  defaultText={orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
-                  as="div"
-                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
-                    dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                  }`}
-                >
-                  <Sparkles size={14} />
-                  {orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
-                </VisualEditable>
+                {isNationalDay ? (
+                  <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
+                    dark
+                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
+                      : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+                  }`}>
+                    <span className="text-sm">🇸🇦</span>
+                    <span className="font-black">مجلة العقيق · هوية اليوم الوطني</span>
+                  </div>
+                ) : (
+                  <VisualEditable
+                    id="journal-hero-kicker"
+                    tag="text"
+                    label="شارة غلاف المجلة"
+                    defaultText={orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
+                    as="div"
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+                      dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                    }`}
+                  >
+                    <Sparkles size={14} />
+                    {orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
+                  </VisualEditable>
+                )}
 
                 <VisualEditable
                   id="journal-hero-title"
@@ -342,7 +392,9 @@ export default function SchoolNewsPage() {
                   label="عنوان غلاف المجلة"
                   defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبر يُقلب إلى ذكرى."}
                   as="h1"
-                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${dark ? "text-white" : "text-black"}`}
+                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
+                    dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+                  }`}
                 />
 
                 <VisualEditable
@@ -354,26 +406,32 @@ export default function SchoolNewsPage() {
                     "رفوف رقمية تجمع أعداد مجلة ونشرات مدارس العقيق الأهلية، مع كتيبات شهرية مؤرشفة وتجربة تصفح تفاعلية راقية."
                   }
                   as="p"
-                  className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+                  className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
                 />
 
                 <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
                   <span className={`rounded-full border px-3 py-2 ${
-                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    isNationalDay
+                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                   }`}>
-                    <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {issues.length} عدد منشور
                   </span>
                   <span className={`rounded-full border px-3 py-2 ${
-                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    isNationalDay
+                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                   }`}>
-                    <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {totalPages} صفحة
                   </span>
                   <span className={`rounded-full border px-3 py-2 ${
-                    dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    isNationalDay
+                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                   }`}>
-                    <FolderArchive className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <FolderArchive className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {monthGroups.length} كتيب شهري
                   </span>
                 </div>
@@ -387,12 +445,17 @@ export default function SchoolNewsPage() {
                     as="button"
                     onAction={() => navigate(`/journal/${featuredIssue.slug}`)}
                     className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
-                      dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+                      dark
+                        ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                        : isNationalDay
+                        ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
+                        : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
                     }`}
                   >
                     <ArrowUpLeft size={16} />
                     اقرأ العدد الحالي
                   </VisualEditable>
+
 
                   {isAdmin ? (
                     <button
@@ -420,12 +483,12 @@ export default function SchoolNewsPage() {
               <div className="mx-auto max-w-[1320px] px-5 md:px-8">
                 <div className="mb-6 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FolderArchive size={18} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                    <h3 className={`text-lg font-black ${dark ? "text-white" : "text-black"}`}>
+                    <FolderArchive size={18} className={dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]"} />
+                    <h3 className={`text-lg font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>
                       الكتيبات الشهرية المجمعة
                     </h3>
                   </div>
-                  <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                  <span className={`text-xs ${dark ? "text-slate-500" : isNationalDay ? "text-emerald-800/70" : "text-slate-400"}`}>
                     تتكون تلقائياً من أعداد كل شهر
                   </span>
                 </div>
@@ -435,16 +498,20 @@ export default function SchoolNewsPage() {
                     <div
                       key={monthKey}
                       className={`group flex items-center justify-between rounded-2xl border p-4 transition ${
-                        dark
+                        isNationalDay
+                          ? dark
+                            ? "border-emerald-500/20 bg-[#001c10] hover:border-emerald-400"
+                            : "border-emerald-500/20 bg-white hover:border-[#005A36] shadow-sm"
+                          : dark
                           ? "border-white/[0.08] bg-[#111111] hover:border-[#f8ca14]/40"
                           : "border-black/[0.08] bg-white hover:border-[#08467d]/40 shadow-sm"
                       }`}
                     >
                       <div>
-                        <h4 className={`font-black ${dark ? "text-white" : "text-black"}`}>
+                        <h4 className={`font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>
                           كتيب {monthName(monthKey)}
                         </h4>
-                        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-950/70" : "text-slate-500"}`}>
                           {entries.length} أعداد ·{" "}
                           {entries.reduce(
                             (sum, i) => sum + Number(i.pageCount || 0),
@@ -458,6 +525,8 @@ export default function SchoolNewsPage() {
                         className={`inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-bold transition ${
                           dark
                             ? "bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                            : isNationalDay
+                            ? "bg-emerald-50 text-[#005A36] hover:bg-[#005A36] hover:text-white"
                             : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
                         }`}
                       >
@@ -474,7 +543,7 @@ export default function SchoolNewsPage() {
           {/* Issues Archive Grid Section */}
           <section className="mx-auto max-w-[1320px] px-5 py-12 md:px-8 md:py-16">
             <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
-              dark ? "border-white/[0.08]" : "border-black/[0.08]"
+              isNationalDay ? (dark ? "border-emerald-500/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
             }`}>
               <div>
                 <VisualEditable
@@ -483,7 +552,9 @@ export default function SchoolNewsPage() {
                   label="شارة أرشيف الأعداد"
                   defaultText="JOURNAL ARCHIVE"
                   as="p"
-                  className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                  className={`text-[10px] font-black tracking-[0.18em] ${
+                    isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")
+                  }`}
                 />
                 <VisualEditable
                   id="journal-archive-title"
@@ -491,9 +562,10 @@ export default function SchoolNewsPage() {
                   label="عنوان أرشيف الأعداد"
                   defaultText="أعداد مجلة العقيق"
                   as="h2"
-                  className={`mt-2 text-2xl font-black ${dark ? "text-white" : "text-black"}`}
+                  className={`mt-2 text-2xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
                 />
               </div>
+
               <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
                 {visibleIssues.length} من {issues.length} عدد
               </span>

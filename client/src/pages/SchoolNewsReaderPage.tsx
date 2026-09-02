@@ -112,7 +112,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
       dir="rtl"
       className={`aq-journal-reader-theme aq-journal-reader-theme-${readerTheme} min-h-screen transition-colors ${
         isNationalDay
-          ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
+          ? dark
+            ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
+            : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
           : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
       }`}
     >
@@ -128,7 +130,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
             as="button"
             onAction={() => navigate("/journal")}
             className={`mb-4 inline-flex items-center gap-2 text-xs font-bold transition ${
-              isNationalDay ? "text-emerald-300 hover:text-[#f8ca14]" : "text-slate-400 hover:text-amber-200"
+              isNationalDay
+                ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
+                : "text-slate-400 hover:text-amber-200"
             }`}
           >
             {(text) => (
@@ -144,7 +148,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
         <header
           className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${
             isNationalDay
-              ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
+              ? dark
+                ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
+                : "border-emerald-600/20 bg-white/95 shadow-md shadow-emerald-950/5 backdrop-blur-md text-slate-900"
               : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
           }`}
         >
@@ -156,8 +162,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                 label="شارة قارئ المجلة"
                 defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}${issue.seasonLabel} · ${issue.issueDate}`}
                 as="div"
-                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? "text-[#f8ca14]" : "text-amber-300")}
+                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : "text-amber-300")}
               />
+
 
               <VisualEditable
                 id="news-reader-header-title"

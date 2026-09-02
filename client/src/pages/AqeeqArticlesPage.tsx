@@ -71,7 +71,7 @@ function ArticleCard({
     <article
       className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
         isNationalDay
-          ? "heritage-card-frame border-[#5aba1c]/40 text-white shadow-[0_20px_50px_rgba(0,50,25,0.4)] hover:border-[#f8ca14]"
+          ? dark ? "snd-bento-card-dark text-white" : "snd-bento-card-light text-slate-900"
           : dark
           ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
           : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
@@ -84,7 +84,7 @@ function ArticleCard({
           onClick={onOpen}
           className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
             isNationalDay
-              ? "border-[#5aba1c]/20 bg-[#001c10]"
+              ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/15 bg-emerald-50/50"
               : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${article.title}`}
@@ -93,7 +93,7 @@ function ArticleCard({
           <div
             className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block ${
               isNationalDay
-                ? "border-[#5aba1c]/20 bg-[#002617]"
+                ? dark ? "border-emerald-500/20 bg-[#002617]" : "border-emerald-500/20 bg-emerald-100/60"
                 : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
@@ -117,7 +117,7 @@ function ArticleCard({
           <div
             className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[62%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
               isNationalDay
-                ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]"
+                ? dark ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]" : "border-emerald-600/50 bg-white"
                 : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
             style={{ transform: "rotate(0deg)" }}
@@ -134,13 +134,13 @@ function ArticleCard({
             ) : (
               <div
                 className={`flex h-full flex-col justify-between rounded-[0.7rem] p-3.5 text-right ${
-                  dark ? "bg-gradient-to-br from-[#1a1400] to-black text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"
+                  dark ? "bg-gradient-to-br from-[#1a1400] to-black text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"
                 }`}
               >
                 <BookOpen size={24} />
                 <div>
                   <span className="text-[9px] font-black uppercase tracking-wider">{article.category}</span>
-                  <p className="line-clamp-2 text-[11px] font-black leading-snug mt-1 text-white">{article.title}</p>
+                  <p className="line-clamp-2 text-[11px] font-black leading-snug mt-1">{article.title}</p>
                 </div>
               </div>
             )}
@@ -153,7 +153,7 @@ function ArticleCard({
             <div
               className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
                 isNationalDay
-                  ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                  ? dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
                   : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
@@ -162,7 +162,7 @@ function ArticleCard({
             <span
               className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black border ${
                 isNationalDay
-                  ? "border-[#5aba1c]/40 bg-[#5aba1c]/15 text-emerald-300"
+                  ? dark ? "border-[#5aba1c]/40 bg-[#5aba1c]/15 text-emerald-300" : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
                   : dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
@@ -181,10 +181,11 @@ function ArticleCard({
             onClick={onOpen}
             className={`mt-3 text-lg font-black line-clamp-2 cursor-pointer transition leading-snug ${
               isNationalDay
-                ? "text-white group-hover:text-[#5aba1c]"
+                ? dark ? "text-white group-hover:text-[#5aba1c]" : "text-[#003822] group-hover:text-[#005A36]"
                 : dark ? "text-white group-hover:text-[#f8ca14]" : "text-black group-hover:text-[#08467d]"
             }`}
           />
+
 
 
           <VisualEditable
@@ -209,7 +210,9 @@ function ArticleCard({
             <span className="text-[10px] text-slate-500 font-bold">· {article.authorRole}</span>
           </div>
 
-          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-3.5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-3.5 ${
+            isNationalDay ? (dark ? "border-[#5aba1c]/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
+          }`}>
             <div className="flex items-center gap-3 text-[10px] font-black text-slate-400">
               <span className="flex items-center gap-1">
                 <Eye size={12} />
@@ -220,7 +223,7 @@ function ArticleCard({
                 <span>{article.likesCount || 0}</span>
               </span>
               {readingTime && (
-                <span className={`flex items-center gap-1 ${dark ? "text-slate-500" : "text-slate-400"}`}>
+                <span className={`flex items-center gap-1 ${dark ? "text-slate-500" : isNationalDay ? "text-emerald-800/70" : "text-slate-400"}`}>
                   <Clock size={12} />
                   <span>{readingTime} د قراءة</span>
                 </span>
@@ -241,13 +244,16 @@ function ArticleCard({
               <button
                 onClick={onOpen}
                 className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
-                  dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
+                  isNationalDay
+                    ? dark ? "text-[#f8ca14] hover:text-[#5aba1c]" : "text-[#005A36] hover:text-[#003822]"
+                    : dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
                 }`}
               >
                 اقرأ المقال <ArrowUpLeft size={14} />
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </article>
@@ -322,20 +328,25 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       void refetch();
       toast.success("شكراً لإعجابك بالمقال ❤️");
     },
-  });
+  }, [rawArticles, featuredArticle]);
 
-  const handleShare = (art: any, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    const url = window.location.origin + `/articles/${art.slug}`;
-    const text = `مقال رائع بمدارس العقيق: «${art.title}» بقلم: ${art.authorName}\n${url}`;
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
-  };
+  // Direct slug URL support
+  useEffect(() => {
+    if (params?.slug && rawArticles.length > 0) {
+      const found = rawArticles.find((a) => a.slug === params.slug);
+      if (found) setReadingArticle(found);
+    }
+  }, [params?.slug, rawArticles]);
 
-  const handleCopyLink = (art: any, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    const url = window.location.origin + `/articles/${art.slug}`;
+  const handleShare = (article: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/articles/${article.slug}`;
+    if (navigator.share) {
+      navigator.share({ title: article.title, text: article.excerpt, url }).catch(() => {});
+      return;
+    }
     navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(art.id);
+      setCopiedId(article.id);
       toast.success("تم نسخ رابط المقال بنجاح 📋");
       setTimeout(() => setCopiedId(null), 2000);
     });
@@ -345,7 +356,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        dark ? "bg-black text-white" : "bg-white text-black"
+        isNationalDay
+          ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
+          : dark ? "bg-black text-white" : "bg-white text-black"
       }`}
     >
       {/* Top Header Bar */}
@@ -354,10 +367,19 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       {/* Hero Section matching Journal & Albums */}
       <section
         className={`relative isolate overflow-hidden border-b ${
-          dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+          isNationalDay
+            ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         }`}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+        {isNationalDay ? (
+          <>
+            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+          </>
+        ) : (
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+        )}
 
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
           {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
@@ -366,7 +388,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               <button
                 onClick={() => setReadingArticle(secondArticle)}
                 className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
-                  dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
                 }`}
                 style={{ transform: "rotate(-7deg)" }}
                 aria-label={`المقال السابق: ${secondArticle.title}`}
@@ -393,7 +417,11 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               <button
                 onClick={() => setReadingArticle(featuredArticle)}
                 className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
-                  dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                  isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                    : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
                 }`}
                 style={{ transform: "rotate(3deg)" }}
                 aria-label={`المقال الحالي: ${featuredArticle.title}`}
@@ -410,6 +438,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                       className={`flex h-full flex-col justify-between p-6 text-right ${
                         dark
                           ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
+                          : isNationalDay
+                          ? "bg-emerald-50 text-[#005A36]"
                           : "bg-slate-100 text-[#08467d]"
                       }`}
                     >
@@ -440,25 +470,36 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
           {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
           <div className="order-1 md:order-2 text-right">
-            <VisualEditable
-              id="articles-hero-kicker"
-              tag="text"
-              label="شارة مقالات العقيق"
-              defaultText={orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}
-              as="div"
-              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
+            {isNationalDay ? (
+              <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                 dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-              }`}
-            >
-              {(text) => (
-                <>
-                  <Sparkles size={14} />
-                  <span>{text}</span>
-                </>
-              )}
-            </VisualEditable>
+                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
+                  : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+              }`}>
+                <span className="text-sm">🇸🇦</span>
+                <span className="font-black">مقالات وأقلام العقيق · هوية اليوم الوطني</span>
+              </div>
+            ) : (
+              <VisualEditable
+                id="articles-hero-kicker"
+                tag="text"
+                label="شارة مقالات العقيق"
+                defaultText={orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}
+                as="div"
+                className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
+                  dark
+                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                }`}
+              >
+                {(text) => (
+                  <>
+                    <Sparkles size={14} />
+                    <span>{text}</span>
+                  </>
+                )}
+              </VisualEditable>
+            )}
 
             <VisualEditable
               id="articles-hero-title"
@@ -467,7 +508,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
               as="h1"
               className={`mt-5 text-4xl font-black leading-[1.14] md:text-6xl ${
-                dark ? "text-white" : "text-black"
+                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
               }`}
             />
 
@@ -478,33 +519,39 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               defaultText={orchestration?.heroCovers?.articlesCustomDesc ||
                 "رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."}
               as="p"
-              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
             />
 
             {/* Stats pills */}
             <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
               <span
                 className={`rounded-full border px-3 py-2 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {rawArticles.length} مقال منشور
               </span>
               <span
                 className={`rounded-full border px-3 py-2 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <User className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <User className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {new Set(rawArticles.map((a) => a.authorName)).size || 1} كاتب وقلم
               </span>
               <span
                 className={`rounded-full border px-3 py-2 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 إبداعات وتجارب
               </span>
             </div>
@@ -517,6 +564,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                   className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
                     dark
                       ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                      : isNationalDay
+                      ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
                       : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
                   }`}
                 >
@@ -531,6 +580,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
                   dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                    : isNationalDay
+                    ? "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100"
                     : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                 }`}
               >

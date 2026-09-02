@@ -402,7 +402,9 @@ export default function AqeeqPodcastPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        dark ? "bg-black text-white" : "bg-[#f8fafc] text-slate-900"
+        isNationalDay
+          ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
+          : dark ? "bg-black text-white" : "bg-[#f8fafc] text-slate-900"
       }`}
     >
       {/* Top Header Bar */}
@@ -411,10 +413,19 @@ export default function AqeeqPodcastPage() {
       {/* ==================== 1. 3D TILTED HERO COVER ==================== */}
       <section
         className={`relative isolate overflow-hidden border-b ${
-          dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+          isNationalDay
+            ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         }`}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+        {isNationalDay ? (
+          <>
+            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+          </>
+        ) : (
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+        )}
 
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-10 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-14 lg:gap-14">
           {/* 3D Tilted Dual-Cover */}
@@ -423,7 +434,9 @@ export default function AqeeqPodcastPage() {
               <button
                 onClick={() => handlePlayOrOpen(secondPodcast)}
                 className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
-                  dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
                 }`}
                 style={{ transform: "rotate(-7deg)" }}
                 aria-label={`الحلقة السابقة: ${secondPodcast.title}`}
@@ -452,6 +465,10 @@ export default function AqeeqPodcastPage() {
                 className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
                   (activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying
                     ? "border-[#f8ca14] ring-2 ring-[#f8ca14]/50 bg-[#161616]"
+                    : isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
                     : dark
                     ? "border-[#f8ca14]/50 bg-[#111111]"
                     : "border-[#08467d]/30 bg-white"
@@ -459,6 +476,7 @@ export default function AqeeqPodcastPage() {
                 style={{ transform: "rotate(3deg)" }}
                 aria-label={`الحلقة الحالية: ${featuredPodcast.title}`}
               >
+
                 <div className="relative h-full overflow-hidden rounded-[1.35rem]">
                   {featuredPodcast.coverUrl ? (
                     <div className="relative h-full w-full">
@@ -533,12 +551,15 @@ export default function AqeeqPodcastPage() {
               as="div"
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                 isNationalDay
-                  ? "border-[#f8ca14]/50 bg-gradient-to-r from-[#003822] to-[#002617] text-[#f8ca14] shadow-lg shadow-emerald-950/40"
+                  ? dark
+                    ? "border-[#f8ca14]/50 bg-gradient-to-r from-[#003822] to-[#002617] text-[#f8ca14] shadow-lg shadow-emerald-950/40"
+                    : "border-emerald-600/30 bg-emerald-50 text-[#005A36] shadow-sm"
                   : dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
+
 
               {(text) => (
                 <>
@@ -555,7 +576,7 @@ export default function AqeeqPodcastPage() {
               defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
               as="h1"
               className={`mt-4 text-3xl font-black leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl ${
-                dark ? "text-white" : "text-black"
+                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
               }`}
             />
 
@@ -566,33 +587,41 @@ export default function AqeeqPodcastPage() {
               defaultText={orchestration?.heroCovers?.podcastsCustomDesc ||
                 "استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية، والتغطيات الصوتية والمرئية لحفلات التخرج والبطولات المدرسية."}
               as="p"
-              className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}
+              className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${
+                dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"
+              }`}
             />
 
             {/* Stats pills */}
             <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-bold">
               <span
                 className={`rounded-full border px-3 py-1.5 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <Music className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <Music className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {songs?.length || 0} أناشيد رسمية
               </span>
               <span
                 className={`rounded-full border px-3 py-1.5 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <Radio className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <Radio className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {rawPodcasts.length} حلقة منشورة
               </span>
               <span
                 className={`rounded-full border px-3 py-1.5 ${
-                  dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
                 }`}
               >
-                <Headphones className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <Headphones className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 صوت وفيديو 100%
               </span>
             </div>
@@ -605,6 +634,8 @@ export default function AqeeqPodcastPage() {
                   className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
                     dark
                       ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                      : isNationalDay
+                      ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
                       : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
                   }`}
                 >
@@ -628,7 +659,9 @@ export default function AqeeqPodcastPage() {
                   onClick={() => playSong(0)}
                   className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
                     isNationalDay
-                      ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14] hover:scale-105 shadow-md"
+                      ? dark
+                        ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14] hover:scale-105 shadow-md"
+                        : "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100 hover:scale-105 shadow-sm"
                       : dark
                       ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
                       : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
@@ -637,10 +670,10 @@ export default function AqeeqPodcastPage() {
                   <Disc size={14} className="animate-[spin_4s_linear_infinite]" />
                   <span>{isNationalDay ? "🇸🇦 تشغيل أناشيد الوطن والعقيق" : "تشغيل الأناشيد 🎵"}</span>
                 </button>
-
               )}
 
               {isAdmin && (
+
                 <button
                   type="button"
                   onClick={() => navigate("/atheer/manage")}

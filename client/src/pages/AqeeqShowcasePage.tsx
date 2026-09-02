@@ -15,6 +15,7 @@ import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, L
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 type ShowcasePost = { id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mediaType: "image" | "video"; sourceType?: "drive" | "manual" | "x" | "instagram" | "youtube"; externalUrl?: string | null; title: string | null; description: string | null; viewCount: number; createdAt?: Date; media?: Array<{ id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mimeType: string; mediaType: "image" | "video" }> };
 type ContentType = "all" | "images" | "videos" | "social";
@@ -626,28 +627,45 @@ function UnifiedShowcaseHero({
   const videoCount = visualPosts.filter((post) => post.mediaType === "video").length;
   const socialCount = posts.filter(isSocialPost).length;
 
+  const { isNationalDay } = useSiteTheme();
+
   return (
     <VisualEditable id="showcase-hero-section" tag="section" label="غلاف الأخبار والعروض" as="section" className={`relative isolate overflow-hidden border-b ${
-      dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+      isNationalDay
+        ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+        : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
     }`}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+      {isNationalDay ? (
+        <>
+          <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
+          <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+        </>
+      ) : (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+      )}
       <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
         <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
           {previousPost ? (
             <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
-              dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+              isNationalDay
+                ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
             }`} style={{ transform: "rotate(-7deg)" }}>
               <VisualBackground id={`showcase-hero-previous-cover-${previousPost.id}`} label="الصورة الخلفية لغلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(previousPost)} alt="" className="h-full w-full rounded-[1.12rem]" />
             </div>
           ) : null}
           <div className={`group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
-            dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+            isNationalDay
+              ? dark
+                ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+              : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
           }`} style={{ transform: "rotate(3deg)" }}>
             <div className="relative h-full overflow-hidden rounded-[1.35rem]">
               {newestPost ? (
                 <ShowcaseHeroCover post={newestPost} className="transition duration-700 group-hover:scale-[1.03]" />
               ) : (
-                <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"}`}>
+                <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
                   <VisualIcon id="showcase-cover-empty-icon" label="أيقونة غلاف الأخبار الفارغ" icon="sparkles" size={42} />
                 </div>
               )}
@@ -659,42 +677,67 @@ function UnifiedShowcaseHero({
           </div>
         </div>
         <div className="order-1 md:order-2">
-          <VisualEditable id="showcase-hero-kicker" tag="text" label="شارة الأخبار والعروض" defaultText={customTag || "العقيق · الأخبار والعروض"} as="div" className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
-            dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-          }`}>
-            <VisualIcon id="showcase-hero-kicker-icon" label="أيقونة شارة الأخبار" icon="sparkles" size={14} />{customTag || "العقيق · الأخبار والعروض"}
-          </VisualEditable>
-          <VisualEditable id="showcase-hero-title" tag="text" label="السطر الأول لعنوان الأخبار والعروض" defaultText={customTitle || showcase.title} as="h1" className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${dark ? "text-white" : "text-black"}`} />
-          <VisualEditable id="showcase-hero-subtitle" tag="text" label="السطر الذهبي لعنوان الأخبار والعروض" defaultText={customSubtitle || "كل جديد، أولًا بأول."} as="h1" className={`text-4xl font-black leading-[1.12] md:text-6xl ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
-          <VisualEditable id="showcase-hero-intro" tag="text" label="مقدمة الأخبار والعروض" defaultText={customDesc || showcase.intro || "رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق وعروضها، وكل منشور يفتح في تجربته المناسبة."} as="p" className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`} />
+          {isNationalDay ? (
+            <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
+              dark
+                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
+                : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+            }`}>
+              <span className="text-sm">🇸🇦</span>
+              <span className="font-black">الأخبار والعروض · هوية اليوم الوطني</span>
+            </div>
+          ) : (
+            <VisualEditable id="showcase-hero-kicker" tag="text" label="شارة الأخبار والعروض" defaultText={customTag || "العقيق · الأخبار والعروض"} as="div" className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+            }`}>
+              <VisualIcon id="showcase-hero-kicker-icon" label="أيقونة شارة الأخبار" icon="sparkles" size={14} />{customTag || "العقيق · الأخبار والعروض"}
+            </VisualEditable>
+          )}
+          <VisualEditable id="showcase-hero-title" tag="text" label="السطر الأول لعنوان الأخبار والعروض" defaultText={customTitle || showcase.title} as="h1" className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
+            dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+          }`} />
+          <VisualEditable id="showcase-hero-subtitle" tag="text" label="السطر الذهبي لعنوان الأخبار والعروض" defaultText={customSubtitle || "كل جديد، أولًا بأول."} as="h1" className={`text-4xl font-black leading-[1.12] md:text-6xl ${
+            isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"
+          }`} />
+          <VisualEditable id="showcase-hero-intro" tag="text" label="مقدمة الأخبار والعروض" defaultText={customDesc || showcase.intro || "رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق وعروضها، وكل منشور يفتح في تجربته المناسبة."} as="p" className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`} />
           <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold">
             <span className={`rounded-full border px-3 py-2 ${
-              dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+              isNationalDay
+                ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
             }`}>
-              <VisualIcon id="showcase-image-count-icon" label="أيقونة عدد الصور" icon="image" className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{imageCount} صورة
+              <VisualIcon id="showcase-image-count-icon" label="أيقونة عدد الصور" icon="image" className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{imageCount} صورة
             </span>
             <span className={`rounded-full border px-3 py-2 ${
-              dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+              isNationalDay
+                ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
             }`}>
-              <VisualIcon id="showcase-video-count-icon" label="أيقونة عدد الفيديوهات" icon="video" className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{videoCount} فيديو
+              <VisualIcon id="showcase-video-count-icon" label="أيقونة عدد الفيديوهات" icon="video" className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{videoCount} فيديو
             </span>
             {socialCount ? (
               <span className={`rounded-full border px-3 py-2 ${
-                dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                isNationalDay
+                  ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                  : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
               }`}>
-                <VisualIcon id="showcase-social-count-icon" label="أيقونة عدد منشورات السوشيال" icon="share" className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{socialCount} سوشيال
+                <VisualIcon id="showcase-social-count-icon" label="أيقونة عدد منشورات السوشيال" icon="share" className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{socialCount} سوشيال
               </span>
             ) : null}
           </div>
           <div className="mt-7 flex flex-wrap gap-3">
             <VisualEditable id="showcase-explore-action" tag="button" label="زر استكشاف الأخبار" defaultText="استكشف الجديد" as="button" onAction={onExplore} className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
-              dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+              dark
+                ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                : isNationalDay
+                ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
+                : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
             }`}>
               <VisualIcon id="showcase-explore-icon" label="أيقونة زر استكشاف الأخبار" icon="external" size={16} />استكشف الجديد
             </VisualEditable>
             {isAdmin ? (
               <VisualEditable id="showcase-studio-action" tag="button" label="زر دخول استوديو الأخبار" defaultText="دخول استوديو الأخبار والعروض" as="button" onAction={onOpenStudio} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
-                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : isNationalDay ? "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
               }`}>
                 <VisualIcon id="showcase-studio-action-icon" label="أيقونة دخول استوديو الأخبار" icon="menu" size={16} />دخول استوديو الأخبار والعروض
               </VisualEditable>
@@ -710,6 +753,7 @@ function UnifiedShowcaseHero({
         </div>
       </div>
     </VisualEditable>
+
   );
 }
 
@@ -792,9 +836,16 @@ export default function AqeeqShowcasePage() {
     );
   }
 
+  const { isNationalDay } = useSiteTheme();
+
   return (
-    <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+    <main dir="rtl" className={`min-h-screen aq-public-shell ${
+      isNationalDay
+        ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
+        : dark ? "bg-black text-white" : "bg-white text-black"
+    }`}>
       <AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={showcase.headerLogoUrl || issues[0]?.headerLogoUrl} />
+
       {showcase.backgroundAudioUrl ? <audio ref={audioRef} src={showcase.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
       <UnifiedShowcaseHero
         showcase={showcase}

@@ -17,8 +17,10 @@ import { trpc } from "@/lib/trpc";
 import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, MonitorPlay, Moon, Printer, RotateCcw, ScanFace, Settings2, Share2, Sparkles, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 type AlbumMode = "spread" | "scroll" | "gallery";
+
 type AlbumItem = {
   id: number;
   mediaUrl: string;
@@ -323,14 +325,45 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   if (isLoading) return <div className="grid min-h-screen place-items-center bg-[#080b12]"><Loader2 className="animate-spin text-amber-300" /></div>;
   if (!album) return <main dir="rtl" className="grid min-h-screen place-items-center bg-[#080b12] p-6 text-center text-slate-400"><div><ImageIcon className="mx-auto text-amber-300" size={38} /><h1 className="mt-4 text-2xl font-black text-amber-50">هذا الألبوم غير متاح</h1><p className="mt-2 text-sm">قد يكون مسودة لم تُنشر بعد أو أن الرابط غير صحيح.</p></div></main>;
 
+  const { isNationalDay } = useSiteTheme();
   const watermarkPlacement = album.watermarkPosition === "top-right" ? "right-[-10%] top-0" : album.watermarkPosition === "bottom-left" ? "bottom-[-8%] left-[-10%]" : album.watermarkPosition === "bottom-right" ? "bottom-[-8%] right-[-10%]" : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
 
-  return <main dir="rtl" className={`aq-album-reader-theme aq-album-reader-theme-${theme} min-h-screen transition-colors ${dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"}`}><AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
-    <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
-      <header className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"}`}>
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="min-w-0"><VisualEditable id="album-reader-kicker" tag="text" label="شارة قارئ الألبوم" defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`} as="div" className="text-[10px] font-black tracking-[.1em] text-amber-300" /><VisualEditable id="album-reader-title" tag="text" label="عنوان الألبوم في القارئ" defaultText={album.title} as="h1" className="truncate text-lg font-black md:text-2xl" /></div>
-        </div>
+  return (
+    <main
+      dir="rtl"
+      className={`aq-album-reader-theme aq-album-reader-theme-${theme} min-h-screen transition-colors ${
+        isNationalDay
+          ? dark
+            ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
+            : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
+          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
+      }`}
+    >
+      <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
+      <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
+        <header
+          className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${
+            isNationalDay
+              ? dark
+                ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
+                : "border-emerald-600/20 bg-white/95 shadow-md shadow-emerald-950/5 backdrop-blur-md text-slate-900"
+              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
+          }`}
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="min-w-0">
+              <VisualEditable
+                id="album-reader-kicker"
+                tag="text"
+                label="شارة قارئ الألبوم"
+                defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`}
+                as="div"
+                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : "text-amber-300")}
+              />
+              <VisualEditable id="album-reader-title" tag="text" label="عنوان الألبوم في القارئ" defaultText={album.title} as="h1" className="truncate text-lg font-black md:text-2xl" />
+            </div>
+          </div>
+
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end w-full md:w-auto">
           {mode === "spread" ? (
             <div className="flex items-center gap-1">
@@ -778,5 +811,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         />
       )}
     </div>
-  </main>;
+  </main>
+  );
 }
+
