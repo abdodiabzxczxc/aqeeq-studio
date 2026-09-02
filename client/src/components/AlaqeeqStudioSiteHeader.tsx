@@ -126,9 +126,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 className={`max-h-full max-w-full object-contain transition duration-200 ${
                   isNationalDay
                     ? dark
-                      ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
-                      : "drop-shadow-[0_1px_4px_rgba(0,90,54,0.12)]"
+                      ? "drop-shadow-[0_2px_12px_rgba(90,186,28,0.25)]"
+                      : "drop-shadow-[0_1px_3px_rgba(96,124,79,0.15)]"
                     : dark
+
                     ? "brightness-0 invert opacity-95"
                     : ""
                 }`}
