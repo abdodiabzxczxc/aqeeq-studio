@@ -100,7 +100,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   return (
     <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
       <header className={`aq-studio-share-header sticky top-0 z-40 border-b backdrop-blur-xl transition duration-200 ${
-        dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
+        isNationalDay
+          ? dark ? "border-emerald-500/20 bg-[#01140c]/90" : "border-emerald-200/80 bg-white/95"
+          : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
       }`}>
         <div className="relative mx-auto h-[66px] sm:h-[80px] max-w-[1380px] px-3.5 sm:px-6 md:px-8">
           {/* Logo with responsive max-width to prevent any collision */}
@@ -120,9 +122,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
 
             {isNationalDay && (
-              <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-sm animate-pulse">
+              <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/15 to-teal-600/15 border border-emerald-500/40 text-emerald-500 shadow-sm">
                 <span>🇸🇦</span>
-                <span>{customBadgeText}</span>
+                <span className="font-bold">{customBadgeText}</span>
               </span>
             )}
           </div>

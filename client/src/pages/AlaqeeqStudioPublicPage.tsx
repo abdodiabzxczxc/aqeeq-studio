@@ -734,28 +734,24 @@ export default function AlaqeeqStudioPublicPage() {
         as="section"
         className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
           isNationalDay
-            ? dark ? "border-emerald-500/30 bg-[#00140c] text-white" : "border-emerald-200 bg-[#f0faf5] text-black"
+            ? dark ? "snd-hero-dark border-emerald-500/30 text-white" : "snd-hero-light border-emerald-200 text-slate-900"
             : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         )}
       >
+        {/* Subtle Ambient Background Watermark */}
         {isNationalDay ? (
-          <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-            style={{
-              backgroundImage: `url('${backgroundPatternUrl}')`,
-              opacity: backgroundPatternOpacity,
-            }}
-          />
+          <div className="pointer-events-none absolute inset-0 snd-pattern-watermark" />
         ) : (
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
         )}
+
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
             {isNationalDay ? (
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-1 mb-3 text-emerald-400 text-xs font-black shadow-sm">
-                <span>🇸🇦</span>
-                <span>{customBadgeText}</span>
-                <span className="text-emerald-300/80 font-normal">· {variantInfo.label}</span>
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/40 px-3.5 py-1 mb-3 text-emerald-400 text-xs font-black shadow-md shadow-emerald-950/20 backdrop-blur-md">
+                <span className="text-sm">🇸🇦</span>
+                <span className="text-emerald-300 font-black">{customBadgeText}</span>
+                <span className="text-white/60 font-normal mr-1">· هوية اليوم الوطني</span>
               </div>
             ) : (
               <VisualEditable
@@ -767,30 +763,45 @@ export default function AlaqeeqStudioPublicPage() {
                 className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
               />
             )}
-            <h1 className={"mt-4 text-4xl font-black leading-[1.1] md:text-6xl " + (dark ? "text-white" : "text-black")}>
+
+            <h1 className={"mt-4 text-4xl font-black leading-[1.1] md:text-6xl " + (
+              isNationalDay
+                ? dark ? "text-white" : "text-[#032e1d]"
+                : dark ? "text-white" : "text-black"
+            )}>
               <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="ذاكرة العقيق" as="span" />
               <br />
-              <VisualEditable
-                id="studio-hero-accent"
-                tag="text"
-                label="تكملة عنوان الاستوديو"
-                defaultText="في مكان واحد."
-                as="span"
-                className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}
-              />
+              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
+                <VisualEditable
+                  id="studio-hero-accent"
+                  tag="text"
+                  label="تكملة عنوان الاستوديو"
+                  defaultText="في مكان واحد."
+                  as="span"
+                />
+              </span>
             </h1>
+
             <VisualEditable
               id="studio-hero-description"
               tag="text"
               label="وصف غلاف الاستوديو"
               defaultText="منصة مدارس العقيق الرقمية المتكاملة لتوثيق الفعاليات المدرسية، إصدارات المجلات الدورية، وأحدث الأخبار والعروض في تجربة تفاعلية فاخرة."
               as="p"
-              className={"mt-5 max-w-xl text-sm leading-8 " + (dark ? "text-slate-300" : "text-slate-600")}
+              className={"mt-5 max-w-xl text-sm leading-8 " + (
+                isNationalDay
+                  ? dark ? "text-emerald-100/80" : "text-slate-700"
+                  : dark ? "text-slate-300" : "text-slate-600"
+              )}
             />
 
             {/* Stats Bar */}
             <div className={"mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-4 " + (
-              dark ? "divide-white/[0.1] border-white/[0.1]" : "divide-black/[0.08] border-black/[0.08]"
+              isNationalDay
+                ? dark
+                  ? "divide-emerald-500/20 border-emerald-500/20 bg-emerald-950/20 rounded-2xl px-3 backdrop-blur-sm"
+                  : "divide-emerald-200 border-emerald-200 bg-emerald-50/50 rounded-2xl px-3 backdrop-blur-sm"
+                : dark ? "divide-white/[0.1] border-white/[0.1]" : "divide-black/[0.08] border-black/[0.08]"
             )}>
               <div className="pl-3">
                 <VisualEditable
@@ -799,7 +810,11 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف عداد المجلات"
                   defaultText="PUBLISHED ISSUES"
                   as="p"
-                  className={"text-[8px] font-black tracking-[0.12em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}
+                  className={"text-[8px] font-black tracking-[0.12em] " + (
+                    isNationalDay
+                      ? "text-[#f8ca14]"
+                      : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
+                  )}
                 />
                 <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(issues.length).padStart(2, "0")}</p>
               </div>
@@ -810,7 +825,11 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف عداد الألبومات"
                   defaultText="EVENT ALBUMS"
                   as="p"
-                  className={"text-[8px] font-black tracking-[0.12em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}
+                  className={"text-[8px] font-black tracking-[0.12em] " + (
+                    isNationalDay
+                      ? "text-[#f8ca14]"
+                      : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
+                  )}
                 />
                 <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(albums.length).padStart(2, "0")}</p>
               </div>
@@ -821,7 +840,11 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف عداد الأخبار والعروض"
                   defaultText="NEWS & OFFERS"
                   as="p"
-                  className={"text-[8px] font-black tracking-[0.12em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}
+                  className={"text-[8px] font-black tracking-[0.12em] " + (
+                    isNationalDay
+                      ? "text-[#f8ca14]"
+                      : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
+                  )}
                 />
                 <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(totalPosts).padStart(2, "0")}</p>
               </div>
@@ -868,7 +891,11 @@ export default function AlaqeeqStudioPublicPage() {
                 if (event.key === "Enter" || event.key === " ") navigate("/journal");
               }}
               className={"group absolute bottom-[2%] left-[1%] top-[5%] z-20 w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 hover:scale-[1.02] " + (
-                dark
+                isNationalDay
+                  ? dark
+                    ? "border-[#f8ca14]/70 bg-[#001f13]/80 shadow-[0_25px_60px_rgba(0,90,54,0.45)] backdrop-blur-md"
+                    : "border-emerald-500/60 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.2)]"
+                  : dark
                   ? "border-[#f8ca14]/50 bg-[#111111] shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
                   : "border-[#08467d]/40 bg-white shadow-[0_30px_70px_rgba(8,70,125,0.15)]"
               )}

@@ -2017,12 +2017,12 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 
 /* ══════════════════════════════════════════════════════════════
-   🇸🇦 SAUDI NATIONAL DAY THEME (هوية اليوم الوطني السعودي)
+   🇸🇦 SAUDI NATIONAL DAY LUXURY THEME ENGINE
    ══════════════════════════════════════════════════════════════ */
-:root[data-site-theme="saudi-national-day"],
-body.theme-saudi-national-day {
-  --snd-green-royal: #005A36;
-  --snd-green-vibrant: #5aba1c;
+:root[data-site-theme="saudi-national-day"] {
+  --snd-primary: #005A36;
+  --snd-primary-dark: #003822;
+  --snd-vibrant: #5aba1c;
   --snd-gold: #f8ca14;
   --snd-vision: #6565e0;
   --snd-generosity: #971a4d;
@@ -2030,36 +2030,48 @@ body.theme-saudi-national-day {
   --snd-giving: #7c5d21;
 }
 
-/* Celebration Ribbon */
-.snd-celebration-ribbon {
-  background: linear-gradient(90deg, #005A36 0%, #007A48 30%, #5aba1c 50%, #007A48 70%, #005A36 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 90, 54, 0.4);
+/* Top Celebration Ribbon */
+.snd-ribbon-bar {
+  background: linear-gradient(90deg, #003d25 0%, #005A36 35%, #007A48 50%, #005A36 65%, #003d25 100%);
+  border-bottom: 1px solid rgba(248, 202, 20, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 58, 34, 0.35);
 }
 
-/* National Theme Glowing Accents */
-.theme-saudi-national-day .snd-glow-box {
-  border-color: rgba(90, 186, 28, 0.35) !important;
-  box-shadow: 0 0 25px rgba(0, 90, 54, 0.25), inset 0 0 15px rgba(90, 186, 28, 0.1) !important;
+/* Saudi National Day Ambient Hero Glow */
+.snd-hero-dark {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 90, 54, 0.5), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(90, 186, 28, 0.1), transparent),
+              linear-gradient(180deg, #01140c 0%, #021a10 50%, #010d08 100%);
 }
 
-.theme-saudi-national-day .snd-btn-primary {
-  background: linear-gradient(135deg, #005A36 0%, #007A48 50%, #5aba1c 100%) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 15px rgba(0, 90, 54, 0.35) !important;
+.snd-hero-light {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(90, 186, 28, 0.18), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0, 90, 54, 0.08), transparent),
+              linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 50%, #ffffff 100%);
 }
 
-.theme-saudi-national-day .snd-btn-primary:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 6px 22px rgba(90, 186, 28, 0.45) !important;
-}
-
-/* Pattern Overlay */
-.snd-bg-pattern {
-  position: absolute;
-  inset: 0;
+/* Geometric Subtle Sadu Pattern Watermark (Pure CSS / SVG - Non-Intrusive) */
+.snd-pattern-watermark {
+  background-image: radial-gradient(rgba(90, 186, 28, 0.15) 1px, transparent 1px), radial-gradient(rgba(248, 202, 20, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
   pointer-events: none;
-  background-size: cover;
-  background-position: center;
-  mix-blend-mode: overlay;
+}
+
+/* Luxury National Day Gold & Emerald Text Gradient */
+.snd-text-gradient {
+  background: linear-gradient(135deg, #f8ca14 0%, #5aba1c 50%, #f8ca14 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* National Theme Glassmorphism Cards */
+.snd-glass-card {
+  border-color: rgba(90, 186, 28, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 58, 34, 0.2), inset 0 0 20px rgba(90, 186, 28, 0.05) !important;
+}
+
+.snd-glass-card:hover {
+  border-color: rgba(248, 202, 20, 0.5) !important;
+  box-shadow: 0 15px 40px rgba(0, 90, 54, 0.3), inset 0 0 25px rgba(248, 202, 20, 0.1) !important;
 }
