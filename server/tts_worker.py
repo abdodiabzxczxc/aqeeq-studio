@@ -31,7 +31,7 @@ def enrich_arabic_for_voice(text: str) -> str:
     t = re.sub(r'\b(3D|3d)\b', 'ثُلَاثِيَّة الأَبْعَاد', t)
     t = re.sub(r'\b(PDF|pdf)\b', 'بِي دِي إِف', t)
 
-    # Convert percentages
+    # Convert percentages to words
     t = re.sub(r'(\d+)\s*%', r'\1 بالمِئَة', t)
 
     # Format long phone numbers digit by digit for clear audible reading
@@ -49,7 +49,7 @@ def enrich_arabic_for_voice(text: str) -> str:
     t = t.replace('الدبلومة الأمريكية', 'الدِّبْلُومَةُ الأَمْرِيكِيَّة')
     t = t.replace('رياض الأطفال', 'رِيَاضُ الأَطْفَال')
 
-    # Natural breathing pauses: add gentle pause after sentence stops
+    # Natural breathing pauses: gentle pause after sentence stops
     t = re.sub(r'([.؟!])\s+', r'\1 ... ', t)
     t = re.sub(r'(:)\s+', r'، ', t)
 
@@ -59,9 +59,9 @@ def enrich_arabic_for_voice(text: str) -> str:
 
 async def main():
     voice = sys.argv[1] if len(sys.argv) > 1 else "ar-SA-HamedNeural"
-    # Optimal acoustic parameters: gentle -3% rate and -2Hz pitch for warm, resonant authority
-    rate = sys.argv[2] if len(sys.argv) > 2 else "-3%"
-    pitch = sys.argv[3] if len(sys.argv) > 3 else "-2Hz"
+    # Snappy and natural +5% rate for brisk responsiveness (no dragging)
+    rate = sys.argv[2] if len(sys.argv) > 2 else "+5%"
+    pitch = sys.argv[3] if len(sys.argv) > 3 else "-1Hz"
 
     raw_text = sys.stdin.read().strip()
     if not raw_text:
@@ -70,7 +70,7 @@ async def main():
     # Apply studio enrichment
     enriched_text = enrich_arabic_for_voice(raw_text)
 
-    communicate = edge_tts.Communicate(enriched_text, voice, rate=rate, pitch=pitch, volume="+10%")
+    communicate = edge_tts.Communicate(enriched_text, voice, rate=rate, pitch=pitch, volume="+15%")
     async for chunk in communicate.stream():
         if chunk["type"] == "audio":
             sys.stdout.buffer.write(chunk["data"])

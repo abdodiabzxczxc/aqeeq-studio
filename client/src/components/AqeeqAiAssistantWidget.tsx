@@ -30,7 +30,10 @@ import {
   Volume2,
   VolumeX,
   Square,
-  AudioWaveform as WaveformIcon
+  AudioWaveform as WaveformIcon,
+  Phone,
+  PhoneOff,
+  PhoneCall,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -199,6 +202,16 @@ export function AqeeqAiAssistantWidget() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Live Voice Call Mode States (Gemini Live Mode)
+  const [isLiveCallOpen, setIsLiveCallOpen] = useState(false);
+  const [liveCallStatus, setLiveCallStatus] = useState<"speaking" | "listening" | "thinking" | "idle">("idle");
+  const [callSeconds, setCallSeconds] = useState(0);
+  const [liveUserTranscript, setLiveUserTranscript] = useState("");
+  const [liveAssistantTranscript, setLiveAssistantTranscript] = useState("");
+  const callMessagesRef = useRef<ChatMsg[]>([]);
+  const callTimerRef = useRef<any>(null);
+  const isCallActiveRef = useRef(false);
 
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -475,9 +488,9 @@ export function AqeeqAiAssistantWidget() {
       };
       setMessages((prev) => {
         const next = [...prev, newMsg];
-        if (isVoiceEnabled && data.reply) {
+        if (isVoiceEnabled && (data.spokenText || data.reply)) {
           setTimeout(() => {
-            speakText(data.reply, next.length - 1);
+            speakText(data.spokenText || data.reply, next.length - 1);
           }, 150);
         }
         return next;
@@ -517,6 +530,242 @@ export function AqeeqAiAssistantWidget() {
     }
   }, [messages, isOpen]);
 
+  const formatCallDuration = (totalSeconds: number): string => {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  const endLiveCall = () => {
+    isCallActiveRef.current = false;
+    if (callTimerRef.current) {
+      clearInterval(callTimerRef.current);
+      callTimerRef.current = null;
+    }
+    stopSpeaking();
+    stopListening();
+    setLiveCallStatus("idle");
+    setIsLiveCallOpen(false);
+
+    if (callMessagesRef.current.length > 0) {
+      setMessages((prev) => [...prev, ...callMessagesRef.current]);
+      setIsOpen(true);
+      toast.success(
+        `تم إنهاء المكالمة وحفظ كامل المحادثة في الشات المكتوب (${callMessagesRef.current.length} رسالة) 📋✨`
+      );
+    }
+  };
+
+  const speakLiveCallText = async (text: string) => {
+    if (!isCallActiveRef.current) return;
+    setLiveCallStatus("speaking");
+    setLiveAssistantTranscript(text);
+    stopSpeaking();
+
+    try {
+      pausePodcast();
+    } catch (e) {}
+
+    try {
+      const data = await synthesizeMutation.mutateAsync({ text, voice: "male" });
+      if (!isCallActiveRef.current) return;
+
+      if (data?.audioBase64) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioBase64}`);
+        audioPlayerRef.current = audio;
+
+        audio.onended = () => {
+          if (!isCallActiveRef.current) return;
+          audioPlayerRef.current = null;
+          listenLiveCall();
+        };
+
+        audio.onerror = () => {
+          if (!isCallActiveRef.current) return;
+          setTimeout(() => {
+            if (isCallActiveRef.current) listenLiveCall();
+          }, 2500);
+        };
+
+        await audio.play();
+      } else {
+        setTimeout(() => {
+          if (isCallActiveRef.current) listenLiveCall();
+        }, 2500);
+      }
+    } catch (err) {
+      setTimeout(() => {
+        if (isCallActiveRef.current) listenLiveCall();
+      }, 2500);
+    }
+  };
+
+  const listenLiveCall = async () => {
+    if (!isCallActiveRef.current) return;
+    setLiveCallStatus("listening");
+    setLiveUserTranscript("");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      audioChunksRef.current = [];
+
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "audio/mp4";
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (evt) => {
+        if (evt.data && evt.data.size > 0) {
+          audioChunksRef.current.push(evt.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const tracks = stream.getTracks();
+        tracks.forEach((t) => t.stop());
+
+        if (!isCallActiveRef.current) return;
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (audioBlob.size > 1200) {
+          setLiveCallStatus("thinking");
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Audio = (reader.result as string)?.split(",")[1];
+            if (base64Audio && isCallActiveRef.current) {
+              try {
+                const res = await transcribeMutation.mutateAsync({
+                  audioBase64: base64Audio,
+                  mimeType: mimeType.split(";")[0],
+                });
+                const userText = res?.text?.trim();
+                if (userText && isCallActiveRef.current) {
+                  setLiveUserTranscript(userText);
+                  callMessagesRef.current.push({ role: "user", content: userText });
+
+                  const aiRes = await askAiMutation.mutateAsync({
+                    prompt: userText,
+                    history: [...messages, ...callMessagesRef.current].map((m) => ({
+                      role: m.role,
+                      content: m.content,
+                    })),
+                  });
+
+                  if (isCallActiveRef.current) {
+                    callMessagesRef.current.push({
+                      role: "assistant",
+                      content: aiRes.reply,
+                      suggestedQuestions: aiRes.suggestedQuestions,
+                      actionShortcuts: aiRes.actionShortcuts,
+                    });
+                    await speakLiveCallText(aiRes.spokenText || aiRes.reply);
+                  }
+                } else if (isCallActiveRef.current) {
+                  listenLiveCall();
+                }
+              } catch (e) {
+                if (isCallActiveRef.current) listenLiveCall();
+              }
+            } else if (isCallActiveRef.current) {
+              listenLiveCall();
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        } else if (isCallActiveRef.current) {
+          listenLiveCall();
+        }
+      };
+
+      recorder.start(250);
+
+      // In parallel: Web Speech Recognition for instant speech detection
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.lang = "ar-SA";
+          recognition.continuous = false;
+          recognition.interimResults = true;
+
+          recognition.onresult = async (event: any) => {
+            const transcript = event.results?.[0]?.[0]?.transcript;
+            if (transcript && transcript.trim()) {
+              setLiveUserTranscript(transcript.trim());
+              if (event.results[0].isFinal) {
+                audioChunksRef.current = [];
+                stopListening();
+                if (!isCallActiveRef.current) return;
+
+                setLiveCallStatus("thinking");
+                callMessagesRef.current.push({ role: "user", content: transcript.trim() });
+
+                try {
+                  const aiRes = await askAiMutation.mutateAsync({
+                    prompt: transcript.trim(),
+                    history: [...messages, ...callMessagesRef.current].map((m) => ({
+                      role: m.role,
+                      content: m.content,
+                    })),
+                  });
+
+                  if (isCallActiveRef.current) {
+                    callMessagesRef.current.push({
+                      role: "assistant",
+                      content: aiRes.reply,
+                      suggestedQuestions: aiRes.suggestedQuestions,
+                      actionShortcuts: aiRes.actionShortcuts,
+                    });
+                    await speakLiveCallText(aiRes.spokenText || aiRes.reply);
+                  }
+                } catch (e) {
+                  if (isCallActiveRef.current) listenLiveCall();
+                }
+              }
+            }
+          };
+
+          speechRecognitionRef.current = recognition;
+          recognition.start();
+        } catch (e) {}
+      }
+    } catch (err) {
+      if (isCallActiveRef.current) {
+        toast.error("يرجى التأكد من إذن المايكروفون لبدء المكالمة");
+        endLiveCall();
+      }
+    }
+  };
+
+  const startLiveCall = async () => {
+    isCallActiveRef.current = true;
+    callMessagesRef.current = [];
+    setLiveUserTranscript("");
+    setCallSeconds(0);
+    setIsLiveCallOpen(true);
+    setIsOpen(false);
+
+    if (callTimerRef.current) clearInterval(callTimerRef.current);
+    callTimerRef.current = setInterval(() => {
+      setCallSeconds((s) => s + 1);
+    }, 1000);
+
+    const initialGreeting =
+      "أَهْلًا وَسَهْلًا بِكَ فِي مَدَارِسِ العَقِيق! أَنَا مُسْتَشَارُكَ التَّعْلِيمِيُّ الذَّكِيُّ، أَنَا فِي اسْتِمَاعِكَ.. تَفَضَّلْ بِسُؤَالِك!";
+    callMessagesRef.current.push({
+      role: "assistant",
+      content: initialGreeting,
+    });
+
+    await speakLiveCallText(initialGreeting);
+  };
+
   const handleSend = (textToSend?: string) => {
     const text = (textToSend || inputPrompt).trim();
     if (!text || askAiMutation.isPending) return;
@@ -555,36 +804,52 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* Floating Trigger Button */}
+      {/* Floating Trigger Buttons */}
       {!isOpen && (
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className={`group relative flex items-center gap-3 rounded-full border p-2 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
-            isDark
-              ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
-              : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
-          }`}
-        >
-          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
-            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
-              isDark ? "border-slate-950" : "border-white"
-            } animate-pulse ${
-              aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"
-            }`} />
-          </div>
-
-          <div className="hidden sm:block text-right">
-            <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>مساعد العقيق الذكي</span>
-              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className={`group relative flex items-center gap-3 rounded-full border p-2 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
+              isDark
+                ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
+                : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
+            }`}
+          >
+            <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
+              <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+              <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+                isDark ? "border-slate-950" : "border-white"
+              } animate-pulse ${
+                aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"
+              }`} />
             </div>
-            <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              {aiStatus?.hasLiveGemini ? "Gemini Live AI متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
-            </p>
-          </div>
-        </button>
+
+            <div className="hidden sm:block text-right">
+              <div className="flex items-center gap-1.5">
+                <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>مساعد العقيق الذكي</span>
+                <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
+              </div>
+              <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                {aiStatus?.hasLiveGemini ? "Gemini Live AI متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
+              </p>
+            </div>
+          </button>
+
+          {/* Quick Direct Live Voice Call Button */}
+          <button
+            type="button"
+            onClick={startLiveCall}
+            className="group relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full border border-emerald-400/60 bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] ring-4 ring-emerald-500/20 animate-pulse"
+            title="بدء مكالمة صوتية حية فورية 📞"
+          >
+            <PhoneCall size={22} className="group-hover:rotate-12 transition-transform" />
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 text-[8px] font-black items-center justify-center text-white">LIVE</span>
+            </span>
+          </button>
+        </div>
       )}
 
       {/* Interactive Luxury Chat Window */}
@@ -609,14 +874,10 @@ export function AqeeqAiAssistantWidget() {
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md">
                 <Bot size={22} />
-                <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ${
-                  isDark ? "ring-[#0f1424]" : "ring-white"
-                } ${
-                  aiStatus?.hasLiveGemini ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
-                }`} />
+                <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-slate-900" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <h3 className={`text-xs sm:text-sm font-black ${isDark ? "text-white" : "text-slate-900"}`}>مساعد مدارس العقيق الذكي</h3>
                   <button
                     type="button"
@@ -642,6 +903,17 @@ export function AqeeqAiAssistantWidget() {
             </div>
 
             <div className="flex items-center gap-1">
+              {/* Live Voice Call Button (Gemini Live Mode) */}
+              <button
+                type="button"
+                onClick={startLiveCall}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white px-2.5 py-1 text-xs font-black shadow-md hover:from-emerald-400 hover:to-teal-400 transition hover:scale-105 mr-1"
+                title="بدء مكالمة صوتية حية (Gemini Live)"
+              >
+                <PhoneCall size={13} className="animate-bounce" />
+                <span className="hidden sm:inline">مكالمة حية ⚡</span>
+              </button>
+
               {/* Voice Sound Toggle Button */}
               <button
                 type="button"
@@ -1060,6 +1332,213 @@ export function AqeeqAiAssistantWidget() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ========================================================================= */}
+      {/* GEMINI LIVE VOICE CALL MODAL (محادثة صوتية حية مستمرة)                   */}
+      {/* ========================================================================= */}
+      {isLiveCallOpen && (
+        <div
+          dir="rtl"
+          className="fixed inset-0 z-[100] flex flex-col justify-between p-4 sm:p-8 bg-[#040711]/95 text-white backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-300"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4 max-w-4xl w-full mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-amber-400 to-[#f8ca14] text-slate-950 font-black shadow-lg">
+                <Bot size={24} />
+                <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-[#040711] animate-ping" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-black text-white">
+                    مكالمة ذكية حية مع مستشار العقيق
+                  </h2>
+                  <span className="rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider animate-pulse">
+                    Live Call ⚡
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-400 font-bold mt-0.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>مدة المكالمة: {formatCallDuration(callSeconds)}</span>
+                  <span>•</span>
+                  <span className="text-amber-300">صوت حامد السعودي الفصيح</span>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              onClick={endLiveCall}
+              variant="destructive"
+              className="rounded-2xl px-4 py-2 text-xs sm:text-sm font-black flex items-center gap-2 shadow-xl bg-red-600 hover:bg-red-500 transition hover:scale-105"
+            >
+              <PhoneOff size={16} />
+              <span>إنهاء وحفظ في الشات</span>
+            </Button>
+          </div>
+
+          {/* Center: The Futuristic Glowing Pulsating Orb */}
+          <div className="flex-1 flex flex-col items-center justify-center my-6 relative max-w-2xl w-full mx-auto text-center px-4">
+            {/* The Interactive Orb Container */}
+            <div className="relative flex items-center justify-center my-8">
+              {/* Outer Radiating Sonic Rings */}
+              <div
+                className={`absolute h-64 w-64 sm:h-80 sm:w-80 rounded-full blur-3xl transition-all duration-700 ${
+                  liveCallStatus === "speaking"
+                    ? "bg-gradient-to-tr from-amber-500/40 via-purple-600/40 to-pink-500/40 scale-125 animate-pulse"
+                    : liveCallStatus === "listening"
+                    ? "bg-gradient-to-tr from-emerald-500/40 via-teal-500/40 to-cyan-500/40 scale-110 animate-pulse"
+                    : "bg-gradient-to-tr from-blue-600/30 via-indigo-600/30 to-amber-500/30 scale-100 animate-spin"
+                }`}
+              />
+
+              {/* Middle Layer Glass Rings */}
+              <div
+                className={`relative grid h-44 w-44 sm:h-56 sm:w-56 place-items-center rounded-full border-2 transition-all duration-500 shadow-2xl backdrop-blur-md ${
+                  liveCallStatus === "speaking"
+                    ? "border-amber-400 bg-gradient-to-tr from-amber-500/20 via-yellow-500/10 to-transparent shadow-[0_0_60px_rgba(248,202,20,0.5)] scale-105"
+                    : liveCallStatus === "listening"
+                    ? "border-emerald-400 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent shadow-[0_0_60px_rgba(16,185,129,0.5)] scale-105"
+                    : "border-cyan-400 bg-gradient-to-tr from-cyan-500/20 via-blue-500/10 to-transparent shadow-[0_0_60px_rgba(6,182,212,0.5)] animate-pulse"
+                }`}
+              >
+                {/* Core Glowing Sphere */}
+                <div
+                  className={`grid h-32 w-32 sm:h-40 sm:w-40 place-items-center rounded-full transition-all duration-300 ${
+                    liveCallStatus === "speaking"
+                      ? "bg-gradient-to-tr from-amber-400 via-[#f8ca14] to-yellow-200 text-slate-950 shadow-inner scale-105"
+                      : liveCallStatus === "listening"
+                      ? "bg-gradient-to-tr from-emerald-400 via-teal-400 to-emerald-200 text-slate-950 shadow-inner animate-pulse"
+                      : "bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-500 text-white shadow-inner"
+                  }`}
+                >
+                  {liveCallStatus === "speaking" ? (
+                    <WaveformIcon size={44} className="animate-pulse" />
+                  ) : liveCallStatus === "listening" ? (
+                    <Mic size={44} className="animate-bounce" />
+                  ) : (
+                    <Sparkles size={44} className="animate-spin" />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Live State Label */}
+            <div className="mt-4 space-y-2">
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-black shadow-md ${
+                  liveCallStatus === "speaking"
+                    ? "bg-amber-400/20 text-amber-300 border border-amber-400/40"
+                    : liveCallStatus === "listening"
+                    ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 animate-pulse"
+                    : "bg-blue-400/20 text-blue-300 border border-blue-400/40"
+                }`}
+              >
+                {liveCallStatus === "speaking" && (
+                  <>
+                    <WaveformIcon size={14} className="animate-pulse text-amber-400" />
+                    <span>المستشار يتحدث إليك الآن... 🔊</span>
+                  </>
+                )}
+                {liveCallStatus === "listening" && (
+                  <>
+                    <Mic size={14} className="animate-bounce text-emerald-400" />
+                    <span>أنا مستمع إليك الآن.. تفضل بالتحدث 🎙️</span>
+                  </>
+                )}
+                {liveCallStatus === "thinking" && (
+                  <>
+                    <Loader2 size={14} className="animate-spin text-blue-400" />
+                    <span>المستشار يفكر ويجهز الإجابة... ⚡</span>
+                  </>
+                )}
+                {liveCallStatus === "idle" && <span>جاهز للمكالمة</span>}
+              </span>
+
+              <p className="text-xs text-slate-400 font-medium">
+                تحدث بحرية وبدون لمس أي زر.. المحادثة مستمرة تلقائياً ومسجلة في الشات بالكامل!
+              </p>
+            </div>
+
+            {/* Live Subtitles & Transcripts Box */}
+            <div className="w-full mt-6 max-h-36 overflow-y-auto rounded-2xl border border-white/10 bg-black/40 p-4 text-right space-y-2 backdrop-blur-md shadow-inner text-xs sm:text-sm">
+              {liveUserTranscript && (
+                <div className="text-emerald-300 font-bold flex items-start gap-2">
+                  <span className="shrink-0 bg-emerald-500/20 px-2 py-0.5 rounded text-[10px] text-emerald-400 border border-emerald-500/30">
+                    أنت:
+                  </span>
+                  <span>"{liveUserTranscript}"</span>
+                </div>
+              )}
+              {liveAssistantTranscript && (
+                <div className="text-slate-200 font-medium flex items-start gap-2 border-t border-white/5 pt-2">
+                  <span className="shrink-0 bg-amber-500/20 px-2 py-0.5 rounded text-[10px] text-amber-400 border border-amber-500/30">
+                    المستشار:
+                  </span>
+                  <span className="line-clamp-3">"{liveAssistantTranscript}"</span>
+                </div>
+              )}
+              {!liveUserTranscript && !liveAssistantTranscript && (
+                <p className="text-slate-500 text-center py-2">
+                  ابدأ بالحديث وسيظهر نص كلامك وإجابات المستشار فورياً هنا...
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Footer Controls */}
+          <div className="border-t border-white/10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl w-full mx-auto">
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  if (liveCallStatus === "speaking") {
+                    stopSpeaking();
+                    listenLiveCall();
+                  } else if (liveCallStatus === "listening") {
+                    stopListening();
+                  } else {
+                    listenLiveCall();
+                  }
+                }}
+                className={`rounded-2xl px-4 py-3 text-xs sm:text-sm font-black transition flex items-center gap-2 ${
+                  liveCallStatus === "speaking"
+                    ? "bg-amber-500 text-black hover:bg-amber-400"
+                    : liveCallStatus === "listening"
+                    ? "bg-emerald-500 text-black hover:bg-emerald-400"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {liveCallStatus === "speaking" ? (
+                  <>
+                    <Square size={16} />
+                    <span>مقاطعة والتحدث الآن 🎙️</span>
+                  </>
+                ) : liveCallStatus === "listening" ? (
+                  <>
+                    <Square size={16} />
+                    <span>إنهاء الحديث والإرسال</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic size={16} />
+                    <span>تحدث الآن</span>
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <Button
+              type="button"
+              onClick={endLiveCall}
+              className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black px-6 py-3.5 shadow-2xl hover:brightness-110 flex items-center justify-center gap-2.5 text-sm"
+            >
+              <PhoneOff size={18} />
+              <span>إنهاء المكالمة وعرض المحادثة في الشات المكتوب</span>
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

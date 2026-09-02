@@ -242,13 +242,19 @@ const SYSTEM_INSTRUCTION_CORPUS = `
      • **أثير إذاعة وبودكاست العقيق (صوت وفيديو)**: (/podcast)
      • **الأخبار والعروض وتغطيات التواصل الاجتماعي**: (/offers)
      • **جهاز اللاسلكي المدرسي (Walkie-Talkie)**: للنداء والتواصل الفوري بين الكادر المدرسي.
-   - **أوقات الدوام الرسمي**: الاصطفاف الصباحي يبدأ 6:45 ص، واستقبال أولياء الأمور وخدمة المستفيدين متاح حتى 3:30 عصراً.
+    - **أوقات الدوام الرسمي**: الاصطفاف الصباحي يبدأ 6:45 ص، واستقبال أولياء الأمور وخدمة المستفيدين متاح حتى 3:30 عصراً.
+
+==================================================
+🎙️ صياغة النطق الصوتي الفصيح التلقائي:
+في نهاية كل رد، أضف هذا الفاصل بالضبط:
+---VOICE_PAYLOAD---
+وتحته مباشرة اكتب ملخصاً صوتياً موجزاً وطبيعياً للرد (1 إلى 3 جمل حوارية سريعة للمحادثة الصوتية)، ومُشَكَّلًا تَشْكِيلًا لُغَوِيًّا ونَحْوِيًّا كَامِلًا ومُتْقَنًا 100% بِالحَرَكَاتِ التَّامَّةِ (الضمة، الفتحة، الكسرة، السكون، والشدة) وفواصل (...)، بدون أي ماركداون أو رموز ليتم نطقه فوراً عبر محرك الصوت البشري الفصيح.
 `;
 
 export async function askSchoolAiAssistant(
   messages: ChatMessage[],
   userPrompt: string
-): Promise<{ reply: string; suggestedQuestions: string[]; actionShortcuts?: ActionShortcut[] }> {
+): Promise<{ reply: string; spokenText?: string; suggestedQuestions: string[]; actionShortcuts?: ActionShortcut[] }> {
   // 1. Fetch live platform context (cached with 0ms overhead)
   const livePlatformData = await getCachedLivePlatformData();
 
@@ -316,10 +322,20 @@ export async function askSchoolAiAssistant(
       }
 
       if (rawReply) {
-        const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, rawReply);
-        const actionShortcuts = generateActionShortcuts(userPrompt, rawReply);
+        let displayReply = rawReply;
+        let spokenText = "";
+
+        if (rawReply.includes("---VOICE_PAYLOAD---")) {
+          const parts = rawReply.split("---VOICE_PAYLOAD---");
+          displayReply = parts[0].trim();
+          spokenText = parts[1].trim();
+        }
+
+        const suggestedQuestions = generateSmartFollowUpQuestions(userPrompt, displayReply);
+        const actionShortcuts = generateActionShortcuts(userPrompt, displayReply);
         return {
-          reply: rawReply,
+          reply: displayReply,
+          spokenText: spokenText || displayReply,
           suggestedQuestions,
           actionShortcuts,
         };
@@ -340,7 +356,7 @@ export async function askSchoolAiAssistant(
 function getDeepConversationalReasoningReply(
   prompt: string,
   history: ChatMessage[]
-): { reply: string; suggestedQuestions: string[]; actionShortcuts?: ActionShortcut[] } {
+): { reply: string; spokenText?: string; suggestedQuestions: string[]; actionShortcuts?: ActionShortcut[] } {
   const norm = normalizeArabicText(prompt);
 
   // Greeting / Chit-chat
