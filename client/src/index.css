@@ -1815,10 +1815,10 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 @keyframes marquee-rtl {
   0% {
-    transform: translateX(-50%);
+    transform: translateX(0%);
   }
   100% {
-    transform: translateX(0%);
+    transform: translateX(50%);
   }
 }
 
@@ -1826,7 +1826,7 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: marquee-rtl 12s linear infinite;
+  animation: marquee-rtl 32s linear infinite;
 }
 
 .animate-marquee-rtl:hover {

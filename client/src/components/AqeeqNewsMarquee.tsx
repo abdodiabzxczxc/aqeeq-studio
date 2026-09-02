@@ -37,11 +37,22 @@ export function AqeeqNewsMarquee({
     return list;
   }, [articles, podcasts, albums, issues]);
 
-  // Duplicate once for seamless -50% to 0% infinite loop
-  const marqueeTrack = useMemo(() => {
+  // Ensure a single unit has enough items to fill large viewports without gaps
+  const singleBatch = useMemo(() => {
     if (rawItems.length === 0) return [];
-    return [...rawItems, ...rawItems];
+    let batch = [...rawItems];
+    while (batch.length < 8) {
+      batch = [...batch, ...rawItems];
+    }
+    return batch;
   }, [rawItems]);
+
+  // Duplicate the batch once: total track = [singleBatch, singleBatch].
+  // Shifting by +50% moves singleBatch #2 into singleBatch #1's exact origin for a 100% seamless, invisible loop!
+  const marqueeTrack = useMemo(() => {
+    if (singleBatch.length === 0) return [];
+    return [...singleBatch, ...singleBatch];
+  }, [singleBatch]);
 
   if (rawItems.length === 0) return null;
 
