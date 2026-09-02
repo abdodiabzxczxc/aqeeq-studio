@@ -1640,12 +1640,13 @@ export default function AlaqeeqStudioPublicPage() {
                   isNationalDay
                     ? dark
                       ? "text-[#5aba1c]"
-                      : "text-[#607c4f]"
+                      : "text-[#015a37]"
                     : dark
                     ? "text-slate-300"
                     : "text-slate-700"
                 }`}
               />
+
 
 
             </div>

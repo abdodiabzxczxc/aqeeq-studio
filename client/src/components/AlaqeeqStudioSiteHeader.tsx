@@ -127,8 +127,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   isNationalDay
                     ? dark
                       ? "drop-shadow-[0_2px_12px_rgba(90,186,28,0.25)]"
-                      : "drop-shadow-[0_1px_3px_rgba(96,124,79,0.15)]"
+                      : "drop-shadow-[0_1px_3px_rgba(1,90,55,0.18)]"
                     : dark
+
 
                     ? "brightness-0 invert opacity-95"
                     : ""
