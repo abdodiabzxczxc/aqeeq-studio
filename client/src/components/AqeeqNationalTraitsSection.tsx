@@ -107,11 +107,15 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
   return (
     <section
       aria-label="القيم الوطنية الست - عزنا بطبعنا"
-      className="relative overflow-hidden py-12 sm:py-20"
+      className={`relative overflow-hidden py-12 sm:py-20 transition-colors duration-300 ${
+        dark ? "bg-transparent" : "bg-gradient-to-b from-[#f0fdf4]/80 via-white to-[#f7fdf9]"
+      }`}
     >
       {/* Subtle Ambient Background Light corresponding to the active trait color */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-20 transition-all duration-700 blur-[130px]"
+        className={`pointer-events-none absolute inset-0 transition-all duration-700 blur-[130px] ${
+          dark ? "opacity-20" : "opacity-15"
+        }`}
         style={{
           background: `radial-gradient(ellipse at 50% 30%, ${activeTrait.color} 0%, #005A36 40%, transparent 80%)`,
         }}
@@ -120,19 +124,27 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header Badge & Title */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#f8ca14]/30 bg-[#f8ca14]/10 px-4 py-1.5 text-xs font-black text-[#f8ca14] shadow-sm backdrop-blur-md">
+          <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black shadow-sm backdrop-blur-md ${
+            dark
+              ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+              : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
+          }`}>
             <Sparkles size={14} className="animate-spin" style={{ animationDuration: "6s" }} />
             <span>الهوية الرسمية لليوم الوطني السعودي • عزّنا بطبعنا</span>
           </div>
 
-          <h2 className="mt-4 text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+          <h2 className={`mt-4 text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight ${
+            dark ? "text-white" : "text-[#003822]"
+          }`}>
             ستّ قيم شكّلت{" "}
-            <span className="bg-gradient-to-r from-[#f8ca14] via-[#5aba1c] to-[#005A36] bg-clip-text text-transparent">
+            <span className={dark ? "bg-gradient-to-r from-[#f8ca14] via-[#5aba1c] to-[#005A36] bg-clip-text text-transparent" : "snd-text-gradient"}>
               جوهر الهوية ومجد الوطن
             </span>
           </h2>
 
-          <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-base font-medium text-emerald-100/75 leading-relaxed">
+          <p className={`mx-auto mt-3 max-w-2xl text-xs sm:text-base font-medium leading-relaxed ${
+            dark ? "text-emerald-100/75" : "text-emerald-950/80"
+          }`}>
             استلهمت الهوية الرسمية رسوماتها من ست صفات متجذرة في وجدان كل سعودي وسعودية، ولكل صفة
             رمز بصري من تراثنا المحبوك وألوان تعبر عن روح أمتنا.
           </p>
@@ -155,14 +167,22 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
                     : "hover:scale-[1.02] opacity-75 hover:opacity-100"
                 }`}
                 style={{
-                  backgroundColor: isSelected ? trait.badgeBg : "rgba(255, 255, 255, 0.04)",
-                  borderColor: isSelected ? trait.color : "rgba(255, 255, 255, 0.1)",
-                  color: isSelected ? "#ffffff" : "rgba(255, 255, 255, 0.7)",
+                  backgroundColor: isSelected
+                    ? trait.badgeBg
+                    : dark ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 90, 54, 0.05)",
+                  borderColor: isSelected
+                    ? trait.color
+                    : dark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 90, 54, 0.15)",
+                  color: isSelected
+                    ? (dark ? "#ffffff" : trait.color)
+                    : (dark ? "rgba(255, 255, 255, 0.7)" : "#003822"),
                   boxShadow: isSelected ? `0 0 25px ${trait.color}40` : "none",
                 }}
               >
                 {/* Micro Thumbnail */}
-                <div className="h-6 w-6 sm:h-7 sm:w-7 overflow-hidden rounded-lg border border-white/20 shadow-inner">
+                <div className={`h-6 w-6 sm:h-7 sm:w-7 overflow-hidden rounded-lg border shadow-inner ${
+                  dark ? "border-white/20 bg-black/40" : "border-emerald-600/20 bg-white"
+                }`}>
                   <img
                     src={trait.iconPath}
                     alt={trait.name}
@@ -183,7 +203,11 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
         </div>
 
         {/* Active Trait Spotlight Showcase Card */}
-        <div className="mt-8 overflow-hidden rounded-[2.5rem] border border-white/15 bg-black/60 p-6 sm:p-10 backdrop-blur-xl shadow-2xl relative">
+        <div className={`mt-8 overflow-hidden rounded-[2.5rem] border p-6 sm:p-10 backdrop-blur-xl shadow-2xl relative ${
+          dark
+            ? "border-white/15 bg-black/60 text-white"
+            : "border-emerald-500/25 bg-white/95 text-slate-900 shadow-emerald-950/10"
+        }`}>
           {/* Subtle Corner Najdi Border Accents */}
           <div className="pointer-events-none absolute -top-12 -right-12 h-40 w-40 rounded-full opacity-30 blur-2xl" style={{ backgroundColor: activeTrait.color }} />
           <div className="pointer-events-none absolute -bottom-12 -left-12 h-40 w-40 rounded-full opacity-30 blur-2xl" style={{ backgroundColor: "#005A36" }} />
@@ -201,7 +225,9 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
                 />
 
                 {/* The Extracted Woven Masterpiece */}
-                <div className="relative h-64 w-64 sm:h-80 sm:w-80 overflow-hidden rounded-3xl border-2 border-white/20 bg-[#00180e] shadow-2xl p-2.5">
+                <div className={`relative h-64 w-64 sm:h-80 sm:w-80 overflow-hidden rounded-3xl border-2 p-2.5 shadow-2xl ${
+                  dark ? "border-white/20 bg-[#00180e]" : "border-emerald-500/25 bg-emerald-50/70"
+                }`}>
                   <img
                     src={activeTrait.iconPath}
                     alt={`${activeTrait.name} - ${activeTrait.symbol}`}
@@ -228,25 +254,35 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
                 }}
               >
                 <span>القيمة الوطنية المعتمدة</span>
-                <span className="text-white/40">•</span>
+                <span className="opacity-40">•</span>
                 <span>{activeTrait.patternName}</span>
               </div>
 
-              <h3 className="text-2xl sm:text-4xl font-black text-white leading-tight">
+              <h3 className={`text-2xl sm:text-4xl font-black leading-tight ${
+                dark ? "text-white" : "text-[#003822]"
+              }`}>
                 {activeTrait.title}
               </h3>
 
               {/* Official Quote */}
-              <blockquote className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5 text-sm sm:text-base font-bold text-emerald-200/90 leading-relaxed italic">
+              <blockquote className={`rounded-2xl border p-4 sm:p-5 text-sm sm:text-base font-bold leading-relaxed italic ${
+                dark
+                  ? "border-white/10 bg-white/5 text-emerald-200/90"
+                  : "border-emerald-200 bg-emerald-50/70 text-[#005A36]"
+              }`}>
                 "{activeTrait.quote}"
               </blockquote>
 
-              <p className="text-sm sm:text-base font-medium text-slate-300 leading-relaxed">
+              <p className={`text-sm sm:text-base font-medium leading-relaxed ${
+                dark ? "text-slate-300" : "text-slate-700"
+              }`}>
                 {activeTrait.desc}
               </p>
 
               {/* Color Swatch & Action */}
-              <div className="pt-2 flex flex-wrap items-center justify-between gap-4 border-t border-white/10">
+              <div className={`pt-2 flex flex-wrap items-center justify-between gap-4 border-t ${
+                dark ? "border-white/10" : "border-emerald-100"
+              }`}>
                 <div className="flex items-center gap-3">
                   <div
                     className="h-8 w-8 rounded-xl shadow-md border border-white/20 flex items-center justify-center text-white text-[10px] font-black"
@@ -255,14 +291,14 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
                     HEX
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold text-slate-400">الرمز اللوني المعتمد</div>
-                    <div className="text-xs font-mono font-black text-white">{activeTrait.color}</div>
+                    <div className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>الرمز اللوني المعتمد</div>
+                    <div className={`text-xs font-mono font-black ${dark ? "text-white" : "text-[#003822]"}`}>{activeTrait.color}</div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => triggerNationalCelebration()}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#005A36] via-[#5aba1c] to-[#005A36] px-5 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-950/40 hover:scale-105 active:scale-95 transition-all"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#005A36] via-[#5aba1c] to-[#005A36] px-5 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-950/30 hover:scale-105 active:scale-95 transition-all"
                 >
                   <Sparkles size={16} className="text-[#f8ca14]" />
                   <span>احتفِ بهذه القيمة 🇸🇦</span>
@@ -283,11 +319,17 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
               }}
               className={`group flex flex-col items-center rounded-2xl border p-3 text-center transition-all ${
                 trait.id === activeTrait.id
-                  ? "border-[#f8ca14] bg-white/10 shadow-lg scale-105"
-                  : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
+                  ? dark
+                    ? "border-[#f8ca14] bg-white/10 shadow-lg scale-105"
+                    : "border-[#005A36] bg-emerald-50 shadow-md scale-105"
+                  : dark
+                  ? "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
+                  : "border-emerald-200/70 bg-white hover:border-emerald-400 hover:bg-emerald-50/50 shadow-sm"
               }`}
             >
-              <div className="h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-xl border border-white/15 p-1 bg-black/40">
+              <div className={`h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-xl border p-1 ${
+                dark ? "border-white/15 bg-black/40" : "border-emerald-200/60 bg-emerald-50/50"
+              }`}>
                 <img
                   src={trait.iconPath}
                   alt={trait.name}
@@ -295,12 +337,13 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
                   loading="lazy"
                 />
               </div>
-              <div className="mt-2 text-xs font-black text-white">{trait.name}</div>
-              <div className="mt-0.5 text-[10px] text-slate-400 line-clamp-1">{trait.symbol}</div>
+              <div className={`mt-2 text-xs font-black ${dark ? "text-white" : "text-[#003822]"}`}>{trait.name}</div>
+              <div className={`mt-0.5 text-[10px] line-clamp-1 ${dark ? "text-slate-400" : "text-emerald-700/80"}`}>{trait.symbol}</div>
             </button>
           ))}
         </div>
       </div>
     </section>
   );
+
 }

@@ -218,7 +218,11 @@ export function AqeeqNewsMarquee({
             type="button"
             onClick={() => navigate(item.url)}
             className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
-              dark
+              isNationalDay
+                ? dark
+                  ? "text-slate-200 hover:text-[#f8ca14] hover:bg-white/[0.08]"
+                  : "text-[#003822] hover:text-[#005A36] hover:bg-emerald-100/60"
+                : dark
                 ? "text-slate-200 hover:text-amber-300 hover:bg-white/[0.08]"
                 : "text-slate-800 hover:text-[#08467d] hover:bg-black/[0.05]"
             }`}
@@ -245,7 +249,7 @@ export function AqeeqNewsMarquee({
           <span
             className={`mx-3 sm:mx-5 shrink-0 flex items-center gap-1.5 ${
               isNationalDay
-                ? "text-[#f8ca14] drop-shadow-[0_0_8px_rgba(248,202,20,0.4)] text-xs"
+                ? dark ? "text-[#f8ca14] drop-shadow-[0_0_8px_rgba(248,202,20,0.4)] text-xs" : "text-[#005A36] text-xs font-black"
                 : dark ? "text-amber-400/40 text-[10px]" : "text-[#08467d]/35 text-[10px]"
             }`}
           >
@@ -272,7 +276,9 @@ export function AqeeqNewsMarquee({
           onTouchEnd={() => setIsPaused(false)}
           className={`relative flex items-center overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 h-11 sm:h-13 ${
             isNationalDay
-              ? "border-[#5aba1c]/35 bg-[#001c10]/95 shadow-[0_8px_30px_rgba(0,58,34,0.4)] ring-1 ring-[#5aba1c]/20"
+              ? dark
+                ? "border-[#5aba1c]/35 bg-[#001c10]/95 shadow-[0_8px_30px_rgba(0,58,34,0.4)] ring-1 ring-[#5aba1c]/20"
+                : "border-emerald-500/30 bg-emerald-50/90 shadow-[0_8px_25px_rgba(0,90,54,0.08)] ring-1 ring-emerald-500/20"
               : dark
               ? "border-amber-400/25 bg-[#0a0d14]/90 shadow-[0_8px_30px_rgba(0,0,0,0.5)] ring-1 ring-white/5"
               : "border-slate-200/90 bg-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ring-1 ring-black/5"
@@ -282,13 +288,15 @@ export function AqeeqNewsMarquee({
           <div
             className={`shrink-0 z-20 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1 font-black text-xs sm:text-sm border-l h-full ${
               isNationalDay
-                ? "bg-gradient-to-r from-[#003822] to-[#005A36] text-[#f8ca14] border-emerald-500/30 shadow-[10px_0_20px_rgba(0,40,20,0.6)]"
+                ? dark
+                  ? "bg-gradient-to-r from-[#003822] to-[#005A36] text-[#f8ca14] border-emerald-500/30 shadow-[10px_0_20px_rgba(0,40,20,0.6)]"
+                  : "bg-[#005A36] text-white border-emerald-600 shadow-[10px_0_20px_rgba(0,90,54,0.15)]"
                 : dark
                 ? "bg-[#0f1422] text-[#f8ca14] border-amber-400/20 shadow-[10px_0_20px_rgba(0,0,0,0.6)]"
                 : "bg-amber-50 text-[#08467d] border-slate-200 shadow-[10px_0_20px_rgba(0,0,0,0.03)]"
             }`}
           >
-            <Sparkles size={13} className="animate-pulse text-[#f8ca14] shrink-0" />
+            <Sparkles size={13} className={`animate-pulse shrink-0 ${dark ? "text-[#f8ca14]" : "text-[#f8ca14]"}`} />
             <VisualEditable
               id="studio-marquee-badge-text"
               tag="text"
@@ -305,14 +313,19 @@ export function AqeeqNewsMarquee({
             {/* Soft edge gradient masks */}
             <div
               className={`absolute right-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-l ${
-                dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
+                isNationalDay
+                  ? dark ? "from-[#001c10] to-transparent" : "from-emerald-50 to-transparent"
+                  : dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
               }`}
             />
             <div
               className={`absolute left-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-r ${
-                dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
+                isNationalDay
+                  ? dark ? "from-[#001c10] to-transparent" : "from-emerald-50 to-transparent"
+                  : dark ? "from-[#0a0d14] to-transparent" : "from-white to-transparent"
               }`}
             />
+
 
             {/* 3. Pixel-exact, 100% Unbreakable Continuous Conveyor Belt */}
             <div

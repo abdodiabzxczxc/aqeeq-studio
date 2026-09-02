@@ -2158,6 +2158,15 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   -webkit-text-fill-color: transparent;
 }
 
+/* Light mode high-contrast emerald & gold gradient */
+:root[data-site-theme="saudi-national-day"] .aq-studio-share--light .snd-text-gradient,
+.aq-studio-share--light .snd-text-gradient {
+  background: linear-gradient(135deg, #005A36 0%, #007A48 45%, #7c5d21 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+
 /* National Theme Glassmorphism Cards */
 .snd-glass-card {
   border-color: rgba(90, 186, 28, 0.3) !important;
@@ -2274,6 +2283,21 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   background: rgba(248,202,20,0.1) !important;
   color: #f8ca14 !important;
 }
+
+:root[data-site-theme="saudi-national-day"] .aq-studio-share--light .snd-kicker-badge,
+.aq-studio-share--light .snd-kicker-badge {
+  border-color: rgba(0, 90, 54, 0.25) !important;
+  background: rgba(0, 90, 54, 0.08) !important;
+  color: #005A36 !important;
+}
+
+/* ── Light Mode Floating Stars ── */
+:root[data-site-theme="saudi-national-day"] .aq-studio-share--light .snd-floating-star {
+  color: #007A48 !important;
+  text-shadow: 0 0 10px rgba(0, 90, 54, 0.35) !important;
+  opacity: 0.35 !important;
+}
+
 
 /* ── Active tabs ── */
 :root[data-site-theme="saudi-national-day"] .snd-tab-active {

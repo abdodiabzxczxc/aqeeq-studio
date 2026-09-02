@@ -136,8 +136,15 @@ export function AqeeqHomeBentoGrid({
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className={`font-black px-6 py-2.5 rounded-full flex items-center gap-2 hover:scale-105 transition-transform ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}
+                  className={`font-black px-6 py-2.5 rounded-full flex items-center gap-2 hover:scale-105 transition-transform ${
+                    dark
+                      ? "bg-[#f8ca14] text-black"
+                      : isNationalDay
+                      ? "bg-[#005A36] text-white hover:bg-[#003822] shadow-md shadow-emerald-950/20"
+                      : "bg-[#08467d] text-white"
+                  }`}
                 >
+
                   <ImageIcon size={18} />
                   <VisualEditable
                     id="studio-highlights-album-btn"

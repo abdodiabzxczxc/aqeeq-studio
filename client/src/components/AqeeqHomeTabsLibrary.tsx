@@ -258,17 +258,31 @@ export function AqeeqHomeTabsLibrary({
         {/* UNIFIED FRAME CONTAINER (Fixed, Identical Structure Across ALL Tabs) */}
         {/* ========================================================================= */}
         <div className={`rounded-[2rem] border transition-all duration-300 overflow-hidden ${
-          dark 
+          isNationalDay
+            ? dark
+              ? "border-[#5aba1c]/25 bg-[#00140c]/90 shadow-2xl"
+              : "border-emerald-500/20 bg-white shadow-xl shadow-emerald-950/5"
+            : dark 
             ? "border-white/[0.08] bg-[#0d0d0d] shadow-2xl" 
             : "border-black/[0.08] bg-slate-50/70 shadow-lg"
         }`}>
           
           {/* Frame Top Header */}
           <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 sm:px-8 py-5 border-b ${
-            dark ? "border-white/[0.08] bg-black/30" : "border-black/[0.05] bg-white/70"
+            dark
+              ? "border-white/[0.08] bg-black/30"
+              : isNationalDay
+              ? "border-emerald-500/15 bg-emerald-50/40"
+              : "border-black/[0.05] bg-white/70"
           }`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-xl border ${dark ? "border-white/10 bg-white/5" : "border-black/10 bg-white shadow-sm"}`}>
+              <div className={`p-2 rounded-xl border ${
+                dark
+                  ? "border-white/10 bg-white/5"
+                  : isNationalDay
+                  ? "border-emerald-500/20 bg-white shadow-sm"
+                  : "border-black/10 bg-white shadow-sm"
+              }`}>
                 {currentConfig.icon}
               </div>
               <div>
@@ -278,7 +292,7 @@ export function AqeeqHomeTabsLibrary({
                   label={`عنوان إطار ${activeTab}`}
                   defaultText={currentConfig.title}
                   as="h3"
-                  className={`text-base sm:text-lg font-black ${dark ? "text-white" : "text-black"}`}
+                  className={`text-base sm:text-lg font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
                 />
                 <VisualEditable
                   id={`studio-library-frame-desc-${activeTab}`}
@@ -286,7 +300,7 @@ export function AqeeqHomeTabsLibrary({
                   label={`وصف إطار ${activeTab}`}
                   defaultText={currentConfig.subtitle}
                   as="p"
-                  className={`text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}
+                  className={`text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/70" : "text-slate-500"}`}
                 />
               </div>
             </div>
@@ -297,6 +311,8 @@ export function AqeeqHomeTabsLibrary({
               className={`self-start sm:self-auto shrink-0 flex items-center gap-2 px-4 py-2 rounded-full font-black text-xs transition hover:scale-105 ${
                 dark 
                   ? "bg-white/10 hover:bg-white/15 text-white border border-white/10" 
+                  : isNationalDay
+                  ? "bg-emerald-50 hover:bg-emerald-100 text-[#005A36] border border-emerald-500/30"
                   : "bg-black/5 hover:bg-black/10 text-black border border-black/10"
               }`}
             >
@@ -338,7 +354,11 @@ export function AqeeqHomeTabsLibrary({
                         key={item.id}
                         onClick={() => navigate(item.href)}
                         className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col shrink-0 w-[200px] sm:w-auto h-[280px] sm:h-[320px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
-                          dark
+                          isNationalDay
+                            ? dark
+                              ? "border-emerald-500/20 bg-[#141414] hover:border-emerald-400/40"
+                              : "border-emerald-500/20 bg-white hover:border-emerald-500/50 shadow-sm"
+                            : dark
                             ? "border-white/[0.08] bg-[#141414] hover:border-white/20"
                             : "border-black/[0.08] bg-white hover:border-black/20"
                         }`}
@@ -367,24 +387,28 @@ export function AqeeqHomeTabsLibrary({
 
                         {/* Card Info */}
                         <div className="p-3 sm:p-4 flex flex-col justify-between flex-1">
-                          <h4 className={`text-xs sm:text-sm font-black line-clamp-2 leading-snug transition-colors group-hover:text-amber-400 ${
-                            dark ? "text-white" : "text-black"
+                          <h4 className={`text-xs sm:text-sm font-black line-clamp-2 leading-snug transition-colors ${
+                            isNationalDay
+                              ? dark ? "text-white group-hover:text-[#f8ca14]" : "text-[#003822] group-hover:text-[#005A36]"
+                              : dark ? "text-white group-hover:text-amber-400" : "text-black group-hover:text-[#08467d]"
                           }`}>
                             {item.title}
                           </h4>
                           <div className={`mt-auto pt-2 sm:pt-3 border-t flex items-center justify-between text-[10px] sm:text-[11px] font-bold ${
-                            dark ? "border-white/[0.06] text-slate-400" : "border-black/[0.05] text-slate-500"
+                            dark ? "border-white/[0.06] text-slate-400" : isNationalDay ? "border-emerald-100 text-emerald-800/80" : "border-black/[0.05] text-slate-500"
                           }`}>
                             <span className="flex items-center gap-1">
                               <Calendar size={10} className="opacity-60" />
                               <span>{item.dateOrMeta}</span>
+
                             </span>
                             <span className={`font-black flex items-center gap-1 group-hover:underline ${
-                              dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                              dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]"
                             }`}>
                               <span>عرض</span>
                               <ArrowLeft size={10} />
                             </span>
+
                           </div>
                         </div>
                       </div>

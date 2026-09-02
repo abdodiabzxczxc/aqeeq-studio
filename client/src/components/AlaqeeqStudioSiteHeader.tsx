@@ -124,9 +124,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
 
             {isNationalDay && (
-              <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full bg-gradient-to-r from-[#005A36]/30 to-[#5aba1c]/20 border border-[#5aba1c]/40 text-[#5aba1c] shadow-sm">
+              <span className={`hidden sm:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm ${
+                dark
+                  ? "bg-gradient-to-r from-[#005A36]/30 to-[#5aba1c]/20 border-[#5aba1c]/40 text-[#5aba1c]"
+                  : "bg-emerald-50 border-emerald-600/30 text-[#005A36]"
+              }`}>
                 <span>🇸🇦</span>
-                <span className="font-bold text-white">عزّنا بطبعنا</span>
+                <span className={`font-bold ${dark ? "text-white" : "text-[#005A36]"}`}>عزّنا بطبعنا</span>
               </span>
             )}
           </div>
@@ -148,13 +152,18 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <button
                 type="button"
                 onClick={() => triggerNationalCelebration()}
-                className="hidden md:flex items-center gap-1.5 rounded-xl border border-[#f8ca14]/40 bg-[#f8ca14]/15 px-3 py-2 text-xs font-black text-[#f8ca14] hover:bg-[#f8ca14]/25 transition active:scale-95 shadow-sm"
+                className={`hidden md:flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition active:scale-95 shadow-sm ${
+                  dark
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14]/25"
+                    : "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100"
+                }`}
                 title="شارِكنا بهجة الوطن"
               >
-                <Sparkles size={14} className="text-[#f8ca14]" />
+                <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#005A36]"} />
                 <span>بهجة الوطن 🇸🇦</span>
               </button>
             )}
+
             
             {/* 1. Options Dropdown Menu OR Login Button (Desktop / Tablet) */}
             {isAuthenticated ? (

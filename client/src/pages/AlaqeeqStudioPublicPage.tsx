@@ -784,10 +784,14 @@ export default function AlaqeeqStudioPublicPage() {
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
             {isNationalDay ? (
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/40 px-3.5 py-1 mb-3 text-emerald-400 text-xs font-black shadow-md shadow-emerald-950/20 backdrop-blur-md">
+              <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
+                dark
+                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-emerald-950/20"
+                  : "bg-emerald-50 border-emerald-500/30 text-[#005A36] shadow-emerald-950/5"
+              }`}>
                 <span className="text-sm">🇸🇦</span>
-                <span className="text-emerald-300 font-black">{customBadgeText}</span>
-                <span className="text-white/60 font-normal mr-1">· هوية اليوم الوطني</span>
+                <span className={`font-black ${dark ? "text-emerald-300" : "text-[#005A36]"}`}>{customBadgeText}</span>
+                <span className={`font-normal mr-1 ${dark ? "text-white/60" : "text-emerald-800/70"}`}>· هوية اليوم الوطني</span>
               </div>
             ) : (
               <VisualEditable
@@ -836,7 +840,7 @@ export default function AlaqeeqStudioPublicPage() {
               isNationalDay
                 ? dark
                   ? "divide-emerald-500/20 border-emerald-500/20 bg-emerald-950/20 rounded-2xl px-3 backdrop-blur-sm"
-                  : "divide-emerald-200 border-emerald-200 bg-emerald-50/50 rounded-2xl px-3 backdrop-blur-sm"
+                  : "divide-emerald-300/40 border-emerald-300/40 bg-emerald-50/60 rounded-2xl px-3 backdrop-blur-sm"
                 : dark ? "divide-white/[0.1] border-white/[0.1]" : "divide-black/[0.08] border-black/[0.08]"
             )}>
               <div className="pl-3">
@@ -848,11 +852,11 @@ export default function AlaqeeqStudioPublicPage() {
                   as="p"
                   className={"text-[8px] font-black tracking-[0.12em] " + (
                     isNationalDay
-                      ? "text-[#f8ca14]"
+                      ? dark ? "text-[#f8ca14]" : "text-[#005A36]"
                       : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
                   )}
                 />
-                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(issues.length).padStart(2, "0")}</p>
+                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>{String(issues.length).padStart(2, "0")}</p>
               </div>
               <div className="px-3">
                 <VisualEditable
@@ -863,11 +867,11 @@ export default function AlaqeeqStudioPublicPage() {
                   as="p"
                   className={"text-[8px] font-black tracking-[0.12em] " + (
                     isNationalDay
-                      ? "text-[#f8ca14]"
+                      ? dark ? "text-[#f8ca14]" : "text-[#005A36]"
                       : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
                   )}
                 />
-                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(albums.length).padStart(2, "0")}</p>
+                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>{String(albums.length).padStart(2, "0")}</p>
               </div>
               <div className="pr-3">
                 <VisualEditable
@@ -878,11 +882,11 @@ export default function AlaqeeqStudioPublicPage() {
                   as="p"
                   className={"text-[8px] font-black tracking-[0.12em] " + (
                     isNationalDay
-                      ? "text-[#f8ca14]"
+                      ? dark ? "text-[#f8ca14]" : "text-[#005A36]"
                       : dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
                   )}
                 />
-                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : "text-black")}>{String(totalPosts).padStart(2, "0")}</p>
+                <p className={"mt-1 text-2xl font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>{String(totalPosts).padStart(2, "0")}</p>
               </div>
             </div>
           </div>
@@ -892,7 +896,9 @@ export default function AlaqeeqStudioPublicPage() {
             {/* Back Card: Showcase / Vision & Excellence */}
             <div className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 transition-all duration-500 " + (
               isNationalDay
-                ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+                ? dark
+                  ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+                  : "border-[#6565e0]/40 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.1)]"
                 : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
             )}>
               <VisualImage
@@ -919,7 +925,9 @@ export default function AlaqeeqStudioPublicPage() {
               }}
               className={"group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 hover:scale-[1.02] " + (
                 isNationalDay
-                  ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
+                  ? dark
+                    ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
+                    : "border-[#5aba1c]/40 bg-white shadow-[0_20px_50px_rgba(0,50,25,0.12)]"
                   : dark ? "border-white/[0.15] bg-[#111111]" : "border-black/[0.12] bg-white shadow-md"
               )}
             >
@@ -949,12 +957,13 @@ export default function AlaqeeqStudioPublicPage() {
                 isNationalDay
                   ? dark
                     ? "border-[#f8ca14]/80 bg-[#001f13]/90 shadow-[0_30px_70px_rgba(0,90,54,0.55)] backdrop-blur-md ring-1 ring-[#f8ca14]/30"
-                    : "border-emerald-500/60 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.2)]"
+                    : "border-emerald-600/50 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.18)] backdrop-blur-md ring-1 ring-emerald-500/20"
                   : dark
                   ? "border-[#f8ca14]/50 bg-[#111111] shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
                   : "border-[#08467d]/40 bg-white shadow-[0_30px_70px_rgba(8,70,125,0.15)]"
               )}
             >
+
               <VisualImage
                 id="studio-hero-journal-image"
                 label="صورة مجلة غلاف الاستوديو"
@@ -1151,7 +1160,7 @@ export default function AlaqeeqStudioPublicPage() {
             >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
-                  dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                  dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-[#08467d]/10 text-[#08467d]"
                 )}>
                   <Award size={24} />
                 </div>
@@ -1161,7 +1170,7 @@ export default function AlaqeeqStudioPublicPage() {
                   label="شارة وسام التميز"
                   defaultText={orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
                   as="span"
-                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
                 />
                 <VisualEditable
                   id="studio-bento-card2-title"
@@ -1169,7 +1178,7 @@ export default function AlaqeeqStudioPublicPage() {
                   label="عنوان وسام التميز"
                   defaultText={orchestration?.weeklyBento?.academicBadgeWeek || "فخر مدارس العقيق"}
                   as="h4"
-                  className={"mt-2 text-lg font-black " + (dark ? "text-white" : "text-black")}
+                  className={"mt-2 text-lg font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
                 />
                 <VisualEditable
                   id="studio-bento-card2-desc"
@@ -1177,10 +1186,10 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف وسام التميز"
                   defaultText={orchestration?.weeklyBento?.academicBadgeDesc || "تحقيق المركز الأول في مسابقات الموهبة والابتكار على مستوى المنطقة وتكريم الطلاب المشاركين."}
                   as="p"
-                  className={"mt-2 text-xs leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}
+                  className={"mt-2 text-xs leading-6 " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/80" : "text-slate-600")}
                 />
               </div>
-              <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
+              <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : isNationalDay ? "border-emerald-500/15" : "border-black/[0.08]")}>
                 <VisualEditable
                   id="studio-bento-card2-tag"
                   tag="text"
@@ -1188,7 +1197,7 @@ export default function AlaqeeqStudioPublicPage() {
                   defaultText="🥇 تكريم مستحق"
                   as="span"
                   className={"inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black " + (
-                    dark ? "bg-white/[0.05] text-[#f8ca14]" : "bg-slate-100 text-[#08467d]"
+                    dark ? "bg-white/[0.05] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36] border border-emerald-200/80" : "bg-slate-100 text-[#08467d]"
                   )}
                 />
               </div>
@@ -1221,9 +1230,9 @@ export default function AlaqeeqStudioPublicPage() {
                   label="عنوان نبض أولياء الأمور"
                   defaultText="نبض وتفاعل أولياء الأمور"
                   as="span"
-                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
                 />
-                <p className={"mt-3 text-3xl sm:text-4xl font-black " + (dark ? "text-white" : "text-black")}>
+                <p className={"mt-3 text-3xl sm:text-4xl font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
                   +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
                 </p>
                 <VisualEditable
@@ -1232,9 +1241,10 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف نبض أولياء الأمور"
                   defaultText="إعجاب وتشجيع لطلاب وأنشطة هذا الأسبوع"
                   as="p"
-                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}
+                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/70" : "text-slate-500")}
                 />
               </div>
+
 
               <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
                 <button
@@ -1306,14 +1316,14 @@ export default function AlaqeeqStudioPublicPage() {
 
             <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-8 items-center">
               <div>
-                <Quote size={40} className={dark ? "text-[#f8ca14]/30" : "text-[#08467d]/25"} />
+                <Quote size={40} className={dark ? "text-[#f8ca14]/30" : isNationalDay ? "text-[#005A36]/30" : "text-[#08467d]/25"} />
                 <VisualEditable
                   id="studio-editorial-quote"
                   tag="text"
                   label="نص اقتباس صوت العقيق"
                   defaultText={`«${orchestration?.editorialVoice?.quoteText || "في مدارس العقيق، لا نعلّم للعلم فحسب، بل نصنع قيادات المستقبل بوعي وطموح لا ينضب."}»`}
                   as="h3"
-                  className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : "text-black")}
+                  className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
                 />
                 <VisualEditable
                   id="studio-editorial-author"
@@ -1321,15 +1331,15 @@ export default function AlaqeeqStudioPublicPage() {
                   label="اسم ووصف صاحب الاقتباس"
                   defaultText={(orchestration?.editorialVoice?.authorName ? `${orchestration.editorialVoice.authorName} · ` : "") + (orchestration?.editorialVoice?.authorTitle || "المشرف العام على مدارس العقيق الأهلية")}
                   as="p"
-                  className={"mt-4 text-sm font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                  className={"mt-4 text-sm font-black " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
                 />
               </div>
 
               <div className={"flex flex-col items-center justify-center p-6 rounded-2xl border text-center " + (
-                dark ? "border-white/[0.08] bg-black/40" : "border-black/[0.06] bg-slate-50"
+                dark ? "border-white/[0.08] bg-black/40" : isNationalDay ? "border-emerald-500/20 bg-white/80 shadow-sm" : "border-black/[0.06] bg-slate-50"
               )}>
                 <div className={"grid h-16 w-16 place-items-center rounded-full mb-3 " + (
-                  dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                  dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : isNationalDay ? "bg-emerald-100 text-[#005A36]" : "bg-[#08467d]/10 text-[#08467d]"
                 )}>
                   <Radio size={28} className={isPlayingQuoteAudio ? "animate-pulse text-[#de191e]" : ""} />
                 </div>
@@ -1339,7 +1349,7 @@ export default function AlaqeeqStudioPublicPage() {
                   label="عنوان الكلمة التوجيهية"
                   defaultText="الكلمة التوجيهية الأسبوعية"
                   as="h4"
-                  className={"font-black text-sm " + (dark ? "text-white" : "text-black")}
+                  className={"font-black text-sm " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
                 />
                 <VisualEditable
                   id="studio-editorial-audio-desc"
@@ -1347,7 +1357,7 @@ export default function AlaqeeqStudioPublicPage() {
                   label="وصف الكلمة التوجيهية"
                   defaultText="رسالة الإدارة لفرسان وأولياء أمور المدارس"
                   as="p"
-                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}
+                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/70" : "text-slate-500")}
                 />
                 <button
                   type="button"
@@ -1358,6 +1368,8 @@ export default function AlaqeeqStudioPublicPage() {
                   className={"mt-4 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black transition active:scale-95 " + (
                     dark
                       ? "!bg-[#f8ca14] !text-black shadow-[0_0_15px_rgba(248,202,20,0.3)]"
+                      : isNationalDay
+                      ? "!bg-[#005A36] !text-white shadow-[0_0_15px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
                       : "!bg-[#08467d] !text-white shadow-[0_0_15px_rgba(8,70,125,0.2)]"
                   )}
                 >
@@ -1369,6 +1381,7 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       </VisualEditable>
+
 
       {/* 7. قسم ذاكرة العقيق المفتوحة (Memory Wall) */}
       <VisualEditable
@@ -1413,7 +1426,7 @@ export default function AlaqeeqStudioPublicPage() {
                 label="عنوان قسم ذاكرة العقيق"
                 defaultText="ذاكرة العقيق الحية"
                 as="h2"
-                className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}
+                className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
               />
               <VisualEditable
                 id="studio-memory-body"
@@ -1421,7 +1434,7 @@ export default function AlaqeeqStudioPublicPage() {
                 label="وصف ذاكرة العقيق"
                 defaultText="كل عدد يوثّق قصة، وكل ألبوم يحفظ لحظة. لقطات حقيقية من أرشيف مدارس العقيق المتجدد."
                 as="p"
-                className={"mt-2 max-w-md text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}
+                className={"mt-2 max-w-md text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/80" : "text-slate-600")}
               />
               <VisualEditable
                 id="studio-memory-action"
@@ -1431,7 +1444,7 @@ export default function AlaqeeqStudioPublicPage() {
                 as="button"
                 onAction={() => navigate("/journal")}
                 className={"mt-6 inline-flex items-center gap-2 border-b pb-1.5 text-sm font-black transition " + (
-                  dark ? "border-[#f8ca14]/60 text-[#f8ca14] hover:opacity-80" : "border-[#08467d]/60 text-[#08467d] hover:opacity-80"
+                  dark ? "border-[#f8ca14]/60 text-[#f8ca14] hover:opacity-80" : isNationalDay ? "border-[#005A36]/60 text-[#005A36] hover:opacity-80" : "border-[#08467d]/60 text-[#08467d] hover:opacity-80"
                 )}
               >
                 {(text) => (
@@ -1456,6 +1469,8 @@ export default function AlaqeeqStudioPublicPage() {
                   ) + " " + (
                     dark
                       ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
+                      : isNationalDay
+                      ? "border-emerald-500/20 bg-white shadow-[0_15px_35px_rgba(0,90,54,0.06)] hover:border-[#005A36]/60"
                       : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50"
                   )}
                 >
@@ -1467,9 +1482,10 @@ export default function AlaqeeqStudioPublicPage() {
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
                   />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16">
-                    <p className="text-[9px] font-black text-[#f8ca14]">{entry.label}</p>
+                    <p className={"text-[9px] font-black " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
                     <p className="mt-1 truncate text-xs font-black text-white">{entry.title}</p>
                   </div>
+
                 </VisualEditable>
               ))}
             </div>
@@ -1732,15 +1748,21 @@ export default function AlaqeeqStudioPublicPage() {
 
           {/* 🇸🇦 Saudi National Day Footer Seal Banner */}
           {isNationalDay && (
-            <div className="mt-8 rounded-3xl border border-[#5aba1c]/30 bg-gradient-to-r from-[#002617] via-[#003822] to-[#001c10] p-4 sm:p-6 text-center backdrop-blur-xl shadow-lg relative overflow-hidden">
+            <div className={`mt-8 rounded-3xl border p-4 sm:p-6 text-center backdrop-blur-xl shadow-lg relative overflow-hidden ${
+              dark
+                ? "border-[#5aba1c]/30 bg-gradient-to-r from-[#002617] via-[#003822] to-[#001c10]"
+                : "border-emerald-500/30 bg-gradient-to-r from-emerald-50 via-white to-emerald-50/80 shadow-emerald-950/5"
+            }`}>
               <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3 text-right">
-                  <div className="h-12 w-12 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/40 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0 ${
+                    dark ? "bg-[#f8ca14]/15 border border-[#f8ca14]/40" : "bg-emerald-100/70 border border-emerald-500/30"
+                  }`}>
                     🇸🇦
                   </div>
                   <div>
-                    <h4 className="text-sm sm:text-base font-black text-white">عزّنا بطبعنا • مسيرة مجد وفخر مستمرة</h4>
-                    <p className="text-xs text-emerald-300 font-bold">#اليوم_الوطني_السعودي · #عزنا_بطبعنا</p>
+                    <h4 className={`text-sm sm:text-base font-black ${dark ? "text-white" : "text-[#003822]"}`}>عزّنا بطبعنا • مسيرة مجد وفخر مستمرة</h4>
+                    <p className={`text-xs font-bold ${dark ? "text-emerald-300" : "text-emerald-700"}`}>#اليوم_الوطني_السعودي · #عزنا_بطبعنا</p>
                   </div>
                 </div>
 
@@ -1748,15 +1770,20 @@ export default function AlaqeeqStudioPublicPage() {
                   <button
                     type="button"
                     onClick={() => triggerNationalCelebration()}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-4 py-2 text-xs font-black text-black shadow-md hover:scale-105 active:scale-95 transition"
+                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-xs font-black shadow-md hover:scale-105 active:scale-95 transition ${
+                      dark
+                        ? "bg-gradient-to-r from-[#f8ca14] to-[#facc15] text-black"
+                        : "bg-[#005A36] text-white hover:bg-[#003822]"
+                    }`}
                   >
-                    <Sparkles size={14} className="text-[#005A36]" />
+                    <Sparkles size={14} className={dark ? "text-[#005A36]" : "text-[#f8ca14]"} />
                     <span>شارِكنا البهجة 🇸🇦</span>
                   </button>
                 </div>
               </div>
             </div>
           )}
+
 
           {/* Minimal Copyright Line & Back to Top (فكرة 1: زر الصعود للأعلى) */}
           <div className={`mt-6 border-t pt-4 flex items-center justify-between gap-4 text-[11px] font-bold ${
