@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import { 
   ImageIcon, 
   Mic, 
@@ -41,9 +42,12 @@ export function AqeeqHomeTabsLibrary({
   descOverride?: string;
 } = {}) {
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"podcasts" | "articles" | "albums" | "journal" | "showcase">("podcasts");
+
+
 
   // Fetch data for all systems
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({});
@@ -160,8 +164,13 @@ export function AqeeqHomeTabsLibrary({
       tag="section"
       label="قسم استكشف المكتبة"
       as="section"
-      className={`w-full py-14 md:py-20 ${dark ? "bg-[#050505]" : "bg-white"}`}
+      className={`w-full py-14 md:py-20 ${
+        isNationalDay
+          ? dark ? "snd-library-dark" : "snd-library-light"
+          : dark ? "bg-[#050505]" : "bg-white"
+      }`}
     >
+      {isNationalDay && <div className="snd-gold-divider" />}
       <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
         
         {/* Unified Section Header */}
@@ -170,15 +179,18 @@ export function AqeeqHomeTabsLibrary({
             id="studio-library-kicker"
             tag="text"
             label="شارة استكشف المكتبة"
-            defaultText="EXPLORE LIBRARY · ALL IN ONE"
+            defaultText={isNationalDay ? "🇸🇦 أرشيف العقيق الوطني الكامل" : "EXPLORE LIBRARY · ALL IN ONE"}
             as="span"
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              isNationalDay
+                ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}
           >
             {(text) => (
               <>
                 <BookOpen size={12} />
+
                 <span>{text}</span>
               </>
             )}
@@ -212,12 +224,18 @@ export function AqeeqHomeTabsLibrary({
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex shrink-0 items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-200 ${
                   isActive
-                    ? dark
+                    ? isNationalDay
+                      ? "snd-tab-active bg-gradient-to-r from-[#005A36] to-[#5aba1c] text-white shadow-[0_4px_18px_rgba(0,90,54,0.4)] scale-105"
+                      : dark
                       ? "bg-[#f8ca14] text-black shadow-[0_0_20px_rgba(248,202,20,0.25)] scale-105"
                       : "bg-[#08467d] text-white shadow-[0_0_20px_rgba(8,70,125,0.25)] scale-105"
+                    : isNationalDay
+                    ? dark
+                      ? "bg-white/[0.04] text-emerald-300 hover:text-[#f8ca14] border border-[#5aba1c]/20"
+                      : "bg-[#f0fdf4] text-[#005A36] hover:bg-[#e0faea] border border-[#005A36]/15"
                     : dark
-                      ? "bg-white/[0.05] text-slate-300 hover:bg-white/[0.09] border border-white/[0.08]"
-                      : "bg-black/[0.03] text-slate-700 hover:bg-black/[0.06] border border-black/[0.06]"
+                    ? "bg-white/[0.05] text-slate-300 hover:bg-white/[0.09] border border-white/[0.08]"
+                    : "bg-black/[0.03] text-slate-700 hover:bg-black/[0.06] border border-black/[0.06]"
                 }`}
               >
                 {tab.icon}
@@ -235,6 +253,7 @@ export function AqeeqHomeTabsLibrary({
             );
           })}
         </div>
+
 
         {/* ========================================================================= */}
         {/* UNIFIED FRAME CONTAINER (Fixed, Identical Structure Across ALL Tabs) */}

@@ -2169,3 +2169,172 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   box-shadow: 0 15px 40px rgba(0, 90, 54, 0.3), inset 0 0 25px rgba(248, 202, 20, 0.1) !important;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   🇸🇦 NATIONAL DAY ENHANCEMENT LAYER II — Sections, Motion, Depth
+   ───────────────────────────────────────────────────────────── */
+
+/* Floating gold star particles */
+@keyframes snd-particle-drift {
+  0%   { transform: translateY(100vh) rotate(0deg) scale(1);   opacity: 0; }
+  8%   { opacity: 0.9; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(-10vh) rotate(900deg) scale(0.3); opacity: 0; }
+}
+.snd-floating-star {
+  position: fixed;
+  pointer-events: none;
+  animation: snd-particle-drift linear infinite;
+  color: #f8ca14;
+  text-shadow: 0 0 10px rgba(248,202,20,0.9), 0 0 28px rgba(248,202,20,0.35);
+  z-index: 1;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+/* Hero card gold glow pulse */
+@keyframes snd-card-glow-pulse {
+  0%, 100% { box-shadow: 0 0 22px rgba(248,202,20,0.18), 0 28px 65px rgba(0,90,54,0.55); }
+  50%       { box-shadow: 0 0 48px rgba(248,202,20,0.48), 0 38px 85px rgba(0,90,54,0.75); }
+}
+.snd-glow-card { animation: snd-card-glow-pulse 3.5s ease-in-out infinite; }
+
+/* Animated gold shimmer divider */
+@keyframes snd-gold-shimmer {
+  0%   { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+.snd-gold-divider {
+  height: 1px;
+  border: none;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(248,202,20,0.08) 12%,
+    #f8ca14 35%, #5aba1c 50%, #f8ca14 65%,
+    rgba(248,202,20,0.08) 88%, transparent 100%);
+  background-size: 300% 100%;
+  animation: snd-gold-shimmer 4s linear infinite;
+  opacity: 0.65;
+}
+
+/* Counter digit entrance animation */
+@keyframes snd-counter-up {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.snd-counter-digit {
+  display: inline-block;
+  animation: snd-counter-up 0.85s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* ── Dark mode section backgrounds ── */
+:root[data-site-theme="saudi-national-day"] .snd-section-dark {
+  background: linear-gradient(180deg, #010f08 0%, #020d07 100%) !important;
+  border-color: rgba(248,202,20,0.09) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-section-dark-alt {
+  background: linear-gradient(180deg, #020d07 0%, #010c06 100%) !important;
+  border-color: rgba(90,186,28,0.09) !important;
+}
+
+/* ── Light mode section backgrounds (warm green-cream heritage) ── */
+:root[data-site-theme="saudi-national-day"] .snd-section-light {
+  background: linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 100%) !important;
+  border-color: rgba(0,90,54,0.11) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-section-light-alt {
+  background: linear-gradient(180deg, #fafffe 0%, #f0fdf4 100%) !important;
+  border-color: rgba(90,186,28,0.09) !important;
+}
+
+/* ── National day bento / feature cards ── */
+:root[data-site-theme="saudi-national-day"] .snd-bento-card-dark {
+  background: rgba(1,16,10,0.92) !important;
+  border-color: rgba(90,186,28,0.35) !important;
+  box-shadow: 0 10px 30px rgba(0,58,34,0.5), inset 0 1px 0 rgba(90,186,28,0.14) !important;
+  backdrop-filter: blur(20px);
+  transition: all 0.35s cubic-bezier(0.23,1,0.32,1) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-bento-card-dark:hover {
+  border-color: rgba(248,202,20,0.6) !important;
+  box-shadow: 0 22px 55px rgba(0,90,54,0.55), inset 0 1px 0 rgba(248,202,20,0.18) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-bento-card-light {
+  background: rgba(240,253,244,0.96) !important;
+  border-color: rgba(0,90,54,0.2) !important;
+  box-shadow: 0 8px 24px rgba(0,90,54,0.12), inset 0 1px 0 rgba(255,255,255,0.85) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-bento-card-light:hover {
+  border-color: rgba(0,90,54,0.4) !important;
+  box-shadow: 0 16px 40px rgba(0,90,54,0.2) !important;
+}
+
+/* ── Editorial quote card ── */
+:root[data-site-theme="saudi-national-day"] .snd-editorial-card-dark {
+  border-color: rgba(90,186,28,0.38) !important;
+  background: linear-gradient(135deg, #010f08 0%, #002617 55%, #010c06 100%) !important;
+  box-shadow: 0 22px 65px rgba(0,90,54,0.48) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-editorial-card-light {
+  border-color: rgba(0,90,54,0.24) !important;
+  background: linear-gradient(135deg, #f0fdf4 0%, #fafffe 55%, #f0fdf4 100%) !important;
+  box-shadow: 0 12px 42px rgba(0,90,54,0.14) !important;
+}
+
+/* ── Story bubbles national ring ── */
+:root[data-site-theme="saudi-national-day"] .snd-story-ring {
+  background: linear-gradient(135deg, #f8ca14 0%, #5aba1c 45%, #005A36 100%) !important;
+  box-shadow: 0 0 16px rgba(248,202,20,0.4) !important;
+}
+
+/* ── Section kicker badge ── */
+:root[data-site-theme="saudi-national-day"] .snd-kicker-badge {
+  border-color: rgba(248,202,20,0.42) !important;
+  background: rgba(248,202,20,0.1) !important;
+  color: #f8ca14 !important;
+}
+
+/* ── Active tabs ── */
+:root[data-site-theme="saudi-national-day"] .snd-tab-active {
+  background: linear-gradient(90deg, #005A36, #5aba1c) !important;
+  color: white !important;
+  box-shadow: 0 4px 18px rgba(0,90,54,0.42) !important;
+}
+
+/* ── Footer backgrounds ── */
+:root[data-site-theme="saudi-national-day"] .snd-footer-dark {
+  background: linear-gradient(180deg, #010c07 0%, #000905 100%) !important;
+  border-color: rgba(248,202,20,0.11) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-footer-light {
+  background: linear-gradient(180deg, #f0fdf4 0%, #e8faf0 100%) !important;
+  border-color: rgba(0,90,54,0.14) !important;
+}
+
+/* ── Memory cards ── */
+:root[data-site-theme="saudi-national-day"] .snd-memory-card-dark {
+  border-color: rgba(90,186,28,0.28) !important;
+  background: rgba(1,18,11,0.82) !important;
+  box-shadow: 0 8px 25px rgba(0,58,34,0.42) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-memory-card-light {
+  border-color: rgba(0,90,54,0.2) !important;
+  background: rgba(240,253,244,0.92) !important;
+}
+
+/* ── Library section ── */
+:root[data-site-theme="saudi-national-day"] .snd-library-dark {
+  background: #010c07 !important;
+  border-color: rgba(90,186,28,0.08) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-library-light {
+  background: #f7fdf9 !important;
+}
+
+/* ── Tab bar ── */
+:root[data-site-theme="saudi-national-day"] .snd-tab-bar-dark {
+  background: rgba(1,20,12,0.8) !important;
+  border-color: rgba(90,186,28,0.25) !important;
+}
+:root[data-site-theme="saudi-national-day"] .snd-tab-bar-light {
+  background: rgba(240,253,244,0.9) !important;
+  border-color: rgba(0,90,54,0.18) !important;
+}

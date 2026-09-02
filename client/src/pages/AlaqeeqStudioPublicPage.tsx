@@ -652,12 +652,37 @@ export default function AlaqeeqStudioPublicPage() {
         dark ? "aq-studio-share--dark bg-black text-white" : "aq-studio-share--light bg-white text-black"
       )}
     >
+      {/* 🇸🇦 Floating Gold Stars — National Day Ambient Particles */}
+      {isNationalDay && (
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {[
+            { char: "★", left: "5%",  dur: "9s",  delay: "0s",   size: "12px" },
+            { char: "☆", left: "18%", dur: "13s", delay: "2s",   size: "9px"  },
+            { char: "★", left: "32%", dur: "11s", delay: "4.5s", size: "15px" },
+            { char: "☆", left: "48%", dur: "8s",  delay: "1s",   size: "10px" },
+            { char: "★", left: "63%", dur: "14s", delay: "3s",   size: "8px"  },
+            { char: "☆", left: "77%", dur: "10s", delay: "6s",   size: "13px" },
+            { char: "★", left: "91%", dur: "12s", delay: "0.5s", size: "11px" },
+          ].map((p, i) => (
+            <span
+              key={i}
+              className="snd-floating-star absolute"
+              style={{ left: p.left, animationDuration: p.dur, animationDelay: p.delay, fontSize: p.size }}
+            >
+              {p.char}
+            </span>
+          ))}
+        </div>
+      )}
+
       <AlaqeeqStudioSiteHeader title="استوديو العقيق" active="studio" logoUrl={logoUrl} />
 
-      {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) - تصميم فائق النظافة والأناقة (Minimalist Instagram/Snapchat Style) */}
+      {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) */}
       {storiesList.length > 0 ? (
         <section className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
-          dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
+          isNationalDay
+            ? dark ? "border-[#f8ca14]/10 bg-[#010f08]/90" : "border-[#005A36]/10 bg-[#f0fdf4]/90"
+            : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
           <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 scrollbar-hide">
@@ -666,13 +691,16 @@ export default function AlaqeeqStudioPublicPage() {
                   key={story.id}
                   type="button"
                   onClick={() => setActiveStoryIndex(index)}
-                  className="group flex flex-col items-center gap-1.5 shrink-0 text-center transition active:scale-95"
+                  className={"group flex flex-col items-center gap-1.5 shrink-0 text-center transition active:scale-95"}
                 >
                   <div className={"relative p-[2.5px] rounded-full transition duration-300 group-hover:scale-105 " + (
-                    dark
+                    isNationalDay
+                      ? "snd-story-ring bg-gradient-to-tr from-[#f8ca14] via-[#5aba1c] to-[#005A36] shadow-[0_0_14px_rgba(248,202,20,0.35)]"
+                      : dark
                       ? "bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] shadow-[0_0_12px_rgba(248,202,20,0.2)]"
                       : "bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] shadow-[0_0_10px_rgba(8,70,125,0.15)]"
                   )}>
+
                     <div className={"h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-full border-2 flex items-center justify-center " + (
                       dark ? "border-black bg-[#121212]" : "border-white bg-slate-100"
                     )}>
@@ -980,20 +1008,28 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="قسم إنجازات وأحداث الأسبوع"
         as="section"
-        className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]")}
+        className={"border-b py-14 md:py-20 transition " + (
+          isNationalDay
+            ? dark ? "border-[#f8ca14]/10 snd-section-dark" : "border-[#005A36]/10 snd-section-light"
+            : dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]"
+        )}
       >
+        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-bento-kicker"
               tag="text"
               label="شارة إنجازات الأسبوع"
-              defaultText="WEEKLY SPOTLIGHT · ACHIEVEMENTS"
+              defaultText={isNationalDay ? "🇸🇦 إنجازات العقيق في اليوم الوطني" : "WEEKLY SPOTLIGHT · ACHIEVEMENTS"}
               as="span"
               className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                isNationalDay
+                  ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               )}
             >
+
               {(text) => (
                 <>
                   <Trophy size={12} />
@@ -1022,10 +1058,13 @@ export default function AlaqeeqStudioPublicPage() {
               label="بطاقة الحدث التعليمي الأبرز"
               as="div"
               className={"group relative overflow-hidden rounded-[2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition duration-300 " + (
-                dark
+                isNationalDay
+                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                  : dark
                   ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
                   : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
               )}
+
             >
               <div className="relative h-48 sm:h-56 overflow-hidden rounded-2xl mb-6">
                 <VisualImage
@@ -1103,10 +1142,13 @@ export default function AlaqeeqStudioPublicPage() {
               label="بطاقة وسام التميز الأكاديمي"
               as="div"
               className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
-                dark
+                isNationalDay
+                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                  : dark
                   ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
                   : "border-[#08467d]/20 bg-white shadow-md"
               )}
+
             >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
@@ -1160,10 +1202,13 @@ export default function AlaqeeqStudioPublicPage() {
               label="بطاقة نبض التفاعل"
               as="div"
               className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
-                dark
+                isNationalDay
+                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                  : dark
                   ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
                   : "border-black/[0.08] bg-white shadow-md"
               )}
+
             >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
@@ -1217,18 +1262,25 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="قسم صوت العقيق والكلمة التوجيهية"
         as="section"
-        className={"border-b py-14 md:py-20 transition " + (dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]")}
+        className={"border-b py-14 md:py-20 transition " + (
+          isNationalDay
+            ? dark ? "border-[#5aba1c]/10 snd-section-dark-alt" : "border-[#005A36]/8 snd-section-light-alt"
+            : dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]"
+        )}
       >
+        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-editorial-kicker"
               tag="text"
               label="شارة صوت العقيق"
-              defaultText="EDITORIAL · LEADERSHIP MESSAGE"
+              defaultText={isNationalDay ? "🇸🇦 رسالة القيادة في اليوم الوطني" : "EDITORIAL · LEADERSHIP MESSAGE"}
               as="span"
               className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                isNationalDay
+                  ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               )}
             >
               {(text) => (
@@ -1238,19 +1290,22 @@ export default function AlaqeeqStudioPublicPage() {
                 </>
               )}
             </VisualEditable>
-            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}>
+            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
               صوت العقيق والكلمة التربوية
             </h2>
-            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}>
+            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}>
               رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق.
             </p>
           </div>
 
           <div className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
-            dark
+            isNationalDay
+              ? dark ? "snd-editorial-card-dark" : "snd-editorial-card-light"
+              : dark
               ? "border-[#f8ca14]/30 bg-gradient-to-l from-[#161616] to-[#0a0a0a] shadow-2xl"
               : "border-[#08467d]/20 bg-white shadow-xl"
           )}>
+
             <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-8 items-center">
               <div>
                 <Quote size={40} className={dark ? "text-[#f8ca14]/30" : "text-[#08467d]/25"} />
@@ -1323,8 +1378,13 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="قسم ذاكرة العقيق"
         as="section"
-        className={"border-b py-14 md:py-20 " + (dark ? "border-white/[0.08] bg-black" : "border-black/[0.06] bg-white")}
+        className={"border-b py-14 md:py-20 " + (
+          isNationalDay
+            ? dark ? "border-[#f8ca14]/8 snd-section-dark" : "border-[#005A36]/8 snd-section-light"
+            : dark ? "border-white/[0.08] bg-black" : "border-black/[0.06] bg-white"
+        )}
       >
+        {isNationalDay && <div className="snd-gold-divider" />}
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
             <div>
@@ -1333,11 +1393,14 @@ export default function AlaqeeqStudioPublicPage() {
                   id="studio-memory-kicker"
                   tag="text"
                   label="شارة ذاكرة العقيق"
-                  defaultText="VISUAL MEMORY · SPOTLIGHT"
+                  defaultText={isNationalDay ? "🇸🇦 أرشيف ذاكرة الوطن" : "VISUAL MEMORY · SPOTLIGHT"}
                   as="span"
                   className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                    dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                    isNationalDay
+                      ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                      : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
                   )}
+
                 >
                   {(text) => (
                     <>
@@ -1524,7 +1587,9 @@ export default function AlaqeeqStudioPublicPage() {
         label="تذييل الصفحة (الفوتر)"
         as="footer"
         className={`border-t transition ${
-          dark ? "border-white/[0.08] bg-[#000000] text-white" : "border-black/[0.06] bg-[#fafafa] text-slate-900"
+          isNationalDay
+            ? dark ? "snd-footer-dark border-[#f8ca14]/10 text-white" : "snd-footer-light border-[#005A36]/10 text-slate-900"
+            : dark ? "border-white/[0.08] bg-[#000000] text-white" : "border-black/[0.06] bg-[#fafafa] text-slate-900"
         }`}
       >
         <div className="mx-auto max-w-[1360px] px-5 py-8 md:px-8">

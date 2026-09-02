@@ -2,6 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Play, BookOpen, ImageIcon, Mic, Newspaper, Sparkles } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 
@@ -13,11 +14,13 @@ export function AqeeqHomeBentoGrid({
   descOverride?: string;
 } = {}) {
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const { playEpisode } = usePodcastPlayer();
 
   // Fetch the latest 1 item from each category
+
   const { data: latestPodcast } = trpc.podcasts.list.useQuery({}, {
     select: (data) => data[0]
   });
@@ -40,18 +43,26 @@ export function AqeeqHomeBentoGrid({
       tag="section"
       label="قسم جديد الاستوديو (Bento Grid)"
       as="div"
-      className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8 py-12 md:py-16"
+      className={"w-full py-12 md:py-16 " + (
+        isNationalDay
+          ? dark ? "snd-section-dark-alt" : "snd-section-light-alt"
+          : ""
+      )}
     >
+      <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
+      {isNationalDay && <div className="snd-gold-divider mb-10" />}
       {/* Unified Section Header */}
       <div className="mb-8 sm:mb-10 text-right">
         <VisualEditable
           id="studio-highlights-kicker"
           tag="text"
           label="شارة جديد الاستوديو"
-          defaultText="STUDIO HIGHLIGHTS · LATEST"
+          defaultText={isNationalDay ? "🇸🇦 إبداعات العقيق في اليوم الوطني" : "STUDIO HIGHLIGHTS · LATEST"}
           as="span"
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-            dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+            isNationalDay
+              ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+              : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
           }`}
         >
           {(text) => (
@@ -60,6 +71,7 @@ export function AqeeqHomeBentoGrid({
               <span>{text}</span>
             </>
           )}
+
         </VisualEditable>
         <VisualEditable
           id="studio-highlights-title"
@@ -67,9 +79,12 @@ export function AqeeqHomeBentoGrid({
           label="عنوان جديد الاستوديو"
           defaultText={titleOverride || "جديد الاستوديو"}
           as="h2"
-          className={`text-2xl sm:text-4xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
+          className={`text-2xl sm:text-4xl font-black font-cairo ${
+            dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+          }`}
         />
         <VisualEditable
+
           id="studio-highlights-desc"
           tag="text"
           label="وصف جديد الاستوديو"
@@ -261,6 +276,8 @@ export function AqeeqHomeBentoGrid({
 
           </div>
         )}
+
+      </div>
 
       </div>
     </VisualEditable>
