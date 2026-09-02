@@ -2028,29 +2028,92 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   --snd-generosity: #971a4d;
   --snd-authenticity: #607c4f;
   --snd-giving: #7c5d21;
+
+  /* Global Token Overrides for the entire site */
+  --aq-blue: #005A36 !important;
+  --aq-green: #5aba1c !important;
+  --aq-yellow: #f8ca14 !important;
+  --aq-gold: #f8ca14 !important;
+  --aq-brand-secondary: #003822 !important;
+}
+
+/* 🇸🇦 All-Site Shell Background Metamorphosis */
+:root[data-site-theme="saudi-national-day"] .aq-studio-share {
+  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(0, 90, 54, 0.28), transparent 75%),
+              radial-gradient(ellipse 80% 50% at 90% 90%, rgba(90, 186, 28, 0.08), transparent 60%),
+              #01140c !important;
+  color: #ffffff !important;
+}
+
+:root[data-site-theme="saudi-national-day"] .aq-studio-share--light {
+  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(90, 186, 28, 0.12), transparent 75%),
+              #f7fbf9 !important;
+  color: #032e1d !important;
+}
+
+/* 🇸🇦 Top Navigation & Active Links */
+:root[data-site-theme="saudi-national-day"] .aq-studio-toplink:hover,
+:root[data-site-theme="saudi-national-day"] .aq-studio-toplink--active {
+  color: #5aba1c !important;
+}
+
+:root[data-site-theme="saudi-national-day"] .aq-studio-toplink--active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0.18rem;
+  left: 0;
+  height: 3px !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(90deg, #005A36, #5aba1c, #f8ca14) !important;
+  box-shadow: 0 0 12px rgba(90, 186, 28, 0.8) !important;
+}
+
+:root[data-site-theme="saudi-national-day"] .aq-studio-share-link--active {
+  background: rgba(90, 186, 28, 0.16) !important;
+  color: #5aba1c !important;
+  border-color: rgba(90, 186, 28, 0.3) !important;
+}
+
+:root[data-site-theme="saudi-national-day"] .aq-studio-share-link:hover {
+  color: #f8ca14 !important;
+}
+
+/* 🇸🇦 Heritage Frame Template (Inspired by Guideline Pages 56-57) */
+.heritage-card-frame {
+  position: relative;
+  border: 1px solid rgba(90, 186, 28, 0.28) !important;
+  background: rgba(1, 24, 15, 0.65) !important;
+  backdrop-filter: blur(16px);
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.heritage-card-frame:hover {
+  border-color: rgba(248, 202, 20, 0.55) !important;
+  box-shadow: 0 12px 36px rgba(0, 90, 54, 0.35), inset 0 0 20px rgba(90, 186, 28, 0.08) !important;
 }
 
 /* Top Celebration Ribbon */
 .snd-ribbon-bar {
-  background: linear-gradient(90deg, #003d25 0%, #005A36 35%, #007A48 50%, #005A36 65%, #003d25 100%);
-  border-bottom: 1px solid rgba(248, 202, 20, 0.35);
-  box-shadow: 0 4px 20px rgba(0, 58, 34, 0.35);
+  background: linear-gradient(90deg, #002b1b 0%, #005A36 30%, #007A48 50%, #005A36 70%, #002b1b 100%);
+  border-bottom: 1px solid rgba(248, 202, 20, 0.4);
+  box-shadow: 0 4px 25px rgba(0, 58, 34, 0.4);
 }
 
 /* Saudi National Day Ambient Hero Glow */
 .snd-hero-dark {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 90, 54, 0.5), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(90, 186, 28, 0.1), transparent),
+  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.55), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(90, 186, 28, 0.12), transparent),
               linear-gradient(180deg, #01140c 0%, #021a10 50%, #010d08 100%);
 }
 
 .snd-hero-light {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(90, 186, 28, 0.18), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0, 90, 54, 0.08), transparent),
+  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(90, 186, 28, 0.2), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(0, 90, 54, 0.1), transparent),
               linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 50%, #ffffff 100%);
 }
 
-/* Geometric Subtle Sadu Pattern Watermark (Pure CSS / SVG - Non-Intrusive) */
+/* Geometric Subtle Sadu Pattern Watermark */
 .snd-pattern-watermark {
   background-image: radial-gradient(rgba(90, 186, 28, 0.15) 1px, transparent 1px), radial-gradient(rgba(248, 202, 20, 0.1) 1px, transparent 1px);
   background-size: 32px 32px;
@@ -2075,3 +2138,4 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   border-color: rgba(248, 202, 20, 0.5) !important;
   box-shadow: 0 15px 40px rgba(0, 90, 54, 0.3), inset 0 0 25px rgba(248, 202, 20, 0.1) !important;
 }
+

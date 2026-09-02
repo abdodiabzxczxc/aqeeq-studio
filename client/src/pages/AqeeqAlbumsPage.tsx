@@ -11,6 +11,7 @@ import { useLocation } from "wouter";
 import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
 
@@ -24,51 +25,62 @@ function directDriveImage(url: string | null) {
 }
 
 function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: number; onOpen: () => void; dark: boolean }) {
+  const { isNationalDay } = useSiteTheme();
   const cover = directDriveImage(album.coverUrl) || album.coverUrl;
   return (
     <article className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
-      dark
+      isNationalDay
+        ? "heritage-card-frame border-[#5aba1c]/40 text-white shadow-[0_20px_50px_rgba(0,50,25,0.4)] hover:border-[#f8ca14]"
+        : dark
         ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
         : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
     }`}>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
         <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
-          dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
+          isNationalDay
+            ? "border-[#5aba1c]/20 bg-[#001c10]"
+            : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
         }`} aria-label={`فتح ${album.title}`}>
           {/* Back tilted image — hidden on mobile */}
           <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block ${
-            dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
+            isNationalDay
+              ? "border-[#5aba1c]/20 bg-[#002617]"
+              : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
           }`} style={{ transform: "rotate(-7deg)" }}>
             {cover ? <VisualImage id={`albums-card-back-cover-${album.id}`} label="صورة خلفية بطاقة الألبوم" src={cover} alt="" className="h-full w-full object-cover" /> : null}
           </div>
           {/* Front cover — full on mobile, partial on sm+ */}
           <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
-            dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
+            isNationalDay
+              ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]"
+              : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
           }`} style={{ transform: "rotate(0deg)" }}>
-            {cover ? <VisualImage id={`albums-card-cover-${album.id}`} label="غلاف بطاقة الألبوم" src={cover} alt={`غلاف ${album.title}`} className="h-full w-full rounded-[.7rem] object-cover" /> : <div className={`grid h-full place-items-center ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}><Camera size={34} /></div>}
+            {cover ? <VisualImage id={`albums-card-cover-${album.id}`} label="غلاف بطاقة الألبوم" src={cover} alt={`غلاف ${album.title}`} className="h-full w-full rounded-[.7rem] object-cover" /> : <div className={`grid h-full place-items-center ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}><Camera size={34} /></div>}
           </div>
         </button>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-3">
             <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
-              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              isNationalDay
+                ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}>
               <Camera size={18} />
             </div>
-            <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-              EVENT ARCHIVE · {String(index + 1).padStart(2, "0")}
+            <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+              {isNationalDay ? "NATIONAL ARCHIVE" : "EVENT ARCHIVE"} · {String(index + 1).padStart(2, "0")}
             </p>
           </div>
           <VisualEditable id={`albums-card-title-${album.id}`} tag="text" label="اسم الألبوم" defaultText={album.title} as="h3" className={`mt-4 text-2xl font-black ${dark ? "text-white" : "text-black"}`} />
           <VisualEditable id={`albums-card-description-${album.id}`} tag="text" label="وصف الألبوم" defaultText={album.description || "ألبوم من ذاكرة فعاليات مدارس العقيق، يجمع الصور والفيديوهات في تجربة قراءة واحدة."} as="p" className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`} />
-          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+          <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${isNationalDay ? "border-[#5aba1c]/20" : dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
             <div>
               <b className={`block text-xl font-black ${dark ? "text-white" : "text-black"}`}>{String(album.mediaCount || 0).padStart(2, "0")}</b>
-              <span className={`text-[9px] font-black tracking-[.16em] ${dark ? "text-slate-500" : "text-slate-400"}`}>FILES</span>
+              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? "text-[#5aba1c]" : dark ? "text-slate-500" : "text-slate-400"}`}>FILES</span>
             </div>
             <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : "text-slate-500"}`}><Eye size={13} />{album.viewCount || 0}</span>
-            <button onClick={onOpen} className={`inline-flex items-center gap-2 text-xs font-black transition ${dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"}`}>استكشف الآن <ArrowUpLeft size={15} /></button>
+            <button onClick={onOpen} className={`inline-flex items-center gap-2 text-xs font-black transition ${isNationalDay ? "text-[#f8ca14] hover:text-[#5aba1c]" : dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"}`}>استكشف الآن <ArrowUpLeft size={15} /></button>
           </div>
         </div>
       </div>
@@ -77,6 +89,8 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
 }
 
 export default function AqeeqAlbumsPage() {
+
+
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
   const { user, isAuthenticated } = useAuth();

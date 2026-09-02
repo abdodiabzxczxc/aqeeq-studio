@@ -7,10 +7,12 @@ import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
-import { Search, LayoutDashboard, PencilRuler, ScanFace, Plus, Grid, Sun, Moon, LogOut, Settings2, Headphones, Rocket } from "lucide-react";
+import { Search, LayoutDashboard, PencilRuler, ScanFace, Plus, Grid, Sun, Moon, LogOut, Settings2, Headphones, Rocket, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
+import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -122,9 +124,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
 
             {isNationalDay && (
-              <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/15 to-teal-600/15 border border-emerald-500/40 text-emerald-500 shadow-sm">
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full bg-gradient-to-r from-[#005A36]/30 to-[#5aba1c]/20 border border-[#5aba1c]/40 text-[#5aba1c] shadow-sm">
                 <span>🇸🇦</span>
-                <span className="font-bold">{customBadgeText}</span>
+                <span className="font-bold text-white">عزّنا بطبعنا</span>
               </span>
             )}
           </div>
@@ -141,6 +143,18 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           {/* Left Action Buttons (Compact & Zero Collision on Mobile) */}
           <div dir="ltr" className="absolute left-3.5 sm:left-6 md:left-8 top-1/2 flex -translate-y-1/2 items-center gap-1.5 sm:gap-2.5 md:gap-3">
+            {/* National Day Celebration Quick Button */}
+            {isNationalDay && (
+              <button
+                type="button"
+                onClick={() => triggerNationalCelebration()}
+                className="hidden md:flex items-center gap-1.5 rounded-xl border border-[#f8ca14]/40 bg-[#f8ca14]/15 px-3 py-2 text-xs font-black text-[#f8ca14] hover:bg-[#f8ca14]/25 transition active:scale-95 shadow-sm"
+                title="شارِكنا بهجة الوطن"
+              >
+                <Sparkles size={14} className="text-[#f8ca14]" />
+                <span>بهجة الوطن 🇸🇦</span>
+              </button>
+            )}
             
             {/* 1. Options Dropdown Menu OR Login Button (Desktop / Tablet) */}
             {isAuthenticated ? (

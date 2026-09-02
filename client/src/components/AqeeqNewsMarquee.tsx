@@ -2,6 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Sparkles, Mic, Newspaper, ImageIcon, BookOpen, Video } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { VisualEditable } from "@/components/VisualEditor";
 
@@ -17,7 +18,9 @@ export function AqeeqNewsMarquee({
   const { data: issues } = trpc.schoolNews.publicList.useQuery(undefined);
   const [, navigate] = useLocation();
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
+
 
   type MarqueeItem = {
     id: string;
@@ -240,11 +243,13 @@ export function AqeeqNewsMarquee({
           </button>
 
           <span
-            className={`mx-3 sm:mx-5 text-[10px] shrink-0 ${
-              dark ? "text-amber-400/40" : "text-[#08467d]/35"
+            className={`mx-3 sm:mx-5 shrink-0 flex items-center gap-1.5 ${
+              isNationalDay
+                ? "text-[#f8ca14] drop-shadow-[0_0_8px_rgba(248,202,20,0.4)] text-xs"
+                : dark ? "text-amber-400/40 text-[10px]" : "text-[#08467d]/35 text-[10px]"
             }`}
           >
-            ✦
+            {isNationalDay ? "🇸🇦 ✦" : "✦"}
           </span>
         </div>
       ))}
@@ -266,7 +271,9 @@ export function AqeeqNewsMarquee({
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
           className={`relative flex items-center overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 h-11 sm:h-13 ${
-            dark
+            isNationalDay
+              ? "border-[#5aba1c]/35 bg-[#001c10]/95 shadow-[0_8px_30px_rgba(0,58,34,0.4)] ring-1 ring-[#5aba1c]/20"
+              : dark
               ? "border-amber-400/25 bg-[#0a0d14]/90 shadow-[0_8px_30px_rgba(0,0,0,0.5)] ring-1 ring-white/5"
               : "border-slate-200/90 bg-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ring-1 ring-black/5"
           }`}
@@ -274,7 +281,9 @@ export function AqeeqNewsMarquee({
           {/* 1. Fixed Luxury Badge on the Right */}
           <div
             className={`shrink-0 z-20 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1 font-black text-xs sm:text-sm border-l h-full ${
-              dark
+              isNationalDay
+                ? "bg-gradient-to-r from-[#003822] to-[#005A36] text-[#f8ca14] border-emerald-500/30 shadow-[10px_0_20px_rgba(0,40,20,0.6)]"
+                : dark
                 ? "bg-[#0f1422] text-[#f8ca14] border-amber-400/20 shadow-[10px_0_20px_rgba(0,0,0,0.6)]"
                 : "bg-amber-50 text-[#08467d] border-slate-200 shadow-[10px_0_20px_rgba(0,0,0,0.03)]"
             }`}
@@ -284,11 +293,12 @@ export function AqeeqNewsMarquee({
               id="studio-marquee-badge-text"
               tag="text"
               label="شارة شريط الأخبار"
-              defaultText={badgeOverride || "آخر الأخبار"}
+              defaultText={badgeOverride || (isNationalDay ? "عزّنا بطبعنا 🇸🇦" : "آخر الأخبار")}
               as="span"
               className="whitespace-nowrap tracking-wide font-black"
             />
           </div>
+
 
           {/* 2. Scrolling Viewport with Soft Fade Gradients */}
           <div ref={viewportRef} className="relative flex-1 overflow-hidden h-full flex items-center">

@@ -46,6 +46,10 @@ import { AqeeqNewsMarquee } from "@/components/AqeeqNewsMarquee";
 import { AqeeqHomeBentoGrid } from "@/components/AqeeqHomeBentoGrid";
 import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqNationalTraitsSection } from "@/components/AqeeqNationalTraitsSection";
+import { triggerNationalCelebration } from "@/components/AqeeqCelebrationConfetti";
+
+
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -918,7 +922,12 @@ export default function AlaqeeqStudioPublicPage() {
       {(orchestration?.sections as any)?.marqueeEnabled !== false && (
         <AqeeqNewsMarquee badgeOverride={(orchestration?.sections as any)?.marqueeBadge} />
       )}
+
+      {/* 🇸🇦 قسم قيم الهوية الوطنية الست الرسمية (عزّنا بطبعنا) */}
+      {isNationalDay && <AqeeqNationalTraitsSection dark={dark} />}
+
       {(orchestration?.sections as any)?.studioHighlightsEnabled !== false && (
+
         <AqeeqHomeBentoGrid
           titleOverride={(orchestration?.sections as any)?.studioHighlightsTitle}
           descOverride={(orchestration?.sections as any)?.studioHighlightsDesc}
@@ -1629,8 +1638,37 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
           </div>
 
+          {/* 🇸🇦 Saudi National Day Footer Seal Banner */}
+          {isNationalDay && (
+            <div className="mt-8 rounded-3xl border border-[#5aba1c]/30 bg-gradient-to-r from-[#002617] via-[#003822] to-[#001c10] p-4 sm:p-6 text-center backdrop-blur-xl shadow-lg relative overflow-hidden">
+              <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-right">
+                  <div className="h-12 w-12 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/40 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                    🇸🇦
+                  </div>
+                  <div>
+                    <h4 className="text-sm sm:text-base font-black text-white">عزّنا بطبعنا • مسيرة مجد وفخر مستمرة</h4>
+                    <p className="text-xs text-emerald-300 font-bold">#اليوم_الوطني_السعودي · #عزنا_بطبعنا</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => triggerNationalCelebration()}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-4 py-2 text-xs font-black text-black shadow-md hover:scale-105 active:scale-95 transition"
+                  >
+                    <Sparkles size={14} className="text-[#005A36]" />
+                    <span>شارِكنا البهجة 🇸🇦</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Minimal Copyright Line & Back to Top (فكرة 1: زر الصعود للأعلى) */}
           <div className={`mt-6 border-t pt-4 flex items-center justify-between gap-4 text-[11px] font-bold ${
+
             dark ? "border-white/[0.06] text-slate-500" : "border-black/[0.06] text-slate-400"
           }`}>
             <VisualEditable

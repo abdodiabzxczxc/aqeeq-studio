@@ -83,6 +83,8 @@ function resolveAudioMediaUrl(url: string | null | undefined): string {
 }
 
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
+
 
 function isDefaultOrLogoImage(url?: string | null): boolean {
   if (!url || url.trim() === "") return true;
@@ -233,7 +235,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   });
 
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const isDark = theme === "dark";
+
 
   // Assemble current school songs from orchestration or defaults
   const schoolSongs = useMemo(() => {
@@ -1110,7 +1114,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               }
             }}
             className={`relative grid h-13 w-13 sm:h-16 sm:w-16 place-items-center rounded-full border-2 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 ${
-              isVideo
+              isNationalDay
+                ? "bg-gradient-to-tr from-[#002617] via-[#003822] to-[#005A36] border-[#f8ca14]/80 shadow-[0_12px_36px_rgba(0,90,54,0.6)] ring-2 ring-[#5aba1c]/50 backdrop-blur-2xl"
+                : isVideo
                 ? isDark
                   ? "bg-gradient-to-tr from-[#0b1022] via-[#0e1635] to-[#122046] border-cyan-400/60 shadow-[0_12px_36px_rgba(6,182,212,0.45)] ring-2 ring-cyan-400/30"
                   : "bg-gradient-to-tr from-[#ecfeff] via-[#f8fafc] to-[#ffffff] border-cyan-400 shadow-[0_10px_30px_rgba(6,182,212,0.25)] ring-2 ring-cyan-400/40"
@@ -1123,7 +1129,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     : "bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#ffffff] border-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.14)] ring-2 ring-amber-400/35 backdrop-blur-2xl"
             } ${
               isPlaying
-                ? isVideo
+                ? isNationalDay
+                  ? "shadow-[#5aba1c]/40 ring-[#f8ca14]/70"
+                  : isVideo
                   ? "shadow-cyan-500/40 ring-cyan-400/60"
                   : isPodcast
                     ? "shadow-indigo-500/40 ring-indigo-400/60"
@@ -1139,17 +1147,23 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               <>
                 {/* Outer Grooves */}
                 <div className={`pointer-events-none absolute inset-1 rounded-full border ${
-                  isVideo
+                  isNationalDay
+                    ? "border-[#5aba1c]/30"
+                    : isVideo
                     ? isDark ? "border-cyan-400/20" : "border-cyan-200"
                     : isDark ? "border-white/10" : "border-slate-300/80"
                 }`} />
                 <div className={`pointer-events-none absolute inset-2 rounded-full border ${
-                  isVideo
+                  isNationalDay
+                    ? "border-[#f8ca14]/20"
+                    : isVideo
                     ? isDark ? "border-cyan-400/10" : "border-cyan-100"
                     : isDark ? "border-white/5" : "border-slate-300/40"
                 }`} />
                 <div className={`pointer-events-none absolute inset-3 rounded-full border ${
-                  isVideo
+                  isNationalDay
+                    ? "border-[#5aba1c]/30"
+                    : isVideo
                     ? isDark ? "border-cyan-400/20" : "border-cyan-200"
                     : isDark ? "border-white/10" : "border-slate-300/80"
                 }`} />
@@ -1157,13 +1171,16 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 {/* Center Spinning Spindle Disc with Musical Note / Video Artwork */}
                 <div
                   className={`relative grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full text-black shadow-md overflow-hidden ${
-                    isVideo
+                    isNationalDay
+                      ? "bg-gradient-to-tr from-[#005A36] via-[#5aba1c] to-[#f8ca14]"
+                      : isVideo
                       ? "bg-gradient-to-tr from-cyan-500 to-indigo-600"
                       : "bg-gradient-to-tr from-[#f8ca14] to-amber-600"
                   } ${
                     isPlaying ? "animate-[spin_4s_linear_infinite]" : ""
                   }`}
                 >
+
                   <img
                     src={getSongCover(activeItem, theme)}
                     alt=""

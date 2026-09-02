@@ -127,20 +127,27 @@ function App() {
   );
 }
 
+import { useSiteTheme } from "./lib/useSiteTheme";
+import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
+
 function StudioAppShell() {
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
   const { activeItem } = usePodcastPlayer();
+  const { isNationalDay } = useSiteTheme();
+
   const brandStyle = {
-    "--aq-gold": brand?.brand_primary || "#e5b84f",
+    "--aq-gold": isNationalDay ? "#f8ca14" : (brand?.brand_primary || "#e5b84f"),
     "--aq-ink": brand?.brand_surface || "#000000",
-    "--aq-brand-secondary": brand?.brand_secondary || "#18293a",
+    "--aq-brand-secondary": isNationalDay ? "#003822" : (brand?.brand_secondary || "#18293a"),
+    "--aq-blue": isNationalDay ? "#005A36" : (brand?.brand_primary || "#08467d"),
     fontFamily: brand?.brand_font ? `'${brand.brand_font}', Tajawal, sans-serif` : undefined,
   } as React.CSSProperties;
 
   return (
     <PodcastPlayerProvider>
-      <div style={brandStyle} className="aq-brand-shell">
+      <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
+        {isNationalDay && <AqeeqCelebrationConfetti />}
         <div className={`min-h-screen transition-[padding-bottom] duration-300 ${activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
           <AqeeqOccasionRibbon />
           <AqeeqBroadcastBanner />
@@ -156,4 +163,5 @@ function StudioAppShell() {
 }
 
 export default App;
+
 
