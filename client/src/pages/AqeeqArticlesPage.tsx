@@ -263,8 +263,10 @@ function ArticleCard({
 export default function AqeeqArticlesPage({ params }: { params?: { slug?: string } } = {}) {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
+
   const isAdmin = isAuthenticated && user?.role === "admin";
 
   const [selectedCategory, setSelectedCategory] = useState("all");
