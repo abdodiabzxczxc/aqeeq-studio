@@ -98,7 +98,9 @@ export default function AqeeqAlbumsPage() {
 
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
+
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<AqeeqSortOption>("newest");
@@ -133,8 +135,6 @@ export default function AqeeqAlbumsPage() {
   );
 
   if (isLoading) return <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}><Loader2 className="animate-spin text-[#f8ca14]" /></div>;
-
-  const { isNationalDay } = useSiteTheme();
 
   return (
     <main dir="rtl" className={`min-h-screen aq-public-shell ${

@@ -65,7 +65,9 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   const { data: journalIssues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const [mode, setMode] = useState<AlbumMode>("spread");
   const { theme, toggleTheme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const [index, setIndex] = useState(0);
+
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const [isTvMode, setIsTvMode] = useState(false);
 
@@ -325,8 +327,8 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   if (isLoading) return <div className="grid min-h-screen place-items-center bg-[#080b12]"><Loader2 className="animate-spin text-amber-300" /></div>;
   if (!album) return <main dir="rtl" className="grid min-h-screen place-items-center bg-[#080b12] p-6 text-center text-slate-400"><div><ImageIcon className="mx-auto text-amber-300" size={38} /><h1 className="mt-4 text-2xl font-black text-amber-50">هذا الألبوم غير متاح</h1><p className="mt-2 text-sm">قد يكون مسودة لم تُنشر بعد أو أن الرابط غير صحيح.</p></div></main>;
 
-  const { isNationalDay } = useSiteTheme();
   const watermarkPlacement = album.watermarkPosition === "top-right" ? "right-[-10%] top-0" : album.watermarkPosition === "bottom-left" ? "bottom-[-8%] left-[-10%]" : album.watermarkPosition === "bottom-right" ? "bottom-[-8%] right-[-10%]" : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
+
 
   return (
     <main

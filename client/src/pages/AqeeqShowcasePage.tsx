@@ -760,7 +760,9 @@ function UnifiedShowcaseHero({
 export default function AqeeqShowcasePage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
+
   const [, navigate] = useLocation();
   const [selected, setSelected] = useState<ShowcasePost | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -836,9 +838,8 @@ export default function AqeeqShowcasePage() {
     );
   }
 
-  const { isNationalDay } = useSiteTheme();
-
   return (
+
     <main dir="rtl" className={`min-h-screen aq-public-shell ${
       isNationalDay
         ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"

@@ -198,7 +198,9 @@ function IssueCard({
 export default function SchoolNewsPage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
+
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<AqeeqSortOption>("newest");
@@ -257,9 +259,8 @@ export default function SchoolNewsPage() {
     );
   }
 
-  const { isNationalDay } = useSiteTheme();
-
   return (
+
     <main dir="rtl" className={`min-h-screen aq-public-shell ${
       isNationalDay
         ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
