@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Sparkles, Mic, Newspaper, ImageIcon, BookOpen, Video } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { VisualEditable } from "@/components/VisualEditor";
 
 export function AqeeqNewsMarquee({
@@ -28,7 +28,7 @@ export function AqeeqNewsMarquee({
     timestamp: number;
   };
 
-  // Aggregate all content (excluding songs), sort each newest-first, then interleave round-robin
+  // Aggregate all content (strictly excluding songs), sort newest-first, then interleave round-robin
   const rawItems = useMemo(() => {
     // 1. Articles
     const artList: MarqueeItem[] = (articles || [])
@@ -113,21 +113,71 @@ export function AqeeqNewsMarquee({
     return interleaved;
   }, [articles, showcases, podcasts, albums, issues]);
 
-  // Ensure a single batch has at least 10 items so there are no empty gaps on wide displays
+  // Ensure singleBatch has at least 8 items for a full conveyor belt
   const singleBatch = useMemo(() => {
     if (rawItems.length === 0) return [];
     let batch = [...rawItems];
-    while (batch.length < 10) {
+    while (batch.length < 8) {
       batch = [...batch, ...rawItems];
     }
     return batch;
   }, [rawItems]);
 
-  // Duplicate the singleBatch once: total track = [batch, batch].
-  // Keyframe: -50% -> 0% (moving smoothly from left to right)
-  const marqueeTrack = useMemo(() => {
-    if (singleBatch.length === 0) return [];
-    return [...singleBatch, ...singleBatch];
+  const [isPaused, setIsPaused] = useState(false);
+  const isPausedRef = useRef(false);
+  isPausedRef.current = isPaused;
+
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const batchRef = useRef<HTMLDivElement | null>(null);
+  const offsetRef = useRef<number>(0);
+  const batchWidthRef = useRef<number>(0);
+  const animFrameIdRef = useRef<number | null>(null);
+
+  // Measure batch width accurately
+  useEffect(() => {
+    if (!batchRef.current) return;
+    const updateWidth = () => {
+      if (batchRef.current) {
+        batchWidthRef.current = batchRef.current.offsetWidth || 0;
+      }
+    };
+    updateWidth();
+
+    const ro = new ResizeObserver(updateWidth);
+    ro.observe(batchRef.current);
+    return () => ro.disconnect();
+  }, [singleBatch]);
+
+  // 60fps hardware-accelerated continuous conveyor belt
+  useEffect(() => {
+    if (singleBatch.length === 0) return;
+
+    let lastTime = performance.now();
+    const speed = 40; // pixels per second — silky smooth and easy to read
+
+    const loop = (now: number) => {
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      if (!isPausedRef.current && batchWidthRef.current > 0 && trackRef.current) {
+        // Move to the right (+X)
+        offsetRef.current += speed * delta;
+        if (offsetRef.current >= batchWidthRef.current) {
+          offsetRef.current -= batchWidthRef.current;
+        }
+        trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      }
+
+      animFrameIdRef.current = requestAnimationFrame(loop);
+    };
+
+    animFrameIdRef.current = requestAnimationFrame(loop);
+
+    return () => {
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current);
+      }
+    };
   }, [singleBatch]);
 
   if (rawItems.length === 0) return null;
@@ -140,6 +190,54 @@ export function AqeeqNewsMarquee({
     journal: <BookOpen size={13} className={dark ? "text-amber-400" : "text-amber-600"} />,
   };
 
+  const renderBatch = (items: MarqueeItem[], keyPrefix: string, isFirst = false) => (
+    <div
+      ref={isFirst ? batchRef : undefined}
+      className="flex items-center shrink-0"
+      aria-hidden={!isFirst ? true : undefined}
+    >
+      {items.map((item, idx) => (
+        <div key={`${keyPrefix}-${item.id}-${idx}`} className="flex items-center shrink-0">
+          <button
+            type="button"
+            onClick={() => navigate(item.url)}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
+              dark
+                ? "text-slate-200 hover:text-amber-300 hover:bg-white/[0.08]"
+                : "text-slate-800 hover:text-[#08467d] hover:bg-black/[0.05]"
+            }`}
+          >
+            <span className="shrink-0">{iconMap[item.icon]}</span>
+            <span
+              className={`text-[9.5px] sm:text-[10.5px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
+                item.icon === "article"
+                  ? dark ? "bg-rose-500/15 text-rose-300 border-rose-500/30" : "bg-rose-50 text-rose-700 border-rose-200"
+                  : item.icon === "video"
+                  ? dark ? "bg-sky-500/15 text-sky-300 border-sky-500/30" : "bg-sky-50 text-sky-700 border-sky-200"
+                  : item.icon === "podcast"
+                  ? dark ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                  : item.icon === "album"
+                  ? dark ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : dark ? "bg-amber-500/15 text-amber-300 border-amber-500/30" : "bg-amber-50 text-amber-800 border-amber-200"
+              }`}
+            >
+              {item.label}
+            </span>
+            <span className="shrink-0 leading-none">{item.title}</span>
+          </button>
+
+          <span
+            className={`mx-3 sm:mx-5 text-[10px] shrink-0 ${
+              dark ? "text-amber-400/40" : "text-[#08467d]/35"
+            }`}
+          >
+            ✦
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <VisualEditable
       id="studio-marquee-section"
@@ -150,6 +248,10 @@ export function AqeeqNewsMarquee({
     >
       <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
         <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
           className={`relative flex items-center overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl transition-all duration-300 h-11 sm:h-13 ${
             dark
               ? "border-amber-400/25 bg-[#0a0d14]/90 shadow-[0_8px_30px_rgba(0,0,0,0.5)] ring-1 ring-white/5"
@@ -189,47 +291,14 @@ export function AqeeqNewsMarquee({
               }`}
             />
 
-            {/* 3. Pure CSS RTL Seamless Marquee Track */}
-            <div className="animate-marquee-rtl flex items-center shrink-0 active:[animation-play-state:paused]">
-              {marqueeTrack.map((item, idx) => (
-                <div key={`${item.id}-${idx}`} className="flex items-center shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => navigate(item.url)}
-                    className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
-                      dark
-                        ? "text-slate-200 hover:text-amber-300 hover:bg-white/[0.08]"
-                        : "text-slate-800 hover:text-[#08467d] hover:bg-black/[0.05]"
-                    }`}
-                  >
-                    <span className="shrink-0">{iconMap[item.icon]}</span>
-                    <span
-                      className={`text-[9.5px] sm:text-[10.5px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
-                        item.icon === "article"
-                          ? dark ? "bg-rose-500/15 text-rose-300 border-rose-500/30" : "bg-rose-50 text-rose-700 border-rose-200"
-                          : item.icon === "video"
-                          ? dark ? "bg-sky-500/15 text-sky-300 border-sky-500/30" : "bg-sky-50 text-sky-700 border-sky-200"
-                          : item.icon === "podcast"
-                          ? dark ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" : "bg-indigo-50 text-indigo-700 border-indigo-200"
-                          : item.icon === "album"
-                          ? dark ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : dark ? "bg-amber-500/15 text-amber-300 border-amber-500/30" : "bg-amber-50 text-amber-800 border-amber-200"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                    <span className="shrink-0 leading-none">{item.title}</span>
-                  </button>
-
-                  <span
-                    className={`mx-3 sm:mx-5 text-[10px] shrink-0 ${
-                      dark ? "text-amber-400/40" : "text-[#08467d]/35"
-                    }`}
-                  >
-                    ✦
-                  </span>
-                </div>
-              ))}
+            {/* 3. Pixel-exact, 100% Unbreakable Continuous Conveyor Belt */}
+            <div
+              ref={trackRef}
+              className="flex items-center shrink-0 will-change-transform"
+            >
+              {renderBatch(singleBatch, "b1", true)}
+              {renderBatch(singleBatch, "b2")}
+              {renderBatch(singleBatch, "b3")}
             </div>
           </div>
         </div>
