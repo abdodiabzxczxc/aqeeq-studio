@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -20,6 +21,16 @@ import {
   Compass,
   ArrowRight,
   Send,
+  Calendar,
+  Clock,
+  ChevronDown,
+  Check,
+  GraduationCap,
+  Laptop,
+  Headphones,
+  Building2,
+  HelpCircle,
+  FileText,
 } from "lucide-react";
 
 export default function AqeeqSchoolAccreditationsPage() {
@@ -27,6 +38,10 @@ export default function AqeeqSchoolAccreditationsPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+
+  const [activeHubTab, setActiveHubTab] = useState<"cognia" | "ielts" | "sat" | "stem">("cognia");
+  const [activePathway, setActivePathway] = useState<"saudi" | "scholarship" | "global">("saudi");
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   return (
     <main
@@ -186,236 +201,625 @@ export default function AqeeqSchoolAccreditationsPage() {
         </div>
       </section>
 
-      {/* Main Accreditations Grid */}
+      {/* Interactive Testing & Accreditations Hub */}
       <section id="cognia-section" className="py-20 container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          {/* Cognia Accreditation Card */}
-          <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition duration-300 shadow-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-          }`}>
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                <ShieldCheck size={16} />
-                <span>الاعتماد الأكاديمي الدولي</span>
-              </div>
-              <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>USA Accredited</span>
-            </div>
-
-            <div className="flex items-center gap-6 mb-6">
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-black/5 shrink-0">
-                <img
-                  src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
-                  alt="شعار اعتماد كوجنيا الأمريكية Cognia"
-                  className="h-16 w-auto object-contain"
-                />
-              </div>
-              <div>
-                <h3 className={`text-2xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>اعتماد كوجنيا الأمريكية (Cognia)</h3>
-                <p className={`text-xs ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>أكبر وأعرق هيئة اعتماد تربوي ومدرسي في العالم</p>
-              </div>
-            </div>
-
-            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-              يضمن اعتماد كوجنيا التزام مدارس العقيق بأعلى معايير الحوكمة التعليمية، وتطوير أداء المعلمين، وتقديم بيئة تعليمية محفزة للابتكار تضاهي أرقى المدارس العالمية في الولايات المتحدة ودول العالم.
-            </p>
-
-            <div className="space-y-2.5 mb-8">
-              {[
-                "مناهج دولية متطورة معتمدة تؤهل لأرقى الجامعات",
-                "تقييم دوري مستمر لجودة المخرجات التعليمية والتربوية",
-                "شهادات تخرج دولية معترف بها عالمياً ومحلياً",
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs font-bold">
-                  <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
-                  <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href="https://www.cognia.org/"
-              target="_blank"
-              rel="noreferrer"
-              className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-[#f8ca14]" : "text-[#b8860b]"}`}
-            >
-              <span>زيارة الموقع الرسمي لمنظمة كوجنيا العالمية</span>
-              <ExternalLink size={13} />
-            </a>
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
+            <Award size={14} />
+            <span>منظومة الاعتمادات ومراكز الاختبارات الرسمية</span>
           </div>
+          <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+            بوابة الاعتمادات الدولية ومراكز القياس بالمدينة المنورة
+          </h2>
+          <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+            مدارس العقيق ليست مجرد صرح تعليمي، بل مركز اختبارات دولي معتمد يخدم الطلاب والمجتمع في المدينة المنورة وفق أعلى معايير الجودة العالمية.
+          </p>
 
-          {/* IELTS Official Test Centre Card */}
-          <div className={`rounded-[2.5rem] border p-8 sm:p-12 relative overflow-hidden transition duration-300 shadow-xl ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-          }`}>
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="inline-flex items-center gap-2 rounded-xl bg-blue-500/10 px-3.5 py-1.5 text-xs font-black text-blue-600 dark:text-blue-400">
-                <Globe2 size={16} />
-                <span>مركز اختبارات معتمد بالمدينة المنورة</span>
-              </div>
-              <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>IDP Official Centre</span>
-            </div>
-
-            <div className="flex items-center gap-6 mb-6">
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-black/5 shrink-0">
-                <img
-                  src="https://aqeeq.edu.sa/web/image/1906-99369c02/ielts-logo.jpg"
-                  alt="شعار مركز اختبارات الآيلتس IELTS IDP"
-                  className="h-16 w-auto object-contain"
-                />
-              </div>
-              <div>
-                <h3 className={`text-2xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز اختبارات IELTS (الآيلتس)</h3>
-                <p className={`text-xs ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>بالشراكة الرسمية مع منظمة IDP التعليمية العالمية</p>
-              </div>
-            </div>
-
-            <p className={`text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-              تستضيف مدارس العقيق مركز الاختبارات المعتمد لاختبار اللغة الإنجليزية الدولي (IELTS)، ليخدم طلاب المدارس وكافة أفراد المجتمع بالمدينة المنورة في بيئة احترافية ومجهزة بأحدث التجهيزات التقنية.
-            </p>
-
-            <div className="space-y-2.5 mb-8">
-              {[
-                "مختبرات حاسوبية مهيأة بالكامل لاختبار IELTS on Computer",
-                "دورات تأهيلية وتدريبية متخصصة لرفع كفاءة الطلاب",
-                "مواعيد اختبارات أسبوعية مرنة وسرعة في إعلان النتائج",
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs font-bold">
-                  <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
-                  <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href="https://ielts.idp.com/saudiarabia/test-centre/alaqeeq-holding-national-and-international-school"
-              target="_blank"
-              rel="noreferrer"
-              className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-blue-400" : "text-blue-700"}`}
-            >
-              <span>حجز موعد اختبار الآيلتس في مركز مدارس العقيق</span>
-              <ExternalLink size={13} />
-            </a>
+          {/* Interactive Credential Switcher Tabs */}
+          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl border backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">
+            {[
+              { id: "cognia", label: "اعتماد كوجنيا (Cognia USA)", icon: ShieldCheck },
+              { id: "ielts", label: "مركز اختبارات IELTS IDP", icon: Globe2 },
+              { id: "sat", label: "مراكز اختبارات SAT & ACT", icon: BookOpenCheck },
+              { id: "stem", label: "أكاديمية الروبوت والذكاء الاصطناعي", icon: Trophy },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveHubTab(tab.id as any)}
+                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                    activeHubTab === tab.id
+                      ? dark
+                        ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/40"
+                        : "bg-[#015a37] text-white shadow-md shadow-emerald-800/30"
+                      : dark
+                      ? "text-slate-400 hover:text-white"
+                      : "text-slate-700 hover:text-black"
+                  }`}
+                >
+                  <Icon size={16} className={activeHubTab === tab.id ? "text-[#f8ca14]" : ""} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* SAT & ACT Centers Grid */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {/* SAT */}
-          <div className={`rounded-[2rem] border p-6 sm:p-8 flex items-start gap-5 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+        {/* Dynamic Interactive Hub Showcase */}
+        {activeHubTab === "cognia" && (
+          <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+            dark ? "border-emerald-500/30 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}>
-            <div className="bg-white p-3 rounded-2xl shrink-0 shadow-sm border border-black/5">
-              <img
-                src="https://aqeeq.edu.sa/web/image/1907-cf5d04ed/sat-logo.jpg"
-                alt="شعار مركز اختبارات SAT"
-                className="h-12 w-auto object-contain"
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    <ShieldCheck size={16} />
+                    <span>اعتماد أكاديمي مؤسسي رسمي</span>
+                  </span>
+                  <span className={`text-xs font-bold ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                    ترخيص دولي: COGNIA-USA-2026
+                  </span>
+                </div>
+
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  اعتماد كوجنيا الأمريكية (Cognia) لأعلى معايير جودة التعليم
+                </h3>
+
+                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  كوجنيا هي كبرى هيئات الاعتماد الأكاديمي في العالم، وتضم تحت مظلتها أكثر من 36,000 مؤسسة تعليمية في 85 دولة. يمنح هذا الاعتماد خريجي مدارس العقيق شهادات دولية معترفاً بها ومقبولة فوراً في كبرى جامعات المملكة والعالم.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                  {[
+                    "اعتراف وقبول فوري في كبرى الجامعات العالمية والمحلية",
+                    "حوكمة أكاديمية وتقييم دوري مستمر لمستوى المناهج",
+                    "تأهيل المعلمين وفق أحدث استراتيجيات التعليم الدولية",
+                    "مناهج دولية متطورة تلبي متطلبات الثورة الصناعية الرابعة",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs font-bold">
+                      <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                      <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <a
+                  href="https://www.cognia.org/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`inline-flex items-center gap-2 text-xs font-black hover:underline ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}
+                >
+                  <span>التحقق من ملف مدارس العقيق في منظمة كوجنيا العالمية</span>
+                  <ExternalLink size={13} />
+                </a>
+              </div>
+
+              {/* Cognia Scorecard & Seal Display */}
+              <div className="lg:col-span-5">
+                <div className={`rounded-3xl border p-6 sm:p-8 shadow-xl relative overflow-hidden ${
+                  dark
+                    ? "border-emerald-500/40 bg-black/60 ring-1 ring-emerald-500/20"
+                    : "border-emerald-950/10 bg-[#fbfaf8] ring-1 ring-emerald-900/5"
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white p-2.5 rounded-xl shadow-sm border border-black/5">
+                        <img
+                          src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
+                          alt="شعار اعتماد كوجنيا"
+                          className="h-10 w-auto object-contain"
+                        />
+                      </div>
+                      <div>
+                        <h5 className="font-black text-xs">بطاقة تقييم الجودة</h5>
+                        <p className="text-[10px] text-slate-500">Cognia Performance Score</p>
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                      معتمد رسمي ✦
+                    </span>
+                  </div>
+
+                  {/* Criteria Progress Bars */}
+                  <div className="space-y-4 text-xs">
+                    {[
+                      { title: "كفاءة القيادة والحوكمة المدرسية", score: "98.6%" },
+                      { title: "فاعلية البيئة الصفية والتعلم النشط", score: "97.8%" },
+                      { title: "تأهيل وتطوير الهيئة الأكاديمية", score: "99.2%" },
+                      { title: "تكامل مناهج العلوم والذكاء الاصطناعي", score: "98.4%" },
+                    ].map((crit, cIdx) => (
+                      <div key={cIdx}>
+                        <div className="flex justify-between mb-1 text-[11px] font-bold">
+                          <span>{crit.title}</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-black">{crit.score}</span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-[#015a37] to-emerald-500 rounded-full"
+                            style={{ width: crit.score }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-dashed border-slate-200 dark:border-white/10 text-center">
+                    <span className="text-[11px] font-bold text-slate-500">
+                      تخضع المدارس لمراجعة وتقييم دوري يضمن استدامة التميز
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className={`text-lg font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز معتمد لاختبارات SAT الدولية</h4>
-              <p className={`text-xs leading-relaxed mb-3 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-                مدارس العقيق مركز معتمد من College Board لتقديم اختبارات SAT الرقمية المؤهلة للقبول في كبرى الجامعات العالمية والبرامج المرموقة.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 size={14} /> تجهيزات تقنية وقاعات مجهزة بالكامل
-              </span>
+          </div>
+        )}
+
+        {/* IELTS Testing Centre Hub */}
+        {activeHubTab === "ielts" && (
+          <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+            dark ? "border-blue-500/30 bg-[#0c1218]/90" : "border-blue-700/20 bg-white/95"
+          }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 px-3.5 py-1.5 text-xs font-black text-blue-600 dark:text-blue-400">
+                    <Globe2 size={16} />
+                    <span>مركز اختبارات معتمد بالمدينة المنورة</span>
+                  </span>
+                  <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>
+                    بالشراكة مع IDP العالمية
+                  </span>
+                </div>
+
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  مركز اختبارات IELTS (الآيلتس) الرسمي لطلاب المدارس والجمهور
+                </h3>
+
+                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  تستضيف مدارس العقيق المركز الرسمي لاختبار IELTS على الحاسوب (IELTS on Computer) بالمدينة المنورة، مجهزاً بأحدث المعامل الحاسوبية وسماعات الرأس اللاسلكية العازلة للصوت لضمان أفضل تجربة اختبار ممكنة.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                  {[
+                    "قاعات حاسوبية عازلة للصوت مجهزة بسماعات IDP الأصلية",
+                    "إعلان نتائج الاختبار السريع خلال 3 إلى 5 أيام فقط",
+                    "جلسات اختبارات مرنة ومتعددة أسبوعياً (صباحية ومسائية)",
+                    "دورات تدريبية مكثفة لطلاب المدارس لتحقيق Band 7.5+",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs font-bold">
+                      <CheckCircle2 size={16} className="text-blue-500 shrink-0 mt-0.5" />
+                      <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4">
+                  <a
+                    href="https://ielts.idp.com/saudiarabia/test-centre/alaqeeq-holding-national-and-international-school"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white px-6 py-3.5 text-xs font-black shadow-lg transition active:scale-95"
+                  >
+                    <span>احجز مقعدك في مركز مدارس العقيق عبر IDP</span>
+                    <ExternalLink size={14} />
+                  </a>
+
+                  <a
+                    href="tel:+966531896000"
+                    className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-bold transition ${
+                      dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                    }`}
+                  >
+                    <span>استفسارات الآيلتس: 966531896000+</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Upcoming Test Sessions Interactive Schedule */}
+              <div className="lg:col-span-5">
+                <div className={`rounded-3xl border p-6 sm:p-8 shadow-xl ${
+                  dark ? "border-blue-500/30 bg-black/60" : "border-blue-950/10 bg-[#f8fafd]"
+                }`}>
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-blue-500" />
+                      <h5 className="font-black text-xs">مواعيد الاختبارات القادمة (IELTS on Computer)</h5>
+                    </div>
+                    <span className="text-[10px] font-black text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-md">
+                      مركز المدينة
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { date: "السبت، 12 سبتمبر 2026", time: "09:00 صباحاً", hall: "معمل الحاسوب (A)", seats: "متاح الحجز", statusColor: "text-emerald-500" },
+                      { date: "الأربعاء، 16 سبتمبر 2026", time: "01:30 ظهراً", hall: "معمل الحاسوب (B)", seats: "متبقي 4 مقاعد", statusColor: "text-amber-500" },
+                      { date: "السبت، 19 سبتمبر 2026", time: "09:00 صباحاً", hall: "معمل الحاسوب (A)", seats: "متاح الحجز", statusColor: "text-emerald-500" },
+                      { date: "الأربعاء، 23 سبتمبر 2026", time: "01:30 ظهراً", hall: "معمل الحاسوب (B)", seats: "متاح الحجز", statusColor: "text-emerald-500" },
+                    ].map((session, sIdx) => (
+                      <div
+                        key={sIdx}
+                        className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition ${
+                          dark ? "border-white/5 bg-white/5 hover:border-blue-500/30" : "border-slate-200 bg-white hover:border-blue-400"
+                        }`}
+                      >
+                        <div>
+                          <p className="font-black text-[12px]">{session.date}</p>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                            <span className="flex items-center gap-1"><Clock size={10} /> {session.time}</span>
+                            <span>• {session.hall}</span>
+                          </div>
+                        </div>
+                        <span className={`text-[11px] font-black ${session.statusColor}`}>
+                          {session.seats}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-[10px] text-slate-500 text-center mt-4 font-medium">
+                    يتم فتح جلسات إضافية بناءً على الإقبال بالتنسيق مع IDP
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SAT & ACT Hub */}
+        {activeHubTab === "sat" && (
+          <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+            dark ? "border-amber-500/30 bg-[#0c1218]/90" : "border-amber-700/20 bg-white/95"
+          }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+              {/* Digital SAT Card */}
+              <div className={`rounded-3xl border p-6 sm:p-8 flex flex-col justify-between ${
+                dark ? "border-white/10 bg-black/60" : "border-slate-200 bg-[#fdfbf7]"
+              }`}>
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-1 text-xs font-black text-amber-600 dark:text-amber-400">
+                      College Board Approved
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">Center Code: #68412</span>
+                  </div>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 shrink-0">
+                      <img
+                        src="https://aqeeq.edu.sa/web/image/1907-cf5d04ed/sat-logo.jpg"
+                        alt="شعار مركز اختبارات SAT"
+                        className="h-12 w-auto object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h4 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                        مركز اختبارات Digital SAT
+                      </h4>
+                      <p className="text-xs text-slate-500">معتمد رسمياً لتقديم الاختبار الرقمي عبر Bluebook</p>
+                    </div>
+                  </div>
+
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    مركز معتمد ومجهز بالكامل بأحدث الحواسيب والشبكات السريعة لاختبارات SAT الرقمية المؤهلة للقبول في كبرى الجامعات العالمية والمسارات المرموقة في المملكة.
+                  </p>
+
+                  <div className="space-y-2 text-xs font-bold mb-6">
+                    <div className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500" /> شبكة إنترنت فايبر مخصصة وآمنة للاختبار</div>
+                    <div className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500" /> تدريب مدرسي مكثف لتحقيق 1400+ في SAT</div>
+                  </div>
+                </div>
+
+                <a
+                  href="https://satsuite.collegeboard.org/sat/registration"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-black px-5 py-3 text-xs font-black transition"
+                >
+                  <span>التسجيل في اختبار SAT عبر College Board</span>
+                  <ExternalLink size={13} />
+                </a>
+              </div>
+
+              {/* ACT Test Center Card */}
+              <div className={`rounded-3xl border p-6 sm:p-8 flex flex-col justify-between ${
+                dark ? "border-white/10 bg-black/60" : "border-slate-200 bg-[#fdfbf7]"
+              }`}>
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-rose-500/10 px-3 py-1 text-xs font-black text-rose-600 dark:text-rose-400">
+                      ACT Official Test Venue
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">American ACT Center</span>
+                  </div>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 shrink-0">
+                      <img
+                        src="https://aqeeq.edu.sa/web/image/1905-c752dcc6/act-logo.jpg"
+                        alt="شعار مركز اختبارات ACT"
+                        className="h-12 w-auto object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h4 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                        مركز اختبارات ACT الأمريكية
+                      </h4>
+                      <p className="text-xs text-slate-500">تقييم مهارات الرياضيات واللغة والعلوم والتفكير النقدي</p>
+                    </div>
+                  </div>
+
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    مركز معتمد لتقديم اختبار ACT الشامل الذي يُعد أحد الركائز الأساسية للقبول الجامعي في الولايات المتحدة وكبرى الجامعات الدولية.
+                  </p>
+
+                  <div className="space-y-2 text-xs font-bold mb-6">
+                    <div className="flex items-center gap-2"><CheckCircle2 size={15} className="text-rose-500" /> بيئة اختبارات دولية بمواصفات قياسية</div>
+                    <div className="flex items-center gap-2"><CheckCircle2 size={15} className="text-rose-500" /> مشرفون ومراقبون معتمدون دولياً</div>
+                  </div>
+                </div>
+
+                <a
+                  href="https://global.act.org/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white px-5 py-3 text-xs font-black transition"
+                >
+                  <span>التسجيل في اختبار ACT الدولي</span>
+                  <ExternalLink size={13} />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Robotics & STEM Hub */}
+        {activeHubTab === "stem" && (
+          <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+            dark ? "border-emerald-500/30 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+          }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3.5 py-1.5 text-xs font-black text-[#f8ca14] mb-4">
+                  <Trophy size={14} />
+                  <span>إنجاز عالمي باسم المملكة والمدينة المنورة</span>
+                </div>
+
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  المركز الخامس عالمياً في أولمبياد الروبوت العالمي WRO
+                </h3>
+
+                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  حقق طلاب مدارس العقيق المركز الخامس على مستوى العالم في مسابقة أولمبياد الروبوت العالمي (World Robot Olympiad) منافسين أكثر من 80 دولة. يجسد هذا الإنجاز كفاءة مناهج STEM وأكاديمية الروبوت والذكاء الاصطناعي التي تبني مهارات الطلاب منذ الصفوف المبكرة.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                  {[
+                    "معامل STEM وروبوتات VEX و LEGO المتقدمة",
+                    "تدريب على لغات Python و C++ للخوارزميات",
+                    "شراكات مع مؤسسة موهبة ومسار أسبار",
+                    "حاضنات لمشاريع الذكاء الاصطناعي وحلول الطاقة",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs font-bold">
+                      <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                      <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* STEM Showcase Photo */}
+              <div className="lg:col-span-5">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-video">
+                  <img
+                    src="/covers/student-robotics-accreditations.jpg"
+                    alt="طلاب مدارس العقيق في منافسات الروبوت الدولية"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 right-4 left-4 text-white">
+                    <span className="text-xs font-black text-[#f8ca14]">أكاديمية العقيق للابتكار</span>
+                    <p className="text-[11px] text-slate-300">أولمبياد الروبوت العالمي والذكاء الاصطناعي</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Interactive University & Career Pathway Simulator */}
+      <section className={`py-20 border-y ${
+        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
+      }`}>
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
+              <GraduationCap size={14} />
+              <span>مستقبل الطالب الجامعي والمهني</span>
+            </div>
+            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              أين تأخذ هذه الاعتمادات ابنك مستقبلاً؟ 🎓
+            </h3>
+            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              اضغط على وجهة طموح ابنك لتكتشف كيف تضمن له اعتمادات العقيق القبول الفوري:
+            </p>
+
+            {/* Pathway Selector Pills */}
+            <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-white/50 dark:bg-black/40 shadow-sm">
+              {[
+                { id: "saudi", label: "🇸🇦 الجامعات السعودية الكبرى" },
+                { id: "scholarship", label: "✈️ برنامج خادم الحرمين للابتعاث" },
+                { id: "global", label: "🌐 كليات الطب والهندسة الدولية" },
+              ].map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setActivePathway(p.id as any)}
+                  className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition ${
+                    activePathway === p.id
+                      ? dark
+                        ? "bg-[#015a37] text-white shadow-md"
+                        : "bg-[#015a37] text-white shadow-md"
+                      : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* ACT */}
-          <div className={`rounded-[2rem] border p-6 sm:p-8 flex items-start gap-5 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+          {/* Pathway Content Card */}
+          <div className={`max-w-4xl mx-auto rounded-3xl border p-8 sm:p-10 shadow-xl transition ${
+            dark ? "border-emerald-500/20 bg-[#0c1218]" : "border-emerald-700/15 bg-white shadow-lg"
           }`}>
-            <div className="bg-white p-3 rounded-2xl shrink-0 shadow-sm border border-black/5">
-              <img
-                src="https://aqeeq.edu.sa/web/image/1905-c752dcc6/act-logo.jpg"
-                alt="شعار مركز اختبارات ACT"
-                className="h-12 w-auto object-contain"
-              />
-            </div>
-            <div>
-              <h4 className={`text-lg font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>مركز معتمد لاختبارات ACT الأمريكية</h4>
-              <p className={`text-xs leading-relaxed mb-3 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-                مركز اختبارات ACT المعتمد لتقييم مهارات الطلاب في اللغة الإنجليزية والرياضيات والعلوم والتفكير النقدي للالتحاق بالتعليم الجامعي.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 size={14} /> بيئة اختبارات دولية مطابقة للمواصفات
-              </span>
-            </div>
+            {activePathway === "saudi" && (
+              <div className="animate-in fade-in space-y-4 text-right">
+                <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  القبول في جامعة الملك فهد للبترول والمعادن (KFUPM)، كاوست (KAUST)، وجامعة الملك سعود:
+                </h4>
+                <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  تشترط هذه الجامعات الرائدة درجات تنافسية عالية في اختبارات قياس (القدرات والتحصيلي) بالإضافة إلى اختبار لغة إنجليزية معتمد (IELTS 6.0+ أو SAT Math 650+).
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">الآيلتس المباشر</span>
+                    <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">تحقيق Band 6.5 - 7.5</span>
+                    <p className="text-[11px] text-slate-500 mt-1">اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">القدرات والتحصيلي</span>
+                    <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">معدلات 90+ و 95+</span>
+                    <p className="text-[11px] text-slate-500 mt-1">برامج تدريب يومية متخصصة ومحاكاة</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">السنة التحضيرية</span>
+                    <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">إعفاء واجتياز مباشر</span>
+                    <p className="text-[11px] text-slate-500 mt-1">بفضل مناهج العلوم واللغات المتطورة</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePathway === "scholarship" && (
+              <div className="animate-in fade-in space-y-4 text-right">
+                <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  برنامج خادم الحرمين الشريفين للابتعاث (مسار الرواد لأفضل 30 جامعة بالعالم):
+                </h4>
+                <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  يتطلب مسار الرواد قبولاً غير مشروط من كبرى الجامعات (مثل Harvard, MIT, Oxford, Stanford). بفضل اعتماد كوجنيا ومراكز SAT و IELTS داخل العقيق، يحصل الطالب على ملف أكاديمي متكامل يطابق معايير القبول في رابطة اللبلاب (Ivy League).
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">شهادة كوجنيا الأمريكية</span>
+                    <span className="font-black text-sm text-amber-600 dark:text-amber-400">High School Diploma</span>
+                    <p className="text-[11px] text-slate-500 mt-1">معادلة ومقبولة فورياً عالمياً</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">اختبارات SAT الرسمية</span>
+                    <span className="font-black text-sm text-amber-600 dark:text-amber-400">درجات تنافسية 1350+</span>
+                    <p className="text-[11px] text-slate-500 mt-1">مركز الاختبارات الرسمي داخل المدرسة</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">الإرشاد الجامعي الدولي</span>
+                    <span className="font-black text-sm text-amber-600 dark:text-amber-400">College Counseling</span>
+                    <p className="text-[11px] text-slate-500 mt-1">خطابات توصية وسيرة ذاتية متكاملة</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePathway === "global" && (
+              <div className="animate-in fade-in space-y-4 text-right">
+                <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  كليات الطب والعلوم والهندسة في بريطانيا، كندا، وأمريكا ودول الخليج:
+                </h4>
+                <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  توفر مدارس العقيق مسارات نوعية للمواد العلمية والإنجليزية المكثفة مع إمكانية احتساب الساعات الجامعية المعتمدة (AP Courses)، مما يوفر على الطالب سنة دراسية كاملة ويسرع انطلاقه في المجال الطبي والهندسي.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">ساعات AP المعتمدة</span>
+                    <span className="font-black text-sm text-blue-600 dark:text-blue-400">Advanced Placement</span>
+                    <p className="text-[11px] text-slate-500 mt-1">معادلة مقررات الجامعة المبكرة</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">المعامل والبحث العلمي</span>
+                    <span className="font-black text-sm text-blue-600 dark:text-blue-400">STEM Research</span>
+                    <p className="text-[11px] text-slate-500 mt-1">تجارب معملية وبحوث موثقة</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                    <span className="block text-xs text-slate-500 font-bold mb-1">اللغة الإنجليزية التخصصية</span>
+                    <span className="font-black text-sm text-blue-600 dark:text-blue-400">Academic Fluency</span>
+                    <p className="text-[11px] text-slate-500 mt-1">طلاقة كاملة في المصطلحات الطبية والهندسية</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Advanced Educational Tracks (AI, STEM, Talent) */}
-      <section className={`py-20 border-t ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
-      }`}>
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
-              <Sparkles size={14} />
-              <span>مهارات المستقبل ورؤية 2030</span>
+      {/* Interactive FAQ Accordion */}
+      <section className="py-20 container mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
+              <HelpCircle size={14} />
+              <span>الإجابات الشافية</span>
             </div>
-            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>البرامج النوعية ومسارات الإبداع</h3>
-            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              نصنع قادة الغد عبر مناهج نوعية وتجارب تعليمية تعزز التفكير التحليلي والابتكار
-            </p>
+            <h3 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              الأسئلة الشائعة حول مراكز الاختبارات والاعتمادات
+            </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* AI & Coding */}
-            <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-            }`}>
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-6">
-                <Brain size={28} />
+          <div className="space-y-4">
+            {[
+              {
+                q: "هل مراكز اختبارات IELTS و SAT متاحة للأفراد والطلاب من خارج مدارس العقيق؟",
+                a: "نعم، مركز مدارس العقيق لاختبارات IELTS IDP و SAT مرخص رسمياً لخدمة كافة أفراد المجتمع والطلاب في المدينة المنورة وخارجها، ويمكن لأي متقدم حجز موعده مباشرة عبر موقع IDP أو College Board واختيار مركز مدارس العقيق.",
+              },
+              {
+                q: "ما الفرق بين اختبار IELTS الورقي والمحوسب المتاح في المركز؟",
+                a: "اختبار IELTS on Computer هو الاختبار الأكثر طلباً عالمياً لأنه يتم في قاعات حاسوبية عازلة للصوت، وتظهر نتائجه في فترة قياسية (خلال 3 إلى 5 أيام عمل فقط)، مع توفير لوحة مفاتيح وسماعات رأس احترافية.",
+              },
+              {
+                q: "ماذا يضيف اعتماد كوجنيا (Cognia) لشهادة تخرج ابني؟",
+                a: "اعتماد كوجنيا يمنح الشهادة معادلة فورية معتمدة دولياً ومحلياً، مما يلغي أي عقبات في تصديق الشهادات لدى الملحقيات الثقافية والجامعات العالمية عند التقديم على المنح وبرامج الابتعاث.",
+              },
+              {
+                q: "كيف تساعد المدرسة الطلاب في الاستعداد لهذه الاختبارات؟",
+                a: "توفر المدرسة مسارات تأهيلية مكثفة ضمن اليوم الدراسي وخارجه، تشمل اختبارات محاكاة دورية للآيلتس والسات والقدرات والتحصيلي، وورش عمل معتمدة بإشراف مدربين دوليين معتمدين.",
+              },
+            ].map((faq, fIdx) => (
+              <div
+                key={fIdx}
+                className={`rounded-2xl border transition overflow-hidden ${
+                  dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white shadow-sm"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === fIdx ? null : fIdx)}
+                  className="w-full p-5 text-right font-black text-sm flex items-center justify-between gap-4"
+                >
+                  <span className={dark ? "text-white" : "text-[#0a192f]"}>{faq.q}</span>
+                  <ChevronDown
+                    size={16}
+                    className={`shrink-0 text-emerald-600 transition duration-300 ${openFaqIndex === fIdx ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {openFaqIndex === fIdx && (
+                  <div className={`p-5 pt-0 text-xs leading-relaxed border-t border-dashed ${
+                    dark ? "border-white/10 text-slate-300" : "border-slate-100 text-slate-700 font-medium"
+                  }`}>
+                    {faq.a}
+                  </div>
+                )}
               </div>
-              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>مسار البرمجة والذكاء الاصطناعي</h4>
-              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-                تعليم لغات البرمجة (Python, Scratch) وأساسيات الخوارزميات وتطبيقات الذكاء الاصطناعي لكافة المراحل، لتمكين الطلاب من أدوات المستقبل.
-              </p>
-              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> معامل حاسوبية متطورة 1:1</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> مشاريع برمجية واقعية وحلول ذكية</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> تأهيل للمسابقات الوطنية والدولية</li>
-              </ul>
-            </div>
-
-            {/* STEM & Robotics */}
-            <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-            }`}>
-              <div className={`grid h-14 w-14 place-items-center rounded-2xl ${dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/10 text-[#c59b27]"} mb-6`}>
-                <Cpu size={28} />
-              </div>
-              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>مناهج STEM والروبوت والابتكار</h4>
-              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-                تطبيق منهجية التعليم المتكامل (العلوم، التقنية، الهندسة، الرياضيات) عبر أندية الروبوت وتحديات WRO العالمية وبطولة الوورد منيا.
-              </p>
-              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> أندية روبوت وأردوينو تفاعلية</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> المركز الخامس في مسابقة WRO العالمية</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-amber-500" /> تجارب معملية ومشاريع تطبيقية</li>
-              </ul>
-            </div>
-
-            {/* Talent & Public Speaking */}
-            <div className={`rounded-3xl border p-8 transition duration-300 hover:-translate-y-1 ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-            }`}>
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 mb-6">
-                <Trophy size={28} />
-              </div>
-              <h4 className={`text-xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>رعاية الموهوبين وفنون الخطابة</h4>
-              <p className={`text-xs leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-                برامج متخصصة لاكتشاف ورعاية الطلبة الموهوبين، وبناء الثقة في النفس من خلال مسارات الإلقاء والخطابة باللغتين العربية والإنجليزية.
-              </p>
-              <ul className={`space-y-2 text-xs font-bold ${dark ? "text-slate-300" : "text-slate-800"}`}>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> شراكة مع مؤسسة موهبة ومسار أسبار</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> ملتقيات سنوية لفنون الخطابة (Public Speaking)</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500" /> ورش عمل في التفكير الناقد والإبداع</li>
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
       </section>
