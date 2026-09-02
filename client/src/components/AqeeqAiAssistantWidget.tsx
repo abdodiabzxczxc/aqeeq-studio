@@ -832,27 +832,26 @@ export function AqeeqAiAssistantWidget() {
   };
 
   return (
-    <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* Unified Apple Intelligence Trigger (Single luxury spatial button) */}
+    <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-6 z-50 font-[Tajawal,sans-serif]">
+      {/* ── 1. Compact Luxury Trigger (When Closed) ────────────────── */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => {
             setIsOpen(true);
-            setActiveUiStyle("siri");
-            enterLiveVoiceMode();
+            stopSpeaking();
           }}
-          className={`group relative flex items-center gap-3 rounded-full border-2 aq-siri-glow p-2 sm:px-4 sm:py-2.5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+          className={`group relative flex items-center gap-2.5 rounded-full border-2 aq-siri-glow px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
             isDark
-              ? "bg-[#070b16]/95 text-white shadow-[0_15px_45px_rgba(0,0,0,0.85)]"
-              : "bg-white/95 text-slate-900 shadow-[0_15px_45px_rgba(248,202,20,0.25)]"
+              ? "bg-[#070b16]/95 text-white shadow-[0_12px_40px_rgba(0,0,0,0.85)] border-amber-400/50"
+              : "bg-white/95 text-slate-900 shadow-[0_12px_40px_rgba(248,202,20,0.25)] border-amber-400/60"
           }`}
-          title="مستشار العقيق الذكي (Apple Intelligence)"
+          title="مستشار العقيق الذكي"
         >
-          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-lg shrink-0">
-            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+          <div className="relative grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
+            <Bot size={20} className="group-hover:rotate-12 transition-transform duration-300" />
             <span
-              className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+              className={`absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 ${
                 isDark ? "border-slate-950" : "border-white"
               } animate-pulse bg-emerald-400`}
             />
@@ -861,986 +860,360 @@ export function AqeeqAiAssistantWidget() {
           <div className="hidden sm:block text-right">
             <div className="flex items-center gap-1.5">
               <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                مستشار العقيق الصوتي
+                مستشار العقيق الذكي
               </span>
-              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
+              <Sparkles size={11} className={isDark ? "text-amber-400" : "text-amber-600"} />
             </div>
             <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              تحدث بالصوت وتصفح الموقع بحرية 🎙️
+              تحدث بالصوت أو اكتب مباشرة 🎙️
             </p>
           </div>
 
-          {/* Dynamic Island Mini Equalizer Waveform */}
-          <div className="hidden sm:flex items-center gap-1 h-5 px-1 shrink-0">
+          {/* Mini Sound Wave Bars */}
+          <div className="hidden sm:flex items-center gap-1 h-4 px-1 shrink-0">
             <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
             <span className="aq-wave-bar w-1 rounded-full bg-emerald-400" style={{ animationDelay: "0.3s" }} />
             <span className="aq-wave-bar w-1 rounded-full bg-cyan-400" style={{ animationDelay: "0.5s" }} />
-            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.2s" }} />
           </div>
         </button>
       )}
 
-      {/* ========================================================================= */}
-      {/* NEXT-GEN ALL-IN-ONE SIRI AMBIENT SPATIAL CAPSULE (Option 1)               */}
-      {/* ========================================================================= */}
-      {isOpen && activeUiStyle === "siri" && (
-        <div className="fixed bottom-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-full sm:max-w-xl animate-in slide-in-from-bottom-5 duration-300 select-none">
-          <div className={`rounded-[2.4rem] border-2 aq-siri-glow backdrop-blur-3xl p-4 sm:p-5 shadow-2xl transition-all relative overflow-hidden ${
-            isDark
-              ? "bg-[#070b16]/95 text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
-              : "bg-white/95 text-slate-900 shadow-[0_25px_80px_rgba(248,202,20,0.18)]"
-          }`}>
-            {/* Top Ambient Fluid Mesh Ribbon Background Glow */}
-            <div className="aq-fluid-mesh absolute top-0 left-0 right-0 h-1.5 opacity-80" />
-
-            {/* Top Header & Status Row */}
-            <div className="flex items-center justify-between pb-3 border-b border-current/10">
-              {/* Right: Bot Brand & Live Status */}
-              <div className="flex items-center gap-2.5">
-                <div className="relative grid h-9 w-9 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow shrink-0">
-                  <Bot size={18} />
-                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-slate-900 animate-pulse" />
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black">مستشار العقيق الذكي</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      liveVoiceState === "speaking"
-                        ? "bg-amber-400/20 text-amber-500 border-amber-400/30"
-                        : liveVoiceState === "listening"
-                        ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30 animate-pulse"
-                        : "bg-cyan-500/20 text-cyan-500 border-cyan-500/30"
-                    }`}>
-                      {liveVoiceState === "speaking" && "يتحدث الآن 🔊"}
-                      {liveVoiceState === "listening" && "يستمع لصوتك 🎙️"}
-                      {liveVoiceState === "thinking" && "يفكر ويصيغ الرد... ⚡"}
-                      {liveVoiceState === "idle" && "جاهز للمحادثة"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Left: Quick Controls */}
-              <div className="flex items-center gap-1.5">
-                {/* Switch to Full Swiss Chat Modal */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveUiStyle("swiss");
-                    localStorage.setItem("aqeeq_ai_ui_style", "swiss");
-                  }}
-                  className={`hidden sm:inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-[10px] font-black transition border ${
-                    isDark
-                      ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
-                      : "border-slate-200 bg-slate-100 text-slate-700 hover:text-black"
-                  }`}
-                  title="فتح نافذة الشات الكاملة"
-                >
-                  <MessageSquare size={11} />
-                  <span>الشات الكامل</span>
-                </button>
-
-                {/* Voice Mute Toggle */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isSpeaking) stopSpeaking();
-                    setIsVoiceEnabled(!isVoiceEnabled);
-                    toast.info(!isVoiceEnabled ? "تم تفعيل الصوت الطبيعي 🔊" : "تم كتم الصوت 🔈");
-                  }}
-                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
-                    isVoiceEnabled
-                      ? isDark
-                        ? "text-amber-300 bg-amber-400/10 hover:bg-amber-400/20"
-                        : "text-amber-700 bg-amber-50 hover:bg-amber-100"
-                      : isDark
-                      ? "text-slate-500 hover:text-white hover:bg-white/10"
-                      : "text-slate-400 hover:text-slate-900 hover:bg-black/5"
-                  }`}
-                  title={isVoiceEnabled ? "الصوت مفعل" : "الصوت مكتوم"}
-                >
-                  {isVoiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
-                </button>
-
-                {/* Keyboard Spotlight Input Toggle */}
-                <button
-                  type="button"
-                  onClick={() => setIsSiriTextOpen(!isSiriTextOpen)}
-                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
-                    isSiriTextOpen
-                      ? "bg-amber-400 text-slate-950 font-black"
-                      : isDark
-                      ? "border border-white/10 bg-white/5 text-slate-300 hover:text-white"
-                      : "border border-slate-200 bg-slate-100 text-slate-700 hover:text-black"
-                  }`}
-                  title="كتابة سؤالك بالكيبورد"
-                >
-                  <Keyboard size={15} />
-                </button>
-
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isSpeaking) stopSpeaking();
-                    if (isListening) stopListening();
-                    setIsOpen(false);
-                  }}
-                  className={`grid h-8 w-8 place-items-center rounded-xl transition ${
-                    isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
-                  }`}
-                  title="تصغير / إغلاق"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Middle Section: Spotlight Input Mode OR Live Voice & Subtitles Stage */}
-            {isSiriTextOpen ? (
-              /* Spotlight Command Input Morph */
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (inputPrompt.trim()) {
-                    handleSend();
-                    setIsSiriTextOpen(false);
-                  }
-                }}
-                className="py-3 animate-in fade-in zoom-in-95 duration-200"
-              >
-                <div className={`flex items-center gap-2 rounded-2xl border p-2 transition shadow-inner ${
-                  isDark
-                    ? "border-white/15 bg-black/70 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/20"
-                    : "border-slate-300 bg-slate-50 focus-within:border-amber-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20"
-                }`}>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputPrompt}
-                    onChange={(e) => setInputPrompt(e.target.value)}
-                    placeholder="اكتب استفسارك هنا، وسأجيبك فوراً بالصوت..."
-                    className="flex-1 bg-transparent px-2 py-1 text-xs sm:text-sm font-bold outline-none"
-                    autoFocus
-                  />
-                  <Button
-                    type="submit"
-                    disabled={!inputPrompt.trim() || askAiMutation.isPending}
-                    className="rounded-xl bg-[#f8ca14] text-slate-950 font-black px-4 py-1.5 text-xs hover:bg-yellow-300 transition shadow"
-                  >
-                    <span>إرسال</span>
-                    <Send size={13} className="mr-1" />
-                  </Button>
-                </div>
-              </form>
-            ) : (
-              /* Live Voice Subtitles & Visualizer Stage */
-              <div className="py-3 sm:py-4 space-y-3">
-                {/* Live Transcript Bubble */}
-                <div className={`rounded-2xl border p-3.5 text-right transition-all ${
-                  isDark
-                    ? "border-white/10 bg-white/[0.04]"
-                    : "border-amber-200/80 bg-amber-50/40"
-                }`}>
-                  {interimSpeech ? (
-                    <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-500 text-[10px] font-black">
-                        🎙️ أنت تتحدث:
-                      </span>
-                      <p className={`mt-1.5 text-xs sm:text-sm font-bold leading-relaxed ${isDark ? "text-emerald-200" : "text-emerald-900"}`}>
-                        "{interimSpeech}"
-                      </p>
-                    </div>
-                  ) : lastAssistantVoiceTranscript ? (
-                    <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-500 text-[10px] font-black">
-                        💎 المستشار:
-                      </span>
-                      <p className={`mt-1.5 text-xs sm:text-sm font-medium leading-relaxed ${isDark ? "text-white" : "text-slate-900"}`}>
-                        {lastAssistantVoiceTranscript}
-                      </p>
-                    </div>
-                  ) : (
-                    <p className={`text-xs sm:text-sm font-medium text-center py-0.5 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                      أنا أسمعك الآن.. تفضل بالسؤال أو تصفح الموقع وسأجيبك فوراً 🎙️✨
-                    </p>
-                  )}
-                </div>
-
-                {/* Siri Multi-Colored Fluid Equalizer Waveform */}
-                <div className="flex items-center justify-center gap-1.5 h-8">
-                  {[25, 60, 40, 90, 70, 100, 80, 50, 30].map((h, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        animationDelay: `${0.1 * idx}s`,
-                      }}
-                      className={`aq-wave-bar w-1.5 sm:w-2 rounded-full transition-all duration-200 ${
-                        idx % 3 === 0
-                          ? "bg-gradient-to-t from-amber-500 to-yellow-300 shadow-[0_0_10px_rgba(248,202,20,0.5)]"
-                          : idx % 3 === 1
-                          ? "bg-gradient-to-t from-emerald-500 to-teal-300 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                          : "bg-gradient-to-t from-cyan-500 to-blue-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Bottom Controls & Contextual Action Chips */}
-            <div className="pt-2 border-t border-current/10 flex flex-wrap items-center justify-between gap-2">
-              {/* Primary Glowing Action Pill */}
-              <div className="flex items-center gap-2">
-                {liveVoiceState === "speaking" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      stopSpeaking();
-                      startLiveVoiceListening();
-                    }}
-                    className="rounded-full bg-gradient-to-r from-amber-400 via-[#f8ca14] to-yellow-300 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(248,202,20,0.5)] hover:scale-105 transition"
-                  >
-                    <Square size={11} className="fill-current" />
-                    <span>مقاطعة والتحدث 🎙️</span>
-                  </button>
-                ) : liveVoiceState === "listening" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (interimSpeech) {
-                        sendLiveVoiceTurn(interimSpeech);
-                      } else {
-                        stopListening();
-                      }
-                    }}
-                    className="rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-300 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-105 transition"
-                  >
-                    <Square size={11} className="fill-current" />
-                    <span>أستمع لصوتك.. (إنهاء وإرسال)</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={startLiveVoiceListening}
-                    className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black px-4 sm:px-5 py-1.5 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-105 transition"
-                  >
-                    <Mic size={13} />
-                    <span>تحدث الآن 🎙️</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Contextual Smart Site Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
-                {[
-                  { label: "القبول والرسوم", url: "https://aqeeq.edu.sa", isExt: true },
-                  { label: "صوري بالوجه", url: "/albums", isExt: false },
-                  { label: "البودكاست", url: "/podcast", isExt: false },
-                ].map((chip, ci) => (
-                  <button
-                    key={ci}
-                    type="button"
-                    onClick={() => handleShortcutClick(chip.url)}
-                    className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition hover:scale-105 ${
-                      isDark
-                        ? "border-white/10 bg-white/5 text-slate-300 hover:border-amber-400/50 hover:bg-amber-400/10 hover:text-amber-300"
-                        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-900"
-                    }`}
-                  >
-                    <span>{chip.label}</span>
-                    <ArrowUpLeft size={10} />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 2. SWISS LUXURY GLASS CARD VIEW (Option 2)                                 */}
-      {/* ========================================================================= */}
-      {isOpen && activeUiStyle === "swiss" && (
+      {/* ── 2. Compact Unified Chat & Voice Spatial Card (When Open) ─── */}
+      {isOpen && (
         <div
-          className={`flex flex-col transition-all duration-300 border-2 aq-siri-glow shadow-2xl backdrop-blur-3xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2.8rem] w-full sm:w-[470px] h-[100dvh] sm:h-[620px] max-h-none sm:max-h-[88vh] z-50 ${
-            isLiveVoiceMode
-              ? isDark
-                ? "bg-[#060913] text-white shadow-[0_25px_90px_rgba(0,0,0,0.95)]"
-                : "bg-white text-slate-900 shadow-[0_25px_90px_rgba(248,202,20,0.15)]"
-              : isDark
-              ? "bg-[#070a14]/95 text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
-              : "bg-white/98 text-slate-900 shadow-[0_25px_80px_rgba(0,0,0,0.18)]"
-          } ${
-            isExpanded
-              ? "sm:w-[740px] sm:h-[85vh] sm:max-h-[820px]"
-              : ""
+          className={`flex flex-col transition-all duration-300 border-2 aq-siri-glow shadow-2xl backdrop-blur-3xl animate-in fade-in zoom-in-95 overflow-hidden w-[calc(100vw-1.5rem)] sm:w-[380px] h-[520px] max-h-[82vh] rounded-[2.2rem] ${
+            isDark
+              ? "bg-[#070a14]/95 text-white border-amber-400/50 shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
+              : "bg-white/98 text-slate-900 border-amber-300/80 shadow-[0_25px_80px_rgba(248,202,20,0.18)]"
           }`}
         >
-          {/* Executive Clean Header */}
-          <div className={`flex items-center justify-between border-b px-3.5 sm:px-4 py-2.5 sm:py-3 transition-colors ${
-            isLiveVoiceMode
-              ? "border-white/10 bg-[#050811] text-white"
-              : isDark
-              ? "border-white/10 bg-gradient-to-r from-[#0a101f] via-[#0d162c] to-[#0a101f] text-white"
-              : "border-slate-200/90 bg-gradient-to-r from-slate-50 via-white to-amber-50/30 text-slate-900"
+          {/* Top Liquid Neon Mesh Line */}
+          <div className="aq-fluid-mesh h-1.5 w-full shrink-0" />
+
+          {/* Card Header */}
+          <div className={`flex items-center justify-between px-3.5 py-2.5 border-b transition-colors shrink-0 ${
+            isDark
+              ? "border-white/10 bg-gradient-to-r from-[#091020] via-[#0d172e] to-[#091020] text-white"
+              : "border-slate-200/90 bg-gradient-to-r from-slate-50 via-white to-amber-50/40 text-slate-900"
           }`}>
             {/* Right: Branding & Status */}
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="relative grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
-                <Bot size={20} className="sm:w-[22px] sm:h-[22px]" />
-                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-slate-950 animate-pulse" />
+            <div className="flex items-center gap-2">
+              <div className="relative grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-sm shrink-0">
+                <Bot size={17} />
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 border border-slate-950 animate-pulse" />
               </div>
               <div className="text-right">
-                <h3 className={`text-xs sm:text-sm font-black tracking-tight leading-tight ${isDark || isLiveVoiceMode ? "text-white" : "text-slate-900"}`}>
+                <h4 className={`text-xs font-black tracking-tight leading-tight ${isDark ? "text-white" : "text-slate-900"}`}>
                   مستشار العقيق الذكي
-                </h3>
-                <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1 mt-0.5">
+                </h4>
+                <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>متصل الآن • مدارس العقيق</span>
+                  <span>متصل • صوتي وكتابي</span>
                 </p>
               </div>
             </div>
 
-            {/* Center: Segmented Pill Switch [ 🎙️ صوتي | 💬 كتابي ] */}
-            <div className={`flex items-center rounded-full p-1 border backdrop-blur-md shadow-inner transition-colors mx-1 ${
-              isDark || isLiveVoiceMode
-                ? "border-white/10 bg-black/60"
-                : "border-slate-200 bg-slate-100/90"
-            }`}>
-              <button
-                type="button"
-                onClick={enterLiveVoiceMode}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-black transition-all duration-300 ${
-                  isLiveVoiceMode
-                    ? "bg-gradient-to-r from-amber-400 to-[#f8ca14] text-slate-950 shadow-md scale-105"
-                    : isDark
-                    ? "text-slate-400 hover:text-white"
-                    : "text-slate-600 hover:text-black"
-                }`}
-                title="التحويل للمحادثة الصوتية المباشرة"
-              >
-                <Mic size={13} className={isLiveVoiceMode ? "animate-pulse" : ""} />
-                <span>صوتي</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={exitLiveVoiceMode}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-black transition-all duration-300 ${
-                  !isLiveVoiceMode
-                    ? isDark
-                      ? "bg-white/15 text-white shadow-md scale-105"
-                      : "bg-white text-slate-950 shadow-sm scale-105"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                title="التحويل للشات المكتوب"
-              >
-                <MessageSquare size={13} />
-                <span>كتابي</span>
-              </button>
-            </div>
-
-            {/* Left: Sound, Switcher, More Options Menu, and Close */}
-            <div className="flex items-center gap-1 sm:gap-1.5 relative">
-              {/* Quick Switch Button to Siri Ambient Ribbon */}
+            {/* Left: Quick Actions (Volume, Reset, API Key, Close) */}
+            <div className="flex items-center gap-0.5">
+              {/* Sound Volume Toggle */}
               <button
                 type="button"
                 onClick={() => {
-                  setActiveUiStyle("siri");
-                  localStorage.setItem("aqeeq_ai_ui_style", "siri");
-                  enterLiveVoiceMode();
-                }}
-                className={`hidden sm:inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-[10px] font-black transition border ${
-                  isDark
-                    ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
-                    : "border-cyan-500/40 bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
-                }`}
-                title="التبديل إلى شريط سيري المحيطي"
-              >
-                <span>🌌 شريط سيري</span>
-              </button>
-
-              {/* Voice Sound Toggle Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (isSpeaking) {
-                    stopSpeaking();
-                  }
+                  if (isSpeaking) stopSpeaking();
                   setIsVoiceEnabled(!isVoiceEnabled);
-                  toast.info(!isVoiceEnabled ? "تم تفعيل القراءة الصوتية الطبيعية 🔊" : "تم كتم الصوت 🔈");
+                  toast.info(!isVoiceEnabled ? "تم تفعيل القراءة الصوتية 🔊" : "تم كتم الصوت 🔈");
                 }}
-                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                className={`grid h-7 w-7 place-items-center rounded-lg transition ${
                   isVoiceEnabled
-                    ? isDark || isLiveVoiceMode
-                      ? "text-amber-300 bg-amber-400/10 hover:bg-amber-400/20"
-                      : "text-amber-700 bg-amber-50 hover:bg-amber-100"
-                    : isDark || isLiveVoiceMode
-                      ? "text-slate-500 hover:text-white hover:bg-white/10"
-                      : "text-slate-400 hover:text-slate-900 hover:bg-black/5"
+                    ? isDark ? "text-amber-300 bg-amber-400/10" : "text-amber-700 bg-amber-50"
+                    : isDark ? "text-slate-500 hover:text-white" : "text-slate-400 hover:text-slate-900"
                 }`}
-                title={isVoiceEnabled ? "الصوت مفعل (اضغط للكتم)" : "الصوت مكتوم (اضغط للتفعيل)"}
+                title={isVoiceEnabled ? "القراءة الصوتية مفعلة" : "الصوت مكتوم"}
               >
-                {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                {isVoiceEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
               </button>
 
-              {/* More Options Dropdown Button ⋯ */}
+              {/* Reset Conversation */}
               <button
                 type="button"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
-                  isMenuOpen
-                    ? isDark || isLiveVoiceMode
-                      ? "bg-white/20 text-white"
-                      : "bg-slate-200 text-black"
-                    : isDark || isLiveVoiceMode
-                      ? "text-slate-400 hover:text-white hover:bg-white/10"
-                      : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                onClick={handleReset}
+                className={`grid h-7 w-7 place-items-center rounded-lg transition ${
+                  isDark ? "text-slate-400 hover:text-red-400 hover:bg-red-500/10" : "text-slate-500 hover:text-red-500 hover:bg-red-50"
                 }`}
-                title="خيارات إضافية"
+                title="بدء محادثة جديدة"
               >
-                <MoreHorizontal size={18} />
+                <RotateCcw size={13} />
               </button>
 
-              {/* More Options Floating Popover Menu */}
-              {isMenuOpen && (
-                <div
-                  className={`absolute top-10 left-0 z-50 w-52 rounded-2xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in zoom-in-95 ${
-                    isDark || isLiveVoiceMode
-                      ? "border-white/15 bg-[#0a0e1c]/95 text-white"
-                      : "border-slate-200 bg-white/98 text-slate-800"
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsExpanded(!isExpanded);
-                    }}
-                    className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-right hover:bg-amber-400/15 hover:text-amber-400 transition"
-                  >
-                    {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                    <span>{isExpanded ? "تصغير حجم النافذة" : "تكبير الشاشة (ملء الحجم)"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      handleReset();
-                    }}
-                    className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-right hover:bg-red-500/15 hover:text-red-400 transition"
-                  >
-                    <RotateCcw size={14} />
-                    <span>مسح وبدء محادثة جديدة</span>
-                  </button>
-
-                  <div className="my-1 border-t border-current/10" />
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsKeyModalOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-right hover:bg-amber-400/15 hover:text-amber-400 transition"
-                  >
-                    <Key size={14} />
-                    <div className="flex flex-col items-start text-right">
-                      <span>إعدادات الذكاء الحي (API)</span>
-                      <span className="text-[10px] opacity-60">
-                        {aiStatus?.hasLiveGemini ? "Google Gemini مفعّل ⚡" : "تفعيل المفتاح الشخصي"}
-                      </span>
-                    </div>
-                  </button>
-                </div>
-              )}
+              {/* API Key Modal Button */}
+              <button
+                type="button"
+                onClick={() => setIsKeyModalOpen(true)}
+                className={`grid h-7 w-7 place-items-center rounded-lg transition ${
+                  aiStatus?.hasLiveGemini
+                    ? "text-emerald-500"
+                    : isDark ? "text-slate-500 hover:text-amber-400" : "text-slate-400 hover:text-amber-600"
+                }`}
+                title="إعدادات الذكاء الحي (API)"
+              >
+                <Key size={13} />
+              </button>
 
               {/* Close Button */}
               <button
                 type="button"
                 onClick={() => {
-                  setIsMenuOpen(false);
+                  stopSpeaking();
+                  stopListening();
                   setIsOpen(false);
                 }}
-                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
-                  isDark || isLiveVoiceMode
-                    ? "text-slate-400 hover:text-white hover:bg-white/10"
-                    : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                className={`grid h-7 w-7 place-items-center rounded-lg transition ${
+                  isDark ? "text-slate-400 hover:text-white hover:bg-white/10" : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
                 }`}
-                title="إغلاق النافذة"
+                title="إغلاق"
               >
-                <X size={18} />
+                <X size={15} />
               </button>
             </div>
           </div>
 
-          {/* MAIN BODY: Either Gemini Live Aurora Studio OR Written Chat History */}
-          {isLiveVoiceMode ? (
-            /* ========================================================================= */
-            /* GEMINI LIVE AURORA STUDIO (استوديو الفويس الحي الأورورا ثلاثي الأبعاد)    */
-            /* ========================================================================= */
-            <div className={`flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none transition-colors ${
-              isDark
-                ? "bg-gradient-to-b from-[#070b16] via-[#091124] to-[#04060e] text-white"
-                : "bg-gradient-to-b from-white via-amber-50/40 to-slate-100 text-slate-900"
-            }`}>
-              {/* Multidimensional Cosmic Aurora Background Blobs */}
-              <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl pointer-events-none animate-pulse" />
-              <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-teal-500/15 blur-3xl pointer-events-none animate-pulse" />
-
-              {/* Status Header Badge (Single - No duplicate buttons!) */}
-              <div className="relative z-10 flex items-center justify-center">
-                <div
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black border backdrop-blur-xl shadow-lg transition ${
-                    liveVoiceState === "speaking"
-                      ? "border-amber-400/50 bg-amber-400/15 text-amber-300 shadow-[0_0_20px_rgba(248,202,20,0.2)]"
-                      : liveVoiceState === "listening"
-                      ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                      : "border-cyan-400/40 bg-cyan-500/10 text-cyan-300"
-                  }`}
-                >
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${
-                      liveVoiceState === "speaking"
-                        ? "bg-amber-400 animate-pulse"
-                        : liveVoiceState === "listening"
-                        ? "bg-emerald-400 animate-ping"
-                        : "bg-cyan-400 animate-spin"
-                    }`}
-                  />
-                  <span>
-                    {liveVoiceState === "speaking" && "المستشار يتحدث بصوت بشري طبيعي 🔊"}
-                    {liveVoiceState === "listening" && "أستمع إليك الآن.. تفضل بالتحدث 🎙️"}
-                    {liveVoiceState === "thinking" && "المستشار يفكر ويصيغ الرد... ⚡"}
-                    {liveVoiceState === "idle" && "جاهز للاستماع"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Center: The Futuristic Living Aurora Plasma Orb */}
-              <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-3">
-                <div className="relative flex items-center justify-center">
-                  {/* Outer Concentric Sonic Ripples */}
-                  <div
-                    className={`absolute h-56 w-56 sm:h-72 sm:w-72 rounded-full blur-3xl transition-all duration-700 ${
-                      liveVoiceState === "speaking"
-                        ? "bg-gradient-to-tr from-amber-500/40 via-yellow-400/30 to-rose-500/30 scale-125 animate-pulse"
-                        : liveVoiceState === "listening"
-                        ? "bg-gradient-to-tr from-emerald-500/40 via-teal-400/30 to-cyan-500/35 scale-120 animate-pulse"
-                        : "bg-gradient-to-tr from-blue-600/30 via-indigo-600/25 to-purple-600/30 scale-100 animate-spin"
-                    }`}
-                  />
-
-                  {/* Glass Outer Ambient Ring */}
-                  <div
-                    className={`relative grid h-44 w-44 sm:h-56 sm:w-56 place-items-center rounded-full border border-white/20 transition-all duration-500 shadow-2xl backdrop-blur-md ${
-                      liveVoiceState === "speaking"
-                        ? "border-amber-400/60 bg-gradient-to-tr from-amber-500/20 via-yellow-500/10 to-transparent shadow-[0_0_60px_rgba(248,202,20,0.5)] scale-105"
-                        : liveVoiceState === "listening"
-                        ? "border-emerald-400/60 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent shadow-[0_0_60px_rgba(16,185,129,0.5)] scale-105"
-                        : "border-cyan-400/40 bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-transparent shadow-[0_0_50px_rgba(6,182,212,0.4)] animate-pulse"
-                    }`}
-                  >
-                    {/* Middle Acoustic Layer */}
-                    <div
-                      className={`grid h-36 w-36 sm:h-44 sm:w-44 place-items-center rounded-full border border-white/25 transition-all duration-300 ${
-                        liveVoiceState === "speaking"
-                          ? "bg-amber-400/10 shadow-[0_0_30px_rgba(248,202,20,0.3)]"
-                          : liveVoiceState === "listening"
-                          ? "bg-emerald-400/10 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
-                          : "bg-blue-500/10"
-                      }`}
-                    >
-                      {/* Fluid Radiant Core with 3D Depth */}
-                      <div
-                        className={`grid h-28 w-28 sm:h-36 sm:w-36 place-items-center rounded-full transition-all duration-300 shadow-2xl relative overflow-hidden ${
-                          liveVoiceState === "speaking"
-                            ? "bg-gradient-to-tr from-amber-500 via-[#f8ca14] to-yellow-200 shadow-[0_0_50px_rgba(248,202,20,0.8),inset_0_0_25px_rgba(255,255,255,0.8)] scale-105"
-                            : liveVoiceState === "listening"
-                            ? "bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-200 shadow-[0_0_50px_rgba(16,185,129,0.8),inset_0_0_25px_rgba(255,255,255,0.8)] animate-pulse"
-                            : "bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-600 shadow-[0_0_40px_rgba(6,182,212,0.7),inset_0_0_20px_rgba(255,255,255,0.5)]"
-                        }`}
-                      >
-                        {/* Dynamic Interactive Sound Wave Spectrum inside the Orb */}
-                        <div className="flex items-center gap-1.5 h-12 z-10 px-2">
-                          {[35, 75, 55, 100, 80, 95, 60, 85, 40].map((barHeight, idx) => (
-                            <span
-                              key={idx}
-                              style={{
-                                animationDelay: `${0.1 * idx}s`,
-                                height:
-                                  liveVoiceState === "speaking" || liveVoiceState === "listening"
-                                    ? undefined
-                                    : "25%",
-                              }}
-                              className={`w-1.5 rounded-full transition-all duration-150 ${
-                                liveVoiceState === "speaking" || liveVoiceState === "listening"
-                                  ? "aq-wave-bar bg-slate-950 shadow-sm"
-                                  : "bg-white/80"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Real-time Subtitles Capsule (100% High-Contrast, Crystal Clear in both Light and Dark!) */}
-                <div className={`mt-6 w-full max-w-sm rounded-2xl border p-4 text-right backdrop-blur-2xl shadow-lg transition-all ${
-                  isDark
-                    ? "border-white/20 bg-white/[0.08] text-white shadow-[0_15px_35px_rgba(0,0,0,0.5)]"
-                    : "border-amber-300/80 bg-white text-slate-900 shadow-md"
-                }`}>
-                  {interimSpeech ? (
-                    <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-500 border border-emerald-400/40 text-[11px] font-black">
-                        🎙️ أنت تتحدث الآن:
-                      </span>
-                      <p className={`mt-2 text-sm font-bold leading-relaxed ${isDark ? "text-emerald-100" : "text-emerald-900"}`}>
-                        "{interimSpeech}"
-                      </p>
-                    </div>
-                  ) : lastAssistantVoiceTranscript ? (
-                    <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/25 text-amber-500 border border-amber-400/40 text-[11px] font-black">
-                        💎 المستشار:
-                      </span>
-                      <p className={`mt-2 text-sm font-medium leading-relaxed line-clamp-4 ${isDark ? "text-white" : "text-slate-900"}`}>
-                        {lastAssistantVoiceTranscript}
-                      </p>
-                    </div>
-                  ) : lastUserVoiceTranscript ? (
-                    <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-500 border border-emerald-400/40 text-[11px] font-black">
-                        🎙️ آخر ما قلته:
-                      </span>
-                      <p className={`mt-2 text-sm font-medium leading-relaxed line-clamp-3 ${isDark ? "text-slate-200" : "text-slate-700"}`}>
-                        "{lastUserVoiceTranscript}"
-                      </p>
-                    </div>
-                  ) : (
-                    <p className={`text-center text-xs font-medium py-1 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                      تحدث بحرية.. سأسمعك وأرد فوراً بدون لمس أي زر 🎙️✨
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Bottom Floating Control Bar */}
-              <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-white/10">
-                {liveVoiceState === "speaking" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      stopSpeaking();
-                      startLiveVoiceListening();
-                    }}
-                    className="rounded-full bg-gradient-to-r from-amber-400 via-[#f8ca14] to-yellow-300 text-slate-950 font-black px-7 py-2.5 text-xs flex items-center gap-2 shadow-[0_0_30px_rgba(248,202,20,0.6)] hover:scale-105 transition"
-                  >
-                    <Square size={13} className="fill-current" />
-                    <span>مقاطعة والتحدث 🎙️</span>
-                  </button>
-                ) : liveVoiceState === "listening" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (interimSpeech) {
-                        sendLiveVoiceTurn(interimSpeech);
-                      } else {
-                        stopListening();
-                      }
-                    }}
-                    className="rounded-full bg-emerald-500 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-emerald-400 transition hover:scale-105"
-                  >
-                    <Square size={14} className="fill-current" />
-                    <span>إنهاء الحديث وإرسال</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={startLiveVoiceListening}
-                    className="rounded-full bg-emerald-500 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-emerald-400 transition hover:scale-105"
-                  >
-                    <Mic size={16} />
-                    <span>تحدث الآن 🎙️</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={exitLiveVoiceMode}
-                  className={`rounded-full p-2.5 border transition ${
-                    isDark
-                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
-                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-black"
-                  }`}
-                  title="العودة للشات المكتوب"
-                >
-                  <Keyboard size={16} />
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* ========================================================================= */
-            /* WRITTEN CHAT VIEW (رسائل الشات المكتوبة + شريط الإدخال)                 */
-            /* ========================================================================= */
-            <>
-              {/* Chat Messages List */}
+          {/* Card Body: Unified Scrollable Chat & Live Interaction Stream */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-hide text-right">
+            {messages.map((msg, i) => (
               <div
-                className={`flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm leading-relaxed ${
-                  isDark ? "bg-[#070a12]/70" : "bg-slate-50/50"
+                key={i}
+                className={`flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-300 ${
+                  msg.role === "user" ? "items-start" : "items-end"
                 }`}
               >
-                {/* Live Speaking Indicator Banner */}
-                {isSpeaking && (
-                  <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 border border-amber-400/40 p-2.5 backdrop-blur-md shadow-md animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center gap-2 text-amber-300 text-xs font-black">
-                      <span className="flex h-2.5 w-2.5 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                      </span>
-                      <WaveformIcon size={16} className="animate-pulse text-amber-400" />
-                      <span>المساعد يتحدث بصوت بشري طبيعي...</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={stopSpeaking}
-                      className="rounded-lg bg-amber-400 px-2.5 py-1 text-[10px] font-black text-black hover:bg-yellow-300 transition shadow-xs flex items-center gap-1"
-                    >
-                      <Square size={10} className="fill-current" />
-                      <span>إيقاف الصوت</span>
-                    </button>
-                  </div>
-                )}
+                <div
+                  className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs font-medium leading-relaxed shadow-xs relative transition-all ${
+                    msg.role === "user"
+                      ? "bg-gradient-to-tr from-amber-500 via-[#f8ca14] to-yellow-300 text-slate-950 font-bold rounded-br-xs shadow-amber-500/20"
+                      : isDark
+                      ? `border rounded-bl-xs text-white ${
+                          isSpeaking && speakingIndex === i
+                            ? "border-amber-400/70 bg-[#0e162a] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
+                            : "border-white/10 bg-[#0c1222]"
+                        }`
+                      : `border rounded-bl-xs text-slate-900 ${
+                          isSpeaking && speakingIndex === i
+                            ? "border-amber-400/80 bg-amber-50/60 shadow-sm"
+                            : "border-slate-200/90 bg-slate-50/90"
+                        }`
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap selection:bg-amber-400 selection:text-slate-950">
+                    {msg.content}
+                  </p>
 
-                {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex flex-col ${
-                      msg.role === "user" ? "items-start" : "items-end"
-                    } animate-in fade-in duration-200`}
-                  >
-                    <div
-                      className={`group relative max-w-[88%] rounded-2xl p-3.5 sm:p-4 text-right shadow-sm ${
-                        msg.role === "user"
-                          ? "rounded-br-none bg-gradient-to-tr from-[#f8ca14] to-yellow-400 text-slate-950 font-bold"
-                          : isDark
-                          ? "rounded-bl-none border border-white/10 bg-[#0e1628] text-slate-100 shadow-md"
-                          : "rounded-bl-none border border-slate-200/80 bg-white text-slate-900 shadow-md"
-                      }`}
-                    >
-                      {msg.role === "assistant" && (
-                        <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-current/10">
-                          <div className="h-5 w-5 rounded-md bg-[#f8ca14] text-slate-950 grid place-items-center font-black text-[10px]">
-                            💎
-                          </div>
-                          <span className={`text-[11px] font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                            مستشار العقيق الذكي
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="space-y-1 text-right leading-relaxed font-medium">
-                        {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
-                      </div>
-
-                      {/* Speech & Copy Action Buttons for Assistant Replies */}
-                      {msg.role === "assistant" && (
-                        <div className="mt-2.5 pt-2 border-t border-current/10 flex items-center justify-between gap-1">
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (isSpeaking && speakingIndex === i) {
-                                  stopSpeaking();
-                                } else {
-                                  speakText(msg.content, i);
-                                }
-                              }}
-                              className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black transition ${
-                                isSpeaking && speakingIndex === i
-                                  ? "text-red-400 bg-red-500/20 animate-pulse border border-red-500/40"
-                                  : isDark
-                                  ? "text-amber-300 hover:text-white bg-white/5 border border-white/10 hover:bg-amber-400/20"
-                                  : "text-amber-800 hover:text-black bg-amber-50 border border-amber-200 hover:bg-amber-100"
-                              }`}
-                              title={isSpeaking && speakingIndex === i ? "إيقاف الصوت" : "استمع للرد بالصوت"}
-                            >
-                              {isSpeaking && speakingIndex === i ? (
-                                <>
-                                  <Square size={11} className="fill-current" />
-                                  <span>إيقاف</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Volume2 size={12} />
-                                  <span>استمع بالصوت 🔊</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-
+                  {/* Assistant Actions Bar (Listen Again, Copy) */}
+                  {msg.role === "assistant" && (
+                    <div className={`mt-2 pt-1.5 flex items-center justify-between border-t border-current/10 text-[10px] ${
+                      isDark ? "text-slate-400" : "text-slate-600"
+                    }`}>
+                      <div className="flex items-center gap-1.5">
+                        {isSpeaking && speakingIndex === i ? (
                           <button
                             type="button"
-                            onClick={() => handleCopy(msg.content, i)}
-                            className={`grid h-6 w-6 place-items-center rounded-lg transition ${
-                              copiedIndex === i
-                                ? "text-emerald-500 bg-emerald-500/20"
-                                : isDark
-                                ? "text-slate-400 hover:text-amber-300 bg-black/40"
-                                : "text-slate-500 hover:text-amber-700 bg-slate-100"
-                            }`}
-                            title="نسخ الرد"
+                            onClick={stopSpeaking}
+                            className="flex items-center gap-1 text-amber-500 font-bold hover:underline"
                           >
-                            {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                            <Square size={10} className="fill-current" />
+                            <span>إيقاف القراءة</span>
                           </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Shortcuts (Only on subsequent messages) */}
-                    {i > 0 && msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1.5 justify-end">
-                        {msg.actionShortcuts.map((act, ai) => (
+                        ) : (
                           <button
-                            key={ai}
                             type="button"
-                            onClick={() => handleShortcutClick(act.url)}
-                            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-black transition shadow-xs ${
-                              isDark
-                                ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
-                                : "border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
-                            }`}
+                            onClick={() => speakText(msg.content, i)}
+                            className="flex items-center gap-1 hover:text-amber-500 transition"
+                            title="إعادة الاستماع للصوت"
                           >
-                            <span>{act.label}</span>
-                            <ArrowUpLeft size={12} />
+                            <Volume2 size={11} />
+                            <span>استمع 🔊</span>
                           </button>
-                        ))}
+                        )}
                       </div>
-                    )}
 
-                    {/* Suggested Quick Follow-Up Questions (Only on subsequent messages) */}
-                    {i > 0 && msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
-                      <div className="mt-3 flex flex-wrap gap-1.5 justify-end">
-                        {msg.suggestedQuestions.map((q, qi) => (
-                          <button
-                            key={qi}
-                            type="button"
-                            onClick={() => handleSend(q)}
-                            className={`rounded-xl border px-3 py-1.5 text-[11px] font-bold transition shadow-xs text-right ${
-                              isDark
-                                ? "border-white/10 bg-black/60 text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950"
-                                : "border-slate-200 bg-white text-amber-800 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 shadow-xs"
-                            }`}
-                          >
-                            {q}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {askAiMutation.isPending && (
-                  <div
-                    className={`flex items-center gap-2.5 text-xs font-black p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse ${
-                      isDark
-                        ? "bg-[#111728] border border-amber-400/30 text-amber-300"
-                        : "bg-white border border-amber-400/50 text-amber-800 shadow-sm"
-                    }`}
-                  >
-                    <Sparkles size={16} className={`${isDark ? "text-amber-400" : "text-amber-600"} animate-spin`} />
-                    <span>المساعد الذكي يفكر ويصيغ الإجابة الحية...</span>
-                  </div>
-                )}
-
-                {/* 3 Clean Minimalist Swiss Service Pills (Zero Clutter!) */}
-                {messages.length === 1 && (
-                  <div className="flex flex-wrap items-center justify-center gap-2 pt-4 pb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {[
-                      { icon: "🎓", text: "شروط ورسوم القبول والتسجيل" },
-                      { icon: "📸", text: "البحث عن صوري بالوجه في الألبومات" },
-                      { icon: "🎙️", text: "مجلة وبودكاست العقيق" },
-                    ].map((card, idx) => (
                       <button
-                        key={idx}
                         type="button"
-                        onClick={() => handleSend(card.text)}
-                        className={`px-3.5 py-2 rounded-2xl border text-xs font-bold transition-all duration-200 hover:scale-105 flex items-center gap-2 shadow-xs ${
+                        onClick={() => handleCopy(msg.content, i)}
+                        className="hover:text-amber-500 transition p-0.5"
+                        title="نسخ الرد"
+                      >
+                        {copiedIndex === i ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Shortcuts on Assistant Replies */}
+                {i > 0 && msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap gap-1 justify-end">
+                    {msg.actionShortcuts.map((act, ai) => (
+                      <button
+                        key={ai}
+                        type="button"
+                        onClick={() => handleShortcutClick(act.url)}
+                        className={`inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[10px] font-bold transition shadow-xs ${
                           isDark
-                            ? "border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200"
-                            : "border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-slate-800 shadow-sm"
+                            ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
+                            : "border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
                         }`}
                       >
-                        <span className="text-sm">{card.icon}</span>
-                        <span>{card.text}</span>
+                        <span>{act.label}</span>
+                        <ArrowUpLeft size={10} />
                       </button>
                     ))}
                   </div>
                 )}
 
-                <div ref={chatBottomRef} />
+                {/* Follow-up Questions */}
+                {i > 0 && msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
+                  <div className="mt-2 flex flex-wrap gap-1 justify-end">
+                    {msg.suggestedQuestions.map((q, qi) => (
+                      <button
+                        key={qi}
+                        type="button"
+                        onClick={() => handleSend(q)}
+                        className={`rounded-xl border px-2.5 py-1 text-[10px] font-bold transition text-right ${
+                          isDark
+                            ? "border-white/10 bg-black/60 text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950"
+                            : "border-slate-200 bg-white text-amber-800 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 shadow-xs"
+                        }`}
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+            ))}
 
-              {/* Floating Executive Input Dock */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSend();
-                }}
-                className={`border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-colors ${
-                  isDark ? "border-white/10 bg-[#070b16]" : "border-slate-200 bg-white"
-                }`}
-              >
-                <div
-                  className={`flex items-center gap-2 rounded-2xl border p-1.5 px-2.5 transition-all shadow-inner ${
-                    isDark
-                      ? "border-white/15 bg-black/60 focus-within:border-amber-400/80 focus-within:ring-2 focus-within:ring-amber-400/20"
-                      : "border-slate-300 bg-slate-50 focus-within:border-amber-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20"
-                  }`}
-                >
-                  {/* Quick Voice Mic Button */}
+            {/* 3 Clean Minimalist Swiss Service Pills (On first message) */}
+            {messages.length === 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2 pb-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {[
+                  { icon: "🎓", text: "شروط ورسوم القبول والتسجيل" },
+                  { icon: "📸", text: "البحث عن صوري بالوجه في الألبومات" },
+                  { icon: "🎙️", text: "مجلة وبودكاست العقيق" },
+                ].map((card, idx) => (
                   <button
+                    key={idx}
                     type="button"
-                    onClick={enterLiveVoiceMode}
-                    className={`grid h-9 w-9 place-items-center rounded-xl transition shrink-0 ${
+                    onClick={() => handleSend(card.text)}
+                    className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all duration-200 hover:scale-105 flex items-center gap-1.5 shadow-xs ${
                       isDark
-                        ? "bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
-                        : "bg-amber-100/70 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
+                        ? "border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200"
+                        : "border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-slate-800 shadow-sm"
                     }`}
-                    title="التحدث صوتياً (محادثة فورية) 🎙️"
                   >
-                    <Mic size={17} />
+                    <span className="text-xs">{card.icon}</span>
+                    <span>{card.text}</span>
                   </button>
+                ))}
+              </div>
+            )}
 
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputPrompt}
-                    onChange={(e) => setInputPrompt(e.target.value)}
-                    placeholder="اكتب استفسارك هنا، أو اضغط على المايك للتحدث..."
-                    className={`flex-1 bg-transparent px-2 py-1 text-xs sm:text-sm font-bold outline-none ${
-                      isDark
-                        ? "text-white placeholder-slate-500"
-                        : "text-slate-900 placeholder-slate-400"
-                    }`}
-                  />
-
-                  <Button
-                    type="submit"
-                    disabled={!inputPrompt.trim() || askAiMutation.isPending}
-                    className="grid h-9 w-9 place-items-center rounded-xl bg-[#f8ca14] text-slate-950 font-black hover:bg-yellow-300 transition shadow-md shrink-0 p-0 disabled:opacity-30"
-                    title="إرسال"
-                  >
-                    <Send size={15} className="mr-0.5" />
-                  </Button>
+            {/* Live Mic Listening Card */}
+            {isListening && (
+              <div className={`flex items-center gap-2 p-3 rounded-2xl border text-xs font-bold animate-pulse ${
+                isDark
+                  ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
+                  : "border-emerald-500/40 bg-emerald-50 text-emerald-800"
+              }`}>
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                <div className="flex-1">
+                  <span>أستمع لصوتك الآن.. تحدث وسأرد فوراً 🎙️</span>
+                  <p className="text-[10px] opacity-75 mt-0.5">اضغط على زر المايك مرة أخرى عند الانتهاء</p>
                 </div>
-              </form>
-            </>
-          )}
+              </div>
+            )}
+
+            {/* Audio Transcribing Loading */}
+            {isTranscribing && (
+              <div className={`flex items-center gap-2 p-2.5 rounded-2xl border text-xs font-bold animate-pulse ${
+                isDark ? "border-cyan-400/30 bg-cyan-500/10 text-cyan-300" : "border-cyan-400/40 bg-cyan-50 text-cyan-800"
+              }`}>
+                <Loader2 size={14} className="animate-spin text-cyan-400 shrink-0" />
+                <span>جاري تحليل صوتك بدقة عالية... ⏳</span>
+              </div>
+            )}
+
+            {/* AI Thinking Indicator */}
+            {askAiMutation.isPending && (
+              <div className={`flex items-center gap-2 p-2.5 rounded-2xl border text-xs font-bold w-fit animate-pulse ${
+                isDark ? "border-amber-400/30 bg-amber-400/10 text-amber-300" : "border-amber-400/40 bg-amber-50 text-amber-800"
+              }`}>
+                <Sparkles size={14} className="animate-spin text-amber-500 shrink-0" />
+                <span>المستشار يفكر ويصيغ الرد... ⚡</span>
+              </div>
+            )}
+
+            <div ref={chatBottomRef} />
+          </div>
+
+          {/* Unified Bottom Dock: Voice + Text in One Single Place */}
+          <div className={`p-2 sm:p-2.5 border-t transition-colors shrink-0 ${
+            isDark ? "border-white/10 bg-[#080d1a]" : "border-slate-200/90 bg-slate-50/90"
+          }`}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+              className="flex items-center gap-1.5"
+            >
+              {/* Mic / Interrupt Voice Button */}
+              {isSpeaking ? (
+                <button
+                  type="button"
+                  onClick={stopSpeaking}
+                  className="h-9 w-9 shrink-0 grid place-items-center rounded-xl bg-amber-400 text-slate-950 font-black shadow-md hover:scale-105 transition animate-pulse"
+                  title="مقاطعة الصوت"
+                >
+                  <Square size={13} className="fill-current" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`h-9 w-9 shrink-0 grid place-items-center rounded-xl font-black shadow-md hover:scale-105 transition ${
+                    isListening
+                      ? "bg-red-500 text-white animate-pulse"
+                      : "bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950"
+                  }`}
+                  title={isListening ? "اضغط لإنهاء التحدث والإرسال" : "تحدث بالصوت 🎙️"}
+                >
+                  <Mic size={15} />
+                </button>
+              )}
+
+              {/* Text Input */}
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputPrompt}
+                onChange={(e) => setInputPrompt(e.target.value)}
+                placeholder={isListening ? "أستمع لصوتك الآن..." : "اكتب استفسارك أو اضغط المايك..."}
+                className={`flex-1 rounded-xl border px-3 py-2 text-xs font-bold outline-none transition ${
+                  isDark
+                    ? "border-white/10 bg-white/5 text-white placeholder-slate-400 focus:border-amber-400"
+                    : "border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:border-amber-500"
+                }`}
+              />
+
+              {/* Send Button */}
+              <button
+                type="submit"
+                disabled={!inputPrompt.trim() || askAiMutation.isPending}
+                className="h-9 w-9 shrink-0 grid place-items-center rounded-xl bg-amber-400 text-slate-950 font-black shadow hover:bg-yellow-300 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                title="إرسال"
+              >
+                <Send size={14} />
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
