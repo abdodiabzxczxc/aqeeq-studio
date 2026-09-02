@@ -815,14 +815,14 @@ export default function AlaqeeqStudioPublicPage() {
                 ? dark ? "text-white" : "text-[#032e1d]"
                 : dark ? "text-white" : "text-black"
             )}>
-              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="مدارس العقيق الأهلية والدولية" as="span" />
+              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="ذاكرة العقيق" as="span" />
               <br />
-              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#015a37]")}>
+              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
                 <VisualEditable
                   id="studio-hero-accent"
                   tag="text"
                   label="تكملة عنوان الاستوديو"
-                  defaultText="نلهم الأجيال.. ونصنع الأثر."
+                  defaultText="في مكان واحد."
                   as="span"
                 />
               </span>
@@ -832,7 +832,7 @@ export default function AlaqeeqStudioPublicPage() {
               id="studio-hero-description"
               tag="text"
               label="وصف غلاف الاستوديو"
-              defaultText="صرح تعليمي رائد للبنين والبنات بالمدينة المنورة يجمع بين أصالة القيم الإسلامية وأحدث المعايير الدولية المعتمدة من كوجنيا ومراكز اختبارات SAT و IELTS."
+              defaultText="منصة مدارس العقيق الرقمية المتكاملة لتوثيق الفعاليات المدرسية، إصدارات المجلات الدورية، وأحدث الأخبار والعروض في تجربة تفاعلية فاخرة."
               as="p"
               className={"mt-5 max-w-xl text-sm leading-8 " + (
                 isNationalDay
@@ -840,6 +840,7 @@ export default function AlaqeeqStudioPublicPage() {
                   : dark ? "text-slate-300" : "text-slate-600"
               )}
             />
+
 
             {/* Quick Action CTA Buttons */}
             <div className="mt-6 flex flex-wrap items-center gap-3">
