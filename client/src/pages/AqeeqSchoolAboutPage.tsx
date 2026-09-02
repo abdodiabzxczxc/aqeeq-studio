@@ -69,17 +69,17 @@ export default function AqeeqSchoolAboutPage() {
   const campuses = [
     {
       name: "مجمع البنين — مدارس العقيق الأهلية والدولية",
-      location: "المدينة المنورة — طريق الملك عبدالله الدائري",
+      location: "المدينة المنورة — حي الرانوناء (ممشى الهجرة)",
       stages: "الابتدائي · المتوسط · الثانوي (أهلي ودولي)",
-      facilities: "معامل حاسوب وروبوت، مسبح أولمبي، صالة رياضية مغطاة، قاعات اختبارات دولية SAT و IELTS.",
-      phone: "+966 53 189 6000",
+      facilities: "معامل حاسوب وذكاء اصطناعي، مسبح أولمبي مغطى، صالة رياضية، قاعات اختبارات دولية SAT و IELTS.",
+      phone: "+966 14 813 1652",
     },
     {
       name: "مجمع البنات — مدارس العقيق الأهلية والدولية",
-      location: "المدينة المنورة — حي باقدو",
-      stages: "رياض الأطفال والتمهيدي · الابتدائي · المتوسط · الثانوي",
+      location: "المدينة المنورة — حي الرانوناء (ممشى الهجرة)",
+      stages: "رياض الأطفال والطفولة المبكرة · الابتدائي · المتوسط · الثانوي",
       facilities: "بيئة تعليمية وتربوية رائدة، معامل ذكية، مسرح احتفالات مدرسي، ساحات وملاعب آمنة ومظللة.",
-      phone: "+966 53 189 6000",
+      phone: "+966 14 864 4466",
     },
   ];
 
@@ -303,7 +303,7 @@ export default function AqeeqSchoolAboutPage() {
             {
               year: "2010 م — 1431 هـ",
               title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
-              desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل على طريق الملك عبدالله الدائري ومجمع البنات بحي باقدو، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
+              desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل ومجمع البنات في حي الرانوناء بمحاذاة ممشى الهجرة، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
               highlight: "مجمعات صرحية مستقلة بمواصفات هندسية وتعليمية قياسية",
               stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
             },
@@ -390,7 +390,7 @@ export default function AqeeqSchoolAboutPage() {
                     : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                 }`}
               >
-                مجمع البنين (طريق الملك عبدالله الدائري)
+                مجمع البنين (حي الرانوناء — ممشى الهجرة)
               </button>
               <button
                 type="button"
@@ -401,7 +401,7 @@ export default function AqeeqSchoolAboutPage() {
                     : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                 }`}
               >
-                مجمع البنات (حي باقدو)
+                مجمع البنات (حي الرانوناء — ممشى الهجرة)
               </button>
             </div>
           </div>
@@ -421,11 +421,11 @@ export default function AqeeqSchoolAboutPage() {
                   </div>
 
                   <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    مجمع البنين — طريق الملك عبدالله الدائري
+                    مجمع البنين — حي الرانوناء (ممشى الهجرة)
                   </h3>
 
                   <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                    يقع المجمع في موقع استراتيجي حيوي على الدائري، ويضم مباني أكاديمية مستقلة للمراحل الابتدائية والمتوسطة والثانوية، مزوداً بأحدث الصالات الرياضية والمسابح والمعامل التقنية.
+                    يقع المجمع في موقع متميز بحي الرانوناء بالقرب من ممشى الهجرة (خلف نايس برايس)، ويضم مباني أكاديمية مستقلة للمراحل الابتدائية والمتوسطة والثانوية، ومزود بأحدث الصالات الرياضية والمسابح والمعامل التقنية وقاعات الاختبارات الدولية.
                   </p>
 
                   {/* Highlights Grid */}
@@ -446,7 +446,7 @@ export default function AqeeqSchoolAboutPage() {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap items-center gap-3">
                     <a
-                      href="https://maps.google.com/?q=Al-Aqeeq+Schools+Boys+Madinah"
+                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
@@ -456,13 +456,13 @@ export default function AqeeqSchoolAboutPage() {
                     </a>
 
                     <a
-                      href="tel:+966531896000"
+                      href="tel:+966148131652"
                       className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
                         dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
                       }`}
                     >
                       <Phone size={14} />
-                      <span>الاتصال بالمجمع: 966531896000+</span>
+                      <span>هاتف المجمع: 0148131652</span>
                     </a>
 
                     <Button
@@ -484,8 +484,8 @@ export default function AqeeqSchoolAboutPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                     <div className="absolute bottom-4 right-4 left-4 text-white">
-                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنين — الدائري</span>
-                      <p className="text-[11px] text-slate-300">معامل الابتكار والمسابح والمراكز الدولية</p>
+                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنين — حي الرانوناء</span>
+                      <p className="text-[11px] text-slate-300">ممشى الهجرة · معامل الابتكار والمسابح والمراكز الدولية</p>
                     </div>
                   </div>
                 </div>
@@ -507,11 +507,11 @@ export default function AqeeqSchoolAboutPage() {
                   </div>
 
                   <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    مجمع البنات — حي باقدو
+                    مجمع البنات — حي الرانوناء (ممشى الهجرة)
                   </h3>
 
                   <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                    صرح تربوي متميز يجمع بين الخصوصية العالية وتوفير أرقى المرافق، يضم أقسام الطفولة المبكرة ورياض الأطفال، والمراحل الابتدائية والمتوسطة والثانوية بقاعاتها ومسارحها المجهزة.
+                    صرح تربوي متكامل في حي الرانوناء بممشى الهجرة يجمع بين الخصوصية التامة وتوفير أحدث التجهيزات، يضم أقسام الطفولة المبكرة ورياض الأطفال، والمراحل الابتدائية والمتوسطة والثانوية بقاعاتها ومعاملها وملاعبها المظللة.
                   </p>
 
                   {/* Highlights Grid */}
@@ -532,7 +532,7 @@ export default function AqeeqSchoolAboutPage() {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap items-center gap-3">
                     <a
-                      href="https://maps.google.com/?q=Al-Aqeeq+Schools+Girls+Baqdo+Madinah"
+                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
@@ -542,13 +542,13 @@ export default function AqeeqSchoolAboutPage() {
                     </a>
 
                     <a
-                      href="tel:+966531896000"
+                      href="tel:+966148644466"
                       className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
                         dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
                       }`}
                     >
                       <Phone size={14} />
-                      <span>الاتصال بالمجمع: 966531896000+</span>
+                      <span>هاتف مجمع البنات: 0148644466</span>
                     </a>
 
                     <Button
@@ -570,8 +570,8 @@ export default function AqeeqSchoolAboutPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                     <div className="absolute bottom-4 right-4 left-4 text-white">
-                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنات — باقدو</span>
-                      <p className="text-[11px] text-slate-300">الطفولة المبكرة، المراحل التعليمية، والمسارح</p>
+                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنات — حي الرانوناء</span>
+                      <p className="text-[11px] text-slate-300">ممشى الهجرة · الطفولة المبكرة والمراحل التعليمية</p>
                     </div>
                   </div>
                 </div>
