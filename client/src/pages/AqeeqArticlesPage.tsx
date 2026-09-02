@@ -28,6 +28,8 @@ import {
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useSiteTheme } from "@/lib/useSiteTheme";
+
 
 const CATEGORIES = [
   { id: "all", label: "الكل" },
@@ -60,6 +62,7 @@ function ArticleCard({
   onShare: (art: any, e: React.MouseEvent) => void;
   dark: boolean;
 }) {
+  const { isNationalDay } = useSiteTheme();
   const cover = directDriveImage(article.coverUrl) || article.coverUrl;
   const readingTime = article.content
     ? Math.max(1, Math.ceil(article.content.trim().split(/\s+/).length / 200))
@@ -67,7 +70,9 @@ function ArticleCard({
   return (
     <article
       className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
-        dark
+        isNationalDay
+          ? "heritage-card-frame border-[#5aba1c]/40 text-white shadow-[0_20px_50px_rgba(0,50,25,0.4)] hover:border-[#f8ca14]"
+          : dark
           ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
           : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
       }`}
@@ -78,14 +83,18 @@ function ArticleCard({
         <button
           onClick={onOpen}
           className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
-            dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
+            isNationalDay
+              ? "border-[#5aba1c]/20 bg-[#001c10]"
+              : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${article.title}`}
         >
           {/* Background tilted page — hidden on mobile */}
           <div
             className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block ${
-              dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
+              isNationalDay
+                ? "border-[#5aba1c]/20 bg-[#002617]"
+                : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
           >
@@ -107,10 +116,13 @@ function ArticleCard({
           {/* Front cover — full width on mobile, partial on sm+ */}
           <div
             className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[62%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
-              dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
+              isNationalDay
+                ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]"
+                : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
             style={{ transform: "rotate(0deg)" }}
           >
+
             {cover ? (
               <VisualImage
                 id={`articles-card-cover-${article.id}`}
@@ -140,14 +152,18 @@ function ArticleCard({
           <div className="flex items-start justify-between gap-3">
             <div
               className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
-                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                isNationalDay
+                  ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
               <PenTool size={16} />
             </div>
             <span
               className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black border ${
-                dark
+                isNationalDay
+                  ? "border-[#5aba1c]/40 bg-[#5aba1c]/15 text-emerald-300"
+                  : dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
@@ -164,9 +180,12 @@ function ArticleCard({
             as="h3"
             onClick={onOpen}
             className={`mt-3 text-lg font-black line-clamp-2 cursor-pointer transition leading-snug ${
-              dark ? "text-white group-hover:text-[#f8ca14]" : "text-black group-hover:text-[#08467d]"
+              isNationalDay
+                ? "text-white group-hover:text-[#5aba1c]"
+                : dark ? "text-white group-hover:text-[#f8ca14]" : "text-black group-hover:text-[#08467d]"
             }`}
           />
+
 
           <VisualEditable
             id={`articles-card-excerpt-${article.id}`}

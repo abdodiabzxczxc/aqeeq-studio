@@ -15,6 +15,8 @@ import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { Archive, Loader2, Newspaper, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useSiteTheme } from "@/lib/useSiteTheme";
+
 
 export default function SchoolNewsReaderPage({ slug, standalone = false }: { slug: string; standalone?: boolean }) {
   const [, navigate] = useLocation();
@@ -37,7 +39,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
   const isLoading = isPreview ? isDraftLoading || !isAuthenticated : isPublicLoading;
   const [readerMode, setReaderMode] = useState<JournalReadingMode>("spread");
   const { theme: readerTheme, toggleTheme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = readerTheme === "dark";
+
   const [flipZoom, setFlipZoom] = useState<number>(1);
 
   useEffect(() => {
@@ -107,7 +111,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
     <main
       dir="rtl"
       className={`aq-journal-reader-theme aq-journal-reader-theme-${readerTheme} min-h-screen transition-colors ${
-        dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
+        isNationalDay
+          ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
+          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} />
@@ -121,7 +127,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
             defaultText="عودة إلى مجلة العقيق"
             as="button"
             onAction={() => navigate("/journal")}
-            className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-200"
+            className={`mb-4 inline-flex items-center gap-2 text-xs font-bold transition ${
+              isNationalDay ? "text-emerald-300 hover:text-[#f8ca14]" : "text-slate-400 hover:text-amber-200"
+            }`}
           >
             {(text) => (
               <>
@@ -135,7 +143,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
         {/* Master Luxury Reader Header - Exactly Matching Album Reader */}
         <header
           className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${
-            dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
+            isNationalDay
+              ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
+              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
           }`}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -146,8 +156,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                 label="شارة قارئ المجلة"
                 defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}${issue.seasonLabel} · ${issue.issueDate}`}
                 as="div"
-                className="text-[10px] font-black tracking-[.1em] text-amber-300"
+                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? "text-[#f8ca14]" : "text-amber-300")}
               />
+
               <VisualEditable
                 id="news-reader-header-title"
                 tag="text"
@@ -248,7 +259,9 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
         <div className="mt-3 flex justify-end">
           <nav
             className={`inline-flex rounded-xl border p-1 ${
-              dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
+              isNationalDay
+                ? "border-[#5aba1c]/30 bg-[#001f13]"
+                : dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
             }`}
             aria-label="طريقة عرض العدد"
           >
@@ -262,11 +275,18 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                 as="button"
                 onAction={() => setReaderMode(option.id)}
                 className={`rounded-lg px-3 py-2 text-[11px] font-black transition ${
-                  readerMode === option.id ? "bg-amber-300 text-slate-950" : dark ? "text-slate-400" : "text-slate-500"
+                  readerMode === option.id
+                    ? isNationalDay
+                      ? "bg-gradient-to-r from-[#f8ca14] to-[#facc15] text-black font-black shadow-md"
+                      : "bg-amber-300 text-slate-950"
+                    : isNationalDay
+                    ? "text-emerald-300 hover:text-white"
+                    : dark ? "text-slate-400" : "text-slate-500"
                 }`}
               />
             ))}
           </nav>
+
         </div>
 
         {/* Reader Body Section */}

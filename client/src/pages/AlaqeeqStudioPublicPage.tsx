@@ -744,10 +744,14 @@ export default function AlaqeeqStudioPublicPage() {
       >
         {/* Subtle Ambient Background Watermark */}
         {isNationalDay ? (
-          <div className="pointer-events-none absolute inset-0 snd-pattern-watermark" />
+          <>
+            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-70" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+          </>
         ) : (
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
         )}
+
 
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
@@ -857,17 +861,27 @@ export default function AlaqeeqStudioPublicPage() {
 
           {/* Overlapping Hero Covers */}
           <div className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px]">
-            <div className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-60 " + (
-              dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
+            {/* Back Card: Showcase / Vision & Excellence */}
+            <div className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 transition-all duration-500 " + (
+              isNationalDay
+                ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+                : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
             )}>
               <VisualImage
                 id="studio-hero-showcase-image"
                 label="صورة أخبار وعروض غلاف الاستوديو"
-                src={showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || ""}
+                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "")}
                 alt="غلاف الأخبار والعروض"
                 className="h-full w-full object-cover"
               />
+              {isNationalDay && (
+                <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-lg bg-black/80 border border-[#6565e0]/50 px-2 py-0.5 text-[9px] font-black text-white shadow-md backdrop-blur-md">
+                  <span>طموح الرؤية 🇸🇦</span>
+                </div>
+              )}
             </div>
+
+            {/* Middle Card: Albums / Heritage & Ajrab Sword */}
             <div
               role="button"
               tabIndex={0}
@@ -876,17 +890,26 @@ export default function AlaqeeqStudioPublicPage() {
                 if (event.key === "Enter" || event.key === " ") navigate("/albums");
               }}
               className={"group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 hover:scale-[1.02] " + (
-                dark ? "border-white/[0.15] bg-[#111111]" : "border-black/[0.12] bg-white shadow-md"
+                isNationalDay
+                  ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
+                  : dark ? "border-white/[0.15] bg-[#111111]" : "border-black/[0.12] bg-white shadow-md"
               )}
             >
               <VisualImage
                 id="studio-hero-album-image"
                 label="صورة ألبوم غلاف الاستوديو"
-                src={albumCovers.front || ""}
+                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : (albumCovers.front || "")}
                 alt="غلاف ألبوم العقيق"
-                className="h-full w-full object-cover opacity-85 transition duration-700 group-hover:scale-[1.03]"
+                className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
               />
+              {isNationalDay && (
+                <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1 rounded-xl bg-black/80 border border-[#5aba1c]/50 px-2.5 py-1 text-[10px] font-black text-[#5aba1c] shadow-lg backdrop-blur-md">
+                  <span>أصالة وفخر 🇸🇦</span>
+                </div>
+              )}
             </div>
+
+            {/* Front Card: Journal / Generosity & Family Generations */}
             <div
               role="button"
               tabIndex={0}
@@ -897,7 +920,7 @@ export default function AlaqeeqStudioPublicPage() {
               className={"group absolute bottom-[2%] left-[1%] top-[5%] z-20 w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 hover:scale-[1.02] " + (
                 isNationalDay
                   ? dark
-                    ? "border-[#f8ca14]/70 bg-[#001f13]/80 shadow-[0_25px_60px_rgba(0,90,54,0.45)] backdrop-blur-md"
+                    ? "border-[#f8ca14]/80 bg-[#001f13]/90 shadow-[0_30px_70px_rgba(0,90,54,0.55)] backdrop-blur-md ring-1 ring-[#f8ca14]/30"
                     : "border-emerald-500/60 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.2)]"
                   : dark
                   ? "border-[#f8ca14]/50 bg-[#111111] shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
@@ -907,14 +930,21 @@ export default function AlaqeeqStudioPublicPage() {
               <VisualImage
                 id="studio-hero-journal-image"
                 label="صورة مجلة غلاف الاستوديو"
-                src={journalCovers.front || ""}
+                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : (journalCovers.front || "")}
                 alt="غلاف مجلة العقيق"
                 className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
               />
+              {isNationalDay && (
+                <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-3 py-1 text-[11px] font-black text-black shadow-xl shadow-black/80 backdrop-blur-md">
+                  <span>🇸🇦</span>
+                  <span>عزّنا بطبعنا</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </VisualEditable>
+
 
       {/* ========================================================================= */}
       {/* 3. NEW MEDIA DASHBOARD */}

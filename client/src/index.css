@@ -2035,6 +2035,35 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   --aq-yellow: #f8ca14 !important;
   --aq-gold: #f8ca14 !important;
   --aq-brand-secondary: #003822 !important;
+
+  /* Official Typography from SND-GUIDELINE page 19 */
+  font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif !important;
+}
+
+:root[data-site-theme="saudi-national-day"] body,
+:root[data-site-theme="saudi-national-day"] .aq-brand-shell,
+:root[data-site-theme="saudi-national-day"] .aq-studio-share,
+:root[data-site-theme="saudi-national-day"] h1,
+:root[data-site-theme="saudi-national-day"] h2,
+:root[data-site-theme="saudi-national-day"] h3,
+:root[data-site-theme="saudi-national-day"] button {
+  font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif !important;
+}
+
+/* Living Ambient Glow Keyframes */
+@keyframes nationalAuraBreathing {
+  0%, 100% {
+    opacity: 0.32;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.03);
+  }
+}
+
+.national-ambient-breath {
+  animation: nationalAuraBreathing 7s ease-in-out infinite;
 }
 
 /* 🇸🇦 All-Site Shell Background Metamorphosis */
@@ -2044,6 +2073,7 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
               #01140c !important;
   color: #ffffff !important;
 }
+
 
 :root[data-site-theme="saudi-national-day"] .aq-studio-share--light {
   background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(90, 186, 28, 0.12), transparent 75%),

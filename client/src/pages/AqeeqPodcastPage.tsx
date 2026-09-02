@@ -6,6 +6,8 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
+
 import {
   Play,
   Pause,
@@ -98,7 +100,9 @@ function isEmbeddableVideo(url: string | undefined | null): boolean {
 
 export default function AqeeqPodcastPage() {
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
+
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const isAdmin = isAuthenticated && user?.role === "admin";
@@ -521,14 +525,21 @@ export default function AqeeqPodcastPage() {
               id="podcast-hero-kicker"
               tag="text"
               label="شارة أثير العقيق"
-              defaultText={orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"}
+              defaultText={
+                isNationalDay
+                  ? "أثير العقيق في اليوم الوطني · نغم الفخر والاعتزاز 🇸🇦"
+                  : orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"
+              }
               as="div"
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
-                dark
+                isNationalDay
+                  ? "border-[#f8ca14]/50 bg-gradient-to-r from-[#003822] to-[#002617] text-[#f8ca14] shadow-lg shadow-emerald-950/40"
+                  : dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
+
               {(text) => (
                 <>
                   <Mic size={14} className="animate-pulse" />
@@ -616,14 +627,17 @@ export default function AqeeqPodcastPage() {
                   type="button"
                   onClick={() => playSong(0)}
                   className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
-                    dark
+                    isNationalDay
+                      ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14] hover:scale-105 shadow-md"
+                      : dark
                       ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
                       : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                   }`}
                 >
                   <Disc size={14} className="animate-[spin_4s_linear_infinite]" />
-                  <span>تشغيل الأناشيد 🎵</span>
+                  <span>{isNationalDay ? "🇸🇦 تشغيل أناشيد الوطن والعقيق" : "تشغيل الأناشيد 🎵"}</span>
                 </button>
+
               )}
 
               {isAdmin && (
