@@ -265,9 +265,19 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* 1. مدارسنا ▾ */}
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>
-                <button className={`aq-studio-toplink flex items-center gap-1.5 outline-none ${currentActive === "about" || currentActive === "accreditations" ? "aq-studio-toplink--active" : ""}`}>
+                <button
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none ${
+                    currentActive === "about" || currentActive === "accreditations"
+                      ? dark
+                        ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
+                        : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
+                      : dark
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
+                      : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
+                  }`}
+                >
                   <span>مدارسنا</span>
-                  <ChevronDown size={13} className="opacity-70" />
+                  <ChevronDown size={12} className="opacity-70" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className={`w-72 p-2 rounded-2xl border shadow-2xl backdrop-blur-2xl ${dark ? "bg-[#0c1218]/95 border-white/15 text-white" : "bg-white/95 border-black/10 text-slate-900"}`}>
@@ -308,12 +318,22 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* 2. القبول والرسوم ▾ */}
+            {/* 2. القبول والتسجيل ▾ */}
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>
-                <button className={`aq-studio-toplink flex items-center gap-1.5 outline-none ${currentActive === "admissions" ? "aq-studio-toplink--active" : ""}`}>
-                  <span>القبول والرسوم</span>
-                  <ChevronDown size={13} className="opacity-70" />
+                <button
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-black transition-all duration-200 outline-none select-none ${
+                    currentActive === "admissions"
+                      ? dark
+                        ? "border-[#f8ca14]/70 bg-[#f8ca14]/20 text-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.25)]"
+                        : "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] shadow-sm"
+                      : dark
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]/50 shadow-[0_0_10px_rgba(248,202,20,0.1)]"
+                      : "border-[#08467d]/20 bg-[#08467d]/8 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]/35 shadow-xs"
+                  }`}
+                >
+                  <span>القبول والتسجيل</span>
+                  <ChevronDown size={12} className="opacity-70" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className={`w-72 p-2 rounded-2xl border shadow-2xl backdrop-blur-2xl ${dark ? "bg-[#0c1218]/95 border-white/15 text-white" : "bg-white/95 border-black/10 text-slate-900"}`}>
@@ -371,7 +391,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               id="aqeeq-studio-nav-podcast"
               tag="button"
               label="اسم رابط أثير العقيق"
-              defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق 🎙️"}
+              defaultText={(orchestration?.nav as any)?.podcastLabel || "أثير العقيق"}
               as="button"
               onAction={() => go("/atheer")}
               className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
@@ -381,11 +401,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               id="aqeeq-studio-nav-articles"
               tag="button"
               label="اسم رابط المقالات"
-              defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات ✍️"}
+              defaultText={(orchestration?.nav as any)?.articlesLabel || "المقالات"}
               as="button"
               onAction={() => go("/articles")}
               className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
             />
+
 
             <VisualEditable
               id="aqeeq-studio-nav-showcase"
@@ -609,7 +630,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <div className="rounded-xl border border-current/10 p-2.5">
                   <div className="text-[11px] font-black text-[#f8ca14] mb-2 flex items-center gap-1.5">
                     <Calculator size={13} />
-                    <span>القبول والرسوم</span>
+                    <span>القبول والتسجيل</span>
                   </div>
                   <div className="space-y-1">
                     <button onClick={() => go("/admissions")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
