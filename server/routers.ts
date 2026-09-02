@@ -1653,7 +1653,18 @@ export const appRouter = router({
           excerpt: z.string().optional(),
           authorName: z.string().min(2, "يرجى كتابة اسم الكاتب"),
           authorRole: z.string().optional(),
-          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]),
+          category: z.enum([
+            "مقالات علمية",
+            "اللغة العربية",
+            "الجودة والاعتماد",
+            "اللغة الإنجليزية",
+            "الذكاء الاصطناعي في التعليم",
+            "تربوي",
+            "إبداعات الطلاب",
+            "إرشاد أسري",
+            "أنشطة وفعاليات",
+            "تجارب ملهمة",
+          ]),
           coverUrl: z.string().optional(),
         })
       )
@@ -1673,7 +1684,18 @@ export const appRouter = router({
           excerpt: z.string().optional(),
           authorName: z.string(),
           authorRole: z.string().optional(),
-          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]),
+          category: z.enum([
+            "مقالات علمية",
+            "اللغة العربية",
+            "الجودة والاعتماد",
+            "اللغة الإنجليزية",
+            "الذكاء الاصطناعي في التعليم",
+            "تربوي",
+            "إبداعات الطلاب",
+            "إرشاد أسري",
+            "أنشطة وفعاليات",
+            "تجارب ملهمة",
+          ]),
           coverUrl: z.string().optional(),
           isPublished: z.boolean().default(true),
         })
@@ -1692,7 +1714,18 @@ export const appRouter = router({
               title: z.string().optional(),
               content: z.string().optional(),
               excerpt: z.string().optional(),
-              category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]).optional(),
+              category: z.enum([
+                "مقالات علمية",
+                "اللغة العربية",
+                "الجودة والاعتماد",
+                "اللغة الإنجليزية",
+                "الذكاء الاصطناعي في التعليم",
+                "تربوي",
+                "إبداعات الطلاب",
+                "إرشاد أسري",
+                "أنشطة وفعاليات",
+                "تجارب ملهمة",
+              ]).optional(),
               coverUrl: z.string().nullable().optional(),
             })
             .optional(),
@@ -1712,12 +1745,24 @@ export const appRouter = router({
       .input(
         z.object({
           topic: z.string().min(2, "يرجى كتابة فكرة أو موضوع المقال"),
-          category: z.enum(["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"]).optional(),
+          category: z.enum([
+            "مقالات علمية",
+            "اللغة العربية",
+            "الجودة والاعتماد",
+            "اللغة الإنجليزية",
+            "الذكاء الاصطناعي في التعليم",
+            "تربوي",
+            "إبداعات الطلاب",
+            "إرشاد أسري",
+            "أنشطة وفعاليات",
+            "تجارب ملهمة",
+          ]).optional(),
         })
       )
       .mutation(async ({ input }) => {
         return aiDraftArticle(input);
       }),
+
 
     delete: adminProcedure
       .input(z.object({ id: z.number() }))

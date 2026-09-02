@@ -37,7 +37,19 @@ import {
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
-const CATEGORIES = ["تربوي", "إبداعات الطلاب", "إرشاد أسري", "أنشطة وفعاليات", "تجارب ملهمة"] as const;
+const CATEGORIES = [
+  "مقالات علمية",
+  "اللغة العربية",
+  "الجودة والاعتماد",
+  "اللغة الإنجليزية",
+  "الذكاء الاصطناعي في التعليم",
+  "تربوي",
+  "إبداعات الطلاب",
+  "إرشاد أسري",
+  "أنشطة وفعاليات",
+  "تجارب ملهمة",
+] as const;
+
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
