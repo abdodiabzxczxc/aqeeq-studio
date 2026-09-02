@@ -25,12 +25,19 @@ import {
   Settings,
   ShieldCheck,
   Loader2,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Square,
+  AudioWaveform as WaveformIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { usePodcastPlayer } from "./AqeeqFloatingPodcastPlayer";
 
 type ActionShortcut = {
   label: string;
@@ -145,9 +152,35 @@ function renderInlineBoldAndLinks(str: string, isDark: boolean = true) {
   });
 }
 
+function cleanTextForSpeech(text: string): string {
+  return text
+    .replace(/###/g, "")
+    .replace(/##/g, "")
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[•\-\_]/g, " ")
+    .replace(/[^\u0600-\u06FF\s0-9a-zA-Z،.؟!:,-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getBestArabicVoice(): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined" || !window.speechSynthesis) return null;
+  const voices = window.speechSynthesis.getVoices();
+  const saudi = voices.find((v) => v.lang === "ar-SA" || v.name.includes("Saudi"));
+  if (saudi) return saudi;
+  const arabic = voices.find((v) => v.lang.startsWith("ar") || v.name.toLowerCase().includes("arabic"));
+  if (arabic) return arabic;
+  return null;
+}
+
 export function AqeeqAiAssistantWidget() {
   const { theme } = useAqeeqStudioTheme();
   const isDark = theme === "dark";
+  const { pausePodcast } = usePodcastPlayer();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
@@ -155,6 +188,14 @@ export function AqeeqAiAssistantWidget() {
   const [inputPrompt, setInputPrompt] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([INITIAL_MESSAGE]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  // Voice Interaction States
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const speechRecognitionRef = useRef<any>(null);
+
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [, navigate] = useLocation();
@@ -163,6 +204,112 @@ export function AqeeqAiAssistantWidget() {
   const { data: aiStatus, refetch: refetchAiStatus } = trpc.schoolAi.getAiStatus.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
+
+  const stopSpeaking = () => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+    setSpeakingIndex(null);
+  };
+
+  const speakText = (text: string, index?: number) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      toast.error("ميزة النطق غير مدعومة في هذا المتصفح");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleaned = cleanTextForSpeech(text);
+    if (!cleaned) return;
+
+    try {
+      pausePodcast();
+    } catch (e) {}
+
+    const utterance = new SpeechSynthesisUtterance(cleaned);
+    const voice = getBestArabicVoice();
+    if (voice) utterance.voice = voice;
+    utterance.lang = voice?.lang || "ar-SA";
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setSpeakingIndex(index ?? null);
+    };
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setSpeakingIndex(null);
+    };
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setSpeakingIndex(null);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (speechRecognitionRef.current) {
+        try {
+          speechRecognitionRef.current.stop();
+        } catch (e) {}
+      }
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("المتصفح لا يدعم ميزة المايكروفون المباشر. استخدم متصفح Chrome أو Edge.");
+      return;
+    }
+
+    try {
+      pausePodcast();
+      stopSpeaking();
+    } catch (e) {}
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "ar-SA";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      toast.info("المساعد يستمع إليك الآن.. تفضل بالتحدث 🎙️", { duration: 2500 });
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[0]?.[0]?.transcript;
+      if (transcript && transcript.trim()) {
+        setInputPrompt(transcript.trim());
+        handleSend(transcript.trim());
+        toast.success(`تم استلام صوتك: "${transcript.trim()}"`);
+      }
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      if (event.error !== "no-speech") {
+        toast.error("تعذر التقاط الصوت، يرجى التأكد من إذن المايك في المتصفح");
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    speechRecognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch (e) {
+      setIsListening(false);
+    }
+  };
 
   const saveKeyMutation = trpc.schoolAi.testAndSaveApiKey.useMutation({
     onSuccess: (res) => {
@@ -178,25 +325,38 @@ export function AqeeqAiAssistantWidget() {
 
   const askAiMutation = trpc.schoolAi.ask.useMutation({
     onSuccess: (data: any) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.reply,
-          suggestedQuestions: data.suggestedQuestions,
-          actionShortcuts: data.actionShortcuts,
-        },
-      ]);
+      const newMsg: ChatMsg = {
+        role: "assistant",
+        content: data.reply,
+        suggestedQuestions: data.suggestedQuestions,
+        actionShortcuts: data.actionShortcuts,
+      };
+      setMessages((prev) => {
+        const next = [...prev, newMsg];
+        if (isVoiceEnabled && data.reply) {
+          setTimeout(() => {
+            speakText(data.reply, next.length - 1);
+          }, 150);
+        }
+        return next;
+      });
     },
     onError: () => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "يسعدنا دائماً خدمتكم! للتواصل المباشر مع إدارة القبول والتسجيل بمدارس العقيق، يرجى زيارة موقعنا الرسمي https://aqeeq.edu.sa أو زيارة مقر المدارس بالمدينة المنورة.",
-          suggestedQuestions: ["ما هي شروط القبول والتسجيل؟", "كيف أتصفح مجلة العقيق؟"],
-        },
-      ]);
+      const fallbackMsg: ChatMsg = {
+        role: "assistant",
+        content:
+          "يسعدنا دائماً خدمتكم! للتواصل المباشر مع إدارة القبول والتسجيل بمدارس العقيق، يرجى زيارة موقعنا الرسمي https://aqeeq.edu.sa أو زيارة مقر المدارس بالمدينة المنورة.",
+        suggestedQuestions: ["ما هي شروط القبول والتسجيل؟", "كيف أتصفح مجلة العقيق؟"],
+      };
+      setMessages((prev) => {
+        const next = [...prev, fallbackMsg];
+        if (isVoiceEnabled) {
+          setTimeout(() => {
+            speakText(fallbackMsg.content, next.length - 1);
+          }, 150);
+        }
+        return next;
+      });
     },
   });
 
@@ -204,6 +364,14 @@ export function AqeeqAiAssistantWidget() {
     if (isOpen) {
       chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
       setTimeout(() => inputRef.current?.focus(), 150);
+    } else {
+      stopSpeaking();
+      if (isListening && speechRecognitionRef.current) {
+        try {
+          speechRecognitionRef.current.stop();
+        } catch (e) {}
+        setIsListening(false);
+      }
     }
   }, [messages, isOpen]);
 
@@ -211,6 +379,7 @@ export function AqeeqAiAssistantWidget() {
     const text = (textToSend || inputPrompt).trim();
     if (!text || askAiMutation.isPending) return;
 
+    stopSpeaking();
     const newHistory = [...messages, { role: "user" as const, content: text }];
     setMessages(newHistory);
     setInputPrompt("");
@@ -222,6 +391,7 @@ export function AqeeqAiAssistantWidget() {
   };
 
   const handleReset = () => {
+    stopSpeaking();
     setMessages([INITIAL_MESSAGE]);
     toast.success("تم بدء محادثة جديدة");
   };
@@ -330,6 +500,30 @@ export function AqeeqAiAssistantWidget() {
             </div>
 
             <div className="flex items-center gap-1">
+              {/* Voice Sound Toggle Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSpeaking) {
+                    stopSpeaking();
+                  }
+                  setIsVoiceEnabled(!isVoiceEnabled);
+                  toast.info(!isVoiceEnabled ? "تم تفعيل القراءة الصوتية الطبيعية 🔊" : "تم كتم الصوت 🔈");
+                }}
+                className={`grid h-8 w-8 place-items-center rounded-xl transition ${
+                  isVoiceEnabled
+                    ? isDark
+                      ? "text-amber-300 bg-amber-400/10 hover:bg-amber-400/20"
+                      : "text-amber-700 bg-amber-50 hover:bg-amber-100"
+                    : isDark
+                      ? "text-slate-500 hover:text-white hover:bg-white/10"
+                      : "text-slate-400 hover:text-slate-900 hover:bg-black/5"
+                }`}
+                title={isVoiceEnabled ? "الصوت مفعل (اضغط للكتم)" : "الصوت مكتوم (اضغط للتفعيل)"}
+              >
+                {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              </button>
+
               <button
                 type="button"
                 onClick={() => setIsKeyModalOpen(true)}
@@ -399,36 +593,112 @@ export function AqeeqAiAssistantWidget() {
             ))}
           </div>
 
-          {/* Messages Feed */}
-          <div className={`flex-1 overflow-y-auto p-4 space-y-4 text-right scrollbar-thin transition-colors ${
-            isDark ? "bg-[#04060b]/90" : "bg-slate-50/80"
+          {/* Chat Messages List */}
+          <div className={`flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm leading-relaxed ${
+            isDark ? "bg-[#070a12]/70" : "bg-slate-50/50"
           }`}>
+            {/* Live Speaking Indicator Banner */}
+            {isSpeaking && (
+              <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 border border-amber-400/40 p-2.5 backdrop-blur-md shadow-md animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center gap-2 text-amber-300 text-xs font-black">
+                  <span className="flex h-2.5 w-2.5 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                  </span>
+                  <WaveformIcon size={16} className="animate-pulse text-amber-400" />
+                  <span>المساعد يتحدث بصوت بشري طبيعي...</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={stopSpeaking}
+                  className="rounded-lg bg-amber-400 px-2.5 py-1 text-[10px] font-black text-black hover:bg-yellow-300 transition shadow-xs flex items-center gap-1"
+                >
+                  <Square size={10} className="fill-current" />
+                  <span>إيقاف الصوت</span>
+                </button>
+              </div>
+            )}
+
             {messages.map((msg, i) => (
-              <div key={i} className={`flex flex-col ${msg.role === "user" ? "items-start" : "items-end"}`}>
+              <div
+                key={i}
+                className={`flex flex-col ${
+                  msg.role === "user" ? "items-start" : "items-end"
+                } animate-in fade-in duration-200`}
+              >
                 <div
-                  className={`group relative max-w-[92%] rounded-2xl p-4 text-xs sm:text-[13px] font-medium leading-relaxed ${
+                  className={`group relative max-w-[88%] rounded-2xl p-3.5 sm:p-4 text-right shadow-sm ${
                     msg.role === "user"
-                      ? "bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-bold rounded-br-none shadow-md"
+                      ? "rounded-br-none bg-gradient-to-tr from-[#f8ca14] to-yellow-400 text-slate-950 font-bold"
                       : isDark
-                        ? "bg-[#111728] text-slate-100 border border-white/10 rounded-bl-none shadow-md"
-                        : "bg-white text-slate-800 border border-slate-200/90 rounded-bl-none shadow-sm"
+                        ? "rounded-bl-none border border-white/10 bg-[#0e1628] text-slate-100 shadow-md"
+                        : "rounded-bl-none border border-slate-200/80 bg-white text-slate-900 shadow-md"
                   }`}
                 >
-                  {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
-
                   {msg.role === "assistant" && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(msg.content, i)}
-                      className={`absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition p-1 rounded-lg ${
-                        isDark
-                          ? "text-slate-400 hover:text-amber-300 bg-black/40"
-                          : "text-slate-500 hover:text-amber-700 bg-slate-100"
-                      }`}
-                      title="نسخ الرد"
-                    >
-                      {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
-                    </button>
+                    <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-current/10">
+                      <div className="h-5 w-5 rounded-md bg-[#f8ca14] text-slate-950 grid place-items-center font-black text-[10px]">
+                        💎
+                      </div>
+                      <span className={`text-[11px] font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                        مستشار العقيق الذكي
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="space-y-1 text-right leading-relaxed font-medium">
+                    {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
+                  </div>
+
+                  {/* Speech & Copy Action Buttons for Assistant Replies */}
+                  {msg.role === "assistant" && (
+                    <div className="mt-2.5 pt-2 border-t border-current/10 flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isSpeaking && speakingIndex === i) {
+                              stopSpeaking();
+                            } else {
+                              speakText(msg.content, i);
+                            }
+                          }}
+                          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black transition ${
+                            isSpeaking && speakingIndex === i
+                              ? "text-red-400 bg-red-500/20 animate-pulse border border-red-500/40"
+                              : isDark
+                                ? "text-amber-300 hover:text-white bg-white/5 border border-white/10 hover:bg-amber-400/20"
+                                : "text-amber-800 hover:text-black bg-amber-50 border border-amber-200 hover:bg-amber-100"
+                          }`}
+                          title={isSpeaking && speakingIndex === i ? "إيقاف الصوت" : "استمع للرد بالصوت"}
+                        >
+                          {isSpeaking && speakingIndex === i ? (
+                            <>
+                              <Square size={11} className="fill-current" />
+                              <span>إيقاف</span>
+                            </>
+                          ) : (
+                            <>
+                              <Volume2 size={12} />
+                              <span>استمع بالصوت 🔊</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(msg.content, i)}
+                        className={`grid h-6 w-6 place-items-center rounded-lg transition ${
+                          isDark
+                            ? "text-slate-400 hover:text-amber-300 bg-black/40"
+                            : "text-slate-500 hover:text-amber-700 bg-slate-100"
+                        }`}
+                        title="نسخ الرد"
+                      >
+                        {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -489,7 +759,7 @@ export function AqeeqAiAssistantWidget() {
             <div ref={chatBottomRef} />
           </div>
 
-          {/* Input Footer */}
+          {/* Input Footer with Microphone Voice Support */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -499,12 +769,32 @@ export function AqeeqAiAssistantWidget() {
               isDark ? "border-white/10 bg-[#0a0e1a]" : "border-slate-200 bg-white"
             }`}
           >
+            {/* Microphone Voice Button */}
+            <Button
+              type="button"
+              onClick={toggleListening}
+              className={`grid h-10 w-10 place-items-center rounded-2xl transition shadow-md shrink-0 p-0 ${
+                isListening
+                  ? "bg-red-500 text-white animate-bounce ring-4 ring-red-500/40"
+                  : isDark
+                    ? "border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
+                    : "border border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-[#f8ca14] hover:text-black"
+              }`}
+              title={isListening ? "جاري الاستماع لصوتك.. (اضغط للإيقاف)" : "تحدث بالصوت 🎙️"}
+            >
+              {isListening ? <MicOff size={18} className="animate-pulse" /> : <Mic size={18} />}
+            </Button>
+
             <input
               ref={inputRef}
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
-              placeholder="اكتب سؤالك هنا (مثلاً: قارن بين الدبلومة الأمريكية والمسار الوطني)..."
+              placeholder={
+                isListening
+                  ? "🎙️ استمع إليك الآن.. تفضل بالتحدث..."
+                  : "اكتب سؤالك أو اضغط على المايك للتحدث..."
+              }
               className={`flex-1 rounded-2xl border px-4 py-2.5 text-xs sm:text-sm font-bold outline-none transition ${
                 isDark
                   ? "border-white/15 bg-black/70 text-white placeholder-slate-500 focus:border-amber-400"
