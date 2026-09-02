@@ -46,6 +46,7 @@ import { PublishedHomepageProvider, usePublishedHomepage } from "./contexts/Publ
 import AqeeqAdminDashboardPage from "./pages/AqeeqAdminDashboardPage";
 import AqeeqAnalyticsDashboardPage from "./pages/AqeeqAnalyticsDashboardPage";
 import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
+import { AqeeqOccasionRibbon } from "./components/AqeeqOccasionRibbon";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
 
 import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
@@ -141,6 +142,7 @@ function StudioAppShell() {
     <PodcastPlayerProvider>
       <div style={brandStyle} className="aq-brand-shell">
         <div className={`min-h-screen transition-[padding-bottom] duration-300 ${activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
+          <AqeeqOccasionRibbon />
           <AqeeqBroadcastBanner />
           <Router />
           <VisualGlobalSections />

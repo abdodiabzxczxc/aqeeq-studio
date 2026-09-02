@@ -529,6 +529,48 @@ const DEFAULT_ORCHESTRATION = {
   const [storyPickerStatusFilter, setStoryPickerStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [storyDurationHours, setStoryDurationHours] = useState<number>(24); // default 24h
 
+  // Global Theme Engine State & Mutation
+  const setActiveThemeMutation = trpc.executiveAdmin.setActiveTheme.useMutation({
+    onSuccess: (data) => {
+      const isNd = data.themeMode?.activeTheme === "saudi-national-day";
+      toast.success(isNd ? "تم تفعيل سيم اليوم الوطني السعودي بنجاح على كامل الموقع! 🇸🇦✨" : "تمت العودة إلى السيم الأصلي للعقيق 💎");
+      void utils.executiveAdmin.getSiteOrchestration.invalidate();
+      void refetchOrchestration();
+    },
+    onError: (err) => {
+      toast.error(err.message || "تعذر تحديث سيم الموقع");
+    },
+  });
+
+  const [themeForm, setThemeForm] = useState<{
+    activeTheme: "default" | "saudi-national-day";
+    durationHours: number | null;
+    templateVariant: "general" | "generosity" | "authenticity" | "vision" | "giving";
+    customBadgeText: string;
+    showCelebrationRibbon: boolean;
+    backgroundPatternOpacity: number;
+  }>({
+    activeTheme: "default",
+    durationHours: null,
+    templateVariant: "general",
+    customBadgeText: "نحلم ونحقق 🇸🇦",
+    showCelebrationRibbon: true,
+    backgroundPatternOpacity: 85,
+  });
+
+  useEffect(() => {
+    if (orchestrationData?.themeMode) {
+      setThemeForm((prev) => ({
+        ...prev,
+        activeTheme: orchestrationData.themeMode?.activeTheme || "default",
+        templateVariant: (orchestrationData.themeMode?.templateVariant as any) || "general",
+        customBadgeText: orchestrationData.themeMode?.customBadgeText || "نحلم ونحقق 🇸🇦",
+        showCelebrationRibbon: orchestrationData.themeMode?.showCelebrationRibbon !== false,
+        backgroundPatternOpacity: orchestrationData.themeMode?.backgroundPatternOpacity ?? 85,
+      }));
+    }
+  }, [orchestrationData]);
+
   // Articles Moderation State & Queries
   const { data: allAdminArticles = [], refetch: refetchAdminArticles } = trpc.articles.listAllAdmin.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
@@ -838,6 +880,252 @@ const DEFAULT_ORCHESTRATION = {
 
             {/* Grid of Configuration Cards */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+
+              {/* 🌟 0. GLOBAL OCCASION THEME ENGINE (سيمات ومناسبات الموقع) */}
+              <div
+                className={`lg:col-span-2 rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden transition-all duration-500 ${
+                  themeForm.activeTheme === "saudi-national-day"
+                    ? dark
+                      ? "border-emerald-500/40 bg-gradient-to-br from-[#001f13] via-[#05150f] to-[#0a100d] text-white shadow-emerald-950/40"
+                      : "border-emerald-400 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/40 text-slate-900 shadow-emerald-100"
+                    : dark
+                    ? "border-white/10 bg-[#101010] text-white"
+                    : "border-black/5 bg-white text-slate-900 shadow-slate-200/50"
+                }`}
+              >
+                {/* Header of Theme Studio */}
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
+                  <div className="flex items-center gap-3.5">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-[#5aba1c] text-white shadow-lg shadow-emerald-600/30 text-xl">
+                      🇸🇦
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-black">منظومة السيمات والهوية الوطنية والمناسبات</h3>
+                        {themeForm.activeTheme === "saudi-national-day" ? (
+                          <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-0.5 text-[11px] font-black text-emerald-400 animate-pulse">
+                            ● نشط ومطبق الآن
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-slate-500/15 border border-slate-500/30 px-3 py-0.5 text-[11px] font-black text-slate-400">
+                            السيم الافتراضي
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-bold text-slate-400 mt-0.5">
+                        تبديل هوية الموقع بالكامل بنقرة واحدة (ألوان، زخارف الهوية الوطنية، وشريط التهنئة) مع بقاء كل المحتوى والمقالات كما هي 100%.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Save Theme Button */}
+                  <Button
+                    type="button"
+                    disabled={setActiveThemeMutation.isPending}
+                    onClick={() => {
+                      setActiveThemeMutation.mutate(themeForm);
+                    }}
+                    className={`text-xs font-black rounded-2xl px-6 py-2.5 transition shadow-lg gap-2 ${
+                      themeForm.activeTheme === "saudi-national-day"
+                        ? "bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-emerald-600/30"
+                        : "bg-white/10 hover:bg-white/20 text-white"
+                    }`}
+                  >
+                    <Sparkles size={16} />
+                    <span>{setActiveThemeMutation.isPending ? "جاري التطبيق..." : "حفظ وتطبيق السيم فوراً"}</span>
+                  </Button>
+                </div>
+
+                {/* Theme Selection Cards (Default vs Saudi National Day) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Theme Option 1: Classic Default Theme */}
+                  <div
+                    onClick={() => setThemeForm((prev) => ({ ...prev, activeTheme: "default" }))}
+                    className={`group relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${
+                      themeForm.activeTheme === "default"
+                        ? "border-[#f8ca14] bg-[#f8ca14]/5 ring-2 ring-[#f8ca14]/30 shadow-lg shadow-[#f8ca14]/10"
+                        : dark
+                        ? "border-white/10 bg-black/30 hover:border-white/20"
+                        : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] text-white font-black text-sm">
+                          💎
+                        </div>
+                        <div>
+                          <h4 className="font-black text-sm">السيم الأصلي للعقيق (الكلاسيكي الملكي)</h4>
+                          <p className="text-[11px] text-slate-400">الهوية الرسمية الكلاسيكية باللون الكحلي والذهبي والزمردي</p>
+                        </div>
+                      </div>
+                      <div className={`h-5 w-5 rounded-full border-2 grid place-items-center ${
+                        themeForm.activeTheme === "default"
+                          ? "border-[#f8ca14] bg-[#f8ca14] text-black text-[10px] font-black"
+                          : "border-slate-400"
+                      }`}>
+                        {themeForm.activeTheme === "default" && "✓"}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2 pt-3 border-t border-current/10 text-[11px] text-slate-400">
+                      <span className="h-3 w-3 rounded-full bg-[#08467d]" />
+                      <span className="h-3 w-3 rounded-full bg-[#367453]" />
+                      <span className="h-3 w-3 rounded-full bg-[#f8ca14]" />
+                      <span className="mr-2 font-mono text-[10px]">الهوية القياسية المستقرة</span>
+                    </div>
+                  </div>
+
+                  {/* Theme Option 2: Saudi National Day Theme */}
+                  <div
+                    onClick={() => setThemeForm((prev) => ({ ...prev, activeTheme: "saudi-national-day" }))}
+                    className={`group relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${
+                      themeForm.activeTheme === "saudi-national-day"
+                        ? "border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/40 shadow-xl shadow-emerald-600/20"
+                        : dark
+                        ? "border-white/10 bg-black/30 hover:border-emerald-500/30"
+                        : "border-slate-200 bg-slate-50/60 hover:border-emerald-300"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#005A36] to-[#5aba1c] text-white text-lg shadow-md">
+                          🇸🇦
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-black text-sm">سيم اليوم الوطني السعودي</h4>
+                            <span className="rounded-full bg-emerald-500/20 px-2 py-0.2 text-[10px] font-black text-emerald-400">
+                              أطباعنا سعودية
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400">هوية اليوم الوطني الرسمية بألوان القيم الستة والخلفيات الرسمية</p>
+                        </div>
+                      </div>
+                      <div className={`h-5 w-5 rounded-full border-2 grid place-items-center ${
+                        themeForm.activeTheme === "saudi-national-day"
+                          ? "border-emerald-500 bg-emerald-500 text-white text-[10px] font-black"
+                          : "border-slate-400"
+                      }`}>
+                        {themeForm.activeTheme === "saudi-national-day" && "✓"}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-1.5 pt-3 border-t border-current/10 text-[11px] text-slate-400 flex-wrap">
+                      <span className="h-3 w-3 rounded-full bg-[#005A36]" title="الأخضر الملكي" />
+                      <span className="h-3 w-3 rounded-full bg-[#6565e0]" title="الرؤية" />
+                      <span className="h-3 w-3 rounded-full bg-[#0050af]" title="العزم" />
+                      <span className="h-3 w-3 rounded-full bg-[#5aba1c]" title="الشجاعة" />
+                      <span className="h-3 w-3 rounded-full bg-[#971a4d]" title="الكرم" />
+                      <span className="h-3 w-3 rounded-full bg-[#607c4f]" title="الأصالة" />
+                      <span className="h-3 w-3 rounded-full bg-[#7c5d21]" title="العطاء" />
+                      <span className="mr-2 font-mono text-[10px] text-emerald-400 font-bold">هوية الـ 6 قيم الوطنية</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detailed Controls when Saudi National Day is selected */}
+                {themeForm.activeTheme === "saudi-national-day" && (
+                  <div className="mt-4 pt-5 border-t border-current/10 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      
+                      {/* 1. Template Variant Selection */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-black flex items-center gap-1.5">
+                          <span>🎨 قالب الزخرفة والخلفية الوطنية:</span>
+                        </label>
+                        <select
+                          value={themeForm.templateVariant}
+                          onChange={(e) => setThemeForm((prev) => ({ ...prev, templateVariant: e.target.value as any }))}
+                          className={`w-full rounded-xl border p-2.5 text-xs font-black cursor-pointer ${
+                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
+                          }`}
+                        >
+                          <option value="general">🏛️ القالب العام الرسمي (General Template)</option>
+                          <option value="generosity">☕ الكرم والجود - الدلة والفنجان (Generosity)</option>
+                          <option value="authenticity">🐪 الأصالة والموروث (Authenticity)</option>
+                          <option value="vision">🔭 الرؤية والمستقبل (Vision)</option>
+                          <option value="giving">🤲 العطاء الاستثنائي (Giving)</option>
+                        </select>
+                        <p className="text-[10px] text-slate-400">يتغير نمط الخلفية والزخرفة في الهيرو والسكاشن تلقائياً</p>
+                      </div>
+
+                      {/* 2. Duration / Expiry selector */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-black flex items-center gap-1.5">
+                          <span>⏱ مدة تفعيل السيم:</span>
+                        </label>
+                        <select
+                          value={themeForm.durationHours === null ? "permanent" : String(themeForm.durationHours)}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setThemeForm((prev) => ({
+                              ...prev,
+                              durationHours: val === "permanent" ? null : Number(val),
+                            }));
+                          }}
+                          className={`w-full rounded-xl border p-2.5 text-xs font-black cursor-pointer ${
+                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
+                          }`}
+                        >
+                          <option value="permanent">♾️ دائم حتى أقوم بإيقافه يدوياً</option>
+                          <option value="24">⏱ ٢٤ ساعة (يوم واحد)</option>
+                          <option value="48">⏱ ٤٨ ساعة (يومان)</option>
+                          <option value="168">⏱ أسبوع كامل (7 أيام)</option>
+                          <option value="720">⏱ شهر كامل (30 يوماً)</option>
+                        </select>
+                        <p className="text-[10px] text-slate-400">يعود الموقع تلقائياً للسيم الأصلي فور انتهاء المدة المحددة</p>
+                      </div>
+
+                      {/* 3. Custom Badge / Slogan Text */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-black flex items-center gap-1.5">
+                          <span>✍️ نص شارة المناسبة:</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={themeForm.customBadgeText}
+                          onChange={(e) => setThemeForm((prev) => ({ ...prev, customBadgeText: e.target.value }))}
+                          placeholder="نحلم ونحقق 🇸🇦"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-black ${
+                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
+                          }`}
+                        />
+                        <p className="text-[10px] text-slate-400">تظهر في الهيدر والـ Ribbon أعلى الموقع</p>
+                      </div>
+
+                    </div>
+
+                    {/* Ribbon & Opacity Toggles */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-current/10">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-black">
+                        <input
+                          type="checkbox"
+                          checked={themeForm.showCelebrationRibbon}
+                          onChange={(e) => setThemeForm((prev) => ({ ...prev, showCelebrationRibbon: e.target.checked }))}
+                          className="h-4 w-4 rounded border-slate-400 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>إظهار شريط التهنئة الوطني أعلى كل الصفحات (Celebration Ribbon)</span>
+                      </label>
+
+                      <div className="flex items-center gap-3 text-xs font-black">
+                        <span className="text-slate-400">شفافية الزخرفة:</span>
+                        <input
+                          type="range"
+                          min="20"
+                          max="100"
+                          step="5"
+                          value={themeForm.backgroundPatternOpacity}
+                          onChange={(e) => setThemeForm((prev) => ({ ...prev, backgroundPatternOpacity: Number(e.target.value) }))}
+                          className="w-28 accent-emerald-500 cursor-pointer"
+                        />
+                        <span className="font-mono text-emerald-400">{themeForm.backgroundPatternOpacity}%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* 1. HERO COVERS STUDIO (الرئيسية والصفحات الفرعية) */}
               <div
                 className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (

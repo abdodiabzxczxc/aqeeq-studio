@@ -45,6 +45,7 @@ import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
 import { AqeeqNewsMarquee } from "@/components/AqeeqNewsMarquee";
 import { AqeeqHomeBentoGrid } from "@/components/AqeeqHomeBentoGrid";
 import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -245,6 +246,7 @@ function formatArabicTimeAgo(dateVal: Date | string | number | undefined): { isW
 export default function AlaqeeqStudioPublicPage() {
   const [, navigate] = useLocation();
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay, backgroundPatternUrl, backgroundPatternOpacity, customBadgeText, variantInfo } = useSiteTheme();
   const dark = theme === "dark";
 
   const { data: issues = [], isLoading: issuesLoading } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -730,21 +732,41 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="غلاف استوديو العقيق"
         as="section"
-        className={"aq-studio-share-hero relative isolate overflow-hidden border-b " + (
-          dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+        className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
+          isNationalDay
+            ? dark ? "border-emerald-500/30 bg-[#00140c] text-white" : "border-emerald-200 bg-[#f0faf5] text-black"
+            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         )}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
+        {isNationalDay ? (
+          <div
+            className="pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+            style={{
+              backgroundImage: `url('${backgroundPatternUrl}')`,
+              opacity: backgroundPatternOpacity,
+            }}
+          />
+        ) : (
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
+        )}
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
-            <VisualEditable
-              id="studio-hero-kicker"
-              tag="text"
-              label="شارة غلاف الاستوديو"
-              defaultText="AQEEQ STUDIO · DIGITAL ARCHIVE"
-              as="p"
-              className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
-            />
+            {isNationalDay ? (
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-1 mb-3 text-emerald-400 text-xs font-black shadow-sm">
+                <span>🇸🇦</span>
+                <span>{customBadgeText}</span>
+                <span className="text-emerald-300/80 font-normal">· {variantInfo.label}</span>
+              </div>
+            ) : (
+              <VisualEditable
+                id="studio-hero-kicker"
+                tag="text"
+                label="شارة غلاف الاستوديو"
+                defaultText="AQEEQ STUDIO · DIGITAL ARCHIVE"
+                as="p"
+                className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+              />
+            )}
             <h1 className={"mt-4 text-4xl font-black leading-[1.1] md:text-6xl " + (dark ? "text-white" : "text-black")}>
               <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي للاستوديو" defaultText="ذاكرة العقيق" as="span" />
               <br />

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { getLoginUrl } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
@@ -34,6 +35,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnWindowFocus: false });
   const editor = useVisualEditorState();
   const { theme, toggleTheme } = useAqeeqStudioTheme();
+  const { isNationalDay, customBadgeText } = useSiteTheme();
   const { activeItem, isPlaying, playSong, togglePlay } = usePodcastPlayer();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -102,19 +104,28 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       }`}>
         <div className="relative mx-auto h-[66px] sm:h-[80px] max-w-[1380px] px-3.5 sm:px-6 md:px-8">
           {/* Logo with responsive max-width to prevent any collision */}
-          <button
-            onClick={() => go("/")}
-            aria-label={`العودة إلى ${title}`}
-            className="absolute right-3.5 sm:right-6 md:right-8 top-1/2 flex h-[44px] sm:h-[60px] w-auto max-w-[160px] sm:max-w-[220px] -translate-y-1/2 items-center justify-end transition hover:opacity-90"
-          >
-            <img
-              src="/alaqeeq-logo.png"
-              alt="شعار مدارس العقيق الأهلية والدولية"
-              className={`max-h-full max-w-full object-contain transition duration-200 ${
-                dark ? "brightness-0 invert opacity-95" : ""
-              }`}
-            />
-          </button>
+          <div className="absolute right-3.5 sm:right-6 md:right-8 top-1/2 flex -translate-y-1/2 items-center gap-3">
+            <button
+              onClick={() => go("/")}
+              aria-label={`العودة إلى ${title}`}
+              className="flex h-[44px] sm:h-[60px] w-auto max-w-[160px] sm:max-w-[220px] items-center justify-end transition hover:opacity-90"
+            >
+              <img
+                src="/alaqeeq-logo.png"
+                alt="شعار مدارس العقيق الأهلية والدولية"
+                className={`max-h-full max-w-full object-contain transition duration-200 ${
+                  dark ? "brightness-0 invert opacity-95" : ""
+                }`}
+              />
+            </button>
+
+            {isNationalDay && (
+              <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-sm animate-pulse">
+                <span>🇸🇦</span>
+                <span>{customBadgeText}</span>
+              </span>
+            )}
+          </div>
 
           {/* Desktop Nav */}
           <nav dir="rtl" className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 lg:gap-7 whitespace-nowrap text-xs font-black md:flex">

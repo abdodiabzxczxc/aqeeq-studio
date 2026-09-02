@@ -1328,6 +1328,40 @@ export const appRouter = router({
         return updated;
       }),
 
+    setActiveTheme: adminProcedure
+      .input(
+        z.object({
+          activeTheme: z.enum(["default", "saudi-national-day"]),
+          durationHours: z.number().int().min(1).max(8760).nullable().optional(),
+          templateVariant: z.enum(["general", "generosity", "authenticity", "vision", "giving"]).optional(),
+          customBadgeText: z.string().nullable().optional(),
+          showCelebrationRibbon: z.boolean().optional(),
+          backgroundPatternOpacity: z.number().min(0).max(100).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const current = await getSiteOrchestration();
+        const expiresAt = input.durationHours
+          ? Date.now() + input.durationHours * 60 * 60 * 1000
+          : null;
+        const updatedThemeMode = {
+          activeTheme: input.activeTheme,
+          expiresAt: input.activeTheme === "default" ? null : (input.durationHours ? expiresAt : null),
+          templateVariant: input.templateVariant || current.themeMode?.templateVariant || "general",
+          customBadgeText: input.customBadgeText !== undefined ? input.customBadgeText : current.themeMode?.customBadgeText,
+          showCelebrationRibbon: input.showCelebrationRibbon !== undefined ? input.showCelebrationRibbon : current.themeMode?.showCelebrationRibbon,
+          backgroundPatternOpacity: input.backgroundPatternOpacity !== undefined ? input.backgroundPatternOpacity : current.themeMode?.backgroundPatternOpacity,
+        };
+        const res = await setSiteOrchestration({ themeMode: updatedThemeMode });
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: "admin.set_active_theme",
+          details: JSON.stringify(updatedThemeMode),
+        });
+        return { success: true, themeMode: res.themeMode };
+      }),
+
     scanGoogleDriveAudioFolder: adminProcedure
       .input(z.object({ folderUrl: z.string().min(1).max(1024) }))
       .mutation(async ({ input, ctx }) => {

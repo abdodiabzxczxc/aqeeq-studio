@@ -2015,3 +2015,51 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 
 
+
+/* ══════════════════════════════════════════════════════════════
+   🇸🇦 SAUDI NATIONAL DAY THEME (هوية اليوم الوطني السعودي)
+   ══════════════════════════════════════════════════════════════ */
+:root[data-site-theme="saudi-national-day"],
+body.theme-saudi-national-day {
+  --snd-green-royal: #005A36;
+  --snd-green-vibrant: #5aba1c;
+  --snd-gold: #f8ca14;
+  --snd-vision: #6565e0;
+  --snd-generosity: #971a4d;
+  --snd-authenticity: #607c4f;
+  --snd-giving: #7c5d21;
+}
+
+/* Celebration Ribbon */
+.snd-celebration-ribbon {
+  background: linear-gradient(90deg, #005A36 0%, #007A48 30%, #5aba1c 50%, #007A48 70%, #005A36 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 90, 54, 0.4);
+}
+
+/* National Theme Glowing Accents */
+.theme-saudi-national-day .snd-glow-box {
+  border-color: rgba(90, 186, 28, 0.35) !important;
+  box-shadow: 0 0 25px rgba(0, 90, 54, 0.25), inset 0 0 15px rgba(90, 186, 28, 0.1) !important;
+}
+
+.theme-saudi-national-day .snd-btn-primary {
+  background: linear-gradient(135deg, #005A36 0%, #007A48 50%, #5aba1c 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(0, 90, 54, 0.35) !important;
+}
+
+.theme-saudi-national-day .snd-btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 22px rgba(90, 186, 28, 0.45) !important;
+}
+
+/* Pattern Overlay */
+.snd-bg-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: overlay;
+}

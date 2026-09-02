@@ -665,6 +665,14 @@ export type SiteOrchestrationConfig = {
   hiddenStoryIds?: string[];
   customStoryIds?: string[];
   storyExpiryMap?: Record<string, number>; // storyId → expiresAt ms timestamp
+  themeMode?: {
+    activeTheme: "default" | "saudi-national-day";
+    expiresAt?: number | null; // ms timestamp or null
+    templateVariant?: "general" | "generosity" | "authenticity" | "vision" | "giving";
+    customBadgeText?: string | null;
+    showCelebrationRibbon?: boolean;
+    backgroundPatternOpacity?: number; // 0 to 100
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -737,6 +745,14 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
   hiddenStoryIds: [],
   customStoryIds: [],
   storyExpiryMap: {},
+  themeMode: {
+    activeTheme: "default",
+    expiresAt: null,
+    templateVariant: "general",
+    customBadgeText: "نحلم ونحقق 🇸🇦",
+    showCelebrationRibbon: true,
+    backgroundPatternOpacity: 85,
+  },
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -760,6 +776,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
           customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
           storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
+          themeMode: { ...DEFAULT_SITE_ORCHESTRATION.themeMode, ...(parsed.themeMode || {}) },
         };
       }
     } catch (err) {
@@ -786,6 +803,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
         customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
         storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
+        themeMode: { ...DEFAULT_SITE_ORCHESTRATION.themeMode, ...(parsed.themeMode || {}) },
       };
     }
   } catch (err) {
@@ -813,6 +831,14 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     storyExpiryMap: data.storyExpiryMap !== undefined
       ? { ...(current.storyExpiryMap || {}), ...data.storyExpiryMap }
       : current.storyExpiryMap,
+    themeMode: {
+      activeTheme: data.themeMode?.activeTheme ?? current.themeMode?.activeTheme ?? DEFAULT_SITE_ORCHESTRATION.themeMode?.activeTheme ?? "default",
+      expiresAt: data.themeMode?.expiresAt !== undefined ? data.themeMode.expiresAt : current.themeMode?.expiresAt,
+      templateVariant: data.themeMode?.templateVariant ?? current.themeMode?.templateVariant ?? "general",
+      customBadgeText: data.themeMode?.customBadgeText !== undefined ? data.themeMode.customBadgeText : current.themeMode?.customBadgeText,
+      showCelebrationRibbon: data.themeMode?.showCelebrationRibbon !== undefined ? data.themeMode.showCelebrationRibbon : current.themeMode?.showCelebrationRibbon,
+      backgroundPatternOpacity: data.themeMode?.backgroundPatternOpacity !== undefined ? data.themeMode.backgroundPatternOpacity : current.themeMode?.backgroundPatternOpacity,
+    },
   };
   const value = JSON.stringify(merged);
 
