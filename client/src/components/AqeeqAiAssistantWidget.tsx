@@ -227,7 +227,14 @@ export function AqeeqAiAssistantWidget() {
     },
   });
 
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  const synthesizeMutation = trpc.schoolAi.synthesizeSpeech.useMutation();
+
   const stopSpeaking = () => {
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
@@ -235,10 +242,8 @@ export function AqeeqAiAssistantWidget() {
     setSpeakingIndex(null);
   };
 
-  const speakText = (text: string, index?: number) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      return;
-    }
+  const fallbackBrowserSpeak = (text: string, index?: number) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const cleaned = cleanTextForSpeech(text);
     if (!cleaned) return;
@@ -268,6 +273,43 @@ export function AqeeqAiAssistantWidget() {
     };
 
     window.speechSynthesis.speak(utterance);
+  };
+
+  const speakText = async (text: string, index?: number) => {
+    stopSpeaking();
+    const cleaned = cleanTextForSpeech(text);
+    if (!cleaned) return;
+
+    try {
+      pausePodcast();
+    } catch (e) {}
+
+    setIsSpeaking(true);
+    setSpeakingIndex(index ?? null);
+
+    try {
+      const data = await synthesizeMutation.mutateAsync({ text: cleaned });
+      if (data?.audioBase64) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioBase64}`);
+        audioPlayerRef.current = audio;
+
+        audio.onended = () => {
+          setIsSpeaking(false);
+          setSpeakingIndex(null);
+          audioPlayerRef.current = null;
+        };
+
+        audio.onerror = () => {
+          fallbackBrowserSpeak(text, index);
+        };
+
+        await audio.play();
+      } else {
+        fallbackBrowserSpeak(text, index);
+      }
+    } catch (err) {
+      fallbackBrowserSpeak(text, index);
+    }
   };
 
   const stopListening = () => {

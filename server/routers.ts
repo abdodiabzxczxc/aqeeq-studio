@@ -141,6 +141,7 @@ import {
   likePodcast,
 } from "./podcastDb";
 import { askSchoolAiAssistant, getEffectiveGeminiApiKey, transcribeAudioWithGemini } from "./schoolAiAssistant";
+import { synthesizeArabicVoice } from "./aiSpeechService";
 import { generateAiVisualCover, searchRealGlobalPhotos } from "./aiVisualService";
 import {
   getLiveEvent,
@@ -1538,6 +1539,16 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         return transcribeAudioWithGemini(input.audioBase64, input.mimeType);
+      }),
+
+    synthesizeSpeech: publicProcedure
+      .input(
+        z.object({
+          text: z.string().min(1).max(2000),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return synthesizeArabicVoice(input.text);
       }),
 
     getAiStatus: publicProcedure.query(async () => {
