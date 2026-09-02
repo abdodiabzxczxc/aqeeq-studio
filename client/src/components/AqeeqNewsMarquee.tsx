@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { Sparkles, Mic, Newspaper, ImageIcon, BookOpen } from "lucide-react";
+import { Sparkles, Mic, Newspaper, ImageIcon, BookOpen, Video } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useMemo } from "react";
 import { VisualEditable } from "@/components/VisualEditor";
@@ -11,6 +11,7 @@ export function AqeeqNewsMarquee({
   badgeOverride?: string;
 } = {}) {
   const { data: articles } = trpc.articles.listPublished.useQuery({});
+  const { data: showcases } = trpc.aqeeqShowcases.publicList.useQuery(undefined);
   const { data: podcasts } = trpc.podcasts.list.useQuery({});
   const { data: albums } = trpc.aqeeqAlbums.publicList.useQuery(undefined);
   const { data: issues } = trpc.schoolNews.publicList.useQuery(undefined);
@@ -18,46 +19,112 @@ export function AqeeqNewsMarquee({
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
 
+  type MarqueeItem = {
+    id: string;
+    title: string;
+    icon: "article" | "video" | "podcast" | "album" | "journal";
+    label: string;
+    url: string;
+    timestamp: number;
+  };
+
+  // Aggregate all content (excluding songs), sort each newest-first, then interleave round-robin
   const rawItems = useMemo(() => {
-    const list: {
-      id: string;
-      title: string;
-      icon: "article" | "podcast" | "album" | "journal";
-      url: string;
-    }[] = [];
+    // 1. Articles
+    const artList: MarqueeItem[] = (articles || [])
+      .map((a) => ({
+        id: `art-${a.id}`,
+        title: a.title,
+        icon: "article" as const,
+        label: "مقال",
+        url: `/articles/${a.slug}`,
+        timestamp: new Date(a.publishedAt || a.createdAt || 0).getTime(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
 
-    articles?.slice(0, 5).forEach((a) => {
-      list.push({ id: `art-${a.id}`, title: a.title, icon: "article", url: `/articles/${a.slug}` });
-    });
-    podcasts?.slice(0, 4).forEach((p) => {
-      list.push({ id: `pod-${p.id}`, title: p.title, icon: "podcast", url: "/podcast" });
-    });
-    albums?.slice(0, 4).forEach((a) => {
-      list.push({ id: `alb-${a.id}`, title: a.title, icon: "album", url: `/albums/${a.slug}` });
-    });
-    issues?.slice(0, 4).forEach((i) => {
-      list.push({ id: `iss-${i.id}`, title: i.title, icon: "journal", url: `/journal/issue/${i.slug}` });
-    });
+    // 2. Video Showcases
+    const showList: MarqueeItem[] = (showcases || [])
+      .map((s) => ({
+        id: `show-${s.id}`,
+        title: s.title,
+        icon: "video" as const,
+        label: "مرئي",
+        url: `/showcase/${s.slug}`,
+        timestamp: new Date((s as any).publishedAt || s.createdAt || 0).getTime(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
 
-    return list;
-  }, [articles, podcasts, albums, issues]);
+    // 3. Podcasts (Strictly exclude songs / anthems: ميعادا الأغاني)
+    const podList: MarqueeItem[] = (podcasts || [])
+      .filter((p) => {
+        const t = (p.title || "").toLowerCase();
+        const c = (p.category || "").toLowerCase();
+        return !t.includes("نشيد") && !t.includes("أغنية") && !t.includes("أغاني") && !c.includes("نشيد");
+      })
+      .map((p) => ({
+        id: `pod-${p.id}`,
+        title: p.title,
+        icon: "podcast" as const,
+        label: "أثير",
+        url: "/podcast",
+        timestamp: new Date(p.createdAt || 0).getTime(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
 
-  // Ensure a single batch has at least 8 items so there are no empty gaps on wide displays
+    // 4. Photo Albums
+    const albList: MarqueeItem[] = (albums || [])
+      .map((a) => ({
+        id: `alb-${a.id}`,
+        title: a.title,
+        icon: "album" as const,
+        label: "ألبوم",
+        url: `/albums/${a.slug}`,
+        timestamp: new Date((a as any).publishedAt || a.createdAt || 0).getTime(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
+
+    // 5. School News & Magazine Issues
+    const issList: MarqueeItem[] = (issues || [])
+      .map((i) => ({
+        id: `iss-${i.id}`,
+        title: i.title,
+        icon: "journal" as const,
+        label: "مجلة",
+        url: `/journal/issue/${i.slug}`,
+        timestamp: new Date(i.publishedAt || i.createdAt || 0).getTime(),
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp);
+
+    // Interleave round-robin: "مشكل بقى واحد من هنا وواحد من هنا"
+    const buckets: MarqueeItem[][] = [artList, showList, podList, albList, issList].filter((b) => b.length > 0);
+    if (buckets.length === 0) return [];
+
+    const maxLen = Math.max(...buckets.map((b) => b.length));
+    const interleaved: MarqueeItem[] = [];
+
+    for (let i = 0; i < maxLen; i++) {
+      for (const bucket of buckets) {
+        if (i < bucket.length) {
+          interleaved.push(bucket[i]);
+        }
+      }
+    }
+
+    return interleaved;
+  }, [articles, showcases, podcasts, albums, issues]);
+
+  // Ensure a single batch has at least 10 items so there are no empty gaps on wide displays
   const singleBatch = useMemo(() => {
     if (rawItems.length === 0) return [];
     let batch = [...rawItems];
-    while (batch.length < 8) {
+    while (batch.length < 10) {
       batch = [...batch, ...rawItems];
     }
     return batch;
   }, [rawItems]);
 
   // Duplicate the singleBatch once: total track = [batch, batch].
-  // Keyframe: 0% -> -50%.
-  // At 0%: item 0 is placed at the right (at the badge).
-  // As it moves to -50% (leftward): it glides across the screen.
-  // When it hits -50%, batch #2's item 0 is exactly at the right.
-  // When looping back to 0%, batch #1's item 0 replaces batch #2's item 0 seamlessly with zero jump!
+  // Keyframe: -50% -> 0% (moving smoothly from left to right)
   const marqueeTrack = useMemo(() => {
     if (singleBatch.length === 0) return [];
     return [...singleBatch, ...singleBatch];
@@ -67,6 +134,7 @@ export function AqeeqNewsMarquee({
 
   const iconMap = {
     article: <Newspaper size={13} className={dark ? "text-rose-400" : "text-rose-600"} />,
+    video: <Video size={13} className={dark ? "text-sky-400" : "text-sky-600"} />,
     podcast: <Mic size={13} className={dark ? "text-indigo-400" : "text-indigo-600"} />,
     album: <ImageIcon size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />,
     journal: <BookOpen size={13} className={dark ? "text-amber-400" : "text-amber-600"} />,
@@ -128,13 +196,28 @@ export function AqeeqNewsMarquee({
                   <button
                     type="button"
                     onClick={() => navigate(item.url)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
+                    className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap text-xs sm:text-[13.5px] font-bold transition-all ${
                       dark
                         ? "text-slate-200 hover:text-amber-300 hover:bg-white/[0.08]"
                         : "text-slate-800 hover:text-[#08467d] hover:bg-black/[0.05]"
                     }`}
                   >
                     <span className="shrink-0">{iconMap[item.icon]}</span>
+                    <span
+                      className={`text-[9.5px] sm:text-[10.5px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
+                        item.icon === "article"
+                          ? dark ? "bg-rose-500/15 text-rose-300 border-rose-500/30" : "bg-rose-50 text-rose-700 border-rose-200"
+                          : item.icon === "video"
+                          ? dark ? "bg-sky-500/15 text-sky-300 border-sky-500/30" : "bg-sky-50 text-sky-700 border-sky-200"
+                          : item.icon === "podcast"
+                          ? dark ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                          : item.icon === "album"
+                          ? dark ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : dark ? "bg-amber-500/15 text-amber-300 border-amber-500/30" : "bg-amber-50 text-amber-800 border-amber-200"
+                      }`}
+                    >
+                      {item.label}
+                    </span>
                     <span className="shrink-0 leading-none">{item.title}</span>
                   </button>
 
