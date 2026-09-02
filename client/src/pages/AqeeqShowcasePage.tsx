@@ -11,7 +11,7 @@ import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Video } from "lucide-react";
+import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -724,6 +724,22 @@ export default function AqeeqShowcasePage() {
   const [sort, setSort] = useState<AqeeqSortOption>("newest");
   const [contentType, setContentType] = useState<ContentType>("all");
   const audioRef = useRef<HTMLAudioElement>(null);
+  const showcaseModalRef = useRef<HTMLDivElement | null>(null);
+  const [isShowcaseFullscreen, setIsShowcaseFullscreen] = useState(false);
+
+  const toggleShowcaseFullscreen = () => {
+    if (!document.fullscreenElement) {
+      showcaseModalRef.current?.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const onFs = () => setIsShowcaseFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
 
   const { data: showcase, isLoading: showcaseLoading } = trpc.aqeeqShowcases.publicShowcase.useQuery({ slug: "news-offers" }, { refetchOnWindowFocus: false });
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -842,21 +858,34 @@ export default function AqeeqShowcasePage() {
         }`}>
           <DialogTitle className="sr-only">{selected?.title || selected?.fileName || "عرض الوسيط"}</DialogTitle>
           {selected ? (
-            <div dir="rtl">
-              <div className="relative bg-black aspect-video w-full overflow-hidden">
+            <div ref={showcaseModalRef} dir="rtl" className="flex flex-col h-full w-full bg-black">
+              <div className="relative bg-black aspect-video w-full overflow-hidden flex-1 min-h-0">
                 {selected.mediaType === "video" ? (
                   <AqeeqUnifiedVideoFrame sourceUrl={selected.mediaUrl} title={selected.title || selected.fileName} posterUrl={getAqeeqShowcaseDisplaySource(selected)} />
                 ) : (
                   <ShowcaseMedia post={selected} className="max-h-[74svh] object-contain" />
                 )}
               </div>
-              <div className={`p-4 sm:p-6 border-t ${dark ? "bg-[#0c101a] border-white/[.08]" : "bg-slate-50 border-black/[.06]"}`}>
+              <div className={`p-4 sm:p-6 border-t shrink-0 ${dark ? "bg-[#0c101a] border-white/[.08]" : "bg-slate-50 border-black/[.06]"}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <h3 className={`text-base sm:text-xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{selected.title || selected.fileName.replace(/\.[^.]+$/, "")}</h3>
                     {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    {selected.mediaType === "video" && (
+                      <button
+                        type="button"
+                        onClick={toggleShowcaseFullscreen}
+                        className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition active:scale-95 ${
+                          dark ? "border-white/10 text-slate-300 hover:border-amber-300 hover:text-amber-200" : "border-black/10 text-slate-700 hover:border-[#08467d] hover:text-[#08467d]"
+                        }`}
+                        title={isShowcaseFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
+                      >
+                        {isShowcaseFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                        <span className="hidden sm:inline">{isShowcaseFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+                      </button>
+                    )}
                     {selected.mediaType === "video" && isAqeeqDriveVideo(selected.mediaUrl) ? (
                       <a
                         href={getAqeeqDriveFallbackUrl(selected.mediaUrl)}
@@ -870,7 +899,18 @@ export default function AqeeqShowcasePage() {
                         Drive
                       </a>
                     ) : null}
-                    <button onClick={() => setSelected(null)} className={`grid h-9 w-9 place-items-center rounded-xl border transition active:scale-95 ${dark ? "border-white/[0.15] text-slate-300 hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" : "border-black/[0.12] text-slate-700 hover:bg-slate-200"}`} aria-label="إغلاق"><X size={17} /></button>
+                    <button
+                      onClick={() => {
+                        if (document.fullscreenElement) {
+                          document.exitFullscreen?.().catch(() => {});
+                        }
+                        setSelected(null);
+                      }}
+                      className={`grid h-9 w-9 place-items-center rounded-xl border transition active:scale-95 ${dark ? "border-white/[0.15] text-slate-300 hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" : "border-black/[0.12] text-slate-700 hover:bg-slate-200"}`}
+                      aria-label="إغلاق"
+                    >
+                      <X size={17} />
+                    </button>
                   </div>
                 </div>
               </div>

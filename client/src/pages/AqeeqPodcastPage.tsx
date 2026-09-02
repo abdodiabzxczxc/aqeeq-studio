@@ -152,8 +152,24 @@ export default function AqeeqPodcastPage() {
     }
   };
 
+  const watchingVideoModalRef = useRef<HTMLDivElement | null>(null);
+  const [isWatchingModalFullscreen, setIsWatchingModalFullscreen] = useState(false);
+
+  const toggleWatchingModalFullscreen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+      watchingVideoModalRef.current?.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
   useEffect(() => {
-    const onFs = () => setIsPavilionFullscreen(Boolean(document.fullscreenElement));
+    const onFs = () => {
+      setIsPavilionFullscreen(Boolean(document.fullscreenElement));
+      setIsWatchingModalFullscreen(Boolean(document.fullscreenElement));
+    };
     document.addEventListener("fullscreenchange", onFs);
     return () => document.removeEventListener("fullscreenchange", onFs);
   }, []);
@@ -1374,27 +1390,16 @@ export default function AqeeqPodcastPage() {
                   className="group/pavilion relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto"
                 >
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={togglePavilionFullscreen}
-                        className="absolute top-2.5 left-2.5 z-30 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/75 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:border-indigo-400 hover:bg-black/90 hover:text-indigo-300 active:scale-95 touch-manipulation opacity-85 hover:opacity-100"
-                        title={isPavilionFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
-                        aria-label="ملء الشاشة بالكامل"
-                      >
-                        {isPavilionFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-                        <span className="hidden sm:inline">{isPavilionFullscreen ? "تصغير" : "ملء الشاشة"}</span>
-                      </button>
-                      {isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
-                        <iframe
-                          src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
-                          title={currentActiveVideo.title}
-                          className="h-full w-full border-0"
-                          allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        />
-                      ) : (
-                        <video
+                    isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
+                      <iframe
+                        src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
+                        title={currentActiveVideo.title}
+                        className="h-full w-full border-0"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    ) : (
+                      <video
                           src={currentActiveVideo.mediaUrl}
                           controls
                           autoPlay
@@ -1421,8 +1426,7 @@ export default function AqeeqPodcastPage() {
                           onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
                           className="h-full w-full object-contain"
                         />
-                      )}
-                    </>
+                      )
                   ) : (
                     <div
                       onClick={() => {
@@ -1501,11 +1505,12 @@ export default function AqeeqPodcastPage() {
                     {inlinePlayingVideoId === currentActiveVideo?.id && (
                       <button
                         type="button"
-                        onClick={() => handleOpenVideoModal(currentActiveVideo)}
+                        onClick={togglePavilionFullscreen}
                         className="rounded-lg border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-2 py-0.5 text-[10px] font-black transition flex items-center gap-1"
+                        title={isPavilionFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
                       >
-                        <Maximize2 size={10} />
-                        <span>تكبير</span>
+                        {isPavilionFullscreen ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
+                        <span>{isPavilionFullscreen ? "تصغير" : "ملء الشاشة"}</span>
                       </button>
                     )}
                   </div>
@@ -2286,67 +2291,85 @@ export default function AqeeqPodcastPage() {
             className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-indigo-500/40 bg-[#070a14]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(99,102,241,0.15)] backdrop-blur-3xl flex flex-col"
             dir="rtl"
           >
-            <div className="aq-fluid-mesh h-1 w-full shrink-0" />
-            <div className="relative aspect-video w-full overflow-hidden bg-black flex-1 min-h-0 flex items-center justify-center">
-              {isEmbeddableVideo(watchingVideoPodcast.mediaUrl) ? (
-                <iframe
-                  src={getVideoEmbedUrl(watchingVideoPodcast.mediaUrl)}
-                  title={watchingVideoPodcast.title}
-                  className="h-full w-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
-              ) : (
-                <video
-                  src={watchingVideoPodcast.mediaUrl}
-                  controls
-                  autoPlay
-                  onPlay={() => {
-                    window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
-                      detail: {
-                        id: watchingVideoPodcast.id,
-                        title: watchingVideoPodcast.title,
-                        coverUrl: watchingVideoPodcast.coverUrl,
-                        hostName: watchingVideoPodcast.hostName,
-                        mediaUrl: watchingVideoPodcast.mediaUrl,
-                      }
-                    }));
-                  }}
-                  onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
-                  onTimeUpdate={(e) => {
-                    window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
-                      detail: {
-                        currentTime: e.currentTarget.currentTime,
-                        duration: e.currentTarget.duration,
-                      }
-                    }));
-                  }}
-                  onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
-                  className="h-full w-full object-contain"
-                />
-              )}
-            </div>
-            {/* Bottom Bar */}
-            <div className="flex items-center justify-between gap-3 border-t border-white/10 bg-gradient-to-r from-[#090d1c] via-[#0e1428] to-[#090d1c] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-indigo-600 text-white px-2 py-0.5 text-[10px] font-black shrink-0">{watchingVideoPodcast.category}</span>
-                  <h3 className="text-xs sm:text-sm font-black text-white truncate">{watchingVideoPodcast.title}</h3>
-                </div>
-                {watchingVideoPodcast.description && (
-                  <p className="mt-1 text-[10px] sm:text-xs text-slate-400 line-clamp-1">
-                    {watchingVideoPodcast.description}
-                  </p>
+            <div ref={watchingVideoModalRef} className="flex flex-col h-full w-full bg-black">
+              <div className="aq-fluid-mesh h-1 w-full shrink-0" />
+              <div className="relative aspect-video w-full overflow-hidden bg-black flex-1 min-h-0 flex items-center justify-center">
+                {isEmbeddableVideo(watchingVideoPodcast.mediaUrl) ? (
+                  <iframe
+                    src={getVideoEmbedUrl(watchingVideoPodcast.mediaUrl)}
+                    title={watchingVideoPodcast.title}
+                    className="h-full w-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                ) : (
+                  <video
+                    src={watchingVideoPodcast.mediaUrl}
+                    controls
+                    autoPlay
+                    onPlay={() => {
+                      window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                        detail: {
+                          id: watchingVideoPodcast.id,
+                          title: watchingVideoPodcast.title,
+                          coverUrl: watchingVideoPodcast.coverUrl,
+                          hostName: watchingVideoPodcast.hostName,
+                          mediaUrl: watchingVideoPodcast.mediaUrl,
+                        }
+                      }));
+                    }}
+                    onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                    onTimeUpdate={(e) => {
+                      window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                        detail: {
+                          currentTime: e.currentTarget.currentTime,
+                          duration: e.currentTarget.duration,
+                        }
+                      }));
+                    }}
+                    onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                    className="h-full w-full object-contain"
+                  />
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => setWatchingVideoPodcast(null)}
-                className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400 hover:text-white active:scale-95"
-                aria-label="إغلاق"
-              >
-                <X size={16} />
-              </button>
+              {/* Bottom Bar */}
+              <div className="flex items-center justify-between gap-3 border-t border-white/10 bg-gradient-to-r from-[#090d1c] via-[#0e1428] to-[#090d1c] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-indigo-600 text-white px-2 py-0.5 text-[10px] font-black shrink-0">{watchingVideoPodcast.category}</span>
+                    <h3 className="text-xs sm:text-sm font-black text-white truncate">{watchingVideoPodcast.title}</h3>
+                  </div>
+                  {watchingVideoPodcast.description && (
+                    <p className="mt-1 text-[10px] sm:text-xs text-slate-400 line-clamp-1">
+                      {watchingVideoPodcast.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={toggleWatchingModalFullscreen}
+                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400/20 hover:text-indigo-200 active:scale-95"
+                    title={isWatchingModalFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
+                  >
+                    {isWatchingModalFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                    <span className="hidden sm:inline">{isWatchingModalFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (document.fullscreenElement) {
+                        document.exitFullscreen?.().catch(() => {});
+                      }
+                      setWatchingVideoPodcast(null);
+                    }}
+                    className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400 hover:text-white active:scale-95"
+                    aria-label="إغلاق"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
