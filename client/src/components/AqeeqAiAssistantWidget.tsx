@@ -186,9 +186,22 @@ export function AqeeqAiAssistantWidget() {
   const { pausePodcast } = usePodcastPlayer();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [activeUiStyle, setActiveUiStyle] = useState<"siri" | "swiss">(() => {
+    return (localStorage.getItem("aqeeq_ai_ui_style") as "siri" | "swiss") || "siri";
+  });
+  const [isSiriTextOpen, setIsSiriTextOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+
+  const openWithStyle = (style: "siri" | "swiss") => {
+    setActiveUiStyle(style);
+    localStorage.setItem("aqeeq_ai_ui_style", style);
+    setIsOpen(true);
+    if (style === "siri") {
+      enterLiveVoiceMode();
+    }
+  };
   const [geminiApiKeyInput, setGeminiApiKeyInput] = useState("");
   const [inputPrompt, setInputPrompt] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([INITIAL_MESSAGE]);
@@ -820,54 +833,214 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* Dynamic Island Floating Capsule Trigger (Apple Intelligence Style) */}
+      {/* TWO FLOATING ICONS ON THE ACTUAL WEBSITE (Direct choice live on the site) */}
       {!isOpen && (
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className={`group relative flex items-center gap-3 rounded-full border-2 aq-siri-glow p-2 sm:px-4 sm:py-2.5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-            isDark
-              ? "bg-[#070b16]/95 text-white shadow-[0_15px_45px_rgba(0,0,0,0.85)]"
-              : "bg-white/95 text-slate-900 shadow-[0_15px_45px_rgba(248,202,20,0.25)]"
-          }`}
-        >
-          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-lg shrink-0">
-            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span
-              className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
-                isDark ? "border-slate-950" : "border-white"
-              } animate-pulse bg-emerald-400`}
-            />
-          </div>
-
-          <div className="hidden sm:block text-right">
-            <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                مستشار العقيق الذكي
-              </span>
-              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
+        <div className="flex items-center gap-2 sm:gap-2.5 p-1 rounded-full backdrop-blur-xl border border-white/15 bg-black/50 shadow-2xl animate-in fade-in slide-in-from-bottom-3 duration-300">
+          {/* Icon 1: Siri Ambient Ribbon */}
+          <button
+            type="button"
+            onClick={() => openWithStyle("siri")}
+            className={`group relative flex items-center gap-2 rounded-full border-2 aq-siri-glow px-3 py-2 sm:px-3.5 sm:py-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+              isDark
+                ? "bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(6,182,212,0.35)]"
+                : "bg-white/95 text-slate-900 shadow-[0_10px_30px_rgba(6,182,212,0.25)]"
+            }`}
+            title="التصميم 1: شريط سيري المحيطي (لا يغطي الموقع)"
+          >
+            <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow-md shrink-0">
+              <span className="text-sm sm:text-base">🌌</span>
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 border border-slate-900 animate-ping" />
             </div>
-            <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              تحدث بالصوت أو اكتب استفسارك 🎙️
+            <div className="text-right">
+              <span className="text-[11px] sm:text-xs font-black block text-cyan-400 leading-tight">1. شريط سيري</span>
+              <span className="text-[9px] text-slate-400 font-bold hidden sm:block">محيطي • حي</span>
+            </div>
+          </button>
+
+          {/* Icon 2: Swiss Luxury Glass Card */}
+          <button
+            type="button"
+            onClick={() => openWithStyle("swiss")}
+            className={`group relative flex items-center gap-2 rounded-full border-2 px-3 py-2 sm:px-3.5 sm:py-2 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+              isDark
+                ? "border-amber-400/60 bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(248,202,20,0.35)]"
+                : "border-amber-400/70 bg-white/95 text-slate-900 shadow-[0_10px_30px_rgba(248,202,20,0.25)]"
+            }`}
+            title="التصميم 2: الكارت السويسري الفاخر (شات فندقي نقي)"
+          >
+            <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md shrink-0">
+              <Bot size={17} className="group-hover:rotate-12 transition-transform" />
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 border border-slate-900 animate-pulse" />
+            </div>
+            <div className="text-right">
+              <span className="text-[11px] sm:text-xs font-black block text-amber-500 leading-tight">2. كارت سويسري</span>
+              <span className="text-[9px] text-slate-400 font-bold hidden sm:block">منظم • فندقي</span>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 1. SIRI AMBIENT RIBBON VIEW (Option 1)                                    */}
+      {/* ========================================================================= */}
+      {isOpen && activeUiStyle === "siri" && (
+        <div className="fixed bottom-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 w-full sm:max-w-xl animate-in slide-in-from-bottom-5 duration-300 select-none">
+          {/* Floating Subtitle Pill above the ribbon */}
+          <div className={`mb-3 rounded-2xl border backdrop-blur-2xl p-3.5 shadow-2xl transition-all text-right ${
+            isDark
+              ? "border-cyan-500/30 bg-[#080d1a]/90 text-white shadow-[0_10px_40px_rgba(0,0,0,0.85)]"
+              : "border-cyan-500/40 bg-white/95 text-slate-900 shadow-xl"
+          }`}>
+            <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-current/10">
+              <span className="text-[11px] font-black text-cyan-400 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                <span>🌌 شريط سيري المحيطي • مدارس العقيق</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveUiStyle("swiss");
+                  localStorage.setItem("aqeeq_ai_ui_style", "swiss");
+                }}
+                className="text-[10px] font-black px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 hover:bg-yellow-300 transition shadow-sm flex items-center gap-1"
+              >
+                <span>🔁 التبديل للكارت السويسري</span>
+              </button>
+            </div>
+            <p className="text-xs sm:text-sm font-medium leading-relaxed">
+              {interimSpeech
+                ? `🎙️ أنت: "${interimSpeech}"`
+                : lastAssistantVoiceTranscript ||
+                  "أهلاً بك! يمكنك تصفح الموقع بحرية وسأرد عليك صوتياً فوراً دون حجب أي شيء 🎙️✨"}
             </p>
           </div>
 
-          {/* Dynamic Island Mini Equalizer Waveform */}
-          <div className="hidden sm:flex items-center gap-1 h-5 px-1 shrink-0">
-            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
-            <span className="aq-wave-bar w-1 rounded-full bg-emerald-400" style={{ animationDelay: "0.3s" }} />
-            <span className="aq-wave-bar w-1 rounded-full bg-cyan-400" style={{ animationDelay: "0.5s" }} />
-            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.2s" }} />
+          {/* Text Input Drawer for Siri (if user clicks keyboard) */}
+          {isSiriTextOpen && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (inputPrompt.trim()) {
+                  handleSend();
+                  setIsSiriTextOpen(false);
+                }
+              }}
+              className={`mb-2 rounded-2xl border p-1.5 flex items-center gap-2 backdrop-blur-2xl shadow-xl animate-in fade-in slide-in-from-bottom-2 ${
+                isDark ? "border-white/20 bg-black/90 text-white" : "border-slate-300 bg-white/95 text-slate-900"
+              }`}
+            >
+              <input
+                type="text"
+                value={inputPrompt}
+                onChange={(e) => setInputPrompt(e.target.value)}
+                placeholder="اكتب استفسارك هنا..."
+                className="flex-1 bg-transparent px-3 py-1.5 text-xs font-bold outline-none"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="px-4 py-1.5 rounded-xl bg-cyan-400 text-black text-xs font-black shadow hover:bg-cyan-300 transition"
+              >
+                إرسال
+              </button>
+            </form>
+          )}
+
+          {/* The Siri Liquid Wave Ribbon */}
+          <div className={`aq-siri-ribbon rounded-full border-2 p-2 sm:px-4 sm:py-2.5 flex items-center justify-between shadow-2xl backdrop-blur-3xl transition-all ${
+            isDark
+              ? "border-cyan-400/70 bg-gradient-to-r from-[#070b16]/95 via-[#0a1224]/95 to-[#070b16]/95 text-white shadow-[0_0_40px_rgba(6,182,212,0.4)]"
+              : "border-cyan-400/80 bg-gradient-to-r from-white/98 via-cyan-50/90 to-white/98 text-slate-900 shadow-[0_10px_40px_rgba(6,182,212,0.3)]"
+          }`}>
+            {/* Right: Bot Icon & State */}
+            <div className="flex items-center gap-2.5">
+              <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-full bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow shrink-0">
+                <span className="text-sm">🌌</span>
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400 border border-slate-900 animate-pulse" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-black block leading-none">
+                  {liveVoiceState === "speaking" ? "المستشار يتحدث..." : liveVoiceState === "listening" ? "يستمع لصوتك..." : "جاهز للمساعدة"}
+                </span>
+                <span className="text-[10px] text-cyan-500 font-bold">ذكاء محيطي حي</span>
+              </div>
+            </div>
+
+            {/* Center: Glowing Animated Equalizer Waveform */}
+            <div className="flex items-center gap-1 sm:gap-1.5 h-6 sm:h-7 px-2">
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-yellow-400" style={{ animationDelay: "0.3s" }} />
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-emerald-400" style={{ animationDelay: "0.5s" }} />
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-teal-300" style={{ animationDelay: "0.2s" }} />
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-cyan-400" style={{ animationDelay: "0.4s" }} />
+              <span className="aq-wave-bar w-1 sm:w-1.5 rounded-full bg-amber-400" style={{ animationDelay: "0.25s" }} />
+            </div>
+
+            {/* Left: Action Controls */}
+            <div className="flex items-center gap-1.5">
+              {liveVoiceState === "speaking" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopSpeaking();
+                    startLiveVoiceListening();
+                  }}
+                  className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 text-black px-3.5 sm:px-4 py-1.5 text-xs font-black shadow hover:scale-105 transition flex items-center gap-1"
+                >
+                  <Square size={11} className="fill-current" />
+                  <span>مقاطعة</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={startLiveVoiceListening}
+                  className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-black px-3.5 sm:px-4 py-1.5 text-xs font-black shadow hover:scale-105 transition flex items-center gap-1"
+                >
+                  <Mic size={13} />
+                  <span>تحدث</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setIsSiriTextOpen(!isSiriTextOpen)}
+                className={`grid h-8 w-8 place-items-center rounded-full border transition ${
+                  isDark ? "border-white/10 bg-white/5 text-slate-300 hover:text-white" : "border-slate-300 bg-slate-100 text-slate-700 hover:text-black"
+                }`}
+                title="كتابة استفسار"
+              >
+                <Keyboard size={14} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSpeaking) stopSpeaking();
+                  if (isListening) stopListening();
+                  setIsOpen(false);
+                }}
+                className={`grid h-8 w-8 place-items-center rounded-full border transition ${
+                  isDark ? "border-white/10 bg-white/5 text-slate-400 hover:text-white" : "border-slate-300 bg-slate-100 text-slate-500 hover:text-black"
+                }`}
+                title="إغلاق"
+              >
+                <X size={15} />
+              </button>
+            </div>
           </div>
-        </button>
+        </div>
       )}
 
-      {/* Interactive Luxury Spatial Glass Window with Apple Intelligence Glow */}
-      {isOpen && (
+      {/* ========================================================================= */}
+      {/* 2. SWISS LUXURY GLASS CARD VIEW (Option 2)                                 */}
+      {/* ========================================================================= */}
+      {isOpen && activeUiStyle === "swiss" && (
         <div
           className={`flex flex-col transition-all duration-300 border-2 aq-siri-glow shadow-2xl backdrop-blur-3xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2.8rem] w-full sm:w-[470px] h-[100dvh] sm:h-[620px] max-h-none sm:max-h-[88vh] z-50 ${
             isLiveVoiceMode
-              ? "bg-[#060913] text-white shadow-[0_25px_90px_rgba(0,0,0,0.95)]"
+              ? isDark
+                ? "bg-[#060913] text-white shadow-[0_25px_90px_rgba(0,0,0,0.95)]"
+                : "bg-white text-slate-900 shadow-[0_25px_90px_rgba(248,202,20,0.15)]"
               : isDark
               ? "bg-[#070a14]/95 text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
               : "bg-white/98 text-slate-900 shadow-[0_25px_80px_rgba(0,0,0,0.18)]"
@@ -941,8 +1114,26 @@ export function AqeeqAiAssistantWidget() {
               </button>
             </div>
 
-            {/* Left: Sound, More Options Menu, and Minimize */}
-            <div className="flex items-center gap-0.5 sm:gap-1 relative">
+            {/* Left: Sound, Switcher, More Options Menu, and Close */}
+            <div className="flex items-center gap-1 sm:gap-1.5 relative">
+              {/* Quick Switch Button to Siri Ambient Ribbon */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveUiStyle("siri");
+                  localStorage.setItem("aqeeq_ai_ui_style", "siri");
+                  enterLiveVoiceMode();
+                }}
+                className={`hidden sm:inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-[10px] font-black transition border ${
+                  isDark
+                    ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
+                    : "border-cyan-500/40 bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
+                }`}
+                title="التبديل إلى شريط سيري المحيطي"
+              >
+                <span>🌌 شريط سيري</span>
+              </button>
+
               {/* Voice Sound Toggle Button */}
               <button
                 type="button"
@@ -1039,7 +1230,7 @@ export function AqeeqAiAssistantWidget() {
                 </div>
               )}
 
-              {/* Minimize/Close Button */}
+              {/* Close Button */}
               <button
                 type="button"
                 onClick={() => {
@@ -1051,57 +1242,23 @@ export function AqeeqAiAssistantWidget() {
                     ? "text-slate-400 hover:text-white hover:bg-white/10"
                     : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
                 }`}
-                title="تصغير النافذة"
+                title="إغلاق النافذة"
               >
-                <ChevronDown size={20} />
+                <X size={18} />
               </button>
             </div>
           </div>
-
-          {/* Smart Service Bento Chips (Only in Written Chat Mode) */}
-          {!isLiveVoiceMode && (
-            <div
-              className={`flex items-center gap-2 border-b px-3.5 py-2 overflow-x-auto scrollbar-none transition-colors ${
-                isDark ? "border-white/5 bg-[#080d18]" : "border-slate-200/80 bg-slate-50/90"
-              }`}
-            >
-              <span className={`text-[10px] font-black shrink-0 ${isDark ? "text-amber-400" : "text-amber-700"}`}>
-                ⚡ خدمات سريعة:
-              </span>
-              {[
-                { label: "القبول والرسوم", icon: GraduationCap, url: "https://aqeeq.edu.sa", isExternal: true },
-                { label: "ألبومات وصور", icon: Camera, url: "/albums" },
-                { label: "البودكاست", icon: Radio, url: "/podcast" },
-                { label: "مجلة العقيق", icon: BookOpen, url: "/journal" },
-                { label: "المقالات", icon: PenTool, url: "/articles" },
-              ].map((sc, i) => {
-                const IconComponent = sc.icon;
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleShortcutClick(sc.url)}
-                    className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1 text-[11px] font-bold transition-all duration-200 hover:scale-105 ${
-                      isDark
-                        ? "border-white/10 bg-white/5 text-slate-200 hover:border-amber-400/50 hover:bg-amber-400/10 hover:text-amber-300"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-900 shadow-xs"
-                    }`}
-                  >
-                    <IconComponent size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
-                    <span>{sc.label}</span>
-                    {sc.isExternal && <ExternalLink size={10} className="opacity-60" />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* MAIN BODY: Either Gemini Live Aurora Studio OR Written Chat History */}
           {isLiveVoiceMode ? (
             /* ========================================================================= */
             /* GEMINI LIVE AURORA STUDIO (استوديو الفويس الحي الأورورا ثلاثي الأبعاد)    */
             /* ========================================================================= */
-            <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none bg-gradient-to-b from-[#070b16] via-[#091124] to-[#04060e] text-white">
+            <div className={`flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none transition-colors ${
+              isDark
+                ? "bg-gradient-to-b from-[#070b16] via-[#091124] to-[#04060e] text-white"
+                : "bg-gradient-to-b from-white via-amber-50/40 to-slate-100 text-slate-900"
+            }`}>
               {/* Multidimensional Cosmic Aurora Background Blobs */}
               <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl pointer-events-none animate-pulse" />
               <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-teal-500/15 blur-3xl pointer-events-none animate-pulse" />
@@ -1204,37 +1361,41 @@ export function AqeeqAiAssistantWidget() {
                   </div>
                 </div>
 
-                {/* Real-time Subtitles Capsule (100% High-Contrast, Crystal Clear!) */}
-                <div className="mt-6 w-full max-w-sm rounded-2xl border border-white/20 bg-white/[0.08] p-4 text-right backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-all">
+                {/* Real-time Subtitles Capsule (100% High-Contrast, Crystal Clear in both Light and Dark!) */}
+                <div className={`mt-6 w-full max-w-sm rounded-2xl border p-4 text-right backdrop-blur-2xl shadow-lg transition-all ${
+                  isDark
+                    ? "border-white/20 bg-white/[0.08] text-white shadow-[0_15px_35px_rgba(0,0,0,0.5)]"
+                    : "border-amber-300/80 bg-white text-slate-900 shadow-md"
+                }`}>
                   {interimSpeech ? (
                     <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-300 border border-emerald-400/40 text-[11px] font-black">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-500 border border-emerald-400/40 text-[11px] font-black">
                         🎙️ أنت تتحدث الآن:
                       </span>
-                      <p className="mt-2 text-sm text-emerald-100 font-bold leading-relaxed">
+                      <p className={`mt-2 text-sm font-bold leading-relaxed ${isDark ? "text-emerald-100" : "text-emerald-900"}`}>
                         "{interimSpeech}"
                       </p>
                     </div>
                   ) : lastAssistantVoiceTranscript ? (
                     <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/25 text-amber-300 border border-amber-400/40 text-[11px] font-black">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-400/25 text-amber-500 border border-amber-400/40 text-[11px] font-black">
                         💎 المستشار:
                       </span>
-                      <p className="mt-2 text-sm text-white font-medium leading-relaxed line-clamp-4">
+                      <p className={`mt-2 text-sm font-medium leading-relaxed line-clamp-4 ${isDark ? "text-white" : "text-slate-900"}`}>
                         {lastAssistantVoiceTranscript}
                       </p>
                     </div>
                   ) : lastUserVoiceTranscript ? (
                     <div>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-300 border border-emerald-400/40 text-[11px] font-black">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-400/25 text-emerald-500 border border-emerald-400/40 text-[11px] font-black">
                         🎙️ آخر ما قلته:
                       </span>
-                      <p className="mt-2 text-sm text-slate-200 font-medium leading-relaxed line-clamp-3">
+                      <p className={`mt-2 text-sm font-medium leading-relaxed line-clamp-3 ${isDark ? "text-slate-200" : "text-slate-700"}`}>
                         "{lastUserVoiceTranscript}"
                       </p>
                     </div>
                   ) : (
-                    <p className="text-slate-300 text-center text-xs font-medium py-1">
+                    <p className={`text-center text-xs font-medium py-1 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                       تحدث بحرية.. سأسمعك وأرد فوراً بدون لمس أي زر 🎙️✨
                     </p>
                   )}
@@ -1413,8 +1574,8 @@ export function AqeeqAiAssistantWidget() {
                       )}
                     </div>
 
-                    {/* Action Shortcuts */}
-                    {msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
+                    {/* Action Shortcuts (Only on subsequent messages) */}
+                    {i > 0 && msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5 justify-end">
                         {msg.actionShortcuts.map((act, ai) => (
                           <button
@@ -1434,8 +1595,8 @@ export function AqeeqAiAssistantWidget() {
                       </div>
                     )}
 
-                    {/* Suggested Quick Follow-Up Questions */}
-                    {msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
+                    {/* Suggested Quick Follow-Up Questions (Only on subsequent messages) */}
+                    {i > 0 && msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
                       <div className="mt-3 flex flex-wrap gap-1.5 justify-end">
                         {msg.suggestedQuestions.map((q, qi) => (
                           <button
@@ -1469,27 +1630,26 @@ export function AqeeqAiAssistantWidget() {
                   </div>
                 )}
 
-                {/* Starter Suggestions Grid when only initial greeting is present */}
+                {/* 3 Clean Minimalist Swiss Service Pills (Zero Clutter!) */}
                 {messages.length === 1 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-4 pb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {[
-                      { icon: "📸", text: "كيف أبحث عن صوري في حفل التخرج بالوجه؟" },
-                      { icon: "🎓", text: "ما هي شروط ورسوم التسجيل في المدارس؟" },
-                      { icon: "📖", text: "أين أجد أحدث أعداد مجلة العقيق؟" },
-                      { icon: "📍", text: "أين تقع فروع مدارس العقيق وساعات العمل؟" },
+                      { icon: "🎓", text: "شروط ورسوم القبول والتسجيل" },
+                      { icon: "📸", text: "البحث عن صوري بالوجه في الألبومات" },
+                      { icon: "🎙️", text: "مجلة وبودكاست العقيق" },
                     ].map((card, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleSend(card.text)}
-                        className={`p-3 rounded-2xl border text-right transition-all duration-200 hover:scale-[1.02] flex items-start gap-2.5 shadow-xs ${
+                        className={`px-3.5 py-2 rounded-2xl border text-xs font-bold transition-all duration-200 hover:scale-105 flex items-center gap-2 shadow-xs ${
                           isDark
-                            ? "border-white/10 bg-white/5 hover:border-amber-400/40 hover:bg-amber-400/10 text-slate-200"
-                            : "border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-slate-700"
+                            ? "border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200"
+                            : "border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-slate-800 shadow-sm"
                         }`}
                       >
-                        <span className="text-base shrink-0">{card.icon}</span>
-                        <span className="text-xs font-bold leading-snug">{card.text}</span>
+                        <span className="text-sm">{card.icon}</span>
+                        <span>{card.text}</span>
                       </button>
                     ))}
                   </div>
