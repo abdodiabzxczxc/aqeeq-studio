@@ -45,9 +45,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const ATHEER_CATEGORIES = [
   { id: "all", label: "🌟 جميع الأروقة" },
-  { id: "songs", label: "🎵 أناشيد وكورال العقيق" },
-  { id: "videos", label: "🎬 تحت الضوء (مرئي)" },
   { id: "audio", label: "🎙️ خلف المايك (مسموع)" },
+  { id: "videos", label: "🎬 تحت الضوء (مرئي)" },
+  { id: "songs", label: "🎵 أناشيد وكورال العقيق" },
 ] as const;
 
 function formatAudioTime(secs: number) {
@@ -674,7 +674,1006 @@ export default function AqeeqPodcastPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* ================= PAVILION 1: 🎵 ديوان الأناشيد والكورال الملكي ================= */}
+        {/* ================= PAVILION 1: 🎙️ صالون خلف المايك (المسموع) ============== */}
+        {/* ========================================================================= */}
+        {audioPodcasts.length > 0 && (
+          <section
+            id="audio-pavilion"
+            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
+              dark
+                ? "border-emerald-500/40 bg-gradient-to-b from-[#081814] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
+                : "border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 shadow-lg"
+            }`}
+          >
+            {/* Ambient Backlight */}
+            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
+
+            {/* Pavilion Header */}
+            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
+              dark ? "border-emerald-500/20" : "border-emerald-200"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 via-emerald-400 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/30">
+                  <Radio size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
+                      dark
+                        ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
+                        : "bg-emerald-100 border-emerald-300 text-emerald-800"
+                    }`}>
+                      AUDIO LOUNGE · {audioPodcasts.length} حلقات
+                    </span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20" : "bg-emerald-100/60 text-emerald-900 border-emerald-200"
+                    }`}>
+                      فريق الإذاعة المدرسية 🎙️
+                    </span>
+                  </div>
+                  <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
+                    صالون «خلف المايك» والبودكاست المسموع 🎙️
+                  </h2>
+                </div>
+              </div>
+
+              {/* Action Buttons & View Mode Switcher */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className={`flex items-center rounded-xl border p-0.5 ${
+                  dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-100"
+                }`}>
+                  <button
+                    type="button"
+                    onClick={() => setAudioViewMode("carousel")}
+                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                      audioViewMode === "carousel"
+                        ? "bg-emerald-500 text-slate-950 shadow-sm"
+                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    <LayoutGrid size={12} />
+                    <span>سلايدر صفّين 🎴</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAudioViewMode("list")}
+                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                      audioViewMode === "list"
+                        ? "bg-emerald-500 text-slate-950 shadow-sm"
+                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    <List size={12} />
+                    <span>سلايدر قائمة 📜</span>
+                  </button>
+                </div>
+
+                {/* Arrow Nav */}
+                {audioViewMode === "carousel" ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => scrollHorizontal(audioScrollRef, "right")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
+                      }`}
+                      title="السابق"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollHorizontal(audioScrollRef, "left")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
+                      }`}
+                      title="التالي"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => scrollVertical(audioListScrollRef, "up")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
+                      }`}
+                      title="تمرير لأعلى"
+                    >
+                      <ChevronUp size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollVertical(audioListScrollRef, "down")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
+                      }`}
+                      title="تمرير لأسفل"
+                    >
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (audioPodcasts[0]) {
+                      setSelectedAudioId(audioPodcasts[0].id);
+                      playPodcast(audioPodcasts[0]);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-3.5 py-1.5 text-xs font-black shadow-md shadow-emerald-500/20 transition active:scale-95"
+                >
+                  <Disc size={14} className="animate-[spin_3s_linear_infinite]" />
+                  <span>تشغيل الكل</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Split Grid */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+              
+              {/* Master Acoustic Broadcasting Deck Centerpiece */}
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
+                dark ? "border-emerald-500/30 bg-black/60 text-white" : "border-emerald-200 bg-white/95 text-slate-900"
+              }`}>
+                <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
+                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                    <Sparkles size={12} />
+                    <span>كابينة البث الإذاعي الحي</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {currentActiveAudio ? currentActiveAudio.duration || "10:00" : "Studio Audio"}
+                  </span>
+                </div>
+
+                {/* Turntable / Mic Centerpiece */}
+                <div className="relative mx-auto my-auto py-1 grid place-items-center">
+                  <div className="relative h-28 w-28 sm:h-32 sm:w-32 grid place-items-center">
+                    <div className={`absolute inset-0 rounded-full border-4 border-emerald-500/40 bg-[#040d0a] shadow-[0_0_30px_rgba(16,185,129,0.2)] transition ${
+                      isCurrentPlaying(currentActiveAudio?.id) ? "border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]" : ""
+                    }`} />
+                    <div className="absolute inset-2 rounded-full border border-white/10" />
+                    <div className="absolute inset-4 rounded-full border border-emerald-500/10" />
+
+                    <div
+                      onClick={() => {
+                        if (currentActiveAudio) {
+                          if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
+                          else playPodcast(currentActiveAudio);
+                        } else if (audioPodcasts[0]) {
+                          playPodcast(audioPodcasts[0]);
+                        }
+                      }}
+                      className={`relative cursor-pointer h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
+                        isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
+                      }`}
+                    >
+                      {currentActiveAudio?.coverUrl ? (
+                        <img
+                          src={directDriveImage(currentActiveAudio.coverUrl) || currentActiveAudio.coverUrl}
+                          alt=""
+                          className="h-full w-full object-cover opacity-90"
+                        />
+                      ) : (
+                        <Mic size={22} className="text-slate-950" />
+                      )}
+                      <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                        <div className="grid h-6 w-6 place-items-center rounded-full bg-black/60 text-emerald-400 backdrop-blur-sm shadow-md">
+                          {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={12} /> : <Play size={12} className="fill-current mr-0.5" />}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Master Audio Info & Presenter Metadata */}
+                <div className="space-y-0.5 my-1">
+                  <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
+                    {currentActiveAudio ? currentActiveAudio.title : "حلقة بودكاست خلف المايك"}
+                  </h3>
+                  <div className="flex flex-col items-center justify-center">
+                    <span className={`text-[11px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                      تقديم: {currentActiveAudio?.hostName || "فريق الإذاعة المدرسية"}
+                    </span>
+                    <span className="text-[9.5px] text-slate-400 font-bold">إذاعة العقيق الرسمية</span>
+                  </div>
+                </div>
+
+                {/* Master Interactive Podcast Console */}
+                <div className={`rounded-xl border p-2.5 space-y-2 mt-auto ${
+                  dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                }`}>
+                  <div dir="ltr" className="space-y-0.5">
+                    <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
+                      <span>{formatAudioTime(currentTime)}</span>
+                      <span>{formatAudioTime(duration)}</span>
+                    </div>
+                    <div className="relative h-2 flex items-center cursor-pointer group/bar">
+                      <div className={`h-1.5 w-full rounded-full overflow-hidden ${dark ? "bg-white/15" : "bg-slate-200"}`}>
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75"
+                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration || 100}
+                        value={currentTime || 0}
+                        onChange={(e) => seek(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-1.5 pt-0.5">
+                    <div className="flex items-center gap-1">
+                      {currentActiveAudio && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleLikePodcast(currentActiveAudio, e)}
+                          className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
+                            dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                          }`}
+                        >
+                          <Heart size={10} className="fill-rose-500/20" />
+                          <span>{currentActiveAudio.likesCount || 0}</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => handleShare(currentActiveAudio, e)}
+                        className={`rounded-lg border p-1 transition ${
+                          dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-700"
+                        }`}
+                        title="مشاركة البودكاست"
+                      >
+                        <Share2 size={11} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={playNextPodcast}
+                        className={`grid h-7 w-7 place-items-center rounded-full border transition active:scale-95 ${
+                          dark ? "border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300" : "border-slate-200 bg-white hover:bg-emerald-500 hover:text-slate-950 text-slate-700 shadow-sm"
+                        }`}
+                        title="الحلقة التالية"
+                      >
+                        <SkipForward size={12} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (currentActiveAudio) {
+                            if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
+                            else playPodcast(currentActiveAudio);
+                          } else if (audioPodcasts[0]) {
+                            playPodcast(audioPodcasts[0]);
+                          }
+                        }}
+                        className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-md shadow-emerald-500/30 transition active:scale-95"
+                        title={isCurrentPlaying(currentActiveAudio?.id) ? "إيقاف مؤقت" : "استماع"}
+                      >
+                        {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={15} /> : <Play size={15} className="fill-current mr-0.5" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handlePrevOrRestart}
+                        className={`grid h-7 w-7 place-items-center rounded-full border transition active:scale-95 ${
+                          dark ? "border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300" : "border-slate-200 bg-white hover:bg-emerald-500 hover:text-slate-950 text-slate-700 shadow-sm"
+                        }`}
+                        title="الحلقة السابقة"
+                      >
+                        <SkipBack size={12} />
+                      </button>
+                    </div>
+
+                    <div dir="ltr" className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        className="text-slate-400 hover:text-emerald-500 transition p-0.5"
+                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
+                      >
+                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-rose-400" /> : <Volume2 size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />}
+                      </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                        className={`w-10 sm:w-12 h-1 accent-emerald-400 rounded-full cursor-pointer ${dark ? "bg-white/20" : "bg-slate-300"}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
+              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
+                {audioViewMode === "carousel" ? (
+                  /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
+                  <div
+                    ref={audioScrollRef}
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
+                  >
+                    {audioPodcasts.map((podcast: any, idx: number) => {
+                      const isThisPlaying = isCurrentPlaying(podcast.id);
+                      const isThisActive = currentActiveAudio?.id === podcast.id;
+                      return (
+                        <div
+                          key={podcast.id}
+                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
+                            isThisPlaying || isThisActive
+                              ? "border-emerald-400 bg-emerald-500/15 ring-2 ring-emerald-400/40 shadow-[0_8px_20px_rgba(16,185,129,0.18)]"
+                              : dark
+                              ? "border-white/10 bg-black/40 hover:border-emerald-400/50 hover:bg-black/60 shadow-sm"
+                              : "border-slate-200/90 bg-white hover:border-emerald-400 hover:shadow-md shadow-sm"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleAudioToggle(podcast)}
+                              className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
+                                dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
+                              }`}
+                            >
+                              {podcast.coverUrl ? (
+                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <Mic size={20} className="text-emerald-400" />
+                              )}
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                {isThisPlaying ? <Pause size={13} className="text-white" /> : <Play size={13} className="text-white fill-current" />}
+                              </div>
+                            </button>
+
+                            <div className="text-right min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                                  حلقة #{String(idx + 1).padStart(2, "0")}
+                                </span>
+                                <span className="text-[9px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
+                              </div>
+
+                              <h4
+                                onClick={() => handleAudioToggle(podcast)}
+                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer line-clamp-1 transition ${
+                                  dark ? "text-white hover:text-emerald-300" : "text-slate-900 hover:text-emerald-600"
+                                }`}
+                              >
+                                {podcast.title}
+                              </h4>
+
+                              {/* Presenter Name */}
+                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
+                                <User size={10} className={dark ? "text-emerald-400" : "text-emerald-600"} />
+                                <span>تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"}</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
+                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
+                          }`}>
+                            {podcast.description || "حوار إذاعي تربوي ضمن سلسلة حلقات خلف المايك."}
+                          </p>
+
+                          {/* Action Bar */}
+                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
+                            <span className={`text-[9px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
+                              {isThisPlaying ? "🔴 بث مباشر" : "مسموع HD"}
+                            </span>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => handleShare(podcast, e)}
+                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-emerald-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
+                                }`}
+                                title="مشاركة"
+                              >
+                                <Share2 size={10} />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleAudioToggle(podcast)}
+                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
+                                  isThisPlaying
+                                    ? "bg-emerald-500 text-slate-950 font-black shadow-emerald-500/25"
+                                    : dark ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950" : "bg-emerald-100 text-emerald-900 hover:bg-emerald-500 hover:text-slate-950"
+                                }`}
+                              >
+                                {isThisPlaying ? <Pause size={10} /> : <Play size={10} className="mr-0.5 fill-current" />}
+                                <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
+                  <div
+                    ref={audioListScrollRef}
+                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
+                      dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
+                    }`}
+                  >
+                    {audioPodcasts.map((podcast: any, idx: number) => {
+                      const isThisPlaying = isCurrentPlaying(podcast.id);
+                      const isThisActive = currentActiveAudio?.id === podcast.id;
+                      return (
+                        <div
+                          key={podcast.id}
+                          onClick={() => handleAudioToggle(podcast)}
+                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
+                            isThisPlaying || isThisActive
+                              ? "border-emerald-400 bg-emerald-500/15 shadow-sm"
+                              : dark
+                              ? "border-white/5 bg-white/[0.02] hover:border-emerald-400/40 hover:bg-white/[0.06]"
+                              : "border-slate-200/80 bg-white hover:border-emerald-300 hover:bg-emerald-50/50 shadow-sm"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span className="w-6 text-center font-mono text-[11px] font-black text-emerald-400">
+                              #{String(idx + 1).padStart(2, "0")}
+                            </span>
+
+                            <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden bg-emerald-950 grid place-items-center">
+                              {podcast.coverUrl ? (
+                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <Mic size={15} className="text-emerald-400" />
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
+                                isThisPlaying || isThisActive
+                                  ? "text-emerald-400"
+                                  : dark ? "text-white group-hover:text-emerald-300" : "text-slate-900 group-hover:text-emerald-700"
+                              }`}>
+                                {podcast.title}
+                              </h4>
+                              <p className="text-[10px] text-slate-500 font-bold truncate">
+                                تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"} · {podcast.duration || "10:00"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => handleLikePodcast(podcast, e)}
+                              className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
+                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
+                              }`}
+                            >
+                              <Heart size={9} className="fill-current" />
+                              <span>{podcast.likesCount || 0}</span>
+                            </button>
+
+                            <div className={`grid h-7 w-7 place-items-center rounded-lg transition ${
+                              isThisPlaying
+                                ? "bg-emerald-500 text-slate-950 font-black"
+                                : "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-slate-950"
+                            }`}>
+                              <Play size={11} className="fill-current mr-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </section>
+        )}
+        {/* ========================================================================= */}
+        {/* ================= PAVILION 2: 🎬 مسرح تحت الضوء (المرئي) ================== */}
+        {/* ========================================================================= */}
+        {videoPodcasts.length > 0 && (
+          <section
+            id="videos-pavilion"
+            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
+              dark
+                ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(99,102,241,0.1)]"
+                : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 shadow-lg"
+            }`}
+          >
+            {/* Ambient Backlight */}
+            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+
+            {/* Pavilion Header */}
+            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
+              dark ? "border-indigo-500/20" : "border-indigo-200"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-500 text-white shadow-md shadow-indigo-600/30">
+                  <Video size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
+                      dark
+                        ? "bg-indigo-500/20 border-indigo-400/40 text-indigo-300"
+                        : "bg-indigo-100 border-indigo-300 text-indigo-800"
+                    }`}>
+                      CINEMA 4K · {videoPodcasts.length} حلقات
+                    </span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
+                      dark ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20" : "bg-indigo-100/60 text-indigo-900 border-indigo-200"
+                    }`}>
+                      فريق التقديم والإعلام 🎬
+                    </span>
+                  </div>
+                  <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
+                    مسرح «تحت الضوء» وحلقات الفيديو المرئية 🎬
+                  </h2>
+                </div>
+              </div>
+
+              {/* Action Buttons & View Mode Switcher */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className={`flex items-center rounded-xl border p-0.5 ${
+                  dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-100"
+                }`}>
+                  <button
+                    type="button"
+                    onClick={() => setVideosViewMode("carousel")}
+                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                      videosViewMode === "carousel"
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    <LayoutGrid size={12} />
+                    <span>سلايدر صفّين 🎴</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVideosViewMode("list")}
+                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                      videosViewMode === "list"
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    <List size={12} />
+                    <span>سلايدر قائمة 📜</span>
+                  </button>
+                </div>
+
+                {/* Arrow Nav */}
+                {videosViewMode === "carousel" ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => scrollHorizontal(videosScrollRef, "right")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                      }`}
+                      title="السابق"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollHorizontal(videosScrollRef, "left")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                      }`}
+                      title="التالي"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => scrollVertical(videosListScrollRef, "up")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                      }`}
+                      title="تمرير لأعلى"
+                    >
+                      <ChevronUp size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollVertical(videosListScrollRef, "down")}
+                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                      }`}
+                      title="تمرير لأسفل"
+                    >
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (videoPodcasts[0]) {
+                      setSelectedVideoId(videoPodcasts[0].id);
+                      setInlinePlayingVideoId(videoPodcasts[0].id);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-3.5 py-1.5 text-xs font-black shadow-md shadow-indigo-600/20 transition active:scale-95"
+                >
+                  <Play size={14} className="fill-current mr-0.5" />
+                  <span>مشاهدة أحدث حلقة</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Split Grid */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+              
+              {/* Master 4K Video Screen Centerpiece */}
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
+                dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
+              }`}>
+                <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
+                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                    <Sparkles size={12} />
+                    <span>شاشة العرض المركزية 4K</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {currentActiveVideo ? currentActiveVideo.duration || "12:00" : "4K UHD"}
+                  </span>
+                </div>
+
+                {/* 16:9 Cinema Box */}
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto">
+                  {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
+                    isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
+                      <iframe
+                        src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
+                        title={currentActiveVideo.title}
+                        className="h-full w-full border-0"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    ) : (
+                      <video
+                        src={currentActiveVideo.mediaUrl}
+                        controls
+                        autoPlay
+                        onPlay={() => {
+                          window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                            detail: {
+                              id: currentActiveVideo.id,
+                              title: currentActiveVideo.title,
+                              coverUrl: currentActiveVideo.coverUrl,
+                              hostName: currentActiveVideo.hostName,
+                              mediaUrl: currentActiveVideo.mediaUrl,
+                            }
+                          }));
+                        }}
+                        onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                        onTimeUpdate={(e) => {
+                          window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                            detail: {
+                              currentTime: e.currentTarget.currentTime,
+                              duration: e.currentTarget.duration,
+                            }
+                          }));
+                        }}
+                        onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                        className="h-full w-full object-contain"
+                      />
+                    )
+                  ) : (
+                    <div
+                      onClick={() => {
+                        if (currentActiveVideo) {
+                          handlePlayVideoInline(currentActiveVideo.id);
+                        }
+                      }}
+                      className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
+                    >
+                      {currentActiveVideo?.coverUrl ? (
+                        <img
+                          src={directDriveImage(currentActiveVideo.coverUrl) || currentActiveVideo.coverUrl}
+                          alt=""
+                          className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center bg-indigo-950/40">
+                          <Video size={40} className="text-indigo-400" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+                      
+                      <div className="absolute top-2.5 right-2.5 rounded-md bg-indigo-600/90 backdrop-blur-md px-2 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-1">
+                        <Video size={10} /> مرئي 4K
+                      </div>
+
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] group-hover/screen:scale-115 transition duration-300">
+                          <Play size={20} className="fill-current mr-0.5" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Master Video Info & Presenter Metadata */}
+                <div className="space-y-0.5 my-1 text-right">
+                  <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
+                    {currentActiveVideo ? currentActiveVideo.title : "حلقة مميزة تحت الضوء"}
+                  </h3>
+                  <p className={`text-[11px] font-bold ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                    تقديم وإعداد: {currentActiveVideo?.hostName || "فريق التقديم والإعلام المدرسي"}
+                  </p>
+                </div>
+
+                <div className={`rounded-xl border p-2.5 flex items-center justify-between gap-2 mt-auto ${
+                  dark ? "border-white/10 bg-white/5 text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700"
+                }`}>
+                  <span className="text-[9.5px] font-black">
+                    {inlinePlayingVideoId === currentActiveVideo?.id ? "🔴 جاري العرض..." : "جاهز للمشاهدة"}
+                  </span>
+
+                  <div className="flex items-center gap-1.5">
+                    {currentActiveVideo && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleLikePodcast(currentActiveVideo, e)}
+                        className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
+                          dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                        }`}
+                      >
+                        <Heart size={10} className="fill-rose-500/20" />
+                        <span>{currentActiveVideo.likesCount || 0}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleShare(currentActiveVideo, e)}
+                      className={`rounded-lg border p-1 transition ${
+                        dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-700"
+                      }`}
+                      title="مشاركة الفيديو"
+                    >
+                      <Share2 size={11} />
+                    </button>
+                    {inlinePlayingVideoId === currentActiveVideo?.id && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenVideoModal(currentActiveVideo)}
+                        className="rounded-lg border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-2 py-0.5 text-[10px] font-black transition flex items-center gap-1"
+                      >
+                        <Maximize2 size={10} />
+                        <span>تكبير</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
+              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
+                {videosViewMode === "carousel" ? (
+                  /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
+                  <div
+                    ref={videosScrollRef}
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
+                  >
+                    {videoPodcasts.map((video: any, idx: number) => {
+                      const isThisActive = currentActiveVideo?.id === video.id;
+                      const isThisPlaying = inlinePlayingVideoId === video.id;
+                      return (
+                        <div
+                          key={video.id}
+                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
+                            isThisActive
+                              ? "border-indigo-400 bg-indigo-500/15 ring-2 ring-indigo-400/40 shadow-[0_8px_20px_rgba(99,102,241,0.18)]"
+                              : dark
+                              ? "border-white/10 bg-black/40 hover:border-indigo-400/50 hover:bg-black/60 shadow-sm"
+                              : "border-slate-200/90 bg-white hover:border-indigo-400 hover:shadow-md shadow-sm"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3 text-right">
+                            {/* Video Thumbnail */}
+                            <button
+                              type="button"
+                              onClick={() => handlePlayVideoInline(video.id)}
+                              className={`relative h-13 w-20 shrink-0 rounded-xl overflow-hidden border group-hover:scale-105 transition ${
+                                dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
+                              }`}
+                            >
+                              {video.coverUrl ? (
+                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="grid h-full place-items-center bg-indigo-950/40">
+                                  <Video size={16} className="text-indigo-400" />
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <div className="grid h-5 w-5 place-items-center rounded-full bg-indigo-600 text-white shadow-sm">
+                                  <Play size={9} className="fill-current mr-0.5" />
+                                </div>
+                              </div>
+                            </button>
+
+                            <div className="text-right min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                                  حلقة #{String(idx + 1).padStart(2, "0")}
+                                </span>
+                                <span className="text-[9px] font-mono text-slate-400">{video.duration || "12:00"}</span>
+                              </div>
+
+                              <h4
+                                onClick={() => handlePlayVideoInline(video.id)}
+                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
+                                  dark ? "text-white hover:text-indigo-300" : "text-slate-900 hover:text-indigo-600"
+                                }`}
+                              >
+                                {video.title}
+                              </h4>
+
+                              {/* Presenter Name */}
+                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
+                                <User size={10} className={dark ? "text-indigo-400" : "text-indigo-600"} />
+                                <span>تقديم: {video.hostName || "فريق الإعلام والتقديم"}</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
+                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
+                          }`}>
+                            {video.description || "تغطية وحوار خاص ضمن سلسلة برامج تحت الضوء."}
+                          </p>
+
+                          {/* Action Bar */}
+                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
+                            <span className={`text-[9px] font-black ${dark ? "text-indigo-400" : "text-indigo-700"}`}>مرئي 4K</span>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => handleShare(video, e)}
+                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-indigo-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
+                                }`}
+                                title="مشاركة"
+                              >
+                                <Share2 size={10} />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handlePlayVideoInline(video.id)}
+                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
+                                  isThisPlaying
+                                    ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
+                                    : dark ? "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white" : "bg-indigo-100 text-indigo-900 hover:bg-indigo-600 hover:text-white"
+                                }`}
+                              >
+                                <Play size={10} className="mr-0.5 fill-current" />
+                                <span>{isThisPlaying ? "جاري العرض" : "تشغيل"}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
+                  <div
+                    ref={videosListScrollRef}
+                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
+                      dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
+                    }`}
+                  >
+                    {videoPodcasts.map((video: any, idx: number) => {
+                      const isThisActive = currentActiveVideo?.id === video.id;
+                      return (
+                        <div
+                          key={video.id}
+                          onClick={() => handlePlayVideoInline(video.id)}
+                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
+                            isThisActive
+                              ? "border-indigo-400 bg-indigo-500/15 shadow-sm"
+                              : dark
+                              ? "border-white/5 bg-white/[0.02] hover:border-indigo-400/40 hover:bg-white/[0.06]"
+                              : "border-slate-200/80 bg-white hover:border-indigo-300 hover:bg-indigo-50/50 shadow-sm"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span className="w-6 text-center font-mono text-[11px] font-black text-indigo-400">
+                              #{String(idx + 1).padStart(2, "0")}
+                            </span>
+
+                            <div className="relative h-10 w-14 shrink-0 rounded-lg overflow-hidden bg-black">
+                              {video.coverUrl ? (
+                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="grid h-full place-items-center bg-indigo-950">
+                                  <Video size={13} className="text-indigo-400" />
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
+                                isThisActive
+                                  ? "text-indigo-400"
+                                  : dark ? "text-white group-hover:text-indigo-300" : "text-slate-900 group-hover:text-indigo-700"
+                              }`}>
+                                {video.title}
+                              </h4>
+                              <p className="text-[10px] text-slate-500 font-bold truncate">
+                                تقديم: {video.hostName || "فريق الإعلام"} · {video.duration || "12:00"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => handleLikePodcast(video, e)}
+                              className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
+                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
+                              }`}
+                            >
+                              <Heart size={9} className="fill-current" />
+                              <span>{video.likesCount || 0}</span>
+                            </button>
+
+                            <div className={`grid h-7 w-7 place-items-center rounded-lg transition ${
+                              isThisActive
+                                ? "bg-indigo-600 text-white font-black"
+                                : "bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white"
+                            }`}>
+                              <Play size={11} className="fill-current mr-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* ================= PAVILION 3: 🎵 ديوان الأناشيد والكورال الملكي ================= */}
         {/* ========================================================================= */}
         {filteredSongs && filteredSongs.length > 0 && (
           <section
@@ -1242,1005 +2241,6 @@ export default function AqeeqPodcastPage() {
           </section>
         )}
 
-        {/* ========================================================================= */}
-        {/* ================= PAVILION 2: 🎬 مسرح تحت الضوء (المرئي) ================== */}
-        {/* ========================================================================= */}
-        {videoPodcasts.length > 0 && (
-          <section
-            id="videos-pavilion"
-            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
-              dark
-                ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(99,102,241,0.1)]"
-                : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 shadow-lg"
-            }`}
-          >
-            {/* Ambient Backlight */}
-            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
-            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-
-            {/* Pavilion Header */}
-            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
-              dark ? "border-indigo-500/20" : "border-indigo-200"
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-500 text-white shadow-md shadow-indigo-600/30">
-                  <Video size={20} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
-                      dark
-                        ? "bg-indigo-500/20 border-indigo-400/40 text-indigo-300"
-                        : "bg-indigo-100 border-indigo-300 text-indigo-800"
-                    }`}>
-                      CINEMA 4K · {videoPodcasts.length} حلقات
-                    </span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
-                      dark ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20" : "bg-indigo-100/60 text-indigo-900 border-indigo-200"
-                    }`}>
-                      فريق التقديم والإعلام 🎬
-                    </span>
-                  </div>
-                  <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
-                    مسرح «تحت الضوء» وحلقات الفيديو المرئية 🎬
-                  </h2>
-                </div>
-              </div>
-
-              {/* Action Buttons & View Mode Switcher */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className={`flex items-center rounded-xl border p-0.5 ${
-                  dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-100"
-                }`}>
-                  <button
-                    type="button"
-                    onClick={() => setVideosViewMode("carousel")}
-                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
-                      videosViewMode === "carousel"
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
-                    }`}
-                  >
-                    <LayoutGrid size={12} />
-                    <span>سلايدر صفّين 🎴</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setVideosViewMode("list")}
-                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
-                      videosViewMode === "list"
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
-                    }`}
-                  >
-                    <List size={12} />
-                    <span>سلايدر قائمة 📜</span>
-                  </button>
-                </div>
-
-                {/* Arrow Nav */}
-                {videosViewMode === "carousel" ? (
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => scrollHorizontal(videosScrollRef, "right")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
-                      }`}
-                      title="السابق"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollHorizontal(videosScrollRef, "left")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
-                      }`}
-                      title="التالي"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => scrollVertical(videosListScrollRef, "up")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
-                      }`}
-                      title="تمرير لأعلى"
-                    >
-                      <ChevronUp size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollVertical(videosListScrollRef, "down")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
-                      }`}
-                      title="تمرير لأسفل"
-                    >
-                      <ChevronDown size={14} />
-                    </button>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (videoPodcasts[0]) {
-                      setSelectedVideoId(videoPodcasts[0].id);
-                      setInlinePlayingVideoId(videoPodcasts[0].id);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-3.5 py-1.5 text-xs font-black shadow-md shadow-indigo-600/20 transition active:scale-95"
-                >
-                  <Play size={14} className="fill-current mr-0.5" />
-                  <span>مشاهدة أحدث حلقة</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Split Grid */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-              
-              {/* Master 4K Video Screen Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
-                dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
-              }`}>
-                <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
-                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
-                    <Sparkles size={12} />
-                    <span>شاشة العرض المركزية 4K</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">
-                    {currentActiveVideo ? currentActiveVideo.duration || "12:00" : "4K UHD"}
-                  </span>
-                </div>
-
-                {/* 16:9 Cinema Box */}
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto">
-                  {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
-                    isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
-                      <iframe
-                        src={getVideoEmbedUrl(currentActiveVideo.mediaUrl)}
-                        title={currentActiveVideo.title}
-                        className="h-full w-full border-0"
-                        allowFullScreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      />
-                    ) : (
-                      <video
-                        src={currentActiveVideo.mediaUrl}
-                        controls
-                        autoPlay
-                        onPlay={() => {
-                          window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
-                            detail: {
-                              id: currentActiveVideo.id,
-                              title: currentActiveVideo.title,
-                              coverUrl: currentActiveVideo.coverUrl,
-                              hostName: currentActiveVideo.hostName,
-                              mediaUrl: currentActiveVideo.mediaUrl,
-                            }
-                          }));
-                        }}
-                        onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
-                        onTimeUpdate={(e) => {
-                          window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
-                            detail: {
-                              currentTime: e.currentTarget.currentTime,
-                              duration: e.currentTarget.duration,
-                            }
-                          }));
-                        }}
-                        onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
-                        className="h-full w-full object-contain"
-                      />
-                    )
-                  ) : (
-                    <div
-                      onClick={() => {
-                        if (currentActiveVideo) {
-                          handlePlayVideoInline(currentActiveVideo.id);
-                        }
-                      }}
-                      className="group/screen relative h-full w-full cursor-pointer overflow-hidden"
-                    >
-                      {currentActiveVideo?.coverUrl ? (
-                        <img
-                          src={directDriveImage(currentActiveVideo.coverUrl) || currentActiveVideo.coverUrl}
-                          alt=""
-                          className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
-                        />
-                      ) : (
-                        <div className="grid h-full place-items-center bg-indigo-950/40">
-                          <Video size={40} className="text-indigo-400" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
-                      
-                      <div className="absolute top-2.5 right-2.5 rounded-md bg-indigo-600/90 backdrop-blur-md px-2 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-1">
-                        <Video size={10} /> مرئي 4K
-                      </div>
-
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] group-hover/screen:scale-115 transition duration-300">
-                          <Play size={20} className="fill-current mr-0.5" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Master Video Info & Presenter Metadata */}
-                <div className="space-y-0.5 my-1 text-right">
-                  <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
-                    {currentActiveVideo ? currentActiveVideo.title : "حلقة مميزة تحت الضوء"}
-                  </h3>
-                  <p className={`text-[11px] font-bold ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
-                    تقديم وإعداد: {currentActiveVideo?.hostName || "فريق التقديم والإعلام المدرسي"}
-                  </p>
-                </div>
-
-                <div className={`rounded-xl border p-2.5 flex items-center justify-between gap-2 mt-auto ${
-                  dark ? "border-white/10 bg-white/5 text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700"
-                }`}>
-                  <span className="text-[9.5px] font-black">
-                    {inlinePlayingVideoId === currentActiveVideo?.id ? "🔴 جاري العرض..." : "جاهز للمشاهدة"}
-                  </span>
-
-                  <div className="flex items-center gap-1.5">
-                    {currentActiveVideo && (
-                      <button
-                        type="button"
-                        onClick={(e) => handleLikePodcast(currentActiveVideo, e)}
-                        className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
-                          dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
-                        }`}
-                      >
-                        <Heart size={10} className="fill-rose-500/20" />
-                        <span>{currentActiveVideo.likesCount || 0}</span>
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={(e) => handleShare(currentActiveVideo, e)}
-                      className={`rounded-lg border p-1 transition ${
-                        dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-700"
-                      }`}
-                      title="مشاركة الفيديو"
-                    >
-                      <Share2 size={11} />
-                    </button>
-                    {inlinePlayingVideoId === currentActiveVideo?.id && (
-                      <button
-                        type="button"
-                        onClick={() => handleOpenVideoModal(currentActiveVideo)}
-                        className="rounded-lg border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-2 py-0.5 text-[10px] font-black transition flex items-center gap-1"
-                      >
-                        <Maximize2 size={10} />
-                        <span>تكبير</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
-              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
-                {videosViewMode === "carousel" ? (
-                  /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
-                  <div
-                    ref={videosScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
-                  >
-                    {videoPodcasts.map((video: any, idx: number) => {
-                      const isThisActive = currentActiveVideo?.id === video.id;
-                      const isThisPlaying = inlinePlayingVideoId === video.id;
-                      return (
-                        <div
-                          key={video.id}
-                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
-                            isThisActive
-                              ? "border-indigo-400 bg-indigo-500/15 ring-2 ring-indigo-400/40 shadow-[0_8px_20px_rgba(99,102,241,0.18)]"
-                              : dark
-                              ? "border-white/10 bg-black/40 hover:border-indigo-400/50 hover:bg-black/60 shadow-sm"
-                              : "border-slate-200/90 bg-white hover:border-indigo-400 hover:shadow-md shadow-sm"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3 text-right">
-                            {/* Video Thumbnail */}
-                            <button
-                              type="button"
-                              onClick={() => handlePlayVideoInline(video.id)}
-                              className={`relative h-13 w-20 shrink-0 rounded-xl overflow-hidden border group-hover:scale-105 transition ${
-                                dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
-                              }`}
-                            >
-                              {video.coverUrl ? (
-                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="grid h-full place-items-center bg-indigo-950/40">
-                                  <Video size={16} className="text-indigo-400" />
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <div className="grid h-5 w-5 place-items-center rounded-full bg-indigo-600 text-white shadow-sm">
-                                  <Play size={9} className="fill-current mr-0.5" />
-                                </div>
-                              </div>
-                            </button>
-
-                            <div className="text-right min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
-                                  حلقة #{String(idx + 1).padStart(2, "0")}
-                                </span>
-                                <span className="text-[9px] font-mono text-slate-400">{video.duration || "12:00"}</span>
-                              </div>
-
-                              <h4
-                                onClick={() => handlePlayVideoInline(video.id)}
-                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
-                                  dark ? "text-white hover:text-indigo-300" : "text-slate-900 hover:text-indigo-600"
-                                }`}
-                              >
-                                {video.title}
-                              </h4>
-
-                              {/* Presenter Name */}
-                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
-                                <User size={10} className={dark ? "text-indigo-400" : "text-indigo-600"} />
-                                <span>تقديم: {video.hostName || "فريق الإعلام والتقديم"}</span>
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Description */}
-                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
-                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
-                          }`}>
-                            {video.description || "تغطية وحوار خاص ضمن سلسلة برامج تحت الضوء."}
-                          </p>
-
-                          {/* Action Bar */}
-                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
-                            <span className={`text-[9px] font-black ${dark ? "text-indigo-400" : "text-indigo-700"}`}>مرئي 4K</span>
-
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={(e) => handleShare(video, e)}
-                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-indigo-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
-                                }`}
-                                title="مشاركة"
-                              >
-                                <Share2 size={10} />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handlePlayVideoInline(video.id)}
-                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
-                                  isThisPlaying
-                                    ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
-                                    : dark ? "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white" : "bg-indigo-100 text-indigo-900 hover:bg-indigo-600 hover:text-white"
-                                }`}
-                              >
-                                <Play size={10} className="mr-0.5 fill-current" />
-                                <span>{isThisPlaying ? "جاري العرض" : "تشغيل"}</span>
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
-                  <div
-                    ref={videosListScrollRef}
-                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
-                      dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
-                    }`}
-                  >
-                    {videoPodcasts.map((video: any, idx: number) => {
-                      const isThisActive = currentActiveVideo?.id === video.id;
-                      return (
-                        <div
-                          key={video.id}
-                          onClick={() => handlePlayVideoInline(video.id)}
-                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
-                            isThisActive
-                              ? "border-indigo-400 bg-indigo-500/15 shadow-sm"
-                              : dark
-                              ? "border-white/5 bg-white/[0.02] hover:border-indigo-400/40 hover:bg-white/[0.06]"
-                              : "border-slate-200/80 bg-white hover:border-indigo-300 hover:bg-indigo-50/50 shadow-sm"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                            <span className="w-6 text-center font-mono text-[11px] font-black text-indigo-400">
-                              #{String(idx + 1).padStart(2, "0")}
-                            </span>
-
-                            <div className="relative h-10 w-14 shrink-0 rounded-lg overflow-hidden bg-black">
-                              {video.coverUrl ? (
-                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="grid h-full place-items-center bg-indigo-950">
-                                  <Video size={13} className="text-indigo-400" />
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
-                                isThisActive
-                                  ? "text-indigo-400"
-                                  : dark ? "text-white group-hover:text-indigo-300" : "text-slate-900 group-hover:text-indigo-700"
-                              }`}>
-                                {video.title}
-                              </h4>
-                              <p className="text-[10px] text-slate-500 font-bold truncate">
-                                تقديم: {video.hostName || "فريق الإعلام"} · {video.duration || "12:00"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                              type="button"
-                              onClick={(e) => handleLikePodcast(video, e)}
-                              className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
-                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
-                              }`}
-                            >
-                              <Heart size={9} className="fill-current" />
-                              <span>{video.likesCount || 0}</span>
-                            </button>
-
-                            <div className={`grid h-7 w-7 place-items-center rounded-lg transition ${
-                              isThisActive
-                                ? "bg-indigo-600 text-white font-black"
-                                : "bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white"
-                            }`}>
-                              <Play size={11} className="fill-current mr-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* ================= PAVILION 3: 🎙️ صالون خلف المايك (المسموع) ============== */}
-        {/* ========================================================================= */}
-        {audioPodcasts.length > 0 && (
-          <section
-            id="audio-pavilion"
-            className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
-              dark
-                ? "border-emerald-500/40 bg-gradient-to-b from-[#081814] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
-                : "border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 shadow-lg"
-            }`}
-          >
-            {/* Ambient Backlight */}
-            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
-            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
-
-            {/* Pavilion Header */}
-            <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
-              dark ? "border-emerald-500/20" : "border-emerald-200"
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 via-emerald-400 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/30">
-                  <Radio size={20} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
-                      dark
-                        ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
-                        : "bg-emerald-100 border-emerald-300 text-emerald-800"
-                    }`}>
-                      AUDIO LOUNGE · {audioPodcasts.length} حلقات
-                    </span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
-                      dark ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20" : "bg-emerald-100/60 text-emerald-900 border-emerald-200"
-                    }`}>
-                      فريق الإذاعة المدرسية 🎙️
-                    </span>
-                  </div>
-                  <h2 className={`mt-0.5 text-lg sm:text-xl font-black ${dark ? "text-white" : "text-slate-950"}`}>
-                    صالون «خلف المايك» والبودكاست المسموع 🎙️
-                  </h2>
-                </div>
-              </div>
-
-              {/* Action Buttons & View Mode Switcher */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className={`flex items-center rounded-xl border p-0.5 ${
-                  dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-100"
-                }`}>
-                  <button
-                    type="button"
-                    onClick={() => setAudioViewMode("carousel")}
-                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
-                      audioViewMode === "carousel"
-                        ? "bg-emerald-500 text-slate-950 shadow-sm"
-                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
-                    }`}
-                  >
-                    <LayoutGrid size={12} />
-                    <span>سلايدر صفّين 🎴</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAudioViewMode("list")}
-                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
-                      audioViewMode === "list"
-                        ? "bg-emerald-500 text-slate-950 shadow-sm"
-                        : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
-                    }`}
-                  >
-                    <List size={12} />
-                    <span>سلايدر قائمة 📜</span>
-                  </button>
-                </div>
-
-                {/* Arrow Nav */}
-                {audioViewMode === "carousel" ? (
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => scrollHorizontal(audioScrollRef, "right")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
-                      }`}
-                      title="السابق"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollHorizontal(audioScrollRef, "left")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
-                      }`}
-                      title="التالي"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => scrollVertical(audioListScrollRef, "up")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
-                      }`}
-                      title="تمرير لأعلى"
-                    >
-                      <ChevronUp size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollVertical(audioListScrollRef, "down")}
-                      className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-emerald-500 hover:text-slate-950" : "border-slate-200 bg-white text-slate-800 hover:bg-emerald-500 hover:text-slate-950 shadow-sm"
-                      }`}
-                      title="تمرير لأسفل"
-                    >
-                      <ChevronDown size={14} />
-                    </button>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (audioPodcasts[0]) {
-                      setSelectedAudioId(audioPodcasts[0].id);
-                      playPodcast(audioPodcasts[0]);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-3.5 py-1.5 text-xs font-black shadow-md shadow-emerald-500/20 transition active:scale-95"
-                >
-                  <Disc size={14} className="animate-[spin_3s_linear_infinite]" />
-                  <span>تشغيل الكل</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Split Grid */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-              
-              {/* Master Acoustic Broadcasting Deck Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[380px] sm:h-[390px] ${
-                dark ? "border-emerald-500/30 bg-black/60 text-white" : "border-emerald-200 bg-white/95 text-slate-900"
-              }`}>
-                <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
-                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
-                    <Sparkles size={12} />
-                    <span>كابينة البث الإذاعي الحي</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">
-                    {currentActiveAudio ? currentActiveAudio.duration || "10:00" : "Studio Audio"}
-                  </span>
-                </div>
-
-                {/* Turntable / Mic Centerpiece */}
-                <div className="relative mx-auto my-auto py-1 grid place-items-center">
-                  <div className="relative h-28 w-28 sm:h-32 sm:w-32 grid place-items-center">
-                    <div className={`absolute inset-0 rounded-full border-4 border-emerald-500/40 bg-[#040d0a] shadow-[0_0_30px_rgba(16,185,129,0.2)] transition ${
-                      isCurrentPlaying(currentActiveAudio?.id) ? "border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)]" : ""
-                    }`} />
-                    <div className="absolute inset-2 rounded-full border border-white/10" />
-                    <div className="absolute inset-4 rounded-full border border-emerald-500/10" />
-
-                    <div
-                      onClick={() => {
-                        if (currentActiveAudio) {
-                          if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
-                          else playPodcast(currentActiveAudio);
-                        } else if (audioPodcasts[0]) {
-                          playPodcast(audioPodcasts[0]);
-                        }
-                      }}
-                      className={`relative cursor-pointer h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
-                        isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
-                      }`}
-                    >
-                      {currentActiveAudio?.coverUrl ? (
-                        <img
-                          src={directDriveImage(currentActiveAudio.coverUrl) || currentActiveAudio.coverUrl}
-                          alt=""
-                          className="h-full w-full object-cover opacity-90"
-                        />
-                      ) : (
-                        <Mic size={22} className="text-slate-950" />
-                      )}
-                      <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                        <div className="grid h-6 w-6 place-items-center rounded-full bg-black/60 text-emerald-400 backdrop-blur-sm shadow-md">
-                          {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={12} /> : <Play size={12} className="fill-current mr-0.5" />}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Master Audio Info & Presenter Metadata */}
-                <div className="space-y-0.5 my-1">
-                  <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
-                    {currentActiveAudio ? currentActiveAudio.title : "حلقة بودكاست خلف المايك"}
-                  </h3>
-                  <div className="flex flex-col items-center justify-center">
-                    <span className={`text-[11px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
-                      تقديم: {currentActiveAudio?.hostName || "فريق الإذاعة المدرسية"}
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 font-bold">إذاعة العقيق الرسمية</span>
-                  </div>
-                </div>
-
-                {/* Master Interactive Podcast Console */}
-                <div className={`rounded-xl border p-2.5 space-y-2 mt-auto ${
-                  dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
-                }`}>
-                  <div dir="ltr" className="space-y-0.5">
-                    <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
-                      <span>{formatAudioTime(currentTime)}</span>
-                      <span>{formatAudioTime(duration)}</span>
-                    </div>
-                    <div className="relative h-2 flex items-center cursor-pointer group/bar">
-                      <div className={`h-1.5 w-full rounded-full overflow-hidden ${dark ? "bg-white/15" : "bg-slate-200"}`}>
-                        <div
-                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75"
-                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                        />
-                      </div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={duration || 100}
-                        value={currentTime || 0}
-                        onChange={(e) => seek(Number(e.target.value))}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-1.5 pt-0.5">
-                    <div className="flex items-center gap-1">
-                      {currentActiveAudio && (
-                        <button
-                          type="button"
-                          onClick={(e) => handleLikePodcast(currentActiveAudio, e)}
-                          className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
-                            dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
-                          }`}
-                        >
-                          <Heart size={10} className="fill-rose-500/20" />
-                          <span>{currentActiveAudio.likesCount || 0}</span>
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={(e) => handleShare(currentActiveAudio, e)}
-                        className={`rounded-lg border p-1 transition ${
-                          dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-700"
-                        }`}
-                        title="مشاركة البودكاست"
-                      >
-                        <Share2 size={11} />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={playNextPodcast}
-                        className={`grid h-7 w-7 place-items-center rounded-full border transition active:scale-95 ${
-                          dark ? "border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300" : "border-slate-200 bg-white hover:bg-emerald-500 hover:text-slate-950 text-slate-700 shadow-sm"
-                        }`}
-                        title="الحلقة التالية"
-                      >
-                        <SkipForward size={12} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (currentActiveAudio) {
-                            if (isCurrentPlaying(currentActiveAudio.id)) pausePodcast();
-                            else playPodcast(currentActiveAudio);
-                          } else if (audioPodcasts[0]) {
-                            playPodcast(audioPodcasts[0]);
-                          }
-                        }}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-md shadow-emerald-500/30 transition active:scale-95"
-                        title={isCurrentPlaying(currentActiveAudio?.id) ? "إيقاف مؤقت" : "استماع"}
-                      >
-                        {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={15} /> : <Play size={15} className="fill-current mr-0.5" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handlePrevOrRestart}
-                        className={`grid h-7 w-7 place-items-center rounded-full border transition active:scale-95 ${
-                          dark ? "border-white/10 bg-white/5 hover:bg-emerald-500 hover:text-slate-950 text-slate-300" : "border-slate-200 bg-white hover:bg-emerald-500 hover:text-slate-950 text-slate-700 shadow-sm"
-                        }`}
-                        title="الحلقة السابقة"
-                      >
-                        <SkipBack size={12} />
-                      </button>
-                    </div>
-
-                    <div dir="ltr" className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        className="text-slate-400 hover:text-emerald-500 transition p-0.5"
-                        title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
-                      >
-                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-rose-400" /> : <Volume2 size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />}
-                      </button>
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={isMuted ? 0 : volume}
-                        onChange={(e) => setVolume(Number(e.target.value))}
-                        className={`w-10 sm:w-12 h-1 accent-emerald-400 rounded-full cursor-pointer ${dark ? "bg-white/20" : "bg-slate-300"}`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Media Hub: 2-Row Carousel OR Vertical List Slider */}
-              <div className="lg:col-span-7 h-[380px] sm:h-[390px] overflow-hidden">
-                {audioViewMode === "carousel" ? (
-                  /* ==================== 1. 2-ROWS CAROUSEL HORIZONTAL SCROLL ==================== */
-                  <div
-                    ref={audioScrollRef}
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[280px] sm:auto-cols-[330px] gap-3.5 overflow-x-auto pb-1 pt-0.5 scrollbar-hide snap-x snap-mandatory h-full"
-                  >
-                    {audioPodcasts.map((podcast: any, idx: number) => {
-                      const isThisPlaying = isCurrentPlaying(podcast.id);
-                      const isThisActive = currentActiveAudio?.id === podcast.id;
-                      return (
-                        <div
-                          key={podcast.id}
-                          className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
-                            isThisPlaying || isThisActive
-                              ? "border-emerald-400 bg-emerald-500/15 ring-2 ring-emerald-400/40 shadow-[0_8px_20px_rgba(16,185,129,0.18)]"
-                              : dark
-                              ? "border-white/10 bg-black/40 hover:border-emerald-400/50 hover:bg-black/60 shadow-sm"
-                              : "border-slate-200/90 bg-white hover:border-emerald-400 hover:shadow-md shadow-sm"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => handleAudioToggle(podcast)}
-                              className={`relative h-13 w-13 shrink-0 rounded-xl overflow-hidden border grid place-items-center group-hover:scale-105 transition ${
-                                dark ? "border-white/10 bg-black" : "border-slate-200 bg-slate-100"
-                              }`}
-                            >
-                              {podcast.coverUrl ? (
-                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
-                              ) : (
-                                <Mic size={20} className="text-emerald-400" />
-                              )}
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                {isThisPlaying ? <Pause size={13} className="text-white" /> : <Play size={13} className="text-white fill-current" />}
-                              </div>
-                            </button>
-
-                            <div className="text-right min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
-                                  حلقة #{String(idx + 1).padStart(2, "0")}
-                                </span>
-                                <span className="text-[9px] font-mono text-slate-400">{podcast.duration || "10:00"}</span>
-                              </div>
-
-                              <h4
-                                onClick={() => handleAudioToggle(podcast)}
-                                className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer line-clamp-1 transition ${
-                                  dark ? "text-white hover:text-emerald-300" : "text-slate-900 hover:text-emerald-600"
-                                }`}
-                              >
-                                {podcast.title}
-                              </h4>
-
-                              {/* Presenter Name */}
-                              <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
-                                <User size={10} className={dark ? "text-emerald-400" : "text-emerald-600"} />
-                                <span>تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"}</span>
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Description */}
-                          <p className={`mt-2 text-[10.5px] font-bold line-clamp-1 leading-normal rounded-lg p-1.5 text-right border ${
-                            dark ? "bg-white/5 border-white/5 text-slate-300" : "bg-slate-50 border-slate-100 text-slate-600"
-                          }`}>
-                            {podcast.description || "حوار إذاعي تربوي ضمن سلسلة حلقات خلف المايك."}
-                          </p>
-
-                          {/* Action Bar */}
-                          <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
-                            <span className={`text-[9px] font-black ${dark ? "text-emerald-400" : "text-emerald-700"}`}>
-                              {isThisPlaying ? "🔴 بث مباشر" : "مسموع HD"}
-                            </span>
-
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={(e) => handleShare(podcast, e)}
-                                className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-emerald-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
-                                }`}
-                                title="مشاركة"
-                              >
-                                <Share2 size={10} />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleAudioToggle(podcast)}
-                                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
-                                  isThisPlaying
-                                    ? "bg-emerald-500 text-slate-950 font-black shadow-emerald-500/25"
-                                    : dark ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950" : "bg-emerald-100 text-emerald-900 hover:bg-emerald-500 hover:text-slate-950"
-                                }`}
-                              >
-                                {isThisPlaying ? <Pause size={10} /> : <Play size={10} className="mr-0.5 fill-current" />}
-                                <span>{isThisPlaying ? "إيقاف" : "استماع"}</span>
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  /* ==================== 2. VERTICAL PLAYLIST SLIDER (SAME EXACT BOX) ==================== */
-                  <div
-                    ref={audioListScrollRef}
-                    className={`h-full overflow-y-auto space-y-2 rounded-2xl border p-3 scrollbar-hide snap-y snap-mandatory ${
-                      dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-slate-50/80"
-                    }`}
-                  >
-                    {audioPodcasts.map((podcast: any, idx: number) => {
-                      const isThisPlaying = isCurrentPlaying(podcast.id);
-                      const isThisActive = currentActiveAudio?.id === podcast.id;
-                      return (
-                        <div
-                          key={podcast.id}
-                          onClick={() => handleAudioToggle(podcast)}
-                          className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
-                            isThisPlaying || isThisActive
-                              ? "border-emerald-400 bg-emerald-500/15 shadow-sm"
-                              : dark
-                              ? "border-white/5 bg-white/[0.02] hover:border-emerald-400/40 hover:bg-white/[0.06]"
-                              : "border-slate-200/80 bg-white hover:border-emerald-300 hover:bg-emerald-50/50 shadow-sm"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                            <span className="w-6 text-center font-mono text-[11px] font-black text-emerald-400">
-                              #{String(idx + 1).padStart(2, "0")}
-                            </span>
-
-                            <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden bg-emerald-950 grid place-items-center">
-                              {podcast.coverUrl ? (
-                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
-                              ) : (
-                                <Mic size={15} className="text-emerald-400" />
-                              )}
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <h4 className={`text-xs sm:text-sm font-black truncate transition ${
-                                isThisPlaying || isThisActive
-                                  ? "text-emerald-400"
-                                  : dark ? "text-white group-hover:text-emerald-300" : "text-slate-900 group-hover:text-emerald-700"
-                              }`}>
-                                {podcast.title}
-                              </h4>
-                              <p className="text-[10px] text-slate-500 font-bold truncate">
-                                تقديم: {podcast.hostName || "فريق الإذاعة المدرسية"} · {podcast.duration || "10:00"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                              type="button"
-                              onClick={(e) => handleLikePodcast(podcast, e)}
-                              className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
-                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
-                              }`}
-                            >
-                              <Heart size={9} className="fill-current" />
-                              <span>{podcast.likesCount || 0}</span>
-                            </button>
-
-                            <div className={`grid h-7 w-7 place-items-center rounded-lg transition ${
-                              isThisPlaying
-                                ? "bg-emerald-500 text-slate-950 font-black"
-                                : "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-slate-950"
-                            }`}>
-                              <Play size={11} className="fill-current mr-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </section>
-        )}
 
       </div>
 
