@@ -19,7 +19,11 @@ export default function SchoolNewsPager({ title, kicker, pages, onArchive, share
   const [full, setFull] = useState(false);
   const [scrollZoom, setScrollZoom] = useState(1);
   const readerRef = useRef<HTMLDivElement>(null);
+  const dragStartX = useRef<number | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const isDragging = useRef<boolean>(false);
   const page = pages[index];
+
   const step = 1;
 
   useEffect(() => { setView(initialView(initialMode)); }, [initialMode]);
@@ -37,11 +41,8 @@ export default function SchoolNewsPager({ title, kicker, pages, onArchive, share
   const downloadCurrent = async () => { try { toast.message("يتم تجهيز ملف PDF للعدد كاملًا…"); await downloadJournalPdf(title, pages); toast.success("تم تنزيل العدد كاملًا بصيغة PDF"); } catch { toast.error("تعذر إنشاء ملف PDF للعدد"); } };
   const printIssue = async () => { try { toast.message("يتم تجهيز PDF للطباعة…"); await openJournalPdfForPrint(title, pages); } catch { toast.error("تعذر فتح ملف PDF للطباعة"); } };
   // Mouse Drag and Touch Swipe for reader (Mouse drag / Touch swipe left = next page, right = previous page)
-  const dragStartX = useRef<number | null>(null);
-  const dragStartY = useRef<number | null>(null);
-  const isDragging = useRef<boolean>(false);
-
   const handlePointerDown = (e: React.PointerEvent) => {
+
     if (e.pointerType === "mouse" && e.button !== 0) return;
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
