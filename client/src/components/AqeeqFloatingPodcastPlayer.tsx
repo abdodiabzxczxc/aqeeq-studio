@@ -277,6 +277,11 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wasPlayingBeforeVideoRef = useRef(false);
+  const pausedAudioRef = useRef<{
+    item: UniversalAudioItem;
+    time: number;
+  } | null>(null);
+  const pendingResumeTimeRef = useRef<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -634,13 +639,18 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     setIsPlaying(track.autoPlay !== false);
 
     return () => {
-      setActiveItem((current) => {
-        if (current && String(current.id) === `reader-${track.id}`) {
-          setIsPlaying(false);
-          return lastSong || schoolSongs[0] || null;
-        }
-        return current;
-      });
+      // User exited the album or magazine reader: stop audio completely!
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setIsPlaying(false);
+      setActiveItem(null);
+      setIsExpanded(false);
+      setIsHovered(false);
+      wasPlayingBeforeVideoRef.current = false;
+      pausedAudioRef.current = null;
+      pendingResumeTimeRef.current = null;
     };
   };
 
@@ -652,12 +662,18 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  // Video Sync Listeners — Bulletproof Auto-Pause on Any Video & Auto-Resume on Video End/Close
+  // Video Sync Listeners — Bulletproof Auto-Pause on Any Video & Auto-Resume from exact paused timestamp
   useEffect(() => {
     const handleVideoStart = (e: any) => {
       const detail = e.detail || {};
       if (isPlaying || (audioRef.current && !audioRef.current.paused)) {
         wasPlayingBeforeVideoRef.current = true;
+        if (activeItem && activeItem.type !== "video") {
+          pausedAudioRef.current = {
+            item: activeItem,
+            time: audioRef.current ? audioRef.current.currentTime : progress,
+          };
+        }
       }
       if (audioRef.current) {
         audioRef.current.pause();
@@ -687,6 +703,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       if (activeItem?.type === "video") {
         setIsPlaying(false);
       }
+      // If video was paused and we had paused audio, resume audio from exact second!
+      if (wasPlayingBeforeVideoRef.current && pausedAudioRef.current) {
+        const { item, time } = pausedAudioRef.current;
+        wasPlayingBeforeVideoRef.current = false;
+        pausedAudioRef.current = null;
+        pendingResumeTimeRef.current = time;
+        setActiveItem(item);
+        setIsPlaying(true);
+      }
     };
 
     const handleVideoProgress = (e: any) => {
@@ -701,13 +726,13 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       if (activeItem?.type === "video") {
         setIsPlaying(false);
       }
-      if (wasPlayingBeforeVideoRef.current) {
+      if (wasPlayingBeforeVideoRef.current && pausedAudioRef.current) {
+        const { item, time } = pausedAudioRef.current;
         wasPlayingBeforeVideoRef.current = false;
-        if (lastSong) {
-          playSong(lastSong);
-        } else if (schoolSongs.length > 0) {
-          playSong(schoolSongs[0]);
-        }
+        pausedAudioRef.current = null;
+        pendingResumeTimeRef.current = time;
+        setActiveItem(item);
+        setIsPlaying(true);
       }
     };
 
@@ -717,6 +742,12 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       if (target instanceof HTMLVideoElement && target !== audioRef.current) {
         if (isPlaying || (audioRef.current && !audioRef.current.paused)) {
           wasPlayingBeforeVideoRef.current = true;
+          if (activeItem && activeItem.type !== "video") {
+            pausedAudioRef.current = {
+              item: activeItem,
+              time: audioRef.current ? audioRef.current.currentTime : progress,
+            };
+          }
           if (audioRef.current) audioRef.current.pause();
           setIsPlaying(false);
         }
@@ -729,15 +760,22 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         const otherPlaying = Array.from(document.querySelectorAll("video")).some(
           (v) => v !== target && !v.paused && !v.ended && v.currentTime > 0
         );
-        if (!otherPlaying && wasPlayingBeforeVideoRef.current) {
+        if (!otherPlaying && wasPlayingBeforeVideoRef.current && pausedAudioRef.current) {
+          const { item, time } = pausedAudioRef.current;
           wasPlayingBeforeVideoRef.current = false;
-          if (lastSong) {
-            playSong(lastSong);
-          } else if (audioRef.current && activeItem && activeItem.mediaType === "audio") {
-            audioRef.current.play().catch(() => {});
+          pausedAudioRef.current = null;
+          pendingResumeTimeRef.current = time;
+          if (activeItem?.id === item.id) {
+            if (audioRef.current) {
+              try {
+                audioRef.current.currentTime = time;
+              } catch {}
+              audioRef.current.play().catch(() => {});
+            }
             setIsPlaying(true);
-          } else if (schoolSongs.length > 0) {
-            playSong(schoolSongs[0]);
+          } else {
+            setActiveItem(item);
+            setIsPlaying(true);
           }
         }
       }
@@ -788,10 +826,22 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     if (isSameTrack && !audio.ended) {
       // ── Same track: just play or pause based on isPlaying ──
       if (isPlaying && audio.paused) {
+        if (pendingResumeTimeRef.current !== null) {
+          try {
+            audio.currentTime = pendingResumeTimeRef.current;
+          } catch {}
+          pendingResumeTimeRef.current = null;
+        }
         if (audio.readyState >= 2) {
           audio.play().catch(() => setIsPlaying(false));
         } else {
           const onReady = () => {
+            if (pendingResumeTimeRef.current !== null) {
+              try {
+                audio.currentTime = pendingResumeTimeRef.current;
+              } catch {}
+              pendingResumeTimeRef.current = null;
+            }
             audio.play().catch(() => setIsPlaying(false));
             audio.removeEventListener("canplay", onReady);
           };
@@ -806,6 +856,12 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       audio.src = targetUrl;
       audio.load();
       const onReady = () => {
+        if (pendingResumeTimeRef.current !== null) {
+          try {
+            audio.currentTime = pendingResumeTimeRef.current;
+          } catch {}
+          pendingResumeTimeRef.current = null;
+        }
         audio.play().catch(() => setIsPlaying(false));
         audio.removeEventListener("canplay", onReady);
       };

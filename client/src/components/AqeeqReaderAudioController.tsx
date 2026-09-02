@@ -34,6 +34,9 @@ export function AqeeqReaderAudioController({
       if (typeof unregister === "function") {
         unregister();
       }
+      if (typeof player.stopPodcast === "function") {
+        player.stopPodcast();
+      }
     };
   }, [audioUrl, trackTitle]);
 
