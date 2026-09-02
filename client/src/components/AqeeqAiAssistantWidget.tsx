@@ -31,9 +31,8 @@ import {
   VolumeX,
   Square,
   AudioWaveform as WaveformIcon,
-  Phone,
-  PhoneOff,
-  PhoneCall,
+  Keyboard,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -207,6 +206,8 @@ export function AqeeqAiAssistantWidget() {
   const [isLiveVoiceMode, setIsLiveVoiceMode] = useState(false);
   const [liveVoiceState, setLiveVoiceState] = useState<"idle" | "listening" | "thinking" | "speaking">("idle");
   const [interimSpeech, setInterimSpeech] = useState("");
+  const [lastUserVoiceTranscript, setLastUserVoiceTranscript] = useState("");
+  const [lastAssistantVoiceTranscript, setLastAssistantVoiceTranscript] = useState("");
   const isLiveVoiceModeRef = useRef(false);
   const isTurnBusyRef = useRef(false);
 
@@ -541,9 +542,9 @@ export function AqeeqAiAssistantWidget() {
     setIsOpen(true);
     setLiveVoiceState("speaking");
     setInterimSpeech("");
-
     const initialGreeting =
       "أَهْلًا وَسَهْلًا بِكَ فِي مَدَارِسِ العَقِيق! أَنَا مُسْتَشَارُكَ التَّعْلِيمِيُّ الذَّكِيُّ، أَنَا فِي اسْتِمَاعِكَ.. تَفَضَّلْ بِسُؤَالِك!";
+    setLastAssistantVoiceTranscript(initialGreeting);
 
     await playVoiceWithCallback(initialGreeting, () => {
       if (isLiveVoiceModeRef.current) {
@@ -616,6 +617,7 @@ export function AqeeqAiAssistantWidget() {
     stopSpeaking();
     setLiveVoiceState("thinking");
     setInterimSpeech("");
+    setLastUserVoiceTranscript(text);
 
     // 1. Immediately append user's speech bubble to chat
     const userMsg: ChatMsg = { role: "user", content: text };
@@ -645,6 +647,7 @@ export function AqeeqAiAssistantWidget() {
         setSpeakingIndex(next.length - 1);
         return next;
       });
+      setLastAssistantVoiceTranscript(res.reply);
 
       // 4. Play audio in Hamed's voice
       const speechText = res.spokenText || res.reply;
@@ -814,52 +817,38 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* Floating Trigger Buttons */}
+      {/* Floating Trigger Button (Single luxury button - No duplicate icons) */}
       {!isOpen && (
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            className={`group relative flex items-center gap-3 rounded-full border p-2 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
-              isDark
-                ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
-                : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
-            }`}
-          >
-            <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
-              <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
-              <span className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={`group relative flex items-center gap-3 rounded-full border p-2.5 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
+            isDark
+              ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
+              : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
+          }`}
+        >
+          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
+            <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+            <span
+              className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
                 isDark ? "border-slate-950" : "border-white"
-              } animate-pulse ${
-                aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"
-              }`} />
-            </div>
+              } animate-pulse ${aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"}`}
+            />
+          </div>
 
-            <div className="hidden sm:block text-right">
-              <div className="flex items-center gap-1.5">
-                <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>مساعد العقيق الذكي</span>
-                <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
-              </div>
-              <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                {aiStatus?.hasLiveGemini ? "Gemini Live AI متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
-              </p>
+          <div className="hidden sm:block text-right">
+            <div className="flex items-center gap-1.5">
+              <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                مساعد العقيق الذكي
+              </span>
+              <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
             </div>
-          </button>
-
-          {/* Quick Direct Live Voice Button */}
-          <button
-            type="button"
-            onClick={enterLiveVoiceMode}
-            className="group relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full border border-emerald-400/60 bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] ring-4 ring-emerald-500/20 animate-pulse"
-            title="بدء محادثة صوتية حية فورية (Gemini Voice) 🎙️"
-          >
-            <PhoneCall size={22} className="group-hover:rotate-12 transition-transform" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 text-[8px] font-black items-center justify-center text-white">LIVE</span>
-            </span>
-          </button>
-        </div>
+            <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+              {aiStatus?.hasLiveGemini ? "Gemini Voice متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
+            </p>
+          </div>
+        </button>
       )}
 
       {/* Interactive Luxury Chat Window */}
@@ -913,26 +902,28 @@ export function AqeeqAiAssistantWidget() {
             </div>
 
             <div className="flex items-center gap-1">
-              {/* Live Voice Toggle Button (Integrated in Chat) */}
+              {/* Voice Mode Toggle Button (ChatGPT Voice Style) */}
               <button
                 type="button"
                 onClick={isLiveVoiceMode ? exitLiveVoiceMode : enterLiveVoiceMode}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-black shadow-md transition hover:scale-105 mr-1 ${
                   isLiveVoiceMode
-                    ? "bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/30 animate-pulse"
-                    : "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white hover:from-emerald-400 hover:to-teal-400"
+                    ? "bg-amber-400 text-slate-950 hover:bg-yellow-300"
+                    : isDark
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/30"
+                    : "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100"
                 }`}
-                title={isLiveVoiceMode ? "إنهاء المحادثة الصوتية والعودة للكتابة" : "بدء محادثة صوتية حية (Gemini Voice)"}
+                title={isLiveVoiceMode ? "الرجوع للشات المكتوب" : "بدء محادثة صوتية تفاعلية (ChatGPT Voice)"}
               >
                 {isLiveVoiceMode ? (
                   <>
-                    <PhoneOff size={13} />
-                    <span className="hidden sm:inline">إنهاء الفويس</span>
+                    <MessageSquare size={13} />
+                    <span className="hidden sm:inline">الشات المكتوب</span>
                   </>
                 ) : (
                   <>
-                    <PhoneCall size={13} className="animate-bounce" />
-                    <span className="hidden sm:inline">فويس لايف ⚡</span>
+                    <Mic size={13} className="animate-pulse text-emerald-500" />
+                    <span className="hidden sm:inline">محادثة صوتية 🎙️</span>
                   </>
                 )}
               </button>
@@ -967,7 +958,7 @@ export function AqeeqAiAssistantWidget() {
                 className={`grid h-8 w-8 place-items-center rounded-xl transition ${
                   isDark ? "text-slate-400 hover:text-amber-300 hover:bg-white/10" : "text-slate-500 hover:text-amber-700 hover:bg-black/5"
                 }`}
-                title="ربط مفتاح الذكاء الاصطناعي (Gemini Key)"
+                title="ربط مفتاح الذكاء الاصطناعي"
               >
                 <Settings size={15} />
               </button>
@@ -1004,231 +995,83 @@ export function AqeeqAiAssistantWidget() {
             </div>
           </div>
 
-          {/* Quick Shortcuts Bar */}
-          <div className={`flex items-center gap-1.5 border-b px-3 py-2 overflow-x-auto scrollbar-none transition-colors ${
-            isDark ? "border-white/5 bg-black/40" : "border-slate-200/80 bg-slate-100/80"
-          }`}>
-            {[
-              { label: "📖 المجلة", url: "/journal" },
-              { label: "📸 الألبومات والبحث بالوجه", url: "/albums" },
-              { label: "✍️ المقالات", url: "/articles" },
-              { label: "🎙️ البودكاست", url: "/podcast" },
-              { label: "🌐 القبول والتسجيل", url: "https://aqeeq.edu.sa" },
-            ].map((sc, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleShortcutClick(sc.url)}
-                className={`shrink-0 rounded-lg border px-2.5 py-1 text-[10px] font-black transition ${
-                  isDark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-[#f8ca14] hover:text-black hover:border-amber-400 shadow-xs"
-                }`}
-              >
-                {sc.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Chat Messages List */}
-          <div className={`flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm leading-relaxed ${
-            isDark ? "bg-[#070a12]/70" : "bg-slate-50/50"
-          }`}>
-            {/* Live Speaking Indicator Banner */}
-            {isSpeaking && (
-              <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 border border-amber-400/40 p-2.5 backdrop-blur-md shadow-md animate-in fade-in slide-in-from-top-2">
-                <div className="flex items-center gap-2 text-amber-300 text-xs font-black">
-                  <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                  </span>
-                  <WaveformIcon size={16} className="animate-pulse text-amber-400" />
-                  <span>المساعد يتحدث بصوت بشري طبيعي...</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={stopSpeaking}
-                  className="rounded-lg bg-amber-400 px-2.5 py-1 text-[10px] font-black text-black hover:bg-yellow-300 transition shadow-xs flex items-center gap-1"
-                >
-                  <Square size={10} className="fill-current" />
-                  <span>إيقاف الصوت</span>
-                </button>
-              </div>
-            )}
-
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex flex-col ${
-                  msg.role === "user" ? "items-start" : "items-end"
-                } animate-in fade-in duration-200`}
-              >
-                <div
-                  className={`group relative max-w-[88%] rounded-2xl p-3.5 sm:p-4 text-right shadow-sm ${
-                    msg.role === "user"
-                      ? "rounded-br-none bg-gradient-to-tr from-[#f8ca14] to-yellow-400 text-slate-950 font-bold"
-                      : isDark
-                        ? "rounded-bl-none border border-white/10 bg-[#0e1628] text-slate-100 shadow-md"
-                        : "rounded-bl-none border border-slate-200/80 bg-white text-slate-900 shadow-md"
-                  }`}
-                >
-                  {msg.role === "assistant" && (
-                    <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-current/10">
-                      <div className="h-5 w-5 rounded-md bg-[#f8ca14] text-slate-950 grid place-items-center font-black text-[10px]">
-                        💎
-                      </div>
-                      <span className={`text-[11px] font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                        مستشار العقيق الذكي
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="space-y-1 text-right leading-relaxed font-medium">
-                    {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
-                  </div>
-
-                  {/* Speech & Copy Action Buttons for Assistant Replies */}
-                  {msg.role === "assistant" && (
-                    <div className="mt-2.5 pt-2 border-t border-current/10 flex items-center justify-between gap-1">
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isSpeaking && speakingIndex === i) {
-                              stopSpeaking();
-                            } else {
-                              speakText(msg.content, i);
-                            }
-                          }}
-                          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black transition ${
-                            isSpeaking && speakingIndex === i
-                              ? "text-red-400 bg-red-500/20 animate-pulse border border-red-500/40"
-                              : isDark
-                                ? "text-amber-300 hover:text-white bg-white/5 border border-white/10 hover:bg-amber-400/20"
-                                : "text-amber-800 hover:text-black bg-amber-50 border border-amber-200 hover:bg-amber-100"
-                          }`}
-                          title={isSpeaking && speakingIndex === i ? "إيقاف الصوت" : "استمع للرد بالصوت"}
-                        >
-                          {isSpeaking && speakingIndex === i ? (
-                            <>
-                              <Square size={11} className="fill-current" />
-                              <span>إيقاف</span>
-                            </>
-                          ) : (
-                            <>
-                              <Volume2 size={12} />
-                              <span>استمع بالصوت 🔊</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(msg.content, i)}
-                        className={`grid h-6 w-6 place-items-center rounded-lg transition ${
-                          isDark
-                            ? "text-slate-400 hover:text-amber-300 bg-black/40"
-                            : "text-slate-500 hover:text-amber-700 bg-slate-100"
-                        }`}
-                        title="نسخ الرد"
-                      >
-                        {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Dynamic Action Buttons in assistant replies */}
-                {msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1.5 justify-end">
-                    {msg.actionShortcuts.map((act, ai) => (
-                      <button
-                        key={ai}
-                        type="button"
-                        onClick={() => handleShortcutClick(act.url)}
-                        className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-black transition shadow-xs ${
-                          isDark
-                            ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
-                            : "border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
-                        }`}
-                      >
-                        <span>{act.label}</span>
-                        <ArrowUpLeft size={12} />
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Suggested Quick Follow-Up Questions */}
-                {msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5 justify-end">
-                    {msg.suggestedQuestions.map((q, qi) => (
-                      <button
-                        key={qi}
-                        type="button"
-                        onClick={() => handleSend(q)}
-                        className={`rounded-xl border px-3 py-1.5 text-[11px] font-bold transition shadow-xs text-right ${
-                          isDark
-                            ? "border-white/10 bg-black/60 text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950"
-                            : "border-slate-200 bg-white text-amber-800 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 shadow-xs"
-                        }`}
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {askAiMutation.isPending && (
-              <div className={`flex items-center gap-2.5 text-xs font-black p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse ${
-                isDark
-                  ? "bg-[#111728] border border-amber-400/30 text-amber-300"
-                  : "bg-white border border-amber-400/50 text-amber-800 shadow-sm"
-              }`}>
-                <Sparkles size={16} className={`${isDark ? "text-amber-400" : "text-amber-600"} animate-spin`} />
-                <span>المساعد الذكي يفكر ويصيغ الإجابة الحية...</span>
-              </div>
-            )}
-
-            <div ref={chatBottomRef} />
-          </div>
-
-          {/* Input Footer: Switches seamlessly between Normal Input and Gemini / ChatGPT Live Voice Bar */}
-          {isLiveVoiceMode ? (
+          {/* Quick Shortcuts Bar (Only in Text Mode) */}
+          {!isLiveVoiceMode && (
             <div
-              className={`border-t p-3 pb-[max(1rem,env(safe-area-inset-bottom))] transition-all flex flex-col gap-2.5 ${
-                isDark
-                  ? "border-amber-400/30 bg-gradient-to-r from-[#070d1a] via-[#0d172e] to-[#070d1a]"
-                  : "border-amber-300/60 bg-gradient-to-r from-amber-50/90 via-white to-amber-50/90"
+              className={`flex items-center gap-1.5 border-b px-3 py-2 overflow-x-auto scrollbar-none transition-colors ${
+                isDark ? "border-white/5 bg-black/40" : "border-slate-200/80 bg-slate-100/80"
               }`}
             >
-              {/* Header Status & Exit Button */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              {[
+                { label: "📖 المجلة", url: "/journal" },
+                { label: "📸 الألبومات والبحث بالوجه", url: "/albums" },
+                { label: "✍️ المقالات", url: "/articles" },
+                { label: "🎙️ البودكاست", url: "/podcast" },
+                { label: "🌐 القبول والتسجيل", url: "https://aqeeq.edu.sa" },
+              ].map((sc, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handleShortcutClick(sc.url)}
+                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-[10px] font-black transition ${
+                    isDark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black"
+                      : "border-slate-200 bg-white text-slate-700 hover:bg-[#f8ca14] hover:text-black hover:border-amber-400 shadow-xs"
+                  }`}
+                >
+                  {sc.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* MAIN BODY: Either ChatGPT Voice Interface OR Written Chat History */}
+          {isLiveVoiceMode ? (
+            /* ========================================================================= */
+            /* CHATGPT VOICE MODE VIEW (الهالة الصوتية المتفاعلة مع الترجمة اللحظية)     */
+            /* ========================================================================= */
+            <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300 relative overflow-hidden select-none">
+              {/* Radial ambient lighting */}
+              <div
+                className={`absolute inset-0 pointer-events-none transition-all duration-700 ${
+                  liveVoiceState === "speaking"
+                    ? "bg-gradient-to-b from-amber-500/15 via-transparent to-transparent"
+                    : liveVoiceState === "listening"
+                    ? "bg-gradient-to-b from-emerald-500/15 via-transparent to-transparent"
+                    : "bg-transparent"
+                }`}
+              />
+
+              {/* Status Header Badge */}
+              <div className="relative z-10 flex items-center justify-between">
+                <div
+                  className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-black border shadow-xs transition ${
+                    liveVoiceState === "speaking"
+                      ? isDark
+                        ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
+                        : "border-amber-300 bg-amber-50 text-amber-800"
+                      : liveVoiceState === "listening"
+                      ? isDark
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                        : "border-emerald-300 bg-emerald-50 text-emerald-800"
+                      : isDark
+                      ? "border-white/10 bg-white/5 text-slate-300"
+                      : "border-slate-200 bg-slate-100 text-slate-700"
+                  }`}
+                >
                   <span
-                    className={`flex h-2.5 w-2.5 rounded-full ${
-                      liveVoiceState === "listening"
-                        ? "bg-emerald-500 animate-ping"
-                        : liveVoiceState === "speaking"
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      liveVoiceState === "speaking"
                         ? "bg-amber-400 animate-pulse"
+                        : liveVoiceState === "listening"
+                        ? "bg-emerald-400 animate-ping"
                         : "bg-cyan-400 animate-spin"
                     }`}
                   />
-                  <span
-                    className={`text-xs font-black flex items-center gap-1.5 ${
-                      liveVoiceState === "listening"
-                        ? "text-emerald-500"
-                        : liveVoiceState === "speaking"
-                        ? isDark ? "text-amber-300" : "text-amber-800"
-                        : "text-cyan-400"
-                    }`}
-                  >
-                    {liveVoiceState === "listening" && "🎙️ أستمع إليك الآن.. تفضل بالتحدث..."}
-                    {liveVoiceState === "speaking" && "🔊 المستشار يتحدث إليك..."}
-                    {liveVoiceState === "thinking" && "⚡ جاري التفكير وصياغة الرد..."}
+                  <span>
+                    {liveVoiceState === "speaking" && "المستشار يتحدث إليك بصوته 🔊"}
+                    {liveVoiceState === "listening" && "أستمع إليك الآن.. تفضل بالتحدث 🎙️"}
+                    {liveVoiceState === "thinking" && "المستشار يفكر ويجهز الإجابة... ⚡"}
                     {liveVoiceState === "idle" && "جاهز للمحادثة الصوتية"}
                   </span>
                 </div>
@@ -1241,65 +1084,97 @@ export function AqeeqAiAssistantWidget() {
                       ? "bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-black"
                   }`}
-                  title="الرجوع للكتابة النصية"
+                  title="الرجوع للشات المكتوب"
                 >
-                  <X size={13} />
-                  <span>إنهاء الفويس</span>
+                  <MessageSquare size={13} />
+                  <span>الشات المكتوب</span>
                 </button>
               </div>
 
-              {/* Soundwave Equalizer Capsule */}
-              <div
-                className={`flex items-center justify-between rounded-2xl border p-2.5 px-4 shadow-inner transition ${
-                  liveVoiceState === "listening"
-                    ? isDark
-                      ? "border-emerald-500/40 bg-emerald-950/20"
-                      : "border-emerald-400/60 bg-emerald-50/50"
-                    : liveVoiceState === "speaking"
-                    ? isDark
-                      ? "border-amber-400/40 bg-amber-950/20"
-                      : "border-amber-400/60 bg-amber-50/50"
-                    : isDark
-                      ? "border-white/10 bg-black/40"
-                      : "border-slate-200 bg-slate-50"
-                }`}
-              >
-                {/* Equalizer Bars */}
-                <div className="flex items-center gap-1 h-7 shrink-0">
-                  {[35, 75, 50, 95, 60, 100, 45, 85, 55, 70, 30].map((h, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        height:
-                          liveVoiceState === "speaking" || liveVoiceState === "listening"
-                            ? `${Math.max(20, h * (i % 2 === 0 ? 1 : 0.75))}%`
-                            : "25%",
-                      }}
-                      className={`w-1 rounded-full transition-all duration-200 ${
-                        liveVoiceState === "listening"
-                          ? "bg-emerald-400 animate-pulse"
-                          : liveVoiceState === "speaking"
-                          ? "bg-amber-400 animate-pulse"
-                          : "bg-slate-500"
+              {/* Center: The Futuristic Glowing ChatGPT Orb */}
+              <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-4">
+                <div className="relative flex items-center justify-center">
+                  {/* Outer Ambient Bloom */}
+                  <div
+                    className={`absolute h-44 w-44 sm:h-56 sm:w-56 rounded-full blur-3xl transition-all duration-700 ${
+                      liveVoiceState === "speaking"
+                        ? "bg-gradient-to-tr from-amber-500/50 via-yellow-400/40 to-amber-600/50 scale-125 animate-pulse"
+                        : liveVoiceState === "listening"
+                        ? "bg-gradient-to-tr from-emerald-500/50 via-teal-400/40 to-cyan-500/50 scale-115 animate-pulse"
+                        : liveVoiceState === "thinking"
+                        ? "bg-gradient-to-tr from-cyan-500/40 via-blue-500/30 to-indigo-500/40 scale-100 animate-spin"
+                        : "bg-slate-500/15 scale-90"
+                    }`}
+                  />
+
+                  {/* Glass Ring with Sonic Glow */}
+                  <div
+                    className={`relative grid h-32 w-32 sm:h-44 sm:w-44 place-items-center rounded-full border-2 transition-all duration-500 shadow-2xl backdrop-blur-md ${
+                      liveVoiceState === "speaking"
+                        ? "border-amber-400 bg-gradient-to-tr from-amber-500/25 via-yellow-500/15 to-transparent shadow-[0_0_50px_rgba(248,202,20,0.6)] scale-105"
+                        : liveVoiceState === "listening"
+                        ? "border-emerald-400 bg-gradient-to-tr from-emerald-500/25 via-teal-500/15 to-transparent shadow-[0_0_50px_rgba(16,185,129,0.6)] scale-105"
+                        : liveVoiceState === "thinking"
+                        ? "border-cyan-400 bg-gradient-to-tr from-cyan-500/20 via-blue-500/10 to-transparent shadow-[0_0_40px_rgba(6,182,212,0.4)] animate-pulse"
+                        : "border-white/15 bg-white/5"
+                    }`}
+                  >
+                    {/* Core Fluid Sphere */}
+                    <div
+                      className={`grid h-24 w-24 sm:h-32 sm:w-32 place-items-center rounded-full transition-all duration-300 shadow-inner ${
+                        liveVoiceState === "speaking"
+                          ? "bg-gradient-to-tr from-amber-400 via-[#f8ca14] to-yellow-200 text-slate-950 scale-105 shadow-[inset_0_0_20px_rgba(255,255,255,0.6)]"
+                          : liveVoiceState === "listening"
+                          ? "bg-gradient-to-tr from-emerald-400 via-teal-400 to-emerald-200 text-slate-950 animate-pulse shadow-[inset_0_0_20px_rgba(255,255,255,0.6)]"
+                          : liveVoiceState === "thinking"
+                          ? "bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.4)]"
+                          : "bg-slate-800 text-slate-300"
                       }`}
-                    />
-                  ))}
+                    >
+                      {liveVoiceState === "speaking" ? (
+                        <WaveformIcon size={40} className="animate-pulse" />
+                      ) : liveVoiceState === "listening" ? (
+                        <Mic size={40} className="animate-bounce" />
+                      ) : liveVoiceState === "thinking" ? (
+                        <Sparkles size={40} className="animate-spin" />
+                      ) : (
+                        <Mic size={36} />
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Real-time Spoken Text Preview */}
-                <div className="flex-1 mx-3 text-right truncate">
-                  <span className={`text-xs font-bold ${isDark ? "text-slate-200" : "text-slate-800"}`}>
-                    {interimSpeech || (
-                      liveVoiceState === "listening"
-                        ? "تحدث بحرية.. سأسمعك وأرد فوراً 🎙️"
-                        : liveVoiceState === "speaking"
-                        ? "استمع لرد المستشار الفصيح 🔊"
-                        : "جاري المعالجة الذكية... ⚡"
-                    )}
-                  </span>
+                {/* Subtitles Capsule (Dynamic Captions) */}
+                <div
+                  className={`mt-6 w-full max-w-sm rounded-2xl border p-3.5 text-right text-xs leading-relaxed transition shadow-inner backdrop-blur-md ${
+                    isDark ? "border-white/10 bg-black/50 text-slate-200" : "border-slate-200 bg-white/90 text-slate-800"
+                  }`}
+                >
+                  {interimSpeech ? (
+                    <div className="text-emerald-400 font-bold flex items-start gap-1.5">
+                      <span className="shrink-0 text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30">أنت:</span>
+                      <span>"{interimSpeech}"</span>
+                    </div>
+                  ) : lastAssistantVoiceTranscript ? (
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 font-bold">المستشار:</span>
+                      <span className="line-clamp-3 font-medium text-slate-100">{lastAssistantVoiceTranscript}</span>
+                    </div>
+                  ) : lastUserVoiceTranscript ? (
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30 font-bold">أنت:</span>
+                      <span className="line-clamp-2 font-medium">"{lastUserVoiceTranscript}"</span>
+                    </div>
+                  ) : (
+                    <p className="text-slate-400 text-center text-[11px] font-medium py-1">
+                      تحدث بحرية وبدون لمس أي زر.. سأسمعك وأرد فوراً بصوت بشري 🎙️
+                    </p>
+                  )}
                 </div>
+              </div>
 
-                {/* Control Action Button */}
+              {/* Bottom Quick Voice Controls */}
+              <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-white/5">
                 {liveVoiceState === "speaking" ? (
                   <button
                     type="button"
@@ -1307,11 +1182,10 @@ export function AqeeqAiAssistantWidget() {
                       stopSpeaking();
                       startLiveVoiceListening();
                     }}
-                    className="shrink-0 rounded-xl bg-amber-500 text-black px-3 py-1.5 text-xs font-black flex items-center gap-1 hover:bg-amber-400 transition shadow"
-                    title="مقاطعة الرد والبدء في التحدث فوراً"
+                    className="rounded-full bg-amber-400 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-yellow-300 transition hover:scale-105"
                   >
-                    <Square size={13} className="fill-current" />
-                    <span>مقاطعة 🎙️</span>
+                    <Square size={14} className="fill-current" />
+                    <span>مقاطعة والتحدث 🎙️</span>
                   </button>
                 ) : liveVoiceState === "listening" ? (
                   <button
@@ -1319,101 +1193,262 @@ export function AqeeqAiAssistantWidget() {
                     onClick={() => {
                       if (interimSpeech) {
                         sendLiveVoiceTurn(interimSpeech);
+                      } else {
+                        stopListening();
                       }
                     }}
-                    disabled={!interimSpeech}
-                    className="shrink-0 rounded-xl bg-emerald-500 disabled:opacity-40 text-black px-3 py-1.5 text-xs font-black flex items-center gap-1 hover:bg-emerald-400 transition shadow"
-                    title="إرسال الكلام الآن"
+                    className="rounded-full bg-emerald-500 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-emerald-400 transition hover:scale-105"
                   >
-                    <Check size={13} />
-                    <span>إرسال</span>
+                    <Square size={14} className="fill-current" />
+                    <span>إنهاء الحديث وإرسال</span>
                   </button>
                 ) : (
-                  <div className="shrink-0 flex items-center gap-1 text-[11px] text-slate-400 font-bold">
-                    <Loader2 size={13} className="animate-spin text-cyan-400" />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={startLiveVoiceListening}
+                    className="rounded-full bg-emerald-500 text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-xl hover:bg-emerald-400 transition hover:scale-105"
+                  >
+                    <Mic size={16} />
+                    <span>تحدث الآن 🎙️</span>
+                  </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={exitLiveVoiceMode}
+                  className={`rounded-full p-2.5 border transition ${
+                    isDark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-black"
+                  }`}
+                  title="العودة للشات المكتوب"
+                >
+                  <Keyboard size={16} />
+                </button>
               </div>
             </div>
           ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className={`border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center gap-2 transition-colors ${
-                isDark ? "border-white/10 bg-[#0a0e1a]" : "border-slate-200 bg-white"
-              }`}
-            >
-              {/* Quick Voice Mode Button */}
-              <Button
-                type="button"
-                onClick={enterLiveVoiceMode}
-                className={`grid h-10 w-10 place-items-center rounded-2xl transition shadow-md shrink-0 p-0 ${
-                  isDark
-                    ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black"
-                    : "border border-emerald-400/60 bg-emerald-50 text-emerald-800 hover:bg-emerald-500 hover:text-white"
+            /* ========================================================================= */
+            /* WRITTEN CHAT VIEW (رسائل الشات المكتوبة + شريط الإدخال)                 */
+            /* ========================================================================= */
+            <>
+              {/* Chat Messages List */}
+              <div
+                className={`flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm leading-relaxed ${
+                  isDark ? "bg-[#070a12]/70" : "bg-slate-50/50"
                 }`}
-                title="بدء محادثة صوتية مستمرة (Gemini Voice) 🎙️"
               >
-                <PhoneCall size={18} />
-              </Button>
-
-              {/* Single Mic Button */}
-              <Button
-                type="button"
-                onClick={toggleListening}
-                disabled={isTranscribing}
-                className={`grid h-10 w-10 place-items-center rounded-2xl transition shadow-md shrink-0 p-0 ${
-                  isListening
-                    ? "bg-red-500 text-white animate-bounce ring-4 ring-red-500/40"
-                    : isTranscribing
-                      ? "bg-amber-500 text-black animate-pulse"
-                      : isDark
-                        ? "border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
-                        : "border border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-[#f8ca14] hover:text-black"
-                }`}
-                title={
-                  isListening
-                    ? "جاري الاستماع.. اضغط للإرسال"
-                    : isTranscribing
-                      ? "جاري تفريغ الصوت..."
-                      : "تحدث بالصوت 🎙️"
-                }
-              >
-                {isListening ? (
-                  <Square size={16} className="fill-current text-white animate-pulse" />
-                ) : isTranscribing ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <Mic size={18} />
+                {/* Live Speaking Indicator Banner */}
+                {isSpeaking && (
+                  <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 border border-amber-400/40 p-2.5 backdrop-blur-md shadow-md animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-2 text-amber-300 text-xs font-black">
+                      <span className="flex h-2.5 w-2.5 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                      </span>
+                      <WaveformIcon size={16} className="animate-pulse text-amber-400" />
+                      <span>المساعد يتحدث بصوت بشري طبيعي...</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={stopSpeaking}
+                      className="rounded-lg bg-amber-400 px-2.5 py-1 text-[10px] font-black text-black hover:bg-yellow-300 transition shadow-xs flex items-center gap-1"
+                    >
+                      <Square size={10} className="fill-current" />
+                      <span>إيقاف الصوت</span>
+                    </button>
+                  </div>
                 )}
-              </Button>
 
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputPrompt}
-                onChange={(e) => setInputPrompt(e.target.value)}
-                placeholder={
-                  isListening
-                    ? "🎙️ استمع إليك الآن.. تفضل بالتحدث..."
-                    : "اكتب سؤالك أو اضغط على الفويس للتحدث..."
-                }
-                className={`flex-1 rounded-2xl border px-4 py-2.5 text-xs sm:text-sm font-bold outline-none transition ${
-                  isDark
-                    ? "border-white/15 bg-black/70 text-white placeholder-slate-500 focus:border-amber-400"
-                    : "border-slate-300 bg-slate-50 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:bg-white"
+                {messages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`flex flex-col ${
+                      msg.role === "user" ? "items-start" : "items-end"
+                    } animate-in fade-in duration-200`}
+                  >
+                    <div
+                      className={`group relative max-w-[88%] rounded-2xl p-3.5 sm:p-4 text-right shadow-sm ${
+                        msg.role === "user"
+                          ? "rounded-br-none bg-gradient-to-tr from-[#f8ca14] to-yellow-400 text-slate-950 font-bold"
+                          : isDark
+                          ? "rounded-bl-none border border-white/10 bg-[#0e1628] text-slate-100 shadow-md"
+                          : "rounded-bl-none border border-slate-200/80 bg-white text-slate-900 shadow-md"
+                      }`}
+                    >
+                      {msg.role === "assistant" && (
+                        <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-current/10">
+                          <div className="h-5 w-5 rounded-md bg-[#f8ca14] text-slate-950 grid place-items-center font-black text-[10px]">
+                            💎
+                          </div>
+                          <span className={`text-[11px] font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                            مستشار العقيق الذكي
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="space-y-1 text-right leading-relaxed font-medium">
+                        {msg.role === "user" ? msg.content : renderFormattedMessage(msg.content, isDark)}
+                      </div>
+
+                      {/* Speech & Copy Action Buttons for Assistant Replies */}
+                      {msg.role === "assistant" && (
+                        <div className="mt-2.5 pt-2 border-t border-current/10 flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isSpeaking && speakingIndex === i) {
+                                  stopSpeaking();
+                                } else {
+                                  speakText(msg.content, i);
+                                }
+                              }}
+                              className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black transition ${
+                                isSpeaking && speakingIndex === i
+                                  ? "text-red-400 bg-red-500/20 animate-pulse border border-red-500/40"
+                                  : isDark
+                                  ? "text-amber-300 hover:text-white bg-white/5 border border-white/10 hover:bg-amber-400/20"
+                                  : "text-amber-800 hover:text-black bg-amber-50 border border-amber-200 hover:bg-amber-100"
+                              }`}
+                              title={isSpeaking && speakingIndex === i ? "إيقاف الصوت" : "استمع للرد بالصوت"}
+                            >
+                              {isSpeaking && speakingIndex === i ? (
+                                <>
+                                  <Square size={11} className="fill-current" />
+                                  <span>إيقاف</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 size={12} />
+                                  <span>استمع بالصوت 🔊</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(msg.content, i)}
+                            className={`grid h-6 w-6 place-items-center rounded-lg transition ${
+                              copiedIndex === i
+                                ? "text-emerald-500 bg-emerald-500/20"
+                                : isDark
+                                ? "text-slate-400 hover:text-amber-300 bg-black/40"
+                                : "text-slate-500 hover:text-amber-700 bg-slate-100"
+                            }`}
+                            title="نسخ الرد"
+                          >
+                            {copiedIndex === i ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Shortcuts */}
+                    {msg.actionShortcuts && msg.actionShortcuts.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5 justify-end">
+                        {msg.actionShortcuts.map((act, ai) => (
+                          <button
+                            key={ai}
+                            type="button"
+                            onClick={() => handleShortcutClick(act.url)}
+                            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-black transition shadow-xs ${
+                              isDark
+                                ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-slate-950"
+                                : "border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-amber-400 hover:text-slate-950"
+                            }`}
+                          >
+                            <span>{act.label}</span>
+                            <ArrowUpLeft size={12} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Suggested Quick Follow-Up Questions */}
+                    {msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && i === messages.length - 1 && (
+                      <div className="mt-3 flex flex-wrap gap-1.5 justify-end">
+                        {msg.suggestedQuestions.map((q, qi) => (
+                          <button
+                            key={qi}
+                            type="button"
+                            onClick={() => handleSend(q)}
+                            className={`rounded-xl border px-3 py-1.5 text-[11px] font-bold transition shadow-xs text-right ${
+                              isDark
+                                ? "border-white/10 bg-black/60 text-amber-300 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950"
+                                : "border-slate-200 bg-white text-amber-800 hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 shadow-xs"
+                            }`}
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {askAiMutation.isPending && (
+                  <div
+                    className={`flex items-center gap-2.5 text-xs font-black p-3.5 rounded-2xl rounded-bl-none w-fit shadow-md animate-pulse ${
+                      isDark
+                        ? "bg-[#111728] border border-amber-400/30 text-amber-300"
+                        : "bg-white border border-amber-400/50 text-amber-800 shadow-sm"
+                    }`}
+                  >
+                    <Sparkles size={16} className={`${isDark ? "text-amber-400" : "text-amber-600"} animate-spin`} />
+                    <span>المساعد الذكي يفكر ويصيغ الإجابة الحية...</span>
+                  </div>
+                )}
+
+                <div ref={chatBottomRef} />
+              </div>
+
+              {/* Standard Input Form with Voice Button */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSend();
+                }}
+                className={`border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center gap-2 transition-colors ${
+                  isDark ? "border-white/10 bg-[#0a0e1a]" : "border-slate-200 bg-white"
                 }`}
-              />
-              <Button
-                type="submit"
-                disabled={!inputPrompt.trim() || askAiMutation.isPending}
-                className="grid h-10 w-10 place-items-center rounded-2xl bg-[#f8ca14] text-slate-950 font-black hover:bg-yellow-300 transition shadow-md shrink-0 p-0 disabled:opacity-40"
               >
-                <Send size={16} className="mr-0.5" />
-              </Button>
-            </form>
+                {/* Voice Button (Enters ChatGPT Voice Mode) */}
+                <Button
+                  type="button"
+                  onClick={enterLiveVoiceMode}
+                  className={`grid h-10 w-10 place-items-center rounded-2xl transition shadow-md shrink-0 p-0 ${
+                    isDark
+                      ? "border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
+                      : "border border-amber-400/60 bg-amber-50 text-amber-800 hover:bg-[#f8ca14] hover:text-black"
+                  }`}
+                  title="محادثة صوتية ذكية (ChatGPT Voice) 🎙️"
+                >
+                  <Mic size={18} />
+                </Button>
+
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputPrompt}
+                  onChange={(e) => setInputPrompt(e.target.value)}
+                  placeholder="اكتب سؤالك أو اضغط على المايك للتحدث فويس..."
+                  className={`flex-1 rounded-2xl border px-4 py-2.5 text-xs sm:text-sm font-bold outline-none transition ${
+                    isDark
+                      ? "border-white/15 bg-black/70 text-white placeholder-slate-500 focus:border-amber-400"
+                      : "border-slate-300 bg-slate-50 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:bg-white"
+                  }`}
+                />
+                <Button
+                  type="submit"
+                  disabled={!inputPrompt.trim() || askAiMutation.isPending}
+                  className="grid h-10 w-10 place-items-center rounded-2xl bg-[#f8ca14] text-slate-950 font-black hover:bg-yellow-300 transition shadow-md shrink-0 p-0 disabled:opacity-40"
+                >
+                  <Send size={16} className="mr-0.5" />
+                </Button>
+              </form>
+            </>
           )}
         </div>
       )}
