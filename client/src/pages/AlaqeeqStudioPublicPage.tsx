@@ -316,7 +316,18 @@ export default function AlaqeeqStudioPublicPage() {
   const storiesList: StoryItem[] = useMemo(() => {
     const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
     const customSet = new Set(orchestration?.customStoryIds || []);
+    const expiryMap: Record<string, number> = orchestration?.storyExpiryMap || {};
+    const nowMs = Date.now();
     const items: (StoryItem & { timestamp: number })[] = [];
+
+    // Check if a story is still within its pinned window
+    const isPinnedAndValid = (id: string): boolean => {
+      if (!customSet.has(id) && !customSet.has(`story-${id}`)) return false;
+      const expiresAt = expiryMap[id] ?? null;
+      // If no expiry recorded, treat as valid (legacy entries)
+      if (!expiresAt) return true;
+      return nowMs < expiresAt;
+    };
 
     // Helper to evaluate freshness / label
     const getTime = (dateVal: any) => {
@@ -330,7 +341,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-article-" + a.id;
       const rawId = "article-" + a.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const { isWithin24Hours, label, ts } = getTime(a.publishedAt || a.createdAt);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
@@ -353,7 +364,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-showcase-" + s.id;
       const rawId = "showcase-" + s.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const { isWithin24Hours, label, ts } = getTime(s.createdAt);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
@@ -376,7 +387,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-podcast-" + p.id;
       const rawId = "podcast-" + p.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const { isWithin24Hours, label, ts } = getTime(p.createdAt);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
@@ -399,7 +410,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-post-" + post.id;
       const rawId = "post-" + post.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const { isWithin24Hours, label, ts } = getTime(post.createdAt);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
@@ -475,7 +486,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-issue-" + iss.id;
       const rawId = "issue-" + iss.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const { isWithin24Hours, label, ts } = getTime(iss.publishedAt || iss.createdAt || iss.issueDate);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
@@ -498,7 +509,7 @@ export default function AlaqeeqStudioPublicPage() {
       const id = "story-album-" + alb.id;
       const rawId = "album-" + alb.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
-      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const isPinned = isPinnedAndValid(id) || isPinnedAndValid(rawId);
       const img = directDriveImage(alb.coverUrl) || alb.coverUrl;
       const { isWithin24Hours, label, ts } = getTime(alb.albumDate || alb.createdAt);
       if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
@@ -524,7 +535,7 @@ export default function AlaqeeqStudioPublicPage() {
     });
 
     return items;
-  }, [showcaseDetail?.posts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds]);
+  }, [showcaseDetail?.posts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
 
   // Story Auto-Advance Timer
   useEffect(() => {

@@ -1368,14 +1368,14 @@ export const appRouter = router({
       }),
 
     toggleStoryActive: adminProcedure
-      .input(z.object({ storyId: z.string(), active: z.boolean() }))
+      .input(z.object({ storyId: z.string(), active: z.boolean(), durationHours: z.number().int().min(1).max(720).default(24) }))
       .mutation(async ({ input, ctx }) => {
-        const res = await toggleSiteStory(input.storyId, input.active);
+        const res = await toggleSiteStory(input.storyId, input.active, input.durationHours);
         await logAudit({
           userId: ctx.user.id,
           userName: ctx.user.name,
           action: input.active ? "admin.activate_story" : "admin.deactivate_story",
-          details: JSON.stringify(input),
+          details: JSON.stringify({ storyId: input.storyId, active: input.active, durationHours: input.durationHours }),
         });
         return { success: true, ...res };
       }),
@@ -1393,6 +1393,8 @@ export const appRouter = router({
 
       const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
       const customSet = new Set(orchestration?.customStoryIds || []);
+      const expiryMap = orchestration?.storyExpiryMap || {};
+      const nowMs = Date.now();
 
       type AvailableStory = {
         id: string;
@@ -1406,9 +1408,20 @@ export const appRouter = router({
         createdAt: string;
         isActive: boolean;
         isPinned: boolean;
+        expiresAt: number | null;       // ms timestamp when story expires (null = auto 24h)
+        remainingHours: number | null;  // hours until expiry (null if not pinned)
       };
 
       const list: AvailableStory[] = [];
+
+      // Helper: get expiry info for a pinned story
+      const getExpiry = (id: string, isPinned: boolean) => {
+        if (!isPinned) return { expiresAt: null, remainingHours: null };
+        const expiresAt = expiryMap[id] ?? null;
+        if (!expiresAt) return { expiresAt: null, remainingHours: null };
+        const remaining = Math.max(0, (expiresAt - nowMs) / (1000 * 60 * 60));
+        return { expiresAt, remainingHours: Math.round(remaining * 10) / 10 };
+      };
 
       // 1. Articles
       for (const a of articles) {
@@ -1427,6 +1440,7 @@ export const appRouter = router({
           createdAt: new Date(a.publishedAt || a.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 
@@ -1447,6 +1461,7 @@ export const appRouter = router({
           createdAt: new Date(s.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 
@@ -1467,6 +1482,7 @@ export const appRouter = router({
           createdAt: new Date(p.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 
@@ -1487,6 +1503,7 @@ export const appRouter = router({
           createdAt: new Date(alb.albumDate || alb.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 
@@ -1507,6 +1524,7 @@ export const appRouter = router({
           createdAt: new Date(iss.publishedAt || iss.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 
@@ -1527,6 +1545,7 @@ export const appRouter = router({
           createdAt: new Date(post.createdAt || 0).toISOString(),
           isActive: isPinned || (!isHidden && customSet.size === 0),
           isPinned,
+          ...getExpiry(id, isPinned),
         });
       }
 

@@ -504,7 +504,14 @@ const DEFAULT_ORCHESTRATION = {
 
   const toggleStoryMutation = trpc.executiveAdmin.toggleStoryActive.useMutation({
     onSuccess: (_, variables) => {
-      toast.success(variables.active ? "تم تفعيل القصة في شريط الموقع الرئيسي بنجاح! 🟢" : "تم إيقاف القصة من الاستوريهات");
+      const durationLabel = variables.durationHours === 24 ? "٢٤ ساعة"
+        : variables.durationHours === 48 ? "٤٨ ساعة"
+        : variables.durationHours === 72 ? "٧٢ ساعة"
+        : variables.durationHours === 168 ? "أسبوع كامل"
+        : `${variables.durationHours} ساعة`;
+      toast.success(variables.active
+        ? `تم تفعيل الاستوري لمدة ${durationLabel} في الصفحة الرئيسية! 🟢`
+        : "تم إيقاف القصة من الاستوريهات");
       void utils.executiveAdmin.getOverviewStats.invalidate();
       void utils.executiveAdmin.getAllAvailableStories.invalidate();
       void utils.executiveAdmin.getSiteOrchestration.invalidate();
@@ -520,6 +527,7 @@ const DEFAULT_ORCHESTRATION = {
   const [storyPickerCategory, setStoryPickerCategory] = useState<string>("all");
   const [storyPickerSearch, setStoryPickerSearch] = useState<string>("");
   const [storyPickerStatusFilter, setStoryPickerStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [storyDurationHours, setStoryDurationHours] = useState<number>(24); // default 24h
 
   // Articles Moderation State & Queries
   const { data: allAdminArticles = [], refetch: refetchAdminArticles } = trpc.articles.listAllAdmin.useQuery(undefined, {
@@ -5162,6 +5170,11 @@ const DEFAULT_ORCHESTRATION = {
                             ★ مثبتة يدوياً
                           </span>
                         )}
+                        {item.isPinned && (item as any).remainingHours != null && (
+                          <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-black border ${(item as any).remainingHours < 6 ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"}`}>
+                            {`⏱ متبقي ${Math.round((item as any).remainingHours)}س`}
+                          </span>
+                        )}
                         <span className="text-[10px] text-slate-400">
                           {item.createdAt ? new Date(item.createdAt).toLocaleDateString("ar-SA") : ""}
                         </span>
@@ -5170,8 +5183,8 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
                   </div>
 
-                  {/* Right (Actions: Preview + Toggle) */}
-                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  {/* Right (Actions: Preview + Duration + Toggle) */}
+                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0 flex-wrap justify-end">
                     <a
                       href={item.targetUrl}
                       target="_blank"
@@ -5184,10 +5197,26 @@ const DEFAULT_ORCHESTRATION = {
                       <ExternalLink size={14} />
                     </a>
 
+                    {!item.isActive && (
+                      <select
+                        value={storyDurationHours}
+                        onChange={(e) => setStoryDurationHours(Number(e.target.value))}
+                        className={`text-[10px] font-black rounded-xl px-2 py-1.5 border cursor-pointer ${
+                          dark ? "bg-white/5 border-white/10 text-slate-200" : "bg-black/5 border-black/10 text-slate-700"
+                        }`}
+                        title="مدة الاستوري"
+                      >
+                        <option value={24}>⏱ 24 ساعة</option>
+                        <option value={48}>⏱ 48 ساعة</option>
+                        <option value={72}>⏱ 72 ساعة</option>
+                        <option value={168}>⏱ أسبوع</option>
+                      </select>
+                    )}
+
                     <Button
                       type="button"
                       disabled={toggleStoryMutation.isPending}
-                      onClick={() => toggleStoryMutation.mutate({ storyId: item.id, active: !item.isActive })}
+                      onClick={() => toggleStoryMutation.mutate({ storyId: item.id, active: !item.isActive, durationHours: item.isActive ? 24 : storyDurationHours })}
                       className={`text-xs font-black rounded-xl px-4 py-2 transition shadow-md gap-1.5 ${
                         item.isActive
                           ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"

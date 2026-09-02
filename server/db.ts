@@ -664,6 +664,7 @@ export type SiteOrchestrationConfig = {
   };
   hiddenStoryIds?: string[];
   customStoryIds?: string[];
+  storyExpiryMap?: Record<string, number>; // storyId → expiresAt ms timestamp
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -735,6 +736,7 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
   },
   hiddenStoryIds: [],
   customStoryIds: [],
+  storyExpiryMap: {},
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -757,6 +759,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
           hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
           customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
+          storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
         };
       }
     } catch (err) {
@@ -782,6 +785,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
         hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
         customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
+        storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
       };
     }
   } catch (err) {
@@ -806,6 +810,9 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     location: { ...current.location, ...(data.location || {}) },
     hiddenStoryIds: data.hiddenStoryIds !== undefined ? data.hiddenStoryIds : current.hiddenStoryIds,
     customStoryIds: data.customStoryIds !== undefined ? data.customStoryIds : current.customStoryIds,
+    storyExpiryMap: data.storyExpiryMap !== undefined
+      ? { ...(current.storyExpiryMap || {}), ...data.storyExpiryMap }
+      : current.storyExpiryMap,
   };
   const value = JSON.stringify(merged);
 
@@ -834,7 +841,10 @@ export async function hideSiteStory(storyId: string): Promise<string[]> {
   list.add(`story-${storyId}`);
   const updated = Array.from(list);
   const updatedCustom = (current.customStoryIds || []).filter((id) => id !== storyId && id !== `story-${storyId}`);
-  await setSiteOrchestration({ hiddenStoryIds: updated, customStoryIds: updatedCustom });
+  // Clear expiry for this story
+  const expiryMap = { ...(current.storyExpiryMap || {}) };
+  delete expiryMap[storyId];
+  await setSiteOrchestration({ hiddenStoryIds: updated, customStoryIds: updatedCustom, storyExpiryMap: expiryMap });
   return updated;
 }
 
@@ -847,25 +857,34 @@ export async function unhideSiteStory(storyId: string): Promise<string[]> {
   return updated;
 }
 
-export async function toggleSiteStory(storyId: string, active: boolean): Promise<{ hiddenStoryIds: string[]; customStoryIds: string[] }> {
+export async function toggleSiteStory(
+  storyId: string,
+  active: boolean,
+  durationHours: number = 24
+): Promise<{ hiddenStoryIds: string[]; customStoryIds: string[]; storyExpiryMap: Record<string, number> }> {
   const current = await getSiteOrchestration();
   const hidden = new Set(current.hiddenStoryIds || []);
   const custom = new Set(current.customStoryIds || []);
+  const expiryMap = { ...(current.storyExpiryMap || {}) };
 
   if (active) {
     hidden.delete(storyId);
     hidden.delete(`story-${storyId}`);
     custom.add(storyId);
+    // Set expiry = now + durationHours
+    expiryMap[storyId] = Date.now() + durationHours * 60 * 60 * 1000;
   } else {
     custom.delete(storyId);
     custom.delete(`story-${storyId}`);
     hidden.add(storyId);
+    // Clear expiry
+    delete expiryMap[storyId];
   }
 
   const updatedHidden = Array.from(hidden);
   const updatedCustom = Array.from(custom);
-  await setSiteOrchestration({ hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom });
-  return { hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom };
+  await setSiteOrchestration({ hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom, storyExpiryMap: expiryMap });
+  return { hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom, storyExpiryMap: expiryMap };
 }
 
 // ==================== Attendees ====================
