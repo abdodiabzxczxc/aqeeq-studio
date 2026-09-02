@@ -2247,56 +2247,71 @@ export default function AqeeqPodcastPage() {
       {/* Video Modal Player */}
       {watchingVideoPodcast && (
         <Dialog open={Boolean(watchingVideoPodcast)} onOpenChange={() => setWatchingVideoPodcast(null)}>
-          <DialogContent className={`max-w-4xl rounded-3xl border p-6 text-right ${
-            dark ? "border-indigo-500/40 bg-[#0a0c16] text-white" : "border-slate-200 bg-white text-slate-900 shadow-2xl"
-          }`} dir="rtl">
-            <div className="space-y-4">
-              <div className={`flex items-center justify-between border-b pb-3 ${dark ? "border-white/10" : "border-slate-200"}`}>
-                <span className="rounded-lg bg-indigo-600 text-white px-2.5 py-0.5 text-xs font-black">{watchingVideoPodcast.category}</span>
-                <h3 className="text-base font-black truncate">{watchingVideoPodcast.title}</h3>
-              </div>
-              <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black border border-white/10 shadow-2xl">
-                {isEmbeddableVideo(watchingVideoPodcast.mediaUrl) ? (
-                  <iframe
-                    src={getVideoEmbedUrl(watchingVideoPodcast.mediaUrl)}
-                    title={watchingVideoPodcast.title}
-                    className="h-full w-full border-0"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
-                ) : (
-                  <video
-                    src={watchingVideoPodcast.mediaUrl}
-                    controls
-                    autoPlay
-                    onPlay={() => {
-                      window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
-                        detail: {
-                          id: watchingVideoPodcast.id,
-                          title: watchingVideoPodcast.title,
-                          coverUrl: watchingVideoPodcast.coverUrl,
-                          hostName: watchingVideoPodcast.hostName,
-                          mediaUrl: watchingVideoPodcast.mediaUrl,
-                        }
-                      }));
-                    }}
-                    onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
-                    onTimeUpdate={(e) => {
-                      window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
-                        detail: {
-                          currentTime: e.currentTarget.currentTime,
-                          duration: e.currentTarget.duration,
-                        }
-                      }));
-                    }}
-                    onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
-                    className="h-full w-full object-contain"
-                  />
+          <DialogContent
+            className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-indigo-500/40 bg-[#070a14]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(99,102,241,0.15)] backdrop-blur-3xl flex flex-col"
+            dir="rtl"
+          >
+            <div className="aq-fluid-mesh h-1 w-full shrink-0" />
+            <div className="relative aspect-video w-full overflow-hidden bg-black flex-1 min-h-0 flex items-center justify-center">
+              {isEmbeddableVideo(watchingVideoPodcast.mediaUrl) ? (
+                <iframe
+                  src={getVideoEmbedUrl(watchingVideoPodcast.mediaUrl)}
+                  title={watchingVideoPodcast.title}
+                  className="h-full w-full border-0"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              ) : (
+                <video
+                  src={watchingVideoPodcast.mediaUrl}
+                  controls
+                  autoPlay
+                  onPlay={() => {
+                    window.dispatchEvent(new CustomEvent("aqeeq-video-start", {
+                      detail: {
+                        id: watchingVideoPodcast.id,
+                        title: watchingVideoPodcast.title,
+                        coverUrl: watchingVideoPodcast.coverUrl,
+                        hostName: watchingVideoPodcast.hostName,
+                        mediaUrl: watchingVideoPodcast.mediaUrl,
+                      }
+                    }));
+                  }}
+                  onPause={() => window.dispatchEvent(new CustomEvent("aqeeq-video-pause"))}
+                  onTimeUpdate={(e) => {
+                    window.dispatchEvent(new CustomEvent("aqeeq-video-progress", {
+                      detail: {
+                        currentTime: e.currentTarget.currentTime,
+                        duration: e.currentTarget.duration,
+                      }
+                    }));
+                  }}
+                  onEnded={() => window.dispatchEvent(new CustomEvent("aqeeq-video-ended"))}
+                  className="h-full w-full object-contain"
+                />
+              )}
+            </div>
+            {/* Bottom Bar */}
+            <div className="flex items-center justify-between gap-3 border-t border-white/10 bg-gradient-to-r from-[#090d1c] via-[#0e1428] to-[#090d1c] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-indigo-600 text-white px-2 py-0.5 text-[10px] font-black shrink-0">{watchingVideoPodcast.category}</span>
+                  <h3 className="text-xs sm:text-sm font-black text-white truncate">{watchingVideoPodcast.title}</h3>
+                </div>
+                {watchingVideoPodcast.description && (
+                  <p className="mt-1 text-[10px] sm:text-xs text-slate-400 line-clamp-1">
+                    {watchingVideoPodcast.description}
+                  </p>
                 )}
               </div>
-              <p className={`text-xs sm:text-sm font-bold leading-relaxed ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                {watchingVideoPodcast.description}
-              </p>
+              <button
+                type="button"
+                onClick={() => setWatchingVideoPodcast(null)}
+                className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400 hover:text-white active:scale-95"
+                aria-label="إغلاق"
+              >
+                <X size={16} />
+              </button>
             </div>
           </DialogContent>
         </Dialog>
