@@ -330,7 +330,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       void refetch();
       toast.success("شكراً لإعجابك بالمقال ❤️");
     },
-  }, [rawArticles, featuredArticle]);
+  });
 
   // Direct slug URL support
   useEffect(() => {
@@ -340,6 +340,16 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     }
   }, [params?.slug, rawArticles]);
 
+  const handleCopyLink = (article: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/articles/${article.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(article.id);
+      toast.success("تم نسخ رابط المقال بنجاح 📋");
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
   const handleShare = (article: any, e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}/articles/${article.slug}`;
@@ -347,12 +357,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       navigator.share({ title: article.title, text: article.excerpt, url }).catch(() => {});
       return;
     }
-    navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(article.id);
-      toast.success("تم نسخ رابط المقال بنجاح 📋");
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+    handleCopyLink(article, e);
   };
+
 
   return (
     <main
