@@ -35,6 +35,8 @@ import {
   Server,
   ArrowRight,
   ExternalLink,
+  GraduationCap,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -161,6 +163,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <PhoneCall size={12} />
               <span>+966 53 189 6000</span>
             </a>
+            <span className="h-3 w-px bg-current opacity-20 hidden md:inline-block" />
+            <a href="mailto:info@alaqeeqholding.com" className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 transition" dir="ltr">
+              <Mail size={12} />
+              <span>info@alaqeeqholding.com</span>
+            </a>
           </div>
 
           <div className="flex items-center gap-3">
@@ -173,7 +180,28 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   <ChevronDown size={11} className="opacity-60" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className={`w-56 p-1.5 rounded-xl border backdrop-blur-xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
+              <DropdownMenuContent align="start" className={`w-64 p-1.5 rounded-xl border backdrop-blur-xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
+                <DropdownMenuLabel className="text-[10px] text-emerald-500 font-black px-2 py-1 flex items-center gap-1.5">
+                  <GraduationCap size={12} />
+                  <span>خدمات أولياء الأمور والطلاب</span>
+                </DropdownMenuLabel>
+                <a href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-500 dark:text-amber-300">
+                  <span className="flex items-center gap-1.5">
+                    <FileText size={12} />
+                    <span>الخطط الدراسية الأسبوعية</span>
+                  </span>
+                  <ExternalLink size={12} className="opacity-60" />
+                </a>
+                <a href="https://qr-codes.io/LQMip0" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
+                  <span className="flex items-center gap-1.5">
+                    <Smartphone size={12} />
+                    <span>تحميل تطبيق أولياء الأمور</span>
+                  </span>
+                  <ExternalLink size={12} className="opacity-60" />
+                </a>
+
+                <div className="h-px bg-current/10 my-1" />
+
                 <DropdownMenuLabel className="text-[10px] text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</DropdownMenuLabel>
                 <a href="https://live.aqeeq.edu.sa" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
                   <span>نظام Odoo الإداري</span>
@@ -583,6 +611,20 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <span>نموذج حجز مقعد دراسي</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
+                    <a href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php" target="_blank" rel="noreferrer" className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between text-amber-500 dark:text-amber-300">
+                      <span className="flex items-center gap-1.5">
+                        <FileText size={12} />
+                        <span>الخطط الدراسية الأسبوعية</span>
+                      </span>
+                      <ExternalLink size={12} className="opacity-40" />
+                    </a>
+                    <a href="https://qr-codes.io/LQMip0" target="_blank" rel="noreferrer" className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Smartphone size={12} />
+                        <span>تحميل تطبيق أولياء الأمور</span>
+                      </span>
+                      <ExternalLink size={12} className="opacity-40" />
+                    </a>
                   </div>
                 </div>
 

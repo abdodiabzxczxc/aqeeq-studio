@@ -28,6 +28,7 @@ import {
   ChevronRight,
   PhoneCall,
   Percent,
+  Play,
 } from "lucide-react";
 
 type TrackType = "national" | "international";
@@ -625,8 +626,8 @@ export default function AqeeqSchoolAdmissionsPage() {
                   })}
                 </div>
 
-                {/* Download CTA */}
-                <div className="flex flex-wrap items-center gap-4">
+                {/* Download CTA & Video Guide */}
+                <div className="flex flex-wrap items-center gap-3.5">
                   <a
                     href="https://qr-codes.io/LQMip0"
                     target="_blank"
@@ -637,6 +638,26 @@ export default function AqeeqSchoolAdmissionsPage() {
                   >
                     <Download size={16} />
                     <span>تحميل تطبيق أولياء الأمور</span>
+                  </a>
+
+                  <a
+                    href="https://www.youtube.com/watch?v=_h3K-q8cDUc"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-3.5 text-xs font-black text-red-500 hover:bg-red-500/20 transition"
+                  >
+                    <Play size={15} />
+                    <span>فيديو شرح استخدام التطبيق والدفع 🎬</span>
+                  </a>
+
+                  <a
+                    href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-3.5 text-xs font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition"
+                  >
+                    <FileText size={15} />
+                    <span>الخطط والواجبات الأسبوعية 📝</span>
                   </a>
 
                   <a

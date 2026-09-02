@@ -348,11 +348,15 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={15} className="text-emerald-500" />
-                  <span>البريد الرسمي: info@aqeeq.edu.sa</span>
+                  <span>البريد الرسمي: <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a></span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={15} className="text-emerald-500" />
                   <span>أوقات العمل: الأحد - الخميس | 7:00 ص - 2:30 م</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sky-500">📢</span>
+                  <span>قناة تيليجرام المدرسية: <a href="https://t.me/alaqeeqschools" target="_blank" rel="noreferrer" className="text-sky-500 hover:underline">t.me/alaqeeqschools</a></span>
                 </div>
               </div>
             </div>

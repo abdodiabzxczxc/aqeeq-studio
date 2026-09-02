@@ -294,6 +294,7 @@ const DEFAULT_ORCHESTRATION = {
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
     facebookUrl: "https://facebook.com/alaqeeqschools",
+    telegramUrl: "https://t.me/alaqeeqschools",
     whatsappNumber: "966500000000",
   },
   footer: {
@@ -2908,6 +2909,16 @@ const DEFAULT_ORCHESTRATION = {
                       type="url"
                       value={orchestrationForm.social.youtubeUrl || ""}
                       onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, youtubeUrl: e.target.value } })}
+                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط قناة تيليجرام (Telegram)</label>
+                    <input
+                      type="url"
+                      value={orchestrationForm.social.telegramUrl || ""}
+                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, telegramUrl: e.target.value } })}
+                      placeholder="https://t.me/alaqeeqschools"
                       className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
                     />
                   </div>
