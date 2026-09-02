@@ -820,52 +820,60 @@ export function AqeeqAiAssistantWidget() {
 
   return (
     <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-5 z-50 font-[Tajawal,sans-serif]">
-      {/* Floating Trigger Button (Single luxury button - No duplicate icons) */}
+      {/* Dynamic Island Floating Capsule Trigger (Apple Intelligence Style) */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className={`group relative flex items-center gap-3 rounded-full border p-2.5 sm:px-4 sm:py-3 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 ${
+          className={`group relative flex items-center gap-3 rounded-full border-2 aq-siri-glow p-2 sm:px-4 sm:py-2.5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
             isDark
-              ? "border-amber-400/50 bg-gradient-to-r from-[#070b14] via-[#0d1527] to-[#121c33] text-white hover:border-amber-400 hover:shadow-[0_0_30px_rgba(248,202,20,0.4)]"
-              : "border-amber-400/60 bg-gradient-to-r from-white via-slate-50 to-amber-50/50 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:border-amber-500 hover:shadow-[0_10px_30px_rgba(248,202,20,0.3)]"
+              ? "bg-[#070b16]/95 text-white shadow-[0_15px_45px_rgba(0,0,0,0.85)]"
+              : "bg-white/95 text-slate-900 shadow-[0_15px_45px_rgba(248,202,20,0.25)]"
           }`}
         >
-          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-amber-300 text-slate-950 font-black shadow-lg">
+          <div className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-lg shrink-0">
             <Bot size={22} className="group-hover:rotate-12 transition-transform duration-300" />
             <span
               className={`absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${
                 isDark ? "border-slate-950" : "border-white"
-              } animate-pulse ${aiStatus?.hasLiveGemini ? "bg-emerald-400" : "bg-amber-400"}`}
+              } animate-pulse bg-emerald-400`}
             />
           </div>
 
           <div className="hidden sm:block text-right">
             <div className="flex items-center gap-1.5">
               <span className={`text-xs font-black ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                مساعد العقيق الذكي
+                مستشار العقيق الذكي
               </span>
               <Sparkles size={12} className={isDark ? "text-amber-400" : "text-amber-600"} />
             </div>
             <p className={`text-[10px] font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-              {aiStatus?.hasLiveGemini ? "Gemini Voice متصل ⚡" : "اسألني أي شيء عن المدارس 🤖"}
+              تحدث بالصوت أو اكتب استفسارك 🎙️
             </p>
+          </div>
+
+          {/* Dynamic Island Mini Equalizer Waveform */}
+          <div className="hidden sm:flex items-center gap-1 h-5 px-1 shrink-0">
+            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.1s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-emerald-400" style={{ animationDelay: "0.3s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-cyan-400" style={{ animationDelay: "0.5s" }} />
+            <span className="aq-wave-bar w-1 rounded-full bg-amber-400" style={{ animationDelay: "0.2s" }} />
           </div>
         </button>
       )}
 
-      {/* Interactive Luxury Chat Window */}
+      {/* Interactive Luxury Spatial Glass Window with Apple Intelligence Glow */}
       {isOpen && (
         <div
-          className={`flex flex-col transition-all duration-300 border shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2rem] w-full sm:w-[460px] h-[100dvh] sm:h-[600px] max-h-none sm:max-h-[88vh] z-50 ${
+          className={`flex flex-col transition-all duration-300 border-2 aq-siri-glow shadow-2xl backdrop-blur-3xl animate-in zoom-in-95 overflow-hidden fixed inset-0 sm:inset-auto sm:relative sm:rounded-[2.8rem] w-full sm:w-[470px] h-[100dvh] sm:h-[620px] max-h-none sm:max-h-[88vh] z-50 ${
             isLiveVoiceMode
-              ? "border-amber-400/40 bg-[#070b16] text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)] ring-1 ring-amber-400/30"
+              ? "bg-[#060913] text-white shadow-[0_25px_90px_rgba(0,0,0,0.95)]"
               : isDark
-              ? "border-amber-400/40 bg-[#070a12] sm:bg-[#070a12]/95 text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-amber-400/20"
-              : "border-slate-200/90 bg-white sm:bg-white/98 text-slate-900 shadow-[0_25px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30"
+              ? "bg-[#070a14]/95 text-white shadow-[0_25px_80px_rgba(0,0,0,0.9)]"
+              : "bg-white/98 text-slate-900 shadow-[0_25px_80px_rgba(0,0,0,0.18)]"
           } ${
             isExpanded
-              ? "sm:w-[720px] sm:h-[85vh] sm:max-h-[820px]"
+              ? "sm:w-[740px] sm:h-[85vh] sm:max-h-[820px]"
               : ""
           }`}
         >
@@ -1171,24 +1179,22 @@ export function AqeeqAiAssistantWidget() {
                             : "bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-600 shadow-[0_0_40px_rgba(6,182,212,0.7),inset_0_0_20px_rgba(255,255,255,0.5)]"
                         }`}
                       >
-                        {/* Interactive Sound Wave Spectrum inside the Orb */}
-                        <div className="flex items-center gap-1.5 h-10 z-10">
+                        {/* Dynamic Interactive Sound Wave Spectrum inside the Orb */}
+                        <div className="flex items-center gap-1.5 h-12 z-10 px-2">
                           {[35, 75, 55, 100, 80, 95, 60, 85, 40].map((barHeight, idx) => (
                             <span
                               key={idx}
                               style={{
+                                animationDelay: `${0.1 * idx}s`,
                                 height:
                                   liveVoiceState === "speaking" || liveVoiceState === "listening"
-                                    ? `${Math.max(25, barHeight * (idx % 2 === 0 ? 1 : 0.75))}%`
+                                    ? undefined
                                     : "25%",
-                                animationDuration: `${0.35 + (idx % 4) * 0.15}s`,
                               }}
-                              className={`w-1 sm:w-1.5 rounded-full transition-all duration-150 ${
-                                liveVoiceState === "speaking"
-                                  ? "bg-slate-950 animate-pulse shadow-sm"
-                                  : liveVoiceState === "listening"
-                                  ? "bg-slate-950 animate-pulse shadow-sm"
-                                  : "bg-white/90"
+                              className={`w-1.5 rounded-full transition-all duration-150 ${
+                                liveVoiceState === "speaking" || liveVoiceState === "listening"
+                                  ? "aq-wave-bar bg-slate-950 shadow-sm"
+                                  : "bg-white/80"
                               }`}
                             />
                           ))}
@@ -1244,7 +1250,7 @@ export function AqeeqAiAssistantWidget() {
                       stopSpeaking();
                       startLiveVoiceListening();
                     }}
-                    className="rounded-full bg-gradient-to-r from-amber-400 to-[#f8ca14] text-slate-950 font-black px-6 py-2.5 text-xs flex items-center gap-2 shadow-[0_0_25px_rgba(248,202,20,0.5)] hover:scale-105 transition"
+                    className="rounded-full bg-gradient-to-r from-amber-400 via-[#f8ca14] to-yellow-300 text-slate-950 font-black px-7 py-2.5 text-xs flex items-center gap-2 shadow-[0_0_30px_rgba(248,202,20,0.6)] hover:scale-105 transition"
                   >
                     <Square size={13} className="fill-current" />
                     <span>مقاطعة والتحدث 🎙️</span>
