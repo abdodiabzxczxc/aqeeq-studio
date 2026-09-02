@@ -34,6 +34,9 @@ import {
   Volume2,
   VolumeX,
   X,
+  Newspaper,
+  Mic,
+  Video,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -209,10 +212,11 @@ type StoryItem = {
   category: string;
   imageUrl?: string | null;
   time: string;
-  sourceType: "journal" | "album" | "post" | "x" | "instagram" | "youtube";
+  sourceType: "journal" | "album" | "post" | "x" | "instagram" | "youtube" | "article" | "showcase" | "podcast";
   targetUrl: string;
   buttonLabel: string;
   youtubeId?: string | null;
+  isPinned?: boolean;
 };
 
 function formatArabicTimeAgo(dateVal: Date | string | number | undefined): { isWithin24Hours: boolean; label: string } {
@@ -226,13 +230,16 @@ function formatArabicTimeAgo(dateVal: Date | string | number | undefined): { isW
   const isWithin24Hours = diffHours >= -1 && diffHours <= 24;
 
   if (diffHours < 1) {
-    const diffMins = Math.max(1, Math.floor(diffMs / (1000 * 60)));
-    return { isWithin24Hours, label: "منذ " + diffMins + " دقيقة" };
+    const mins = Math.max(1, Math.round(diffMs / (1000 * 60)));
+    return { isWithin24Hours, label: `منذ ${mins} دقيقة` };
   }
-  if (diffHours < 2) return { isWithin24Hours, label: "منذ ساعة" };
-  if (diffHours < 11) return { isWithin24Hours, label: "منذ " + Math.floor(diffHours) + " ساعات" };
-  if (diffHours <= 24) return { isWithin24Hours, label: "منذ " + Math.floor(diffHours) + " ساعة" };
-  return { isWithin24Hours: false, label: "منذ يوم" };
+  if (diffHours < 24) {
+    return { isWithin24Hours, label: `منذ ${Math.round(diffHours)} ساعة` };
+  }
+  const diffDays = Math.round(diffHours / 24);
+  if (diffDays === 1) return { isWithin24Hours, label: "أمس" };
+  if (diffDays < 7) return { isWithin24Hours, label: `منذ ${diffDays} أيام` };
+  return { isWithin24Hours, label: "مؤخراً" };
 }
 
 export default function AlaqeeqStudioPublicPage() {
@@ -243,6 +250,8 @@ export default function AlaqeeqStudioPublicPage() {
   const { data: issues = [], isLoading: issuesLoading } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: albums = [], isLoading: albumsLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: showcases = [], isLoading: showcasesLoading } = trpc.aqeeqShowcases.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
+  const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, { refetchOnWindowFocus: false });
+  const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
 
   const issue = issues[0];
@@ -303,14 +312,96 @@ export default function AlaqeeqStudioPublicPage() {
   const totalFiles = albums.reduce((total, entry) => total + Number(entry.mediaCount || 0), 0);
   const totalPosts = showcases.reduce((total, entry) => total + Number(entry.postCount || 0), 0);
 
-// Dynamic 24-Hour Snapchat-style Stories Data
+// Dynamic Stories Data (Supporting All Content Types + Custom Selected Stories)
   const storiesList: StoryItem[] = useMemo(() => {
-    const items: StoryItem[] = [];
+    const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
+    const customSet = new Set(orchestration?.customStoryIds || []);
+    const items: (StoryItem & { timestamp: number })[] = [];
 
-    // 1. Posts from Showcase (within 24h)
+    // Helper to evaluate freshness / label
+    const getTime = (dateVal: any) => {
+      const { isWithin24Hours, label } = formatArabicTimeAgo(dateVal);
+      const ts = new Date(dateVal || 0).getTime();
+      return { isWithin24Hours, label: label || "مؤخراً", ts };
+    };
+
+    // 1. Articles
+    for (const a of articles) {
+      const id = "story-article-" + a.id;
+      const rawId = "article-" + a.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const { isWithin24Hours, label, ts } = getTime(a.publishedAt || a.createdAt);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
+
+      items.push({
+        id,
+        title: a.title,
+        category: "مقال جديد",
+        imageUrl: directDriveImage(a.coverUrl) || a.coverUrl || null,
+        time: label,
+        sourceType: "article",
+        targetUrl: "/articles/" + a.slug,
+        buttonLabel: "قراءة المقال الآن",
+        isPinned,
+        timestamp: ts,
+      });
+    }
+
+    // 2. Video Showcases
+    for (const s of showcases) {
+      const id = "story-showcase-" + s.id;
+      const rawId = "showcase-" + s.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const { isWithin24Hours, label, ts } = getTime(s.createdAt);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
+
+      items.push({
+        id,
+        title: s.title,
+        category: "مرئي وتغطية",
+        imageUrl: directDriveImage(s.coverUrl) || s.coverUrl || null,
+        time: label,
+        sourceType: "showcase",
+        targetUrl: "/showcase/" + s.slug,
+        buttonLabel: "مشاهدة العرض المرئي",
+        isPinned,
+        timestamp: ts,
+      });
+    }
+
+    // 3. Podcasts
+    for (const p of podcasts) {
+      const id = "story-podcast-" + p.id;
+      const rawId = "podcast-" + p.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const { isWithin24Hours, label, ts } = getTime(p.createdAt);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
+
+      items.push({
+        id,
+        title: p.title,
+        category: p.mediaType === "video" ? "فيديو بودكاست" : "أثير العقيق 🎙️",
+        imageUrl: directDriveImage(p.coverUrl) || p.coverUrl || null,
+        time: label,
+        sourceType: "podcast",
+        targetUrl: "/podcast",
+        buttonLabel: "استمع للبودكاست",
+        isPinned,
+        timestamp: ts,
+      });
+    }
+
+    // 4. Showcase Posts
     for (const post of showcaseDetail?.posts || []) {
-      const { isWithin24Hours, label } = formatArabicTimeAgo(post.createdAt);
-      if (!isWithin24Hours) continue;
+      const id = "story-post-" + post.id;
+      const rawId = "post-" + post.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const { isWithin24Hours, label, ts } = getTime(post.createdAt);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
 
       const postUrl = post.externalUrl || post.mediaUrl || "";
       const isX = post.sourceType === "x" || postUrl.includes("x.com") || postUrl.includes("twitter.com");
@@ -319,25 +410,29 @@ export default function AlaqeeqStudioPublicPage() {
 
       if (isX) {
         items.push({
-          id: "story-post-" + post.id,
+          id,
           title: post.title || post.fileName || "منشور من منصة 𝕏",
           category: "منشور 𝕏",
           imageUrl: null,
-          time: label || "الآن",
+          time: label,
           sourceType: "x",
           targetUrl: postUrl || "/offers",
           buttonLabel: "فتح المنشور على منصة 𝕏",
+          isPinned,
+          timestamp: ts,
         });
       } else if (isInsta) {
         items.push({
-          id: "story-post-" + post.id,
+          id,
           title: post.title || post.fileName || "منشور Instagram",
           category: "Instagram",
           imageUrl: null,
-          time: label || "الآن",
+          time: label,
           sourceType: "instagram",
           targetUrl: postUrl || "/offers",
           buttonLabel: "فتح المنشور على Instagram",
+          isPinned,
+          timestamp: ts,
         });
       } else if (isYT) {
         let ytId: string | null = null;
@@ -346,70 +441,90 @@ export default function AlaqeeqStudioPublicPage() {
           if (match) ytId = match[1];
         } catch {}
         items.push({
-          id: "story-post-" + post.id,
+          id,
           title: post.title || post.fileName || "فيديو YouTube",
           category: "فيديو YouTube",
           imageUrl: ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : null,
-          time: label || "الآن",
+          time: label,
           sourceType: "youtube",
           targetUrl: postUrl || "/offers",
           buttonLabel: "مشاهدة الفيديو على YouTube",
           youtubeId: ytId,
+          isPinned,
+          timestamp: ts,
         });
       } else {
         const img = directDriveImage(post.thumbnailUrl) || post.thumbnailUrl || post.mediaUrl;
-        if (!img) continue;
         items.push({
-          id: "story-post-" + post.id,
+          id,
           title: post.title || post.fileName.replace(/\.[^.]+$/, ""),
           category: post.mediaType === "video" ? "فيديو جديد" : "خبر جديد",
-          imageUrl: img,
-          time: label || "الآن",
+          imageUrl: img || null,
+          time: label,
           sourceType: "post",
           targetUrl: "/offers",
           buttonLabel: "فتح الخبر والتغطية الكاملة",
+          isPinned,
+          timestamp: ts,
         });
       }
     }
 
-    // 2. Journal Issues (within 24h)
+    // 5. Journal Issues
     for (const iss of issues) {
-      if (!iss.coverUrl) continue;
-      const { isWithin24Hours, label } = formatArabicTimeAgo(iss.createdAt || iss.issueDate);
-      if (!isWithin24Hours) continue;
+      const id = "story-issue-" + iss.id;
+      const rawId = "issue-" + iss.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
+      const { isWithin24Hours, label, ts } = getTime(iss.publishedAt || iss.createdAt || iss.issueDate);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
+
       items.push({
-        id: "story-issue-" + iss.id,
+        id,
         title: iss.title,
         category: "مجلة العقيق",
-        imageUrl: iss.coverUrl,
-        time: label || "اليوم",
+        imageUrl: directDriveImage(iss.coverUrl) || iss.coverUrl || null,
+        time: label,
         sourceType: "journal",
         targetUrl: "/journal/issue/" + encodeURIComponent(iss.slug),
         buttonLabel: "تصفح مجلة العقيق الآن",
+        isPinned,
+        timestamp: ts,
       });
     }
 
-    // 3. Albums (within 24h)
+    // 6. Albums
     for (const alb of albums) {
+      const id = "story-album-" + alb.id;
+      const rawId = "album-" + alb.id;
+      if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
+      const isPinned = customSet.has(id) || customSet.has(rawId);
       const img = directDriveImage(alb.coverUrl) || alb.coverUrl;
-      if (!img) continue;
-      const { isWithin24Hours, label } = formatArabicTimeAgo(alb.createdAt || alb.albumDate);
-      if (!isWithin24Hours) continue;
+      const { isWithin24Hours, label, ts } = getTime(alb.albumDate || alb.createdAt);
+      if (!isPinned && !isWithin24Hours && customSet.size > 0) continue;
+
       items.push({
-        id: "story-album-" + alb.id,
+        id,
         title: alb.title,
         category: "ألبوم فعاليات",
-        imageUrl: img,
-        time: label || "اليوم",
+        imageUrl: img || null,
+        time: label,
         sourceType: "album",
         targetUrl: "/albums/" + encodeURIComponent(alb.slug),
         buttonLabel: "مشاهدة الألبوم بالكامل",
+        isPinned,
+        timestamp: ts,
       });
     }
 
-    const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
-    return items.filter((it) => !hiddenSet.has(it.id) && !hiddenSet.has(it.id.replace("story-", "")));
-  }, [showcaseDetail?.posts, issues, albums, orchestration?.hiddenStoryIds]);
+    // Sort: Pinned first, then newest timestamp first
+    items.sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return b.timestamp - a.timestamp;
+    });
+
+    return items;
+  }, [showcaseDetail?.posts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds]);
 
   // Story Auto-Advance Timer
   useEffect(() => {
@@ -554,11 +669,37 @@ export default function AlaqeeqStudioPublicPage() {
                         </div>
                       ) : story.imageUrl ? (
                         <img src={story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                      ) : story.sourceType === "article" ? (
+                        <div className="grid h-full w-full place-items-center bg-rose-500/20 text-rose-400">
+                          <Newspaper size={22} />
+                        </div>
+                      ) : story.sourceType === "podcast" ? (
+                        <div className="grid h-full w-full place-items-center bg-indigo-500/20 text-indigo-400">
+                          <Mic size={22} />
+                        </div>
+                      ) : story.sourceType === "showcase" ? (
+                        <div className="grid h-full w-full place-items-center bg-sky-500/20 text-sky-400">
+                          <Video size={22} />
+                        </div>
+                      ) : story.sourceType === "journal" ? (
+                        <div className="grid h-full w-full place-items-center bg-amber-500/20 text-amber-400">
+                          <BookOpen size={22} />
+                        </div>
+                      ) : story.sourceType === "album" ? (
+                        <div className="grid h-full w-full place-items-center bg-emerald-500/20 text-emerald-400">
+                          <Camera size={22} />
+                        </div>
                       ) : (
                         <span className="text-xs font-black">العقيق</span>
                       )}
                     </div>
-                    <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 border-black animate-pulse" />
+                    {story.isPinned ? (
+                      <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f8ca14] text-[9px] font-black text-black shadow-md">
+                        ★
+                      </span>
+                    ) : (
+                      <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 border-black animate-pulse" />
+                    )}
                   </div>
                   <p className={"max-w-[72px] sm:max-w-[84px] truncate text-[10px] sm:text-[11px] font-black transition " + (
                     dark ? "text-slate-200 group-hover:text-[#f8ca14]" : "text-slate-800 group-hover:text-[#08467d]"
@@ -1490,13 +1631,28 @@ export default function AlaqeeqStudioPublicPage() {
                   ) : storiesList[activeStoryIndex].sourceType === "x" ? (
                     <span className="text-xs font-black">𝕏</span>
                   ) : storiesList[activeStoryIndex].imageUrl ? (
-                    <img src={storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
+                    <img src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
+                  ) : storiesList[activeStoryIndex].sourceType === "article" ? (
+                    <Newspaper size={16} className="text-rose-400" />
+                  ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
+                    <Mic size={16} className="text-indigo-400" />
+                  ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
+                    <Video size={16} className="text-sky-400" />
+                  ) : storiesList[activeStoryIndex].sourceType === "journal" ? (
+                    <BookOpen size={16} className="text-amber-400" />
+                  ) : storiesList[activeStoryIndex].sourceType === "album" ? (
+                    <Camera size={16} className="text-emerald-400" />
                   ) : (
                     <span className="text-[10px] font-black">العقيق</span>
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-black">{storiesList[activeStoryIndex].category}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-black">{storiesList[activeStoryIndex].category}</p>
+                    {storiesList[activeStoryIndex].isPinned && (
+                      <span className="rounded bg-[#f8ca14] px-1 py-0.2 text-[8px] font-black text-black">مميز</span>
+                    )}
+                  </div>
                   <p className="text-[10px] text-white/70">{storiesList[activeStoryIndex].time}</p>
                 </div>
               </div>
@@ -1528,10 +1684,34 @@ export default function AlaqeeqStudioPublicPage() {
                 </div>
               ) : storiesList[activeStoryIndex].imageUrl ? (
                 <img
-                  src={storiesList[activeStoryIndex].imageUrl || ""}
+                  src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""}
                   alt={storiesList[activeStoryIndex].title}
                   className="h-full w-full object-cover"
                 />
+              ) : storiesList[activeStoryIndex].sourceType === "article" ? (
+                <div className="p-8 text-center text-white space-y-4">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+                    <Newspaper size={40} />
+                  </div>
+                  <span className="inline-block rounded-full bg-rose-500/20 px-3 py-1 text-xs font-black text-rose-300">مقال أدبي جديد</span>
+                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
+                </div>
+              ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
+                <div className="p-8 text-center text-white space-y-4">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.3)] animate-pulse">
+                    <Mic size={40} />
+                  </div>
+                  <span className="inline-block rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black text-indigo-300">أثير العقيق 🎙️</span>
+                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
+                </div>
+              ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
+                <div className="p-8 text-center text-white space-y-4">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
+                    <Video size={40} />
+                  </div>
+                  <span className="inline-block rounded-full bg-sky-500/20 px-3 py-1 text-xs font-black text-sky-300">عرض مرئي وتغطية</span>
+                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
+                </div>
               ) : (
                 <div className="p-8 text-center text-white">
                   <span className="text-3xl font-black">العقيق</span>

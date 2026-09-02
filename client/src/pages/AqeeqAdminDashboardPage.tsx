@@ -56,6 +56,9 @@ import {
   Pause,
   ListMusic,
   FolderSync,
+  Newspaper,
+  Mic,
+  Video,
 } from "lucide-react";
 import {
   Dialog,
@@ -498,6 +501,25 @@ const DEFAULT_ORCHESTRATION = {
     },
     onError: (err) => toast.error(err.message || "تعذر استعادة القصة"),
   });
+
+  const toggleStoryMutation = trpc.executiveAdmin.toggleStoryActive.useMutation({
+    onSuccess: (_, variables) => {
+      toast.success(variables.active ? "تم تفعيل القصة في شريط الموقع الرئيسي بنجاح! 🟢" : "تم إيقاف القصة من الاستوريهات");
+      void utils.executiveAdmin.getOverviewStats.invalidate();
+      void utils.executiveAdmin.getAllAvailableStories.invalidate();
+      void utils.executiveAdmin.getSiteOrchestration.invalidate();
+    },
+    onError: (err) => toast.error(err.message || "تعذر تعديل حالة القصة"),
+  });
+
+  const { data: availableStories = [], isLoading: isLoadingStories, refetch: refetchAvailableStories } = trpc.executiveAdmin.getAllAvailableStories.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
+
+  const [isStoryPickerOpen, setIsStoryPickerOpen] = useState(false);
+  const [storyPickerCategory, setStoryPickerCategory] = useState<string>("all");
+  const [storyPickerSearch, setStoryPickerSearch] = useState<string>("");
+  const [storyPickerStatusFilter, setStoryPickerStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
   // Articles Moderation State & Queries
   const { data: allAdminArticles = [], refetch: refetchAdminArticles } = trpc.articles.listAllAdmin.useQuery(undefined, {
@@ -2749,32 +2771,42 @@ const DEFAULT_ORCHESTRATION = {
                   dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#de191e] text-white">
+                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#de191e] text-white shadow-md">
                       <Flame size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-black">رادار قصص ولحظات اليوم (24H Stories)</h3>
-                      <p className="text-xs font-bold text-slate-400">القصص الحية المعروضة الآن في قمة الموقع الرئيسي</p>
+                      <h3 className="text-base font-black">رادار واستوريهات اليوم (Stories Hub)</h3>
+                      <p className="text-xs font-bold text-slate-400">القصص التفاعلية في قمة الموقع لجميع المحتويات (مقالات، مرئيات، بودكاست، ألبومات، مجلات، سوشيال)</p>
                     </div>
                   </div>
-                  <span
-                    className={"rounded-xl px-3 py-1 text-xs font-black " + (
-                      stats?.activeStoriesCount
-                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                        : "bg-slate-500/15 text-slate-400 border border-slate-500/30"
-                    )}
-                  >
-                    {stats?.activeStoriesCount ? stats.activeStoriesCount + " قصص نشطة الآن" : "لا توجد قصص حالياً"}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={"rounded-xl px-3 py-1 text-xs font-black " + (
+                        stats?.activeStoriesCount
+                          ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                          : "bg-slate-500/15 text-slate-400 border border-slate-500/30"
+                      )}
+                    >
+                      {stats?.activeStoriesCount ? stats.activeStoriesCount + " قصص نشطة" : "لا توجد قصص حالياً"}
+                    </span>
+                    <Button
+                      type="button"
+                      onClick={() => setIsStoryPickerOpen(true)}
+                      className="gap-2 bg-gradient-to-r from-[#08467d] via-[#367453] to-[#f8ca14] text-white hover:opacity-95 text-xs font-black rounded-xl shadow-md"
+                    >
+                      <Sparkles size={14} className="text-[#f8ca14]" />
+                      <span>اختيار وتفعيل استوريهات</span>
+                    </Button>
+                  </div>
                 </div>
 
                 {stats?.activeStories && stats.activeStories.length > 0 ? (
                   <div className="space-y-4">
                     {/* Visual Stories Row Preview */}
                     <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none border-b pb-4 border-current/10">
-                      {stats.activeStories.slice(0, 10).map((story: any) => (
+                      {stats.activeStories.slice(0, 12).map((story: any) => (
                         <div key={story.id} className="flex flex-col items-center gap-1 shrink-0 text-center">
                           <div className={"relative p-[2px] rounded-full " + (
                             dark
@@ -2792,11 +2824,27 @@ const DEFAULT_ORCHESTRATION = {
                                 <span className="text-xs font-black text-red-500">▶</span>
                               ) : story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
+                              ) : story.sourceType === "article" ? (
+                                <Newspaper size={18} className="text-rose-400" />
+                              ) : story.sourceType === "podcast" ? (
+                                <Mic size={18} className="text-indigo-400" />
+                              ) : story.sourceType === "showcase" ? (
+                                <Video size={18} className="text-sky-400" />
+                              ) : story.sourceType === "journal" ? (
+                                <BookOpen size={18} className="text-amber-400" />
+                              ) : story.sourceType === "album" ? (
+                                <Camera size={18} className="text-emerald-400" />
                               ) : (
                                 <span className="text-[10px] font-black">العقيق</span>
                               )}
                             </div>
-                            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-[#367453] border-2 border-black" />
+                            {story.isPinned ? (
+                              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f8ca14] text-[9px] font-black text-black shadow-md">
+                                ★
+                              </span>
+                            ) : (
+                              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-[#367453] border-2 border-black" />
+                            )}
                           </div>
                           <span className="text-[10px] font-bold text-slate-400 max-w-[60px] truncate">{story.title}</span>
                         </div>
@@ -2804,7 +2852,7 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
 
                     {/* Active Stories List */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
                       {stats.activeStories.map((story: any) => (
                         <div
                           key={story.id}
@@ -2820,12 +2868,27 @@ const DEFAULT_ORCHESTRATION = {
                                 <span className="font-black text-xs">𝕏</span>
                               ) : story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
+                              ) : story.sourceType === "article" ? (
+                                <Newspaper size={16} className="text-rose-400" />
+                              ) : story.sourceType === "podcast" ? (
+                                <Mic size={16} className="text-indigo-400" />
+                              ) : story.sourceType === "showcase" ? (
+                                <Video size={16} className="text-sky-400" />
+                              ) : story.sourceType === "journal" ? (
+                                <BookOpen size={16} className="text-amber-400" />
+                              ) : story.sourceType === "album" ? (
+                                <Camera size={16} className="text-emerald-400" />
                               ) : (
                                 <span className="text-[9px] font-black">قصة</span>
                               )}
                             </div>
                             <div className="min-w-0">
-                              <p className="font-black truncate">{story.title}</p>
+                              <div className="flex items-center gap-1.5">
+                                <p className="font-black truncate">{story.title}</p>
+                                {story.isPinned && (
+                                  <span className="rounded bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/30 px-1 py-0.2 text-[8px] font-black">مثبتة</span>
+                                )}
+                              </div>
                               <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
                                 <span className="rounded bg-current/10 px-1.5 py-0.5 font-bold text-slate-300">{story.category}</span>
                                 <span>{story.timeAgo}</span>
@@ -2833,17 +2896,14 @@ const DEFAULT_ORCHESTRATION = {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-                              باقي {story.expiresInHours}س
-                            </span>
                             <button
                               type="button"
                               onClick={() => hideStoryMutation.mutate({ storyId: story.id })}
                               disabled={hideStoryMutation.isPending}
                               className="rounded-lg p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
-                              title="استبعاد / حذف من الاستوري"
+                              title="استبعاد من الاستوريهات"
                             >
-                              <Trash2 size={13} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
@@ -4940,6 +5000,232 @@ const DEFAULT_ORCHESTRATION = {
         onSelect={mediaPickerConfig.onSelect}
         dark={dark}
       />
+
+      {/* Story Picker & Orchestration Modal */}
+      <Dialog open={isStoryPickerOpen} onOpenChange={setIsStoryPickerOpen}>
+        <DialogContent className={`max-w-4xl max-h-[90vh] flex flex-col p-6 overflow-hidden rounded-3xl ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
+          <DialogHeader className="space-y-1 text-right">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#de191e] text-white shadow-lg">
+                  <Flame size={20} />
+                </div>
+                <div>
+                  <DialogTitle className="text-lg font-black">
+                    مركز اختيار وتفعيل استوريهات الموقع (Stories Hub)
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-slate-400">
+                    فعّل أو أوقف أي محتوى من مقالات، مرئيات، بودكاست، ألبومات، ومجلات ليظهر في شريط الاستوري لزوار الموقع
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Controls: Search + Categories */}
+          <div className="space-y-3 pt-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={storyPickerSearch}
+                  onChange={(e) => setStoryPickerSearch(e.target.value)}
+                  placeholder="ابحث عن مقال، عرض مرئي، بودكاست، ألبوم، أو مجلة..."
+                  className={`w-full rounded-xl py-2 pr-9 pl-4 text-xs font-bold transition border focus:outline-none ${
+                    dark ? "bg-white/5 border-white/10 text-white focus:border-[#f8ca14]" : "bg-slate-50 border-black/10 text-black focus:border-[#08467d]"
+                  }`}
+                />
+              </div>
+
+              {/* Status Filter Toggle */}
+              <div className={`flex rounded-xl p-1 border text-xs font-bold ${dark ? "bg-white/5 border-white/10" : "bg-slate-100 border-black/5"}`}>
+                <button
+                  type="button"
+                  onClick={() => setStoryPickerStatusFilter("all")}
+                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "all" ? (dark ? "bg-white/20 text-white font-black" : "bg-white text-black font-black shadow-sm") : "text-slate-400"}`}
+                >
+                  الكل
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStoryPickerStatusFilter("active")}
+                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "active" ? "bg-emerald-500 text-white font-black shadow-sm" : "text-slate-400"}`}
+                >
+                  المفعلة 🟢
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStoryPickerStatusFilter("inactive")}
+                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "inactive" ? (dark ? "bg-white/20 text-white font-black" : "bg-white text-black font-black shadow-sm") : "text-slate-400"}`}
+                >
+                  غير المفعلة ⚪
+                </button>
+              </div>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              {[
+                { id: "all", label: "🌟 الكل", count: availableStories.length },
+                { id: "article", label: "✍️ المقالات", count: availableStories.filter((s: any) => s.type === "article").length },
+                { id: "showcase", label: "🎬 المرئيات", count: availableStories.filter((s: any) => s.type === "showcase").length },
+                { id: "podcast", label: "🎙️ أثير العقيق", count: availableStories.filter((s: any) => s.type === "podcast").length },
+                { id: "album", label: "📸 الألبومات", count: availableStories.filter((s: any) => s.type === "album").length },
+                { id: "journal", label: "📖 المجلات", count: availableStories.filter((s: any) => s.type === "journal").length },
+                { id: "post", label: "📱 السوشيال", count: availableStories.filter((s: any) => s.type === "post").length },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setStoryPickerCategory(tab.id)}
+                  className={`shrink-0 rounded-xl px-3 py-1.5 font-bold transition flex items-center gap-1.5 ${
+                    storyPickerCategory === tab.id
+                      ? (dark ? "bg-gradient-to-r from-[#f8ca14] to-[#de191e] text-black font-black shadow-sm" : "bg-[#08467d] text-white font-black shadow-sm")
+                      : (dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200")
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span className="text-[10px] opacity-75">({tab.count})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Items List */}
+          <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2.5 max-h-[50vh]">
+            {isLoadingStories ? (
+              <div className="py-12 text-center text-slate-400">
+                <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[#f8ca14]" />
+                <p className="text-xs font-bold">جاري تحميل عناصر الموقع...</p>
+              </div>
+            ) : (() => {
+              const filtered = availableStories.filter((item: any) => {
+                const matchCat = storyPickerCategory === "all" || item.type === storyPickerCategory;
+                const matchSearch = !storyPickerSearch.trim() || item.title.toLowerCase().includes(storyPickerSearch.toLowerCase()) || item.category.toLowerCase().includes(storyPickerSearch.toLowerCase());
+                const matchStatus = storyPickerStatusFilter === "all" || (storyPickerStatusFilter === "active" && item.isActive) || (storyPickerStatusFilter === "inactive" && !item.isActive);
+                return matchCat && matchSearch && matchStatus;
+              });
+
+              if (filtered.length === 0) {
+                return (
+                  <div className="py-12 text-center text-slate-400">
+                    <p className="text-sm font-bold">لا توجد عناصر مطابقة للبحث الحالي</p>
+                  </div>
+                );
+              }
+
+              return filtered.map((item: any) => (
+                <div
+                  key={item.id}
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-3.5 transition ${
+                    item.isActive
+                      ? (dark ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]" : "border-emerald-500/40 bg-emerald-50/50 shadow-sm")
+                      : (dark ? "border-white/10 bg-white/5 opacity-80 hover:opacity-100" : "border-black/5 bg-slate-50")
+                  }`}
+                >
+                  {/* Left (Thumbnail + Info) */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-current/10 bg-black/40 flex items-center justify-center">
+                      {item.imageUrl ? (
+                        <img src={directDriveImage(item.imageUrl) || item.imageUrl} alt="" className="h-full w-full object-cover" />
+                      ) : item.type === "article" ? (
+                        <Newspaper size={24} className="text-rose-400" />
+                      ) : item.type === "podcast" ? (
+                        <Mic size={24} className="text-indigo-400" />
+                      ) : item.type === "showcase" ? (
+                        <Video size={24} className="text-sky-400" />
+                      ) : item.type === "journal" ? (
+                        <BookOpen size={24} className="text-amber-400" />
+                      ) : item.type === "album" ? (
+                        <Camera size={24} className="text-emerald-400" />
+                      ) : (
+                        <span className="text-xs font-black">العقيق</span>
+                      )}
+                      <span className={`absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border-2 ${dark ? "border-black" : "border-white"} ${item.isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`rounded-md px-2 py-0.5 text-[10px] font-black ${
+                          item.type === "article" ? "bg-rose-500/15 text-rose-400 border border-rose-500/30"
+                          : item.type === "podcast" ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
+                          : item.type === "showcase" ? "bg-sky-500/15 text-sky-400 border border-sky-500/30"
+                          : item.type === "journal" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                          : item.type === "album" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                          : "bg-slate-500/15 text-slate-300 border border-slate-500/30"
+                        }`}>
+                          {item.typeLabel}
+                        </span>
+                        {item.isPinned && (
+                          <span className="rounded-md bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40 px-1.5 py-0.5 text-[9px] font-black">
+                            ★ مثبتة يدوياً
+                          </span>
+                        )}
+                        <span className="text-[10px] text-slate-400">
+                          {item.createdAt ? new Date(item.createdAt).toLocaleDateString("ar-SA") : ""}
+                        </span>
+                      </div>
+                      <h4 className="mt-1 font-black text-xs sm:text-sm truncate">{item.title}</h4>
+                    </div>
+                  </div>
+
+                  {/* Right (Actions: Preview + Toggle) */}
+                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                    <a
+                      href={item.targetUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`p-2 rounded-xl border transition ${
+                        dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-slate-200 text-slate-600"
+                      }`}
+                      title="معاينة الصفحة"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
+
+                    <Button
+                      type="button"
+                      disabled={toggleStoryMutation.isPending}
+                      onClick={() => toggleStoryMutation.mutate({ storyId: item.id, active: !item.isActive })}
+                      className={`text-xs font-black rounded-xl px-4 py-2 transition shadow-md gap-1.5 ${
+                        item.isActive
+                          ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
+                          : "bg-gradient-to-r from-[#08467d] via-[#367453] to-[#f8ca14] text-white hover:opacity-95"
+                      }`}
+                    >
+                      {item.isActive ? (
+                        <>
+                          <Trash2 size={13} />
+                          <span>إيقاف من الاستوريهات</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={13} className="text-[#f8ca14]" />
+                          <span>تفعيل كاستوري نشطة 🟢</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ));
+            })()}
+          </div>
+
+          <DialogFooter className="pt-3 border-t border-current/10 flex items-center justify-between sm:justify-between">
+            <div className="text-xs font-bold text-slate-400">
+              {availableStories.filter((s: any) => s.isActive).length} قصة مفعلة الآن ستظهر لزوار الموقع
+            </div>
+            <Button
+              type="button"
+              onClick={() => setIsStoryPickerOpen(false)}
+              className="bg-white/10 hover:bg-white/20 text-white text-xs font-black rounded-xl px-5"
+            >
+              تم وإغلاق
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
     </div>

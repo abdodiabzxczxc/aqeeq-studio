@@ -108,6 +108,7 @@ import {
   setSiteOrchestration,
   hideSiteStory,
   unhideSiteStory,
+  toggleSiteStory,
   getAqeeqAnalyticsSummary,
   setSetting,
   type SiteBroadcast,
@@ -855,7 +856,7 @@ export const appRouter = router({
   // ==================== Executive Admin Command Center ====================
   executiveAdmin: router({
     getOverviewStats: adminProcedure.query(async () => {
-      const [issues, albums, showcase, usersList, logs, broadcast, orchestration] = await Promise.all([
+      const [issues, albums, showcase, usersList, logs, broadcast, orchestration, articles, showcases, podcasts] = await Promise.all([
         listSchoolNewsIssues().catch(() => []),
         listAqeeqAlbums().catch(() => []),
         getAqeeqShowcaseBySlug("news-offers").catch(() => null),
@@ -863,6 +864,9 @@ export const appRouter = router({
         listAuditLogs(10).catch(() => []),
         getSiteBroadcast().catch((): SiteBroadcast => ({ enabled: false, message: "", type: "info" })),
         getSiteOrchestration().catch(() => null),
+        listAllArticles().catch(() => []),
+        listAqeeqShowcases().catch(() => []),
+        getPodcasts().catch(() => []),
       ]);
 
       const totalIssues = issues.length;
@@ -875,7 +879,7 @@ export const appRouter = router({
         ((showcase as any)?.posts?.reduce((sum: number, p: any) => sum + (p.viewCount || 0), 0) || 0);
 
       const now = Date.now();
-      const allActiveStories: Array<{
+      const allStories: Array<{
         id: string;
         title: string;
         category: string;
@@ -885,81 +889,151 @@ export const appRouter = router({
         timeAgo: string;
         expiresInHours: number;
         targetUrl: string;
+        isPinned?: boolean;
       }> = [];
 
-      // 1. Showcase posts within 24h
+      const formatStoryTime = (dateVal: any) => {
+        if (!dateVal) return { timeAgo: "الآن", expiresInHours: 24 };
+        const diffMs = now - new Date(dateVal).getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        const hoursLeft = Math.max(1, Math.round(24 - (diffHours % 24)));
+        const timeAgo =
+          diffHours < 1
+            ? `منذ ${Math.max(1, Math.round(diffMs / 60000))} دقيقة`
+            : diffHours < 24
+            ? `منذ ${Math.round(diffHours)} ساعة`
+            : `منذ ${Math.round(diffHours / 24)} يوم`;
+        return { timeAgo, expiresInHours: hoursLeft };
+      };
+
+      // 1. Articles
+      for (const a of articles) {
+        const t = formatStoryTime(a.publishedAt || a.createdAt);
+        allStories.push({
+          id: `article-${a.id}`,
+          title: a.title,
+          category: "مقال أدبي",
+          imageUrl: a.coverUrl || null,
+          sourceType: "article",
+          createdAt: new Date(a.publishedAt || a.createdAt || 0).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: `/articles/${a.slug}`,
+        });
+      }
+
+      // 2. Video Showcases
+      for (const s of showcases) {
+        const t = formatStoryTime(s.createdAt);
+        allStories.push({
+          id: `showcase-${s.id}`,
+          title: s.title,
+          category: "عرض وتغطية",
+          imageUrl: s.coverUrl || null,
+          sourceType: "showcase",
+          createdAt: new Date(s.createdAt || 0).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: `/showcase/${s.slug}`,
+        });
+      }
+
+      // 3. Podcasts
+      for (const p of podcasts) {
+        const t = formatStoryTime(p.createdAt);
+        allStories.push({
+          id: `podcast-${p.id}`,
+          title: p.title,
+          category: p.mediaType === "video" ? "فيديو بودكاست" : "إذاعة صوتية",
+          imageUrl: p.coverUrl || null,
+          sourceType: "podcast",
+          createdAt: new Date(p.createdAt || 0).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: `/podcast`,
+        });
+      }
+
+      // 4. Showcase Posts
       for (const post of showcase?.posts || []) {
         if (!post.createdAt) continue;
-        const diffMs = now - new Date(post.createdAt).getTime();
-        const diffHours = diffMs / (1000 * 60 * 60);
-        if (diffHours >= -1 && diffHours <= 24) {
-          const hoursLeft = Math.max(1, Math.round(24 - diffHours));
-          const postUrl = post.externalUrl || post.mediaUrl || "";
-          const isX = post.sourceType === "x" || postUrl.includes("x.com") || postUrl.includes("twitter.com");
-          const isInsta = post.sourceType === "instagram" || postUrl.includes("instagram.com");
-          const isYT = post.sourceType === "youtube" || postUrl.includes("youtube.com") || postUrl.includes("youtu.be");
+        const t = formatStoryTime(post.createdAt);
+        const postUrl = post.externalUrl || post.mediaUrl || "";
+        const isX = post.sourceType === "x" || postUrl.includes("x.com") || postUrl.includes("twitter.com");
+        const isInsta = post.sourceType === "instagram" || postUrl.includes("instagram.com");
+        const isYT = post.sourceType === "youtube" || postUrl.includes("youtube.com") || postUrl.includes("youtu.be");
 
-          allActiveStories.push({
-            id: "post-" + post.id,
-            title: post.title || post.fileName || "خبر وتغطية جديدة",
-            category: isX ? "منشور 𝕏" : isInsta ? "Instagram" : isYT ? "فيديو YouTube" : (post.mediaType === "video" ? "فيديو جديد" : "خبر جديد"),
-            imageUrl: post.thumbnailUrl || post.mediaUrl || null,
-            sourceType: isX ? "x" : isInsta ? "instagram" : isYT ? "youtube" : "post",
-            createdAt: new Date(post.createdAt).toISOString(),
-            timeAgo: diffHours < 1 ? `منذ ${Math.max(1, Math.round(diffMs / 60000))} دقيقة` : `منذ ${Math.round(diffHours)} ساعة`,
-            expiresInHours: hoursLeft,
-            targetUrl: "/offers",
-          });
-        }
+        allStories.push({
+          id: "post-" + post.id,
+          title: post.title || post.fileName || "خبر وتغطية جديدة",
+          category: isX ? "منشور 𝕏" : isInsta ? "Instagram" : isYT ? "فيديو YouTube" : (post.mediaType === "video" ? "فيديو جديد" : "خبر جديد"),
+          imageUrl: post.thumbnailUrl || post.mediaUrl || null,
+          sourceType: isX ? "x" : isInsta ? "instagram" : isYT ? "youtube" : "post",
+          createdAt: new Date(post.createdAt).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: "/offers",
+        });
       }
 
-      // 2. Issues within 24h
+      // 5. Issues
       for (const iss of issues) {
-        const dateVal = iss.createdAt || iss.issueDate;
-        if (!dateVal) continue;
-        const diffMs = now - new Date(dateVal).getTime();
-        const diffHours = diffMs / (1000 * 60 * 60);
-        if (diffHours >= -1 && diffHours <= 24) {
-          const hoursLeft = Math.max(1, Math.round(24 - diffHours));
-          allActiveStories.push({
-            id: "issue-" + iss.id,
-            title: iss.title,
-            category: "مجلة العقيق",
-            imageUrl: iss.coverUrl || null,
-            sourceType: "journal",
-            createdAt: new Date(dateVal).toISOString(),
-            timeAgo: diffHours < 1 ? "منذ قليل" : `منذ ${Math.round(diffHours)} ساعة`,
-            expiresInHours: hoursLeft,
-            targetUrl: `/journal/${encodeURIComponent(iss.slug)}`,
-          });
-        }
+        const dateVal = iss.publishedAt || iss.createdAt || iss.issueDate;
+        const t = formatStoryTime(dateVal);
+        allStories.push({
+          id: "issue-" + iss.id,
+          title: iss.title,
+          category: "مجلة العقيق",
+          imageUrl: iss.coverUrl || null,
+          sourceType: "journal",
+          createdAt: new Date(dateVal || 0).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: `/journal/${encodeURIComponent(iss.slug)}`,
+        });
       }
 
-      // 3. Albums within 24h
+      // 6. Albums
       for (const alb of albums) {
-        const dateVal = alb.createdAt || alb.albumDate;
-        if (!dateVal) continue;
-        const diffMs = now - new Date(dateVal).getTime();
-        const diffHours = diffMs / (1000 * 60 * 60);
-        if (diffHours >= -1 && diffHours <= 24) {
-          const hoursLeft = Math.max(1, Math.round(24 - diffHours));
-          allActiveStories.push({
-            id: "album-" + alb.id,
-            title: alb.title,
-            category: "ألبوم فعاليات",
-            imageUrl: alb.coverUrl || null,
-            sourceType: "album",
-            createdAt: new Date(dateVal).toISOString(),
-            timeAgo: diffHours < 1 ? "منذ قليل" : `منذ ${Math.round(diffHours)} ساعة`,
-            expiresInHours: hoursLeft,
-            targetUrl: `/albums/${encodeURIComponent(alb.slug)}`,
-          });
-        }
+        const dateVal = alb.albumDate || alb.createdAt;
+        const t = formatStoryTime(dateVal);
+        allStories.push({
+          id: "album-" + alb.id,
+          title: alb.title,
+          category: "ألبوم فعاليات",
+          imageUrl: alb.coverUrl || null,
+          sourceType: "album",
+          createdAt: new Date(dateVal || 0).toISOString(),
+          timeAgo: t.timeAgo,
+          expiresInHours: t.expiresInHours,
+          targetUrl: `/albums/${encodeURIComponent(alb.slug)}`,
+        });
       }
 
       const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
-      const visibleStories = allActiveStories.filter((s) => !hiddenSet.has(s.id) && !hiddenSet.has(`story-${s.id}`));
-      const hiddenStories = allActiveStories.filter((s) => hiddenSet.has(s.id) || hiddenSet.has(`story-${s.id}`));
+      const customSet = new Set(orchestration?.customStoryIds || []);
+
+      // Sort all stories newest first
+      allStories.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      // Mark pinned stories
+      for (const s of allStories) {
+        if (customSet.has(s.id) || customSet.has(`story-${s.id}`)) {
+          s.isPinned = true;
+        }
+      }
+
+      // Filter visible and hidden stories
+      const visibleStories = allStories.filter(
+        (s) => !hiddenSet.has(s.id) && !hiddenSet.has(`story-${s.id}`) && (customSet.size === 0 || s.isPinned)
+      );
+
+      // Prioritize pinned stories at the beginning
+      visibleStories.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
+
+      const hiddenStories = allStories.filter(
+        (s) => hiddenSet.has(s.id) || hiddenSet.has(`story-${s.id}`)
+      );
 
       return {
         totalIssues,
@@ -1292,6 +1366,172 @@ export const appRouter = router({
         });
         return { success: true, hiddenList };
       }),
+
+    toggleStoryActive: adminProcedure
+      .input(z.object({ storyId: z.string(), active: z.boolean() }))
+      .mutation(async ({ input, ctx }) => {
+        const res = await toggleSiteStory(input.storyId, input.active);
+        await logAudit({
+          userId: ctx.user.id,
+          userName: ctx.user.name,
+          action: input.active ? "admin.activate_story" : "admin.deactivate_story",
+          details: JSON.stringify(input),
+        });
+        return { success: true, ...res };
+      }),
+
+    getAllAvailableStories: adminProcedure.query(async () => {
+      const [issues, albums, showcases, postsShowcase, articles, podcasts, orchestration] = await Promise.all([
+        listSchoolNewsIssues().catch(() => []),
+        listAqeeqAlbums().catch(() => []),
+        listAqeeqShowcases().catch(() => []),
+        getAqeeqShowcaseBySlug("news-offers").catch(() => null),
+        listAllArticles().catch(() => []),
+        getPodcasts().catch(() => []),
+        getSiteOrchestration().catch(() => null),
+      ]);
+
+      const hiddenSet = new Set(orchestration?.hiddenStoryIds || []);
+      const customSet = new Set(orchestration?.customStoryIds || []);
+
+      type AvailableStory = {
+        id: string;
+        rawId: number | string;
+        title: string;
+        category: string;
+        type: "article" | "showcase" | "podcast" | "album" | "journal" | "post";
+        typeLabel: string;
+        imageUrl: string | null;
+        targetUrl: string;
+        createdAt: string;
+        isActive: boolean;
+        isPinned: boolean;
+      };
+
+      const list: AvailableStory[] = [];
+
+      // 1. Articles
+      for (const a of articles) {
+        const id = `article-${a.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: a.id,
+          title: a.title,
+          category: "مقال",
+          type: "article",
+          typeLabel: "مقال أدبي",
+          imageUrl: a.coverUrl || null,
+          targetUrl: `/articles/${a.slug}`,
+          createdAt: new Date(a.publishedAt || a.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      // 2. Video Showcases
+      for (const s of showcases) {
+        const id = `showcase-${s.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: s.id,
+          title: s.title,
+          category: "مرئي",
+          type: "showcase",
+          typeLabel: "عرض وتغطية",
+          imageUrl: s.coverUrl || null,
+          targetUrl: `/showcase/${s.slug}`,
+          createdAt: new Date(s.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      // 3. Podcasts
+      for (const p of podcasts) {
+        const id = `podcast-${p.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: p.id,
+          title: p.title,
+          category: "أثير",
+          type: "podcast",
+          typeLabel: p.mediaType === "video" ? "فيديو بودكاست" : "إذاعة صوتية",
+          imageUrl: p.coverUrl || null,
+          targetUrl: `/podcast`,
+          createdAt: new Date(p.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      // 4. Albums
+      for (const alb of albums) {
+        const id = `album-${alb.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: alb.id,
+          title: alb.title,
+          category: "ألبوم",
+          type: "album",
+          typeLabel: "ألبوم فعاليات",
+          imageUrl: alb.coverUrl || null,
+          targetUrl: `/albums/${alb.slug}`,
+          createdAt: new Date(alb.albumDate || alb.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      // 5. Issues
+      for (const iss of issues) {
+        const id = `issue-${iss.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: iss.id,
+          title: iss.title,
+          category: "مجلة",
+          type: "journal",
+          typeLabel: "مجلة العقيق",
+          imageUrl: iss.coverUrl || null,
+          targetUrl: `/journal/issue/${iss.slug}`,
+          createdAt: new Date(iss.publishedAt || iss.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      // 6. Showcase Posts
+      for (const post of postsShowcase?.posts || []) {
+        const id = `post-${post.id}`;
+        const isHidden = hiddenSet.has(id) || hiddenSet.has(`story-${id}`);
+        const isPinned = customSet.has(id) || customSet.has(`story-${id}`);
+        list.push({
+          id,
+          rawId: post.id,
+          title: post.title || post.fileName || "خبر وتغطية",
+          category: "منشور",
+          type: "post",
+          typeLabel: post.sourceType === "x" ? "منشور 𝕏" : post.sourceType === "instagram" ? "Instagram" : post.mediaType === "video" ? "فيديو" : "خبر",
+          imageUrl: post.thumbnailUrl || post.mediaUrl || null,
+          targetUrl: `/offers`,
+          createdAt: new Date(post.createdAt || 0).toISOString(),
+          isActive: isPinned || (!isHidden && customSet.size === 0),
+          isPinned,
+        });
+      }
+
+      return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }),
   }),
 
   // ==================== Admin Audio & Folder Utilities ====================

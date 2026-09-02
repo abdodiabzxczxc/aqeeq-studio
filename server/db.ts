@@ -663,6 +663,7 @@ export type SiteOrchestrationConfig = {
     mapUrl?: string | null;
   };
   hiddenStoryIds?: string[];
+  customStoryIds?: string[];
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -733,6 +734,7 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     mapUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
   },
   hiddenStoryIds: [],
+  customStoryIds: [],
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -754,6 +756,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           footer: { ...DEFAULT_SITE_ORCHESTRATION.footer, ...(parsed.footer || {}) },
           location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
           hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
+          customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
         };
       }
     } catch (err) {
@@ -778,6 +781,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         footer: { ...DEFAULT_SITE_ORCHESTRATION.footer, ...(parsed.footer || {}) },
         location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
         hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
+        customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
       };
     }
   } catch (err) {
@@ -801,6 +805,7 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     footer: { ...current.footer, ...(data.footer || {}) },
     location: { ...current.location, ...(data.location || {}) },
     hiddenStoryIds: data.hiddenStoryIds !== undefined ? data.hiddenStoryIds : current.hiddenStoryIds,
+    customStoryIds: data.customStoryIds !== undefined ? data.customStoryIds : current.customStoryIds,
   };
   const value = JSON.stringify(merged);
 
@@ -826,16 +831,41 @@ export async function hideSiteStory(storyId: string): Promise<string[]> {
   const current = await getSiteOrchestration();
   const list = new Set(current.hiddenStoryIds || []);
   list.add(storyId);
+  list.add(`story-${storyId}`);
   const updated = Array.from(list);
-  await setSiteOrchestration({ hiddenStoryIds: updated });
+  const updatedCustom = (current.customStoryIds || []).filter((id) => id !== storyId && id !== `story-${storyId}`);
+  await setSiteOrchestration({ hiddenStoryIds: updated, customStoryIds: updatedCustom });
   return updated;
 }
 
 export async function unhideSiteStory(storyId: string): Promise<string[]> {
   const current = await getSiteOrchestration();
-  const updated = (current.hiddenStoryIds || []).filter((id) => id !== storyId);
-  await setSiteOrchestration({ hiddenStoryIds: updated });
+  const updated = (current.hiddenStoryIds || []).filter((id) => id !== storyId && id !== `story-${storyId}`);
+  const customList = new Set(current.customStoryIds || []);
+  customList.add(storyId);
+  await setSiteOrchestration({ hiddenStoryIds: updated, customStoryIds: Array.from(customList) });
   return updated;
+}
+
+export async function toggleSiteStory(storyId: string, active: boolean): Promise<{ hiddenStoryIds: string[]; customStoryIds: string[] }> {
+  const current = await getSiteOrchestration();
+  const hidden = new Set(current.hiddenStoryIds || []);
+  const custom = new Set(current.customStoryIds || []);
+
+  if (active) {
+    hidden.delete(storyId);
+    hidden.delete(`story-${storyId}`);
+    custom.add(storyId);
+  } else {
+    custom.delete(storyId);
+    custom.delete(`story-${storyId}`);
+    hidden.add(storyId);
+  }
+
+  const updatedHidden = Array.from(hidden);
+  const updatedCustom = Array.from(custom);
+  await setSiteOrchestration({ hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom });
+  return { hiddenStoryIds: updatedHidden, customStoryIds: updatedCustom };
 }
 
 // ==================== Attendees ====================
