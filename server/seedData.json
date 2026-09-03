@@ -1119,7 +1119,7 @@
   },
   "overrides": {
     "/admissions::admissions-hero-student-photo": {
-      "id": 1788417552022,
+      "id": 1788417579004,
       "pagePath": "/admissions",
       "elementId": "admissions-hero-student-photo",
       "elementTag": "image",
@@ -1149,8 +1149,8 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "published",
-      "updatedAt": "2026-09-03T06:39:12.022Z",
-      "publishedAt": "2026-09-03T06:39:12.068Z"
+      "updatedAt": "2026-09-03T06:39:39.004Z",
+      "publishedAt": "2026-09-03T06:39:39.063Z"
     }
   },
   "nextId": {
