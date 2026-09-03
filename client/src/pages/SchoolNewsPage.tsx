@@ -10,6 +10,8 @@ import { ArrowUpLeft, BookOpen, CalendarDays, ChevronLeft, FolderArchive, Layers
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqPageHeroShowcase } from "@/components/AqeeqPageHeroShowcase";
+import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 
 type NewsIssue = {
   id: number;
@@ -304,204 +306,66 @@ export default function SchoolNewsPage() {
 
       {featuredIssue ? (
         <>
-          {/* Hero Section */}
-          <section className={`relative isolate overflow-hidden border-b ${
-            isNationalDay
-              ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
-              : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-          }`}>
-            {isNationalDay ? (
-              <>
-                <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
-              </>
-            ) : (
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
-            )}
-
-            <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-12 md:grid-cols-[1fr_1.1fr] md:px-8 md:py-16 lg:gap-16">
-              {/* Cover perspective on left in RTL */}
-              <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
-                {secondIssue ? (
-                  <button
-                    onClick={() => navigate(`/journal/${secondIssue.slug}`)}
-                    className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl ${
-                      isNationalDay
-                        ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
-                        : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-                    }`}
-                    style={{ transform: "rotate(-7deg)" }}
-                    aria-label={`العدد السابق: ${secondIssue.title}`}
-                  >
-                    {secondIssue.coverUrl ? (
-                      <VisualImage
-                        id={`journal-hero-previous-cover-${secondIssue.id}`}
-                        label="غلاف العدد السابق"
-                        src={directDriveImage(secondIssue.coverUrl) || secondIssue.coverUrl}
-                        alt=""
-                        className="h-full w-full rounded-[1.2rem] object-cover"
-                      />
-                    ) : null}
-                  </button>
-                ) : null}
-
-                <button
-                  onClick={() => navigate(`/journal/${featuredIssue.slug}`)}
-                  className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
-                    isNationalDay
-                      ? dark
-                        ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                        : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
-                      : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
-                  }`}
-                  style={{ transform: "rotate(3deg)" }}
-                  aria-label={`العدد الحالي: ${featuredIssue.title}`}
-                >
-                  <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-                    {featuredIssue.coverUrl ? (
-                      <VisualImage
-                        id={`journal-hero-current-cover-${featuredIssue.id}`}
-                        label="غلاف العدد الحالي"
-                        src={directDriveImage(featuredIssue.coverUrl) || featuredIssue.coverUrl}
-                        alt={`غلاف ${featuredIssue.title}`}
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
-                        <Newspaper size={42} />
-                      </div>
-                    )}
-
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16">
-                      <span className="text-[10px] font-black text-[#f8ca14]">
-                        {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
-                      </span>
-                      <VisualEditable
-                        id="journal-hero-featured-title"
-                        tag="text"
-                        label="عنوان غلاف العدد الحالي"
-                        defaultText={featuredIssue.title}
-                        as="h2"
-                        className="mt-1 text-lg font-black text-white"
-                      />
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              {/* Text info */}
-              <div className="order-1 md:order-2">
-                {isNationalDay ? (
-                  <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
-                    dark
-                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                      : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
-                  }`}>
-                    <span className="text-sm">🇸🇦</span>
-                    <span className="font-black">مجلة العقيق · هوية اليوم الوطني</span>
-                  </div>
-                ) : (
-                  <VisualEditable
-                    id="journal-hero-kicker"
-                    tag="text"
-                    label="شارة غلاف المجلة"
-                    defaultText={orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
-                    as="div"
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
-                      dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                    }`}
-                  >
-                    <Sparkles size={14} />
-                    {orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
-                  </VisualEditable>
-                )}
-
-                <VisualEditable
-                  id="journal-hero-title"
-                  tag="text"
-                  label="عنوان غلاف المجلة"
-                  defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبر يُقلب إلى ذكرى."}
-                  as="h1"
-                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
-                    dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
-                  }`}
+          {/* 🌟 1. 3D HERO CINEMA SHOWCASE */}
+          <section
+            className={`relative isolate overflow-hidden border-b py-12 md:py-16 ${
+              isNationalDay
+                ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+                : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+            }`}
+          >
+            <div className="relative mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+              {/* Header Row: Title & Action Buttons */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                <AqeeqSectionHeader
+                  badge={isNationalDay ? "🇸🇦 مجلة العقيق المدرسية · اليوم الوطني" : "MONTHLY JOURNAL · مجلة العقيق المدرسية"}
+                  badgeIcon={<BookOpen size={13} />}
+                  title="خبر يُقلب إلى ذكرى.. وإصدارات توثق التميز"
+                  subtitle="نشرات دورية وأعداد حصرية توثق إنجازات الطلاب، المقالات التربوية، والفعاليات الميدانية في مدارس العقيق بتجربة قراءة ثلاثية الأبعاد."
+                  dark={dark}
+                  className="!mb-0"
                 />
 
-                <VisualEditable
-                  id="journal-hero-intro"
-                  tag="text"
-                  label="مقدمة غلاف المجلة"
-                  defaultText={
-                    orchestration?.heroCovers?.journalCustomDesc ||
-                    "رفوف رقمية تجمع أعداد مجلة ونشرات مدارس العقيق الأهلية، مع كتيبات شهرية مؤرشفة وتجربة تصفح تفاعلية راقية."
-                  }
-                  as="p"
-                  className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
-                />
-
-                <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
-                  <span className={`rounded-full border px-3 py-2 ${
-                    isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                  }`}>
-                    <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                    {issues.length} عدد منشور
-                  </span>
-                  <span className={`rounded-full border px-3 py-2 ${
-                    isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                  }`}>
-                    <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                    {totalPages} صفحة
-                  </span>
-                  <span className={`rounded-full border px-3 py-2 ${
-                    isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                  }`}>
-                    <FolderArchive className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                    {monthGroups.length} كتيب شهري
-                  </span>
-                </div>
-
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <VisualEditable
-                    id="journal-hero-action"
-                    tag="button"
-                    label="زر قراءة العدد الحالي"
-                    defaultText="اقرأ العدد الحالي"
-                    as="button"
-                    onAction={() => navigate(`/journal/${featuredIssue.slug}`)}
-                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
-                      dark
-                        ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
-                        : isNationalDay
-                        ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
-                        : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
-                    }`}
-                  >
-                    <ArrowUpLeft size={16} />
-                    اقرأ العدد الحالي
-                  </VisualEditable>
-
-
-                  {isAdmin ? (
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-3">
+                  {isAdmin && (
                     <button
                       onClick={() => navigate("/journal/manage")}
-                      className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                      className={`inline-flex items-center gap-2 rounded-2xl border px-6 py-3.5 text-xs font-black transition-all hover:scale-105 shadow-md ${
                         dark
-                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
-                          : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                          ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14]/25"
+                          : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                       }`}
                     >
-                      <Settings2 size={16} />
-                      دخول استوديو المجلة
+                      <Settings2 size={15} />
+                      <span>دخول استوديو المجلة</span>
                     </button>
-                  ) : null}
+                  )}
                 </div>
               </div>
+
+              {/* 🌟 The Exact 7-col Hero + 3-stacked Cards Showcase */}
+              <AqeeqPageHeroShowcase
+                dark={dark}
+                hero={{
+                  id: featuredIssue.id,
+                  title: featuredIssue.title,
+                  coverUrl: (directDriveImage(featuredIssue.coverUrl) || featuredIssue.coverUrl) ?? null,
+                  badge: `${featuredIssue.pageCount || 1} صفحة صحفية`,
+                  dateOrMeta: featuredIssue.issueDate,
+                  href: `/journal/${featuredIssue.slug}`,
+                  excerpt: featuredIssue.description || "عدد وثائقي حصري يحفظ نبض فعاليات مدارس العقيق وإبداعات الطلاب والمعلمين.",
+                  ctaText: "تصفح أوراق العدد ثلاثي الأبعاد 📖",
+                }}
+                stack={visibleIssues.filter((i) => i.id !== featuredIssue.id).slice(0, 3).map((i) => ({
+                  id: i.id,
+                  title: i.title,
+                  coverUrl: (directDriveImage(i.coverUrl) || i.coverUrl) ?? null,
+                  badge: `${i.pageCount || 1} صفحات`,
+                  dateOrMeta: i.issueDate,
+                  href: `/journal/${i.slug}`,
+                }))}
+              />
             </div>
           </section>
 

@@ -1289,13 +1289,18 @@ export default function AlaqeeqStudioPublicPage() {
             <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
               صوت العقيق والكلمة التربوية
             </h2>
-            <motion.div
-              initial={{ width: 0 }}
-              whileInView={{ width: 140 }}
-              viewport={{ once: false }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className={`h-1 rounded-full mt-3 mb-2 ${dark ? "bg-gradient-to-l from-[#f8ca14] to-transparent" : "bg-gradient-to-l from-[#08467d] to-transparent"}`}
-            />
+            {/* Glowing Golden Accent Line with Traveling Light Shimmer */}
+            <div className={`relative my-3 h-[3px] w-44 sm:w-56 rounded-full overflow-hidden ${
+              dark
+                ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/70 to-transparent shadow-[0_0_12px_rgba(248,202,20,0.45)]"
+                : "bg-gradient-to-l from-[#08467d] via-[#08467d]/70 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.3)]"
+            }`}>
+              <motion.div
+                animate={{ x: ["100%", "-100%"] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-y-0 w-16 bg-white/80 blur-[2px]"
+              />
+            </div>
             <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}>
               رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق.
             </p>

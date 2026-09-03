@@ -97,6 +97,18 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
             <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
               أروقة العقيق الإعلامية
             </h2>
+            {/* Glowing Golden Accent Line */}
+            <div className={`relative my-2.5 h-[3px] w-44 sm:w-56 rounded-full overflow-hidden ${
+              dark
+                ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/70 to-transparent shadow-[0_0_12px_rgba(248,202,20,0.45)]"
+                : "bg-gradient-to-l from-[#08467d] via-[#08467d]/70 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.3)]"
+            }`}>
+              <motion.div
+                animate={{ x: ["100%", "-100%"] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-y-0 w-16 bg-white/80 blur-[2px]"
+              />
+            </div>
             <p className={`mt-1.5 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}>
               اسحب أو مرر بالماوس لاستكشاف أحدث أعداد المجلة المدرسية والتوثيقات المصورة للفعاليات الكبرى.
             </p>

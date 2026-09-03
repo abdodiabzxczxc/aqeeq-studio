@@ -152,6 +152,19 @@ export function AqeeqLiveArchiveSection({
               أرشيف العقيق <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المفتوح الشامل.</span>
             </h2>
 
+            {/* Glowing Golden Accent Line */}
+            <div className={`relative my-3.5 h-[3px] w-48 sm:w-60 rounded-full overflow-hidden ${
+              dark
+                ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/70 to-transparent shadow-[0_0_12px_rgba(248,202,20,0.45)]"
+                : "bg-gradient-to-l from-[#08467d] via-[#08467d]/70 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.3)]"
+            }`}>
+              <motion.div
+                animate={{ x: ["100%", "-100%"] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-y-0 w-16 bg-white/80 blur-[2px]"
+              />
+            </div>
+
             <p className={`mt-3 text-xs sm:text-sm leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}>
               منظومة إحصائية حية توثق النبض اليومي لمدارس العقيق، من الأخبار والعروض المباشرة والمجلات والألبومات، متاحة بشفافية تامة للمجتمع المدرسي.
             </p>

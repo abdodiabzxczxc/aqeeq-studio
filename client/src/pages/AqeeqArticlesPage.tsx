@@ -7,6 +7,8 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { AqeeqPageHeroShowcase } from "@/components/AqeeqPageHeroShowcase";
+import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 import {
   PenTool,
   Search,
@@ -384,228 +386,38 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       {/* Top Header Bar */}
       <AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="articles" />
 
-      {/* Hero Section matching Journal & Albums */}
+      {/* Hero Showcase Section with 7-col Hero + 3-stacked Cards Layout */}
       <section
-        className={`relative isolate overflow-hidden border-b ${
+        className={`relative isolate overflow-hidden border-b py-12 md:py-16 ${
           isNationalDay
             ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
             : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         }`}
       >
-        {isNationalDay ? (
-          <>
-            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
-          </>
-        ) : (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
-        )}
-
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
-          {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
-          <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
-            {secondArticle ? (
-              <button
-                onClick={() => setReadingArticle(secondArticle)}
-                className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
-                  isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
-                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-                }`}
-                style={{ transform: "rotate(-7deg)" }}
-                aria-label={`المقال السابق: ${secondArticle.title}`}
-              >
-                {secondArticle.coverUrl ? (
-                  <img
-                    src={directDriveImage(secondArticle.coverUrl) || secondArticle.coverUrl}
-                    alt=""
-                    className="h-full w-full rounded-[1.2rem] object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
-                    <BookOpen size={30} className="text-slate-400" />
-                    <div>
-                      <span className="text-[10px] font-black text-[#f8ca14]">{secondArticle.category}</span>
-                      <p className="line-clamp-2 text-xs font-black text-white">{secondArticle.title}</p>
-                    </div>
-                  </div>
-                )}
-              </button>
-            ) : null}
-
-            {featuredArticle ? (
-              <button
-                onClick={() => setReadingArticle(featuredArticle)}
-                className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
-                  isNationalDay
-                    ? dark
-                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
-                    : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
-                }`}
-                style={{ transform: "rotate(3deg)" }}
-                aria-label={`المقال الحالي: ${featuredArticle.title}`}
-              >
-                <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-                  {featuredArticle.coverUrl ? (
-                    <img
-                      src={directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl}
-                      alt={`غلاف ${featuredArticle.title}`}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div
-                      className={`flex h-full flex-col justify-between p-6 text-right ${
-                        dark
-                          ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
-                          : isNationalDay
-                          ? "bg-emerald-50 text-[#005A36]"
-                          : "bg-slate-100 text-[#08467d]"
-                      }`}
-                    >
-                      <BookOpen size={42} />
-                      <div>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
-                          <Sparkles size={11} /> مقال مميز
-                        </span>
-                        <h2 className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
-                          {featuredArticle.title}
-                        </h2>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
-                    <span className="text-[10px] font-black text-[#f8ca14]">
-                      {featuredArticle.category} · بقلم: {featuredArticle.authorName}
-                    </span>
-                    <h2 className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
-                      {featuredArticle.title}
-                    </h2>
-                  </div>
-                </div>
-              </button>
-            ) : null}
-          </div>
-
-          {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
-          <div className="order-1 md:order-2 text-right">
-            {isNationalDay ? (
-              <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
-                dark
-                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                  : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
-              }`}>
-                <span className="text-sm">🇸🇦</span>
-                <span className="font-black">مقالات وأقلام العقيق · هوية اليوم الوطني</span>
-              </div>
-            ) : (
-              <VisualEditable
-                id="articles-hero-kicker"
-                tag="text"
-                label="شارة مقالات العقيق"
-                defaultText={orchestration?.heroCovers?.articlesCustomTag || "موسم العقيق · مقالات وأقلام"}
-                as="div"
-                className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
-                  dark
-                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                }`}
-              >
-                {(text) => (
-                  <>
-                    <Sparkles size={14} />
-                    <span>{text}</span>
-                  </>
-                )}
-              </VisualEditable>
-            )}
-
-            <VisualEditable
-              id="articles-hero-title"
-              tag="text"
-              label="عنوان صفحة المقالات"
-              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
-              as="h1"
-              className={`mt-5 text-4xl font-black leading-[1.14] md:text-6xl ${
-                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
-              }`}
+        <div className="relative mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+          {/* Header Row: Title & Action Buttons */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <AqeeqSectionHeader
+              badge={isNationalDay ? "🇸🇦 مقالات وأقلام العقيق · اليوم الوطني" : "ARTICLES & ESSAYS · أقلام وفكر العقيق"}
+              badgeIcon={<PenTool size={13} />}
+              title="أقلام تفيض فكراً وإبداعاً"
+              subtitle="رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."
+              dark={dark}
+              className="!mb-0"
             />
 
-            <VisualEditable
-              id="articles-hero-desc"
-              tag="text"
-              label="وصف صفحة المقالات"
-              defaultText={orchestration?.heroCovers?.articlesCustomDesc ||
-                "رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."}
-              as="p"
-              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
-            />
-
-            {/* Stats pills */}
-            <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
-              <span
-                className={`rounded-full border px-3 py-2 ${
-                  isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                }`}
-              >
-                <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                {rawArticles.length} مقال منشور
-              </span>
-              <span
-                className={`rounded-full border px-3 py-2 ${
-                  isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                }`}
-              >
-                <User className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                {new Set(rawArticles.map((a) => a.authorName)).size || 1} كاتب وقلم
-              </span>
-              <span
-                className={`rounded-full border px-3 py-2 ${
-                  isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
-                }`}
-              >
-                <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
-                إبداعات وتجارب
-              </span>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="mt-7 flex flex-wrap gap-3">
-              {featuredArticle ? (
-                <button
-                  onClick={() => setReadingArticle(featuredArticle)}
-                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
-                    dark
-                      ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
-                      : isNationalDay
-                      ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
-                      : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
-                  }`}
-                >
-                  <ArrowUpLeft size={16} />
-                  <span>اقرأ المقال المميز</span>
-                </button>
-              ) : null}
-
+            {/* Actions */}
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsSubmitOpen(true)}
-                className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-2xl border px-6 py-3.5 text-xs font-black transition-all hover:scale-105 shadow-md ${
                   dark
-                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
-                    : isNationalDay
-                    ? "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100"
-                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14]/25"
+                    : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                 }`}
               >
-                <PenTool size={16} />
+                <PenTool size={15} />
                 <span>شاركنا بمقالك ✍️</span>
               </button>
 
@@ -613,9 +425,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 <button
                   type="button"
                   onClick={() => navigate("/articles/manage")}
-                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-black transition ${
+                  className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-black transition-all hover:scale-105 shadow-md ${
                     dark
-                      ? "border-purple-400/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
+                      ? "border-purple-400/40 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25"
                       : "border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
                   }`}
                 >
