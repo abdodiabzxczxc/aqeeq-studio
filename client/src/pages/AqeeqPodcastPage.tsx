@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -2462,6 +2463,9 @@ export default function AqeeqPodcastPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

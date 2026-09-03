@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1540,6 +1541,9 @@ export default function AqeeqSchoolAdmissionsPage() {
           </div>
         </div>
       </section>
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

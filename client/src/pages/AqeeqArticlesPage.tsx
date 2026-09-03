@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -399,7 +400,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
         )}
 
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
           {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
           <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
             {secondArticle ? (
@@ -984,6 +985,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
       {/* Guest Submit Modal */}
       <AqeeqArticleSubmitModal open={isSubmitOpen} onOpenChange={setIsSubmitOpen} />
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

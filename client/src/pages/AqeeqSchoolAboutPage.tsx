@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
@@ -762,6 +763,9 @@ export default function AqeeqSchoolAboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

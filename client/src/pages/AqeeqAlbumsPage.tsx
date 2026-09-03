@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AqeeqArchiveControls } from "@/components/AqeeqArchiveControls";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -346,6 +347,9 @@ export default function AqeeqAlbumsPage() {
       )}
 
       <AqeeqAiYearbookGenerator open={isWrappedOpen} onOpenChange={setIsWrappedOpen} />
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

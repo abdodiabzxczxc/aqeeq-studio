@@ -5754,7 +5754,141 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
                   )}
 
-                  <div className={`rounded-3xl border overflow-hidden shadow-lg ${
+                  {/* Mobile Cards View (block md:hidden) */}
+                  <div className="block md:hidden space-y-3">
+                    {filtered.map((lead: any) => {
+                      const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
+                      const waMessage = encodeURIComponent(
+                        `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
+                      );
+                      const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
+
+                      return (
+                        <div
+                          key={`mob-${lead.id}`}
+                          className={`rounded-2xl border p-4 space-y-3 transition ${
+                            dark ? "border-white/10 bg-[#121212]" : "border-slate-200/90 bg-white shadow-sm"
+                          }`}
+                        >
+                          {/* Top Row: Checkbox + Student Name + Track */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2.5">
+                              <input
+                                type="checkbox"
+                                checked={selectedLeadIds.includes(lead.id)}
+                                onChange={() => {
+                                  setSelectedLeadIds((prev) =>
+                                    prev.includes(lead.id) ? prev.filter((id) => id !== lead.id) : [...prev, lead.id]
+                                  );
+                                }}
+                                className="rounded accent-emerald-600 h-4 w-4 mt-0.5 cursor-pointer"
+                              />
+                              <div>
+                                <h4 className="font-black text-sm">{lead.studentName}</h4>
+                                <p className="text-[11px] text-slate-500 mt-0.5">
+                                  {lead.gradeLevel === "kindergarten"
+                                    ? "رياض الأطفال (KG)"
+                                    : lead.gradeLevel === "primary"
+                                    ? "المرحلة الابتدائية"
+                                    : lead.gradeLevel === "middle"
+                                    ? "المرحلة المتوسطة"
+                                    : "المرحلة الثانوية"}
+                                  {" · "}
+                                  {lead.gender === "girls" ? "مجمع البنات" : "مجمع البنين"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <span className="inline-block rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400 shrink-0">
+                              {lead.track === "international" ? "🌐 دولي" : "🇸🇦 أهلي"}
+                            </span>
+                          </div>
+
+                          {/* Middle Row: Guardian & Submission Date */}
+                          <div className="flex items-center justify-between text-xs border-t border-b py-2 border-current/5">
+                            <div>
+                              <span className="text-slate-400 text-[10px] block">ولي الأمر:</span>
+                              <span className="font-bold">{lead.guardianName}</span>
+                            </div>
+                            <div className="text-left font-mono text-[10px] text-slate-400">
+                              {new Date(lead.createdAt).toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
+                            </div>
+                          </div>
+
+                          {/* Notes if present */}
+                          {lead.notes && (
+                            <p className="text-[11px] text-slate-500 bg-current/5 p-2 rounded-xl">
+                              💬 {lead.notes}
+                            </p>
+                          )}
+
+                          {/* Actions: Direct Contact & Status Dropdown & Delete */}
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <div className="flex items-center gap-1.5">
+                              <a
+                                href={`tel:${lead.phone}`}
+                                className="flex items-center gap-1 h-8 px-2.5 rounded-xl bg-blue-500/10 text-blue-500 text-xs font-bold hover:bg-blue-500 hover:text-white transition"
+                              >
+                                <PhoneCall size={12} />
+                                <span>اتصال</span>
+                              </a>
+                              <a
+                                href={waUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1 h-8 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-600 text-xs font-black hover:bg-emerald-600 hover:text-white transition"
+                              >
+                                <MessageCircle size={12} />
+                                <span>واتساب</span>
+                              </a>
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={lead.status}
+                                onChange={(e) =>
+                                  updateAdmissionStatusMutation.mutate({
+                                    id: lead.id,
+                                    status: e.target.value as any,
+                                  })
+                                }
+                                className={`rounded-xl border px-2 py-1 text-[11px] font-black outline-none ${
+                                  lead.status === "new"
+                                    ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
+                                    : lead.status === "contacted"
+                                    ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
+                                    : lead.status === "admitted"
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                                    : "border-red-500/30 bg-red-500/10 text-red-500"
+                                }`}
+                              >
+                                <option value="new">جديد 🟡</option>
+                                <option value="contacted">تم التواصل 📞</option>
+                                <option value="admitted">تم القبول ✅</option>
+                                <option value="rejected">مرفوض ❌</option>
+                              </select>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (window.confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) {
+                                    deleteAdmissionMutation.mutate({ id: lead.id });
+                                  }
+                                }}
+                                className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition shrink-0"
+                                title="حذف الطلب"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Table View (hidden md:block) */}
+                  <div className={`hidden md:block rounded-3xl border overflow-hidden shadow-lg ${
                     dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
                   }`}>
                     <div className="overflow-x-auto">

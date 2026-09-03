@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AqeeqArchiveControls } from "@/components/AqeeqArchiveControls";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -253,9 +254,37 @@ export default function SchoolNewsPage() {
 
   if (isLoading) {
     return (
-      <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-        <Loader2 className="animate-spin text-[#f8ca14]" />
-      </div>
+      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
+        {/* Skeleton Hero */}
+        <section className={`border-b py-12 px-5 sm:px-8 animate-pulse ${dark ? "border-white/10 bg-[#080808]" : "border-black/5 bg-slate-50"}`}>
+          <div className="mx-auto grid max-w-[1440px] items-center gap-8 md:grid-cols-[1fr_1.1fr]">
+            <div className={`h-[320px] md:h-[420px] rounded-[2rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+            <div className="space-y-4">
+              <div className={`h-6 w-36 rounded-full ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+              <div className={`h-10 w-3/4 rounded-2xl ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+              <div className={`h-4 w-full rounded-lg ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+              <div className={`h-4 w-2/3 rounded-lg ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+              <div className="flex gap-3 pt-4">
+                <div className={`h-10 w-36 rounded-xl ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+                <div className={`h-10 w-36 rounded-xl ${dark ? "bg-white/5" : "bg-slate-100"}`} />
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* Skeleton Cards Grid */}
+        <section className="mx-auto max-w-[1440px] px-5 sm:px-8 py-12">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={`rounded-[2rem] border p-5 animate-pulse space-y-4 ${dark ? "border-white/10 bg-[#0c0c0c]" : "border-black/5 bg-slate-50"}`}>
+                <div className={`h-44 rounded-[1.5rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+                <div className={`h-5 w-3/4 rounded-lg ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+                <div className={`h-3 w-1/2 rounded-md ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
     );
   }
 
@@ -629,6 +658,9 @@ export default function SchoolNewsPage() {
           ) : null}
         </section>
       )}
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

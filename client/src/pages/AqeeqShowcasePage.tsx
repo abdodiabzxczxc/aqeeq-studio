@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AqeeqArchiveControls } from "@/components/AqeeqArchiveControls";
 import { AqeeqUnifiedVideoFrame, AqeeqVideoPlayer, AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualBackground, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -976,6 +977,9 @@ export default function AqeeqShowcasePage() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }
