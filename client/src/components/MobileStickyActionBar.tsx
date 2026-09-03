@@ -31,7 +31,6 @@ export function MobileStickyActionBar() {
           const windowHeight = window.innerHeight;
           const documentHeight = document.documentElement.scrollHeight;
           const nearBottom = scrollY + windowHeight > documentHeight - 120;
-
           if (scrollY > 180 && !nearBottom && !dismissed) {
             setVisible(true);
           } else {
@@ -42,91 +41,90 @@ export function MobileStickyActionBar() {
         ticking = true;
       }
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [dismissed]);
 
-  // Don't show in admin dashboard
-  if (location.startsWith("/admin")) {
-    return null;
-  }
+  if (location.startsWith("/admin")) return null;
+
+  const accentGradient = isNationalDay
+    ? dark
+      ? "from-[#f8ca14] to-amber-500 text-black shadow-amber-500/25"
+      : "from-[#005a37] to-emerald-700 text-white shadow-emerald-900/30"
+    : dark
+    ? "from-emerald-500 to-[#005a37] text-white shadow-emerald-900/40"
+    : "from-[#005a37] to-emerald-700 text-white shadow-emerald-900/25";
 
   return (
     <div
       dir="rtl"
-      className={`fixed bottom-0 inset-x-0 z-40 lg:hidden px-3 pt-2 pb-[env(safe-area-inset-bottom,0px)] transition-all duration-300 ease-out ${
-        visible ? "translate-y-0 opacity-100 pointer-events-auto" : "translate-y-full opacity-0 pointer-events-none"
+      className={`fixed bottom-0 inset-x-0 z-40 lg:hidden transition-all duration-300 ease-out ${
+        visible
+          ? "translate-y-0 opacity-100 pointer-events-auto"
+          : "translate-y-full opacity-0 pointer-events-none"
       } ${
         dark
-          ? "bg-[#060a0f]/92 border-t border-emerald-500/20 text-white shadow-[0_-8px_30px_rgba(0,0,0,0.85)]"
-          : "bg-white/94 border-t border-emerald-950/10 text-slate-900 shadow-[0_-8px_25px_rgba(1,90,55,0.12)]"
+          ? "bg-[#060a0f]/95 border-t border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.9)]"
+          : "bg-white/96 border-t border-black/[.08] shadow-[0_-6px_24px_rgba(0,0,0,0.10)]"
       } backdrop-blur-xl`}
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="max-w-md mx-auto flex items-center gap-2">
-        {/* Main Apply Button */}
+      <div className="max-w-md mx-auto flex items-center gap-2 px-3 py-2">
+
+        {/* زر سجّل الآن — Primary CTA */}
         <button
           type="button"
           onClick={() => {
             if (location === "/admissions") {
-              const el = document.getElementById("admission-form-section");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
+              document.getElementById("admission-form-section")?.scrollIntoView({ behavior: "smooth" });
             } else {
               navigate("/admissions");
             }
           }}
-          className={`flex-1 inline-flex items-center justify-center gap-1.5 h-11 min-h-[44px] px-4 rounded-xl text-xs font-black shadow-md active:scale-95 transition ${
-            isNationalDay
-              ? dark
-                ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-amber-500/20"
-                : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white shadow-emerald-900/25"
-              : dark
-              ? "bg-gradient-to-r from-emerald-600 to-[#005A36] text-white shadow-emerald-950/40"
-              : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white shadow-emerald-900/25"
-          }`}
+          className={`flex-1 inline-flex items-center justify-center gap-2 h-11 min-h-[44px] rounded-2xl text-sm font-black shadow-lg active:scale-[.97] transition bg-gradient-to-l ${accentGradient}`}
         >
-          <GraduationCap size={15} />
-          <span>سجّل الآن ✦</span>
+          <GraduationCap size={16} />
+          <span>سجّل الآن</span>
         </button>
 
-        {/* WhatsApp Instant Chat */}
+        {/* واتساب */}
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noreferrer"
-          aria-label="تواصل عبر الواتساب"
-          className="inline-flex items-center justify-center gap-1 h-11 min-h-[44px] px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black shadow-md transition shrink-0"
-        >
-          <MessageCircle size={16} />
-          <span className="hidden xs:inline">واتساب</span>
-        </a>
-
-        {/* Call School Admissions */}
-        <a
-          href={`tel:${cleanPhone}`}
-          aria-label="اتصال بهاتف القبول"
-          className={`inline-flex items-center justify-center h-11 w-11 min-h-[44px] rounded-xl border active:scale-95 transition shrink-0 ${
+          aria-label="واتساب"
+          className={`inline-flex items-center justify-center h-11 w-11 min-h-[44px] rounded-2xl active:scale-[.97] transition shrink-0 ${
             dark
-              ? "border-white/15 bg-white/5 text-slate-200 hover:bg-white/10"
-              : "border-slate-300 bg-slate-50 text-slate-800 hover:bg-slate-100 shadow-sm"
+              ? "bg-white/[.08] border border-white/[.12] text-[#25D366]"
+              : "bg-[#25D366]/10 border border-[#25D366]/20 text-[#128C7E]"
           }`}
         >
-          <PhoneCall size={16} className="text-emerald-500" />
+          <MessageCircle size={18} />
         </a>
 
-        {/* Close / Dismiss Bar */}
+        {/* اتصال */}
+        <a
+          href={`tel:${cleanPhone}`}
+          aria-label="اتصال"
+          className={`inline-flex items-center justify-center h-11 w-11 min-h-[44px] rounded-2xl active:scale-[.97] transition shrink-0 ${
+            dark
+              ? "bg-white/[.08] border border-white/[.12] text-slate-300"
+              : "bg-slate-100 border border-slate-200 text-slate-700"
+          }`}
+        >
+          <PhoneCall size={16} />
+        </a>
+
+        {/* إغلاق */}
         <button
           type="button"
-          onClick={() => {
-            setVisible(false);
-            setDismissed(true);
-          }}
-          aria-label="إغلاق الشريط"
-          className="h-11 w-11 min-h-[44px] inline-flex items-center justify-center text-slate-400 hover:text-current transition opacity-60 hover:opacity-100 shrink-0"
+          onClick={() => { setVisible(false); setDismissed(true); }}
+          aria-label="إغلاق"
+          className="inline-flex items-center justify-center h-9 w-9 rounded-xl opacity-35 hover:opacity-70 transition shrink-0"
         >
-          <X size={14} />
+          <X size={15} />
         </button>
+
       </div>
     </div>
   );
