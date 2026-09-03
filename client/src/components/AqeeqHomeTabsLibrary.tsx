@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -10,11 +10,17 @@ import {
   Clapperboard, 
   ArrowLeft,
   Calendar,
-  Sparkles
+  Sparkles,
+  Play,
+  Volume2,
+  Eye,
+  ArrowUpLeft,
+  Compass
 } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { useLocation } from "wouter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
+import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -32,6 +38,7 @@ interface UnifiedLibraryCardItem {
   badge: string;
   dateOrMeta?: string;
   href: string;
+  excerpt?: string;
 }
 
 export function AqeeqHomeTabsLibrary({
@@ -45,20 +52,10 @@ export function AqeeqHomeTabsLibrary({
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+  const { playEpisode } = usePodcastPlayer();
   const [activeTab, setActiveTab] = useState<"podcasts" | "articles" | "albums" | "journal" | "showcase">("podcasts");
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const rawEvenY = useTransform(scrollYProgress, [0, 1], [30, -30]);
-  const rawOddY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
-  const evenY = useSpring(rawEvenY, { stiffness: 90, damping: 22 });
-  const oddY = useSpring(rawOddY, { stiffness: 90, damping: 22 });
-
-
 
   // Fetch data for all systems
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({});
@@ -68,11 +65,11 @@ export function AqeeqHomeTabsLibrary({
   const { data: showcase } = trpc.aqeeqShowcases.publicShowcase.useQuery({ slug: "news-offers" });
 
   const tabs = [
-    { id: "podcasts", label: "البودكاست", icon: <Mic size={15} />, count: podcasts.length },
-    { id: "articles", label: "المقالات", icon: <Newspaper size={15} />, count: articles.length },
-    { id: "albums", label: "الألبومات", icon: <ImageIcon size={15} />, count: albums.length },
-    { id: "journal", label: "المجلة", icon: <BookOpen size={15} />, count: issues.length },
-    { id: "showcase", label: "العروض", icon: <Clapperboard size={15} />, count: showcase?.posts?.length || 0 },
+    { id: "podcasts", label: "البودكاست", icon: <Mic size={16} />, count: podcasts.length, color: "from-indigo-500 to-purple-600" },
+    { id: "articles", label: "المقالات", icon: <Newspaper size={16} />, count: articles.length, color: "from-rose-500 to-pink-600" },
+    { id: "albums", label: "الألبومات", icon: <ImageIcon size={16} />, count: albums.length, color: "from-emerald-500 to-teal-600" },
+    { id: "journal", label: "المجلة", icon: <BookOpen size={16} />, count: issues.length, color: "from-amber-500 to-yellow-600" },
+    { id: "showcase", label: "العروض", icon: <Clapperboard size={16} />, count: showcase?.posts?.length || 0, color: "from-cyan-500 to-blue-600" },
   ] as const;
 
   // Build unified items for current tab
@@ -80,29 +77,32 @@ export function AqeeqHomeTabsLibrary({
     switch (activeTab) {
       case "podcasts":
         return {
-          title: "حلقات صوت العقيق الإذاعية",
-          subtitle: "استمع لأحدث الحوارات، الإذاعات المدرسية واللقاءات الحصرية المسجلة.",
-          viewAllText: "تصفح جميع الحلقات",
+          title: "صوت العقيق الإذاعي",
+          subtitle: "حوارات ملهمة، تجارب طلابية، وإذاعات مدرسية حصرية مسجلة بأعلى جودة.",
+          viewAllText: "استمع لجميع الحلقات",
           viewAllHref: "/podcast",
-          badgeColor: dark ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30" : "bg-indigo-50 text-indigo-700 border-indigo-200",
-          icon: <Mic size={18} className="text-indigo-400" />,
+          themeColor: "#6366f1",
+          heroBadge: "🎙️ أحدث الحلقات الصوتية",
+          icon: <Mic size={20} className="text-indigo-400" />,
           items: podcasts.slice(0, 4).map((p): UnifiedLibraryCardItem => ({
             id: p.id,
             title: p.title,
             coverUrl: directDriveImage(p.coverUrl),
-            badge: "بودكاست",
+            badge: "بودكاست العقيق",
             dateOrMeta: p.publishedAt ? new Date(p.publishedAt).toLocaleDateString("ar-SA") : "تسجيل صوتي",
             href: "/podcast",
+            excerpt: "حلقة صوتية حصرية تناقش أبرز المحاور التعليمية والتربوية لمدارس العقيق.",
           }))
         };
       case "articles":
         return {
-          title: "أحدث المقالات والنشرات",
-          subtitle: "قراءات فكرية وتربوية وتغطيات خبرية متكاملة بقلم أسرة العقيق.",
-          viewAllText: "قراءة كافة المقالات",
+          title: "النشرات والمقالات التربوية",
+          subtitle: "رؤى فكرية وقراءات عميقة بقلم قادة المدارس ومعلميها المتميزين.",
+          viewAllText: "تصفح مكتبة المقالات",
           viewAllHref: "/articles",
-          badgeColor: dark ? "bg-rose-500/20 text-rose-300 border-rose-500/30" : "bg-rose-50 text-rose-700 border-rose-200",
-          icon: <Newspaper size={18} className="text-rose-400" />,
+          themeColor: "#f43f5e",
+          heroBadge: "📰 مقال الأسبوع المميز",
+          icon: <Newspaper size={20} className="text-rose-400" />,
           items: articles.slice(0, 4).map((a): UnifiedLibraryCardItem => ({
             id: a.id,
             title: a.title,
@@ -110,64 +110,73 @@ export function AqeeqHomeTabsLibrary({
             badge: "مقال ونشرة",
             dateOrMeta: a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("ar-SA") : "قراءة صحفية",
             href: `/articles/${a.slug}`,
+            excerpt: a.excerpt || "قراءة تحليلية تثري المعرفة التربوية لأولياء الأمور والطلاب.",
           }))
         };
       case "albums":
         return {
-          title: "ألبومات الفعاليات والأنشطة",
-          subtitle: "معرض الصور التذكارية والفوتوغرافية لأهم لحظات ومناسبات المدارس.",
-          viewAllText: "استكشاف جميع الألبومات",
+          title: "أرشيف الألبومات والفعاليات",
+          subtitle: "توثيق فوتوغرافي شامل لكل احتفالية وبطولة ومناسبة على مدار العام.",
+          viewAllText: "استكشف كافة الألبومات",
           viewAllHref: "/albums",
-          badgeColor: dark ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-200",
-          icon: <ImageIcon size={18} className="text-emerald-400" />,
+          themeColor: "#10b981",
+          heroBadge: "📸 تغطية مصورة كبرى",
+          icon: <ImageIcon size={20} className="text-emerald-400" />,
           items: albums.slice(0, 4).map((al): UnifiedLibraryCardItem => ({
             id: al.id,
             title: al.title,
             coverUrl: directDriveImage(al.coverUrl),
-            badge: "ألبوم صور",
+            badge: "ألبوم صور حي",
             dateOrMeta: (al as any).eventDate || (al.publishedAt ? new Date(al.publishedAt).toLocaleDateString("ar-SA") : "أرشيف مصور"),
             href: `/albums/${al.slug}`,
+            excerpt: "لقطات احترافية توثق ملامح الفرح والإنجاز لفرسان وفراشات العقيق.",
           }))
         };
       case "journal":
         return {
           title: "أعداد المجلة المدرسية التفاعلية",
-          subtitle: "إصدارات دورية إلكترونية بتقليب صفحات تفاعلي وتصميم صحفي راقٍ.",
-          viewAllText: "أرشيف المجلة الكامل",
+          subtitle: "إصدارات دورية فاخرة تُنشر رقمياً مع خاصية تقليب الصفحات ثلاثية الأبعاد.",
+          viewAllText: "أرشيف الأعداد الكامل",
           viewAllHref: "/journal",
-          badgeColor: dark ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-amber-50 text-amber-700 border-amber-200",
-          icon: <BookOpen size={18} className="text-amber-400" />,
+          themeColor: "#f59e0b",
+          heroBadge: "📖 العدد الرسمي المتصدر",
+          icon: <BookOpen size={20} className="text-amber-400" />,
           items: issues.slice(0, 4).map((i): UnifiedLibraryCardItem => ({
             id: i.id,
             title: i.title,
             coverUrl: directDriveImage(i.coverUrl),
-            badge: "مجلة دورية",
+            badge: "مجلة العقيق الدورية",
             dateOrMeta: i.publishedAt ? new Date(i.publishedAt).toLocaleDateString("ar-SA") : "عدد رقمي",
             href: `/journal/issue/${i.slug}`,
+            excerpt: "عدد مميز يجمع أبرز مقالات وأنشطة وتقارير الفصل الدراسي في إخراج صحفي راقٍ.",
           }))
         };
       case "showcase":
         const posts = (showcase?.posts || []) as any[];
         return {
-          title: "شاشة العروض والتغطيات الحية",
-          subtitle: "منشورات فورية وفيديوهات ملهمة توثق حياة المدارس اليومية خطوة بخطوة.",
+          title: "شاشة العروض والتغطيات الفورية",
+          subtitle: "فيديوهات حية ورسائل بصرية سريعة تنبض بأحدث لحظات المدارس اليومية.",
           viewAllText: "مشاهدة شاشة العروض",
           viewAllHref: "/offers",
-          badgeColor: dark ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" : "bg-cyan-50 text-cyan-700 border-cyan-200",
-          icon: <Clapperboard size={18} className="text-cyan-400" />,
+          themeColor: "#06b6d4",
+          heroBadge: "🎬 تغطية فيديو مباشرة",
+          icon: <Clapperboard size={20} className="text-cyan-400" />,
           items: posts.slice(0, 4).map((post): UnifiedLibraryCardItem => ({
             id: post.id,
             title: post.title || post.caption || "عرض وتغطية مباشرة",
             coverUrl: directDriveImage(post.thumbnailUrl || post.mediaUrl),
-            badge: "تغطية حية",
+            badge: "تغطية مباشرة",
             dateOrMeta: post.createdAt ? new Date(post.createdAt).toLocaleDateString("ar-SA") : "عرض حي",
             href: "/offers",
+            excerpt: "محتوى بصري متجدد يشارك المجتمع المدرسي أحلى اللحظات خطوة بخطوة.",
           }))
         };
     }
   };
 
   const currentConfig = getTabConfig();
+  const heroItem = currentConfig.items[0];
+  const deckItems = currentConfig.items.slice(1, 4);
 
   return (
     <div ref={sectionRef} className="relative w-full">
@@ -176,268 +185,316 @@ export function AqeeqHomeTabsLibrary({
         tag="section"
         label="قسم استكشف المكتبة"
         as="section"
-      className={`w-full py-14 md:py-20 ${
-        isNationalDay
-          ? dark ? "snd-library-dark" : "snd-library-light"
-          : dark ? "bg-[#050505]" : "bg-white"
-      }`}
-    >
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
-        
-        {/* Unified Section Header */}
-        <div className="mb-8 sm:mb-10 text-right">
-          <VisualEditable
-            id="studio-library-kicker"
-            tag="text"
-            label="شارة استكشف المكتبة"
-            defaultText={isNationalDay ? "🇸🇦 أرشيف العقيق الوطني الكامل" : "EXPLORE LIBRARY · ALL IN ONE"}
-            as="span"
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-              isNationalDay
-                ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-            }`}
-          >
-            {(text) => (
-              <>
-                <BookOpen size={12} />
-
-                <span>{text}</span>
-              </>
-            )}
-          </VisualEditable>
-          <VisualEditable
-            id="studio-library-title"
-            tag="text"
-            label="عنوان استكشف المكتبة"
-            defaultText={titleOverride || "استكشف المكتبة"}
-            as="h2"
-            className={`text-2xl sm:text-4xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
-          />
-          <VisualEditable
-            id="studio-library-desc"
-            tag="text"
-            label="وصف استكشف المكتبة"
-            defaultText={descOverride || "تصفح متكامل وشامل لجميع أرشيفات البودكاست، المقالات، الألبومات والمجلات المدرسية."}
-            as="p"
-            className={`mt-2 max-w-xl text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}
-          />
-        </div>
-
-        {/* Tab Switcher Buttons — horizontal scroll on mobile */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-8 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex shrink-0 items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-200 ${
-                  isActive
-                    ? isNationalDay
-                      ? "snd-tab-active bg-gradient-to-r from-[#005A36] to-[#5aba1c] text-white shadow-[0_4px_18px_rgba(0,90,54,0.4)] scale-105"
-                      : dark
-                      ? "bg-[#f8ca14] text-black shadow-[0_0_20px_rgba(248,202,20,0.25)] scale-105"
-                      : "bg-[#08467d] text-white shadow-[0_0_20px_rgba(8,70,125,0.25)] scale-105"
-                    : isNationalDay
-                    ? dark
-                      ? "bg-white/[0.04] text-emerald-300 hover:text-[#f8ca14] border border-[#5aba1c]/20"
-                      : "bg-[#f0fdf4] text-[#005A36] hover:bg-[#e0faea] border border-[#005A36]/15"
-                    : dark
-                    ? "bg-white/[0.05] text-slate-300 hover:bg-white/[0.09] border border-white/[0.08]"
-                    : "bg-black/[0.03] text-slate-700 hover:bg-black/[0.06] border border-black/[0.06]"
-                }`}
-              >
-                {tab.icon}
-                <span>{tab.label}</span>
-                {tab.count > 0 && (
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                    isActive
-                      ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white"
-                      : dark ? "bg-white/10 text-slate-400" : "bg-black/10 text-slate-600"
-                  }`}>
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-
-        {/* ========================================================================= */}
-        {/* UNIFIED FRAME CONTAINER (Fixed, Identical Structure Across ALL Tabs) */}
-        {/* ========================================================================= */}
-        <div className={`rounded-[2rem] border transition-all duration-300 overflow-hidden ${
+        className={`w-full py-16 md:py-24 transition-colors duration-500 relative overflow-hidden ${
           isNationalDay
-            ? dark
-              ? "border-[#5aba1c]/25 bg-[#00140c]/90 shadow-2xl"
-              : "border-emerald-500/20 bg-white shadow-xl shadow-emerald-950/5"
-            : dark 
-            ? "border-white/[0.08] bg-[#0d0d0d] shadow-2xl" 
-            : "border-black/[0.08] bg-slate-50/70 shadow-lg"
-        }`}>
-          
-          {/* Frame Top Header */}
-          <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 sm:px-8 py-5 border-b ${
-            dark
-              ? "border-white/[0.08] bg-black/30"
-              : isNationalDay
-              ? "border-emerald-500/15 bg-emerald-50/40"
-              : "border-black/[0.05] bg-white/70"
-          }`}>
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-xl border ${
-                dark
-                  ? "border-white/10 bg-white/5"
-                  : isNationalDay
-                  ? "border-emerald-500/20 bg-white shadow-sm"
-                  : "border-black/10 bg-white shadow-sm"
-              }`}>
-                {currentConfig.icon}
-              </div>
-              <div>
-                <VisualEditable
-                  id={`studio-library-frame-title-${activeTab}`}
-                  tag="text"
-                  label={`عنوان إطار ${activeTab}`}
-                  defaultText={currentConfig.title}
-                  as="h3"
-                  className={`text-base sm:text-lg font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
-                />
-                <VisualEditable
-                  id={`studio-library-frame-desc-${activeTab}`}
-                  tag="text"
-                  label={`وصف إطار ${activeTab}`}
-                  defaultText={currentConfig.subtitle}
-                  as="p"
-                  className={`text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/70" : "text-slate-500"}`}
-                />
-              </div>
-            </div>
+            ? dark ? "snd-library-dark" : "snd-library-light"
+            : dark ? "bg-[#05080c]" : "bg-gradient-to-b from-[#f8fafc] to-[#ffffff]"
+        }`}
+      >
+        {/* Ambient Radial Spotlight */}
+        <div 
+          className="pointer-events-none absolute top-1/4 -right-32 w-[550px] h-[550px] rounded-full blur-[140px] opacity-20 transition-all duration-700"
+          style={{ backgroundColor: currentConfig.themeColor }}
+        />
 
-            <button
-              type="button"
-              onClick={() => navigate(currentConfig.viewAllHref)}
-              className={`self-start sm:self-auto shrink-0 flex items-center gap-2 px-4 py-2 rounded-full font-black text-xs transition hover:scale-105 ${
-                dark 
-                  ? "bg-white/10 hover:bg-white/15 text-white border border-white/10" 
-                  : isNationalDay
-                  ? "bg-emerald-50 hover:bg-emerald-100 text-[#005A36] border border-emerald-500/30"
-                  : "bg-black/5 hover:bg-black/10 text-black border border-black/10"
+        <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+          
+          {/* Section Header */}
+          <div className="mb-10 sm:mb-12 text-right">
+            <VisualEditable
+              id="studio-library-kicker"
+              tag="text"
+              label="شارة استكشف المكتبة"
+              defaultText={isNationalDay ? "🇸🇦 أرشيف العقيق الوطني الكامل" : "EXPLORE LIBRARY · ALL IN ONE"}
+              as="span"
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
+                isNationalDay
+                  ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               }`}
             >
-              <VisualEditable
-                id={`studio-library-frame-btn-${activeTab}`}
-                tag="text"
-                label={`زر إطار ${activeTab}`}
-                defaultText={currentConfig.viewAllText}
-                as="span"
-              />
-              <ArrowLeft size={14} />
-            </button>
+              {(text) => (
+                <>
+                  <Sparkles size={12} />
+                  <span>{text}</span>
+                </>
+              )}
+            </VisualEditable>
+            <VisualEditable
+              id="studio-library-title"
+              tag="text"
+              label="عنوان استكشف المكتبة"
+              defaultText={titleOverride || "استكشف المكتبة الرقمية"}
+              as="h2"
+              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
+            />
+            <VisualEditable
+              id="studio-library-desc"
+              tag="text"
+              label="وصف استكشف المكتبة"
+              defaultText={descOverride || "منصة مركزية ذكية تجمع كل إصدارات البودكاست، المقالات الفكرية، الألبومات التوثيقية، والمجلات الدورية في تجربة سينمائية واحدة."}
+              as="p"
+              className={`mt-2 max-w-xl text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-400" : "text-slate-600"}`}
+            />
           </div>
 
-          {/* Frame Cards Body — horizontal scroll on mobile, grid on desktop */}
-          <div className="p-4 sm:p-6 md:p-8 min-h-[260px] sm:min-h-[380px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.22, ease: "easeOut" }}
-              >
-                {currentConfig.items.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
-                    <div className={`p-4 rounded-full mb-3 opacity-30 ${dark ? "text-white bg-white/5" : "text-black bg-black/5"}`}>
-                      {currentConfig.icon}
-                    </div>
-                    <p className={`text-sm font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                      لا توجد عناصر منشورة حالياً في هذا القسم.
-                    </p>
-                  </div>
-                ) : (
-                  /* Mobile: horizontal scroll / Desktop: 4-col grid */
-                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-5 sm:overflow-visible sm:pb-0">
-                    {currentConfig.items.map((item, idx) => (
+          {/* ========================================================================= */}
+          {/* LUXURY FLOATING GLASS DOCK (TAB SWITCHER WITH LIQUID ACTIVE PILL)         */}
+          {/* ========================================================================= */}
+          <div className="flex justify-center mb-10 sm:mb-14">
+            <div className={`p-1.5 sm:p-2 rounded-full border flex items-center gap-1 sm:gap-2 max-w-full overflow-x-auto scrollbar-hide backdrop-blur-2xl shadow-2xl ${
+              dark 
+                ? "bg-[#0d151e]/85 border-white/10 shadow-black/60" 
+                : "bg-white/90 border-black/10 shadow-xl"
+            }`}>
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`relative flex shrink-0 items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-black text-xs sm:text-sm transition-all duration-300 z-10 ${
+                      isActive
+                        ? "text-white"
+                        : dark
+                        ? "text-slate-400 hover:text-white"
+                        : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    {isActive && (
                       <motion.div
-                        key={item.id}
-                        style={{ y: idx % 2 === 0 ? evenY : oddY }}
-                        whileHover={{ y: -8, scale: 1.02 }}
-                        transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                        onClick={() => navigate(item.href)}
-                        className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col shrink-0 w-[200px] sm:w-auto h-[280px] sm:h-[320px] transition-all duration-300 shadow-lg will-change-transform ${
-                          isNationalDay
-                            ? dark
-                              ? "border-emerald-500/20 bg-[#141414] hover:border-emerald-400/40"
-                              : "border-emerald-500/20 bg-white hover:border-emerald-500/50 shadow-sm"
-                            : dark
-                            ? "border-white/[0.08] bg-[#141414] hover:border-white/20"
-                            : "border-black/[0.08] bg-white hover:border-black/20"
+                        layoutId="libraryActivePill"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        className={`absolute inset-0 rounded-full shadow-lg ${
+                          dark ? "bg-gradient-to-r from-[#f8ca14] to-yellow-600 !text-black" : "bg-gradient-to-r from-[#08467d] to-sky-700"
                         }`}
-                      >
-                        {/* Image Container */}
-                        <div className="relative h-[140px] sm:h-[180px] w-full shrink-0 overflow-hidden bg-slate-900/30">
-                          {item.coverUrl ? (
-                            <img
-                              src={item.coverUrl}
-                              alt={item.title}
-                              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                              loading="lazy"
+                      />
+                    )}
+                    <span className={`relative z-10 flex items-center gap-2 ${isActive && dark ? "!text-black font-black" : ""}`}>
+                      {tab.icon}
+                      <span>{tab.label}</span>
+                      {tab.count > 0 && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-black ${
+                          isActive
+                            ? dark ? "bg-black/25 text-black" : "bg-white/20 text-white"
+                            : dark ? "bg-white/10 text-slate-400" : "bg-black/10 text-slate-600"
+                        }`}>
+                          {tab.count}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* THE 3D INTERACTIVE CINEMA THEATER + GLASS COLLECTION DECK                 */}
+          {/* ========================================================================= */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch"
+            >
+              {/* 🌟 1. RIGHT: THE CINEMATIC HERO SHOWCASE STAGE (7 COLS) */}
+              {heroItem && (
+                <div className="lg:col-span-7 flex flex-col">
+                  <div
+                    onClick={() => {
+                      if (activeTab === "podcasts") {
+                        const pod = podcasts.find((p) => p.id === heroItem.id);
+                        if (pod) playEpisode(pod);
+                      } else {
+                        navigate(heroItem.href);
+                      }
+                    }}
+                    className={`group relative flex-1 min-h-[380px] sm:min-h-[480px] rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-6 sm:p-10 ${
+                      dark
+                        ? "bg-[#0b1016] border-white/15 shadow-black/80 hover:border-[#f8ca14]/50"
+                        : "bg-white border-slate-200 shadow-xl hover:border-[#08467d]/40"
+                    }`}
+                  >
+                    {/* Background Hero Image with Ken Burns Zoom */}
+                    <VisualImage
+                      id={`studio-library-hero-${activeTab}`}
+                      label="صورة العنصر الرئيسي للمكتبة"
+                      src={heroItem.coverUrl || "/alaqeeq-hero-light.png"}
+                      alt={heroItem.title}
+                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-108 transition-transform duration-1000 ease-out"
+                    />
+
+                    {/* Gradient Depth Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent z-10" />
+
+                    {/* Top Floating Badge Bar */}
+                    <div className="absolute top-6 inset-x-6 sm:inset-x-10 z-20 flex items-center justify-between">
+                      <span className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-black backdrop-blur-md border ${
+                        dark 
+                          ? "bg-black/60 border-white/20 text-[#f8ca14]" 
+                          : "bg-white/80 border-black/10 text-[#08467d]"
+                      }`}>
+                        {currentConfig.icon}
+                        <span>{currentConfig.heroBadge}</span>
+                      </span>
+
+                      <span className="text-[11px] font-mono text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                        {heroItem.dateOrMeta}
+                      </span>
+                    </div>
+
+                    {/* Audio Spectrum Visualizer (When Podcast Tab) */}
+                    {activeTab === "podcasts" && (
+                      <div className="absolute top-20 right-6 sm:right-10 z-20 hidden sm:flex items-center gap-1 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
+                        <Volume2 size={14} className="text-indigo-400" />
+                        <div className="flex items-center gap-0.5 h-3">
+                          {[6, 12, 8, 14, 5, 10, 13, 7].map((h, i) => (
+                            <motion.span
+                              key={i}
+                              animate={{ height: [4, h, 3] }}
+                              transition={{ duration: 0.7 + i * 0.1, repeat: Infinity, ease: "easeInOut" }}
+                              className="w-1 bg-indigo-400 rounded-full inline-block"
                             />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center opacity-30">
-                              {currentConfig.icon}
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-                          <div className="absolute top-2.5 right-2.5">
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black border backdrop-blur-md ${currentConfig.badgeColor}`}>
-                              {item.badge}
-                            </span>
-                          </div>
+                          ))}
                         </div>
+                        <span className="text-[10px] font-black text-indigo-300 mr-1">صوت فائق النقاوة</span>
+                      </div>
+                    )}
 
-                        {/* Card Info */}
-                        <div className="p-3 sm:p-4 flex flex-col justify-between flex-1">
-                          <h4 className={`text-xs sm:text-sm font-black line-clamp-2 leading-snug transition-colors ${
-                            isNationalDay
-                              ? dark ? "text-white group-hover:text-[#f8ca14]" : "text-[#003822] group-hover:text-[#005A36]"
-                              : dark ? "text-white group-hover:text-amber-400" : "text-black group-hover:text-[#08467d]"
-                          }`}>
-                            {item.title}
-                          </h4>
-                          <div className={`mt-auto pt-2 sm:pt-3 border-t flex items-center justify-between text-[10px] sm:text-[11px] font-bold ${
-                            dark ? "border-white/[0.06] text-slate-400" : isNationalDay ? "border-emerald-100 text-emerald-800/80" : "border-black/[0.05] text-slate-500"
-                          }`}>
-                            <span className="flex items-center gap-1">
-                              <Calendar size={10} className="opacity-60" />
-                              <span>{item.dateOrMeta}</span>
+                    {/* Hero Content */}
+                    <div className="relative z-20 text-white">
+                      <h3 className="text-2xl sm:text-4xl font-black font-cairo leading-tight mb-3 group-hover:text-[#f8ca14] transition-colors drop-shadow-lg">
+                        {heroItem.title}
+                      </h3>
+                      {heroItem.excerpt && (
+                        <p className="text-xs sm:text-sm text-slate-300 max-w-lg mb-6 line-clamp-2 leading-relaxed">
+                          {heroItem.excerpt}
+                        </p>
+                      )}
 
-                            </span>
-                            <span className={`font-black flex items-center gap-1 group-hover:underline ${
-                              dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]"
-                            }`}>
-                              <span>عرض</span>
-                              <ArrowLeft size={10} />
-                            </span>
+                      <div className="flex items-center gap-4">
+                        <button
+                          type="button"
+                          className={`font-black px-7 py-3 rounded-2xl flex items-center gap-2.5 text-xs sm:text-sm shadow-xl transition-all duration-300 group-hover:scale-105 active:scale-95 ${
+                            dark
+                              ? "bg-[#f8ca14] text-black hover:bg-[#e6b90f]"
+                              : "bg-[#08467d] text-white hover:bg-[#063863]"
+                          }`}
+                        >
+                          {activeTab === "podcasts" ? <Play size={16} className="fill-current" /> : <Eye size={16} />}
+                          <span>{activeTab === "podcasts" ? "تشغيل الحلقة الصوتية" : "استعراض العمل بالكامل"}</span>
+                          <ArrowUpLeft size={16} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                        </button>
 
+                        <span className="text-xs text-slate-400 font-bold hidden sm:inline-block">
+                          اضغط للمعاينة الفورية
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 📚 2. LEFT: THE INTERACTIVE GLASS COLLECTION DECK (5 COLS) */}
+              <div className="lg:col-span-5 flex flex-col justify-between gap-3.5">
+                {deckItems.length > 0 ? (
+                  deckItems.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      whileHover={{ x: -8, scale: 1.015 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                      onClick={() => {
+                        if (activeTab === "podcasts") {
+                          const pod = podcasts.find((p) => p.id === item.id);
+                          if (pod) playEpisode(pod);
+                        } else {
+                          navigate(item.href);
+                        }
+                      }}
+                      className={`group cursor-pointer rounded-[1.8rem] border p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 shadow-md ${
+                        dark
+                          ? "bg-[#0d141d]/75 border-white/10 hover:border-[#f8ca14]/40 hover:bg-[#121c27]"
+                          : "bg-white/90 border-slate-200 hover:border-[#08467d]/40 hover:bg-slate-50"
+                      }`}
+                    >
+                      {/* Numeric Index Badge */}
+                      <div className={`w-8 h-8 rounded-xl font-mono text-xs font-black flex items-center justify-center shrink-0 border ${
+                        dark 
+                          ? "bg-white/5 border-white/10 text-slate-400 group-hover:text-[#f8ca14] group-hover:border-[#f8ca14]/40" 
+                          : "bg-slate-100 border-black/10 text-slate-600 group-hover:text-[#08467d]"
+                      }`}>
+                        0{idx + 2}
+                      </div>
+
+                      {/* Thumbnail Preview */}
+                      <div className="relative h-20 w-24 sm:h-22 sm:w-28 rounded-2xl overflow-hidden shrink-0 border border-white/10 shadow-md">
+                        <img
+                          src={item.coverUrl || "/alaqeeq-hero-light.png"}
+                          alt={item.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/25 group-hover:bg-transparent transition-colors" />
+                        {activeTab === "podcasts" && (
+                          <div className="absolute inset-0 m-auto h-7 w-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center text-white">
+                            <Play size={12} className="fill-current" />
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0 text-right">
+                        <span className={`text-[10px] font-black uppercase tracking-wider block mb-1 ${
+                          dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                        }`}>
+                          {item.badge}
+                        </span>
+                        <h4 className={`text-xs sm:text-sm font-black truncate leading-snug font-cairo group-hover:text-[#f8ca14] transition-colors ${
+                          dark ? "text-white" : "text-black"
+                        }`}>
+                          {item.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mt-1 truncate">
+                          {item.dateOrMeta}
+                        </p>
+                      </div>
+
+                      {/* Action Arrow */}
+                      <div className={`grid h-8 w-8 place-items-center rounded-xl border shrink-0 transition-transform group-hover:-translate-x-1 ${
+                        dark ? "border-white/10 bg-white/5 text-white" : "border-black/10 bg-slate-100 text-slate-700"
+                      }`}>
+                        <ArrowLeft size={14} />
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="flex-1 flex items-center justify-center p-8 text-center text-slate-500 text-sm">
+                    لا توجد عناصر إضافية في هذا القسم
                   </div>
                 )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
 
+                {/* View All Bar at bottom of deck */}
+                <button
+                  type="button"
+                  onClick={() => navigate(currentConfig.viewAllHref)}
+                  className={`w-full py-3.5 rounded-2xl border font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-md ${
+                    dark
+                      ? "border-white/15 bg-white/5 hover:bg-white/10 text-white hover:border-[#f8ca14]/50"
+                      : "border-slate-200 bg-white hover:bg-slate-100 text-slate-800"
+                  }`}
+                >
+                  <span>{currentConfig.viewAllText}</span>
+                  <ArrowUpLeft size={15} />
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
-
-      </div>
-    </VisualEditable>
+      </VisualEditable>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
 import { AqeeqMemoryWallSection } from "@/components/AqeeqMemoryWallSection";
+import { AqeeqLiveArchiveSection } from "@/components/AqeeqLiveArchiveSection";
 import { AqeeqTypographicScrubBar } from "@/components/AqeeqTypographicScrubBar";
 import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
@@ -1431,105 +1432,15 @@ export default function AlaqeeqStudioPublicPage() {
         memoryEntries={memoryEntries}
       />
 
-      {/* 8. إحصائيات الأرشيف المفتوح الشامل - المحدث ليشمل الأخبار والعروض والمجلات والألبومات */}
-      <VisualEditable
-        id="studio-archive-summary"
-        tag="section"
-        label="قسم الأرشيف المفتوح"
-        as="section"
-        className="mx-auto max-w-[1340px] px-5 py-16 md:px-8 md:py-20"
-      >
-        <div className={"rounded-[2rem] border px-5 py-9 sm:px-8 sm:py-12 " + (
-          dark
-            ? "border-[#f8ca14]/25 bg-[#080808] text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-            : "border-[#08467d]/20 bg-[#fbfbfb] text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
-        )}>
-          <div className="max-w-2xl text-right">
-            <div className="mb-2">
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-              }`}>
-                <Sparkles size={12} />
-                <VisualEditable
-                  id="studio-archive-kicker"
-                  tag="text"
-                  label="شارة الأرشيف"
-                  defaultText="OPEN ARCHIVE · LIVE STATS"
-                  as="span"
-                />
-              </div>
-            </div>
-            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}>
-              <VisualEditable id="studio-archive-title" tag="text" label="عنوان الأرشيف" defaultText="أرشيف العقيق" as="span" />{" "}
-              <VisualEditable
-                id="studio-archive-accent"
-                tag="text"
-                label="تكملة عنوان الأرشيف"
-                defaultText="المفتوح."
-                as="span"
-                className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}
-              />
-            </h2>
-            <VisualEditable
-              id="studio-archive-body"
-              tag="text"
-              label="وصف الأرشيف"
-              defaultText="ذاكرة رقمية متكاملة تنمو يومياً مع كل خبر وعرض مباشر، وكل عدد جديد من المجلة، وكل ألبوم فعالية، متاحة بالكامل للجمهور والزوار."
-              as="p"
-              className={"mt-2 max-w-xl text-xs sm:text-sm leading-relaxed " + (dark ? "text-slate-400" : "text-slate-600")}
-            />
-          </div>
-
-          <div className={"mt-9 grid grid-cols-2 divide-x divide-x-reverse divide-y border-y sm:grid-cols-3 lg:grid-cols-5 lg:divide-y-0 " + (
-            dark ? "divide-white/[0.08] border-white/[0.08]" : "divide-black/[0.08] border-black/[0.08]"
-          )}>
-            {/* 1. الأخبار والعروض */}
-            <div className="py-5 pl-4 sm:pl-6">
-              <p className={"text-[9px] font-black tracking-[0.14em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}>
-                LIVE FEED & POSTS
-              </p>
-              <b className={"mt-2 block text-3xl font-black " + (dark ? "text-white" : "text-black")}>{String(totalPosts).padStart(2, "0")}</b>
-              <span className={"mt-1 block text-xs " + (dark ? "text-slate-500" : "text-slate-400")}>منشور وخبر حي</span>
-            </div>
-
-            {/* 2. أعداد المجلة */}
-            <div className="py-5 pr-4 pl-4 sm:px-6">
-              <p className={"text-[9px] font-black tracking-[0.14em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}>
-                PUBLISHED ISSUES
-              </p>
-              <b className={"mt-2 block text-3xl font-black " + (dark ? "text-white" : "text-black")}>{String(issues.length).padStart(2, "0")}</b>
-              <span className={"mt-1 block text-xs " + (dark ? "text-slate-500" : "text-slate-400")}>عدد مجلة منشور</span>
-            </div>
-
-            {/* 3. ألبومات الفعاليات */}
-            <div className="py-5 pr-4 pl-4 sm:px-6">
-              <p className={"text-[9px] font-black tracking-[0.14em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}>
-                EVENT ALBUMS
-              </p>
-              <b className={"mt-2 block text-3xl font-black " + (dark ? "text-white" : "text-black")}>{String(albums.length).padStart(2, "0")}</b>
-              <span className={"mt-1 block text-xs " + (dark ? "text-slate-500" : "text-slate-400")}>ألبوم فعالية</span>
-            </div>
-
-            {/* 4. صفحات المجلة */}
-            <div className="py-5 pr-4 pl-4 sm:px-6">
-              <p className={"text-[9px] font-black tracking-[0.14em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}>
-                JOURNAL PAGES
-              </p>
-              <b className={"mt-2 block text-3xl font-black " + (dark ? "text-white" : "text-black")}>{String(totalPages).padStart(2, "0")}</b>
-              <span className={"mt-1 block text-xs " + (dark ? "text-slate-500" : "text-slate-400")}>صفحة محفوظة</span>
-            </div>
-
-            {/* 5. إجمالي الصور والفيديوهات */}
-            <div className="py-5 pr-4 sm:pr-6">
-              <p className={"text-[9px] font-black tracking-[0.14em] " + (dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80")}>
-                MEDIA FILES
-              </p>
-              <b className={"mt-2 block text-3xl font-black " + (dark ? "text-white" : "text-black")}>{String(totalFiles + totalPosts).padStart(2, "0")}</b>
-              <span className={"mt-1 block text-xs " + (dark ? "text-slate-500" : "text-slate-400")}>صورة وفيديو موثق</span>
-            </div>
-          </div>
-        </div>
-      </VisualEditable>
+      {/* 8. إحصائيات الأرشيف المفتوح الشامل - المحدث بنظام الهولوجرام والعدادات الحية */}
+      <AqeeqLiveArchiveSection
+        dark={dark}
+        totalPosts={totalPosts}
+        totalIssues={issues.length}
+        totalAlbums={albums.length}
+        totalPages={totalPages}
+        totalMedia={totalFiles + totalPosts}
+      />
 
             {/* Unified Luxury Site Footer */}
       <AlaqeeqStudioSiteFooter />

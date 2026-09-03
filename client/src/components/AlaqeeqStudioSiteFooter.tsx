@@ -65,60 +65,109 @@ export function AlaqeeqStudioSiteFooter() {
       }`}
     >
       <div className="mx-auto max-w-[1360px] px-5 pt-10 pb-8 md:px-8">
-        {/* 1. Pre-Footer Call-to-Excellence Card (الجزء العلوي الذي أعجبك) */}
+        {/* 1. Pre-Footer Call-to-Excellence Card: The Horizon Stargate to Excellence */}
         <div
-          className={`mb-10 rounded-[2rem] border p-6 sm:p-8 lg:p-10 relative overflow-hidden backdrop-blur-xl transition shadow-2xl ${
+          className={`mb-12 rounded-[2.8rem] border p-7 sm:p-10 lg:p-12 relative overflow-hidden backdrop-blur-3xl transition-all duration-500 shadow-2xl group ${
             dark
-              ? "border-[#f8ca14]/25 bg-gradient-to-br from-[#0a1218] via-[#05090e] to-[#02140c] shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-              : "border-emerald-700/20 bg-gradient-to-br from-white via-emerald-50/40 to-amber-50/30 shadow-[0_15px_40px_rgba(1,90,55,0.06)]"
+              ? "border-[#f8ca14]/30 bg-gradient-to-r from-[#031209] via-[#070d13] to-[#171203] shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
+              : "border-emerald-700/25 bg-gradient-to-r from-[#f0fdf4] via-white to-[#fffbeb] shadow-[0_20px_50px_rgba(1,90,55,0.08)]"
           }`}
         >
-          {/* Subtle Glow Accents */}
-          <div className="pointer-events-none absolute -left-12 -top-12 h-64 w-64 rounded-full bg-[#f8ca14]/5 blur-3xl" />
-          <div className="pointer-events-none absolute -right-12 -bottom-12 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+          {/* Cosmic Glow & Subtle Ambient Mesh */}
+          <div className="pointer-events-none absolute -left-16 -top-16 h-80 w-80 rounded-full bg-[#f8ca14]/15 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -right-16 -bottom-16 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl animate-pulse" />
+          
+          {/* Rotating Golden Compass Seal in Background */}
+          <div className="pointer-events-none absolute -bottom-12 left-1/3 w-64 h-64 opacity-5 select-none animate-[spin_60s_linear_infinite]">
+            <svg viewBox="0 0 200 200" fill="none" className="w-full h-full text-[#f8ca14]">
+              <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6" />
+              <circle cx="100" cy="100" r="70" stroke="currentColor" strokeWidth="1.5" />
+              <polygon points="100,20 115,85 180,100 115,115 100,180 85,115 20,100 85,85" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.1" />
+            </svg>
+          </div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-400 mb-3">
-                <Sparkles size={12} className="text-[#f8ca14]" />
-                <span>القبول والتسجيل مفتوح للعام الدراسي 2026 / 2027</span>
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10">
+            <div className="max-w-2xl text-right">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-4 py-1.5 text-xs font-black text-emerald-400 mb-4 shadow-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <Sparkles size={13} className="text-[#f8ca14]" />
+                <span>القبول والتسجيل مفتوح للعام الدراسي الجديد 2026 / 2027</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug">
-                ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦
+
+              <h3 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight font-cairo">
+                ابدأ مسيرة التفوق والريادة مع <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>مدارس العقيق ✦</span>
               </h3>
-              <p className={`mt-2 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.
+
+              <p className={`mt-3 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والأهلي المتقدم)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.
               </p>
+
+              {/* Floating Accreditation Orbit Badges */}
+              <div className="mt-6 flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-black border ${
+                  dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-white border-slate-200 text-slate-700 shadow-sm"
+                }`}>
+                  <Award size={13} className="text-[#f8ca14]" />
+                  <span>اعتماد دولي كامل Cognia</span>
+                </span>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-black border ${
+                  dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-white border-slate-200 text-slate-700 shadow-sm"
+                }`}>
+                  <GraduationCap size={13} className="text-emerald-400" />
+                  <span>المسار الأمريكي والأهلي المتقدم</span>
+                </span>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-black border ${
+                  dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-white border-slate-200 text-slate-700 shadow-sm"
+                }`}>
+                  <ShieldCheck size={13} className="text-sky-400" />
+                  <span>بيئة رقمية ونموذجية ذكية</span>
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
+            {/* CTAs with Liquid Gold Shimmer and Live Advisor */}
+            <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-3.5 w-full lg:w-auto shrink-0">
+              {/* Primary: Book Seat with Liquid Shimmer Beam */}
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
-                className="flex-1 sm:flex-initial px-6 py-3.5 rounded-xl bg-gradient-to-l from-[#f8ca14] to-yellow-500 hover:from-yellow-400 hover:to-yellow-500 text-black font-black text-xs sm:text-sm shadow-xl shadow-amber-500/15 transition active:scale-95 flex items-center justify-center gap-2 group"
+                className="relative overflow-hidden px-8 py-4 rounded-2xl bg-gradient-to-r from-[#f8ca14] via-yellow-400 to-[#e6b90f] hover:brightness-110 text-black font-black text-sm shadow-2xl shadow-amber-500/25 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group"
               >
-                <span>حجز مقعد دراسي</span>
-                <ArrowUpLeft size={16} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                {/* Diagonal Sweeping Light Shimmer */}
+                <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
+                
+                <span className="font-cairo">حجز مقعد دراسي فوري</span>
+                <ArrowUpLeft size={18} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </button>
 
+              {/* Secondary: WhatsApp Live Advisor */}
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                className={`flex-1 sm:flex-initial px-5 py-3.5 rounded-xl border text-xs sm:text-sm font-black transition active:scale-95 flex items-center justify-center gap-2 ${
+                className={`px-6 py-4 rounded-2xl border text-sm font-black transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 ${
                   dark
-                    ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
-                    : "border-emerald-600/30 bg-white text-emerald-700 hover:bg-emerald-50 shadow-sm"
+                    ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50 shadow-emerald-950/40"
+                    : "border-emerald-600/30 bg-white text-emerald-700 hover:bg-emerald-50 shadow-md"
                 }`}
               >
-                <MessageCircle size={16} className="text-emerald-500" />
-                <span>مستشار القبول</span>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                </span>
+                <MessageCircle size={18} className="text-emerald-500" />
+                <span>مستشار القبول (رد فوري)</span>
               </a>
 
+              {/* Approved Fees Button */}
               <button
                 type="button"
                 onClick={() => navigate("/admissions#fees-table-section")}
-                className={`w-full sm:w-auto px-4 py-3.5 rounded-xl border text-xs font-bold transition ${
+                className={`px-5 py-4 rounded-2xl border text-xs font-black transition-all duration-300 hover:scale-102 ${
                   dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
                     : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm"
