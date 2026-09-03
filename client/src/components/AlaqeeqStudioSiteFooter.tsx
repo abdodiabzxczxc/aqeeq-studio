@@ -142,10 +142,10 @@ export function AlaqeeqStudioSiteFooter() {
               }`}
             />
 
-            {/* Container fits title exactly, so badges span from 'م' to 'ة' */}
-            <div className="inline-flex flex-col">
-              <span
-                className={`text-base sm:text-lg font-black tracking-wide whitespace-nowrap ${
+            {/* Container fits title exactly, so badges span precisely from 'م' to 'ة' */}
+            <div className="inline-block">
+              <div
+                className={`text-lg sm:text-xl font-black tracking-tight whitespace-nowrap leading-none ${
                   dark
                     ? "text-white"
                     : isNationalDay
@@ -154,31 +154,31 @@ export function AlaqeeqStudioSiteFooter() {
                 }`}
               >
                 مدارس العقيق الأهلية والدولية
-              </span>
+              </div>
 
-              {/* Badges aligned precisely under 'مدارس العقيق الأهلية والدولية' from 'م' to 'ة' */}
-              <div className="mt-2 flex items-center justify-between w-full gap-2 text-[10.5px] font-bold">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border whitespace-nowrap transition ${
+              {/* The 2 boxes spanning from 'م' in مدارس to 'ة' in الدولية */}
+              <div className="mt-2.5 grid grid-cols-2 gap-2 w-full">
+                <div
+                  className={`flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] sm:text-[11px] font-bold whitespace-nowrap transition ${
                     dark
                       ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                       : "border-amber-600/20 bg-amber-50 text-amber-800"
                   }`}
                 >
-                  <Award size={12} className="text-[#f8ca14]" />
+                  <Award size={12} className="text-[#f8ca14] shrink-0" />
                   <span>اعتماد Cognia الدولي</span>
-                </span>
+                </div>
 
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border whitespace-nowrap transition ${
+                <div
+                  className={`flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] sm:text-[11px] font-bold whitespace-nowrap transition ${
                     dark
                       ? "border-sky-500/30 bg-sky-500/10 text-sky-300"
                       : "border-sky-600/20 bg-sky-50 text-sky-800"
                   }`}
                 >
-                  <GraduationCap size={12} className="text-sky-400" />
+                  <GraduationCap size={12} className="text-sky-400 shrink-0" />
                   <span>مركز اختبارات SAT & IELTS</span>
-                </span>
+                </div>
               </div>
             </div>
           </div>
