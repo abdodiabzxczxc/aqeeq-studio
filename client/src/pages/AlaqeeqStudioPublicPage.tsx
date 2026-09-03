@@ -5,8 +5,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
+import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import {
   ArrowUp,
@@ -648,6 +650,22 @@ export default function AlaqeeqStudioPublicPage() {
     })),
   ].slice(0, 8);
 
+  // فيزياء تفتح كروت الهيرو في البعد الثالث مع السكرول (3D Fan-out on Scroll)
+  const { scrollY } = useScroll();
+  const rawHeroFrontCardX = useTransform(scrollY, [0, 500], [0, -40]);
+  const rawHeroFrontCardRotate = useTransform(scrollY, [0, 500], [0, -7]);
+  const rawHeroBackCardX = useTransform(scrollY, [0, 500], [0, 40]);
+  const rawHeroBackCardRotate = useTransform(scrollY, [0, 500], [0, 7]);
+  const rawHeroMiddleCardY = useTransform(scrollY, [0, 500], [0, -30]);
+  const rawHeroMiddleCardScale = useTransform(scrollY, [0, 500], [1, 1.06]);
+
+  const heroFrontCardX = useSpring(rawHeroFrontCardX, { stiffness: 100, damping: 20 });
+  const heroFrontCardRotate = useSpring(rawHeroFrontCardRotate, { stiffness: 100, damping: 20 });
+  const heroBackCardX = useSpring(rawHeroBackCardX, { stiffness: 100, damping: 20 });
+  const heroBackCardRotate = useSpring(rawHeroBackCardRotate, { stiffness: 100, damping: 20 });
+  const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
+  const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
+
   if (issuesLoading || albumsLoading || showcasesLoading) {
     return (
       <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
@@ -731,6 +749,17 @@ export default function AlaqeeqStudioPublicPage() {
                   key={story.id}
                   type="button"
                   onClick={() => setActiveStoryIndex(index)}
+                  onMouseEnter={() => {
+                    if (story.imageUrl) {
+                      triggerCursorPreview({
+                        visible: true,
+                        imageUrl: story.imageUrl,
+                        title: story.title,
+                        badge: "لحظات وقصص العقيق",
+                      });
+                    }
+                  }}
+                  onMouseLeave={() => triggerCursorPreview({ visible: false })}
                   className={"group flex flex-col items-center gap-1.5 shrink-0 text-center transition active:scale-95"}
                 >
                   <div className={"relative p-[2.5px] rounded-full transition duration-300 group-hover:scale-105 " + (
@@ -964,15 +993,16 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
           </div>
 
-          {/* Overlapping Hero Covers */}
-          <div className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px]">
+          {/* Overlapping Hero Covers with 3D Fan-out on Scroll */}
+          <div className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000">
             {/* Back Card: Showcase / Vision & Excellence */}
-            <div
+            <motion.div
+              style={{ x: heroBackCardX, rotate: heroBackCardRotate }}
               role="button"
               tabIndex={0}
               onClick={() => navigate("/offers")}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate("/offers")}
-              className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 cursor-pointer hover:opacity-100 hover:scale-[1.03] transition-all duration-500 " + (
+              className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 cursor-pointer hover:opacity-100 hover:scale-[1.03] transition-all duration-500 will-change-transform " + (
                 isNationalDay
                   ? dark
                     ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
@@ -991,17 +1021,18 @@ export default function AlaqeeqStudioPublicPage() {
                   <span>طموح الرؤية 🇸🇦</span>
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Middle Card: Albums / Heritage & Ajrab Sword */}
-            <div
+            <motion.div
+              style={{ y: heroMiddleCardY, scale: heroMiddleCardScale }}
               role="button"
               tabIndex={0}
               onClick={() => navigate("/albums")}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") navigate("/albums");
               }}
-              className={"group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 hover:scale-[1.02] " + (
+              className={"group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 hover:scale-[1.02] will-change-transform " + (
                 isNationalDay
                   ? dark
                     ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
@@ -1021,17 +1052,18 @@ export default function AlaqeeqStudioPublicPage() {
                   <span>أصالة وفخر 🇸🇦</span>
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Front Card: Journal / Generosity & Family Generations */}
-            <div
+            <motion.div
+              style={{ x: heroFrontCardX, rotate: heroFrontCardRotate }}
               role="button"
               tabIndex={0}
               onClick={() => navigate("/journal")}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") navigate("/journal");
               }}
-              className={"group absolute bottom-[2%] left-[1%] top-[5%] z-20 w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 hover:scale-[1.02] " + (
+              className={"group absolute bottom-[2%] left-[1%] top-[5%] z-20 w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 hover:scale-[1.02] will-change-transform " + (
                 isNationalDay
                   ? dark
                     ? "border-[#f8ca14]/80 bg-[#001f13]/90 shadow-[0_30px_70px_rgba(0,90,54,0.55)] backdrop-blur-md ring-1 ring-[#f8ca14]/30"
@@ -1055,7 +1087,7 @@ export default function AlaqeeqStudioPublicPage() {
                   <span>عزّنا بطبعنا</span>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </VisualEditable>
@@ -1072,6 +1104,8 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp", title: "اعتماد كوجنيا العالمي للجودة التعليمية", badge: "Cognia USA" })}
+              onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -1083,6 +1117,8 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_journal_national.webp", title: "المركز المعتمد لاختبارات آيلتس بالمدينة المنورة", badge: "IELTS Centre" })}
+              onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="hidden sm:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500">
@@ -1094,6 +1130,8 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_showcase_national.webp", title: "مراكز الاختبارات القياسية الدولية SAT & ACT", badge: "SAT & ACT" })}
+              onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
@@ -1105,6 +1143,8 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/about")}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: albumCovers.front || "/themes/saudi-national-day/opt/cover_album_national.webp", title: "مجتمع يضم أكثر من 10,000 أسرة تثق بمسيرتنا", badge: "مجتمع العقيق" })}
+              onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="hidden md:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
@@ -1912,6 +1952,9 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Wellington-style Interactive Cursor Hover Preview */}
+      <AqeeqCursorHoverPreview />
     </main>
   );
 }

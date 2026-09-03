@@ -9,77 +9,89 @@ interface AqeeqCurtainHeroWrapperProps {
 }
 
 /**
- * AqeeqCurtainHeroWrapper
- * يحاكي انتقال ويلينغتون الستاري الفاخر (Curtain Wipe & 3D Depth):
- * - الهيرو يثبت ويتراجع بنعومة في البعد الثالث (Scale + Opacity + Soft Parallax).
- * - القسم التالي يصعد بحواف علوية مستديرة وظلال زجاجية ملكية ليغطي الهيرو كالستارة.
+ * AqeeqCurtainHeroWrapper — الإصدار السينمائي الفائق (True Pinned Hero + 3D Transform + Curtain Reveal)
+ * مستوحى من ويلينغتون:
+ * 1. الهيرو يثبت بالكامل (Pinned) في بداية السكرول.
+ * 2. أثناء دوران عجلة الماوس: الهيرو لا يهرب؛ بل يتراجع في البعد الثالث وتنفصل كروته بنعومة فيزيائية.
+ * 3. تصعد الستارة الملكية (Curtain) من الأسفل وتغطي الهيرو بسلاسة مطلقة.
  */
 export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHeroWrapperProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const heroPinContainerRef = useRef<HTMLDivElement>(null);
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
 
-  // تتبع تقدم السكرول الخاص بالهيرو
+  // تتبع تقدم السكرول خلال رحلة الهيرو المثبت (Pinned Journey)
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: heroPinContainerRef,
     offset: ["start start", "end start"],
   });
 
-  // فيزياء الحركة الناعمة مع تراجع البعد الثالث
-  const rawHeroScale = useTransform(scrollYProgress, [0, 0.85], [1, 0.94]);
-  const rawHeroOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.78]);
-  const rawHeroY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+  // فيزياء الحركة السينمائية القوية:
+  // في النصف الأول من السكرول (0 إلى 0.6): تراجع الهيرو في البعد الثالث وزيادة العتمة والفوكس
+  const rawScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.88]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0.35]);
+  const rawY = useTransform(scrollYProgress, [0, 0.6], ["0px", "-50px"]);
+  const rawBlur = useTransform(scrollYProgress, [0, 0.6], ["blur(0px)", "blur(6px)"]);
 
-  const heroScale = useSpring(rawHeroScale, { stiffness: 120, damping: 24, mass: 0.5 });
-  const heroOpacity = useSpring(rawHeroOpacity, { stiffness: 120, damping: 24, mass: 0.5 });
-  const heroY = useSpring(rawHeroY, { stiffness: 120, damping: 24, mass: 0.5 });
+  const heroScale = useSpring(rawScale, { stiffness: 100, damping: 20, mass: 0.5 });
+  const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 20, mass: 0.5 });
+  const heroY = useSpring(rawY, { stiffness: 100, damping: 20, mass: 0.5 });
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      {/* 1. طبقة الهيرو المثبتة (Pinned Background Hero with 3D Depth) */}
-      <div className="sticky top-0 z-0 w-full overflow-hidden">
-        <motion.div
-          style={{
-            scale: heroScale,
-            opacity: heroOpacity,
-            y: heroY,
-            transformOrigin: "center top",
-          }}
-          className="will-change-transform"
-        >
-          {hero}
-        </motion.div>
+    <div className="relative w-full">
+      {/* 1. الحاوية الطويلة لتثبيت الهيرو (Pinned Hero Stage - 160vh) */}
+      <div ref={heroPinContainerRef} className="relative h-[160vh] w-full">
+        {/* الهيرو المثبت في الشاشة بنسبة 100% أثناء السكرول */}
+        <div className="sticky top-0 z-0 h-screen w-full flex items-center justify-center overflow-hidden">
+          <motion.div
+            style={{
+              scale: heroScale,
+              opacity: heroOpacity,
+              y: heroY,
+              filter: rawBlur,
+              transformOrigin: "center center",
+            }}
+            className="w-full will-change-transform"
+          >
+            {hero}
+          </motion.div>
+        </div>
       </div>
 
-      {/* 2. طبقة الستارة الصاعدة (The Royal Curtain Layer) */}
+      {/* 2. طبقة الستارة الملكية الصاعدة فوق الهيرو (The Overlapping Royal Curtain) */}
       <div
-        className={`relative z-20 -mt-8 sm:-mt-14 w-full rounded-t-[2.5rem] sm:rounded-t-[3.75rem] transition-colors duration-500 overflow-x-clip ${
+        className={`relative z-20 -mt-[60vh] w-full rounded-t-[3rem] sm:rounded-t-[4.5rem] transition-colors duration-500 overflow-x-clip ${
           isNationalDay
             ? dark
-              ? "bg-[#020b06] shadow-[0_-30px_90px_rgba(0,0,0,0.85)] border-t border-[#f8ca14]/25"
-              : "bg-[#f8faf8] shadow-[0_-25px_70px_rgba(0,90,54,0.12)] border-t border-emerald-500/20"
+              ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
+              : "bg-[#f8faf8] shadow-[0_-30px_80px_rgba(0,90,54,0.18)] border-t-2 border-emerald-500/30"
             : dark
-            ? "bg-[#06080d] shadow-[0_-30px_90px_rgba(0,0,0,0.9)] border-t border-white/10"
-            : "bg-white shadow-[0_-25px_60px_rgba(0,0,0,0.08)] border-t border-black/5"
+            ? "bg-[#07090e] shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t-2 border-white/15"
+            : "bg-white shadow-[0_-30px_80px_rgba(0,0,0,0.12)] border-t-2 border-black/10"
         }`}
       >
-        {/* خط إضاءة ملكي علوي خافت (Royal Glow Accent Hairline) */}
+        {/* خط إضاءة نيون ملكي في أعلى الستارة */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-3xl h-[1.5px] bg-gradient-to-r from-transparent via-[#f8ca14]/60 to-transparent z-30"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
         />
 
-        {/* مقبض سحب بصري أنيق جداً (Subtle Tactile Indicator) */}
-        <div className="flex items-center justify-center pt-3 pb-1">
+        {/* مقبض سحب واستكشاف بصري فاخر */}
+        <div className="flex flex-col items-center justify-center pt-4 pb-2 gap-1.5">
           <div
-            className={`h-1.5 w-14 rounded-full transition ${
-              dark ? "bg-white/15" : "bg-black/10"
+            className={`h-1.5 w-16 rounded-full transition ${
+              dark ? "bg-white/25" : "bg-black/20"
             }`}
           />
+          <span className={`text-[10px] font-black tracking-widest uppercase ${
+            dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
+          }`}>
+            ✦ واحة العقيق الرقمية ✦
+          </span>
         </div>
 
-        {/* المحتوى الفعلي للأقسام */}
+        {/* المحتوى الفعلي للأقسام الصاعدة */}
         {curtainContent}
       </div>
     </div>
