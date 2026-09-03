@@ -5,6 +5,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
+import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
+import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import {
   ArrowUp,
@@ -616,6 +618,36 @@ export default function AlaqeeqStudioPublicPage() {
     })),
   ].slice(0, 3);
 
+  const horizontalShowcaseItems = [
+    ...issues.map((entry) => ({
+      id: "issue-" + entry.id,
+      title: entry.title,
+      category: "journal" as const,
+      badge: "مجلة العقيق",
+      imageUrl: entry.coverUrl || null,
+      href: `/journal/${entry.slug || entry.id}`,
+      metaText: "العدد المدرسي الرسمي",
+    })),
+    ...albums.map((entry) => ({
+      id: "album-" + entry.id,
+      title: entry.title,
+      category: "album" as const,
+      badge: "ألبوم العقيق",
+      imageUrl: directDriveImage(entry.coverUrl) || entry.coverUrl || null,
+      href: `/albums/${entry.slug || entry.id}`,
+      metaText: "تغطية مصورة كاملة",
+    })),
+    ...showcases.map((entry) => ({
+      id: "showcase-" + entry.id,
+      title: entry.title,
+      category: "offer" as const,
+      badge: "الأخبار والأنشطة",
+      imageUrl: directDriveImage(entry.coverUrl) || entry.coverUrl || null,
+      href: "/offers",
+      metaText: "فعاليات العقيق الكبرى",
+    })),
+  ].slice(0, 8);
+
   if (issuesLoading || albumsLoading || showcasesLoading) {
     return (
       <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
@@ -766,18 +798,20 @@ export default function AlaqeeqStudioPublicPage() {
         </section>
       ) : null}
 
-      {/* 2. غلاف واجهة مدارس العقيق الرئيسية (Hero Section مع الكفرات المتداخلة) */}
-      <VisualEditable
-        id="studio-hero-section"
-        tag="section"
-        label="غلاف واجهة مدارس العقيق"
-        as="section"
-        className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
-          isNationalDay
-            ? dark ? "snd-hero-dark border-emerald-500/30 text-white" : "snd-hero-light border-emerald-200 text-slate-900"
-            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-        )}
-      >
+      {/* 2. غلاف واجهة مدارس العقيق الرئيسية مع تجربة ويلينغتون الستارية الملكية (Curtain Wipe & 3D Depth) */}
+      <AqeeqCurtainHeroWrapper
+        hero={
+          <VisualEditable
+            id="studio-hero-section"
+            tag="section"
+            label="غلاف واجهة مدارس العقيق"
+            as="section"
+            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 " + (
+              isNationalDay
+                ? dark ? "snd-hero-dark border-emerald-500/30 text-white" : "snd-hero-light border-emerald-200 text-slate-900"
+                : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+            )}
+          >
         {/* Subtle Ambient Background Watermark */}
         {isNationalDay ? (
           <>
@@ -1025,6 +1059,9 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       </VisualEditable>
+        }
+        curtainContent={
+          <>
 
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
       <section className={`border-b py-3.5 sm:py-4 backdrop-blur-md transition ${
@@ -1097,6 +1134,9 @@ export default function AlaqeeqStudioPublicPage() {
           descOverride={(orchestration?.sections as any)?.studioHighlightsDesc}
         />
       )}
+
+      {/* 🎬 مسار ويلينغتون السينمائي الأفقي للمجلات والألبومات (Horizontal Scrubbing) */}
+      <AqeeqHorizontalScrubSection items={horizontalShowcaseItems} />
       {(orchestration?.sections as any)?.libraryEnabled !== false && (
         <AqeeqHomeTabsLibrary
           titleOverride={(orchestration?.sections as any)?.libraryTitle}
@@ -1695,6 +1735,9 @@ export default function AlaqeeqStudioPublicPage() {
 
             {/* Unified Luxury Site Footer */}
       <AlaqeeqStudioSiteFooter />
+          </>
+        }
+      />
 
 
 
