@@ -933,13 +933,18 @@ export default function AlaqeeqStudioPublicPage() {
           {/* Overlapping Hero Covers */}
           <div className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px]">
             {/* Back Card: Showcase / Vision & Excellence */}
-            <div className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 transition-all duration-500 " + (
-              isNationalDay
-                ? dark
-                  ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
-                  : "border-[#6565e0]/40 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.1)]"
-                : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
-            )}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate("/offers")}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate("/offers")}
+              className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 cursor-pointer hover:opacity-100 hover:scale-[1.03] transition-all duration-500 " + (
+                isNationalDay
+                  ? dark
+                    ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+                    : "border-[#6565e0]/40 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.1)]"
+                  : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
+              )}>
               <VisualImage
                 id="studio-hero-showcase-image"
                 label="صورة غلاف الأخبار"

@@ -66,6 +66,7 @@ import {
   UserCheck,
   Building2,
   Smartphone,
+  Rocket,
 } from "lucide-react";
 
 import {
@@ -107,10 +108,22 @@ export default function AqeeqAdminDashboardPage() {
   const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
   const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
   const utils = trpc.useUtils();
+
+  const deployMutation = trpc.deploy.syncToLive.useMutation({
+    onSuccess: () => {
+      setIsDeploying(false);
+      toast.success("🚀 تم نشر وتحديث الموقع المباشر بنجاح!");
+    },
+    onError: (err) => {
+      setIsDeploying(false);
+      toast.error(err.message || "فشل نشر التعديلات");
+    },
+  });
 
 
   // Admin Overview Queries
@@ -849,6 +862,25 @@ const DEFAULT_ORCHESTRATION = {
                 <span className="text-[10px] font-bold text-emerald-400">مشرف معتمد</span>
               </div>
             </div>
+
+            {/* Deploy to Live Button — يعمل من أي جهاز ومن داخل لوحة التحكم */}
+            <button
+              onClick={() => {
+                if (isDeploying) return;
+                setIsDeploying(true);
+                deployMutation.mutate();
+              }}
+              disabled={isDeploying}
+              className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 ${
+                isDeploying
+                  ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
+                  : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
+              }`}
+              title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
+            >
+              <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للموقع المباشر 🚀"}</span>
+            </button>
 
             {/* Logout */}
             <button

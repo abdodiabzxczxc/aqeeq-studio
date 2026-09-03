@@ -75,6 +75,21 @@ export default function AqeeqSchoolAdmissionsPage() {
     return Object.keys(errors).length === 0;
   };
 
+  const validateStep2 = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.guardianName.trim()) {
+      errors.guardianName = "اسم ولي الأمر مطلوب";
+    }
+    const cleanPhone = formData.phone.trim().replace(/\s+/g, "");
+    if (!cleanPhone) {
+      errors.phone = "رقم الجوال مطلوب";
+    } else if (!/^(05|5)\d{8}$/.test(cleanPhone)) {
+      errors.phone = "يرجى إدخال رقم جوال سعودي يبدأ بـ 05 ويتكون من 10 أرقام";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const [whatsappConfirmOpen, setWhatsappConfirmOpen] = useState(false);
   const [pendingWhatsappMsg, setPendingWhatsappMsg] = useState('');
 
@@ -377,11 +392,12 @@ export default function AqeeqSchoolAdmissionsPage() {
           </DialogHeader>
           <DialogFooter className="gap-2 flex-row-reverse">
             <Button onClick={() => {
-              const cleanPhone = "0148131652".replace(/[^0-9]/g, "");
+              const whatsappNum = orchestrationData?.social?.whatsappNumber || "0531896000";
+              const cleanPhone = whatsappNum.replace(/[^0-9]/g, "");
               const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(pendingWhatsappMsg)}`;
               window.open(url, '_blank');
               setWhatsappConfirmOpen(false);
-            }} className="bg-[#25D366] hover:bg-[#20b558] text-white">
+            }} className="bg-[#25D366] hover:bg-[#20b558] text-white font-bold">
               📤 إرسال الآن
             </Button>
             <Button variant="outline" onClick={() => setWhatsappConfirmOpen(false)}>إلغاء</Button>
@@ -1335,9 +1351,13 @@ export default function AqeeqSchoolAdmissionsPage() {
                         required
                         placeholder="مثال: عبدالله محمد الشريف"
                         value={formData.guardianName}
-                        onChange={(e) => setFormData({ ...formData, guardianName: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, guardianName: e.target.value });
+                          if (fieldErrors.guardianName) setFieldErrors({ ...fieldErrors, guardianName: "" });
+                        }}
                         className="rounded-xl h-12"
                       />
+                      {fieldErrors.guardianName && <p className="text-xs text-red-500 font-bold mt-1">{fieldErrors.guardianName}</p>}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
@@ -1347,10 +1367,14 @@ export default function AqeeqSchoolAdmissionsPage() {
                           type="tel"
                           placeholder="05XXXXXXXX"
                           value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          onChange={(e) => {
+                            setFormData({ ...formData, phone: e.target.value });
+                            if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: "" });
+                          }}
                           className="rounded-xl h-12 text-left"
                           dir="ltr"
                         />
+                        {fieldErrors.phone && <p className="text-xs text-red-500 font-bold mt-1">{fieldErrors.phone}</p>}
                       </div>
                       <div>
                         <label className="block text-xs font-black mb-2">البريد الإلكتروني (اختياري)</label>
@@ -1400,6 +1424,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                   {formStep < 3 ? (
                     <button type="button" onClick={() => {
                       if (formStep === 1 && !validateStep1()) return;
+                      if (formStep === 2 && !validateStep2()) return;
                       setFormStep((s) => (s + 1) as 1|2|3);
                     }}
                       className="flex-1 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition">التالي →</button>

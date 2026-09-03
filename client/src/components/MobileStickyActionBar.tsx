@@ -56,7 +56,15 @@ export function MobileStickyActionBar() {
     };
   }, [visible, dismissed]);
 
-  if (location.startsWith("/admin")) return null;
+  // Hide sticky action bar on admin pages and interactive reader pages so it never blocks reading controls
+  const isReaderPage =
+    location.includes("/issue/") ||
+    location.includes("/month/") ||
+    (location.startsWith("/albums/") && location !== "/albums") ||
+    (location.startsWith("/journal/") && location !== "/journal" && location !== "/journal/archive") ||
+    location.startsWith("/news/");
+
+  if (location.startsWith("/admin") || isReaderPage) return null;
 
   const accentGradient = isNationalDay
     ? dark

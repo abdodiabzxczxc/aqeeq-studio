@@ -75,10 +75,32 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   if (!issue) {
     return (
-      <main dir="rtl" className="flex min-h-screen flex-col items-center justify-center bg-[#090b11] text-center text-slate-100">
-        <Newspaper size={36} className="text-amber-300" />
-        <h1 className="mt-4 text-2xl font-black text-amber-50">هذا العدد غير متاح</h1>
-        <p className="mt-2 text-sm text-slate-500">قد يكون مسودة لم تُنشر بعد أو أن رابط النشرة غير صحيح.</p>
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#fbfaf8] text-slate-900"}`}>
+        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
+        <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
+          <Newspaper size={48} className={dark ? "text-amber-300" : "text-[#08467d]"} />
+          <h1 className={`mt-4 text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-slate-900"}`}>هذا العدد غير متاح حالياً</h1>
+          <p className="mt-2 text-sm text-slate-400 max-w-sm">قد يكون مسودة لم تُنشر بعد أو أن رابط النشرة غير صحيح.</p>
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <button
+              onClick={() => navigate("/journal")}
+              className={`px-5 py-3 rounded-xl text-xs font-black transition shadow-md ${
+                dark ? "bg-amber-300 text-black hover:bg-amber-400" : "bg-[#08467d] text-white hover:bg-[#06335c]"
+              }`}
+            >
+              استعراض أعداد مجلة العقيق ✦
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className={`px-5 py-3 rounded-xl text-xs font-bold border transition ${
+                dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              الرئيسية
+            </button>
+          </div>
+        </div>
+        <AlaqeeqStudioSiteFooter />
       </main>
     );
   }

@@ -296,6 +296,13 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     }
   }, [params?.slug, rawArticles]);
 
+  const handleCloseArticle = () => {
+    setReadingArticle(null);
+    if (params?.slug) {
+      navigate("/articles", { replace: true });
+    }
+  };
+
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     refetchOnMount: true,
     staleTime: 0,
@@ -801,7 +808,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
       {/* Royal Article Reading Lightbox Modal */}
       {readingArticle && (
-        <Dialog open={Boolean(readingArticle)} onOpenChange={() => setReadingArticle(null)}>
+        <Dialog open={Boolean(readingArticle)} onOpenChange={(open) => !open && handleCloseArticle()}>
           <DialogContent
             className={`max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] border p-6 sm:p-10 text-right shadow-2xl ${
               dark
@@ -813,15 +820,19 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             <div className="space-y-6">
               {/* Breadcrumb Navigation */}
               <nav className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-                <button type="button" onClick={() => { setReadingArticle(null); navigate("/"); }} className="hover:text-current transition">الرئيسية</button>
+                <button type="button" onClick={() => { handleCloseArticle(); navigate("/"); }} className="hover:text-current transition">الرئيسية</button>
                 <span className="opacity-40">›</span>
-                <button type="button" onClick={() => setReadingArticle(null)} className="hover:text-current transition">المقالات</button>
+                <button type="button" onClick={handleCloseArticle} className="hover:text-current transition">المقالات</button>
                 <span className="opacity-40">›</span>
-                <span className="text-[#f8ca14]">{readingArticle.category}</span>
+                <span className={dark ? "text-[#f8ca14]" : "text-[#08467d] font-black"}>{readingArticle.category}</span>
               </nav>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                <span className="rounded-xl border border-[#f8ca14]/40 bg-[#f8ca14]/10 px-3 py-1 text-xs font-black text-[#f8ca14]">
+              <div className={`flex flex-wrap items-center justify-between gap-3 border-b pb-4 ${dark ? "border-white/10" : "border-black/10"}`}>
+                <span className={`rounded-xl border px-3 py-1 text-xs font-black ${
+                  dark
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#08467d]/40 bg-[#08467d]/10 text-[#08467d]"
+                }`}>
                   {readingArticle.category}
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
@@ -829,13 +840,13 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-black leading-snug">
+              <h1 className={`text-2xl sm:text-4xl font-black leading-snug ${dark ? "text-white" : "text-slate-900"}`}>
                 {readingArticle.title}
               </h1>
 
               {/* Author Bio Card */}
               <div
-                className={`flex items-center justify-between rounded-2xl border p-4 ${
+                className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border p-4 ${
                   dark ? "border-white/10 bg-white/[0.03]" : "border-black/10 bg-slate-50"
                 }`}
               >
@@ -849,7 +860,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                   </div>
                   <div>
                     <h4 className="text-sm font-black">{readingArticle.authorName}</h4>
-                    <p className="text-xs font-bold text-[#f8ca14]">{readingArticle.authorRole}</p>
+                    <p className={`text-xs font-bold ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>{readingArticle.authorRole}</p>
                   </div>
                 </div>
 
@@ -888,7 +899,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               )}
 
               {/* Modern Crystal-Clear Tajawal Typography Article Body */}
-              <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-5 sm:p-8 font-[Tajawal,sans-serif]">
+              <div className={`rounded-3xl border p-5 sm:p-8 font-[Tajawal,sans-serif] ${
+                dark ? "border-white/5 bg-white/[0.02]" : "border-black/10 bg-slate-50/70"
+              }`}>
                 {(() => {
                   const paragraphs = readingArticle.content.split(/\n\s*\n|\r\n\s*\r\n/);
                   return (
@@ -900,7 +913,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                         if (trimmed.startsWith("###") || trimmed.startsWith("##") || trimmed.startsWith("#")) {
                           const cleanTitle = trimmed.replace(/^#+\s*/, "");
                           return (
-                            <h3 key={idx} className="text-xl sm:text-2xl font-black text-[#f8ca14] pt-2 pb-1 border-b border-white/10">
+                            <h3 key={idx} className={`text-xl sm:text-2xl font-black pt-2 pb-1 border-b ${
+                              dark ? "text-[#f8ca14] border-white/10" : "text-[#08467d] border-black/10"
+                            }`}>
                               {cleanTitle}
                             </h3>
                           );
@@ -919,20 +934,22 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
                               const parts = (isNumbered || isBullet ? cleanText : lineTrimmed).split(/(\*\*[^*]+\*\*)/g);
                               const renderedParts = parts.map((part: string, pIdx: number) => {
-                                if (part.startsWith("**") && part.endsWith("**")) {
-                                  return (
-                                    <strong key={pIdx} className="font-black text-[#f8ca14]">
-                                      {part.slice(2, -2)}
-                                    </strong>
-                                  );
-                                }
+                                 if (part.startsWith("**") && part.endsWith("**")) {
+                                   return (
+                                     <strong key={pIdx} className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                                       {part.slice(2, -2)}
+                                     </strong>
+                                   );
+                                 }
                                 return <span key={pIdx}>{part}</span>;
                               });
 
                               if (isNumbered || isBullet) {
                                 return (
                                   <div key={lIdx} className="flex items-start gap-3 pr-2 sm:pr-4 py-1">
-                                    <span className="shrink-0 mt-2.5 h-2 w-2 rounded-full bg-[#f8ca14] shadow-[0_0_8px_#f8ca14]" />
+                                    <span className={`shrink-0 mt-2.5 h-2 w-2 rounded-full ${
+                                      dark ? "bg-[#f8ca14] shadow-[0_0_8px_#f8ca14]" : "bg-[#08467d]"
+                                    }`} />
                                     <p className={`flex-1 text-base sm:text-lg leading-[2.3] font-normal ${
                                       dark ? "text-slate-100" : "text-slate-800"
                                     }`}>
@@ -981,7 +998,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setReadingArticle(null)}
+                  onClick={handleCloseArticle}
                   className="text-xs text-slate-400 hover:text-white"
                 >
                   إغلاق القراءة
