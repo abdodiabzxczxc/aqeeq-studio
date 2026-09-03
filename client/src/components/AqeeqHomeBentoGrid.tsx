@@ -1,4 +1,30 @@
-import { useRef } from "react";
+import { useRef, useState, useCallback } from "react";
+
+function useMagneticTilt() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0, gx: 50, gy: 50 });
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    setTilt({
+      x: (py - 0.5) * -14,   // rotateX
+      y: (px - 0.5) * 14,    // rotateY
+      gx: px * 100,
+      gy: py * 100,
+    });
+  }, []);
+
+  const onLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0, gx: 50, gy: 50 });
+  }, []);
+
+  return { ref, tilt, onMove, onLeave };
+}
+
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Play, BookOpen, ImageIcon, Mic, Newspaper, Sparkles, ArrowUpLeft } from "lucide-react";
@@ -38,6 +64,11 @@ export function AqeeqHomeBentoGrid({
   const journalY = useSpring(rawJournalY, { stiffness: 85, damping: 20 });
   const podY = useSpring(rawPodY, { stiffness: 85, damping: 20 });
   const artY = useSpring(rawArtY, { stiffness: 85, damping: 20 });
+
+  const c1 = useMagneticTilt();
+  const c2 = useMagneticTilt();
+  const c3 = useMagneticTilt();
+  const c4 = useMagneticTilt();
 
   const { data: latestPodcast } = trpc.podcasts.list.useQuery({}, {
     select: (data) => data[0]
@@ -121,7 +152,10 @@ export function AqeeqHomeBentoGrid({
             {/* Card 1: Album Hero Card مع البارالاكس */}
             {latestAlbum && (
               <motion.div
-                style={{ y: albumY }}
+                ref={c1.ref}
+                onMouseMove={c1.onMove}
+                onMouseLeave={c1.onLeave}
+                style={{ y: albumY, rotateX: c1.tilt.x, rotateY: c1.tilt.y, transformStyle: 'preserve-3d', transition: 'box-shadow 0.3s', perspective: 800 }}
                 whileHover={{ y: -8, scale: 1.015 }}
                 transition={{ type: "spring", stiffness: 220, damping: 18 }}
                 className="md:col-span-2 lg:col-span-2 lg:row-span-2 will-change-transform"
@@ -136,6 +170,13 @@ export function AqeeqHomeBentoGrid({
                     dark ? "bg-emerald-950/40 border-white/10 hover:border-emerald-500/40 shadow-black/80" : "bg-emerald-50 border-black/5 hover:border-emerald-500/30"
                   }`}
                 >
+                  {/* Ambient spotlight following mouse */}
+                  <div
+                    className="pointer-events-none absolute inset-0 rounded-[inherit] z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                    style={{
+                      background: `radial-gradient(circle 180px at ${c1.tilt.gx}% ${c1.tilt.gy}%, rgba(248,202,20,0.12), transparent 70%)`,
+                    }}
+                  />
                   <VisualImage
                     id="studio-highlights-album-img"
                     label="صورة غلاف ألبوم البينتو"
@@ -196,7 +237,10 @@ export function AqeeqHomeBentoGrid({
                 {/* Card 2: Latest Journal */}
                 {latestIssue && (
                   <motion.div
-                    style={{ y: journalY }}
+                    ref={c2.ref}
+                    onMouseMove={c2.onMove}
+                    onMouseLeave={c2.onLeave}
+                    style={{ y: journalY, rotateX: c2.tilt.x, rotateY: c2.tilt.y, transformStyle: 'preserve-3d', transition: 'box-shadow 0.3s', perspective: 800 }}
                     whileHover={{ y: -8, scale: 1.02 }}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 lg:col-span-2 will-change-transform"
@@ -211,6 +255,13 @@ export function AqeeqHomeBentoGrid({
                         dark ? "bg-amber-950/25 border-amber-500/20 hover:border-amber-500/40" : "bg-amber-50 border-amber-500/20 hover:border-amber-500/40"
                       }`}
                     >
+                      {/* Ambient spotlight following mouse */}
+                      <div
+                        className="pointer-events-none absolute inset-0 rounded-[inherit] z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                        style={{
+                          background: `radial-gradient(circle 180px at ${c2.tilt.gx}% ${c2.tilt.gy}%, rgba(248,202,20,0.12), transparent 70%)`,
+                        }}
+                      />
                       <VisualImage
                         id="studio-highlights-journal-img"
                         label="صورة غلاف مجلة البينتو"
@@ -245,7 +296,10 @@ export function AqeeqHomeBentoGrid({
                 {/* Card 3: Latest Podcast */}
                 {latestPodcast && (
                   <motion.div
-                    style={{ y: podY }}
+                    ref={c3.ref}
+                    onMouseMove={c3.onMove}
+                    onMouseLeave={c3.onLeave}
+                    style={{ y: podY, rotateX: c3.tilt.x, rotateY: c3.tilt.y, transformStyle: 'preserve-3d', transition: 'box-shadow 0.3s', perspective: 800 }}
                     whileHover={{ y: -8, scale: 1.02 }}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 will-change-transform"
@@ -260,6 +314,13 @@ export function AqeeqHomeBentoGrid({
                         dark ? "bg-indigo-950/30 border-indigo-500/20 hover:border-indigo-500/40" : "bg-indigo-50 border-indigo-500/20 hover:border-indigo-500/40"
                       }`}
                     >
+                      {/* Ambient spotlight following mouse */}
+                      <div
+                        className="pointer-events-none absolute inset-0 rounded-[inherit] z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                        style={{
+                          background: `radial-gradient(circle 180px at ${c3.tilt.gx}% ${c3.tilt.gy}%, rgba(248,202,20,0.12), transparent 70%)`,
+                        }}
+                      />
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 z-0" />
                       <VisualImage
                         id="studio-highlights-podcast-img"
@@ -294,7 +355,10 @@ export function AqeeqHomeBentoGrid({
                 {/* Card 4: Latest Article */}
                 {latestArticle && (
                   <motion.div
-                    style={{ y: artY }}
+                    ref={c4.ref}
+                    onMouseMove={c4.onMove}
+                    onMouseLeave={c4.onLeave}
+                    style={{ y: artY, rotateX: c4.tilt.x, rotateY: c4.tilt.y, transformStyle: 'preserve-3d', transition: 'box-shadow 0.3s', perspective: 800 }}
                     whileHover={{ y: -8, scale: 1.02 }}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 will-change-transform"
@@ -309,6 +373,13 @@ export function AqeeqHomeBentoGrid({
                         dark ? "bg-rose-950/20 border-rose-500/20 hover:border-rose-500/40" : "bg-rose-50 border-rose-500/20 hover:border-rose-500/40"
                       }`}
                     >
+                      {/* Ambient spotlight following mouse */}
+                      <div
+                        className="pointer-events-none absolute inset-0 rounded-[inherit] z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                        style={{
+                          background: `radial-gradient(circle 180px at ${c4.tilt.gx}% ${c4.tilt.gy}%, rgba(248,202,20,0.12), transparent 70%)`,
+                        }}
+                      />
                       <VisualImage
                         id="studio-highlights-article-img"
                         label="صورة غلاف مقال البينتو"

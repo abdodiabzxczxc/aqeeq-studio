@@ -61,6 +61,7 @@ import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqNationalTraitsSection } from "@/components/AqeeqNationalTraitsSection";
 import { triggerNationalCelebration } from "@/components/AqeeqCelebrationConfetti";
 import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
+import { AqeeqMagneticCursor } from "@/components/AqeeqMagneticCursor";
 
 
 
@@ -750,6 +751,10 @@ export default function AlaqeeqStudioPublicPage() {
           : "#fafafb",
       }}
     >
+      {/* Custom Magnetic Cursor */}
+      <AqeeqMagneticCursor />
+      {/* Film Grain Texture Overlay */}
+      <div className="aqeeq-grain-overlay" aria-hidden />
       {/* Ambient background radial glow — fixed, always present */}
       {!isNationalDay && (
         <div
