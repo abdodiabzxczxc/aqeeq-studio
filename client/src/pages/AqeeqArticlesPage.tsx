@@ -437,6 +437,33 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               )}
             </div>
           </div>
+
+          {/* 🌟 The Exact 7-col Hero + 3-stacked Cards Showcase */}
+          {featuredArticle && (
+            <AqeeqPageHeroShowcase
+              dark={dark}
+              hero={{
+                id: featuredArticle.id,
+                title: featuredArticle.title,
+                coverUrl: (directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl) ?? null,
+                badge: featuredArticle.category || "مقال مميز",
+                dateOrMeta: featuredArticle.publishedAt ? new Date(featuredArticle.publishedAt).toLocaleDateString("ar-SA") : undefined,
+                href: `/articles/${featuredArticle.slug}`,
+                excerpt: featuredArticle.excerpt || "قراءة تحليلية تثري المعرفة التربوية لأولياء الأمور والطلاب.",
+                ctaText: "قراءة المقال بالكامل",
+                onCtaClick: () => setReadingArticle(featuredArticle),
+              }}
+              stack={rawArticles.filter((a) => a.id !== featuredArticle.id).slice(0, 3).map((a) => ({
+                id: a.id,
+                title: a.title,
+                coverUrl: (directDriveImage(a.coverUrl) || a.coverUrl) ?? null,
+                badge: a.category || "مقال ونشرة",
+                dateOrMeta: a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("ar-SA") : undefined,
+                href: `/articles/${a.slug}`,
+                onClick: () => setReadingArticle(a),
+              }))}
+            />
+          )}
         </div>
       </section>
 
