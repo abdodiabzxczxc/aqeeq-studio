@@ -167,12 +167,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                     label="صورة أبطال العقيق - كأس بطولة فيرست ليجو بالمملكة"
                     src="/covers/first-lego-champions.png"
                     alt="أبطال مدارس العقيق مع كأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
-                    className="h-full w-full object-cover object-[center_25%] transition duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover object-[center_12%] transition duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
-                  {/* Top Floating Badge */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-lg backdrop-blur-md">
+                  {/* Top Floating Badge - Placed at Top-Left to Keep Coach and Student Faces Clear */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-lg backdrop-blur-md">
                     <Trophy size={13} className="text-[#f8ca14]" />
                     <span>{isNationalDay ? "🇸🇦 بطل المملكة · المركز الأول في فيرست ليجو" : "بطل المملكة · المركز الأول FIRST LEGO"}</span>
                   </div>
@@ -654,10 +654,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                   <img
                     src="/covers/first-lego-champions.png"
                     alt="تتويج أبطال مدارس العقيق بكأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
-                    className="h-full w-full object-cover object-[center_20%] transition duration-700 hover:scale-105"
+                    className="h-full w-full object-cover object-[center_12%] transition duration-700 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md">
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md">
                     <Trophy size={12} className="text-[#f8ca14]" />
                     <span>بطل المملكة 🥇</span>
                   </div>
