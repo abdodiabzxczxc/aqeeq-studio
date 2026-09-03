@@ -660,14 +660,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <span>أثير (البودكاست)</span>
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
-                    <button onClick={() => go("/articles")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>المقالات</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <button onClick={() => go("/offers")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>الأخبار</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
+                    <div className="border-t border-current/10 pt-1.5 mt-1">
+                      <div className="text-[10px] font-black text-[#f8ca14] px-2 py-0.5 mb-1 flex items-center gap-1">
+                        <Sparkles size={11} />
+                        <span>أخبار ومقالات</span>
+                      </div>
+                      <button onClick={() => go("/offers")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <span>الأخبار والفعاليات 📰</span>
+                        </span>
+                        <ArrowRight size={13} className="opacity-40" />
+                      </button>
+                      <button onClick={() => go("/articles")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <span>مقالات الطلاب والمعلمين ✍️</span>
+                        </span>
+                        <ArrowRight size={13} className="opacity-40" />
+                      </button>
+                    </div>
                   </div>
 
                 </div>
