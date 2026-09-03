@@ -372,48 +372,50 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             />
 
             {/* 8. أخبار ومقالات */}
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className={`aq-studio-toplink inline-flex items-center gap-1 ${
-                    currentActive === "articles" || currentActive === "showcase" ? "aq-studio-toplink--active" : ""
-                  }`}
-                >
-                  <span>أخبار ومقالات</span>
-                  <ChevronDown size={11} className="opacity-60" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className={`w-56 p-1.5 rounded-xl border backdrop-blur-xl shadow-xl z-50 ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
-                <button
-                  type="button"
-                  onClick={() => go("/offers")}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-bold transition text-right ${
-                    currentActive === "showcase" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-[#f8ca14]" />
-                    <span>الأخبار والفعاليات 📰</span>
-                  </span>
-                  <ArrowRight size={12} className="opacity-40" />
-                </button>
+            <div className="relative group">
+              <button
+                type="button"
+                onClick={() => go("/offers")}
+                className={`aq-studio-toplink inline-flex items-center gap-1 cursor-pointer ${
+                  currentActive === "articles" || currentActive === "showcase" ? "aq-studio-toplink--active" : ""
+                }`}
+              >
+                <span>أخبار ومقالات</span>
+                <ChevronDown size={11} className="opacity-60 transition duration-200 group-hover:rotate-180" />
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => go("/articles")}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-bold transition text-right ${
-                    currentActive === "articles" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <BookOpen size={14} className="text-emerald-500" />
-                    <span>مقالات الطلاب والمعلمين ✍️</span>
-                  </span>
-                  <ArrowRight size={12} className="opacity-40" />
-                </button>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              <div className="absolute top-full left-0 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
+                <div className={`p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
+                  <button
+                    type="button"
+                    onClick={() => go("/offers")}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition text-right cursor-pointer ${
+                      currentActive === "showcase" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Sparkles size={14} className="text-[#f8ca14]" />
+                      <span>الأخبار والفعاليات 📰</span>
+                    </span>
+                    <ArrowRight size={12} className="opacity-40" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => go("/articles")}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition text-right cursor-pointer ${
+                      currentActive === "articles" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <BookOpen size={14} className="text-emerald-500" />
+                      <span>مقالات الطلاب والمعلمين ✍️</span>
+                    </span>
+                    <ArrowRight size={12} className="opacity-40" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </nav>
 
 

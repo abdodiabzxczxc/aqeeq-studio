@@ -23,17 +23,23 @@ export function MobileStickyActionBar() {
   const whatsappUrl = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent("السلام عليكم ورحمة الله، أود الاستفسار عن القبول والتسجيل بمدارس العقيق")}`;
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      // Show after scrolling past top hero (180px), hide near the absolute bottom footer
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const nearBottom = scrollY + windowHeight > documentHeight - 120;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const nearBottom = scrollY + windowHeight > documentHeight - 120;
 
-      if (scrollY > 180 && !nearBottom && !dismissed) {
-        setVisible(true);
-      } else {
-        setVisible(false);
+          if (scrollY > 180 && !nearBottom && !dismissed) {
+            setVisible(true);
+          } else {
+            setVisible(false);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
