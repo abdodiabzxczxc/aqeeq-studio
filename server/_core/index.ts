@@ -42,6 +42,10 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Health check endpoint for uptime monitors / Render keep-alive
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok", uptime: Math.floor(process.uptime()), timestamp: Date.now() });
+  });
   // tRPC API
   app.use(
     "/api/trpc",
