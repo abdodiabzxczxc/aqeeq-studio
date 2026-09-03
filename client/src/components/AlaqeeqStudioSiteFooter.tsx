@@ -170,7 +170,7 @@ export function AlaqeeqStudioSiteFooter() {
                   }`}
                 >
                   <Award size={13} className="text-amber-400 shrink-0" />
-                  <span>اعتماد Cognia الدولي</span>
+                  <span>اعتماد Cognia</span>
                 </div>
 
                 {/* 2. Sky Blue Pill on the left (under الأهلية والدولية) */}
