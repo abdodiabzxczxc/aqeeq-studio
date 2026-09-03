@@ -158,35 +158,6 @@ export function AqeeqMagneticCursor() {
           </AnimatePresence>
         </motion.div>
       </motion.div>
-
-      {/* Inner Pin Dot */}
-      <motion.div
-        className="pointer-events-none fixed top-0 left-0 z-[99999] hidden lg:block will-change-transform"
-        style={{
-          x: dx,
-          y: dy,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          opacity: shouldShow ? 1 : 0,
-          scale: shouldShow ? 1 : 0.2,
-        }}
-        transition={{ duration: 0.12 }}
-      >
-        <motion.div
-          className="rounded-full transition-colors duration-150"
-          style={{
-            backgroundColor: dotColor,
-            boxShadow: dotShadow,
-          }}
-          animate={{
-            width: cursorState === "click" ? 14 : cursorState === "hover" ? 7 : 6,
-            height: cursorState === "click" ? 14 : cursorState === "hover" ? 7 : 6,
-          }}
-          transition={{ duration: 0.12 }}
-        />
-      </motion.div>
     </>
   );
 }
