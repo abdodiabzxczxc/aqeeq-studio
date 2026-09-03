@@ -216,31 +216,33 @@ export default function AqeeqSchoolAccreditationsPage() {
           </p>
 
           {/* Interactive Credential Switcher Tabs */}
-          <div className="mt-8 flex justify-center max-w-full overflow-x-auto scrollbar-hide py-1">
-            <div className={`inline-flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition flex-nowrap ${
+          <div className="mt-8 w-full max-w-3xl mx-auto px-2">
+            <div className={`grid grid-cols-4 gap-1 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition ${
               dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
             }`}>
               {[
-                { id: "cognia", label: "اعتماد كوجنيا (Cognia)", icon: ShieldCheck },
-                { id: "ielts", label: "اختبارات IELTS IDP", icon: Globe2 },
-                { id: "sat", label: "مراكز اختبارات SAT & ACT", icon: BookOpenCheck },
-                { id: "stem", label: "الروبوت والذكاء الاصطناعي", icon: Trophy },
+                { id: "cognia", label: "اعتماد كوجنيا", icon: ShieldCheck },
+                { id: "ielts", label: "مركز IELTS", icon: Globe2 },
+                { id: "sat", label: "مراكز SAT & ACT", icon: BookOpenCheck },
+                { id: "stem", label: "الروبوت والـ AI", icon: Trophy },
               ].map((tab) => {
                 const Icon = tab.icon;
+                const isActive = activeHubTab === tab.id;
                 return (
                   <button
                     key={tab.id}
+                    type="button"
                     onClick={() => setActiveHubTab(tab.id as any)}
-                    className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-xl px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-black transition whitespace-nowrap shrink-0 active:scale-95 ${
-                      activeHubTab === tab.id
+                    className={`inline-flex items-center justify-center gap-1 sm:gap-2 rounded-xl py-2.5 px-1 sm:px-3 text-center text-xs sm:text-sm font-black transition active:scale-95 ${
+                      isActive
                         ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/20"
                         : dark
                         ? "text-slate-400 hover:text-white hover:bg-white/5"
                         : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                     }`}
                   >
-                    <Icon size={16} className={activeHubTab === tab.id ? "text-[#f8ca14]" : "shrink-0"} />
-                    <span>{tab.label}</span>
+                    <Icon size={16} className={`shrink-0 ${isActive ? "text-[#f8ca14]" : ""}`} />
+                    <span className="truncate">{tab.label}</span>
                   </button>
                 );
               })}
@@ -650,29 +652,33 @@ export default function AqeeqSchoolAccreditationsPage() {
             </p>
 
             {/* Pathway Selector Pills */}
-            <div className="mt-8 flex justify-center max-w-full overflow-x-auto scrollbar-hide py-1">
-              <div className={`inline-flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition flex-nowrap ${
+            <div className="mt-8 w-full max-w-2xl mx-auto px-2">
+              <div className={`grid grid-cols-3 gap-1 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition ${
                 dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
               }`}>
                 {[
-                  { id: "saudi", label: "🇸🇦 الجامعات السعودية الكبرى" },
-                  { id: "scholarship", label: "✈️ برنامج خادم الحرمين للابتعاث" },
-                  { id: "global", label: "🌐 كليات الطب والهندسة الدولية" },
-                ].map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setActivePathway(p.id as any)}
-                    className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition whitespace-nowrap shrink-0 active:scale-95 ${
-                      activePathway === p.id
-                        ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/20"
-                        : dark
-                        ? "text-slate-400 hover:text-white hover:bg-white/5"
-                        : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+                  { id: "saudi", label: "الجامعات السعودية 🇸🇦" },
+                  { id: "scholarship", label: "برنامج الابتعاث ✈️" },
+                  { id: "global", label: "الجامعات الدولية 🌐" },
+                ].map((p) => {
+                  const isActive = activePathway === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActivePathway(p.id as any)}
+                      className={`rounded-xl py-2.5 px-2 text-xs sm:text-sm font-black transition active:scale-95 text-center truncate ${
+                        isActive
+                          ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/20"
+                          : dark
+                          ? "text-slate-400 hover:text-white hover:bg-white/5"
+                          : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
