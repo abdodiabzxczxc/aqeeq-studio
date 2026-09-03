@@ -14,6 +14,7 @@ import {
 import QRCode from "qrcode";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { trpc } from "@/lib/trpc";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 interface AqeeqSchoolAppShowcaseSectionProps {
   dark?: boolean;
@@ -22,10 +23,21 @@ interface AqeeqSchoolAppShowcaseSectionProps {
 export default function AqeeqSchoolAppShowcaseSection({
   dark = false,
 }: AqeeqSchoolAppShowcaseSectionProps) {
+  const sectionRef = React.useRef<HTMLDivElement>(null);
   const { isNationalDay } = useSiteTheme();
   const { data: orchestrationData } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     staleTime: 60000,
   });
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const rawCol1Y = useTransform(scrollYProgress, [0, 1], [35, -35]);
+  const rawCol2Y = useTransform(scrollYProgress, [0, 1], [65, -15]);
+  const col1Y = useSpring(rawCol1Y, { stiffness: 85, damping: 20 });
+  const col2Y = useSpring(rawCol2Y, { stiffness: 85, damping: 20 });
 
   const appShowcase = orchestrationData?.appShowcase;
   const isEnabled = appShowcase?.enabled ?? true;
@@ -79,6 +91,7 @@ export default function AqeeqSchoolAppShowcaseSection({
 
   return (
     <section
+      ref={sectionRef}
       id="aqeeq-app-section"
       className={`relative py-16 md:py-24 border-b overflow-hidden transition-colors duration-300 ${
         dark
@@ -98,7 +111,13 @@ export default function AqeeqSchoolAppShowcaseSection({
 
       <div className="relative mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
         {/* Unified Section Header — Aligned Right Matching Site Identity */}
-        <div className="mb-8 sm:mb-12 text-right">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="mb-8 sm:mb-12 text-right"
+        >
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
               isNationalDay
@@ -128,12 +147,15 @@ export default function AqeeqSchoolAppShowcaseSection({
             بوابتكم الرقمية المتكاملة لمتابعة الأبناء، سداد الرسوم الدراسية إلكترونياً،
             والاطلاع على الفواتير المعتمدة وإشعارات المدرسة أولاً بأول.
           </p>
-        </div>
+        </motion.div>
 
         {/* Main 2-Column Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
           {/* Column 1 (Right in RTL): Interactive Embedded Video Player (7 Cols) */}
-          <div className="lg:col-span-7 flex flex-col justify-between">
+          <motion.div
+            style={{ y: col1Y }}
+            className="lg:col-span-7 flex flex-col justify-between will-change-transform"
+          >
             <div
               className={`rounded-[2.2rem] border p-4 sm:p-6 shadow-2xl transition duration-300 flex-1 flex flex-col justify-between ${
                 dark
@@ -234,10 +256,13 @@ export default function AqeeqSchoolAppShowcaseSection({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Column 2 (Left in RTL): Features, QR Code & Store Links (5 Cols) */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+          <motion.div
+            style={{ y: col2Y }}
+            className="lg:col-span-5 flex flex-col justify-between space-y-6 will-change-transform"
+          >
             {/* Features List */}
             <div
               className={`rounded-[2.2rem] border p-6 shadow-xl ${
@@ -368,7 +393,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

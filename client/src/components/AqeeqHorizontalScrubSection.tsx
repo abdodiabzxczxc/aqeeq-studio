@@ -31,27 +31,34 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
     offset: ["start start", "end end"],
   });
 
-  // في نظام RTL: العناصر تبدأ في اليمين وتتمدد جهة اليسار
-  // لإظهار بقية العناصر مع نزول السكرول، نحرك المسار نحو اليمين (Positive X) بنسبة مدروسة
-  const maxShift = items.length > 3 ? `${(items.length - 2) * 14}%` : "20%";
+  // حركة السكرول الأفقي التفاعلية المربوطة بالسكرول نزولاً وطلوعاً
+  // حساب المدى بدقة لتجنب أي فراغات
+  const maxShift = items.length > 3 ? `${Math.min(48, (items.length - 1) * 12)}%` : "18%";
   const rawX = useTransform(scrollYProgress, [0, 1], ["0%", maxShift]);
-  const x = useSpring(rawX, { stiffness: 90, damping: 20, mass: 0.5 });
+  const x = useSpring(rawX, { stiffness: 100, damping: 22, mass: 0.4 });
+
+  // تأثير عمق وإضاءة العنوان مع السكرول
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.8, 1, 1, 0.85]);
+  const headerScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.98, 1, 0.98]);
 
   if (!items || items.length === 0) return null;
 
   return (
     <section
       ref={targetRef}
-      className={`relative h-[200vh] w-full transition-colors duration-500 ${
+      className={`relative h-[110vh] w-full transition-colors duration-500 overflow-visible ${
         isNationalDay
           ? dark ? "bg-[#010905]" : "bg-[#f5fbf7]"
           : dark ? "bg-[#05070a]" : "bg-[#f9fafb]"
       }`}
     >
-      {/* Container المثبت أثناء حركة السكرول الأفقي (Sticky 100vh on Desktop) */}
-      <div className="sticky top-0 flex h-screen w-full flex-col justify-center overflow-hidden py-8">
-        {/* رأس المعرض السينمائي */}
-        <div className="mx-auto w-full max-w-[1380px] px-5 md:px-8 mb-6 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+      {/* الحاوية المثبتة طوال فترة السكرول الأفقي */}
+      <div className="sticky top-0 flex h-screen w-full flex-col justify-center overflow-hidden py-6">
+        {/* رأس المعرض السينمائي المتفاعل */}
+        <motion.div
+          style={{ opacity: headerOpacity, scale: headerScale }}
+          className="mx-auto w-full max-w-[1380px] px-5 md:px-8 mb-5 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3"
+        >
           <div>
             <div
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[10px] font-black tracking-widest uppercase mb-2 ${
@@ -73,16 +80,15 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
             </p>
           </div>
 
-          {/* مؤشر استكشاف السكرول */}
+          {/* مؤشر استكشاف السكرول + شريط النسبة */}
           <div className="flex items-center gap-3">
             <div className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold ${
               dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/10 bg-black/5 text-slate-700"
             }`}>
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>مرر لأسفل للاستكشاف أفقياً ✦</span>
+              <span>مرر بالماوس للاستكشاف أفقياً (نزولاً وطلوعاً) ✦</span>
             </div>
 
-            {/* شريط نسبة التقدم الزمني */}
             <div className={`h-1.5 w-28 rounded-full overflow-hidden ${dark ? "bg-white/10" : "bg-black/10"}`}>
               <motion.div
                 style={{ scaleX: scrollYProgress }}
@@ -90,22 +96,24 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* مسار الكروت المنزلقة أفقياً (The Horizontal Track) */}
+        {/* مسار الكروت المنزلقة أفقياً مع البارالاكس ثلاثي الأبعاد */}
         <div className="relative w-full overflow-visible">
           <motion.div
             style={{ x }}
             className="flex items-center gap-5 sm:gap-7 px-5 md:px-8 w-max will-change-transform"
           >
             {items.map((item, index) => (
-              <div
+              <motion.div
                 key={item.id + "-" + index}
                 role="button"
                 tabIndex={0}
                 onClick={() => navigate(item.href)}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate(item.href)}
-                className={`group relative h-[380px] sm:h-[430px] w-[270px] sm:w-[320px] shrink-0 cursor-pointer overflow-hidden rounded-[2.2rem] border transition-all duration-500 hover:scale-[1.02] active:scale-95 ${
+                whileHover={{ y: -10, scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 250, damping: 18 }}
+                className={`group relative h-[380px] sm:h-[430px] w-[270px] sm:w-[320px] shrink-0 cursor-pointer overflow-hidden rounded-[2.2rem] border transition-all duration-300 ${
                   isNationalDay
                     ? dark
                       ? "border-[#f8ca14]/30 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
@@ -122,7 +130,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                       src={item.imageUrl}
                       alt={item.title}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     />
                   ) : (
                     <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 text-slate-400">
@@ -131,7 +139,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                   )}
 
                   {/* Gradient Overlay الفاخر للقراءة */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
 
                   {/* الشارة العلوية */}
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full bg-black/60 border border-white/20 px-3 py-1 text-[11px] font-black text-[#f8ca14] backdrop-blur-md shadow-md">
@@ -160,7 +168,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </div>

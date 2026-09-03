@@ -8,6 +8,7 @@ import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
+import { AqeeqTypographicScrubBar } from "@/components/AqeeqTypographicScrubBar";
 import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import {
@@ -852,7 +853,7 @@ export default function AlaqeeqStudioPublicPage() {
         )}
 
 
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 pt-5 pb-12 md:px-8 md:pt-7 md:pb-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
@@ -1177,6 +1178,10 @@ export default function AlaqeeqStudioPublicPage() {
 
       {/* 🎬 مسار ويلينغتون السينمائي الأفقي للمجلات والألبومات (Horizontal Scrubbing) */}
       <AqeeqHorizontalScrubSection items={horizontalShowcaseItems} />
+
+      {/* 👑 الشريط الطباعي السينمائي العملاق المتفاعل مع السكرول نزولاً وطلوعاً */}
+      <AqeeqTypographicScrubBar text="✦ مـدارس الـعـقـيـق الأهلـيـة والـدوليـة ✦ AL-AQEEQ SCHOOLS ✦ أصـالـة وتـمـيّـز ✦" />
+
       {(orchestration?.sections as any)?.libraryEnabled !== false && (
         <AqeeqHomeTabsLibrary
           titleOverride={(orchestration?.sections as any)?.libraryTitle}
@@ -1186,6 +1191,9 @@ export default function AlaqeeqStudioPublicPage() {
 
       {/* 📱 قسم تطبيق مدارس العقيق الذكي — فيديو الشرح، رمز QR، وأزرار المتاجر */}
       <AqeeqSchoolAppShowcaseSection dark={dark} />
+
+      {/* 👑 الشريط الطباعي العكسي المتفاعل مع السكرول */}
+      <AqeeqTypographicScrubBar text="✦ صـوت الـعـقـيـق والـريـادة ✦ LEADERSHIP & INNOVATION ✦ نـلـهـم الأجـيـال ✦" reverse={true} />
 
       {/* ========================================================================= */}
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
@@ -1245,14 +1253,13 @@ export default function AlaqeeqStudioPublicPage() {
               tag="section"
               label="بطاقة الحدث التعليمي الأبرز"
               as="div"
-              className={"group relative overflow-hidden rounded-[2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition duration-300 " + (
+              className={"group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
                 isNationalDay
                   ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
                   : dark
                   ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
                   : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
               )}
-
             >
               <div className="relative h-48 sm:h-56 overflow-hidden rounded-2xl mb-6">
                 <VisualImage
@@ -1329,14 +1336,13 @@ export default function AlaqeeqStudioPublicPage() {
               tag="section"
               label="بطاقة وسام التميز الأكاديمي"
               as="div"
-              className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
+              className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
                 isNationalDay
                   ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
                   : dark
                   ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
                   : "border-[#08467d]/20 bg-white shadow-md"
               )}
-
             >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
@@ -1389,14 +1395,13 @@ export default function AlaqeeqStudioPublicPage() {
               tag="section"
               label="بطاقة نبض التفاعل"
               as="div"
-              className={"relative overflow-hidden rounded-[2rem] border p-6 flex flex-col justify-between transition duration-300 " + (
+              className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
                 isNationalDay
                   ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
                   : dark
                   ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
                   : "border-black/[0.08] bg-white shadow-md"
               )}
-
             >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (

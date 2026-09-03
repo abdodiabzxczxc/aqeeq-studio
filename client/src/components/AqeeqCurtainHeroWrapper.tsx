@@ -11,9 +11,9 @@ interface AqeeqCurtainHeroWrapperProps {
 /**
  * AqeeqCurtainHeroWrapper — الإصدار السينمائي الفائق (True Pinned Hero + 3D Transform + Curtain Reveal)
  * مستوحى من ويلينغتون:
- * 1. الهيرو يثبت بالكامل (Pinned) في بداية السكرول.
- * 2. أثناء دوران عجلة الماوس: الهيرو لا يهرب؛ بل يتراجع في البعد الثالث وتنفصل كروته بنعومة فيزيائية.
- * 3. تصعد الستارة الملكية (Curtain) من الأسفل وتغطي الهيرو بسلاسة مطلقة.
+ * - الهيرو ملتصق مباشرة أسفل شريط القصص بدون أي مسافة فارغة زائدة.
+ * - يثبت مكانه أثناء بداية السكرول وتتفتح كروته بالبعد الثالث.
+ * - تصعد الستارة الملكية وتغطي الهيرو بسلاسة مطلقة.
  */
 export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHeroWrapperProps) {
   const heroPinContainerRef = useRef<HTMLDivElement>(null);
@@ -21,18 +21,16 @@ export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHe
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
 
-  // تتبع تقدم السكرول خلال رحلة الهيرو المثبت (Pinned Journey)
+  // تتبع تقدم السكرول خلال رحلة الهيرو المثبت
   const { scrollYProgress } = useScroll({
     target: heroPinContainerRef,
     offset: ["start start", "end start"],
   });
 
-  // فيزياء الحركة السينمائية القوية:
-  // في النصف الأول من السكرول (0 إلى 0.6): تراجع الهيرو في البعد الثالث وزيادة العتمة والفوكس
-  const rawScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.88]);
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0.35]);
-  const rawY = useTransform(scrollYProgress, [0, 0.6], ["0px", "-50px"]);
-  const rawBlur = useTransform(scrollYProgress, [0, 0.6], ["blur(0px)", "blur(6px)"]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.9]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0.4]);
+  const rawY = useTransform(scrollYProgress, [0, 0.6], ["0px", "-40px"]);
+  const rawBlur = useTransform(scrollYProgress, [0, 0.6], ["blur(0px)", "blur(5px)"]);
 
   const heroScale = useSpring(rawScale, { stiffness: 100, damping: 20, mass: 0.5 });
   const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 20, mass: 0.5 });
@@ -40,17 +38,17 @@ export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHe
 
   return (
     <div className="relative w-full">
-      {/* 1. الحاوية الطويلة لتثبيت الهيرو (Pinned Hero Stage - 160vh) */}
-      <div ref={heroPinContainerRef} className="relative h-[160vh] w-full">
-        {/* الهيرو المثبت في الشاشة بنسبة 100% أثناء السكرول */}
-        <div className="sticky top-0 z-0 h-screen w-full flex items-center justify-center overflow-hidden">
+      {/* 1. الحاوية لتثبيت الهيرو بدون تباعد رأسي زائد */}
+      <div ref={heroPinContainerRef} className="relative h-[135vh] w-full">
+        {/* الهيرو يبدأ مباشرة من الأعلى تحت القصص */}
+        <div className="sticky top-0 z-0 w-full overflow-hidden pt-0">
           <motion.div
             style={{
               scale: heroScale,
               opacity: heroOpacity,
               y: heroY,
               filter: rawBlur,
-              transformOrigin: "center center",
+              transformOrigin: "center top",
             }}
             className="w-full will-change-transform"
           >
@@ -59,9 +57,9 @@ export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHe
         </div>
       </div>
 
-      {/* 2. طبقة الستارة الملكية الصاعدة فوق الهيرو (The Overlapping Royal Curtain) */}
+      {/* 2. طبقة الستارة الملكية الصاعدة فوق الهيرو */}
       <div
-        className={`relative z-20 -mt-[60vh] w-full rounded-t-[3rem] sm:rounded-t-[4.5rem] transition-colors duration-500 overflow-x-clip ${
+        className={`relative z-20 -mt-[35vh] w-full rounded-t-[3rem] sm:rounded-t-[4.5rem] transition-colors duration-500 overflow-x-clip ${
           isNationalDay
             ? dark
               ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
