@@ -975,6 +975,18 @@
   ],
   "mediaAssets": [
     {
+      "id": 15,
+      "fileName": "Gemini_Generated_Image_kes60xkes60xkes6.png",
+      "fileSize": 8033736,
+      "mimeType": "image/png",
+      "storageKey": "site-media/1/1788417548932-1fa86ea7-Gemini_Generated_Image_kes60xkes60xkes6_3b7612f8.png",
+      "url": "/uploads/site-media/1/1788417548932-1fa86ea7-Gemini_Generated_Image_kes60xkes60xkes6_3b7612f8.png",
+      "kind": "image",
+      "altText": "Gemini_Generated_Image_kes60xkes60xkes6",
+      "uploadedBy": 1,
+      "createdAt": "2026-09-03T06:39:08.934Z"
+    },
+    {
       "id": 10,
       "fileName": "-_-.mp3",
       "fileSize": 6156168,
@@ -1105,7 +1117,42 @@
     "site_broadcast": "{\"enabled\":false,\"message\":\"\",\"type\":\"info\"}",
     "gemini_api_key": ""
   },
-  "overrides": {},
+  "overrides": {
+    "/admissions::admissions-hero-student-photo": {
+      "id": 1788417552022,
+      "pagePath": "/admissions",
+      "elementId": "admissions-hero-student-photo",
+      "elementTag": "image",
+      "contentText": null,
+      "mediaUrl": "/uploads/site-media/1/1788417548932-1fa86ea7-Gemini_Generated_Image_kes60xkes60xkes6_3b7612f8.png",
+      "altText": "Gemini_Generated_Image_kes60xkes60xkes6",
+      "linkUrl": null,
+      "alignment": "center",
+      "textColor": null,
+      "bgColor": null,
+      "fontSize": null,
+      "padding": null,
+      "margin": null,
+      "borderRadius": null,
+      "layerX": 0,
+      "layerY": 0,
+      "layerWidth": null,
+      "layerHeight": null,
+      "layerZIndex": 0,
+      "layerOpacity": 100,
+      "backgroundSize": 100,
+      "backgroundPositionX": 50,
+      "backgroundPositionY": 50,
+      "backgroundOverlay": 0,
+      "customCss": null,
+      "isLocked": false,
+      "isHidden": false,
+      "updatedBy": 1,
+      "status": "published",
+      "updatedAt": "2026-09-03T06:39:12.022Z",
+      "publishedAt": "2026-09-03T06:39:12.068Z"
+    }
+  },
   "nextId": {
     "issue": 4,
     "issuePage": 9,
@@ -1114,7 +1161,7 @@
     "showcase": 2,
     "showcasePost": 21,
     "showcasePostMedia": 1,
-    "mediaAsset": 15,
+    "mediaAsset": 16,
     "admission": 2
   },
   "admissions": [
