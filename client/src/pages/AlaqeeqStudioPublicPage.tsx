@@ -268,6 +268,7 @@ export default function AlaqeeqStudioPublicPage() {
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay, backgroundPatternUrl, backgroundPatternOpacity, customBadgeText, variantInfo } = useSiteTheme();
   const dark = theme === "dark";
+  const { isEditing, select, selectedId } = useVisualEditorState();
 
   const { data: issues = [], isLoading: issuesLoading } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: albums = [], isLoading: albumsLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -285,10 +286,14 @@ export default function AlaqeeqStudioPublicPage() {
     { enabled: Boolean(showcase?.slug), refetchOnWindowFocus: false }
   );
 
+  const activeShowcasePosts: any[] = (showcaseDetail?.posts && showcaseDetail.posts.length > 0)
+    ? (showcaseDetail.posts as any[])
+    : ((showcase as any)?.posts as any[]) || [];
+
   const defaultJournalCovers = resolveStudioCardCovers(issues, (entry) => entry.coverUrl);
   const defaultAlbumCovers = resolveStudioCardCovers(albums, (entry) => directDriveImage(entry.coverUrl) || entry.coverUrl);
   const defaultShowcaseCovers = resolveStudioCardCovers(
-    showcaseDetail?.posts || [],
+    activeShowcasePosts,
     (entry) => directDriveImage(entry.thumbnailUrl) || entry.thumbnailUrl || entry.mediaUrl
   );
 
@@ -301,7 +306,7 @@ export default function AlaqeeqStudioPublicPage() {
     : null;
   const customShowcaseCover = orchestration?.heroCovers?.showcaseMode === "custom" && orchestration?.heroCovers?.customShowcasePostId
     ? (() => {
-        const p = showcaseDetail?.posts?.find((post) => post.id === orchestration.heroCovers.customShowcasePostId);
+        const p = activeShowcasePosts.find((post) => post.id === orchestration.heroCovers.customShowcasePostId);
         return p ? (directDriveImage(p.thumbnailUrl) || p.thumbnailUrl || p.mediaUrl) : null;
       })()
     : null;
@@ -319,8 +324,8 @@ export default function AlaqeeqStudioPublicPage() {
     back: defaultShowcaseCovers.back,
   };
   const featuredEventPost = orchestration?.weeklyBento?.featuredMode === "custom" && orchestration?.weeklyBento?.customPostId
-    ? showcaseDetail?.posts?.find((p) => p.id === orchestration.weeklyBento.customPostId) || showcaseDetail?.posts?.[0]
-    : showcaseDetail?.posts?.[0];
+    ? activeShowcasePosts.find((p) => p.id === orchestration.weeklyBento.customPostId) || activeShowcasePosts[0]
+    : activeShowcasePosts[0];
   const logoUrl = issues.find((entry) => entry.headerLogoUrl)?.headerLogoUrl || null;
 
   // Interactive States for New Showcased Sections
@@ -428,7 +433,7 @@ export default function AlaqeeqStudioPublicPage() {
     }
 
     // 4. Showcase Posts
-    for (const post of showcaseDetail?.posts || []) {
+    for (const post of activeShowcasePosts) {
       const id = "story-post-" + post.id;
       const rawId = "post-" + post.id;
       if (hiddenSet.has(id) || hiddenSet.has(rawId)) continue;
@@ -557,7 +562,7 @@ export default function AlaqeeqStudioPublicPage() {
     });
 
     return items;
-  }, [showcaseDetail?.posts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
+  }, [activeShowcasePosts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
 
   // Story Auto-Advance Timer
   useEffect(() => {
@@ -1033,106 +1038,213 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
 
           {/* Overlapping Hero Covers with 3D Fan-out on Scroll & 3D Interactive Mouse Tilt */}
-          <motion.div
-            onMouseMove={handleHeroMouseMove}
-            onMouseLeave={handleHeroMouseLeave}
-            style={{ rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
-            className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
-          >
-            {/* Back Card: Showcase / Vision & Excellence */}
-            <motion.div
-              style={{ x: heroBackCardX, rotate: heroBackCardRotate }}
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate("/offers")}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate("/offers")}
-              className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border opacity-75 cursor-pointer hover:opacity-100 hover:scale-[1.03] transition-all duration-500 will-change-transform " + (
-                isNationalDay
-                  ? dark
-                    ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
-                    : "border-[#6565e0]/40 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.1)]"
-                  : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
-              )}>
-              <VisualImage
-                id="studio-hero-showcase-image"
-                label="صورة غلاف الأخبار"
-                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "")}
-                alt="غلاف الأخبار والعروض"
-                className="h-full w-full object-cover"
-              />
-              {isNationalDay && (
-                <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-lg bg-black/80 border border-[#6565e0]/50 px-2 py-0.5 text-[9px] font-black text-white shadow-md backdrop-blur-md">
-                  <span>طموح الرؤية 🇸🇦</span>
-                </div>
-              )}
-            </motion.div>
+          <div className="relative">
+            {/* Quick Hero Covers Direct Edit Bar in Visual Editor Mode */}
+            {isEditing && (
+              <div className="absolute -top-14 inset-x-0 mx-auto w-fit z-50 flex items-center gap-1.5 bg-[#0b0f17]/95 border border-amber-400/40 px-3.5 py-1.5 rounded-2xl shadow-2xl backdrop-blur-xl">
+                <span className="text-[11px] font-black text-amber-400 ml-1">تحرير الأغلفة:</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
+                  }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                    selectedId === "studio-hero-journal-image"
+                      ? "bg-[#f8ca14] text-black shadow-lg"
+                      : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📘 غلاف المجلة (الأمامي)
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
+                  }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                    selectedId === "studio-hero-album-image"
+                      ? "bg-[#5aba1c] text-white shadow-lg"
+                      : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📸 غلاف الألبومات (الأوسط)
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار");
+                  }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                    selectedId === "studio-hero-showcase-image"
+                      ? "bg-[#6565e0] text-white shadow-lg"
+                      : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📰 غلاف الأخبار (الخلفي)
+                </button>
+              </div>
+            )}
 
-            {/* Middle Card: Albums / Heritage & Ajrab Sword */}
             <motion.div
-              style={{ y: heroMiddleCardY, scale: heroMiddleCardScale }}
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate("/albums")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") navigate("/albums");
-              }}
-              className={"group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 hover:scale-[1.02] will-change-transform " + (
-                isNationalDay
-                  ? dark
-                    ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
-                    : "border-[#5aba1c]/40 bg-white shadow-[0_20px_50px_rgba(0,50,25,0.12)]"
-                  : dark ? "border-white/[0.15] bg-[#111111]" : "border-black/[0.12] bg-white shadow-md"
-              )}
+              onMouseMove={handleHeroMouseMove}
+              onMouseLeave={handleHeroMouseLeave}
+              style={{ rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
+              className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
             >
-              <VisualImage
-                id="studio-hero-album-image"
-                label="صورة غلاف الألبومات"
-                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : (albumCovers.front || "")}
-                alt="غلاف ألبوم العقيق"
-                className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
-              />
-              {isNationalDay && (
-                <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1 rounded-xl bg-black/80 border border-[#5aba1c]/50 px-2.5 py-1 text-[10px] font-black text-[#5aba1c] shadow-lg backdrop-blur-md">
-                  <span>أصالة وفخر 🇸🇦</span>
-                </div>
-              )}
-            </motion.div>
+              {/* Back Card: Showcase / Vision & Excellence */}
+              <motion.div
+                style={{ x: heroBackCardX, rotate: heroBackCardRotate }}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  if (isEditing) {
+                    e.stopPropagation();
+                    select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار");
+                    return;
+                  }
+                  navigate("/offers");
+                }}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (isEditing ? select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار") : navigate("/offers"))}
+                className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border cursor-pointer will-change-transform transition-all duration-300 " + (
+                  isEditing
+                    ? "z-30 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#6565e0] opacity-100 shadow-2xl"
+                    : "opacity-75 hover:opacity-100 hover:scale-[1.03] duration-500 "
+                ) + (
+                  isNationalDay
+                    ? dark
+                      ? "border-[#6565e0]/40 bg-[#001c10] shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+                      : "border-[#6565e0]/40 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.1)]"
+                    : dark ? "border-white/[0.08] bg-[#111111]" : "border-black/[0.08] bg-slate-100"
+                )}>
+                <VisualImage
+                  id="studio-hero-showcase-image"
+                  label="صورة غلاف الأخبار"
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "")}
+                  alt="غلاف الأخبار والعروض"
+                  className="h-full w-full object-cover"
+                />
+                {isEditing ? (
+                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#6565e0] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                    <span>📰 غلاف الأخبار</span>
+                  </div>
+                ) : isNationalDay ? (
+                  <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-lg bg-black/80 border border-[#6565e0]/50 px-2 py-0.5 text-[9px] font-black text-white shadow-md backdrop-blur-md">
+                    <span>طموح الرؤية 🇸🇦</span>
+                  </div>
+                ) : null}
+              </motion.div>
 
-            {/* Front Card: Journal / Generosity & Family Generations */}
-            <motion.div
-              style={{ x: heroFrontCardX, rotate: heroFrontCardRotate }}
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate("/journal")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") navigate("/journal");
-              }}
-              className={"group absolute bottom-[2%] left-[1%] top-[5%] z-20 w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 hover:scale-[1.02] will-change-transform " + (
-                isNationalDay
-                  ? dark
-                    ? "border-[#f8ca14]/80 bg-[#001f13]/90 shadow-[0_30px_70px_rgba(0,90,54,0.55)] backdrop-blur-md ring-1 ring-[#f8ca14]/30"
-                    : "border-emerald-600/50 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.18)] backdrop-blur-md ring-1 ring-emerald-500/20"
-                  : dark
-                  ? "border-[#f8ca14]/50 bg-[#111111] shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
-                  : "border-[#08467d]/40 bg-white shadow-[0_30px_70px_rgba(8,70,125,0.15)]"
-              )}
-            >
+              {/* Middle Card: Albums / Heritage & Ajrab Sword */}
+              <motion.div
+                style={{ y: heroMiddleCardY, scale: heroMiddleCardScale }}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  if (isEditing) {
+                    e.stopPropagation();
+                    select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
+                    return;
+                  }
+                  navigate("/albums");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    if (isEditing) {
+                      select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
+                      return;
+                    }
+                    navigate("/albums");
+                  }
+                }}
+                className={"group absolute bottom-[8%] left-[28%] top-[8%] w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 will-change-transform " + (
+                  isEditing
+                    ? "z-20 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#5aba1c] shadow-2xl"
+                    : "z-10 hover:scale-[1.02]"
+                ) + " " + (
+                  isNationalDay
+                    ? dark
+                      ? "border-[#5aba1c]/50 bg-[#002617] shadow-[0_20px_50px_rgba(0,50,25,0.45)]"
+                      : "border-[#5aba1c]/40 bg-white shadow-[0_20px_50px_rgba(0,50,25,0.12)]"
+                    : dark ? "border-white/[0.15] bg-[#111111]" : "border-black/[0.12] bg-white shadow-md"
+                )}
+              >
+                <VisualImage
+                  id="studio-hero-album-image"
+                  label="صورة غلاف الألبومات"
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : (albumCovers.front || "")}
+                  alt="غلاف ألبوم العقيق"
+                  className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
+                />
+                {isEditing ? (
+                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#5aba1c] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                    <span>📸 غلاف الألبومات</span>
+                  </div>
+                ) : isNationalDay ? (
+                  <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1 rounded-xl bg-black/80 border border-[#5aba1c]/50 px-2.5 py-1 text-[10px] font-black text-[#5aba1c] shadow-lg backdrop-blur-md">
+                    <span>أصالة وفخر 🇸🇦</span>
+                  </div>
+                ) : null}
+              </motion.div>
 
-              <VisualImage
-                id="studio-hero-journal-image"
-                label="صورة غلاف المجلة"
-                src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : (journalCovers.front || "")}
-                alt="غلاف مجلة العقيق"
-                className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
-              />
-              {isNationalDay && (
-                <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-3 py-1 text-[11px] font-black text-black shadow-xl shadow-black/80 backdrop-blur-md">
-                  <span>🇸🇦</span>
-                  <span>عزّنا بطبعنا</span>
-                </div>
-              )}
+              {/* Front Card: Journal / Generosity & Family Generations */}
+              <motion.div
+                style={{ x: heroFrontCardX, rotate: heroFrontCardRotate }}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  if (isEditing) {
+                    e.stopPropagation();
+                    select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
+                    return;
+                  }
+                  navigate("/journal");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    if (isEditing) {
+                      select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
+                      return;
+                    }
+                    navigate("/journal");
+                  }
+                }}
+                className={"group absolute bottom-[2%] left-[1%] top-[5%] w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 will-change-transform " + (
+                  isEditing
+                    ? "z-10 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#f8ca14] shadow-2xl"
+                    : "z-20 hover:scale-[1.02]"
+                ) + " " + (
+                  isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/80 bg-[#001f13]/90 shadow-[0_30px_70px_rgba(0,90,54,0.55)] backdrop-blur-md ring-1 ring-[#f8ca14]/30"
+                      : "border-emerald-600/50 bg-white/95 shadow-[0_25px_60px_rgba(0,90,54,0.18)] backdrop-blur-md ring-1 ring-emerald-500/20"
+                    : dark
+                    ? "border-[#f8ca14]/50 bg-[#111111] shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
+                    : "border-[#08467d]/40 bg-white shadow-[0_30px_70px_rgba(8,70,125,0.15)]"
+                )}
+              >
+                <VisualImage
+                  id="studio-hero-journal-image"
+                  label="صورة غلاف المجلة"
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : (journalCovers.front || "")}
+                  alt="غلاف مجلة العقيق"
+                  className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
+                />
+                {isEditing ? (
+                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#f8ca14] text-black text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                    <span>📘 غلاف المجلة</span>
+                  </div>
+                ) : isNationalDay ? (
+                  <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-3 py-1 text-[11px] font-black text-black shadow-xl shadow-black/80 backdrop-blur-md">
+                    <span>🇸🇦</span>
+                    <span>عزّنا بطبعنا</span>
+                  </div>
+                ) : null}
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </VisualEditable>
         }

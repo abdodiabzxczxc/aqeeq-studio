@@ -806,7 +806,8 @@ export const localShowcases = {
     let list = [...db.showcases];
     if (status) list = list.filter((s) => s.status === status);
     return list.map((s) => {
-      const coverPost = s.posts?.find((post) => !["x", "instagram", "youtube"].includes(post.sourceType));
+      const sortedPosts = [...(s.posts || [])].sort((a, b) => a.postOrder - b.postOrder);
+      const coverPost = sortedPosts.find((post) => !["x", "instagram", "youtube"].includes(post.sourceType));
       return {
         ...s,
         intro: s.intro || null,

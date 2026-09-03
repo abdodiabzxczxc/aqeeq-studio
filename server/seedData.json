@@ -950,25 +950,6 @@
           "viewCount": 0,
           "createdAt": "2026-08-29T18:45:43.434Z",
           "media": []
-        },
-        {
-          "id": 1,
-          "showcaseId": 1,
-          "driveFileId": "1AYSiRxeFYWvcDCLYJDNbFf3KmAmUcGmZ",
-          "mediaUrl": "/api/drive-proxy/1AYSiRxeFYWvcDCLYJDNbFf3KmAmUcGmZ",
-          "thumbnailUrl": "/api/drive-proxy/1AYSiRxeFYWvcDCLYJDNbFf3KmAmUcGmZ",
-          "fileName": "1.png",
-          "mimeType": "image/png",
-          "mediaType": "image",
-          "sourceType": "manual",
-          "externalUrl": null,
-          "title": null,
-          "description": null,
-          "isNew": true,
-          "postOrder": 0,
-          "viewCount": 0,
-          "createdAt": "2026-08-29T18:45:43.434Z",
-          "media": []
         }
       ]
     }
