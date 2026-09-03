@@ -43,6 +43,9 @@ describe("visual editor studio routing and image layout", () => {
       "/atheer/manage",
       "/podcast",
       "/podcast/manage",
+      "/about",
+      "/admissions",
+      "/accreditations",
     ].every(isAqeeqStudioVisualPath)).toBe(true);
     expect(isAqeeqStudioVisualPath("/unknown-random-path")).toBe(false);
   });

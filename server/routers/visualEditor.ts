@@ -3,10 +3,10 @@ import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset,
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 
-const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio)$|^\/(?:news|albums|offers)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2})|albums\/[a-z0-9-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
+const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditations|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio)$|^\/(?:news|albums|offers)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2})|albums\/[a-z0-9-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
 const cssTokenSchema = z.string().max(32).regex(/^[#a-zA-Z0-9.%(), /-]*$/, "قيمة النمط غير صالحة").nullable().optional();
 // Keep this list aligned with VisualEditable ids in all first-party pages. "events" owns the public Event OS homepage.
-const supportedElementSchema = z.string().min(3).max(128).regex(/^(?:home|school|event|events|lobby|dashboard|workspace|scan|control|attendees|operations|reports|settings|audit|roles|custom|page|section|journal|news|album|albums|showcase|offers|studio|aqeeq|live|blueprint|stage|memory|maison|guest)-[a-z0-9-]+$/, "العنصر غير مدعوم في المحرر البصري");
+const supportedElementSchema = z.string().min(3).max(128).regex(/^(?:home|school|event|events|lobby|dashboard|workspace|scan|control|attendees|operations|reports|settings|audit|roles|custom|page|section|journal|news|album|albums|showcase|offers|studio|aqeeq|live|blueprint|stage|memory|maison|guest|about|admissions|accreditations|app)-[a-z0-9-]+$/, "العنصر غير مدعوم في المحرر البصري");
 const sectionTypeSchema = z.enum(["hero", "features", "gallery", "video", "cta", "custom"]);
 const sectionConfigSchema = z.object({
   anchorId: z.string().min(2).max(96).regex(/^[a-z0-9-]+$/, "موضع الإدراج غير صالح").optional(),
