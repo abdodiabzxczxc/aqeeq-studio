@@ -173,7 +173,7 @@ export function AqeeqAiAssistantWidget() {
 
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
 
   const utils = trpc.useUtils();
   const { data: aiStatus, refetch: refetchAiStatus } = trpc.schoolAi.getAiStatus.useQuery(undefined, {
@@ -269,8 +269,14 @@ export function AqeeqAiAssistantWidget() {
     }
   };
 
+  if (location.startsWith("/admin")) return null;
+
   return (
-    <div dir="rtl" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 sm:left-6 z-50 font-[Tajawal,sans-serif]">
+    <div
+      dir="rtl"
+      className="fixed left-3 sm:left-6 z-50 font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out"
+      style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
+    >
       {/* ── 1. Permanent Luxury Spatial Morphing Orb (When Closed) ── */}
       {!isOpen && (
         <button

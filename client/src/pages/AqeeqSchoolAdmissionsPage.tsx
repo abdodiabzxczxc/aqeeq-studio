@@ -927,7 +927,52 @@ export default function AqeeqSchoolAdmissionsPage() {
           <div className={`overflow-hidden rounded-[2rem] border shadow-2xl backdrop-blur-xl mb-8 ${
             dark ? "border-white/10 bg-[#0c1218]/90" : "border-emerald-950/10 bg-white/95"
           }`}>
-            <div className="overflow-x-auto">
+            {/* Mobile Responsive Cards for Table View */}
+            <div className="block md:hidden space-y-3 p-3 sm:p-4">
+              {activeFees.map((row, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-2xl border p-4 transition ${
+                    dark ? "border-white/10 bg-white/[0.02]" : "border-emerald-950/10 bg-white"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <h4 className="font-black text-sm text-slate-900 dark:text-white">{row.grade}</h4>
+                    <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                      {row.fee} <span className="text-[10px] font-normal">ر.س / سنة</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3 pb-2 border-b border-current/10">
+                    <span>القسط الفصلي:</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200">{row.term} ر.س</span>
+                  </div>
+                  {row.notes && (
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
+                      {row.notes}
+                    </p>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        track: activeTrack,
+                        gradeLevel: row.targetGrade as any,
+                      }));
+                      scrollToSection("admission-form-section");
+                    }}
+                    className={`w-full rounded-xl text-xs font-bold ${
+                      dark ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-[#015a37] hover:bg-emerald-800 text-white"
+                    }`}
+                  >
+                    سجّل بهذه المرحلة
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-right border-collapse">
                 <thead>
                   <tr className={`border-b text-xs sm:text-sm font-black ${

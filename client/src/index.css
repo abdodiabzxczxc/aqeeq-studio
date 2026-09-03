@@ -3,6 +3,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --mobile-sticky-bar-offset: 0px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --mobile-sticky-bar-offset: 0px !important;
+  }
+}
+
 /* ── Scrollbar Utilities ─────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;

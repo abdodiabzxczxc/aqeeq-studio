@@ -421,15 +421,15 @@ export default function AqeeqPodcastPage() {
         {isNationalDay ? (
           <>
             <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
           </>
         ) : (
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
         )}
 
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-10 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-14 lg:gap-14">
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-10 md:grid-cols-[1fr_1.1fr] md:py-14 lg:gap-14">
           {/* 3D Tilted Dual-Cover */}
-          <div className="relative order-2 mx-auto h-[340px] w-full max-w-[560px] md:order-1 md:h-[440px]">
+          <div className="relative order-2 mx-auto h-[280px] sm:h-[340px] w-full max-w-[560px] md:order-1 md:h-[440px]">
             {secondPodcast ? (
               <button
                 onClick={() => handlePlayOrOpen(secondPodcast)}
@@ -911,7 +911,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Master Acoustic Broadcasting Deck Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl min-h-[340px] lg:h-[405px] ${
                 dark ? "border-emerald-500/30 bg-black/60 text-white" : "border-emerald-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1428,7 +1428,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Master 4K Video Screen Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl min-h-[340px] lg:h-[405px] ${
                 dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
@@ -1914,7 +1914,7 @@ export default function AqeeqPodcastPage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               
               {/* Grand Dynamic Vinyl Deck Centerpiece */}
-              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl h-[395px] sm:h-[405px] ${
+              <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl min-h-[340px] lg:h-[405px] ${
                 dark ? "border-amber-400/30 bg-black/60 text-white" : "border-amber-200 bg-white/95 text-slate-900"
               }`}>
                 

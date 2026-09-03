@@ -184,12 +184,12 @@ export default function AqeeqAlbumsPage() {
             {isNationalDay ? (
               <>
                 <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
               </>
             ) : (
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
             )}
-            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
+            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[1fr_1.1fr] md:py-16 lg:gap-16">
               <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
                 {secondAlbum ? (
                   <button onClick={() => navigate(`/albums/${secondAlbum.slug}`)} className={`absolute left-[4%] top-[5%] h-[77%] w-[62%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl ${

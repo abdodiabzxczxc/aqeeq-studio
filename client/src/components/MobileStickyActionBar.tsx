@@ -45,6 +45,17 @@ export function MobileStickyActionBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [dismissed]);
 
+  useEffect(() => {
+    if (visible && !dismissed) {
+      document.documentElement.style.setProperty("--mobile-sticky-bar-offset", "64px");
+    } else {
+      document.documentElement.style.setProperty("--mobile-sticky-bar-offset", "0px");
+    }
+    return () => {
+      document.documentElement.style.setProperty("--mobile-sticky-bar-offset", "0px");
+    };
+  }, [visible, dismissed]);
+
   if (location.startsWith("/admin")) return null;
 
   const accentGradient = isNationalDay
