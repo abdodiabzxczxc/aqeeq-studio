@@ -145,7 +145,7 @@ export function AlaqeeqStudioSiteFooter() {
             {/* Container fits title exactly, scaled down as a single unit */}
             <div
               className="w-fit inline-flex flex-col items-stretch origin-right shrink-0"
-              style={{ zoom: 0.82 }}
+              style={{ zoom: 0.70 }}
             >
               <h3
                 className={`text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap leading-none ${
