@@ -64,21 +64,21 @@ export function AlaqeeqStudioSiteFooter() {
           : "border-black/[0.06] bg-[#fafafa] text-slate-900"
       }`}
     >
-      <div className="mx-auto max-w-[1360px] px-5 pt-10 pb-8 md:px-8">
-        {/* 1. Pre-Footer Call-to-Excellence Card (الهيكل القديم المتزن + التأثيرات الجديدة الفخمة) */}
+      <div className="mx-auto max-w-[1360px] px-5 pt-8 pb-8 md:px-8">
+        {/* 1. Pre-Footer Call-to-Excellence Card (الشكل القديم الملموم ذو الارتفاع الصغير الأنيق + نفس التأثيرات الفخمة) */}
         <div
-          className={`mb-10 rounded-[2rem] border p-6 sm:p-8 lg:p-10 relative overflow-hidden backdrop-blur-2xl transition-all duration-500 shadow-2xl ${
+          className={`mb-8 rounded-2xl sm:rounded-[1.8rem] border p-5 sm:p-6 md:p-7 relative overflow-hidden backdrop-blur-2xl transition-all duration-300 shadow-xl ${
             dark
-              ? "border-[#f8ca14]/25 bg-gradient-to-br from-[#0a1218] via-[#05090e] to-[#02140c] shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
-              : "border-emerald-700/20 bg-gradient-to-br from-white via-emerald-50/40 to-amber-50/30 shadow-[0_15px_40px_rgba(1,90,55,0.06)]"
+              ? "border-[#f8ca14]/20 bg-gradient-to-br from-[#0a1218] via-[#05090e] to-[#02140c] shadow-[0_15px_40px_rgba(0,0,0,0.5)]"
+              : "border-emerald-700/15 bg-gradient-to-br from-white via-emerald-50/40 to-amber-50/30 shadow-[0_10px_30px_rgba(1,90,55,0.05)]"
           }`}
         >
           {/* Subtle Ambient Glow */}
-          <div className="pointer-events-none absolute -left-12 -top-12 h-64 w-64 rounded-full bg-[#f8ca14]/10 blur-3xl animate-pulse" />
-          <div className="pointer-events-none absolute -right-12 -bottom-12 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-[#f8ca14]/10 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -right-12 -bottom-12 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl animate-pulse" />
 
           {/* Rotating Golden Compass Seal in Background */}
-          <div className="pointer-events-none absolute -bottom-10 left-1/4 w-52 h-52 opacity-[0.04] select-none animate-[spin_60s_linear_infinite]">
+          <div className="pointer-events-none absolute -bottom-10 left-1/4 w-44 h-44 opacity-[0.04] select-none animate-[spin_60s_linear_infinite]">
             <svg viewBox="0 0 200 200" fill="none" className="w-full h-full text-[#f8ca14]">
               <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6" />
               <circle cx="100" cy="100" r="70" stroke="currentColor" strokeWidth="1.5" />
@@ -86,54 +86,38 @@ export function AlaqeeqStudioSiteFooter() {
             </svg>
           </div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="max-w-2xl text-right">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-400 mb-3 shadow-sm">
-                <span className="relative flex h-2 w-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-black text-emerald-400 mb-2 shadow-sm">
+                <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
-                <Sparkles size={12} className="text-[#f8ca14]" />
-                <span>القبول والتسجيل مفتوح للعام الدراسي الجديد 2026 / 2027</span>
+                <Sparkles size={11} className="text-[#f8ca14]" />
+                <span>القبول والتسجيل مفتوح للعام الدراسي 2026 / 2027</span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug font-cairo">
+              <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-snug font-cairo">
                 ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦
               </h3>
 
-              <p className={`mt-2 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والأهلي المتقدم)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.
+              <p className={`mt-1.5 text-xs sm:text-[13px] leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.
               </p>
-
-              {/* Badges in a single compact row */}
-              <div className="mt-3.5 flex flex-wrap items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${
-                  dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-white border-slate-200 text-slate-700 shadow-sm"
-                }`}>
-                  <Award size={12} className="text-[#f8ca14]" />
-                  <span>اعتماد دولي كامل Cognia</span>
-                </span>
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${
-                  dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-white border-slate-200 text-slate-700 shadow-sm"
-                }`}>
-                  <GraduationCap size={12} className="text-emerald-400" />
-                  <span>المسار الأمريكي والأهلي</span>
-                </span>
-              </div>
             </div>
 
             {/* Clean Horizontal Button Strip on Left Side */}
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto shrink-0">
               {/* Primary Button with Liquid Shimmer Beam */}
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
-                className="relative overflow-hidden flex-1 sm:flex-initial px-6 py-3.5 rounded-xl bg-gradient-to-l from-[#f8ca14] to-yellow-500 hover:from-yellow-400 hover:to-yellow-500 text-black font-black text-xs sm:text-sm shadow-xl shadow-amber-500/20 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
+                className="relative overflow-hidden flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-l from-[#f8ca14] to-yellow-500 hover:from-yellow-400 hover:to-yellow-500 text-black font-black text-xs shadow-lg shadow-amber-500/15 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
               >
                 {/* Diagonal Light Shimmer */}
                 <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
                 <span>حجز مقعد دراسي</span>
-                <ArrowUpLeft size={16} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpLeft size={15} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </button>
 
               {/* WhatsApp Live Advisor */}
@@ -141,17 +125,17 @@ export function AlaqeeqStudioSiteFooter() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                className={`flex-1 sm:flex-initial px-5 py-3.5 rounded-xl border text-xs sm:text-sm font-black transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 ${
+                className={`flex-1 sm:flex-initial px-4 py-3 rounded-xl border text-xs font-black transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 ${
                   dark
                     ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
                     : "border-emerald-600/30 bg-white text-emerald-700 hover:bg-emerald-50 shadow-sm"
                 }`}
               >
-                <span className="relative flex h-2 w-2">
+                <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
-                <MessageCircle size={16} className="text-emerald-500" />
+                <MessageCircle size={15} className="text-emerald-500" />
                 <span>مستشار القبول</span>
               </a>
 
@@ -159,7 +143,7 @@ export function AlaqeeqStudioSiteFooter() {
               <button
                 type="button"
                 onClick={() => navigate("/admissions#fees-table-section")}
-                className={`w-full sm:w-auto px-4 py-3.5 rounded-xl border text-xs font-bold transition hover:scale-102 ${
+                className={`w-full sm:w-auto px-3.5 py-3 rounded-xl border text-xs font-bold transition ${
                   dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
                     : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm"

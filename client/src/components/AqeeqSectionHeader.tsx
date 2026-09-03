@@ -41,21 +41,24 @@ export function AqeeqSectionHeader({
         {title}
       </h2>
 
-      {/* 3. Glowing Golden Gradient Accent Line */}
-      <div className={`relative my-3.5 h-[3px] rounded-full overflow-hidden ${
-        isCenter ? "mx-auto w-48" : "w-44 sm:w-56"
-      } ${
-        dark
-          ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/70 to-transparent shadow-[0_0_12px_rgba(248,202,20,0.45)]"
-          : "bg-gradient-to-l from-[#08467d] via-[#08467d]/70 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.3)]"
-      }`}>
-        {/* Animated Light Shimmer traveling along the line */}
-        <motion.div
-          animate={{ x: isCenter ? ["-100%", "100%"] : ["100%", "-100%"] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-y-0 w-16 bg-white/80 blur-[2px]"
-        />
-      </div>
+      {/* 3. Glowing Golden Gradient Accent Line (يتمدد وينكمش - بيصغر ويكبر في عرضه) */}
+      <motion.div
+        initial={{ width: "35px" }}
+        whileInView={{ width: ["35px", "190px", "35px"] }}
+        viewport={{ once: false }}
+        transition={{
+          duration: 2.6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
+          isCenter ? "mx-auto" : ""
+        } ${
+          dark
+            ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_14px_rgba(248,202,20,0.55)]"
+            : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.4)]"
+        }`}
+      />
 
       {/* 4. Subtitle / Description */}
       {subtitle && (

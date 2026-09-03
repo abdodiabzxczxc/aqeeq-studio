@@ -8,8 +8,6 @@ import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
-import { AqeeqPageHeroShowcase } from "@/components/AqeeqPageHeroShowcase";
-import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 
 import {
   Play,
@@ -413,54 +411,276 @@ export default function AqeeqPodcastPage() {
       {/* Top Header Bar */}
       <AlaqeeqStudioSiteHeader title="أثير العقيق 🎙️" active="podcast" />
 
-      {/* ==================== 1. 3D HERO CINEMA SHOWCASE ==================== */}
+      {/* ==================== 1. 3D TILTED HERO COVER ==================== */}
       <section
-        className={`relative isolate overflow-hidden border-b py-12 md:py-16 ${
+        className={`relative isolate overflow-hidden border-b ${
           isNationalDay
             ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
             : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
         }`}
       >
-        <div className="relative mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
-          {/* Header Row: Title & Action Buttons */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-            <AqeeqSectionHeader
-              badge={isNationalDay ? "🇸🇦 أثير العقيق · اليوم الوطني" : "PODCAST & AUDIO · أثير العقيق الصوتي"}
-              badgeIcon={<Mic size={13} />}
-              title="أثير العقيق.. صوت ينبض بالإلهام"
-              subtitle="حلقات صوتية ومرئية ملهمة، تستضيف نخبة من القيادات التربوية والخبراء والطلاب لمناقشة قضايا التعليم والمستقبل."
-              dark={dark}
-              className="!mb-0"
+        {isNationalDay ? (
+          <>
+            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+          </>
+        ) : (
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
+        )}
+
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-10 md:grid-cols-[1fr_1.1fr] md:py-14 lg:gap-14">
+          {/* 3D Tilted Dual-Cover */}
+          <div className="relative order-2 mx-auto h-[280px] sm:h-[340px] w-full max-w-[560px] md:order-1 md:h-[440px]">
+            {secondPodcast ? (
+              <button
+                onClick={() => handlePlayOrOpen(secondPodcast)}
+                className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                }`}
+                style={{ transform: "rotate(-7deg)" }}
+                aria-label={`الحلقة السابقة: ${secondPodcast.title}`}
+              >
+                {secondPodcast.coverUrl ? (
+                  <img
+                    src={directDriveImage(secondPodcast.coverUrl) || secondPodcast.coverUrl}
+                    alt=""
+                    className="h-full w-full rounded-[1.2rem] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
+                    <Mic size={30} className="text-slate-400" />
+                    <div>
+                      <span className="text-[10px] font-black text-[#f8ca14]">{secondPodcast.category}</span>
+                      <p className="line-clamp-2 text-xs font-black text-white">{secondPodcast.title}</p>
+                    </div>
+                  </div>
+                )}
+              </button>
+            ) : null}
+
+            {featuredPodcast ? (
+              <button
+                onClick={() => handlePlayOrOpen(featuredPodcast)}
+                className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
+                  (activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying
+                    ? "border-[#f8ca14] ring-2 ring-[#f8ca14]/50 bg-[#161616]"
+                    : isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                    : dark
+                    ? "border-[#f8ca14]/50 bg-[#111111]"
+                    : "border-[#08467d]/30 bg-white"
+                }`}
+                style={{ transform: "rotate(3deg)" }}
+                aria-label={`الحلقة الحالية: ${featuredPodcast.title}`}
+              >
+
+                <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                  {featuredPodcast.coverUrl ? (
+                    <div className="relative h-full w-full">
+                      <img
+                        src={directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl}
+                        alt={`غلاف ${featuredPodcast.title}`}
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="grid h-16 w-16 place-items-center rounded-full bg-[#f8ca14] text-black shadow-2xl transition group-hover:scale-110">
+                          {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? (
+                            <Pause size={28} />
+                          ) : (
+                            <Play size={28} className="mr-1" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex h-full flex-col justify-between p-6 text-right ${
+                        dark
+                          ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
+                          : "bg-slate-100 text-[#08467d]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Mic size={42} />
+                        {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying && (
+                          <div className="flex items-end gap-1 h-6">
+                            <span className="w-1 bg-[#f8ca14] animate-[bounce_0.6s_infinite] h-6 rounded-full" />
+                            <span className="w-1 bg-[#f8ca14] animate-[bounce_0.8s_infinite] h-4 rounded-full" />
+                            <span className="w-1 bg-[#f8ca14] animate-[bounce_0.5s_infinite] h-5 rounded-full" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
+                          <Sparkles size={11} /> حلقة مميزة
+                        </span>
+                        <h2 className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
+                          {featuredPodcast.title}
+                        </h2>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
+                    <span className="text-[10px] font-black text-[#f8ca14]">
+                      {featuredPodcast.category} · {featuredPodcast.duration || "15:00"}
+                    </span>
+                    <h2 className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
+                      {featuredPodcast.title}
+                    </h2>
+                  </div>
+                </div>
+              </button>
+            ) : null}
+          </div>
+
+          {/* Text Info */}
+          <div className="order-1 md:order-2 text-right">
+            <VisualEditable
+              id="podcast-hero-kicker"
+              tag="text"
+              label="شارة أثير العقيق"
+              defaultText={
+                isNationalDay
+                  ? "أثير العقيق في اليوم الوطني · نغم الفخر والاعتزاز 🇸🇦"
+                  : orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"
+              }
+              as="div"
+              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
+                isNationalDay
+                  ? dark
+                    ? "border-[#f8ca14]/50 bg-gradient-to-r from-[#003822] to-[#002617] text-[#f8ca14] shadow-lg shadow-emerald-950/40"
+                    : "border-emerald-600/30 bg-emerald-50 text-[#005A36] shadow-sm"
+                  : dark
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              }`}
+            >
+
+
+              {(text) => (
+                <>
+                  <Mic size={14} className="animate-pulse" />
+                  <span>{text}</span>
+                </>
+              )}
+            </VisualEditable>
+
+            <VisualEditable
+              id="podcast-hero-title"
+              tag="text"
+              label="عنوان صفحة البودكاست"
+              defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
+              as="h1"
+              className={`mt-4 text-3xl font-black leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl ${
+                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+              }`}
             />
 
-            {/* Actions */}
-            <div className="flex flex-wrap items-center gap-3">
+            <VisualEditable
+              id="podcast-hero-desc"
+              tag="text"
+              label="وصف صفحة البودكاست"
+              defaultText={orchestration?.heroCovers?.podcastsCustomDesc ||
+                "استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية، والتغطيات الصوتية والمرئية لحفلات التخرج والبطولات المدرسية."}
+              as="p"
+              className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${
+                dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"
+              }`}
+            />
+
+            {/* Stats pills */}
+            <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-bold">
+              <span
+                className={`rounded-full border px-3 py-1.5 ${
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                }`}
+              >
+                <Music className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                {songs?.length || 0} أناشيد رسمية
+              </span>
+              <span
+                className={`rounded-full border px-3 py-1.5 ${
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                }`}
+              >
+                <Radio className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                {rawPodcasts.length} حلقة منشورة
+              </span>
+              <span
+                className={`rounded-full border px-3 py-1.5 ${
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                }`}
+              >
+                <Headphones className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                صوت وفيديو 100%
+              </span>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              {featuredPodcast ? (
+                <button
+                  onClick={() => handlePlayOrOpen(featuredPodcast)}
+                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
+                    dark
+                      ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                      : isNationalDay
+                      ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
+                      : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+                  }`}
+                >
+                  {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? (
+                    <>
+                      <Pause size={15} />
+                      <span>إيقاف مؤقت</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play size={15} className="mr-0.5" />
+                      <span>{featuredPodcast.mediaType === "video" ? "مشاهدة الحلقة المميزة" : "استمع للحلقة الآن"}</span>
+                    </>
+                  )}
+                </button>
+              ) : null}
+
               {songs && songs.length > 0 && (
                 <button
                   type="button"
                   onClick={() => playSong(0)}
-                  className={`inline-flex items-center gap-2 rounded-2xl border px-6 py-3.5 text-xs font-black transition-all hover:scale-105 shadow-md ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
                     isNationalDay
                       ? dark
-                        ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14]"
-                        : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
+                        ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14] hover:scale-105 shadow-md"
+                        : "border-emerald-600/30 bg-emerald-50 text-[#005A36] hover:bg-emerald-100 hover:scale-105 shadow-sm"
                       : dark
-                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14]/25"
-                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                      : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                   }`}
                 >
-                  <Disc size={15} className="animate-[spin_4s_linear_infinite]" />
-                  <span>{isNationalDay ? "تشغيل أناشيد العقيق 🇸🇦" : "تشغيل الأناشيد 🎵"}</span>
+                  <Disc size={14} className="animate-[spin_4s_linear_infinite]" />
+                  <span>{isNationalDay ? "🇸🇦 تشغيل أناشيد الوطن والعقيق" : "تشغيل الأناشيد 🎵"}</span>
                 </button>
               )}
 
               {isAdmin && (
+
                 <button
                   type="button"
                   onClick={() => navigate("/atheer/manage")}
-                  className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-black transition-all hover:scale-105 shadow-md ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
                     dark
-                      ? "border-purple-400/40 bg-purple-500/15 text-purple-300 hover:bg-purple-500/25"
+                      ? "border-purple-400/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
                       : "border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
                   }`}
                 >
@@ -470,45 +690,6 @@ export default function AqeeqPodcastPage() {
               )}
             </div>
           </div>
-
-          {/* 🌟 The Exact 7-col Hero + 3-stacked Cards Showcase */}
-          {featuredPodcast && (
-            <AqeeqPageHeroShowcase
-              dark={dark}
-              hero={{
-                id: featuredPodcast.id,
-                title: featuredPodcast.title,
-                coverUrl: (directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl) ?? null,
-                badge: featuredPodcast.mediaType === "video" ? "حلقة مرئية 🎬" : "حلقة صوتية 🎙️",
-                dateOrMeta: featuredPodcast.duration ? String(featuredPodcast.duration) : "حلقة مميزة",
-                href: `/podcast`,
-                excerpt: featuredPodcast.description || "حلقة حصرية من أثير العقيق تناقش أحدث الاتجاهات التربوية والتعليمية.",
-                ctaText: featuredPodcast.mediaType === "video" ? "مشاهدة الحلقة المميزة" : "تشغيل الحلقة الصوتية 🎙️",
-                ctaIcon: (activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? <Pause size={15} /> : <Play size={15} />,
-                onCtaClick: () => handlePlayOrOpen(featuredPodcast),
-                extraBadge: (
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-400">
-                    <div className="flex items-end gap-0.5 h-3">
-                      <div className="w-1 bg-amber-400 h-2 animate-[pulse_0.8s_ease-in-out_infinite]" />
-                      <div className="w-1 bg-amber-400 h-3 animate-[pulse_0.6s_ease-in-out_infinite_0.2s]" />
-                      <div className="w-1 bg-amber-400 h-1.5 animate-[pulse_1s_ease-in-out_infinite_0.4s]" />
-                    </div>
-                    <span>صوت فائق النقاوة</span>
-                  </div>
-                ),
-              }}
-              stack={rawPodcasts.filter((p) => p.id !== featuredPodcast.id).slice(0, 3).map((p) => ({
-                id: p.id,
-                title: p.title,
-                coverUrl: (directDriveImage(p.coverUrl) || p.coverUrl) ?? null,
-                badge: p.mediaType === "video" ? "فيديو" : "بودكاست",
-                dateOrMeta: p.duration ? String(p.duration) : undefined,
-                href: `/podcast`,
-                onClick: () => handlePlayOrOpen(p),
-                playIcon: true,
-              }))}
-            />
-          )}
         </div>
       </section>
 
