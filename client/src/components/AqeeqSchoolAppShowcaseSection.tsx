@@ -39,6 +39,15 @@ export default function AqeeqSchoolAppShowcaseSection({
   const col1Y = useSpring(rawCol1Y, { stiffness: 85, damping: 20 });
   const col2Y = useSpring(rawCol2Y, { stiffness: 85, damping: 20 });
 
+  // 3D Perspective scrubbing physics for the video / app frame
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.45, 0.9], [14, 0, -6]);
+  const rawRotateY = useTransform(scrollYProgress, [0, 0.45, 0.9], [-16, 0, 8]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.45, 0.9], [0.92, 1, 0.96]);
+
+  const rotateX = useSpring(rawRotateX, { stiffness: 80, damping: 20 });
+  const rotateY = useSpring(rawRotateY, { stiffness: 80, damping: 20 });
+  const scale = useSpring(rawScale, { stiffness: 80, damping: 20 });
+
   const appShowcase = orchestrationData?.appShowcase;
   const isEnabled = appShowcase?.enabled ?? true;
   const appDownloadUrl = appShowcase?.qrCodeUrl || "https://qr-codes.io/LQMip0";
@@ -153,7 +162,13 @@ export default function AqeeqSchoolAppShowcaseSection({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
           {/* Column 1 (Right in RTL): Interactive Embedded Video Player (7 Cols) */}
           <motion.div
-            style={{ y: col1Y }}
+            style={{
+              y: col1Y,
+              rotateX,
+              rotateY,
+              scale,
+              transformStyle: "preserve-3d",
+            }}
             className="lg:col-span-7 flex flex-col justify-between will-change-transform"
           >
             <div

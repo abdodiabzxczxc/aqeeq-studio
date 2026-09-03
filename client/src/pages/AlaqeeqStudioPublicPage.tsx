@@ -59,8 +59,8 @@ import { AqeeqHomeBentoGrid } from "@/components/AqeeqHomeBentoGrid";
 import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqNationalTraitsSection } from "@/components/AqeeqNationalTraitsSection";
-import { triggerNationalCelebration } from "@/components/AqeeqCelebrationConfetti";
 import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
+import { AqeeqWeeklyStackingDeck } from "@/components/AqeeqWeeklyStackingDeck";
 
 
 
@@ -682,14 +682,6 @@ export default function AlaqeeqStudioPublicPage() {
     setHeroMouse({ x: 0, y: 0 });
   };
 
-  // فيزياء السكرول التفاعلي للأقسام السفلية (Lower Sections Bidirectional Parallax)
-  const rawWeeklyBentoCard1Y = useTransform(scrollY, [2800, 4400], [35, -35]);
-  const rawWeeklyBentoCard2Y = useTransform(scrollY, [2800, 4400], [15, -45]);
-  const rawWeeklyBentoCard3Y = useTransform(scrollY, [2800, 4400], [45, -25]);
-
-  const weeklyBentoCard1Y = useSpring(rawWeeklyBentoCard1Y, { stiffness: 90, damping: 22 });
-  const weeklyBentoCard2Y = useSpring(rawWeeklyBentoCard2Y, { stiffness: 90, damping: 22 });
-  const weeklyBentoCard3Y = useSpring(rawWeeklyBentoCard3Y, { stiffness: 90, damping: 22 });
 
   const rawMemoryCol0Y = useTransform(scrollY, [3800, 5600], [40, -40]);
   const rawMemoryCol1Y = useTransform(scrollY, [3800, 5600], [-35, 35]);
@@ -1254,270 +1246,29 @@ export default function AlaqeeqStudioPublicPage() {
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
       {/* ========================================================================= */}
 
-      {/* 🌟 2. لوحة «بينتو إنجازات وأحداث الأسبوع» (Weekly Bento Grid Highlights) */}
+      {/* 🌟 2. لوحة «تراكم كروت إنجازات وأحداث الأسبوع الملكية» (Pinned 3D Stacking Deck) */}
       <VisualEditable
         id="studio-bento-section"
         tag="section"
         label="قسم إنجازات وأحداث الأسبوع"
         as="section"
-        className={"border-b py-14 md:py-20 transition " + (
+        className={"border-b transition " + (
           isNationalDay
             ? dark ? "border-[#f8ca14]/10 snd-section-dark" : "border-[#005A36]/10 snd-section-light"
             : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.015]"
         )}
       >
-        <div className="mx-auto max-w-[1340px] px-5 md:px-8">
-          <div className="mb-8 sm:mb-10 text-right">
-            <VisualEditable
-              id="studio-bento-kicker"
-              tag="text"
-              label="شارة إنجازات الأسبوع"
-              defaultText={isNationalDay ? "🇸🇦 إنجازات العقيق في اليوم الوطني" : "WEEKLY SPOTLIGHT · ACHIEVEMENTS"}
-              as="span"
-              className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                isNationalDay
-                  ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-              )}
-            >
-
-              {(text) => (
-                <>
-                  <Trophy size={12} />
-                  {text}
-                </>
-              )}
-            </VisualEditable>
-            <VisualEditable
-              id="studio-bento-title"
-              tag="text"
-              label="عنوان إنجازات وأحداث الأسبوع"
-              defaultText="أبرز أحداث وإنجازات الأسبوع"
-              as="h2"
-              className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : "text-black")}
-            />
-            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-600")}>
-              محطات النجاح، التكريمات، والفعاليات الأبرز التي شهدتها المدارس هذا الأسبوع.
-            </p>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-4">
-            {/* Bento Card 1: الحدث الرئيسي الأبرز (Spans 2 columns) */}
-            <motion.div
-              style={{ y: weeklyBentoCard1Y }}
-              className="md:col-span-2 lg:col-span-2 will-change-transform"
-            >
-              <VisualEditable
-                id="studio-bento-card1"
-                tag="section"
-                label="بطاقة الحدث التعليمي الأبرز"
-                as="div"
-                className={"group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-8 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                  isNationalDay
-                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                    : dark
-                    ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
-                    : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
-                )}
-              >
-              <div className="relative h-48 sm:h-56 overflow-hidden rounded-2xl mb-6">
-                <VisualImage
-                  id="studio-bento-card1-image"
-                  label="صورة الحدث التعليمي الأبرز"
-                  src={
-                    (featuredEventPost ? (directDriveImage(featuredEventPost.thumbnailUrl) || featuredEventPost.thumbnailUrl || featuredEventPost.mediaUrl) : null) ||
-                    showcaseCovers.front || albumCovers.front || "/alaqeeq-hero-dark.png"
-                  }
-                  alt="تغطية الأسبوع"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                <VisualEditable
-                  id="studio-bento-card1-tag"
-                  tag="text"
-                  label="شارة وسم الأسبوع"
-                  defaultText={orchestration?.weeklyBento?.customTag || "🌟 تغطية الأسبوع الكبرى"}
-                  as="span"
-                  className={"absolute top-3 right-3 rounded-full border px-3 py-1 text-[10px] font-black backdrop-blur-md " + (
-                    dark ? "border-[#f8ca14]/40 bg-black/80 text-[#f8ca14]" : "border-[#08467d]/20 bg-white/90 text-[#08467d]"
-                  )}
-                />
-              </div>
-              <div>
-                <VisualEditable
-                  id="studio-bento-card1-category"
-                  tag="text"
-                  label="تصنيف الحدث الأبرز"
-                  defaultText="الحدث التعليمي الأبرز"
-                  as="span"
-                  className={"text-xs font-black " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
-                />
-                <VisualEditable
-                  id="studio-bento-card1-title"
-                  tag="text"
-                  label="عنوان الحدث الأبرز"
-                  defaultText={orchestration?.weeklyBento?.customTitle || featuredEventPost?.title || "انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان"}
-                  as="h3"
-                  className={"mt-2 text-xl sm:text-2xl font-black leading-snug " + (dark ? "text-white" : "text-black")}
-                />
-                <VisualEditable
-                  id="studio-bento-card1-desc"
-                  tag="text"
-                  label="وصف الحدث الأبرز"
-                  defaultText={orchestration?.weeklyBento?.customDescription || "تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز في ساحات ومختبرات مدارس العقيق."}
-                  as="p"
-                  className={"mt-2 text-xs sm:text-sm leading-6 " + (dark ? "text-slate-400" : "text-slate-600")}
-                />
-              </div>
-              <div className={"mt-6 pt-4 border-t flex items-center justify-between " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
-                <VisualEditable
-                  id="studio-bento-card1-action"
-                  tag="button"
-                  label="زر مشاهدة التغطية"
-                  defaultText="مشاهدة التغطية بالكامل"
-                  as="button"
-                  onAction={() => navigate("/offers")}
-                  className={"inline-flex items-center gap-2 text-xs font-black transition " + (
-                    dark ? "text-[#f8ca14] hover:opacity-80" : "text-[#08467d] hover:opacity-80"
-                  )}
-                >
-                  {(text) => (
-                    <>
-                      {text} <ArrowUpLeft size={15} />
-                    </>
-                  )}
-                </VisualEditable>
-              </div>
-            </VisualEditable>
-            </motion.div>
-
-            {/* Bento Card 2: وسام وإنجاز الأسبوع */}
-            <motion.div
-              style={{ y: weeklyBentoCard2Y }}
-              className="will-change-transform"
-            >
-              <VisualEditable
-                id="studio-bento-card2"
-                tag="section"
-                label="بطاقة وسام التميز الأكاديمي"
-                as="div"
-                className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                  isNationalDay
-                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                    : dark
-                    ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
-                    : "border-[#08467d]/20 bg-white shadow-md"
-                )}
-              >
-                <div>
-                  <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
-                    dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-[#08467d]/10 text-[#08467d]"
-                  )}>
-                    <Award size={24} />
-                  </div>
-                  <VisualEditable
-                    id="studio-bento-card2-label"
-                    tag="text"
-                    label="شارة وسام التميز"
-                    defaultText={orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
-                    as="span"
-                    className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
-                  />
-                <VisualEditable
-                  id="studio-bento-card2-title"
-                  tag="text"
-                  label="عنوان وسام التميز"
-                  defaultText={orchestration?.weeklyBento?.academicBadgeWeek || "فخر مدارس العقيق"}
-                  as="h4"
-                  className={"mt-2 text-lg font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
-                />
-                <VisualEditable
-                  id="studio-bento-card2-desc"
-                  tag="text"
-                  label="وصف وسام التميز"
-                  defaultText={orchestration?.weeklyBento?.academicBadgeDesc || "تحقيق المركز الأول في مسابقات الموهبة والابتكار على مستوى المنطقة وتكريم الطلاب المشاركين."}
-                  as="p"
-                  className={"mt-2 text-xs leading-6 " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/80" : "text-slate-600")}
-                />
-              </div>
-              <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : isNationalDay ? "border-emerald-500/15" : "border-black/[0.08]")}>
-                <VisualEditable
-                  id="studio-bento-card2-tag"
-                  tag="text"
-                  label="وسم تكريم مستحق"
-                  defaultText="🥇 تكريم مستحق"
-                  as="span"
-                  className={"inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black " + (
-                    dark ? "bg-white/[0.05] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36] border border-emerald-200/80" : "bg-slate-100 text-[#08467d]"
-                  )}
-                />
-              </div>
-            </VisualEditable>
-            </motion.div>
-
-            {/* Bento Card 3: مقياس نبض التفاعل الأسبوعي */}
-            <motion.div
-              style={{ y: weeklyBentoCard3Y }}
-              className="will-change-transform"
-            >
-              <VisualEditable
-                id="studio-bento-card3"
-                tag="section"
-                label="بطاقة نبض التفاعل"
-                as="div"
-                className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                  isNationalDay
-                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                    : dark
-                    ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
-                    : "border-black/[0.08] bg-white shadow-md"
-                )}
-              >
-              <div>
-                <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
-                  dark ? "bg-[#de191e]/15 text-[#de191e]" : "bg-[#de191e]/10 text-[#de191e]"
-                )}>
-                  <Flame size={24} />
-                </div>
-                <VisualEditable
-                  id="studio-bento-card3-title"
-                  tag="text"
-                  label="عنوان نبض أولياء الأمور"
-                  defaultText="نبض وتفاعل أولياء الأمور"
-                  as="span"
-                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
-                />
-                <p className={"mt-3 text-3xl sm:text-4xl font-black " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
-                  +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
-                </p>
-                <VisualEditable
-                  id="studio-bento-card3-desc"
-                  tag="text"
-                  label="وصف نبض أولياء الأمور"
-                  defaultText="إعجاب وتشجيع لطلاب وأنشطة هذا الأسبوع"
-                  as="p"
-                  className={"mt-1 text-xs " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/70" : "text-slate-500")}
-                />
-              </div>
-
-
-              <div className={"mt-6 pt-4 border-t " + (dark ? "border-white/[0.08]" : "border-black/[0.08]")}>
-                <button
-                  type="button"
-                  onClick={toggleLike}
-                  className={"w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition active:scale-95 " + (
-                    hasLiked
-                      ? "bg-[#de191e] text-white shadow-lg"
-                      : (dark ? "bg-white/10 text-white hover:bg-[#de191e]/20" : "bg-slate-100 text-slate-900 hover:bg-[#de191e]/10")
-                  )}
-                >
-                  <Heart size={16} className={hasLiked ? "fill-current" : ""} />
-                  {hasLiked ? "أنت معجب بهذا! ❤️" : "شجّع الطلاب الآن"}
-                </button>
-              </div>
-            </VisualEditable>
-            </motion.div>
-          </div>
-        </div>
+        <AqeeqWeeklyStackingDeck
+          dark={dark}
+          isNationalDay={isNationalDay}
+          orchestration={orchestration}
+          featuredEventPost={featuredEventPost}
+          showcaseCovers={showcaseCovers}
+          albumCovers={albumCovers}
+          hasLiked={hasLiked}
+          toggleLike={toggleLike}
+          directDriveImage={directDriveImage}
+        />
       </VisualEditable>
 
       {/* 🌟 3. لوحة «صوت العقيق» التحريرية (Editorial Spotlight & Quote) */}
@@ -1556,18 +1307,31 @@ export default function AlaqeeqStudioPublicPage() {
             <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
               صوت العقيق والكلمة التربوية
             </h2>
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: 140 }}
+              viewport={{ once: false }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`h-1 rounded-full mt-3 mb-2 ${dark ? "bg-gradient-to-l from-[#f8ca14] to-transparent" : "bg-gradient-to-l from-[#08467d] to-transparent"}`}
+            />
             <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}>
               رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق.
             </p>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: "-80px" }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
-            isNationalDay
-              ? dark ? "snd-editorial-card-dark" : "snd-editorial-card-light"
-              : dark
-              ? "border-[#f8ca14]/30 bg-gradient-to-l from-[#161616] to-[#0a0a0a] shadow-2xl"
-              : "border-[#08467d]/20 bg-white shadow-xl"
-          )}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 60 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: false, margin: "-60px" }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className={"relative overflow-hidden rounded-[2.5rem] border p-8 sm:p-14 " + (
+              isNationalDay
+                ? dark ? "snd-editorial-card-dark" : "snd-editorial-card-light"
+                : dark
+                ? "border-[#f8ca14]/30 bg-gradient-to-l from-[#161616] to-[#0a0a0a] shadow-2xl"
+                : "border-[#08467d]/20 bg-white shadow-xl"
+            )}
+          >
 
             {/* Ghost Watermark Quote */}
             <div
