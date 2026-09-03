@@ -10,15 +10,14 @@ import "./index.css";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // لا نعيد جلب كل صفحة عند أي تركيز عابر للنافذة؛ بعض الواجهات تعتمد
-      // على مسودات محلية، وإعادة الجلب كانت تعيدها للحالة الافتراضية.
       staleTime: 60_000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-      retry: 1,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
     },
-    mutations: { retry: 0 },
+    mutations: { retry: 1 },
   },
 });
 

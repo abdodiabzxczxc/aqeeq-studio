@@ -20,8 +20,11 @@ export const useDialogComposition = () =>
   React.useContext(DialogCompositionContext);
 
 function Dialog({
+  open,
+  children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  if (open === false) return null;
   const composingRef = React.useRef(false);
   const justEndedRef = React.useRef(false);
   const endTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);

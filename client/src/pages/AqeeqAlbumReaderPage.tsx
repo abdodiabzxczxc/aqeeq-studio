@@ -57,12 +57,14 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   const { snapshot } = usePublishedHomepage();
   const isAdmin = isAuthenticated && user?.role === "admin";
   const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "1";
-  const { data: publicAlbum, isLoading: isPublicLoading } = trpc.aqeeqAlbums.publicAlbum.useQuery({ slug }, { enabled: !isPreview });
-  const { data: draftAlbum, isLoading: isDraftLoading } = trpc.aqeeqAlbums.album.useQuery({ slug }, { enabled: isPreview && isAdmin });
+  const { data: publicAlbum, isLoading: isPublicLoading, isError: isPublicError, refetch: refetchPublic } = trpc.aqeeqAlbums.publicAlbum.useQuery({ slug }, { enabled: !isPreview });
+  const { data: draftAlbum, isLoading: isDraftLoading, isError: isDraftError, refetch: refetchDraft } = trpc.aqeeqAlbums.album.useQuery({ slug }, { enabled: isPreview && isAdmin });
   const recordView = trpc.aqeeqAlbums.recordView.useMutation();
   const [storedPreview] = useState(() => { if (!isPreview) return null; try { return JSON.parse(localStorage.getItem(`aqeeq-album-preview:${slug}`) || "null") as Record<string, unknown> | null; } catch { return null; } });
   const album = isPreview && isAdmin && draftAlbum ? { ...draftAlbum, ...(storedPreview || {}) } : publicAlbum;
   const isLoading = isPreview ? isDraftLoading || !isAuthenticated : isPublicLoading;
+  const isError = isPreview ? isDraftError : isPublicError;
+  const refetch = () => { if (isPreview) refetchDraft(); else refetchPublic(); };
   const { data: journalIssues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const [mode, setMode] = useState<AlbumMode>("spread");
   const { theme, toggleTheme } = useAqeeqStudioTheme();
@@ -336,6 +338,29 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
           <div className="h-[550px] rounded-3xl bg-current/5 border border-current/10" />
         </div>
+      </main>
+    );
+  }
+  if (isError && !album) {
+    return (
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#080b12] text-white" : "bg-[#fbfaf8] text-slate-900"}`}>
+        <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
+        <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
+          <RotateCcw className="text-amber-400 animate-spin mb-4" size={48} />
+          <h1 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-slate-900"}`}>جاري المزامنة والاتصال...</h1>
+          <p className="mt-2 text-sm text-slate-400 max-w-sm">جاري محاولة الاتصال بالخادم لجلب وسائط وتفاصيل الألبوم تلقائياً دون انقطاع.</p>
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <button
+              onClick={() => void refetch()}
+              className={`px-6 py-3 rounded-xl text-xs font-black transition shadow-md active:scale-95 ${
+                dark ? "bg-amber-300 text-black hover:bg-amber-400" : "bg-[#08467d] text-white hover:bg-[#06335c]"
+              }`}
+            >
+              🔄 إعادة المحاولة الآن
+            </button>
+          </div>
+        </div>
+        <AlaqeeqStudioSiteFooter />
       </main>
     );
   }

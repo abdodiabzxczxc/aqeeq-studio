@@ -193,13 +193,13 @@ function StudioAppShell() {
         </div>
       )}
       <div className={`min-h-screen transition-[padding-bottom] duration-300 ${activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
-        <AqeeqOccasionRibbon />
-        <AqeeqBroadcastBanner />
-        <Router />
+        <ErrorBoundary fallback={null}><AqeeqOccasionRibbon /></ErrorBoundary>
+        <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>
+        <ErrorBoundary><Router /></ErrorBoundary>
 
-        <VisualGlobalSections />
-        <PwaInstallBanner />
-        <AqeeqAiAssistantWidget />
+        <ErrorBoundary fallback={null}><VisualGlobalSections /></ErrorBoundary>
+        <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>
+        <ErrorBoundary fallback={null}><AqeeqAiAssistantWidget /></ErrorBoundary>
       </div>
 
     </div>
