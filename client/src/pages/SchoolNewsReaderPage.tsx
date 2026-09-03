@@ -253,7 +253,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                 label="زر إدارة العدد"
                 defaultText="إدارة العدد"
                 as="button"
-                onAction={() => navigate(`/news/manage?issue=${issue.slug}`)}
+                onAction={() => navigate(`/journal/manage?issue=${issue.slug}`)}
                 className={`grid h-9 w-9 place-items-center rounded-xl border ${
                   dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"
                 }`}

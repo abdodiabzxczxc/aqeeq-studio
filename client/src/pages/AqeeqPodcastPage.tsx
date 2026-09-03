@@ -760,7 +760,24 @@ export default function AqeeqPodcastPage() {
         {/* ========================================================================= */}
         {/* ================= PAVILION 1: 🎙️ صالون خلف المايك (المسموع) ============== */}
         {/* ========================================================================= */}
-        {videoPodcasts.length === 0 && audioPodcasts.length === 0 && filteredSongs.length === 0 && (
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 py-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className={`rounded-[2rem] border p-5 animate-pulse ${
+                  dark ? "border-white/10 bg-[#0e121a]" : "border-black/10 bg-slate-100"
+                }`}
+              >
+                <div className={`h-40 rounded-2xl ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+                <div className={`mt-4 h-5 w-3/4 rounded-lg ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+                <div className={`mt-2 h-3.5 w-1/2 rounded-lg ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && videoPodcasts.length === 0 && audioPodcasts.length === 0 && filteredSongs.length === 0 && (
           <div className={`col-span-full flex flex-col items-center justify-center py-20 text-center ${
             dark ? 'text-slate-500' : 'text-slate-400'
           }`}>

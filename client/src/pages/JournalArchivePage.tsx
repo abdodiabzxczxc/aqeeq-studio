@@ -194,7 +194,7 @@ export default function JournalArchivePage() {
                     <ArrowUpLeft size={16} />ابدأ بأحدث عدد
                   </button>
                   {isAdmin ? (
-                    <button onClick={() => navigate("/news/manage")} className="inline-flex items-center gap-2 rounded-xl border border-amber-300/35 bg-amber-300/[.06] px-5 py-3 text-xs font-black text-amber-100 transition hover:bg-amber-300/[.13]">
+                    <button onClick={() => navigate("/journal/manage")} className="inline-flex items-center gap-2 rounded-xl border border-amber-300/35 bg-amber-300/[.06] px-5 py-3 text-xs font-black text-amber-100 transition hover:bg-amber-300/[.13]">
                       <Settings2 size={16} />إدارة أعداد المجلة
                     </button>
                   ) : null}
@@ -231,7 +231,7 @@ export default function JournalArchivePage() {
           <VisualEditable id="journal-empty-title" tag="text" label="عنوان المكتبة الفارغة" defaultText="المكتبة تجهز رفها الأول" as="h1" className="mt-6 text-3xl font-black text-amber-50" />
           <VisualEditable id="journal-empty-description" tag="text" label="وصف المكتبة الفارغة" defaultText="عند نشر أول نشرة ستظهر هنا كغلاف محفوظ ورابط قراءة مستقل يمكن مشاركته مع مجتمع مدارس العقيق." as="p" className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-400" />
           {isAdmin ? (
-            <button onClick={() => navigate("/news/manage")} className="mt-6 rounded-xl bg-amber-300 px-4 py-3 text-xs font-black text-black">
+            <button onClick={() => navigate("/journal/manage")} className="mt-6 rounded-xl bg-amber-300 px-4 py-3 text-xs font-black text-black">
               إنشاء أول عدد
             </button>
           ) : null}
