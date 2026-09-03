@@ -33,6 +33,7 @@ function directDriveImage(url: string | null | undefined) {
 
 interface UnifiedLibraryCardItem {
   id: string | number;
+  originalId?: string | number;
   title: string;
   coverUrl: string | null;
   badge: string;
@@ -176,7 +177,25 @@ export function AqeeqHomeTabsLibrary({
 
   const currentConfig = getTabConfig();
   const heroItem = currentConfig.items[0];
-  const deckItems = currentConfig.items.slice(1, 4);
+
+  // Guarantee exactly 3 stacked cards on the left for all tabs so sizing is 100% identical
+  const deckItems = React.useMemo(() => {
+    const raw = currentConfig.items;
+    if (!raw || raw.length === 0) return [];
+    if (raw.length >= 4) return raw.slice(1, 4);
+
+    const pool = raw.length > 1 ? raw.slice(1) : [raw[0]];
+    const list: UnifiedLibraryCardItem[] = [];
+    for (let i = 0; i < 3; i++) {
+      const item = pool[i % pool.length];
+      list.push({
+        ...item,
+        originalId: item.id,
+        id: `${item.id}-slot-${i}`,
+      });
+    }
+    return list;
+  }, [currentConfig.items]);
 
   return (
     <div ref={sectionRef} className="relative w-full">
@@ -326,7 +345,7 @@ export function AqeeqHomeTabsLibrary({
                         navigate(heroItem.href);
                       }
                     }}
-                    className={`group relative flex-1 min-h-[380px] sm:min-h-[480px] rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-6 sm:p-10 ${
+                    className={`group relative flex-1 min-h-[440px] sm:min-h-[480px] lg:h-[480px] rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-6 sm:p-10 ${
                       dark
                         ? "bg-[#0b1016] border-white/15 shadow-black/80 hover:border-[#f8ca14]/50"
                         : "bg-white border-slate-200 shadow-xl hover:border-[#08467d]/40"
@@ -413,7 +432,7 @@ export function AqeeqHomeTabsLibrary({
               )}
 
               {/* 📚 2. LEFT: THE INTERACTIVE GLASS COLLECTION DECK (5 COLS) */}
-              <div className="lg:col-span-5 flex flex-col justify-start gap-3.5">
+              <div className="lg:col-span-5 flex flex-col justify-between gap-3 sm:gap-3.5 h-full">
                 {deckItems.length > 0 ? (
                   deckItems.map((item, idx) => (
                     <motion.div
@@ -422,13 +441,14 @@ export function AqeeqHomeTabsLibrary({
                       transition={{ type: "spring", stiffness: 260, damping: 20 }}
                       onClick={() => {
                         if (activeTab === "podcasts") {
-                          const pod = podcasts.find((p) => p.id === item.id);
+                          const targetId = item.originalId ?? item.id;
+                          const pod = podcasts.find((p) => String(p.id) === String(targetId));
                           if (pod) playEpisode(pod);
                         } else {
                           navigate(item.href);
                         }
                       }}
-                      className={`group cursor-pointer rounded-[1.8rem] border p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 shadow-md ${
+                      className={`group cursor-pointer flex-1 min-h-[105px] sm:min-h-[115px] rounded-[1.8rem] border p-3.5 sm:p-4 flex items-center gap-3.5 transition-all duration-300 shadow-md ${
                         dark
                           ? "bg-[#0d141d]/75 border-white/10 hover:border-[#f8ca14]/40 hover:bg-[#121c27]"
                           : "bg-white/90 border-slate-200 hover:border-[#08467d]/40 hover:bg-slate-50"
