@@ -180,6 +180,7 @@ function App() {
 
 import { useSiteTheme } from "./lib/useSiteTheme";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
+import { AqeeqMagneticCursor } from "./components/AqeeqMagneticCursor";
 
 function StudioAppShell() {
   const { snapshot } = usePublishedHomepage();
@@ -197,6 +198,10 @@ function StudioAppShell() {
 
   return (
     <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
+      {/* 🌟 Global Magnetic Spring Cursor on all pages */}
+      <AqeeqMagneticCursor />
+      {/* 🎞️ Global Cinematic Film Grain Texture */}
+      <div className="aqeeq-grain-overlay" aria-hidden />
       {isNationalDay && <AqeeqCelebrationConfetti />}
       {/* 🌟 Floating Gold & Emerald Stars Particles on ALL Pages */}
       {isNationalDay && (

@@ -2388,10 +2388,18 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   background-repeat: repeat;
   background-size: 180px 180px;
 }
-/* Hide default cursor on desktop when our custom cursor is active */
-.aq-studio-share {
-  cursor: none !important;
-}
-.aq-studio-share * {
-  cursor: none !important;
+/* Hide default cursor on desktop when our magnetic cursor is active, but keep text caret for inputs/textareas */
+@media (hover: hover) and (pointer: fine) {
+  body.has-magnetic-cursor,
+  body.has-magnetic-cursor * {
+    cursor: none;
+  }
+  body.has-magnetic-cursor input,
+  body.has-magnetic-cursor textarea,
+  body.has-magnetic-cursor select,
+  body.has-magnetic-cursor [contenteditable="true"],
+  body.has-magnetic-cursor [role="textbox"],
+  body.has-magnetic-cursor .cursor-text {
+    cursor: text !important;
+  }
 }
