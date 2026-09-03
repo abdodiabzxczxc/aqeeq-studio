@@ -258,7 +258,9 @@ export default function AqeeqSchoolAboutPage() {
           </p>
 
           {/* Interactive Era Buttons */}
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">
+          <div className={`mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-sm transition ${
+            dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
+          }`}>
             {[
               { year: "1994", label: "التأسيس والانطلاقة", index: 0 },
               { year: "2010", label: "المجمعات والمسابح", index: 1 },
@@ -271,12 +273,10 @@ export default function AqeeqSchoolAboutPage() {
                 onClick={() => setActiveTimelineIndex(era.index)}
                 className={`p-3 rounded-xl text-center transition active:scale-95 ${
                   activeTimelineIndex === era.index
-                    ? dark
-                      ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
-                      : "bg-[#015a37] text-white shadow-md ring-1 ring-emerald-900/30"
+                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
-                    : "text-slate-700 hover:text-black hover:bg-white/70"
+                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
                 <span className={`block text-base font-black ${activeTimelineIndex === era.index ? "text-[#f8ca14]" : ""}`}>
@@ -380,28 +380,34 @@ export default function AqeeqSchoolAboutPage() {
             </p>
 
             {/* Campus Switcher Tabs */}
-            <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-white/60 dark:bg-black/40 shadow-sm">
+            <div className={`mt-8 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
+              dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
+            }`}>
               <button
                 type="button"
                 onClick={() => setActiveCampusTab("boys")}
-                className={`rounded-xl px-6 py-2.5 text-xs sm:text-sm font-black transition ${
+                className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
                     ? "bg-[#015a37] text-white shadow-md"
-                    : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
+                    : dark
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنين (حي الرانوناء — ممشى الهجرة)
+                مجمع البنين
               </button>
               <button
                 type="button"
                 onClick={() => setActiveCampusTab("girls")}
-                className={`rounded-xl px-6 py-2.5 text-xs sm:text-sm font-black transition ${
+                className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
                     ? "bg-[#015a37] text-white shadow-md"
-                    : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
+                    : dark
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنات (حي الرانوناء — ممشى الهجرة)
+                مجمع البنات
               </button>
             </div>
           </div>

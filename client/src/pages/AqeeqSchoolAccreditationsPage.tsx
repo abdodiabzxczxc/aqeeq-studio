@@ -216,33 +216,35 @@ export default function AqeeqSchoolAccreditationsPage() {
           </p>
 
           {/* Interactive Credential Switcher Tabs */}
-          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl border backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">
-            {[
-              { id: "cognia", label: "اعتماد كوجنيا (Cognia USA)", icon: ShieldCheck },
-              { id: "ielts", label: "مركز اختبارات IELTS IDP", icon: Globe2 },
-              { id: "sat", label: "مراكز اختبارات SAT & ACT", icon: BookOpenCheck },
-              { id: "stem", label: "أكاديمية الروبوت والذكاء الاصطناعي", icon: Trophy },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveHubTab(tab.id as any)}
-                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
-                    activeHubTab === tab.id
-                      ? dark
-                        ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/40"
-                        : "bg-[#015a37] text-white shadow-md shadow-emerald-800/30"
-                      : dark
-                      ? "text-slate-400 hover:text-white"
-                      : "text-slate-700 hover:text-black"
-                  }`}
-                >
-                  <Icon size={16} className={activeHubTab === tab.id ? "text-[#f8ca14]" : ""} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+          <div className="mt-8 flex justify-center max-w-full overflow-x-auto scrollbar-hide py-1">
+            <div className={`inline-flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition flex-nowrap ${
+              dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
+            }`}>
+              {[
+                { id: "cognia", label: "اعتماد كوجنيا (Cognia)", icon: ShieldCheck },
+                { id: "ielts", label: "اختبارات IELTS IDP", icon: Globe2 },
+                { id: "sat", label: "مراكز اختبارات SAT & ACT", icon: BookOpenCheck },
+                { id: "stem", label: "الروبوت والذكاء الاصطناعي", icon: Trophy },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveHubTab(tab.id as any)}
+                    className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-xl px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-black transition whitespace-nowrap shrink-0 active:scale-95 ${
+                      activeHubTab === tab.id
+                        ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/20"
+                        : dark
+                        ? "text-slate-400 hover:text-white hover:bg-white/5"
+                        : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                    }`}
+                  >
+                    <Icon size={16} className={activeHubTab === tab.id ? "text-[#f8ca14]" : "shrink-0"} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -648,26 +650,30 @@ export default function AqeeqSchoolAccreditationsPage() {
             </p>
 
             {/* Pathway Selector Pills */}
-            <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-white/50 dark:bg-black/40 shadow-sm">
-              {[
-                { id: "saudi", label: "🇸🇦 الجامعات السعودية الكبرى" },
-                { id: "scholarship", label: "✈️ برنامج خادم الحرمين للابتعاث" },
-                { id: "global", label: "🌐 كليات الطب والهندسة الدولية" },
-              ].map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setActivePathway(p.id as any)}
-                  className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition ${
-                    activePathway === p.id
-                      ? dark
-                        ? "bg-[#015a37] text-white shadow-md"
-                        : "bg-[#015a37] text-white shadow-md"
-                      : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+            <div className="mt-8 flex justify-center max-w-full overflow-x-auto scrollbar-hide py-1">
+              <div className={`inline-flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl border shadow-sm transition flex-nowrap ${
+                dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
+              }`}>
+                {[
+                  { id: "saudi", label: "🇸🇦 الجامعات السعودية الكبرى" },
+                  { id: "scholarship", label: "✈️ برنامج خادم الحرمين للابتعاث" },
+                  { id: "global", label: "🌐 كليات الطب والهندسة الدولية" },
+                ].map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setActivePathway(p.id as any)}
+                    className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition whitespace-nowrap shrink-0 active:scale-95 ${
+                      activePathway === p.id
+                        ? "bg-[#015a37] text-white shadow-md shadow-emerald-950/20"
+                        : dark
+                        ? "text-slate-400 hover:text-white hover:bg-white/5"
+                        : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
