@@ -49,6 +49,8 @@ export function AqeeqCreatorStudioModal({ open, onOpenChange }: CreatorModalProp
     },
   ];
 
+  if (!open) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -46,15 +46,6 @@ import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
-
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { AqeeqCreatorStudioModal } from "./AqeeqCreatorStudioModal";
 import { Button } from "@/components/ui/button";
 
@@ -88,6 +79,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const [creatorModalOpen, setCreatorModalOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [portalsOpen, setPortalsOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const portalsRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (portalsRef.current && !portalsRef.current.contains(e.target as Node)) {
+        setPortalsOpen(false);
+      }
+      if (optionsRef.current && !optionsRef.current.contains(e.target as Node)) {
+        setOptionsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const dark = theme === "dark";
   const isAdmin = isAuthenticated && user?.role === "admin";
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
@@ -192,59 +201,111 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           <div className="flex items-center gap-3">
             {/* Portals Dropdown */}
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 hover:text-emerald-600 transition">
-                  <Server size={12} className="text-emerald-500" />
-                  <span>بوابات الأنظمة والخدمات</span>
-                  <ChevronDown size={11} className="opacity-60" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className={`w-64 p-1.5 rounded-xl border backdrop-blur-xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
-                <DropdownMenuLabel className="text-[10px] text-emerald-500 font-black px-2 py-1 flex items-center gap-1.5">
-                  <GraduationCap size={12} />
-                  <span>خدمات أولياء الأمور والطلاب</span>
-                </DropdownMenuLabel>
-                <a href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-500 dark:text-amber-300">
-                  <span className="flex items-center gap-1.5">
-                    <FileText size={12} />
-                    <span>الخطط الدراسية الأسبوعية</span>
-                  </span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-                <a href="https://qr-codes.io/LQMip0" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span className="flex items-center gap-1.5">
-                    <Smartphone size={12} />
-                    <span>تحميل تطبيق أولياء الأمور</span>
-                  </span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
+            <div ref={portalsRef} className="relative">
+              <button
+                type="button"
+                onClick={() => { setPortalsOpen((prev) => !prev); setOptionsOpen(false); }}
+                className="flex items-center gap-1 hover:text-emerald-600 transition cursor-pointer"
+              >
+                <Server size={12} className="text-emerald-500" />
+                <span>بوابات الأنظمة والخدمات</span>
+                <ChevronDown size={11} className={`opacity-60 transition-transform ${portalsOpen ? "rotate-180" : ""}`} />
+              </button>
 
-                <div className="h-px bg-current/10 my-1" />
+              {portalsOpen && (
+                <div
+                  dir="rtl"
+                  className={`absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 ${
+                    dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"
+                  }`}
+                >
+                  <div className="text-[10px] text-emerald-500 font-black px-2 py-1 flex items-center gap-1.5">
+                    <GraduationCap size={12} />
+                    <span>خدمات أولياء الأمور والطلاب</span>
+                  </div>
+                  <a
+                    href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-500 dark:text-amber-300"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <FileText size={12} />
+                      <span>الخطط الدراسية الأسبوعية</span>
+                    </span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href="https://qr-codes.io/LQMip0"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Smartphone size={12} />
+                      <span>تحميل تطبيق أولياء الأمور</span>
+                    </span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
 
-                <DropdownMenuLabel className="text-[10px] text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</DropdownMenuLabel>
-                <a href="https://live.aqeeq.edu.sa" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span>نظام Odoo الإداري</span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-                <a href="https://email.aqeeqholding.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span>البريد الإلكتروني الرسمي</span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-                <a href="https://next.aqeeq.app" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span>سحابة العقيق الرقمية</span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-                <a href="https://portal.aqeeq.app" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span>بوابة التذاكر والصيانة</span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-                <a href="https://aqeeq.live" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10">
-                  <span>اجتماعات العقيق المرئية</span>
-                  <ExternalLink size={12} className="opacity-60" />
-                </a>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <div className="h-px bg-current/10 my-1" />
+
+                  <div className="text-[10px] text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</div>
+                  <a
+                    href="https://live.aqeeq.edu.sa"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span>نظام Odoo الإداري</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href="https://email.aqeeqholding.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span>البريد الإلكتروني الرسمي</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href="https://next.aqeeq.app"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span>سحابة العقيق الرقمية</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href="https://portal.aqeeq.app"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span>بوابة التذاكر والصيانة</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href="https://aqeeq.live"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setPortalsOpen(false)}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                  >
+                    <span>اجتماعات العقيق المرئية</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                </div>
+              )}
+            </div>
 
             <span className="h-3 w-px bg-current opacity-20" />
             <a href="https://live.aqeeq.edu.sa/jobs" target="_blank" rel="noreferrer" className="hover:text-emerald-600 transition">
@@ -440,51 +501,75 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
             {/* Options Dropdown Menu OR Login Button (Desktop) */}
             {isAuthenticated ? (
-              <div className="hidden sm:block">
-                <DropdownMenu dir="rtl">
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark
-                          ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                          : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
-                      }`}
-                      aria-label="قائمة الخيارات"
-                      title="قائمة الخيارات"
-                    >
-                      <Settings2 size={16} />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className={`w-56 mt-2 rounded-2xl border ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
-                    <DropdownMenuLabel className="font-black text-xs text-center py-2">
+              <div ref={optionsRef} className="hidden sm:block relative">
+                <button
+                  type="button"
+                  onClick={() => { setOptionsOpen((prev) => !prev); setPortalsOpen(false); }}
+                  className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 cursor-pointer ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                      : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                  }`}
+                  aria-label="قائمة الخيارات"
+                  title="قائمة الخيارات"
+                >
+                  <Settings2 size={16} />
+                </button>
+
+                {optionsOpen && (
+                  <div
+                    dir="rtl"
+                    className={`absolute left-0 top-full mt-2 w-56 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 p-1.5 ${
+                      dark ? "bg-[#0c0c0c]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"
+                    }`}
+                  >
+                    <div className="font-black text-xs text-center py-2 text-slate-400">
                       {user?.name || "المشرف العام"}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
-                    
+                    </div>
+                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-black/10"}`} />
+
                     {/* Admin Only Actions */}
                     {isAdmin && (
                       <>
-                        <DropdownMenuItem onClick={() => editor.toggleEditing()} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
-                          <PencilRuler size={15} className="text-emerald-500" />
+                        <button
+                          type="button"
+                          onClick={() => { setOptionsOpen(false); editor.toggleEditing(); }}
+                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                            dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
+                          } rounded-xl mb-1 text-right transition`}
+                        >
+                          <PencilRuler size={15} className="text-emerald-500 shrink-0" />
                           <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem onClick={() => navigate("/admin")} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-white/5" : "hover:bg-slate-100"} rounded-xl mb-1`}>
-                          <LayoutDashboard size={15} className="text-blue-500" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => { setOptionsOpen(false); navigate("/admin"); }}
+                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                            dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
+                          } rounded-xl mb-1 text-right transition`}
+                        >
+                          <LayoutDashboard size={15} className="text-blue-500 shrink-0" />
                           <span>لوحة التحكم للإدارة</span>
-                        </DropdownMenuItem>
+                        </button>
                       </>
                     )}
-                    
-                    <DropdownMenuSeparator className={dark ? "bg-white/10" : "bg-black/10"} />
-                    
+
+                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-black/10"}`} />
+
                     {/* Auth Logout */}
-                    <DropdownMenuItem onClick={handleAuth} className={`flex items-center gap-3 py-3 px-4 cursor-pointer font-bold text-xs ${dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"} rounded-xl`}>
-                      <LogOut size={15} />
+                    <button
+                      type="button"
+                      onClick={() => { setOptionsOpen(false); handleAuth(); }}
+                      className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                        dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"
+                      } rounded-xl text-right transition`}
+                    >
+                      <LogOut size={15} className="shrink-0" />
                       <span>تسجيل الخروج</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : null}
 

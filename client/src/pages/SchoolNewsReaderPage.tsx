@@ -14,7 +14,7 @@ import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioControl
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { Archive, Loader2, Newspaper, ZoomIn, ZoomOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 
@@ -48,16 +48,15 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
   useEffect(() => {
     if (issue) {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-      if (isMobile) {
-        setReaderMode("scroll");
-      } else {
-        setReaderMode(normalizeJournalReadingMode(issue.readingMode));
-      }
+      const target = isMobile ? "scroll" : normalizeJournalReadingMode(issue.readingMode);
+      setReaderMode((prev) => (prev === target ? prev : target));
     }
   }, [issue?.id, issue?.readingMode]);
 
+  const recordedViewRef = useRef<number | null>(null);
   useEffect(() => {
-    if (!issue?.id || isPreview) return;
+    if (!issue?.id || isPreview || recordedViewRef.current === issue.id) return;
+    recordedViewRef.current = issue.id;
     void recordView.mutateAsync({ id: issue.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined);
   }, [issue?.id, isPreview]);
 

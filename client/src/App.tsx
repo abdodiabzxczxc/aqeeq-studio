@@ -59,6 +59,22 @@ import AqeeqSchoolAccreditationsPage from "./pages/AqeeqSchoolAccreditationsPage
 import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
 import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
 
+function ArticleDetailRoute({ params }: { params: { slug: string } }) {
+  return <AqeeqArticlesPage params={params} />;
+}
+
+function JournalMonthRoute({ params }: { params: { monthKey: string } }) {
+  return <SchoolNewsMonthlyPage monthKey={params.monthKey} standalone />;
+}
+
+function JournalIssueRoute({ params }: { params: { slug: string } }) {
+  return <SchoolNewsReaderPage slug={params.slug} standalone />;
+}
+
+function AlbumReaderRoute({ params }: { params: { slug: string } }) {
+  return <AqeeqAlbumReaderPage slug={params.slug} />;
+}
+
 function Router() {
 
   const [location] = useLocation();
@@ -79,7 +95,7 @@ function Router() {
       <Route path="/admin" component={AqeeqAdminDashboardPage} />
       <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
       <Route path="/articles" component={AqeeqArticlesPage} />
-      <Route path="/articles/:slug" component={({ params }: { params: { slug: string } }) => <AqeeqArticlesPage params={params} />} />
+      <Route path="/articles/:slug" component={ArticleDetailRoute} />
       <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
       <Route path="/atheer" component={AqeeqPodcastPage} />
       <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
@@ -87,11 +103,11 @@ function Router() {
       <Route path="/journal" component={SchoolNewsPage} />
       <Route path="/journal/archive" component={JournalArchivePage} />
       <Route path="/journal/manage" component={JournalStudioPage} />
-      <Route path="/journal/month/:monthKey" component={({ params }: { params: { monthKey: string } }) => <SchoolNewsMonthlyPage monthKey={params.monthKey} standalone />} />
-      <Route path="/journal/issue/:slug" component={({ params }: { params: { slug: string } }) => <SchoolNewsReaderPage slug={params.slug} standalone />} />
-      <Route path="/journal/:slug" component={({ params }: { params: { slug: string } }) => <SchoolNewsReaderPage slug={params.slug} standalone />} />
+      <Route path="/journal/month/:monthKey" component={JournalMonthRoute} />
+      <Route path="/journal/issue/:slug" component={JournalIssueRoute} />
+      <Route path="/journal/:slug" component={JournalIssueRoute} />
       <Route path="/albums/manage" component={AqeeqAlbumStudioPage} />
-      <Route path="/albums/:slug" component={({ params }: { params: { slug: string } }) => <AqeeqAlbumReaderPage slug={params.slug} />} />
+      <Route path="/albums/:slug" component={AlbumReaderRoute} />
       <Route path="/albums" component={AqeeqAlbumsPage} />
       <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
       <Route path="/offers" component={AqeeqShowcasePage} />

@@ -258,6 +258,7 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
 
 type EditorDraft = { contentText: string; mediaUrl: string; altText: string; linkUrl: string; alignment: "start" | "center" | "end" | "stretch"; textColor: string; bgColor: string; fontSize: string; padding: string; margin: string; borderRadius: string; layerX: number; layerY: number; layerWidth: number | null; layerHeight: number | null; layerZIndex: number; layerOpacity: number; backgroundSize: number; backgroundPositionX: number; backgroundPositionY: number; backgroundOverlay: number; customCss: string; isLocked: boolean; isHidden: boolean };
 const EMPTY_DRAFT: EditorDraft = { contentText: "", mediaUrl: "", altText: "", linkUrl: "", alignment: "center", textColor: "", bgColor: "", fontSize: "", padding: "", margin: "", borderRadius: "", layerX: 0, layerY: 0, layerWidth: null, layerHeight: null, layerZIndex: 0, layerOpacity: 100, backgroundSize: 100, backgroundPositionX: 50, backgroundPositionY: 50, backgroundOverlay: 0, customCss: "", isLocked: false, isHidden: false };
+const EMPTY_OVERRIDES: VisualOverride[] = [];
 
 const VISUAL_ICON_OPTIONS = [
   { id: "sparkles", label: "بريق", Icon: Sparkles }, { id: "star", label: "نجمة", Icon: Star }, { id: "sun", label: "شمس", Icon: Sun }, { id: "moon", label: "قمر", Icon: Moon },
@@ -561,9 +562,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       setLayerMode(false);
     }
   }, [isAdmin, openEditorFromQuery, pagePath]);
-  const { data: fetchedPublicOverrides = [] } = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
-  const publicOverrides = pagePath === "/" ? (snapshot?.overrides ?? []) : fetchedPublicOverrides;
-  const { data: editorOverrides = [] } = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
+  const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
+  const fetchedPublicOverrides = publicListQuery.data ?? EMPTY_OVERRIDES;
+  const publicOverrides = pagePath === "/" ? (snapshot?.overrides ?? EMPTY_OVERRIDES) : fetchedPublicOverrides;
+  const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
+  const editorOverrides = editorOverridesQuery.data ?? EMPTY_OVERRIDES;
   const { data: builderSections = [] } = trpc.visualEditor.sections.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), refetchOnWindowFocus: false });
   const { data: history = [] } = trpc.visualEditor.history.useQuery({ pagePath: pagePath ?? "/", limit: 20 }, { enabled: Boolean(pagePath && isAdmin && isEditing), refetchOnWindowFocus: false });
   const overrides = isAdmin && isEditing ? editorOverrides : publicOverrides;

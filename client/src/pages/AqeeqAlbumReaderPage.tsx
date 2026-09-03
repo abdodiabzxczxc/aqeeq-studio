@@ -76,15 +76,18 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     if (!album) return;
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     if (isMobile) {
-      setMode(album.readingMode === "gallery" ? "gallery" : "scroll");
+      setMode((prev) => (prev === "scroll" ? prev : "scroll"));
     } else {
-      setMode(album.media.some((item) => item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") ? "scroll" : album.readingMode === "gallery" || album.readingMode === "scroll" ? album.readingMode : "spread");
+      const target = album.media.some((item) => item.sourceType === "x" || item.sourceType === "instagram" || item.sourceType === "youtube") ? "scroll" : album.readingMode === "gallery" || album.readingMode === "scroll" ? album.readingMode : "spread";
+      setMode((prev) => (prev === target ? prev : target));
     }
-    setIndex(0);
+    setIndex((prev) => (prev === 0 ? prev : 0));
   }, [album?.id, album?.readingMode]);
 
+  const recordedViewRef = useRef<number | null>(null);
   useEffect(() => {
-    if (!album?.id || isPreview) return;
+    if (!album?.id || isPreview || recordedViewRef.current === album.id) return;
+    recordedViewRef.current = album.id;
     void recordView.mutateAsync({ id: album.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined);
   }, [album?.id, isPreview]);
 

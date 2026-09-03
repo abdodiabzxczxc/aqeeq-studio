@@ -280,6 +280,8 @@ export function AqeeqFaceSearchModal({
     setHasSearched(false);
   };
 
+  if (!open) return null;
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>

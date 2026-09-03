@@ -627,6 +627,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     }
 
     const resolvedUrl = resolveAudioUrl(track.audioUrl);
+    if (activeItem?.id === `reader-${track.id}` && activeItem?.mediaUrl === resolvedUrl) {
+      return () => {};
+    }
+
     const readerItem: UniversalAudioItem = {
       id: `reader-${track.id}`,
       type: "reader",

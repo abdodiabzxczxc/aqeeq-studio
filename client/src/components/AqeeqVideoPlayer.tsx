@@ -387,78 +387,80 @@ export function AqeeqVideoPlayer({
       </button>
 
       {/* Tube Modal Player — سينما عقيق المنبثقة الذكية المتكيفة مع كل الشاشات */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent
-          className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-amber-400/40 bg-[#070a12]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(248,202,20,0.12)] backdrop-blur-3xl flex flex-col"
-        >
-          <DialogTitle className="sr-only">{title}</DialogTitle>
-          <div ref={modalContainerRef} dir="rtl" className="flex flex-col h-full w-full bg-black">
-            {/* Top Ambient Fluid Glow Mesh */}
-            <div className="aq-fluid-mesh h-1 w-full shrink-0" />
+      {open && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent
+            className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-amber-400/40 bg-[#070a12]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(248,202,20,0.12)] backdrop-blur-3xl flex flex-col"
+          >
+            <DialogTitle className="sr-only">{title}</DialogTitle>
+            <div ref={modalContainerRef} dir="rtl" className="flex flex-col h-full w-full bg-black">
+              {/* Top Ambient Fluid Glow Mesh */}
+              <div className="aq-fluid-mesh h-1 w-full shrink-0" />
 
-            {/* Video Stage Frame */}
-            <div className="relative aspect-video w-full overflow-hidden bg-black flex-1 min-h-0 flex items-center justify-center">
-              <AqeeqUnifiedVideoFrame sourceUrl={sourceUrl} title={title} posterUrl={posterUrl} />
-            </div>
+              {/* Video Stage Frame */}
+              <div className="relative aspect-video w-full overflow-hidden bg-black flex-1 min-h-0 flex items-center justify-center">
+                <AqeeqUnifiedVideoFrame sourceUrl={sourceUrl} title={title} posterUrl={posterUrl} />
+              </div>
 
-            {/* Cinema Control Bar */}
-            <div className="flex items-center justify-between gap-2.5 sm:gap-4 border-t border-white/10 bg-gradient-to-r from-[#090e1a] via-[#0c1222] to-[#090e1a] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
-              <div className="min-w-0 flex-1 text-right">
-                <p className="truncate text-xs sm:text-sm md:text-base font-black text-amber-50 leading-tight">
-                  {title}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                  <p className="text-[10px] sm:text-xs font-bold text-amber-300/80 truncate">
-                    تغطيات مدارس العقيق المرئية 🎬
+              {/* Cinema Control Bar */}
+              <div className="flex items-center justify-between gap-2.5 sm:gap-4 border-t border-white/10 bg-gradient-to-r from-[#090e1a] via-[#0c1222] to-[#090e1a] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
+                <div className="min-w-0 flex-1 text-right">
+                  <p className="truncate text-xs sm:text-sm md:text-base font-black text-amber-50 leading-tight">
+                    {title}
                   </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <p className="text-[10px] sm:text-xs font-bold text-amber-300/80 truncate">
+                      تغطيات مدارس العقيق المرئية 🎬
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  {/* Cinema Fullscreen Button */}
+                  <button
+                    type="button"
+                    onClick={toggleFullscreen}
+                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-amber-300 hover:bg-amber-400/10 hover:text-amber-300 active:scale-95"
+                    title={isFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
+                  >
+                    {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                    <span className="hidden sm:inline">{isFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+                  </button>
+
+                  {isAqeeqDriveVideo(sourceUrl) ? (
+                    <a
+                      href={getAqeeqDriveFallbackUrl(sourceUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-amber-300 hover:bg-amber-400/10 hover:text-amber-300 active:scale-95"
+                      title="فتح في Google Drive"
+                    >
+                      <ExternalLink size={13} />
+                      <span className="hidden sm:inline">فتح في Drive</span>
+                    </a>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (document.fullscreenElement) {
+                        document.exitFullscreen?.().catch(() => {});
+                      }
+                      setOpen(false);
+                    }}
+                    className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 active:scale-95"
+                    aria-label="إغلاق"
+                    title="إغلاق"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
               </div>
-
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                {/* Cinema Fullscreen Button */}
-                <button
-                  type="button"
-                  onClick={toggleFullscreen}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-amber-300 hover:bg-amber-400/10 hover:text-amber-300 active:scale-95"
-                  title={isFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
-                >
-                  {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                  <span className="hidden sm:inline">{isFullscreen ? "تصغير" : "ملء الشاشة"}</span>
-                </button>
-
-                {isAqeeqDriveVideo(sourceUrl) ? (
-                  <a
-                    href={getAqeeqDriveFallbackUrl(sourceUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-amber-300 hover:bg-amber-400/10 hover:text-amber-300 active:scale-95"
-                    title="فتح في Google Drive"
-                  >
-                    <ExternalLink size={13} />
-                    <span className="hidden sm:inline">فتح في Drive</span>
-                  </a>
-                ) : null}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (document.fullscreenElement) {
-                      document.exitFullscreen?.().catch(() => {});
-                    }
-                    setOpen(false);
-                  }}
-                  className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-amber-400 hover:bg-amber-400 hover:text-slate-950 active:scale-95"
-                  aria-label="إغلاق"
-                  title="إغلاق"
-                >
-                  <X size={16} />
-                </button>
-              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
