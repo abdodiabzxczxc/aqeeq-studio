@@ -126,27 +126,25 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
       <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} />
 
       <div className={standalone ? "mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6" : "container py-6"}>
-        {!standalone ? (
-          <nav className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
-            <div className="flex items-center gap-2">
-              <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
-              <span className="opacity-40">›</span>
-              <button onClick={() => navigate("/journal")} className="hover:text-current transition">مجلة العقيق</button>
-              <span className="opacity-40">›</span>
-              <span className={dark ? "text-white truncate max-w-xs" : "text-black truncate max-w-xs"}>{issue.title}</span>
-            </div>
-            <button
-              onClick={() => navigate("/journal")}
-              className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
-                isNationalDay
-                  ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
-                  : "text-slate-400 hover:text-amber-300"
-              }`}
-            >
-              <span>← عودة للأعداد</span>
-            </button>
-          </nav>
-        ) : null}
+        <nav className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
+            <span className="opacity-40">›</span>
+            <button onClick={() => navigate("/journal")} className="hover:text-current transition">مجلة العقيق</button>
+            <span className="opacity-40">›</span>
+            <span className={dark ? "text-white truncate max-w-xs" : "text-black truncate max-w-xs"}>{issue.title}</span>
+          </div>
+          <button
+            onClick={() => navigate("/journal")}
+            className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+              isNationalDay
+                ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
+                : "text-slate-400 hover:text-amber-300"
+            }`}
+          >
+            <span>← عودة للأعداد</span>
+          </button>
+        </nav>
 
         {/* Master Luxury Reader Header - Exactly Matching Album Reader */}
         <header
@@ -329,7 +327,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
         </div>
       </div>
 
-      {!standalone && <AlaqeeqStudioSiteFooter />}
+      <AlaqeeqStudioSiteFooter />
     </main>
   );
 }

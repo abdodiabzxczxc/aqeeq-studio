@@ -811,6 +811,15 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             dir="rtl"
           >
             <div className="space-y-6">
+              {/* Breadcrumb Navigation */}
+              <nav className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                <button type="button" onClick={() => { setReadingArticle(null); navigate("/"); }} className="hover:text-current transition">الرئيسية</button>
+                <span className="opacity-40">›</span>
+                <button type="button" onClick={() => setReadingArticle(null)} className="hover:text-current transition">المقالات</button>
+                <span className="opacity-40">›</span>
+                <span className="text-[#f8ca14]">{readingArticle.category}</span>
+              </nav>
+
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <span className="rounded-xl border border-[#f8ca14]/40 bg-[#f8ca14]/10 px-3 py-1 text-xs font-black text-[#f8ca14]">
                   {readingArticle.category}

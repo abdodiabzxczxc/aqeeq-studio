@@ -355,14 +355,26 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
       <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
       <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
         {/* Breadcrumb */}
-        <nav className={`flex items-center gap-2 text-xs font-bold mb-4 ${
+        <nav className={`flex items-center justify-between gap-2 text-xs font-bold mb-4 ${
           dark ? 'text-slate-400' : 'text-slate-500'
         }`}>
-          <button onClick={() => navigate('/')} className="hover:text-current transition">الرئيسية</button>
-          <span className="opacity-40">›</span>
-          <button onClick={() => navigate('/albums')} className="hover:text-current transition">الألبومات</button>
-          <span className="opacity-40">›</span>
-          <span className={dark ? 'text-white' : 'text-black'}>{album?.title || 'الألبوم'}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate('/')} className="hover:text-current transition">الرئيسية</button>
+            <span className="opacity-40">›</span>
+            <button onClick={() => navigate('/albums')} className="hover:text-current transition">الألبومات</button>
+            <span className="opacity-40">›</span>
+            <span className={dark ? 'text-white truncate max-w-xs' : 'text-black truncate max-w-xs'}>{album?.title || 'الألبوم'}</span>
+          </div>
+          <button
+            onClick={() => navigate("/albums")}
+            className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+              isNationalDay
+                ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
+                : dark ? "text-amber-400 hover:text-amber-300" : "text-amber-600 hover:text-amber-700"
+            }`}
+          >
+            <span>← عودة للألبومات</span>
+          </button>
         </nav>
         
         <header
