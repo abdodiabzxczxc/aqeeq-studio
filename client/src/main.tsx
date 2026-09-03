@@ -84,6 +84,14 @@ createRoot(document.getElementById("root")!).render(
   </trpc.Provider>
 );
 
+// Auto-heal when dynamic imports fail after deployment
+if (typeof window !== "undefined") {
+  window.addEventListener("vite:preloadError", (event) => {
+    console.warn("Vite dynamic chunk preload error caught, auto-reloading fresh build...", event);
+    window.location.reload();
+  });
+}
+
 // Auto-heal and refresh ServiceWorker caches in background
 if (typeof window !== "undefined" && "serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {

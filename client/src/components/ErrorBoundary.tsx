@@ -24,16 +24,58 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Aqeeq Studio Caught Error:", error, errorInfo);
+    // Auto-heal when dynamic imports fail after deployment
+    const isChunkError =
+      error?.message?.includes("dynamically imported module") ||
+      error?.message?.includes("Loading chunk") ||
+      error?.name === "ChunkLoadError";
+
+    const hasAttemptedAutoReload = typeof window !== "undefined" && sessionStorage.getItem("aqeeq_auto_chunk_reload") === "true";
+
+    if (isChunkError && !hasAttemptedAutoReload) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("aqeeq_auto_chunk_reload", "true");
+      }
+      void this.handleReload();
+    }
   }
 
-  handleReload = () => {
+  handleReload = async () => {
     this.setState({ hasError: false, error: null });
-    window.location.reload();
+    if (typeof window !== "undefined") {
+      try {
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map((r) => r.unregister()));
+        }
+      } catch (e) {
+        console.error("Purge cache failed", e);
+      }
+      window.location.href = window.location.origin + window.location.pathname + "?_t=" + Date.now();
+    }
   };
 
-  handleGoHome = () => {
+  handleGoHome = async () => {
     this.setState({ hasError: false, error: null });
-    window.location.href = "/";
+    if (typeof window !== "undefined") {
+      try {
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map((r) => r.unregister()));
+        }
+      } catch (e) {
+        console.error("Purge cache failed", e);
+      }
+      window.location.href = "/?_t=" + Date.now();
+    }
   };
 
   render() {
@@ -41,8 +83,6 @@ class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-
-      const isDev = process.env.NODE_ENV === "development";
 
       return (
         <div dir="rtl" className="flex items-center justify-center min-h-[70vh] p-6 bg-[#06080d] text-white font-[Tajawal,sans-serif]">
@@ -66,7 +106,7 @@ class ErrorBoundary extends Component<Props, State> {
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#005A36] hover:from-emerald-500 hover:to-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-900/30 transition active:scale-95 cursor-pointer"
               >
                 <RotateCcw size={16} />
-                <span>إعادة تحميل الصفحة</span>
+                <span>إعادة تحميل الصفحة (تنظيف الكاش)</span>
               </button>
 
               <button
@@ -79,10 +119,10 @@ class ErrorBoundary extends Component<Props, State> {
               </button>
             </div>
 
-            {isDev && this.state.error && (
+            {this.state.error && (
               <details className="mt-6 w-full text-right">
                 <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-400 select-none">
-                  تفاصيل المطور (Development Debug Info)
+                  تفاصيل الخطأ (Error Debug Info)
                 </summary>
                 <div className="mt-2 p-3 w-full rounded-xl bg-black/60 border border-white/10 overflow-auto max-h-48 text-left" dir="ltr">
                   <pre className="text-[11px] text-red-400 font-mono whitespace-break-spaces">

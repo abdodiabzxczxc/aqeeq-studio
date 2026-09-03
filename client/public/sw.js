@@ -1,5 +1,5 @@
 // Alaqeeq Studio Service Worker (Network-First Auto-Healing)
-const CACHE_NAME = "aqeeq-studio-v2";
+const CACHE_NAME = "aqeeq-studio-v3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -19,18 +19,28 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Always Network-First so Chrome refreshes and new deployments never get stuck on a blank page
+// Always Network-First so Chrome refreshes and new deployments never get stuck on an outdated bundle
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
 
-  // For API or tRPC requests, never cache in ServiceWorker
-  if (url.pathname.startsWith("/api/")) {
+  // For API, tRPC, or Vite dev requests, never intercept in ServiceWorker
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/@") || url.pathname.includes("node_modules")) {
     return;
   }
 
-  // Network-First for HTML navigation and JS/CSS assets
+  // For HTML navigation, always fetch fresh from network to receive the latest chunk hashes
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match("/").then((cached) => cached || new Response("Offline", { status: 503 }));
+      })
+    );
+    return;
+  }
+
+  // Network-First for JS/CSS assets
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
@@ -43,12 +53,8 @@ self.addEventListener("fetch", (event) => {
         return networkResponse;
       })
       .catch(() => {
-        // Fallback to cache only if completely offline
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) return cachedResponse;
-          if (event.request.mode === "navigate") {
-            return caches.match("/");
-          }
           return new Response("Offline", { status: 503, statusText: "Service Unavailable" });
         });
       })
