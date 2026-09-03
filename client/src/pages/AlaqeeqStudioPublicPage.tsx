@@ -54,6 +54,7 @@ import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqNationalTraitsSection } from "@/components/AqeeqNationalTraitsSection";
 import { triggerNationalCelebration } from "@/components/AqeeqCelebrationConfetti";
+import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
 
 
 
@@ -1096,6 +1097,9 @@ export default function AlaqeeqStudioPublicPage() {
           descOverride={(orchestration?.sections as any)?.libraryDesc}
         />
       )}
+
+      {/* 📱 قسم تطبيق مدارس العقيق الذكي — فيديو الشرح، رمز QR، وأزرار المتاجر */}
+      <AqeeqSchoolAppShowcaseSection dark={dark} />
 
       {/* ========================================================================= */}
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
