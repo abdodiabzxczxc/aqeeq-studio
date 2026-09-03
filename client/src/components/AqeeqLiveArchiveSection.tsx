@@ -148,26 +148,36 @@ export function AqeeqLiveArchiveSection({
               <span>THE OPEN DIGITAL CORE · الذاكرة الرقمية الحية</span>
             </div>
 
-            <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}>
-              أرشيف العقيق <span className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المفتوح الشامل.</span>
-            </h2>
+            <VisualEditable
+              id="studio-livearchive-title"
+              tag="text"
+              label="عنوان أرشيف العقيق"
+              defaultText="أرشيف العقيق المفتوح الشامل."
+              as="h2"
+              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}
+            />
 
-            {/* Glowing Golden Accent Line (يتمدد وينكمش - بيصغر ويكبر في عرضه) */}
+            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
             <motion.div
-              initial={{ width: "35px" }}
-              whileInView={{ width: ["35px", "190px", "35px"] }}
-              viewport={{ once: false }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ width: 0, opacity: 0.3 }}
+              whileInView={{ width: 175, opacity: 1 }}
+              viewport={{ once: false, margin: "-20px" }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
               className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
                 dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_14px_rgba(248,202,20,0.55)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.4)]"
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
               }`}
             />
 
-            <p className={`mt-3 text-xs sm:text-sm leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}>
-              منظومة إحصائية حية توثق النبض اليومي لمدارس العقيق، من الأخبار والعروض المباشرة والمجلات والألبومات، متاحة بشفافية تامة للمجتمع المدرسي.
-            </p>
+            <VisualEditable
+              id="studio-livearchive-desc"
+              tag="text"
+              label="وصف أرشيف العقيق"
+              defaultText="منظومة إحصائية حية توثق النبض اليومي لمدارس العقيق، من الأخبار والعروض المباشرة والمجلات والألبومات، متاحة بشفافية تامة للمجتمع المدرسي."
+              as="p"
+              className={`mt-3 text-xs sm:text-sm leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}
+            />
           </div>
 
           {/* Live System Status Pill */}

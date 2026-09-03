@@ -4,6 +4,7 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { Sparkles, BookOpen, ImageIcon, ArrowUpLeft, ChevronLeft, ChevronRight, Film } from "lucide-react";
 import { useLocation } from "wouter";
+import { VisualEditable } from "./VisualEditor";
 
 interface ShowcaseItem {
   id: string | number;
@@ -94,24 +95,34 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
               <Film size={12} />
               <span>CINEMATIC MEDIA REEL · أروقة العقيق الإعلامية</span>
             </div>
-            <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
-              أروقة العقيق الإعلامية
-            </h2>
-            {/* Glowing Golden Accent Line (يتمدد وينكمش - بيصغر ويكبر في عرضه) */}
+            <VisualEditable
+              id="studio-scrub-title"
+              tag="text"
+              label="عنوان أروقة العقيق الإعلامية"
+              defaultText="أروقة العقيق الإعلامية"
+              as="h2"
+              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
+            />
+            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
             <motion.div
-              initial={{ width: "35px" }}
-              whileInView={{ width: ["35px", "190px", "35px"] }}
-              viewport={{ once: false }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ width: 0, opacity: 0.3 }}
+              whileInView={{ width: 175, opacity: 1 }}
+              viewport={{ once: false, margin: "-20px" }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
               className={`h-1 sm:h-[3.5px] rounded-full my-3 ${
                 dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_14px_rgba(248,202,20,0.55)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.4)]"
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
               }`}
             />
-            <p className={`mt-1.5 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}>
-              اسحب أو مرر بالماوس لاستكشاف أحدث أعداد المجلة المدرسية والتوثيقات المصورة للفعاليات الكبرى.
-            </p>
+            <VisualEditable
+              id="studio-scrub-desc"
+              tag="text"
+              label="وصف أروقة العقيق الإعلامية"
+              defaultText="اسحب أو مرر بالماوس لاستكشاف أحدث أعداد المجلة المدرسية والتوثيقات المصورة للفعاليات الكبرى."
+              as="p"
+              className={`mt-1.5 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}
+            />
           </div>
 
           {/* Reel Controls & Scene Counter */}

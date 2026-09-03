@@ -247,16 +247,16 @@ export function AqeeqHomeTabsLibrary({
               as="h2"
               className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
             />
-            {/* Glowing Golden Accent Line (يتمدد وينكمش - بيصغر ويكبر في عرضه) */}
+            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
             <motion.div
-              initial={{ width: "35px" }}
-              whileInView={{ width: ["35px", "190px", "35px"] }}
-              viewport={{ once: false }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ width: 0, opacity: 0.3 }}
+              whileInView={{ width: 175, opacity: 1 }}
+              viewport={{ once: false, margin: "-20px" }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
               className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
                 dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_14px_rgba(248,202,20,0.55)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.4)]"
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
               }`}
             />
             <VisualEditable
@@ -399,13 +399,23 @@ export function AqeeqHomeTabsLibrary({
 
                     {/* Hero Content */}
                     <div className="relative z-20 text-white">
-                      <h3 className="text-2xl sm:text-4xl font-black font-cairo leading-tight mb-3 group-hover:text-[#f8ca14] transition-colors drop-shadow-lg">
-                        {heroItem.title}
-                      </h3>
+                      <VisualEditable
+                        id={`studio-library-hero-title-${activeTab}`}
+                        tag="text"
+                        label="عنوان العنصر المتصدر"
+                        defaultText={heroItem.title}
+                        as="h3"
+                        className="text-2xl sm:text-4xl font-black font-cairo leading-tight mb-3 group-hover:text-[#f8ca14] transition-colors drop-shadow-lg"
+                      />
                       {heroItem.excerpt && (
-                        <p className="text-xs sm:text-sm text-slate-300 max-w-lg mb-6 line-clamp-2 leading-relaxed">
-                          {heroItem.excerpt}
-                        </p>
+                        <VisualEditable
+                          id={`studio-library-hero-excerpt-${activeTab}`}
+                          tag="text"
+                          label="وصف العنصر المتصدر"
+                          defaultText={heroItem.excerpt}
+                          as="p"
+                          className="text-xs sm:text-sm text-slate-300 max-w-lg mb-6 line-clamp-2 leading-relaxed"
+                        />
                       )}
 
                       <div className="flex items-center gap-4">
@@ -418,7 +428,13 @@ export function AqeeqHomeTabsLibrary({
                           }`}
                         >
                           {activeTab === "podcasts" ? <Play size={16} className="fill-current" /> : <Eye size={16} />}
-                          <span>{activeTab === "podcasts" ? "تشغيل الحلقة الصوتية" : "استعراض العمل بالكامل"}</span>
+                          <VisualEditable
+                            id={`studio-library-hero-btn-${activeTab}`}
+                            tag="text"
+                            label="نص زر المعاينة الرئيسية"
+                            defaultText={activeTab === "podcasts" ? "تشغيل الحلقة الصوتية" : "استعراض العمل بالكامل"}
+                            as="span"
+                          />
                           <ArrowUpLeft size={16} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
                         </button>
 
@@ -480,16 +496,26 @@ export function AqeeqHomeTabsLibrary({
 
                       {/* Info */}
                       <div className="flex-1 min-w-0 text-right">
-                        <span className={`text-[10px] font-black uppercase tracking-wider block mb-1 ${
-                          dark ? "text-[#f8ca14]" : "text-[#08467d]"
-                        }`}>
-                          {item.badge}
-                        </span>
-                        <h4 className={`text-xs sm:text-sm font-black truncate leading-snug font-cairo group-hover:text-[#f8ca14] transition-colors ${
-                          dark ? "text-white" : "text-black"
-                        }`}>
-                          {item.title}
-                        </h4>
+                        <VisualEditable
+                          id={`studio-library-deck-badge-${activeTab}-${idx}`}
+                          tag="text"
+                          label={`شارة العنصر 0${idx + 2}`}
+                          defaultText={item.badge}
+                          as="span"
+                          className={`text-[10px] font-black uppercase tracking-wider block mb-1 ${
+                            dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                          }`}
+                        />
+                        <VisualEditable
+                          id={`studio-library-deck-title-${activeTab}-${idx}`}
+                          tag="text"
+                          label={`عنوان العنصر 0${idx + 2}`}
+                          defaultText={item.title}
+                          as="h4"
+                          className={`text-xs sm:text-sm font-black truncate leading-snug font-cairo group-hover:text-[#f8ca14] transition-colors ${
+                            dark ? "text-white" : "text-black"
+                          }`}
+                        />
                         <p className="text-[11px] text-slate-500 mt-1 truncate">
                           {item.dateOrMeta}
                         </p>
@@ -519,7 +545,13 @@ export function AqeeqHomeTabsLibrary({
                       : "border-slate-200 bg-white hover:bg-slate-100 text-slate-800"
                   }`}
                 >
-                  <span>{currentConfig.viewAllText}</span>
+                  <VisualEditable
+                    id={`studio-library-viewall-${activeTab}`}
+                    tag="text"
+                    label="نص زر عرض الكل"
+                    defaultText={currentConfig.viewAllText}
+                    as="span"
+                  />
                   <ArrowUpLeft size={15} />
                 </button>
               </div>

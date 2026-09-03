@@ -562,17 +562,45 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       setLayerMode(false);
     }
   }, [isAdmin, openEditorFromQuery, pagePath]);
+  const pageCacheKey = `aqeeq-overrides-${pagePath ?? "/"}`;
+  const initialCachedOverrides = useMemo(() => {
+    try {
+      if (typeof window === "undefined") return EMPTY_OVERRIDES;
+      const raw = localStorage.getItem(pageCacheKey);
+      return raw ? JSON.parse(raw) : EMPTY_OVERRIDES;
+    } catch {
+      return EMPTY_OVERRIDES;
+    }
+  }, [pageCacheKey]);
+
   const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
-  const fetchedPublicOverrides = publicListQuery.data ?? EMPTY_OVERRIDES;
-  const publicOverrides = pagePath === "/" ? (snapshot?.overrides ?? EMPTY_OVERRIDES) : fetchedPublicOverrides;
+  const fetchedPublicOverrides = publicListQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
+  const publicOverrides = pagePath === "/" ? (snapshot?.overrides ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES)) : fetchedPublicOverrides;
   const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
-  const editorOverrides = editorOverridesQuery.data ?? EMPTY_OVERRIDES;
+  const editorOverrides = editorOverridesQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
+
+  useEffect(() => {
+    const dataToCache = isAdmin && isEditing ? editorOverridesQuery.data : (pagePath === "/" ? snapshot?.overrides : publicListQuery.data);
+    if (dataToCache && Array.isArray(dataToCache) && dataToCache.length > 0) {
+      try {
+        localStorage.setItem(pageCacheKey, JSON.stringify(dataToCache));
+      } catch {}
+    }
+  }, [pageCacheKey, isAdmin, isEditing, editorOverridesQuery.data, publicListQuery.data, snapshot?.overrides, pagePath]);
+
   const { data: builderSections = [] } = trpc.visualEditor.sections.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), refetchOnWindowFocus: false });
   const { data: history = [] } = trpc.visualEditor.history.useQuery({ pagePath: pagePath ?? "/", limit: 20 }, { enabled: Boolean(pagePath && isAdmin && isEditing), refetchOnWindowFocus: false });
   const overrides = isAdmin && isEditing ? editorOverrides : publicOverrides;
   const save = trpc.visualEditor.save.useMutation({
-    onSuccess: () => {
+    onSuccess: (savedData) => {
       toast.success("تم حفظ التعديل كمسودة خاصة بك");
+      if (savedData) {
+        try {
+          const current = (initialCachedOverrides as VisualOverride[]) || [];
+          const updated = [...current.filter((o) => o.elementId !== (savedData as any).elementId), savedData as VisualOverride];
+          localStorage.setItem(pageCacheKey, JSON.stringify(updated));
+        } catch {}
+      }
       if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
     },
     onError: (error) => toast.error(error.message || "تعذر حفظ التعديل"),
@@ -587,6 +615,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       draftPreviewEnabled.current = false;
       setDraft(EMPTY_DRAFT);
       toast.message("تمت استعادة تصميم العنصر الأصلي");
+      try {
+        const current = (initialCachedOverrides as VisualOverride[]) || [];
+        const filtered = current.filter((o) => o.elementId !== variables.elementId);
+        localStorage.setItem(pageCacheKey, JSON.stringify(filtered));
+      } catch {}
       if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.publicList.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
     },
     onError: (error) => toast.error(error.message || "تعذر استعادة العنصر"),
@@ -594,7 +627,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const publish = trpc.visualEditor.publish.useMutation({
     onSuccess: () => {
       toast.success("تم نشر التعديل للزوار بنجاح");
-      if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.publicList.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
+      if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.publicList.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); void utils.homepage.publicSnapshot.invalidate(); }
     },
     onError: (error) => toast.error(error.message || "تعذر نشر التعديل"),
   });

@@ -1286,24 +1286,34 @@ export default function AlaqeeqStudioPublicPage() {
                 </>
               )}
             </VisualEditable>
-            <h2 className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}>
-              صوت العقيق والكلمة التربوية
-            </h2>
-            {/* Glowing Golden Accent Line (يتمدد وينكمش - بيصغر ويكبر في عرضه) */}
+            <VisualEditable
+              id="studio-editorial-title"
+              tag="text"
+              label="عنوان صوت العقيق"
+              defaultText="صوت العقيق والكلمة التربوية"
+              as="h2"
+              className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
+            />
+            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
             <motion.div
-              initial={{ width: "35px" }}
-              whileInView={{ width: ["35px", "190px", "35px"] }}
-              viewport={{ once: false }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ width: 0, opacity: 0.3 }}
+              whileInView={{ width: 175, opacity: 1 }}
+              viewport={{ once: false, margin: "-20px" }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
               className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
                 dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_14px_rgba(248,202,20,0.55)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_10px_rgba(8,70,125,0.4)]"
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
               }`}
             />
-            <p className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}>
-              رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق.
-            </p>
+            <VisualEditable
+              id="studio-editorial-desc"
+              tag="text"
+              label="وصف صوت العقيق"
+              defaultText="رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق."
+              as="p"
+              className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}
+            />
           </div>
 
           <motion.div

@@ -2,6 +2,7 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
+import { VisualEditable } from "@/components/VisualEditor";
 import {
   MapPin,
   MessageCircle,
@@ -94,16 +95,32 @@ export function AlaqeeqStudioSiteFooter() {
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
                 <Sparkles size={11} className="text-[#f8ca14]" />
-                <span>القبول والتسجيل مفتوح للعام الدراسي 2026 / 2027</span>
+                <VisualEditable
+                  id="studio-prefooter-kicker"
+                  tag="text"
+                  label="شارة شريط القبول"
+                  defaultText="القبول والتسجيل مفتوح للعام الدراسي 2026 / 2027"
+                  as="span"
+                />
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-snug font-cairo">
-                ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦
-              </h3>
+              <VisualEditable
+                id="studio-prefooter-title"
+                tag="text"
+                label="عنوان شريط القبول"
+                defaultText="ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦"
+                as="h3"
+                className="text-xl sm:text-2xl font-black tracking-tight leading-snug font-cairo"
+              />
 
-              <p className={`mt-1.5 text-xs sm:text-[13px] leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.
-              </p>
+              <VisualEditable
+                id="studio-prefooter-desc"
+                tag="text"
+                label="وصف شريط القبول"
+                defaultText="بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة."
+                as="p"
+                className={`mt-1.5 text-xs sm:text-[13px] leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
+              />
             </div>
 
             {/* Clean Horizontal Button Strip on Left Side */}
@@ -116,7 +133,13 @@ export function AlaqeeqStudioSiteFooter() {
               >
                 {/* Diagonal Light Shimmer */}
                 <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
-                <span>حجز مقعد دراسي</span>
+                <VisualEditable
+                  id="studio-prefooter-cta-text"
+                  tag="text"
+                  label="نص زر حجز مقعد دراسي"
+                  defaultText="حجز مقعد دراسي"
+                  as="span"
+                />
                 <ArrowUpLeft size={15} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </button>
 
@@ -136,7 +159,13 @@ export function AlaqeeqStudioSiteFooter() {
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
                 <MessageCircle size={15} className="text-emerald-500" />
-                <span>مستشار القبول</span>
+                <VisualEditable
+                  id="studio-prefooter-advisor-text"
+                  tag="text"
+                  label="نص زر مستشار القبول"
+                  defaultText="مستشار القبول"
+                  as="span"
+                />
               </a>
 
               {/* Approved Fees Button */}
@@ -149,7 +178,13 @@ export function AlaqeeqStudioSiteFooter() {
                     : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm"
                 }`}
               >
-                جدول الرسوم المعتمد
+                <VisualEditable
+                  id="studio-prefooter-fees-text"
+                  tag="text"
+                  label="نص زر جدول الرسوم"
+                  defaultText="جدول الرسوم المعتمد"
+                  as="span"
+                />
               </button>
             </div>
           </div>

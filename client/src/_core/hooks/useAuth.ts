@@ -77,16 +77,27 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [meQuery.data, meQuery.isSuccess]);
 
-  const state = useMemo(() => {
+  const cachedUser = useMemo(() => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem("aqeeq-runtime-user-info") : null;
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
 
+  const currentUser = meQuery.data !== undefined ? meQuery.data : cachedUser;
+
+  const state = useMemo(() => {
     return {
-      user: meQuery.data ?? null,
-      loading: meQuery.isLoading || loginMutation.isPending || logoutMutation.isPending,
+      user: currentUser ?? null,
+      loading: (meQuery.isLoading && !cachedUser) || loginMutation.isPending || logoutMutation.isPending,
       error: meQuery.error ?? loginMutation.error ?? logoutMutation.error ?? null,
-      isAuthenticated: Boolean(meQuery.data),
+      isAuthenticated: Boolean(currentUser),
     };
   }, [
-    meQuery.data,
+    currentUser,
+    cachedUser,
     meQuery.error,
     meQuery.isLoading,
     loginMutation.error,
