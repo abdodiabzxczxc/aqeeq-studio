@@ -66,6 +66,7 @@ import {
   UserCheck,
   Building2,
   Smartphone,
+  ChevronDown,
 } from "lucide-react";
 
 import {
@@ -102,7 +103,7 @@ export default function AqeeqAdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
-  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "app" | "campuses" | "sections">("hero");
+  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "app" | "campuses" | "sections" | null>("hero");
   const [contentSubTab, setContentSubTab] = useState<"master" | "articles">("master");
   const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
   const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
@@ -110,13 +111,14 @@ export default function AqeeqAdminDashboardPage() {
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const utils = trpc.useUtils();
 
 
   // Admin Overview Queries
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = trpc.executiveAdmin.getOverviewStats.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   });
 
   const { data: usersList = [], refetch: refetchUsers } = trpc.executiveAdmin.getUsers.useQuery(undefined, {
@@ -3533,10 +3535,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalViews?.toLocaleString() || 0}</p>
-                <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-emerald-500">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>تحديث لحظي مستمر</span>
-                </div>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>حي ومحدث الآن</span>
+                </p>
               </div>
 
               {/* 2. Magazines */}
@@ -3552,7 +3554,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalIssues || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">عدد مجلة منشور بالأرشيف</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
 
               {/* 3. Albums */}
@@ -3568,7 +3573,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalAlbums || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">ألبوم فعالية ومناسبة</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
 
               {/* 4. Media Files */}
@@ -3584,7 +3592,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalMediaFiles || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">صورة وفيديو ومنشور</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
             </div>
 
@@ -5743,6 +5754,42 @@ const DEFAULT_ORCHESTRATION = {
                           <span>تصدير المحددين CSV 📑</span>
                         </Button>
 
+                        <Button
+                          size="sm"
+                          type="button"
+                          variant="destructive"
+                          onClick={() => setBulkDeleteConfirmOpen(true)}
+                          className="rounded-xl h-8 text-[11px] font-bold gap-1 bg-red-600 hover:bg-red-700"
+                        >
+                          <span>حذف جماعي 🗑️</span>
+                        </Button>
+
+                        <Dialog open={bulkDeleteConfirmOpen} onOpenChange={setBulkDeleteConfirmOpen}>
+                          <DialogContent className="max-w-sm">
+                            <DialogHeader>
+                              <DialogTitle className="text-right">⚠️ تأكيد الحذف الجماعي</DialogTitle>
+                              <DialogDescription className="text-right">
+                                هل أنت متأكد من حذف {selectedLeadIds.length} طلب؟ هذا الإجراء لا يمكن التراجع عنه.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="gap-2 flex-row-reverse">
+                              <Button variant="destructive" onClick={async () => {
+                                for (const id of selectedLeadIds) {
+                                  await deleteAdmissionMutation.mutateAsync({ id });
+                                }
+                                toast.success(`تم حذف ${selectedLeadIds.length} طلبات بنجاح`);
+                                setSelectedLeadIds([]);
+                                setBulkDeleteConfirmOpen(false);
+                              }}>
+                                نعم، احذف
+                              </Button>
+                              <Button variant="outline" onClick={() => setBulkDeleteConfirmOpen(false)}>
+                                إلغاء
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+
                         <button
                           type="button"
                           onClick={() => setSelectedLeadIds([])}
@@ -7007,6 +7054,40 @@ const DEFAULT_ORCHESTRATION = {
       </Dialog>
 
       <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
+
+      {/* Mobile Bottom Nav - Admin Dashboard */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 block lg:hidden border-t ${
+        dark ? 'bg-[#0a0f14]/95 border-white/10' : 'bg-white/95 border-black/10'
+      } backdrop-blur-xl`}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex items-center justify-around px-2 py-2">
+          <button onClick={() => setActiveTab('radar')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'radar' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <LayoutDashboard size={20} />
+            <span>الرادار</span>
+          </button>
+          <button onClick={() => setActiveTab('admissions')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'admissions' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <GraduationCap size={20} />
+            <span>القبول</span>
+          </button>
+          <button onClick={() => setActiveTab('content')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'content' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Layers size={20} />
+            <span>المحتوى</span>
+          </button>
+          <button onClick={() => setActiveTab('orchestration')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'orchestration' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Sliders size={20} />
+            <span>الإعدادات</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

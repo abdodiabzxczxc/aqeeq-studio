@@ -759,6 +759,16 @@ export default function AqeeqPodcastPage() {
         {/* ========================================================================= */}
         {/* ================= PAVILION 1: 🎙️ صالون خلف المايك (المسموع) ============== */}
         {/* ========================================================================= */}
+        {videoPodcasts.length === 0 && audioPodcasts.length === 0 && filteredSongs.length === 0 && (
+          <div className={`col-span-full flex flex-col items-center justify-center py-20 text-center ${
+            dark ? 'text-slate-500' : 'text-slate-400'
+          }`}>
+            <div className="text-6xl mb-4">🎙️</div>
+            <h3 className="text-lg font-black mb-2">لا يوجد محتوى في هذا التصنيف</h3>
+            <p className="text-sm">سيتم إضافة حلقات جديدة قريباً</p>
+          </div>
+        )}
+
         {audioPodcasts.length > 0 && (
           <section
             id="audio-pavilion"

@@ -73,6 +73,8 @@ function ArticleCard({
   return (
     <article
       className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
+        index === 0 ? "lg:col-span-2 " : ""
+      }${
         isNationalDay
           ? dark ? "snd-bento-card-dark text-white" : "snd-bento-card-light text-slate-900"
           : dark
@@ -353,11 +355,15 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     });
   };
 
-  const handleShare = (article: any, e: React.MouseEvent) => {
+  const handleShare = async (article: any, e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}/articles/${article.slug}`;
     if (navigator.share) {
-      navigator.share({ title: article.title, text: article.excerpt, url }).catch(() => {});
+      await navigator.share({
+        title: article.title,
+        text: article.excerpt || article.title,
+        url: window.location.origin + '/articles/' + article.slug,
+      }).catch(() => {});
       return;
     }
     handleCopyLink(article, e);
@@ -718,7 +724,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
           </div>
 
           {/* Category Filter Pills */}
-          <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-1.5">
+          <div className="mt-3 pt-3 border-t border-white/10 flex overflow-x-auto scrollbar-hide flex-nowrap pb-1 items-center gap-1.5">
             <span className="text-[11px] font-bold text-slate-400 ml-2">التصنيف:</span>
             {CATEGORIES.map((cat) => {
               const active = selectedCategory === cat.id;
@@ -746,7 +752,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
         {/* Articles Grid */}
         {isLoading ? (
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
@@ -777,7 +783,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             </button>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {articles.map((art, idx) => (
               <ArticleCard
                 key={art.id}

@@ -6,6 +6,7 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   GraduationCap,
@@ -63,6 +64,19 @@ export default function AqeeqSchoolAdmissionsPage() {
     notes: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const validateStep1 = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.studentName.trim()) errors.studentName = 'مطلوب اسم الطالب';
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const [whatsappConfirmOpen, setWhatsappConfirmOpen] = useState(false);
+  const [pendingWhatsappMsg, setPendingWhatsappMsg] = useState('');
+
 
   const { data: orchestrationData } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     staleTime: 60000,
@@ -337,9 +351,8 @@ export default function AqeeqSchoolAdmissionsPage() {
   const handleShareWhatsAppQuote = () => {
     const trackName = activeTrack === "national" ? "الأهلي" : "الدولي";
     const msg = `السلام عليكم ورحمة الله،\nاستعلمت عن خطة الرسوم الدراسية بمدارس العقيق الأهلية والدولية:\n• المسار: ${trackName}\n• المرحلة: ${selectedTier.grade}\n• عدد الطلاب: ${calcSiblingsCount}\n• الصافي السنوي: ${netTotalAnnual.toLocaleString()} ر.س\n• القسط الفصلي (3 فصول): ${netTermTotal.toLocaleString()} ر.س\n• قسط تابي/تمارا: ${tabbyFourInstallments.toLocaleString()} ر.س\n\nأود استكمال إجراءات القبول وحجز المقعد الدراسي 🎓`;
-    const cleanPhone = "0148131652".replace(/[^0-9]/g, "");
-    const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
+    setPendingWhatsappMsg(msg);
+    setWhatsappConfirmOpen(true);
   };
 
   return (
@@ -352,6 +365,28 @@ export default function AqeeqSchoolAdmissionsPage() {
       }`}
     >
       <AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />
+
+      <Dialog open={whatsappConfirmOpen} onOpenChange={setWhatsappConfirmOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-right">إرسال عبر واتساب 💚</DialogTitle>
+            <DialogDescription className="text-right text-sm">
+              سيتم فتح واتساب مع كشف حساب الأقساط جاهزاً للإرسال.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 flex-row-reverse">
+            <Button onClick={() => {
+              const cleanPhone = "0148131652".replace(/[^0-9]/g, "");
+              const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(pendingWhatsappMsg)}`;
+              window.open(url, '_blank');
+              setWhatsappConfirmOpen(false);
+            }} className="bg-[#25D366] hover:bg-[#20b558] text-white">
+              📤 إرسال الآن
+            </Button>
+            <Button variant="outline" onClick={() => setWhatsappConfirmOpen(false)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Hero Section: Modern Executive 2-Column Showcase */}
       <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
@@ -687,10 +722,20 @@ export default function AqeeqSchoolAdmissionsPage() {
 
                   {siblingDiscountAmount > 0 && (
                     <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-black">
-                      <span className="inline-flex items-center gap-1">
+                      <div className="group relative inline-flex items-center gap-1">
                         <Percent size={13} />
-                        وفر خصم الإخوة المطبق:
-                      </span>
+                        <span>وفر خصم الإخوة المطبق:</span>
+                        <span className="cursor-help text-slate-400 hover:text-emerald-400">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                          </svg>
+                        </span>
+                        <div className="absolute bottom-full right-0 mb-2 w-48 rounded-xl p-3 text-xs font-medium leading-5 shadow-xl opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 bg-slate-900 text-white border border-white/10">
+                          ينطبق هذا الخصم على الطالب الثاني في الأسرة الواحدة تلقائياً.
+                        </div>
+                      </div>
                       <span>- {siblingDiscountAmount.toLocaleString()} ر.س</span>
                     </div>
                   )}
@@ -1153,132 +1198,182 @@ export default function AqeeqSchoolAdmissionsPage() {
                     </p>
                   </div>
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-xs font-black mb-2">اسم الطالب / الطالبة الثلاثي *</label>
-                    <Input
-                      required
-                      placeholder="مثال: محمد عبدالله الشريف"
-                      value={formData.studentName}
-                      onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
-                      className="rounded-xl h-12"
-                    />
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-black mb-2">اسم ولي الأمر *</label>
-                    <Input
-                      required
-                      placeholder="مثال: عبدالله محمد الشريف"
-                      value={formData.guardianName}
-                      onChange={(e) => setFormData({ ...formData, guardianName: e.target.value })}
-                      className="rounded-xl h-12"
-                    />
-                  </div>
+                {/* Progress Steps */}
+                <div className="flex items-center gap-2 mb-8">
+                  {[1, 2, 3].map((step) => (
+                    <div key={step} className="flex items-center gap-2 flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black transition-all ${
+                        formStep > step ? 'bg-emerald-500 text-white' :
+                        formStep === step ? (dark ? 'bg-[#f8ca14] text-black' : 'bg-[#08467d] text-white') :
+                        dark ? 'bg-white/10 text-slate-400' : 'bg-black/10 text-slate-400'
+                      }`}>
+                        {formStep > step ? '✓' : step}
+                      </div>
+                      {step < 3 && <div className={`flex-1 h-0.5 ${
+                        formStep > step ? 'bg-emerald-500' : dark ? 'bg-white/10' : 'bg-black/10'
+                      }`} />}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-sm text-center mb-6 font-bold text-slate-400">
+                  {formStep === 1 && 'الخطوة 1 من 3 — بيانات الطالب'}
+                  {formStep === 2 && 'الخطوة 2 من 3 — بيانات ولي الأمر'}
+                  {formStep === 3 && 'الخطوة 3 من 3 — مراجعة وإرسال'}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-xs font-black mb-2">رقم جوال ولي الأمر (واتساب) *</label>
-                    <Input
-                      required
-                      type="tel"
-                      placeholder="05XXXXXXXX"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="rounded-xl h-12 text-left"
-                      dir="ltr"
-                    />
-                  </div>
+                {formStep === 1 && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-black mb-2">اسم الطالب / الطالبة الثلاثي *</label>
+                      <Input
+                        required
+                        placeholder="مثال: محمد عبدالله الشريف"
+                        value={formData.studentName}
+                        onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
+                        className="rounded-xl h-12"
+                      />
+                      {fieldErrors.studentName && <span className="text-xs text-red-500 mt-1">{fieldErrors.studentName}</span>}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                      <div>
+                        <label className="block text-xs font-black mb-2">المرحلة الدراسية *</label>
+                        <select
+                          value={formData.gradeLevel}
+                          onChange={(e) => setFormData({ ...formData, gradeLevel: e.target.value })}
+                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
+                          }`}
+                        >
+                          <option value="kindergarten">مرحلة رياض الأطفال (KG)</option>
+                          <option value="primary">المرحلة الابتدائية (1 - 6)</option>
+                          <option value="middle">المرحلة المتوسطة (7 - 9)</option>
+                          <option value="high">المرحلة الثانوية (10 - 12)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black mb-2">المسار التعليمي *</label>
+                        <select
+                          value={formData.track}
+                          onChange={(e) => setFormData({ ...formData, track: e.target.value })}
+                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
+                          }`}
+                        >
+                          <option value="national">المدارس الأهلية</option>
+                          <option value="international">المدارس الدولية (International)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black mb-2">الفرع / المجمع *</label>
+                        <select
+                          value={formData.gender}
+                          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
+                          }`}
+                        >
+                          <option value="boys">مجمع البنين</option>
+                          <option value="girls">مجمع البنات</option>
+                        </select>
+                      </div>
+                    </div>
+                  </>
+                )}
 
-                  <div>
-                    <label className="block text-xs font-black mb-2">البريد الإلكتروني (اختياري)</label>
-                    <Input
-                      type="email"
-                      placeholder="name@example.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="rounded-xl h-12 text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                </div>
+                {formStep === 2 && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-black mb-2">اسم ولي الأمر *</label>
+                      <Input
+                        required
+                        placeholder="مثال: عبدالله محمد الشريف"
+                        value={formData.guardianName}
+                        onChange={(e) => setFormData({ ...formData, guardianName: e.target.value })}
+                        className="rounded-xl h-12"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-xs font-black mb-2">رقم جوال ولي الأمر (واتساب) *</label>
+                        <Input
+                          required
+                          type="tel"
+                          placeholder="05XXXXXXXX"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="rounded-xl h-12 text-left"
+                          dir="ltr"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black mb-2">البريد الإلكتروني (اختياري)</label>
+                        <Input
+                          type="email"
+                          placeholder="name@example.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="rounded-xl h-12 text-left"
+                          dir="ltr"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                  <div>
-                    <label className="block text-xs font-black mb-2">المرحلة الدراسية *</label>
-                    <select
-                      value={formData.gradeLevel}
-                      onChange={(e) => setFormData({ ...formData, gradeLevel: e.target.value })}
-                      className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
-                        dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
+                {formStep === 3 && (
+                  <>
+                    <div className={`rounded-2xl border p-4 text-sm text-right space-y-2 mb-4 ${dark ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}>
+                       <div><strong className="text-emerald-500">اسم الطالب:</strong> {formData.studentName}</div>
+                       <div><strong className="text-emerald-500">المرحلة:</strong> {formData.gradeLevel}</div>
+                       <div><strong className="text-emerald-500">المسار:</strong> {formData.track}</div>
+                       <div><strong className="text-emerald-500">اسم ولي الأمر:</strong> {formData.guardianName}</div>
+                       <div><strong className="text-emerald-500">رقم الجوال:</strong> {formData.phone}</div>
+                       {formData.email && <div><strong className="text-emerald-500">البريد الإلكتروني:</strong> {formData.email}</div>}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black mb-2">أي ملاحظات أو استفسارات إضافية</label>
+                      <textarea
+                        rows={3}
+                        placeholder="اكتب هنا أي تفاصيل تود إضافتها (مثل درجات الطالب السابقة أو تطلعاتكم)..."
+                        value={formData.notes}
+                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                        className={`w-full rounded-xl border p-3 text-xs outline-none ${
+                          dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
+                        }`}
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="flex gap-3 mt-6">
+                  {formStep > 1 && (
+                    <button type="button" onClick={() => setFormStep((s) => (s - 1) as 1|2|3)}
+                      className={`flex-1 py-3 rounded-2xl border font-bold text-sm ${dark ? 'border-white/10 text-slate-300 hover:bg-white/5' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}>السابق</button>
+                  )}
+                  {formStep < 3 ? (
+                    <button type="button" onClick={() => {
+                      if (formStep === 1 && !validateStep1()) return;
+                      setFormStep((s) => (s + 1) as 1|2|3);
+                    }}
+                      className="flex-1 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition">التالي →</button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={submitMutation.isPending}
+                      className={`flex-1 py-3 rounded-2xl h-12 text-sm font-black shadow-lg transition active:scale-95 ${
+                        dark
+                          ? "bg-gradient-to-r from-emerald-600 to-[#005A36] text-white hover:opacity-90 shadow-emerald-950/40"
+                          : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-90 shadow-emerald-900/30"
                       }`}
                     >
-                      <option value="kindergarten">مرحلة رياض الأطفال (KG)</option>
-                      <option value="primary">المرحلة الابتدائية (1 - 6)</option>
-                      <option value="middle">المرحلة المتوسطة (7 - 9)</option>
-                      <option value="high">المرحلة الثانوية (10 - 12)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black mb-2">المسار التعليمي *</label>
-                    <select
-                      value={formData.track}
-                      onChange={(e) => setFormData({ ...formData, track: e.target.value })}
-                      className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
-                        dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
-                      }`}
-                    >
-                      <option value="national">المدارس الأهلية</option>
-                      <option value="international">المدارس الدولية (International)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black mb-2">الفرع / المجمع *</label>
-                    <select
-                      value={formData.gender}
-                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
-                        dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
-                      }`}
-                    >
-                      <option value="boys">مجمع البنين</option>
-                      <option value="girls">مجمع البنات</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-black mb-2">أي ملاحظات أو استفسارات إضافية</label>
-                  <textarea
-                    rows={3}
-                    placeholder="اكتب هنا أي تفاصيل تود إضافتها (مثل درجات الطالب السابقة أو تطلعاتكم)..."
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className={`w-full rounded-xl border p-3 text-xs outline-none ${
-                      dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
-                    }`}
-                  />
-                </div>
-
-                <div className="text-center pt-3">
-                  <Button
-                    type="submit"
-                    disabled={submitMutation.isPending}
-                    className={`w-full sm:w-auto min-w-[240px] rounded-xl h-12 text-sm font-black shadow-lg transition active:scale-95 ${
-                      dark
-                        ? "bg-gradient-to-r from-emerald-600 to-[#005A36] text-white hover:opacity-90 shadow-emerald-950/40"
-                        : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-90 shadow-emerald-900/30"
-                    }`}
-                  >
-                    {submitMutation.isPending
-                      ? "جارِ إرسال الطلب..."
-                      : !isRegistrationOpen
-                      ? "تسجيل في قائمة الانتظار للعام الدراسي ✦"
-                      : "تأكيد وإرسال طلب التسجيل ✦"}
-                  </Button>
+                      {submitMutation.isPending
+                        ? "جارِ إرسال الطلب..."
+                        : !isRegistrationOpen
+                        ? "تسجيل في قائمة الانتظار للعام الدراسي ✦"
+                        : "تأكيد وإرسال طلب التسجيل ✦"}
+                    </Button>
+                  )}
                 </div>
               </form>
             )}

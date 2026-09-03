@@ -692,7 +692,7 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
           <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
-            <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 scrollbar-hide">
+            <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
                 <button
                   key={story.id}

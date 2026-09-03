@@ -343,6 +343,17 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     >
       <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
       <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
+        {/* Breadcrumb */}
+        <nav className={`flex items-center gap-2 text-xs font-bold mb-4 ${
+          dark ? 'text-slate-400' : 'text-slate-500'
+        }`}>
+          <button onClick={() => navigate('/')} className="hover:text-current transition">الرئيسية</button>
+          <span className="opacity-40">›</span>
+          <button onClick={() => navigate('/albums')} className="hover:text-current transition">الألبومات</button>
+          <span className="opacity-40">›</span>
+          <span className={dark ? 'text-white' : 'text-black'}>{album?.title || 'الألبوم'}</span>
+        </nav>
+        
         <header
           className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${
             isNationalDay

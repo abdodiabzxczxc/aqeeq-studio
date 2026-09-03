@@ -794,8 +794,12 @@ export default function AqeeqShowcasePage() {
   const isAdmin = isAuthenticated && user?.role === "admin";
   const posts = useMemo(() => (showcase?.posts || []) as ShowcasePost[], [showcase?.posts]);
   const visiblePosts = useMemo(() => searchAndSortAqeeqContent(posts.filter((post) => matchesContentType(post, contentType)), searchQuery, sort), [posts, contentType, searchQuery, sort]);
-
-  useEffect(() => {
+  const typeOptionsWithCounts = useMemo(() => {
+    return SHOWCASE_TYPE_OPTIONS.map((opt) => ({
+      ...opt,
+      count: posts.filter((post) => matchesContentType(post, opt.id as ContentType)).length,
+    }));
+  }, [posts]);
     const audio = audioRef.current;
     if (!audio || !showcase?.backgroundAudioUrl) return;
     audio.volume = 0.38;

@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AQEEQ_SORT_OPTIONS, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-type ContentTypeOption = { id: string; label: string };
+type ContentTypeOption = { id: string; label: string; count?: number };
 type AqeeqArchiveControlsProps = {
   id: string;
   label: string;
@@ -57,7 +57,12 @@ export function AqeeqArchiveControls({ id, label, query, onQueryChange, sort, on
 
   const typeButtons = hasTypeOptions ? <div className="aqeeq-content-type-group flex shrink-0 flex-wrap items-center gap-2" role="group" aria-label="تصنيفات الأخبار">
     <VisualEditable id={`${id}-content-type-label`} tag="text" label={`عنوان تصنيفات ${label}`} defaultText="اعرض:" as="span" className="text-[11px] font-black text-[#d9bd26]" />
-    {typeOptions?.map((option) => <VisualEditable key={option.id} id={`${id}-content-type-${option.id}`} tag="button" label={`تصنيف ${option.label}`} defaultText={option.label} as="button" onAction={() => onTypeChange?.(option.id)} aria-pressed={activeType === option.id} className={`aqeeq-content-type-button rounded-xl border px-3 py-2 text-xs font-black ${activeType === option.id ? "is-active" : ""}`}>{option.label}</VisualEditable>)}
+    {typeOptions?.map((option) => (
+      <VisualEditable key={option.id} id={`${id}-content-type-${option.id}`} tag="button" label={`تصنيف ${option.label}`} defaultText={option.label} as="button" onAction={() => onTypeChange?.(option.id)} aria-pressed={activeType === option.id} className={`aqeeq-content-type-button rounded-xl border px-3 py-2 text-xs font-black flex items-center gap-1 ${activeType === option.id ? "is-active" : ""}`}>
+        <span>{option.label}</span>
+        {option.count !== undefined && <span className="opacity-50 font-normal">({option.count})</span>}
+      </VisualEditable>
+    ))}
   </div> : null;
 
   return <VisualEditable id={`${id}-shell`} tag="section" label={label} as="section" className="aqeeq-archive-controls mb-7 rounded-[1.5rem] border border-[#d9bd26]/25 bg-black/20 p-3 sm:p-4">
