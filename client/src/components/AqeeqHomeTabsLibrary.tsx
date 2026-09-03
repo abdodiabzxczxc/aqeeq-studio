@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -12,7 +12,7 @@ import {
   Calendar,
   Sparkles
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { useLocation } from "wouter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 
@@ -46,6 +46,17 @@ export function AqeeqHomeTabsLibrary({
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"podcasts" | "articles" | "albums" | "journal" | "showcase">("podcasts");
+
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const rawEvenY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const rawOddY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+  const evenY = useSpring(rawEvenY, { stiffness: 90, damping: 22 });
+  const oddY = useSpring(rawOddY, { stiffness: 90, damping: 22 });
 
 
 
@@ -159,11 +170,12 @@ export function AqeeqHomeTabsLibrary({
   const currentConfig = getTabConfig();
 
   return (
-    <VisualEditable
-      id="studio-library-section"
-      tag="section"
-      label="قسم استكشف المكتبة"
-      as="section"
+    <div ref={sectionRef} className="relative w-full">
+      <VisualEditable
+        id="studio-library-section"
+        tag="section"
+        label="قسم استكشف المكتبة"
+        as="section"
       className={`w-full py-14 md:py-20 ${
         isNationalDay
           ? dark ? "snd-library-dark" : "snd-library-light"
@@ -349,11 +361,14 @@ export function AqeeqHomeTabsLibrary({
                 ) : (
                   /* Mobile: horizontal scroll / Desktop: 4-col grid */
                   <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-5 sm:overflow-visible sm:pb-0">
-                    {currentConfig.items.map((item) => (
-                      <div
+                    {currentConfig.items.map((item, idx) => (
+                      <motion.div
                         key={item.id}
+                        style={{ y: idx % 2 === 0 ? evenY : oddY }}
+                        whileHover={{ y: -8, scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 220, damping: 18 }}
                         onClick={() => navigate(item.href)}
-                        className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col shrink-0 w-[200px] sm:w-auto h-[280px] sm:h-[320px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
+                        className={`group cursor-pointer rounded-2xl overflow-hidden border flex flex-col shrink-0 w-[200px] sm:w-auto h-[280px] sm:h-[320px] transition-all duration-300 shadow-lg will-change-transform ${
                           isNationalDay
                             ? dark
                               ? "border-emerald-500/20 bg-[#141414] hover:border-emerald-400/40"
@@ -411,7 +426,7 @@ export function AqeeqHomeTabsLibrary({
 
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
@@ -423,5 +438,6 @@ export function AqeeqHomeTabsLibrary({
 
       </div>
     </VisualEditable>
+    </div>
   );
 }

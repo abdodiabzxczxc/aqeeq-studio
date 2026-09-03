@@ -41,10 +41,10 @@ export function AqeeqTypographicScrubBar({
         className="flex items-center gap-8 whitespace-nowrap will-change-transform"
       >
         <span
-          className={`text-5xl sm:text-7xl lg:text-8xl font-black tracking-widest ${
+          className={`text-5xl sm:text-7xl lg:text-8xl font-black tracking-widest uppercase ${
             dark
-              ? "text-transparent [-webkit-text-stroke:1.2px_rgba(248,202,20,0.22)]"
-              : "text-transparent [-webkit-text-stroke:1.2px_rgba(8,70,125,0.18)]"
+              ? "text-[#f8ca14]/[0.11]"
+              : "text-[#08467d]/[0.10]"
           }`}
         >
           {text} {text}

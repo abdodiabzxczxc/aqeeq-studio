@@ -667,6 +667,23 @@ export default function AlaqeeqStudioPublicPage() {
   const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
   const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
 
+  // فيزياء السكرول التفاعلي للأقسام السفلية (Lower Sections Bidirectional Parallax)
+  const rawWeeklyBentoCard1Y = useTransform(scrollY, [2800, 4400], [35, -35]);
+  const rawWeeklyBentoCard2Y = useTransform(scrollY, [2800, 4400], [15, -45]);
+  const rawWeeklyBentoCard3Y = useTransform(scrollY, [2800, 4400], [45, -25]);
+
+  const weeklyBentoCard1Y = useSpring(rawWeeklyBentoCard1Y, { stiffness: 90, damping: 22 });
+  const weeklyBentoCard2Y = useSpring(rawWeeklyBentoCard2Y, { stiffness: 90, damping: 22 });
+  const weeklyBentoCard3Y = useSpring(rawWeeklyBentoCard3Y, { stiffness: 90, damping: 22 });
+
+  const rawMemoryCol0Y = useTransform(scrollY, [3800, 5600], [40, -40]);
+  const rawMemoryCol1Y = useTransform(scrollY, [3800, 5600], [-35, 35]);
+  const rawMemoryCol2Y = useTransform(scrollY, [3800, 5600], [55, -25]);
+
+  const memoryCol0Y = useSpring(rawMemoryCol0Y, { stiffness: 90, damping: 22 });
+  const memoryCol1Y = useSpring(rawMemoryCol1Y, { stiffness: 90, damping: 22 });
+  const memoryCol2Y = useSpring(rawMemoryCol2Y, { stiffness: 90, damping: 22 });
+
   if (issuesLoading || albumsLoading || showcasesLoading) {
     return (
       <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
@@ -1248,19 +1265,23 @@ export default function AlaqeeqStudioPublicPage() {
 
           <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-4">
             {/* Bento Card 1: الحدث الرئيسي الأبرز (Spans 2 columns) */}
-            <VisualEditable
-              id="studio-bento-card1"
-              tag="section"
-              label="بطاقة الحدث التعليمي الأبرز"
-              as="div"
-              className={"group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-8 md:col-span-2 lg:col-span-2 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                isNationalDay
-                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                  : dark
-                  ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
-                  : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
-              )}
+            <motion.div
+              style={{ y: weeklyBentoCard1Y }}
+              className="md:col-span-2 lg:col-span-2 will-change-transform"
             >
+              <VisualEditable
+                id="studio-bento-card1"
+                tag="section"
+                label="بطاقة الحدث التعليمي الأبرز"
+                as="div"
+                className={"group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-8 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
+                  isNationalDay
+                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                    : dark
+                    ? "border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0a0a0a] shadow-xl hover:border-[#f8ca14]/50"
+                    : "border-black/[0.08] bg-white shadow-md hover:border-[#08467d]/50"
+                )}
+              >
               <div className="relative h-48 sm:h-56 overflow-hidden rounded-2xl mb-6">
                 <VisualImage
                   id="studio-bento-card1-image"
@@ -1329,35 +1350,40 @@ export default function AlaqeeqStudioPublicPage() {
                 </VisualEditable>
               </div>
             </VisualEditable>
+            </motion.div>
 
             {/* Bento Card 2: وسام وإنجاز الأسبوع */}
-            <VisualEditable
-              id="studio-bento-card2"
-              tag="section"
-              label="بطاقة وسام التميز الأكاديمي"
-              as="div"
-              className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                isNationalDay
-                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                  : dark
-                  ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
-                  : "border-[#08467d]/20 bg-white shadow-md"
-              )}
+            <motion.div
+              style={{ y: weeklyBentoCard2Y }}
+              className="will-change-transform"
             >
-              <div>
-                <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
-                  dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-[#08467d]/10 text-[#08467d]"
-                )}>
-                  <Award size={24} />
-                </div>
-                <VisualEditable
-                  id="studio-bento-card2-label"
-                  tag="text"
-                  label="شارة وسام التميز"
-                  defaultText={orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
-                  as="span"
-                  className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
-                />
+              <VisualEditable
+                id="studio-bento-card2"
+                tag="section"
+                label="بطاقة وسام التميز الأكاديمي"
+                as="div"
+                className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
+                  isNationalDay
+                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                    : dark
+                    ? "border-[#f8ca14]/30 bg-[#0d0d0d] shadow-xl"
+                    : "border-[#08467d]/20 bg-white shadow-md"
+                )}
+              >
+                <div>
+                  <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
+                    dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-[#08467d]/10 text-[#08467d]"
+                  )}>
+                    <Award size={24} />
+                  </div>
+                  <VisualEditable
+                    id="studio-bento-card2-label"
+                    tag="text"
+                    label="شارة وسام التميز"
+                    defaultText={orchestration?.weeklyBento?.academicBadgeTitle || "وسام التميز الأكاديمي"}
+                    as="span"
+                    className={"text-[10px] font-black tracking-wider " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
+                  />
                 <VisualEditable
                   id="studio-bento-card2-title"
                   tag="text"
@@ -1388,21 +1414,26 @@ export default function AlaqeeqStudioPublicPage() {
                 />
               </div>
             </VisualEditable>
+            </motion.div>
 
             {/* Bento Card 3: مقياس نبض التفاعل الأسبوعي */}
-            <VisualEditable
-              id="studio-bento-card3"
-              tag="section"
-              label="بطاقة نبض التفاعل"
-              as="div"
-              className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
-                isNationalDay
-                  ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
-                  : dark
-                  ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
-                  : "border-black/[0.08] bg-white shadow-md"
-              )}
+            <motion.div
+              style={{ y: weeklyBentoCard3Y }}
+              className="will-change-transform"
             >
+              <VisualEditable
+                id="studio-bento-card3"
+                tag="section"
+                label="بطاقة نبض التفاعل"
+                as="div"
+                className={"relative overflow-hidden rounded-[2.2rem] border p-6 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl " + (
+                  isNationalDay
+                    ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
+                    : dark
+                    ? "border-white/[0.08] bg-[#0d0d0d] shadow-xl"
+                    : "border-black/[0.08] bg-white shadow-md"
+                )}
+              >
               <div>
                 <div className={"grid h-12 w-12 place-items-center rounded-2xl mb-4 " + (
                   dark ? "bg-[#de191e]/15 text-[#de191e]" : "bg-[#de191e]/10 text-[#de191e]"
@@ -1446,6 +1477,7 @@ export default function AlaqeeqStudioPublicPage() {
                 </button>
               </div>
             </VisualEditable>
+            </motion.div>
           </div>
         </div>
       </VisualEditable>
@@ -1642,36 +1674,40 @@ export default function AlaqeeqStudioPublicPage() {
 
             <div className="grid grid-cols-3 gap-3 sm:gap-5">
               {memoryEntries.map((entry, index) => (
-                <VisualEditable
+                <motion.div
                   key={entry.id}
-                  id={"studio-memory-" + entry.id}
-                  tag="section"
-                  label={"بطاقة ذاكرة " + entry.title}
-                  as="button"
-                  onAction={entry.onOpen}
-                  className={"group relative h-[230px] sm:h-[300px] overflow-hidden rounded-[1.5rem] border text-right transition duration-300 hover:-translate-y-1 " + (
-                    index === 1 ? "mt-6" : ""
-                  ) + " " + (
-                    dark
-                      ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
-                      : isNationalDay
-                      ? "border-emerald-500/20 bg-white shadow-[0_15px_35px_rgba(0,90,54,0.06)] hover:border-[#005A36]/60"
-                      : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50"
-                  )}
+                  style={{ y: index === 0 ? memoryCol0Y : index === 1 ? memoryCol1Y : memoryCol2Y }}
+                  className="will-change-transform"
                 >
-                  <VisualImage
-                    id={"studio-memory-" + entry.id + "-image"}
-                    label={"صورة " + entry.title}
-                    src={entry.imageUrl || ""}
-                    alt={entry.title}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
-                  />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16">
-                    <p className={"text-[9px] font-black " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
-                    <p className="mt-1 truncate text-xs font-black text-white">{entry.title}</p>
-                  </div>
-
-                </VisualEditable>
+                  <VisualEditable
+                    id={"studio-memory-" + entry.id}
+                    tag="section"
+                    label={"بطاقة ذاكرة " + entry.title}
+                    as="button"
+                    onAction={entry.onOpen}
+                    className={"group relative h-[230px] sm:h-[300px] w-full overflow-hidden rounded-[1.5rem] border text-right transition duration-300 hover:-translate-y-1 " + (
+                      index === 1 ? "mt-6" : ""
+                    ) + " " + (
+                      dark
+                        ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
+                        : isNationalDay
+                        ? "border-emerald-500/20 bg-white shadow-[0_15px_35px_rgba(0,90,54,0.06)] hover:border-[#005A36]/60"
+                        : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50"
+                    )}
+                  >
+                    <VisualImage
+                      id={"studio-memory-" + entry.id + "-image"}
+                      label={"صورة " + entry.title}
+                      src={entry.imageUrl || ""}
+                      alt={entry.title}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16">
+                      <p className={"text-[9px] font-black " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
+                      <p className="mt-1 truncate text-xs font-black text-white">{entry.title}</p>
+                    </div>
+                  </VisualEditable>
+                </motion.div>
               ))}
             </div>
           </div>
