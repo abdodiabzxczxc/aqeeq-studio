@@ -84,6 +84,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const [searchOpen, setSearchOpen] = useState(false);
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const [creatorModalOpen, setCreatorModalOpen] = useState(false);
+  const [newsDropdownOpen, setNewsDropdownOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const dark = theme === "dark";
   const isAdmin = isAuthenticated && user?.role === "admin";
@@ -372,46 +373,55 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             />
 
             {/* 8. أخبار ومقالات */}
-            <div className="relative group">
+            <div
+              className="relative group"
+              onMouseLeave={() => setNewsDropdownOpen(false)}
+            >
               <button
                 type="button"
-                onClick={() => go("/offers")}
-                className={`aq-studio-toplink inline-flex items-center gap-1 cursor-pointer ${
+                onClick={(e) => {
+                  e.preventDefault();
+                  setNewsDropdownOpen((prev) => !prev);
+                }}
+                className={`aq-studio-toplink cursor-pointer ${
                   currentActive === "articles" || currentActive === "showcase" ? "aq-studio-toplink--active" : ""
                 }`}
               >
-                <span>أخبار ومقالات</span>
-                <ChevronDown size={11} className="opacity-60 transition duration-200 group-hover:rotate-180" />
+                أخبار ومقالات
               </button>
 
-              <div className="absolute top-full left-0 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
-                <div className={`p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
+              <div
+                className={`absolute top-full right-0 pt-2 w-36 transition-all duration-150 z-50 ${
+                  newsDropdownOpen
+                    ? "opacity-100 visible pointer-events-auto"
+                    : "opacity-0 invisible group-hover:opacity-100 group-hover:visible pointer-events-none group-hover:pointer-events-auto"
+                }`}
+              >
+                <div className={`p-1 rounded-xl border backdrop-blur-xl shadow-xl ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
                   <button
                     type="button"
-                    onClick={() => go("/offers")}
-                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition text-right cursor-pointer ${
+                    onClick={() => {
+                      setNewsDropdownOpen(false);
+                      go("/offers");
+                    }}
+                    className={`w-full text-right px-3.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                       currentActive === "showcase" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
                     }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <Sparkles size={14} className="text-[#f8ca14]" />
-                      <span>الأخبار والفعاليات 📰</span>
-                    </span>
-                    <ArrowRight size={12} className="opacity-40" />
+                    الأخبار
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => go("/articles")}
-                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition text-right cursor-pointer ${
+                    onClick={() => {
+                      setNewsDropdownOpen(false);
+                      go("/articles");
+                    }}
+                    className={`w-full text-right px-3.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                       currentActive === "articles" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
                     }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <BookOpen size={14} className="text-emerald-500" />
-                      <span>مقالات الطلاب والمعلمين ✍️</span>
-                    </span>
-                    <ArrowRight size={12} className="opacity-40" />
+                    المقالات
                   </button>
                 </div>
               </div>
@@ -661,21 +671,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <ArrowRight size={13} className="opacity-40" />
                     </button>
                     <div className="border-t border-current/10 pt-1.5 mt-1">
-                      <div className="text-[10px] font-black text-[#f8ca14] px-2 py-0.5 mb-1 flex items-center gap-1">
-                        <Sparkles size={11} />
-                        <span>أخبار ومقالات</span>
+                      <div className="text-[10px] font-black text-slate-400 px-2 py-0.5 mb-1">
+                        أخبار ومقالات
                       </div>
                       <button onClick={() => go("/offers")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <span>الأخبار والفعاليات 📰</span>
-                        </span>
-                        <ArrowRight size={13} className="opacity-40" />
+                        <span>الأخبار</span>
                       </button>
                       <button onClick={() => go("/articles")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <span>مقالات الطلاب والمعلمين ✍️</span>
-                        </span>
-                        <ArrowRight size={13} className="opacity-40" />
+                        <span>المقالات</span>
                       </button>
                     </div>
                   </div>
