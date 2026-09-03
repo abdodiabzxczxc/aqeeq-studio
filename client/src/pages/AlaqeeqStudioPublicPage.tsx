@@ -667,6 +667,21 @@ export default function AlaqeeqStudioPublicPage() {
   const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
   const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
 
+  // فيزياء ميلان كروت الهيرو بالماوس في البعد الثالث (3D Mouse Perspective Tilt)
+  const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
+  const heroTiltX = useSpring(heroMouse.y, { stiffness: 120, damping: 18 });
+  const heroTiltY = useSpring(heroMouse.x, { stiffness: 120, damping: 18 });
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+    setHeroMouse({ x, y });
+  };
+  const handleHeroMouseLeave = () => {
+    setHeroMouse({ x: 0, y: 0 });
+  };
+
   // فيزياء السكرول التفاعلي للأقسام السفلية (Lower Sections Bidirectional Parallax)
   const rawWeeklyBentoCard1Y = useTransform(scrollY, [2800, 4400], [35, -35]);
   const rawWeeklyBentoCard2Y = useTransform(scrollY, [2800, 4400], [15, -45]);
@@ -1011,8 +1026,13 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
           </div>
 
-          {/* Overlapping Hero Covers with 3D Fan-out on Scroll */}
-          <div className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000">
+          {/* Overlapping Hero Covers with 3D Fan-out on Scroll & 3D Interactive Mouse Tilt */}
+          <motion.div
+            onMouseMove={handleHeroMouseMove}
+            onMouseLeave={handleHeroMouseLeave}
+            style={{ rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
+            className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
+          >
             {/* Back Card: Showcase / Vision & Excellence */}
             <motion.div
               style={{ x: heroBackCardX, rotate: heroBackCardRotate }}
@@ -1106,7 +1126,7 @@ export default function AlaqeeqStudioPublicPage() {
                 </div>
               )}
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </VisualEditable>
         }
@@ -1122,7 +1142,7 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp", title: "اعتماد كوجنيا العالمي للجودة التعليمية", badge: "Cognia USA" })}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/articles/is-quality-important-school-accreditation.jpg", title: "اعتماد كوجنيا الأمريكي لأعلى معايير الجودة التعليمية", badge: "Cognia USA Accredited" })}
               onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
@@ -1135,7 +1155,7 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_journal_national.webp", title: "المركز المعتمد لاختبارات آيلتس بالمدينة المنورة", badge: "IELTS Centre" })}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-lab-admissions.jpg", title: "مركز اختبارات IELTS الرسمي والحاسوبي بالمدينة المنورة", badge: "IELTS on Computer · IDP" })}
               onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="hidden sm:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
@@ -1148,7 +1168,7 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/themes/saudi-national-day/opt/cover_showcase_national.webp", title: "مراكز الاختبارات القياسية الدولية SAT & ACT", badge: "SAT & ACT" })}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-robotics-accreditations.jpg", title: "المركز الدولي المعتمد لاختبارات SAT و ACT", badge: "SAT & ACT Testing Hub" })}
               onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
@@ -1161,7 +1181,7 @@ export default function AlaqeeqStudioPublicPage() {
             <button
               type="button"
               onClick={() => navigate("/about")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: albumCovers.front || "/themes/saudi-national-day/opt/cover_album_national.webp", title: "مجتمع يضم أكثر من 10,000 أسرة تثق بمسيرتنا", badge: "مجتمع العقيق" })}
+              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-excellence-about.jpg", title: "مجتمع العقيق: فخر وثقة أكثر من 10,000 أسرة بطيبة الطيبة", badge: "مجتمع العقيق · 1994" })}
               onMouseLeave={() => triggerCursorPreview({ visible: false })}
               className="hidden md:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
             >
@@ -1197,7 +1217,7 @@ export default function AlaqeeqStudioPublicPage() {
       <AqeeqHorizontalScrubSection items={horizontalShowcaseItems} />
 
       {/* 👑 الشريط الطباعي السينمائي العملاق المتفاعل مع السكرول نزولاً وطلوعاً */}
-      <AqeeqTypographicScrubBar text="✦ مـدارس الـعـقـيـق الأهلـيـة والـدوليـة ✦ AL-AQEEQ SCHOOLS ✦ أصـالـة وتـمـيّـز ✦" />
+      <AqeeqTypographicScrubBar text="✦ AL-AQEEQ SCHOOLS · SINCE 1994 · EXCELLENCE & LEADERSHIP ✦" />
 
       {(orchestration?.sections as any)?.libraryEnabled !== false && (
         <AqeeqHomeTabsLibrary
@@ -1210,7 +1230,7 @@ export default function AlaqeeqStudioPublicPage() {
       <AqeeqSchoolAppShowcaseSection dark={dark} />
 
       {/* 👑 الشريط الطباعي العكسي المتفاعل مع السكرول */}
-      <AqeeqTypographicScrubBar text="✦ صـوت الـعـقـيـق والـريـادة ✦ LEADERSHIP & INNOVATION ✦ نـلـهـم الأجـيـال ✦" reverse={true} />
+      <AqeeqTypographicScrubBar text="✦ INNOVATION & FUTURE LEADERSHIP · AL-AQEEQ SCHOOLS ✦" reverse={true} />
 
       {/* ========================================================================= */}
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
