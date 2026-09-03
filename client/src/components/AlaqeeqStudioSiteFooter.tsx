@@ -145,7 +145,7 @@ export function AlaqeeqStudioSiteFooter() {
             {/* Container fits title exactly, scaled down as a single unit */}
             <div
               className="w-fit inline-flex flex-col items-stretch origin-right shrink-0"
-              style={{ zoom: 0.70 }}
+              style={{ zoom: 0.78 }}
             >
               <h3
                 className={`text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap leading-none ${
@@ -159,11 +159,11 @@ export function AlaqeeqStudioSiteFooter() {
                 مدارس العقيق الأهلية والدولية
               </h3>
 
-              {/* The 2 capsule pills spanning from 'م' in مدارس to 'ة' in الدولية */}
-              <div className="mt-2.5 grid grid-cols-2 gap-2.5 w-full">
-                {/* 1. Golden Pill on the right (under مدارس العقيق) */}
+              {/* The 2 capsule pills spanning from 'م' in مدارس to 'ة' in الدولية without empty void */}
+              <div className="mt-2.5 flex items-center justify-between gap-2 w-full">
+                {/* 1. Golden Pill on the right (under مدارس العقيق) - sized to fit without empty void */}
                 <div
-                  className={`flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
+                  className={`shrink-0 flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
                     dark
                       ? "border-amber-500/80 bg-amber-950/20 text-amber-400 shadow-amber-500/5"
                       : "border-amber-600/40 bg-amber-50 text-amber-800"
@@ -173,9 +173,9 @@ export function AlaqeeqStudioSiteFooter() {
                   <span>اعتماد Cognia</span>
                 </div>
 
-                {/* 2. Sky Blue Pill on the left (under الأهلية والدولية) */}
+                {/* 2. Sky Blue Pill on the left (under الأهلية والدولية) - fills the rest to reach 'ة' */}
                 <div
-                  className={`flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
                     dark
                       ? "border-sky-500/80 bg-sky-950/20 text-sky-400 shadow-sky-500/5"
                       : "border-sky-600/40 bg-sky-50 text-sky-800"
