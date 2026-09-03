@@ -6,6 +6,7 @@ import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
+import { MobileStickyActionBar } from "@/components/MobileStickyActionBar";
 import {
   Search,
   LayoutDashboard,
@@ -284,8 +285,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             )}
           </div>
 
-          {/* Center 9 Core Navigation Links (Desktop) */}
-          <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif]">
+          {/* Center 8 Core Navigation Links (Desktop) */}
+          <nav dir="rtl" className="hidden lg:flex items-center gap-3 xl:gap-6 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif]">
             {/* 1. الرئيسية */}
             <button
               onClick={() => go("/")}
@@ -370,36 +371,49 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
             />
 
-            {/* 7. المقالات */}
-            <VisualEditable
-              id="aqeeq-studio-nav-articles"
-              tag="button"
-              label="اسم رابط المقالات"
-              defaultText={
-                (orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" ||
-                (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق"
-                  ? "المقالات"
-                  : (orchestration?.nav as any)?.articlesLabel || "المقالات"
-              }
-              as="button"
-              onAction={() => go("/articles")}
-              className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
-            />
+            {/* 8. أخبار ومقالات */}
+            <DropdownMenu dir="rtl">
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`aq-studio-toplink inline-flex items-center gap-1 ${
+                    currentActive === "articles" || currentActive === "showcase" ? "aq-studio-toplink--active" : ""
+                  }`}
+                >
+                  <span>أخبار ومقالات</span>
+                  <ChevronDown size={11} className="opacity-60" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className={`w-56 p-1.5 rounded-xl border backdrop-blur-xl shadow-xl z-50 ${dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"}`}>
+                <button
+                  type="button"
+                  onClick={() => go("/offers")}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-bold transition text-right ${
+                    currentActive === "showcase" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles size={14} className="text-[#f8ca14]" />
+                    <span>الأخبار والفعاليات 📰</span>
+                  </span>
+                  <ArrowRight size={12} className="opacity-40" />
+                </button>
 
-            {/* 8. الأخبار */}
-            <VisualEditable
-              id="aqeeq-studio-nav-showcase"
-              tag="button"
-              label="اسم رابط الأخبار"
-              defaultText={
-                orchestration?.nav?.showcaseLabel === "الأخبار والعروض"
-                  ? "الأخبار"
-                  : orchestration?.nav?.showcaseLabel || "الأخبار"
-              }
-              as="button"
-              onAction={() => go("/offers")}
-              className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
-            />
+                <button
+                  type="button"
+                  onClick={() => go("/articles")}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-bold transition text-right ${
+                    currentActive === "articles" ? "bg-emerald-500/15 text-emerald-500 font-black" : "hover:bg-current/5"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <BookOpen size={14} className="text-emerald-500" />
+                    <span>مقالات الطلاب والمعلمين ✍️</span>
+                  </span>
+                  <ArrowRight size={12} className="opacity-40" />
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
 
@@ -667,6 +681,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       {/* Global AI Face Recognition Modal */}
       <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
       <AqeeqCreatorStudioModal open={creatorModalOpen} onOpenChange={setCreatorModalOpen} />
+
+      {/* Global Mobile Sticky Action Bar */}
+      <MobileStickyActionBar />
     </div>
   );
 }

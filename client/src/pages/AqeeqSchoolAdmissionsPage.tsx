@@ -37,6 +37,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Check,
+  Share2,
 } from "lucide-react";
 
 type TrackType = "national" | "international";
@@ -259,6 +260,87 @@ export default function AqeeqSchoolAdmissionsPage() {
   const netTotalAnnual = totalBaseFee - siblingDiscountAmount;
   const netTermTotal = Math.round(netTotalAnnual / 3);
   const tabbyFourInstallments = Math.round(netTotalAnnual / 4);
+
+  const handlePrintTuitionQuote = () => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+    const trackName = activeTrack === "national" ? "المسار الأهلي (المنهج الوطني والدولي الإثرائي)" : "المسار الدولي (American Diploma - Cognia)";
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="utf-8">
+  <title>خطة الرسوم والأقساط الدراسية - مدارس العقيق</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+    body { font-family: 'Tajawal', sans-serif, system-ui; padding: 36px; color: #0f172a; background: #fff; max-width: 800px; margin: auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #015a37; padding-bottom: 18px; margin-bottom: 24px; }
+    .logo-title { font-size: 24px; font-weight: 900; color: #015a37; }
+    .subtitle { font-size: 12px; color: #64748b; font-weight: 700; margin-top: 4px; }
+    .quote-box { border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 20px; background: #f8fafc; margin-bottom: 20px; }
+    .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 13px; }
+    .row:last-child { border-bottom: none; }
+    .total-row { display: flex; justify-content: space-between; padding: 14px 0 6px 0; font-size: 18px; font-weight: 900; color: #015a37; border-top: 2px solid #015a37; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px; background: #fff; text-align: center; }
+    .card-title { font-size: 11px; color: #64748b; font-weight: 700; }
+    .card-val { font-size: 17px; font-weight: 900; color: #015a37; margin-top: 4px; }
+    .footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b; line-height: 1.8; }
+    @media print { body { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="logo-title">مدارس العقيق الأهلية والدولية</div>
+      <div class="subtitle">المدينة المنورة - ممشى الهجرة (مجمع الرانوناء) · هاتف: 0148131652</div>
+    </div>
+    <div style="text-align: left;">
+      <div style="font-weight: 900; color: #015a37; font-size: 15px;">كشف تقديري للرسوم الدراسية</div>
+      <div style="font-size: 11px; color: #64748b;">العام الدراسي 2026 - 2027</div>
+    </div>
+  </div>
+
+  <div class="quote-box">
+    <div class="row"><span>المسار التعليمي:</span><strong>${trackName}</strong></div>
+    <div class="row"><span>المرحلة الدراسية المختارة:</span><strong>${selectedTier.grade}</strong></div>
+    <div class="row"><span>عدد الطلاب:</span><strong>${calcSiblingsCount} طالب / طلاب</strong></div>
+    <div class="row"><span>إجمالي الرسوم الأساسية السنوية:</span><span>${totalBaseFee.toLocaleString()} ريال</span></div>
+    ${siblingDiscountAmount > 0 ? `<div class="row" style="color: #059669;"><span>وفر خصم الإخوة المطبق:</span><strong>- ${siblingDiscountAmount.toLocaleString()} ريال</strong></div>` : ""}
+    <div class="total-row"><span>الصافي السنوي المستحق:</span><span>${netTotalAnnual.toLocaleString()} ريال سعودي</span></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">القسط الفصلي (3 فصول دراسية)</div>
+      <div class="card-val">${netTermTotal.toLocaleString()} ر.س / فصلياً</div>
+    </div>
+    <div class="card">
+      <div class="card-title">قسط تابي / تمارا (4 دفعات ميسرة)</div>
+      <div class="card-val" style="color: #4338ca;">${tabbyFourInstallments.toLocaleString()} ر.س / دفعة</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>هذا الكشف استرشادي وصادر إلكترونياً من منصة القبول الرسمية لمدارس العقيق الأهلية والدولية.</p>
+    <p>للتواصل وحجز المقعد: مجمع البنين <strong>0148131652</strong> | مجمع البنات <strong>0148644466</strong> | واتساب القبول <strong>0531896000</strong></p>
+  </div>
+  <script>window.onload = function() { window.print(); };</script>
+</body>
+</html>`;
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
+  const handleShareWhatsAppQuote = () => {
+    const trackName = activeTrack === "national" ? "الأهلي" : "الدولي";
+    const msg = `السلام عليكم ورحمة الله،\nاستعلمت عن خطة الرسوم الدراسية بمدارس العقيق الأهلية والدولية:\n• المسار: ${trackName}\n• المرحلة: ${selectedTier.grade}\n• عدد الطلاب: ${calcSiblingsCount}\n• الصافي السنوي: ${netTotalAnnual.toLocaleString()} ر.س\n• القسط الفصلي (3 فصول): ${netTermTotal.toLocaleString()} ر.س\n• قسط تابي/تمارا: ${tabbyFourInstallments.toLocaleString()} ر.س\n\nأود استكمال إجراءات القبول وحجز المقعد الدراسي 🎓`;
+    const cleanPhone = "0148131652".replace(/[^0-9]/g, "");
+    const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  };
 
   return (
     <main
@@ -658,6 +740,35 @@ export default function AqeeqSchoolAdmissionsPage() {
                   <span>سجّل الآن بهذا التقدير ✦</span>
                   <ArrowDown size={14} className="mr-1.5" />
                 </Button>
+
+                {/* Export & WhatsApp Share Buttons */}
+                <div className="grid grid-cols-2 gap-2 mt-2.5">
+                  <button
+                    type="button"
+                    onClick={handlePrintTuitionQuote}
+                    className={`rounded-xl h-10 text-[11px] font-black transition border flex items-center justify-center gap-1.5 active:scale-95 shadow-sm ${
+                      dark
+                        ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-200"
+                        : "border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    <Download size={13} className="text-emerald-500" />
+                    <span>طباعة / PDF 📄</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleShareWhatsAppQuote}
+                    className={`rounded-xl h-10 text-[11px] font-black transition border flex items-center justify-center gap-1.5 active:scale-95 shadow-sm ${
+                      dark
+                        ? "border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400"
+                        : "border-emerald-700/20 bg-emerald-50 hover:bg-emerald-100 text-emerald-800"
+                    }`}
+                  >
+                    <Share2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                    <span>واتساب الحسبة 💬</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

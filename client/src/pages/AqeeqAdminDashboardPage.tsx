@@ -109,6 +109,7 @@ export default function AqeeqAdminDashboardPage() {
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
+  const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
   const utils = trpc.useUtils();
 
 
@@ -864,7 +865,13 @@ const DEFAULT_ORCHESTRATION = {
         <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-5 sm:px-8 overflow-x-auto scrollbar-none pb-2">
           {[
             { key: "radar", label: "مركز القيادة والرادار", icon: LayoutDashboard },
-            { key: "admissions", label: "شؤون القبول والرسوم 🎓", icon: GraduationCap, badge: admissionsList.filter((a: any) => a.status === "new").length || undefined },
+            {
+              key: "admissions",
+              label: "شؤون القبول والرسوم 🎓",
+              icon: GraduationCap,
+              badge: admissionsList.filter((a: any) => a.status === "new" || a.status === "pending").length || undefined,
+              alert: admissionsList.some((a: any) => a.status === "new" || a.status === "pending"),
+            },
             { key: "orchestration", label: "تخصيص الموقع والمجمعات 🎨", icon: Palette, alert: false },
             { key: "content", label: "المحتوى والمقالات 📚", icon: BookOpen, badge: allAdminArticles.filter((a) => a.status === "pending").length || undefined },
             { key: "audio_media", label: "الاستوديو الصوتي والراديو 🎙️", icon: Radio, badge: allAdminPodcasts.length },
@@ -907,8 +914,10 @@ const DEFAULT_ORCHESTRATION = {
                 <span>{tab.label}</span>
                 {tab.badge !== undefined ? (
                   <span
-                    className={"rounded-md px-1.5 py-0.2 text-[10px] font-black " + (
-                      active
+                    className={"rounded-md px-1.5 py-0.5 text-[10px] font-black " + (
+                      tab.key === "admissions"
+                        ? "bg-rose-500 text-white animate-pulse shadow-sm shadow-rose-500/50"
+                        : active
                         ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white"
                         : dark ? "bg-white/10 text-slate-300" : "bg-slate-200 text-slate-700"
                     )}
@@ -5656,36 +5665,153 @@ const DEFAULT_ORCHESTRATION = {
               }
 
               return (
-                <div className={`rounded-3xl border overflow-hidden shadow-lg ${
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                }`}>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-right border-collapse text-xs">
-                      <thead>
-                        <tr className={`border-b font-black ${
-                          dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/5 bg-slate-50 text-slate-700"
-                        }`}>
-                          <th className="p-4">تاريخ التقديم</th>
-                          <th className="p-4">اسم الطالب</th>
-                          <th className="p-4">المرحلة والمسار</th>
-                          <th className="p-4">ولي الأمر والجوال</th>
-                          <th className="p-4 text-center">التواصل المباشر</th>
-                          <th className="p-4">حالة الطلب</th>
-                          <th className="p-4">ملاحظات</th>
-                          <th className="p-4 text-center">إجراءات</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-current/5">
-                        {filtered.map((lead: any) => {
-                          const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
-                          const waMessage = encodeURIComponent(
-                            `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
-                          );
-                          const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
+                <div className="space-y-3">
+                  {/* Floating Bulk Action Bar */}
+                  {selectedLeadIds.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-black animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[11px]">
+                          {selectedLeadIds.length} محدد
+                        </span>
+                        <span>إجراءات سريعة على الطلبات المختارة:</span>
+                      </div>
 
-                          return (
-                            <tr key={lead.id} className="hover:bg-current/5 transition">
-                              <td className="p-4 text-slate-400 font-mono whitespace-nowrap">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={async () => {
+                            for (const id of selectedLeadIds) {
+                              await updateAdmissionStatusMutation.mutateAsync({ id, status: "contacted" });
+                            }
+                            toast.success(`تم تحديث ${selectedLeadIds.length} طلبات إلى: تم التواصل`);
+                            setSelectedLeadIds([]);
+                          }}
+                          className="rounded-xl h-8 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-black gap-1"
+                        >
+                          <span>تم التواصل 📞</span>
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={async () => {
+                            for (const id of selectedLeadIds) {
+                              await updateAdmissionStatusMutation.mutateAsync({ id, status: "admitted" });
+                            }
+                            toast.success(`تم اعتماد قبول ${selectedLeadIds.length} طلبات بنجاح 🎓`);
+                            setSelectedLeadIds([]);
+                          }}
+                          className="rounded-xl h-8 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
+                        >
+                          <span>اعتماد القبول 🎓</span>
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            const targetList = admissionsList.filter((a: any) => selectedLeadIds.includes(a.id));
+                            const csvRows = [
+                              ["المعرف", "اسم الطالب", "اسم ولي الأمر", "رقم الجوال", "البريد", "المرحلة", "المسار", "الفرع", "الحالة", "تاريخ التقديم"],
+                              ...targetList.map((a: any) => [
+                                a.id,
+                                `"${a.studentName}"`,
+                                `"${a.guardianName}"`,
+                                `"${a.phone}"`,
+                                `"${a.email || ''}"`,
+                                `"${a.gradeLevel}"`,
+                                `"${a.track}"`,
+                                `"${a.gender}"`,
+                                `"${a.status}"`,
+                                `"${new Date(a.createdAt).toLocaleString('ar-SA')}"`,
+                              ]),
+                            ];
+                            const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.map((e) => e.join(",")).join("\n");
+                            const encodedUri = encodeURI(csvContent);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", `aqeeq-admissions-selected-${new Date().toISOString().slice(0, 10)}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            toast.success(`تم تصدير ${targetList.length} طلب محدد بنجاح!`);
+                          }}
+                          className="rounded-xl h-8 text-[11px] font-bold gap-1"
+                        >
+                          <span>تصدير المحددين CSV 📑</span>
+                        </Button>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLeadIds([])}
+                          className="text-slate-400 hover:text-red-400 text-xs font-bold px-2 py-1"
+                        >
+                          إلغاء التحديد ✕
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={`rounded-3xl border overflow-hidden shadow-lg ${
+                    dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
+                  }`}>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-right border-collapse text-xs">
+                        <thead>
+                          <tr className={`border-b font-black ${
+                            dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/5 bg-slate-50 text-slate-700"
+                          }`}>
+                            <th className="p-4 w-10 text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedLeadIds.length === filtered.length && filtered.length > 0}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedLeadIds(filtered.map((l: any) => l.id));
+                                  } else {
+                                    setSelectedLeadIds([]);
+                                  }
+                                }}
+                                className="rounded accent-emerald-600 h-4 w-4 cursor-pointer"
+                              />
+                            </th>
+                            <th className="p-4">تاريخ التقديم</th>
+                            <th className="p-4">اسم الطالب</th>
+                            <th className="p-4">المرحلة والمسار</th>
+                            <th className="p-4">ولي الأمر والجوال</th>
+                            <th className="p-4 text-center">التواصل المباشر</th>
+                            <th className="p-4">حالة الطلب</th>
+                            <th className="p-4">ملاحظات</th>
+                            <th className="p-4 text-center">إجراءات</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-current/5">
+                          {filtered.map((lead: any) => {
+                            const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
+                            const waMessage = encodeURIComponent(
+                              `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
+                            );
+                            const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
+
+                            return (
+                              <tr key={lead.id} className="hover:bg-current/5 transition">
+                                <td className="p-4 w-10 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedLeadIds.includes(lead.id)}
+                                    onChange={() => {
+                                      setSelectedLeadIds((prev) =>
+                                        prev.includes(lead.id)
+                                          ? prev.filter((id) => id !== lead.id)
+                                          : [...prev, lead.id]
+                                      );
+                                    }}
+                                    className="rounded accent-emerald-600 h-4 w-4 cursor-pointer"
+                                  />
+                                </td>
+                                <td className="p-4 text-slate-400 font-mono whitespace-nowrap">
                                 {new Date(lead.createdAt).toLocaleDateString("ar-SA", {
                                   month: "short",
                                   day: "numeric",
@@ -5793,7 +5919,8 @@ const DEFAULT_ORCHESTRATION = {
                     </table>
                   </div>
                 </div>
-              );
+              </div>
+            );
             })()}
               </div>
             )}
