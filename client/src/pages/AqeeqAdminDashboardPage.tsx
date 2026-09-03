@@ -7054,30 +7054,72 @@ const DEFAULT_ORCHESTRATION = {
       } backdrop-blur-xl`}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="flex items-center justify-around px-2 py-2">
-          <button onClick={() => setActiveTab('radar')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+        <div className="flex items-center gap-1 px-2 py-1.5 overflow-x-auto scrollbar-hide">
+          {/* الرادار */}
+          <button onClick={() => setActiveTab('radar')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
             activeTab === 'radar' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
           }`}>
-            <LayoutDashboard size={20} />
+            <LayoutDashboard size={18} />
             <span>الرادار</span>
           </button>
-          <button onClick={() => setActiveTab('admissions')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+
+          {/* القبول */}
+          <button onClick={() => setActiveTab('admissions')} className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
             activeTab === 'admissions' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
           }`}>
-            <GraduationCap size={20} />
+            <GraduationCap size={18} />
             <span>القبول</span>
+            {admissionsList.filter((a: any) => a.status === 'new' || a.status === 'pending').length > 0 && (
+              <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-red-500 animate-ping" />
+            )}
           </button>
-          <button onClick={() => setActiveTab('content')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
-            activeTab === 'content' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+
+          {/* المحتوى */}
+          <button onClick={() => setActiveTab('content')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
+            activeTab === 'content' || activeTab === 'articles' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
           }`}>
-            <Layers size={20} />
+            <BookOpen size={18} />
             <span>المحتوى</span>
           </button>
-          <button onClick={() => setActiveTab('orchestration')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+
+          {/* الاستوديو */}
+          <button onClick={() => setActiveTab('podcast')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
+            activeTab === 'podcast' || activeTab === 'audio_media' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Radio size={18} />
+            <span>الصوتي</span>
+          </button>
+
+          {/* المزيكا */}
+          <button onClick={() => setActiveTab('music')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
+            activeTab === 'music' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Music size={18} />
+            <span>المزيكا</span>
+          </button>
+
+          {/* التواصل */}
+          <button onClick={() => setActiveTab('broadcast')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
+            activeTab === 'broadcast' || activeTab === 'whatsapp' || activeTab === 'campaigns' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Megaphone size={18} />
+            <span>التواصل</span>
+          </button>
+
+          {/* الإعدادات */}
+          <button onClick={() => setActiveTab('orchestration')} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
             activeTab === 'orchestration' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
           }`}>
-            <Sliders size={20} />
+            <Sliders size={18} />
             <span>الإعدادات</span>
+          </button>
+
+          {/* AI — فتح Yearbook Generator */}
+          <button onClick={() => setIsYearbookOpen(true)} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
+            dark ? 'text-[#f8ca14] bg-[#f8ca14]/10 hover:bg-[#f8ca14]/20' : 'text-[#08467d] bg-[#08467d]/10 hover:bg-[#08467d]/20'
+          }`}>
+            <Wand2 size={18} />
+            <span>AI ✨</span>
           </button>
         </div>
       </div>
