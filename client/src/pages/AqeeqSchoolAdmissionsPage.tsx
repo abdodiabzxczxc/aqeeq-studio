@@ -243,13 +243,19 @@ export default function AqeeqSchoolAdmissionsPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
+        isNationalDay
+          ? dark ? "bg-[#01140c] text-white" : "bg-[#f7fbf9] text-[#032e1d]"
+          : dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />
 
       {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className="relative isolate overflow-hidden border-b border-black/[0.08] dark:border-white/[0.08] py-12 sm:py-20">
+      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
+        isNationalDay
+          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
+          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
+      }`}>
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
 
@@ -259,12 +265,16 @@ export default function AqeeqSchoolAdmissionsPage() {
             {/* Right Column: Hero Content & CTAs (7 cols) */}
             <div className="lg:col-span-7 text-right">
               <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 shadow-sm ${
-                dark
+                isNationalDay
+                  ? dark
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#005A36]/30 bg-emerald-50 text-[#005A36]"
+                  : dark
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                   : "border-emerald-700/25 bg-white/95 text-[#015a37]"
               }`}>
-                <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />
-                <span>بوابة القبول والتسجيل للعام الدراسي 2026 - 2027</span>
+                {isNationalDay ? <span>🇸🇦</span> : <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />}
+                <span>{isNationalDay ? "بوابة القبول والتسجيل للعام الجديد · عزّنا بطبعنا 🇸🇦" : "بوابة القبول والتسجيل للعام الدراسي 2026 - 2027"}</span>
               </div>
 
               <VisualEditable
@@ -364,7 +374,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                   {/* Top Floating Badge */}
                   <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
                     <Sparkles size={13} className="text-[#f8ca14]" />
-                    <span>مقاعد محدودة 2026 - 2027</span>
+                    <span>{isNationalDay ? "🇸🇦 مقاعد محدودة · مبادرة اليوم الوطني 94" : "مقاعد محدودة 2026 - 2027"}</span>
                   </div>
 
                   {/* Bottom Overlaid Details */}
@@ -418,6 +428,19 @@ export default function AqeeqSchoolAdmissionsPage() {
           <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
             رسوم تنافسية تشمل أحدث المناهج المتطورة، والأنشطة الصفية واللاصفية، ومعامل الذكاء الاصطناعي وSTEM مع تسهيلات سداد مرنة.
           </p>
+
+          {/* National Day Initiative Banner */}
+          {isNationalDay && (
+            <div className="mt-6 max-w-2xl mx-auto p-4 rounded-2xl border border-[#f8ca14]/40 bg-gradient-to-r from-[#005A36] to-[#003822] text-white shadow-xl flex items-center justify-between gap-4 text-right">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🇸🇦</span>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-black text-[#f8ca14]">مبادرة اليوم الوطني السعودي 94 · عزّنا بطبعنا</h4>
+                  <p className="text-[11px] text-slate-200 mt-0.5">تسهيلات مرنة في خطط الأقساط الميسرة وخصومات تسجيل مبكر لأبناء وبنات الوطن.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Track Switcher Tabs */}
           <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-sm">

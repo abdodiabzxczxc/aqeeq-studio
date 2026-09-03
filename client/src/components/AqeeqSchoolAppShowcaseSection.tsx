@@ -12,6 +12,7 @@ import {
   Apple,
 } from "lucide-react";
 import QRCode from "qrcode";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 
 interface AqeeqSchoolAppShowcaseSectionProps {
   dark?: boolean;
@@ -20,6 +21,7 @@ interface AqeeqSchoolAppShowcaseSectionProps {
 export default function AqeeqSchoolAppShowcaseSection({
   dark = false,
 }: AqeeqSchoolAppShowcaseSectionProps) {
+  const { isNationalDay } = useSiteTheme();
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const appDownloadUrl = "https://qr-codes.io/LQMip0";
   const youtubeEmbedUrl =
@@ -85,13 +87,15 @@ export default function AqeeqSchoolAppShowcaseSection({
         <div className="mb-8 sm:mb-12 text-right">
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-              dark
+              isNationalDay
+                ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                : dark
                 ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                 : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}
           >
-            <Smartphone size={12} />
-            <span>SMART SCHOOL APP · PARENT PORTAL</span>
+            {isNationalDay ? <span>🇸🇦</span> : <Smartphone size={12} />}
+            <span>{isNationalDay ? "بوابة الخدمات الذكية لأولياء الأمور · عزّنا بطبعنا 🇸🇦" : "SMART SCHOOL APP · PARENT PORTAL"}</span>
           </span>
 
           <h2

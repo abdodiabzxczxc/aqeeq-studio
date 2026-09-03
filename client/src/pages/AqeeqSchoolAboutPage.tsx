@@ -87,13 +87,19 @@ export default function AqeeqSchoolAboutPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
+        isNationalDay
+          ? dark ? "bg-[#01140c] text-white" : "bg-[#f7fbf9] text-[#032e1d]"
+          : dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="عن مدارس العقيق الأهلية والدولية" active="about" />
 
       {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className="relative isolate overflow-hidden border-b border-black/[0.08] dark:border-white/[0.08] py-12 sm:py-20">
+      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
+        isNationalDay
+          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
+          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
+      }`}>
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
 
@@ -103,12 +109,16 @@ export default function AqeeqSchoolAboutPage() {
             {/* Right Column: Hero Content & CTAs (7 cols) */}
             <div className="lg:col-span-7 text-right">
               <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 shadow-sm ${
-                dark
+                isNationalDay
+                  ? dark
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#005A36]/30 bg-emerald-50 text-[#005A36]"
+                  : dark
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                   : "border-emerald-700/25 bg-white/95 text-[#015a37]"
               }`}>
-                <Building2 size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />
-                <span>صرح العقيق التعليمي الرائد بالمدينة المنورة</span>
+                {isNationalDay ? <span>🇸🇦</span> : <Building2 size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />}
+                <span>{isNationalDay ? "مسيرة وطنية رائدة منذ عام 1994 · عزّنا بطبعنا" : "صرح العقيق التعليمي الرائد بالمدينة المنورة"}</span>
               </div>
 
               <VisualEditable
@@ -207,7 +217,7 @@ export default function AqeeqSchoolAboutPage() {
                   {/* Top Floating Badge */}
                   <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
                     <Sparkles size={13} className="text-[#f8ca14]" />
-                    <span>نلهم الأجيال · نصنع الأثر</span>
+                    <span>{isNationalDay ? "🇸🇦 عزّنا بطبعنا · 94 عاماً من المجد" : "نلهم الأجيال · نصنع الأثر"}</span>
                   </div>
 
                   {/* Bottom Overlaid Details */}
@@ -595,9 +605,13 @@ export default function AqeeqSchoolAboutPage() {
             : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8] ring-1 ring-emerald-900/10 shadow-xl"
         }`}>
           <div className="text-center max-w-xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-3 border border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]">
+            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-3 border ${
+              isNationalDay
+                ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                : "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+            }`}>
               <Compass size={14} />
-              <span>المرتكزات الاستراتيجية للصرح</span>
+              <span>{isNationalDay ? "🇸🇦 رؤية وطنية راسخة · عزّنا بطبعنا" : "المرتكزات الاستراتيجية للصرح"}</span>
             </div>
             <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
               الرؤية والرسالة المؤسسية

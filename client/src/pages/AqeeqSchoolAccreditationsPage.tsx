@@ -47,13 +47,19 @@ export default function AqeeqSchoolAccreditationsPage() {
     <main
       dir="rtl"
       className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
+        isNationalDay
+          ? dark ? "bg-[#01140c] text-white" : "bg-[#f7fbf9] text-[#032e1d]"
+          : dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="الاعتمادات الدولية ومراكز الاختبارات" active="accreditations" />
 
       {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className="relative isolate overflow-hidden border-b border-black/[0.08] dark:border-white/[0.08] py-12 sm:py-20">
+      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
+        isNationalDay
+          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
+          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
+      }`}>
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
 
@@ -63,12 +69,16 @@ export default function AqeeqSchoolAccreditationsPage() {
             {/* Right Column: Hero Content & CTAs (7 cols) */}
             <div className="lg:col-span-7 text-right">
               <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 shadow-sm ${
-                dark
+                isNationalDay
+                  ? dark
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#005A36]/30 bg-emerald-50 text-[#005A36]"
+                  : dark
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                   : "border-emerald-700/25 bg-white/95 text-[#015a37]"
               }`}>
-                <Award size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />
-                <span>معايير عالمية في قلب المدينة المنورة</span>
+                {isNationalDay ? <span>🇸🇦</span> : <Award size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />}
+                <span>{isNationalDay ? "مخرجات تعليمية عالمية تصنع فخر الوطن · عزّنا بطبعنا 🇸🇦" : "معايير عالمية في قلب المدينة المنورة"}</span>
               </div>
 
               <VisualEditable
@@ -165,7 +175,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   {/* Top Floating Badge */}
                   <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
                     <Trophy size={13} className="text-[#f8ca14]" />
-                    <span>المركز الخامس عالمياً في WRO</span>
+                    <span>{isNationalDay ? "🇸🇦 فخر الوطن · المركز الخامس عالمياً في WRO" : "المركز الخامس عالمياً في WRO"}</span>
                   </div>
 
                   {/* Bottom Overlaid Details */}
