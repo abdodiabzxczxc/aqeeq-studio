@@ -722,7 +722,7 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
         {/* Skeleton Bento Grid */}
-        <div className={`border-b py-14 md:py-20 ${dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]"}`}>
+        <div className={`border-b py-14 md:py-20 ${dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.015]"}`}>
           <div className="mx-auto max-w-[1380px] px-5 md:px-8">
             <div className={`h-8 w-48 rounded-full mb-8 animate-pulse ${dark ? "bg-white/10" : "bg-black/10"}`} />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -739,10 +739,29 @@ export default function AlaqeeqStudioPublicPage() {
   return (
     <main
       dir="rtl"
-      className={"aq-studio-share min-h-screen overflow-x-hidden " + (
-        dark ? "aq-studio-share--dark bg-black text-white" : "aq-studio-share--light bg-white text-black"
+      className={"aq-studio-share min-h-screen overflow-x-hidden relative " + (
+        dark
+          ? "aq-studio-share--dark text-white"
+          : "aq-studio-share--light text-black"
       )}
+      style={{
+        background: dark
+          ? "#060608"
+          : "#fafafb",
+      }}
     >
+      {/* Ambient background radial glow — fixed, always present */}
+      {!isNationalDay && (
+        <div
+          className="pointer-events-none fixed inset-0 z-0 opacity-100"
+          aria-hidden
+          style={{
+            background: dark
+              ? "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(248,202,20,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(8,70,125,0.05) 0%, transparent 55%), radial-gradient(ellipse 40% 30% at 50% 50%, rgba(222,25,30,0.03) 0%, transparent 50%)"
+              : "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(8,70,125,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(248,202,20,0.03) 0%, transparent 55%)",
+          }}
+        />
+      )}
       {/* 🇸🇦 Floating Gold Stars — National Day Ambient Particles */}
       {isNationalDay && (
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
@@ -1217,8 +1236,7 @@ export default function AlaqeeqStudioPublicPage() {
       {/* 🎬 مسار ويلينغتون السينمائي الأفقي للمجلات والألبومات (Horizontal Scrubbing) */}
       <AqeeqHorizontalScrubSection items={horizontalShowcaseItems} />
 
-      {/* 👑 الشريط الطباعي السينمائي العملاق المتفاعل مع السكرول نزولاً وطلوعاً */}
-      <AqeeqTypographicScrubBar text="✦ AL-AQEEQ SCHOOLS · SINCE 1994 · EXCELLENCE & LEADERSHIP ✦" />
+
 
       {(orchestration?.sections as any)?.libraryEnabled !== false && (
         <AqeeqHomeTabsLibrary
@@ -1230,8 +1248,7 @@ export default function AlaqeeqStudioPublicPage() {
       {/* 📱 قسم تطبيق مدارس العقيق الذكي — فيديو الشرح، رمز QR، وأزرار المتاجر */}
       <AqeeqSchoolAppShowcaseSection dark={dark} />
 
-      {/* 👑 الشريط الطباعي العكسي المتفاعل مع السكرول */}
-      <AqeeqTypographicScrubBar text="✦ INNOVATION & FUTURE LEADERSHIP · AL-AQEEQ SCHOOLS ✦" reverse={true} />
+
 
       {/* ========================================================================= */}
       {/* 4. الأقسام المعتمدة: القصص اليومية، بينتو إنجازات الأسبوع، وصوت العقيق */}
@@ -1246,7 +1263,7 @@ export default function AlaqeeqStudioPublicPage() {
         className={"border-b py-14 md:py-20 transition " + (
           isNationalDay
             ? dark ? "border-[#f8ca14]/10 snd-section-dark" : "border-[#005A36]/10 snd-section-light"
-            : dark ? "border-white/[0.08] bg-[#090909]" : "border-black/[0.06] bg-[#fbfbfb]"
+            : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.015]"
         )}
       >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
@@ -1512,7 +1529,7 @@ export default function AlaqeeqStudioPublicPage() {
         className={"border-b py-14 md:py-20 transition " + (
           isNationalDay
             ? dark ? "border-[#5aba1c]/10 snd-section-dark-alt" : "border-[#005A36]/8 snd-section-light-alt"
-            : dark ? "border-white/[0.08] bg-[#0a0a0a]" : "border-black/[0.06] bg-[#f7f7f8]"
+            : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.01]"
         )}
       >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
@@ -1640,7 +1657,7 @@ export default function AlaqeeqStudioPublicPage() {
         className={"border-b py-14 md:py-20 " + (
           isNationalDay
             ? dark ? "border-[#f8ca14]/8 snd-section-dark" : "border-[#005A36]/8 snd-section-light"
-            : dark ? "border-white/[0.08] bg-black" : "border-black/[0.06] bg-white"
+            : dark ? "border-white/[0.05] bg-transparent" : "border-black/[0.04] bg-transparent"
         )}
       >
         <div className="mx-auto max-w-[1340px] px-5 md:px-8">
