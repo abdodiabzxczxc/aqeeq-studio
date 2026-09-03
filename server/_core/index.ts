@@ -20,6 +20,12 @@ function isPortAvailable(port: number): Promise<boolean> {
 }
 
 async function findAvailablePort(startPort: number = 3000): Promise<number> {
+  for (let retry = 0; retry < 5; retry++) {
+    if (await isPortAvailable(startPort)) {
+      return startPort;
+    }
+    await new Promise((r) => setTimeout(r, 400));
+  }
   for (let port = startPort; port < startPort + 20; port++) {
     if (await isPortAvailable(port)) {
       return port;
