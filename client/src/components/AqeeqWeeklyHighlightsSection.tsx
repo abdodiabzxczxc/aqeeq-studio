@@ -203,11 +203,11 @@ export function AqeeqWeeklyHighlightsSection({
                     id="studio-bento-card1-title"
                     tag="text"
                     label="عنوان الحدث الأبرز"
-                    defaultText={eventTitle}
+                    defaultText="انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان"
                     as="h3"
                     className={`mt-2 text-xl sm:text-2xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
                   >
-                    {(content) => (content && content.trim().length > 3 ? content : eventTitle)}
+                    انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان
                   </VisualEditable>
                   <VisualEditable
                     id="studio-bento-card1-desc"
