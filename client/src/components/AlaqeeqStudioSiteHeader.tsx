@@ -284,8 +284,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             )}
           </div>
 
-          {/* Center 8 Core Navigation Links (Desktop) */}
-          <nav dir="rtl" className="hidden lg:flex items-center gap-3.5 xl:gap-6 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif]">
+          {/* Center 9 Core Navigation Links (Desktop) */}
+          <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif]">
             {/* 1. الرئيسية */}
             <button
               onClick={() => go("/")}
@@ -298,13 +298,23 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             <button
               onClick={() => go("/about")}
               className={`aq-studio-toplink ${
-                currentActive === "about" || currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
+                currentActive === "about" ? "aq-studio-toplink--active" : ""
               } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
               مدارسنا
             </button>
 
-            {/* 3. القبول والتسجيل */}
+            {/* 3. الاعتمادات */}
+            <button
+              onClick={() => go("/accreditations")}
+              className={`aq-studio-toplink ${
+                currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
+              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+            >
+              الاعتمادات
+            </button>
+
+            {/* 4. القبول والتسجيل */}
             <button
               onClick={() => go("/admissions")}
               className={`aq-studio-toplink ${
