@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
@@ -272,6 +272,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
   const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
+  const routeParams = useParams<{ slug?: string }>();
+  const activeSlug = params?.slug || routeParams?.slug;
 
   const isAdmin = isAuthenticated && user?.role === "admin";
 
@@ -288,17 +290,17 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
   });
 
   useEffect(() => {
-    if (params?.slug && rawArticles.length > 0) {
-      const match = rawArticles.find((a) => a.slug === params.slug);
+    if (activeSlug && rawArticles.length > 0) {
+      const match = rawArticles.find((a) => a.slug === activeSlug);
       if (match) {
         setReadingArticle(match);
       }
     }
-  }, [params?.slug, rawArticles]);
+  }, [activeSlug, rawArticles]);
 
   const handleCloseArticle = () => {
     setReadingArticle(null);
-    if (params?.slug) {
+    if (activeSlug) {
       navigate("/articles", { replace: true });
     }
   };
@@ -344,14 +346,6 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       toast.success("شكراً لإعجابك بالمقال ❤️");
     },
   });
-
-  // Direct slug URL support
-  useEffect(() => {
-    if (params?.slug && rawArticles.length > 0) {
-      const found = rawArticles.find((a) => a.slug === params.slug);
-      if (found) setReadingArticle(found);
-    }
-  }, [params?.slug, rawArticles]);
 
   const handleCopyLink = (article: any, e: React.MouseEvent) => {
     e.stopPropagation();

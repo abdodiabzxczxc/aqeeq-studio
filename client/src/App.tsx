@@ -111,9 +111,9 @@ function Router() {
       <Route path="/albums" component={AqeeqAlbumsPage} />
       <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
       <Route path="/offers" component={AqeeqShowcasePage} />
-      <Route path="/news/manage" component={() => { const [, navigate] = useLocation(); useEffect(() => { navigate("/journal/manage", { replace: true }); }, [navigate]); return null; }} />
-      <Route path="/news/month/:monthKey" component={({ params }: { params: { monthKey: string } }) => { const [, navigate] = useLocation(); useEffect(() => { navigate(`/journal/month/${params.monthKey}`, { replace: true }); }, [params, navigate]); return null; }} />
-      <Route path="/news/:slug" component={({ params }: { params: { slug: string } }) => { const [, navigate] = useLocation(); useEffect(() => { navigate(`/journal/${params.slug}`, { replace: true }); }, [params, navigate]); return null; }} />
+      <Route path="/news/manage" component={LegacyNewsManageRedirect} />
+      <Route path="/news/month/:monthKey" component={LegacyNewsMonthRedirect} />
+      <Route path="/news/:slug" component={LegacyNewsSlugRedirect} />
       <Route path="/news" component={LegacyNewsRedirect} />
       <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
       <Route path="/404" component={NotFound} />
@@ -123,6 +123,24 @@ function Router() {
   );
 }
 
+
+function LegacyNewsManageRedirect() {
+  const [, navigate] = useLocation();
+  useEffect(() => { navigate("/journal/manage", { replace: true }); }, [navigate]);
+  return null;
+}
+
+function LegacyNewsMonthRedirect({ params }: { params: { monthKey: string } }) {
+  const [, navigate] = useLocation();
+  useEffect(() => { navigate(`/journal/month/${params.monthKey}`, { replace: true }); }, [params.monthKey, navigate]);
+  return null;
+}
+
+function LegacyNewsSlugRedirect({ params }: { params: { slug: string } }) {
+  const [, navigate] = useLocation();
+  useEffect(() => { navigate(`/journal/${params.slug}`, { replace: true }); }, [params.slug, navigate]);
+  return null;
+}
 
 function LegacyNewsRedirect() {
   const [, navigate] = useLocation();
