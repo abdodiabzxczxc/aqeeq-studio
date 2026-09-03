@@ -1734,7 +1734,7 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald-300"] { background-colo
 .aq-studio-share-link { color: rgba(255,255,255,.75); transition: color 160ms cubic-bezier(.23,1,.32,1); }
 .aq-studio-share-link:hover { color: #f8ca14; }
 .aq-studio-share-link--active { background: rgba(248,202,20,.12); color: #f8ca14; }
-.aq-studio-toplink { position: relative; padding: .75rem 0; color: rgba(255,255,255,.8); transition: color .2s ease; }
+.aq-studio-toplink { position: relative; padding: .75rem 0; font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: 0.82rem; color: rgba(255,255,255,.85); transition: color .2s ease; }
 .aq-studio-toplink:hover, .aq-studio-toplink--active { color: #f8ca14; }
 .aq-studio-toplink--active::after { content: ""; position: absolute; right: 0; bottom: .18rem; left: 0; height: 2px; background: #f8ca14; }
 .aq-studio-mobile-link { display: block; width: 100%; border-radius: .75rem; padding: .9rem 1rem; text-align: right; font-size: .78rem; font-weight: 800; color: #ffffff; transition: background .2s ease, color .2s ease; }
@@ -2036,18 +2036,24 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   --aq-gold: #f8ca14 !important;
   --aq-brand-secondary: #003822 !important;
 
-  /* Official Typography from SND-GUIDELINE page 19 */
-  font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif !important;
+  /* Royal Saudi Identity Typography: Tajawal & Cairo */
+  font-family: 'Tajawal', sans-serif !important;
 }
 
 :root[data-site-theme="saudi-national-day"] body,
 :root[data-site-theme="saudi-national-day"] .aq-brand-shell,
 :root[data-site-theme="saudi-national-day"] .aq-studio-share,
+:root[data-site-theme="saudi-national-day"] button,
+:root[data-site-theme="saudi-national-day"] nav,
+:root[data-site-theme="saudi-national-day"] a,
+:root[data-site-theme="saudi-national-day"] span {
+  font-family: 'Tajawal', sans-serif !important;
+}
+
 :root[data-site-theme="saudi-national-day"] h1,
 :root[data-site-theme="saudi-national-day"] h2,
-:root[data-site-theme="saudi-national-day"] h3,
-:root[data-site-theme="saudi-national-day"] button {
-  font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif !important;
+:root[data-site-theme="saudi-national-day"] h3 {
+  font-family: 'Cairo', 'Tajawal', sans-serif !important;
 }
 
 /* Living Ambient Glow Keyframes */
