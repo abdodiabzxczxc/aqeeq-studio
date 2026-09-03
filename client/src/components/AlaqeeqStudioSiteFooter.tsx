@@ -156,21 +156,10 @@ export function AlaqeeqStudioSiteFooter() {
                 مدارس العقيق الأهلية والدولية
               </span>
 
-              {/* 3 Badges aligned precisely under 'مدارس العقيق الأهلية والدولية' from 'م' to 'ة' */}
+              {/* Badges aligned precisely under 'مدارس العقيق الأهلية والدولية' from 'م' to 'ة' */}
               <div className="mt-2 flex items-center justify-between w-full gap-2 text-[10.5px] font-bold">
                 <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border whitespace-nowrap transition ${
-                    dark
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                      : "border-emerald-600/20 bg-emerald-50 text-emerald-800"
-                  }`}
-                >
-                  <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
-                  <span>إشراف وزارة التعليم 🇸🇦</span>
-                </span>
-
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border whitespace-nowrap transition ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border whitespace-nowrap transition ${
                     dark
                       ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                       : "border-amber-600/20 bg-amber-50 text-amber-800"
@@ -181,7 +170,7 @@ export function AlaqeeqStudioSiteFooter() {
                 </span>
 
                 <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border whitespace-nowrap transition ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border whitespace-nowrap transition ${
                     dark
                       ? "border-sky-500/30 bg-sky-500/10 text-sky-300"
                       : "border-sky-600/20 bg-sky-50 text-sky-800"
