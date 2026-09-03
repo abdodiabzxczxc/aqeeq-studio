@@ -800,6 +800,8 @@ export default function AqeeqShowcasePage() {
       count: posts.filter((post) => matchesContentType(post, opt.id as ContentType)).length,
     }));
   }, [posts]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !showcase?.backgroundAudioUrl) return;
     audio.volume = 0.38;
@@ -878,7 +880,7 @@ export default function AqeeqShowcasePage() {
             dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
           }`}>{visiblePosts.length} من {posts.length} منشور</span>
         </div>
-        <AqeeqArchiveControls id="showcase-archive-controls" label="البحث وترتيب الأخبار والعروض" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} typeOptions={[...SHOWCASE_TYPE_OPTIONS]} activeType={contentType} onTypeChange={(value) => setContentType(value as ContentType)} />
+        <AqeeqArchiveControls id="showcase-archive-controls" label="البحث وترتيب الأخبار والعروض" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} typeOptions={typeOptionsWithCounts} activeType={contentType} onTypeChange={(value) => setContentType(value as ContentType)} />
         {visiblePosts.length ? (
           <div className="columns-1 gap-5 sm:columns-2 xl:columns-3">
             {visiblePosts.map((post) =>

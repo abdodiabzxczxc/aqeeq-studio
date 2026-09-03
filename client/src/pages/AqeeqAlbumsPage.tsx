@@ -93,6 +93,26 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
 }
 
 
+function AlbumCardSkeleton({ dark }: { dark: boolean }) {
+  return (
+    <div className={`rounded-[2rem] border p-4 md:p-5 animate-pulse ${
+      dark ? 'border-white/10 bg-[#0c0c0c]' : 'border-black/10 bg-gray-50'
+    }`}>
+      <div className="flex flex-col sm:flex-row gap-5">
+        <div className={`min-h-[160px] sm:min-h-[220px] w-full sm:w-[45%] rounded-[1.5rem] ${
+          dark ? 'bg-white/5' : 'bg-gray-200'
+        }`} />
+        <div className="flex-1 space-y-4">
+          <div className={`h-4 rounded-full w-1/3 ${ dark ? 'bg-white/5' : 'bg-gray-200' }`} />
+          <div className={`h-8 rounded-xl w-2/3 ${ dark ? 'bg-white/5' : 'bg-gray-200' }`} />
+          <div className={`h-4 rounded-full w-full ${ dark ? 'bg-white/5' : 'bg-gray-200' }`} />
+          <div className={`h-4 rounded-full w-3/4 ${ dark ? 'bg-white/5' : 'bg-gray-200' }`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AqeeqAlbumsPage() {
 
 
@@ -134,7 +154,18 @@ export default function AqeeqAlbumsPage() {
     { enabled: isTvMode }
   );
 
-  if (isLoading) return <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}><Loader2 className="animate-spin text-[#f8ca14]" /></div>;
+  if (isLoading) {
+    return (
+      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+        <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />
+        <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {[1, 2, 3, 4].map(i => <AlbumCardSkeleton key={i} dark={dark} />)}
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main dir="rtl" className={`min-h-screen aq-public-shell ${
