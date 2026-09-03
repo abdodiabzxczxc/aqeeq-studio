@@ -569,19 +569,19 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           }`}
         >
               {/* Inner Scroll Container with Safe Bottom Space */}
-              <div className="h-full overflow-y-auto overscroll-contain px-4 sm:px-6 pt-4 pb-36 max-w-lg mx-auto space-y-6 scrollbar-hide">
+              <div className="h-full overflow-y-auto overscroll-contain px-4 sm:px-6 pt-3 pb-36 max-w-lg mx-auto space-y-4 scrollbar-hide">
 
-                {/* 1. Executive / Account Status Bar */}
-                <div className={`flex items-center justify-between p-3 rounded-2xl border ${
-                  dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50 border-black/5"
+                {/* 1. Account / Admin Bar */}
+                <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                  dark ? "bg-white/[0.04] border-white/10" : "bg-slate-100/90 border-slate-200/80"
                 }`}>
                   <div className="flex items-center gap-2.5">
-                    <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-400"}`} />
+                    <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-slate-400"}`} />
                     <div>
-                      <span className="text-xs font-black block leading-tight">
+                      <span className={`text-xs font-black block leading-tight ${dark ? "text-white" : "text-slate-900"}`}>
                         {isAuthenticated ? (user?.name || "المشرف العام") : "مرحباً بك في مدارس العقيق"}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-bold block leading-tight">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block leading-tight">
                         {isAuthenticated ? "جلسة المشرف نشطة" : "بوابة أولياء الأمور والزوار"}
                       </span>
                     </div>
@@ -595,7 +595,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black border shadow-sm transition active:scale-95 ${
                           dark
                             ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
-                            : "border-[#08467d]/25 bg-[#08467d]/10 text-[#08467d]"
+                            : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
                         }`}
                       >
                         <LayoutDashboard size={13} />
@@ -606,7 +606,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       type="button"
                       onClick={() => { setMobileMenuOpen(false); handleAuth(); }}
                       className={`rounded-xl px-3 py-1.5 text-xs font-black border transition active:scale-95 ${
-                        dark ? "border-white/15 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-100"
+                        dark
+                          ? "border-white/15 bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
                       }`}
                     >
                       {isAuthenticated ? "خروج" : "دخول"}
@@ -618,216 +620,242 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <button
                   type="button"
                   onClick={() => go("/admissions#admission-form-section")}
-                  className={`w-full flex items-center justify-center gap-2 rounded-2xl h-12 text-sm font-black shadow-xl transition active:scale-[.98] ${
+                  className={`w-full flex items-center justify-center gap-2 rounded-2xl h-12 text-sm font-black shadow-lg transition active:scale-[.98] ${
                     dark
                       ? "bg-gradient-to-l from-[#f8ca14] via-amber-400 to-amber-500 text-slate-950 shadow-amber-400/20"
-                      : "bg-gradient-to-l from-[#015a37] via-emerald-700 to-emerald-800 text-white shadow-emerald-900/30"
+                      : "bg-gradient-to-l from-[#015a37] via-emerald-700 to-emerald-800 text-white shadow-emerald-950/25"
                   }`}
                 >
                   <Send size={16} />
                   <span>سجّل ابنك الآن في مدارس العقيق ✦</span>
                 </button>
 
-                {/* 3. Navigation Links List */}
-                <div className="space-y-4 pt-1">
-
-                  {/* 3.1 الرئيسية (Home) */}
-                  <button
-                    type="button"
-                    onClick={() => go("/")}
-                    className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-base font-black transition ${
-                      currentActive === "studio"
-                        ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                        : dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-900"
-                    }`}
-                  >
-                    <span>الرئيسية</span>
-                    <span className="text-xs opacity-40 font-mono">01</span>
-                  </button>
-
-                  <div className="h-px bg-current/10 my-2" />
-
-                  {/* 3.2 مدارسنا */}
-                  <div>
-                    <p className="px-3 pb-2 text-[11px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase">
-                      مدارسنا
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => go("/about")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "about"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        عن مدارس العقيق الأهلية والدولية
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/accreditations")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "accreditations"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        الاعتمادات ومراكز الاختبارات (Cognia / IELTS)
-                      </button>
-                    </div>
+                {/* 3. Group 1: المسار الأكاديمي والمدارس */}
+                <div>
+                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🏛️</span>
+                    <span>مدارسنا والمسار التعليمي</span>
                   </div>
-
-                  <div className="h-px bg-current/10 my-2" />
-
-                  {/* 3.3 القبول والتسجيل */}
-                  <div>
-                    <p className="px-3 pb-2 text-[11px] font-black tracking-widest text-amber-500 dark:text-amber-400 uppercase">
-                      القبول والتسجيل
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => go("/admissions")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "admissions"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        جدول الرسوم الدراسية
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/admissions#admission-form-section")}
-                        className="w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                      >
-                        نموذج حجز مقعد دراسي فوري
-                      </button>
-                      <a
-                        href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition"
-                      >
-                        <span>الخطط الدراسية الأسبوعية</span>
-                        <ExternalLink size={13} className="opacity-60" />
-                      </a>
-                      <a
-                        href="https://qr-codes.io/LQMip0"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                      >
-                        <span>تحميل تطبيق أولياء الأمور</span>
-                        <ExternalLink size={13} className="opacity-60" />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="h-px bg-current/10 my-2" />
-
-                  {/* 3.4 المركز الإعلامي والمحتوى */}
-                  <div>
-                    <p className="px-3 pb-2 text-[11px] font-black tracking-widest text-sky-500 dark:text-sky-400 uppercase">
-                      المركز الإعلامي والمحتوى
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => go("/journal")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "journal"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        المجلة المدرسية
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/albums")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "albums"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        ألبومات الفعاليات والأنشطة
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/atheer")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "podcast"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        أثير — الاستوديو الصوتي والبودكاست
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/offers")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "showcase"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        الأخبار والإعلانات
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/articles")}
-                        className={`w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold transition ${
-                          currentActive === "articles"
-                            ? dark ? "bg-white/10 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
-                            : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        المقالات وأقلام العقيق
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="h-px bg-current/10 my-2" />
-
-                  {/* 4. Direct Contact & Hours Card */}
-                  <div className={`p-4 rounded-2xl border space-y-3 ${
-                    dark ? "bg-white/[0.02] border-white/10" : "bg-slate-50 border-black/5"
+                  <div className={`rounded-2xl border overflow-hidden divide-y ${
+                    dark
+                      ? "bg-white/[0.03] border-white/10 divide-white/5"
+                      : "bg-slate-50/90 border-slate-200 divide-slate-200/70 shadow-sm"
                   }`}>
-                    <div className="text-xs font-black flex items-center justify-between">
-                      <span>تواصل مباشر مع إدارة القبول</span>
-                      <span className="text-[10px] text-slate-400 font-normal">المدينة المنورة</span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => go("/")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "studio"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>الصفحة الرئيسية</span>
+                      {currentActive === "studio" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <a
-                        href={`tel:${cleanPhone}`}
-                        className={`flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-bold border transition ${
-                          dark ? "border-white/15 bg-white/5 text-slate-200 hover:bg-white/10" : "border-slate-300 bg-white text-slate-800 shadow-sm"
-                        }`}
-                      >
-                        <PhoneCall size={14} className="text-emerald-500" />
-                        <span>اتصال بالهاتف</span>
-                      </a>
-                      <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-bold bg-[#25D366] text-white shadow-sm hover:opacity-95 transition"
-                      >
-                        <MessageCircle size={14} />
-                        <span>محادثة واتساب</span>
-                      </a>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => go("/about")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "about"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>عن مدارس العقيق الأهلية والدولية</span>
+                      {currentActive === "about" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
 
-                    <p className="text-[10px] text-slate-400 text-center">
-                      أوقات العمل: الأحد – الخميس (7:00 ص – 2:00 م)
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => go("/accreditations")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "accreditations"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>الاعتمادات ومراكز الاختبارات (Cognia / IELTS)</span>
+                      {currentActive === "accreditations" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Group 2: القبول والتسجيل وبوابة أولياء الأمور */}
+                <div>
+                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🎓</span>
+                    <span>القبول والتسجيل وخدمات أولياء الأمور</span>
+                  </div>
+                  <div className={`rounded-2xl border overflow-hidden divide-y ${
+                    dark
+                      ? "bg-white/[0.03] border-white/10 divide-white/5"
+                      : "bg-slate-50/90 border-slate-200 divide-slate-200/70 shadow-sm"
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => go("/admissions")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "admissions"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>جدول الرسوم الدراسية المعتمد</span>
+                      {currentActive === "admissions" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => go("/admissions#admission-form-section")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>نموذج حجز مقعد دراسي فوري</span>
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">متاح الآن</span>
+                    </button>
+
+                    <a
+                      href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        dark ? "text-amber-400 hover:bg-white/5" : "text-amber-700 hover:bg-white"
+                      }`}
+                    >
+                      <span>الخطط الدراسية الأسبوعية</span>
+                      <ExternalLink size={14} className="opacity-70" />
+                    </a>
+
+                    <a
+                      href="https://qr-codes.io/LQMip0"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>تحميل تطبيق أولياء الأمور للجوال</span>
+                      <ExternalLink size={14} className="opacity-70" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 5. Group 3: المركز الإعلامي والمحتوى */}
+                <div>
+                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>📰</span>
+                    <span>المركز الإعلامي والمحتوى</span>
+                  </div>
+                  <div className={`rounded-2xl border overflow-hidden divide-y ${
+                    dark
+                      ? "bg-white/[0.03] border-white/10 divide-white/5"
+                      : "bg-slate-50/90 border-slate-200 divide-slate-200/70 shadow-sm"
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => go("/journal")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "journal"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>مجلة العقيق الدورية</span>
+                      {currentActive === "journal" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => go("/albums")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "albums"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>ألبومات الفعاليات والأنشطة</span>
+                      {currentActive === "albums" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => go("/atheer")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "podcast"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>أثير — الاستوديو الصوتي والبودكاست</span>
+                      {currentActive === "podcast" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => go("/offers")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "showcase"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>الأخبار والإعلانات المدرسية</span>
+                      {currentActive === "showcase" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => go("/articles")}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
+                        currentActive === "articles"
+                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
+                      }`}
+                    >
+                      <span>المقالات وأقلام المعلمين والطلاب</span>
+                      {currentActive === "articles" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 6. Group 4: تواصل مباشر وساعات العمل */}
+                <div className={`p-4 rounded-2xl border space-y-3 ${
+                  dark ? "bg-white/[0.04] border-white/10" : "bg-slate-50/90 border-slate-200 shadow-sm"
+                }`}>
+                  <div className="flex items-center justify-between text-xs font-black">
+                    <span className={dark ? "text-white" : "text-slate-900"}>تواصل مباشر مع إدارة المدارس</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">المدينة المنورة</span>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <a
+                      href={`tel:${cleanPhone}`}
+                      className={`flex items-center justify-center gap-1.5 h-11 rounded-xl text-xs font-black border transition ${
+                        dark
+                          ? "border-white/15 bg-white/5 text-slate-200 hover:bg-white/10"
+                          : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                      }`}
+                    >
+                      <PhoneCall size={15} className="text-emerald-600" />
+                      <span>اتصال هاتفي</span>
+                    </a>
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-1.5 h-11 rounded-xl text-xs font-black bg-[#25D366] text-white shadow-md hover:bg-[#20bd59] transition"
+                    >
+                      <MessageCircle size={15} />
+                      <span>واتساب القبول</span>
+                    </a>
+                  </div>
+
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center font-bold">
+                    ساعات العمل: الأحد – الخميس (7:00 ص – 2:00 م)
+                  </p>
                 </div>
               </div>
             </div>
