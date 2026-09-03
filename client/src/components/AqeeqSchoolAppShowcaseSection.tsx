@@ -81,42 +81,34 @@ export default function AqeeqSchoolAppShowcaseSection({
       />
 
       <div className="relative mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-4 border ${
+        {/* Unified Section Header — Aligned Right Matching Site Identity */}
+        <div className="mb-8 sm:mb-12 text-right">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
               dark
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                : "border-emerald-700/20 bg-emerald-50 text-[#015a37]"
+                ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}
           >
-            <Smartphone size={15} />
-            <span>بوابة الخدمات الذكية لأولياء الأمور 📱</span>
-          </div>
+            <Smartphone size={12} />
+            <span>SMART SCHOOL APP · PARENT PORTAL</span>
+          </span>
 
           <h2
-            className={`text-2xl sm:text-4xl md:text-5xl font-black font-cairo leading-tight ${
-              dark ? "text-white" : "text-[#0a192f]"
+            className={`text-2xl sm:text-4xl font-black font-cairo ${
+              dark ? "text-white" : "text-black"
             }`}
           >
             تطبيق مدارس العقيق الذكي
-            <span
-              className={`block mt-2 text-xl sm:text-2xl md:text-3xl font-extrabold ${
-                dark ? "text-[#f8ca14]" : "text-[#015a37]"
-              }`}
-            >
-              خدمات تعليمية ومالية متكاملة بين يديك
-            </span>
           </h2>
 
           <p
-            className={`mt-4 text-xs sm:text-sm md:text-base leading-relaxed ${
-              dark ? "text-slate-300" : "text-slate-600"
+            className={`mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed ${
+              dark ? "text-slate-400" : "text-slate-600"
             }`}
           >
-            صُمم التطبيق ليوفر لأولياء الأمور تجربة رقمية استثنائية لمتابعة الأبناء،
-            سداد الرسوم الدراسية إلكترونياً، الاطلاع على الفواتير، والتواصل الفوري مع
-            إدارة المدارس بكل يسر وسهولة.
+            بوابتكم الرقمية المتكاملة لمتابعة الأبناء، سداد الرسوم الدراسية إلكترونياً،
+            والاطلاع على الفواتير المعتمدة وإشعارات المدرسة أولاً بأول.
           </p>
         </div>
 
