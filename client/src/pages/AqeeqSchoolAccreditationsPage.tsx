@@ -153,56 +153,90 @@ export default function AqeeqSchoolAccreditationsPage() {
               </div>
             </div>
 
-            {/* Left Column: Close-Up Visual Showcase Card (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div className={`relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 hover:scale-[1.01] shadow-2xl ${
+            {/* Left Column: Dual Championship Showcase Cards (5 cols) */}
+            <div className="lg:col-span-5 relative space-y-3.5">
+              {/* Card 1: FIRST LEGO League National Champion */}
+              <div className={`group relative rounded-[2.2rem] p-2.5 sm:p-3 border transition duration-500 hover:scale-[1.015] shadow-2xl overflow-hidden ${
                 dark
-                  ? "border-emerald-500/20 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/10"
-                  : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
+                  ? "border-amber-500/30 bg-[#0b1218] shadow-black/80 ring-1 ring-amber-500/20"
+                  : "border-amber-600/25 bg-white shadow-amber-950/10 ring-1 ring-amber-600/15"
               }`}>
-                {/* Close-Up Student Robotics Photo */}
-                <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
+                <div className="relative overflow-hidden rounded-[1.8rem] aspect-[16/9] sm:aspect-[16/8.5]">
                   <VisualImage
-                    id="accreditations-hero-student-photo"
-                    label="صورة طلاب العقيق المقربة في مسابقة الروبوت"
-                    src="/covers/student-robotics-accreditations.jpg"
-                    alt="طلاب مدارس العقيق في منافسات الروبوت والابتكار"
-                    className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                    id="accreditations-hero-fll-photo"
+                    label="صورة أبطال العقيق - كأس بطولة فيرست ليجو بالمملكة"
+                    src="/covers/first-lego-champions.png"
+                    alt="أبطال مدارس العقيق مع كأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
+                    className="h-full w-full object-cover object-[center_25%] transition duration-700 group-hover:scale-105"
                   />
-                  {/* Subtle Gradient Shade at Bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
                   {/* Top Floating Badge */}
-                  <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-lg backdrop-blur-md">
                     <Trophy size={13} className="text-[#f8ca14]" />
-                    <span>{isNationalDay ? "🇸🇦 فخر الوطن · المركز الخامس عالمياً في WRO" : "المركز الخامس عالمياً في WRO"}</span>
+                    <span>{isNationalDay ? "🇸🇦 بطل المملكة · المركز الأول في فيرست ليجو" : "بطل المملكة · المركز الأول FIRST LEGO"}</span>
                   </div>
 
                   {/* Bottom Overlaid Details */}
-                  <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
-                    <div>
-                      <h4 className="text-sm font-black drop-shadow-md">أكاديمية الروبوت والابتكار STEM</h4>
-                      <p className="text-[11px] text-emerald-300 drop-shadow-md">تأهيل وتتويج في المحافل الدولية</p>
+                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white">
+                    <div className="text-right">
+                      <h4 className="text-sm font-black drop-shadow-md">بطولة FIRST LEGO League بالمملكة</h4>
+                      <p className="text-[11px] text-amber-200/90 drop-shadow-md">تتويج أبطال مدارس العقيق بكأس البطولة الوطنية 🇸🇦</p>
                     </div>
-                    <span className="rounded-xl bg-blue-600/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
-                      معايير عالمية
+                    <span className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black px-2.5 py-1 text-[10px] shadow-md shrink-0">
+                      المركز الأول 🥇
                     </span>
                   </div>
                 </div>
+              </div>
 
-                {/* Overlapping Floating Trust Chip (Bottom) */}
-                <div className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
-                  dark
-                    ? "border-white/10 bg-black/60 text-slate-200"
-                    : "border-emerald-950/10 bg-[#f4f7f4] text-slate-800"
-                }`}>
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                    <Globe2 size={20} />
+              {/* Card 2: WRO World Robot Olympiad */}
+              <div className={`group relative rounded-[2.2rem] p-2.5 sm:p-3 border transition duration-500 hover:scale-[1.015] shadow-2xl overflow-hidden ${
+                dark
+                  ? "border-emerald-500/25 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/15"
+                  : "border-emerald-950/10 bg-white shadow-emerald-950/10 ring-1 ring-emerald-900/5"
+              }`}>
+                <div className="relative overflow-hidden rounded-[1.8rem] aspect-[16/9] sm:aspect-[16/8.5]">
+                  <VisualImage
+                    id="accreditations-hero-wro-photo"
+                    label="صورة طلاب العقيق في أولمبياد الروبوت العالمي WRO"
+                    src="/covers/student-robotics-accreditations.jpg"
+                    alt="طلاب مدارس العقيق في منافسات أولمبياد الروبوت الدولي WRO"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+
+                  {/* Top Floating Badge */}
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-cyan-400/40 px-3 py-1 text-xs font-black text-cyan-300 shadow-lg backdrop-blur-md">
+                    <Award size={13} className="text-cyan-300" />
+                    <span>{isNationalDay ? "🇸🇦 تمثيل الوطن · المركز الخامس عالمياً في WRO" : "المركز الخامس عالمياً · أولمبياد WRO الدولي"}</span>
                   </div>
-                  <div>
-                    <h5 className="text-xs font-black">مراكز اختبارات دولية معتمدة بالمدينة</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">قاعات حاسوبية مهيأة بالكامل لاختبارات IELTS & SAT</p>
+
+                  {/* Bottom Overlaid Details */}
+                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white">
+                    <div className="text-right">
+                      <h4 className="text-sm font-black drop-shadow-md">أولمبياد الروبوت العالمي (WRO)</h4>
+                      <p className="text-[11px] text-emerald-300 drop-shadow-md">تمثيل المملكة والمنافسة بين أكثر من 80 دولة 🌐</p>
+                    </div>
+                    <span className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black px-2.5 py-1 text-[10px] shadow-md shrink-0">
+                      خامس العالم 🏆
+                    </span>
                   </div>
+                </div>
+              </div>
+
+              {/* Bottom Trust Chip */}
+              <div className={`p-3 rounded-2xl border flex items-center gap-3 transition ${
+                dark
+                  ? "border-white/10 bg-black/60 text-slate-200 shadow-lg"
+                  : "border-emerald-950/10 bg-[#f4f7f4] text-slate-800 shadow-sm"
+              }`}>
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Globe2 size={20} />
+                </div>
+                <div className="text-right">
+                  <h5 className="text-xs font-black">مراكز اختبارات دولية معتمدة بالمدينة المنورة</h5>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">قاعات حاسوبية مهيأة بالكامل لاختبارات IDP IELTS & SAT & ACT</p>
                 </div>
               </div>
             </div>
@@ -591,53 +625,129 @@ export default function AqeeqSchoolAccreditationsPage() {
 
         {/* Robotics & STEM Hub */}
         {activeHubTab === "stem" && (
-          <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+          <div className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
             dark ? "border-emerald-500/30 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-7">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3.5 py-1.5 text-xs font-black text-[#f8ca14] mb-4">
-                  <Trophy size={14} />
-                  <span>إنجاز عالمي باسم المملكة والمدينة المنورة</span>
+            {/* Header */}
+            <div className="max-w-3xl mb-8 text-right">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3.5 py-1.5 text-xs font-black text-[#f8ca14] mb-3">
+                <Trophy size={14} />
+                <span>أكاديمية الروبوت والذكاء الاصطناعي وبطولاتها الكبرى ✦</span>
+              </div>
+
+              <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                سجل بطولات الروبوت والـ STEM: أبطال المملكة محلياً وخامس العالم دولياً
+              </h3>
+
+              <p className={`text-sm sm:text-base leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                تعد أكاديمية الروبوت والذكاء الاصطناعي بمدارس العقيق حاضنة وطنية للابتكار وصناعة المبتكرين؛ تجمع بين التتويج بكأس المركز الأول على مستوى المملكة في بطولة فيرست ليجو (FLL) وحصد المركز الخامس عالمياً في أولمبياد الروبوت الدولي (WRO) بين أكثر من 80 دولة.
+              </p>
+            </div>
+
+            {/* Dual Championship Showcase Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Championship 1: FIRST LEGO League */}
+              <div className={`rounded-3xl border p-5 shadow-lg relative overflow-hidden transition hover:shadow-xl ${
+                dark ? "border-amber-500/30 bg-[#080d14]" : "border-amber-600/20 bg-[#fffdf7]"
+              }`}>
+                <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
+                  <img
+                    src="/covers/first-lego-champions.png"
+                    alt="تتويج أبطال مدارس العقيق بكأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
+                    className="h-full w-full object-cover object-[center_20%] transition duration-700 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md">
+                    <Trophy size={12} className="text-[#f8ca14]" />
+                    <span>بطل المملكة 🥇</span>
+                  </div>
+                  <div className="absolute bottom-3 right-3 left-3 text-white">
+                    <span className="text-[10px] font-black text-amber-300">FIRST SAUDI ARABIA</span>
+                    <h4 className="text-sm font-black drop-shadow">بطولة فيرست ليجو (FIRST LEGO League)</h4>
+                  </div>
                 </div>
 
-                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  المركز الخامس عالمياً في أولمبياد الروبوت العالمي WRO
-                </h3>
-
-                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                  حقق طلاب مدارس العقيق المركز الخامس على مستوى العالم في مسابقة أولمبياد الروبوت العالمي (World Robot Olympiad) منافسين أكثر من 80 دولة. يجسد هذا الإنجاز كفاءة مناهج STEM وأكاديمية الروبوت والذكاء الاصطناعي التي تبني مهارات الطلاب منذ الصفوف المبكرة.
+                <h4 className={`text-base font-black mb-2 text-right ${dark ? "text-amber-300" : "text-amber-800"}`}>
+                  كأس المركز الأول على مستوى المملكة في بطولة فيرست ليجو
+                </h4>
+                <p className={`text-xs sm:text-sm leading-relaxed mb-4 text-right ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  حصد أبطال مدارس العقيق كأس البطولة الوطنية والمركز الأول بالمملكة في دوري فيرست ليجو للروبوت والعلوم، بعد تصميم وبرمجة روبوتات المهام الذكية وتقديم حلول علمية مبتكرة نالت إشادة لجان التحكيم الوطنية.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                  {[
-                    "معامل STEM وروبوتات VEX و LEGO المتقدمة",
-                    "تدريب على لغات Python و C++ للخوارزميات",
-                    "شراكات مع مؤسسة موهبة ومسار أسبار",
-                    "حاضنات لمشاريع الذكاء الاصطناعي وحلول الطاقة",
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs font-bold">
-                      <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
-                      <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
-                    </div>
-                  ))}
+                <div className="flex flex-wrap gap-2 text-[11px] font-black text-right">
+                  <span className="rounded-xl px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500">
+                    كأس بطولة المملكة 🏆
+                  </span>
+                  <span className="rounded-xl px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500">
+                    برمجة الروبوتات الذكية
+                  </span>
+                  <span className="rounded-xl px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500">
+                    التأهل لتمثيل الوطن 🇸🇦
+                  </span>
                 </div>
               </div>
 
-              {/* STEM Showcase Photo */}
-              <div className="lg:col-span-5">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-video">
+              {/* Championship 2: World Robot Olympiad */}
+              <div className={`rounded-3xl border p-5 shadow-lg relative overflow-hidden transition hover:shadow-xl ${
+                dark ? "border-cyan-500/30 bg-[#080d14]" : "border-cyan-700/20 bg-[#f7fbff]"
+              }`}>
+                <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
                   <img
                     src="/covers/student-robotics-accreditations.jpg"
-                    alt="طلاب مدارس العقيق في منافسات الروبوت الدولية"
-                    className="h-full w-full object-cover"
+                    alt="طلاب مدارس العقيق في أولمبياد الروبوت العالمي WRO"
+                    className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 right-4 left-4 text-white">
-                    <span className="text-xs font-black text-[#f8ca14]">أكاديمية العقيق للابتكار</span>
-                    <p className="text-[11px] text-slate-300">أولمبياد الروبوت العالمي والذكاء الاصطناعي</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-cyan-400/40 px-3 py-1 text-xs font-black text-cyan-300 shadow-md">
+                    <Award size={12} className="text-cyan-300" />
+                    <span>خامس العالم 🏆</span>
+                  </div>
+                  <div className="absolute bottom-3 right-3 left-3 text-white">
+                    <span className="text-[10px] font-black text-cyan-300">WRO INTERNATIONAL</span>
+                    <h4 className="text-sm font-black drop-shadow">أولمبياد الروبوت العالمي (WRO)</h4>
                   </div>
                 </div>
+
+                <h4 className={`text-base font-black mb-2 text-right ${dark ? "text-cyan-300" : "text-cyan-800"}`}>
+                  المركز الخامس عالمياً في أولمبياد الروبوت العالمي (WRO)
+                </h4>
+                <p className={`text-xs sm:text-sm leading-relaxed mb-4 text-right ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  مثل طلاب مدارس العقيق المملكة في المحفل العالمي الأضخم وتوجوا بالمركز الخامس على مستوى العالم بين أكثر من 80 دولة متنافسة، مما يعكس كفاءة الإعداد الأكاديمي والتدريب المتقدم على الخوارزميات والذكاء الاصطناعي.
+                </p>
+
+                <div className="flex flex-wrap gap-2 text-[11px] font-black text-right">
+                  <span className="rounded-xl px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500">
+                    المركز الخامس عالمياً 🌐
+                  </span>
+                  <span className="rounded-xl px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500">
+                    منافسة أكثر من 80 دولة
+                  </span>
+                  <span className="rounded-xl px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500">
+                    خوارزميات الذكاء الاصطناعي
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Infrastructure Grid */}
+            <div className={`p-5 sm:p-6 rounded-2xl border ${
+              dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+            }`}>
+              <h5 className="text-xs font-black mb-3 text-right">
+                التجهيزات والبنية التحتية لأكاديمية الروبوت والـ STEM بمدارس العقيق:
+              </h5>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                  "معامل STEM وروبوتات VEX و LEGO المتقدمة",
+                  "تدريب مكثف على لغات Python و C++ للخوارزميات",
+                  "شراكات مع مؤسسة موهبة ومسار أسبار والجامعات",
+                  "حاضنات لمشاريع الذكاء الاصطناعي وحلول الطاقة",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs font-bold text-right">
+                    <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                    <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
