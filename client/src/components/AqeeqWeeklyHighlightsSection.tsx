@@ -206,7 +206,9 @@ export function AqeeqWeeklyHighlightsSection({
                     defaultText={eventTitle}
                     as="h3"
                     className={`mt-2 text-xl sm:text-2xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
-                  />
+                  >
+                    {(content) => (content && content.trim().length > 3 ? content : eventTitle)}
+                  </VisualEditable>
                   <VisualEditable
                     id="studio-bento-card1-desc"
                     tag="text"
