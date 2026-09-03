@@ -132,12 +132,12 @@ export function AlaqeeqStudioSiteFooter() {
 
         {/* 2. Main Minimal Studio Bar: Brand + Badges under title (from 'م' to 'ة') + Location + Socials */}
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row py-4">
-          {/* Brand Logo & Name with Badges spanning from 'م' to 'ة' exactly as in user image */}
-          <div className="flex items-center gap-4 sm:gap-5">
+          {/* Brand Logo & Name with Badges spanning from 'م' to 'ة' as a sleek compact block */}
+          <div className="flex items-center gap-3.5">
             <img
               src={activeLogo}
               alt="مدارس العقيق"
-              className={`h-14 sm:h-16 w-auto object-contain transition shrink-0 ${
+              className={`h-10 sm:h-11 w-auto object-contain transition shrink-0 ${
                 dark ? "brightness-0 invert opacity-95" : "opacity-90"
               }`}
             />
@@ -145,7 +145,7 @@ export function AlaqeeqStudioSiteFooter() {
             {/* Container fits title exactly, so badges span precisely from 'م' to 'ة' */}
             <div className="w-fit inline-flex flex-col items-stretch">
               <h3
-                className={`text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap leading-none ${
+                className={`text-base sm:text-lg font-black tracking-tight whitespace-nowrap leading-none ${
                   dark
                     ? "text-white"
                     : isNationalDay
@@ -157,28 +157,28 @@ export function AlaqeeqStudioSiteFooter() {
               </h3>
 
               {/* The 2 capsule pills spanning from 'م' in مدارس to 'ة' in الدولية */}
-              <div className="mt-2.5 grid grid-cols-2 gap-2.5 w-full">
+              <div className="mt-2 grid grid-cols-2 gap-1.5 w-full">
                 {/* 1. Golden Pill on the right (under مدارس العقيق) */}
                 <div
-                  className={`flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
+                  className={`flex items-center justify-center gap-1 px-2 py-0.5 rounded-full border text-[9.5px] sm:text-[10.5px] font-bold whitespace-nowrap transition shadow-sm ${
                     dark
                       ? "border-amber-500/80 bg-amber-950/20 text-amber-400 shadow-amber-500/5"
                       : "border-amber-600/40 bg-amber-50 text-amber-800"
                   }`}
                 >
-                  <Award size={13} className="text-amber-400 shrink-0" />
+                  <Award size={11} className="text-amber-400 shrink-0" />
                   <span>اعتماد Cognia الدولي</span>
                 </div>
 
                 {/* 2. Sky Blue Pill on the left (under الأهلية والدولية) */}
                 <div
-                  className={`flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
+                  className={`flex items-center justify-center gap-1 px-2 py-0.5 rounded-full border text-[9.5px] sm:text-[10.5px] font-bold whitespace-nowrap transition shadow-sm ${
                     dark
                       ? "border-sky-500/80 bg-sky-950/20 text-sky-400 shadow-sky-500/5"
                       : "border-sky-600/40 bg-sky-50 text-sky-800"
                   }`}
                 >
-                  <GraduationCap size={13} className="text-sky-400 shrink-0" />
+                  <GraduationCap size={11} className="text-sky-400 shrink-0" />
                   <span>مركز اختبارات SAT & IELTS</span>
                 </div>
               </div>
