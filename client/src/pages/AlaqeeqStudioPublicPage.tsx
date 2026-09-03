@@ -311,6 +311,10 @@ export default function AlaqeeqStudioPublicPage() {
       })()
     : null;
 
+  const primaryShowcaseCover = showcase?.coverUrl
+    ? (directDriveImage(showcase.coverUrl) || showcase.coverUrl)
+    : (defaultShowcaseCovers.front || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE");
+
   const journalCovers = {
     front: customJournalCover || defaultJournalCovers.front,
     back: defaultJournalCovers.back,
@@ -320,8 +324,8 @@ export default function AlaqeeqStudioPublicPage() {
     back: defaultAlbumCovers.back,
   };
   const showcaseCovers = {
-    front: customShowcaseCover || defaultShowcaseCovers.front,
-    back: defaultShowcaseCovers.back,
+    front: customShowcaseCover || primaryShowcaseCover,
+    back: defaultShowcaseCovers.back || primaryShowcaseCover,
   };
   const featuredEventPost = orchestration?.weeklyBento?.featuredMode === "custom" && orchestration?.weeklyBento?.customPostId
     ? activeShowcasePosts.find((p) => p.id === orchestration.weeklyBento.customPostId) || activeShowcasePosts[0]
@@ -1041,21 +1045,21 @@ export default function AlaqeeqStudioPublicPage() {
           <div className="relative">
             {/* Quick Hero Covers Direct Edit Bar in Visual Editor Mode */}
             {isEditing && (
-              <div className="absolute -top-14 inset-x-0 mx-auto w-fit z-50 flex items-center gap-1.5 bg-[#0b0f17]/95 border border-amber-400/40 px-3.5 py-1.5 rounded-2xl shadow-2xl backdrop-blur-xl">
-                <span className="text-[11px] font-black text-amber-400 ml-1">تحرير الأغلفة:</span>
+              <div className="mb-5 mx-auto w-fit z-50 flex flex-wrap items-center justify-center gap-2 bg-[#0b0f17]/95 border-2 border-amber-400/80 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-xl">
+                <span className="text-xs font-black text-amber-400 ml-1">تعديل الأغلفة الثلاثة مباشرة:</span>
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
                   }}
-                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
                     selectedId === "studio-hero-journal-image"
-                      ? "bg-[#f8ca14] text-black shadow-lg"
+                      ? "bg-[#f8ca14] text-black shadow-lg scale-105"
                       : "bg-white/10 hover:bg-white/20 text-white"
                   }`}
                 >
-                  📘 غلاف المجلة (الأمامي)
+                  <span>📘 غلاف المجلة (الأمامي)</span>
                 </button>
                 <button
                   type="button"
@@ -1063,13 +1067,13 @@ export default function AlaqeeqStudioPublicPage() {
                     e.stopPropagation();
                     select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
                   }}
-                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
                     selectedId === "studio-hero-album-image"
-                      ? "bg-[#5aba1c] text-white shadow-lg"
+                      ? "bg-[#5aba1c] text-white shadow-lg scale-105"
                       : "bg-white/10 hover:bg-white/20 text-white"
                   }`}
                 >
-                  📸 غلاف الألبومات (الأوسط)
+                  <span>📸 غلاف الألبومات (الأوسط)</span>
                 </button>
                 <button
                   type="button"
@@ -1077,21 +1081,21 @@ export default function AlaqeeqStudioPublicPage() {
                     e.stopPropagation();
                     select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار");
                   }}
-                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
                     selectedId === "studio-hero-showcase-image"
-                      ? "bg-[#6565e0] text-white shadow-lg"
+                      ? "bg-[#6565e0] text-white shadow-lg scale-105"
                       : "bg-white/10 hover:bg-white/20 text-white"
                   }`}
                 >
-                  📰 غلاف الأخبار (الخلفي)
+                  <span>📰 غلاف الأخبار (الخلفي)</span>
                 </button>
               </div>
             )}
 
             <motion.div
-              onMouseMove={handleHeroMouseMove}
-              onMouseLeave={handleHeroMouseLeave}
-              style={{ rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
+              onMouseMove={isEditing ? undefined : handleHeroMouseMove}
+              onMouseLeave={isEditing ? undefined : handleHeroMouseLeave}
+              style={isEditing ? {} : { rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
               className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
             >
               {/* Back Card: Showcase / Vision & Excellence */}
@@ -1110,8 +1114,8 @@ export default function AlaqeeqStudioPublicPage() {
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (isEditing ? select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار") : navigate("/offers"))}
                 className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border cursor-pointer will-change-transform transition-all duration-300 " + (
                   isEditing
-                    ? "z-30 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#6565e0] opacity-100 shadow-2xl"
-                    : "opacity-75 hover:opacity-100 hover:scale-[1.03] duration-500 "
+                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#6565e0] opacity-100 shadow-2xl"
+                    : "z-0 opacity-75 hover:opacity-100 hover:scale-[1.03] duration-500 "
                 ) + (
                   isNationalDay
                     ? dark
@@ -1122,7 +1126,7 @@ export default function AlaqeeqStudioPublicPage() {
                 <VisualImage
                   id="studio-hero-showcase-image"
                   label="صورة غلاف الأخبار"
-                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE")}
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE")}
                   alt="غلاف الأخبار والعروض"
                   className="h-full w-full object-cover"
                 />
@@ -1161,7 +1165,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 className={"group absolute bottom-[8%] left-[28%] top-[8%] w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 will-change-transform " + (
                   isEditing
-                    ? "z-20 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#5aba1c] shadow-2xl"
+                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#5aba1c] shadow-2xl"
                     : "z-10 hover:scale-[1.02]"
                 ) + " " + (
                   isNationalDay
@@ -1213,7 +1217,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 className={"group absolute bottom-[2%] left-[1%] top-[5%] w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 will-change-transform " + (
                   isEditing
-                    ? "z-10 hover:z-50 hover:scale-[1.06] hover:ring-2 hover:ring-[#f8ca14] shadow-2xl"
+                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#f8ca14] shadow-2xl"
                     : "z-20 hover:scale-[1.02]"
                 ) + " " + (
                   isNationalDay

@@ -91,11 +91,20 @@ if (typeof window !== "undefined") {
   });
 }
 
-// Auto-heal and refresh ServiceWorker caches in background
-if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const reg of registrations) {
-      reg.update().catch(() => {});
-    }
-  }).catch(() => {});
+// Purge old ServiceWorkers and stale caches completely
+if (typeof window !== "undefined") {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const reg of registrations) {
+        reg.unregister().catch(() => {});
+      }
+    }).catch(() => {});
+  }
+  if ("caches" in window) {
+    caches.keys().then((names) => {
+      for (const name of names) {
+        caches.delete(name).catch(() => {});
+      }
+    }).catch(() => {});
+  }
 }

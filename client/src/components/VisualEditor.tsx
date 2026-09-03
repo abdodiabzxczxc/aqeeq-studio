@@ -989,7 +989,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 1. Scan Images
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (img.closest(".aq-editor-toolbar") || img.closest(".aq-editor-drawer") || img.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+        if (img.closest(".aq-editor-toolbar") || img.closest(".aq-editor-drawer") || img.closest("[data-aq-editor-properties]") || img.closest("[data-radix-popper-content-wrapper]")) return;
+        if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
         if (!id) {
@@ -1016,7 +1017,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         "h1, h2, h3, h4, h5, h6, p, button, a, label, span"
       ));
       textNodes.forEach((node, idx) => {
-        if (node.closest(".aq-editor-toolbar") || node.closest(".aq-editor-drawer") || node.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+        if (node.closest(".aq-editor-toolbar") || node.closest(".aq-editor-drawer") || node.closest("[data-aq-editor-properties]") || node.closest("[data-radix-popper-content-wrapper]")) return;
+        if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Check if node has direct text content
         const directText = Array.from(node.childNodes)
@@ -1039,8 +1041,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const override = overrideMap.get(id);
         if (override?.contentText) {
           const textChild = Array.from(node.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
-          if (textChild && textChild.textContent !== override.contentText) {
-            textChild.textContent = override.contentText;
+          if (textChild) {
+            if (textChild.textContent !== override.contentText) textChild.textContent = override.contentText;
+          } else {
+            node.textContent = override.contentText;
           }
         }
         if (override?.textColor && node.style.color !== override.textColor) {
@@ -1051,20 +1055,22 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 3. Scan SVG Icons
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (svg.closest(".aq-editor-toolbar") || svg.closest(".aq-editor-drawer") || svg.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+        if (svg.closest(".aq-editor-toolbar") || svg.closest(".aq-editor-drawer") || svg.closest("[data-aq-editor-properties]") || svg.closest("[data-radix-popper-content-wrapper]")) return;
+        const htmlSvg = svg as unknown as HTMLElement;
+        if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
-        let id = svg.dataset.visualId;
+        let id = htmlSvg.dataset?.visualId;
         if (!id) {
           id = `auto-icon-${hashString((svg.getAttribute("class") || "") + idx)}`;
-          svg.dataset.visualId = id;
-          svg.dataset.visualTag = "icon";
-          svg.dataset.visualLabel = `أيقونة ${idx + 1}`;
-          svg.dataset.visualAuto = "true";
+          htmlSvg.dataset.visualId = id;
+          htmlSvg.dataset.visualTag = "icon";
+          htmlSvg.dataset.visualLabel = `أيقونة ${idx + 1}`;
+          htmlSvg.dataset.visualAuto = "true";
         }
 
         const override = overrideMap.get(id);
         if (override?.textColor) {
-          (svg as unknown as HTMLElement).style.color = override.textColor;
+          htmlSvg.style.color = override.textColor;
         }
       });
     };
@@ -1785,6 +1791,40 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           <>
             <div className="aq-editor-properties-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <div className="space-y-4 p-4">
+          {["studio-hero-journal-image", "studio-hero-album-image", "studio-hero-showcase-image"].includes(selected.id) && (
+            <div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-2.5">
+              <div className="text-[11px] font-black text-amber-300 mb-2">أغلفة الواجهة الرئيسية (بدّل بينها مباشرة):</div>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => selectElement("studio-hero-journal-image", "image", "صورة غلاف المجلة")}
+                  className={`py-1.5 px-1 rounded-xl text-[11px] font-black transition ${
+                    selected.id === "studio-hero-journal-image" ? "bg-[#f8ca14] text-black shadow" : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📘 المجلة
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectElement("studio-hero-album-image", "image", "صورة غلاف الألبومات")}
+                  className={`py-1.5 px-1 rounded-xl text-[11px] font-black transition ${
+                    selected.id === "studio-hero-album-image" ? "bg-[#5aba1c] text-white shadow" : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📸 الألبومات
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectElement("studio-hero-showcase-image", "image", "صورة غلاف الأخبار")}
+                  className={`py-1.5 px-1 rounded-xl text-[11px] font-black transition ${
+                    selected.id === "studio-hero-showcase-image" ? "bg-[#6565e0] text-white shadow" : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                >
+                  📰 الأخبار
+                </button>
+              </div>
+            </div>
+          )}
           {/* TEXT CONTROLS */}
           {!(["section", "section-block", "image", "video", "icon"] as ElementTag[]).includes(selected.tag) ? (
             <div className="space-y-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-3.5">
