@@ -8,6 +8,7 @@ import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
+import { AqeeqMemoryWallSection } from "@/components/AqeeqMemoryWallSection";
 import { AqeeqTypographicScrubBar } from "@/components/AqeeqTypographicScrubBar";
 import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
@@ -683,14 +684,6 @@ export default function AlaqeeqStudioPublicPage() {
     setHeroMouse({ x: 0, y: 0 });
   };
 
-  const rawMemoryCol0Y = useTransform(scrollY, [3800, 5600], [40, -40]);
-  const rawMemoryCol1Y = useTransform(scrollY, [3800, 5600], [-35, 35]);
-  const rawMemoryCol2Y = useTransform(scrollY, [3800, 5600], [55, -25]);
-
-  const memoryCol0Y = useSpring(rawMemoryCol0Y, { stiffness: 90, damping: 22 });
-  const memoryCol1Y = useSpring(rawMemoryCol1Y, { stiffness: 90, damping: 22 });
-  const memoryCol2Y = useSpring(rawMemoryCol2Y, { stiffness: 90, damping: 22 });
-
   if (issuesLoading || albumsLoading || showcasesLoading) {
     return (
       <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
@@ -1342,15 +1335,46 @@ export default function AlaqeeqStudioPublicPage() {
                     className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
                   />
                 </motion.div>
+
+                {/* 🎙️ Dynamic Soundwave Visualizer */}
+                <div className="flex items-center gap-1.5 my-5 h-7">
+                  {[14, 28, 45, 20, 36, 52, 24, 48, 60, 32, 20, 44, 56, 38, 18, 42, 30, 16].map((h, i) => (
+                    <motion.span
+                      key={i}
+                      animate={{ height: [`${Math.max(4, h * 0.25)}px`, `${h * 0.65}px`, `${Math.max(4, h * 0.25)}px`] }}
+                      transition={{ duration: 1.1 + (i % 4) * 0.25, repeat: Infinity, ease: "easeInOut", delay: i * 0.04 }}
+                      className={`w-1 rounded-full ${dark ? "bg-gradient-to-t from-[#f8ca14]/30 to-[#f8ca14]" : "bg-gradient-to-t from-[#08467d]/30 to-[#08467d]"}`}
+                      style={{ height: `${h * 0.45}px` }}
+                    />
+                  ))}
+                  <span className={`text-[11px] font-bold mr-3 ${dark ? "text-slate-400" : "text-slate-600"}`}>
+                    الموجة الصوتية الحية للكلمة التربوية 🎙️
+                  </span>
+                </div>
+
                 <VisualEditable
                   id="studio-editorial-author"
                   tag="text"
                   label="اسم ووصف صاحب الاقتباس"
                   defaultText={(orchestration?.editorialVoice?.authorName ? `${orchestration.editorialVoice.authorName} · ` : "") + (orchestration?.editorialVoice?.authorTitle || "المشرف العام على مدارس العقيق الأهلية")}
                   as="p"
-                  className={"mt-4 text-sm font-black " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
+                  className={"mt-2 text-sm font-black " + (dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]")}
                 />
               </div>
+
+              {/* 🎖️ Rotating Golden Seal Watermark */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+                className="pointer-events-none absolute -bottom-12 -left-12 select-none opacity-[0.08]"
+                aria-hidden
+              >
+                <svg width="220" height="220" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>
+                  <circle cx="50" cy="50" r="46" strokeDasharray="3 3" />
+                  <circle cx="50" cy="50" r="38" />
+                  <polygon points="50,15 61,38 85,38 66,54 73,78 50,64 27,78 34,54 15,38 39,38" />
+                </svg>
+              </motion.div>
 
               <div className={"flex flex-col items-center justify-center p-6 rounded-2xl border text-center " + (
                 dark ? "border-white/[0.08] bg-black/40" : isNationalDay ? "border-emerald-500/20 bg-white/80 shadow-sm" : "border-black/[0.06] bg-slate-50"
@@ -1401,118 +1425,11 @@ export default function AlaqeeqStudioPublicPage() {
 
 
       {/* 7. قسم ذاكرة العقيق المفتوحة (Memory Wall) */}
-      <VisualEditable
-        id="studio-memory-section"
-        tag="section"
-        label="قسم ذاكرة العقيق"
-        as="section"
-        className={"border-b py-14 md:py-20 " + (
-          isNationalDay
-            ? dark ? "border-[#f8ca14]/8 snd-section-dark" : "border-[#005A36]/8 snd-section-light"
-            : dark ? "border-white/[0.05] bg-transparent" : "border-black/[0.04] bg-transparent"
-        )}
-      >
-        <div className="mx-auto max-w-[1340px] px-5 md:px-8">
-          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
-            <div>
-              <div className="mb-2">
-                <VisualEditable
-                  id="studio-memory-kicker"
-                  tag="text"
-                  label="شارة ذاكرة العقيق"
-                  defaultText={isNationalDay ? "🇸🇦 أرشيف ذاكرة الوطن" : "VISUAL MEMORY · SPOTLIGHT"}
-                  as="span"
-                  className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                    isNationalDay
-                      ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                      : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                  )}
-
-                >
-                  {(text) => (
-                    <>
-                      <Camera size={12} />
-                      {text}
-                    </>
-                  )}
-                </VisualEditable>
-              </div>
-              <VisualEditable
-                id="studio-memory-title"
-                tag="text"
-                label="عنوان قسم ذاكرة العقيق"
-                defaultText="ذاكرة العقيق الحية"
-                as="h2"
-                className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
-              />
-              <VisualEditable
-                id="studio-memory-body"
-                tag="text"
-                label="وصف ذاكرة العقيق"
-                defaultText="كل عدد يوثّق قصة، وكل ألبوم يحفظ لحظة. لقطات حقيقية من أرشيف مدارس العقيق المتجدد."
-                as="p"
-                className={"mt-2 max-w-md text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-900/80" : "text-slate-600")}
-              />
-              <VisualEditable
-                id="studio-memory-action"
-                tag="button"
-                label="زر استكشاف الأرشيف"
-                defaultText="استكشف الأرشيف"
-                as="button"
-                onAction={() => navigate("/journal")}
-                className={"mt-6 inline-flex items-center gap-2 border-b pb-1.5 text-sm font-black transition " + (
-                  dark ? "border-[#f8ca14]/60 text-[#f8ca14] hover:opacity-80" : isNationalDay ? "border-[#005A36]/60 text-[#005A36] hover:opacity-80" : "border-[#08467d]/60 text-[#08467d] hover:opacity-80"
-                )}
-              >
-                {(text) => (
-                  <>
-                    {text} <ArrowUpLeft size={16} />
-                  </>
-                )}
-              </VisualEditable>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 sm:gap-5">
-              {memoryEntries.map((entry, index) => (
-                <motion.div
-                  key={entry.id}
-                  style={{ y: index === 0 ? memoryCol0Y : index === 1 ? memoryCol1Y : memoryCol2Y }}
-                  className="will-change-transform"
-                >
-                  <VisualEditable
-                    id={"studio-memory-" + entry.id}
-                    tag="section"
-                    label={"بطاقة ذاكرة " + entry.title}
-                    as="button"
-                    onAction={entry.onOpen}
-                    className={"group relative w-full overflow-hidden rounded-[1.5rem] border text-right transition duration-300 hover:-translate-y-1 " + (
-                      index === 1 ? "h-[280px] sm:h-[380px] mt-6" : "h-[230px] sm:h-[300px]"
-                    ) + " " + (
-                      dark
-                        ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60 hover:shadow-[0_0_45px_rgba(248,202,20,0.2)]"
-                        : isNationalDay
-                        ? "border-emerald-500/20 bg-white shadow-[0_15px_35px_rgba(0,90,54,0.06)] hover:border-[#005A36]/60"
-                        : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50 hover:shadow-[0_0_40px_rgba(8,70,125,0.15)]"
-                    )}
-                  >
-                    <VisualImage
-                      id={"studio-memory-" + entry.id + "-image"}
-                      label={"صورة " + entry.title}
-                      src={entry.imageUrl || ""}
-                      alt={entry.title}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
-                    />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                      <p className={"text-[9px] font-black transition-all duration-500 group-hover:-translate-y-1 " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
-                      <p className="mt-1 truncate text-xs font-black text-white transition-all duration-500 group-hover:-translate-y-1">{entry.title}</p>
-                    </div>
-                  </VisualEditable>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </VisualEditable>
+      <AqeeqMemoryWallSection
+        dark={dark}
+        isNationalDay={isNationalDay}
+        memoryEntries={memoryEntries}
+      />
 
       {/* 8. إحصائيات الأرشيف المفتوح الشامل - المحدث ليشمل الأخبار والعروض والمجلات والألبومات */}
       <VisualEditable

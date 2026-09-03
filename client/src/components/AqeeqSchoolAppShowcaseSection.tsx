@@ -169,8 +169,53 @@ export default function AqeeqSchoolAppShowcaseSection({
               scale,
               transformStyle: "preserve-3d",
             }}
-            className="lg:col-span-7 flex flex-col justify-between will-change-transform"
+            className="lg:col-span-7 flex flex-col justify-between will-change-transform relative"
           >
+            {/* 🚗 Floating 3D Pill 1: Smart Gate Auto-Call */}
+            <motion.div
+              initial={{ opacity: 0, x: 35, y: -15, scale: 0.85 }}
+              whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              viewport={{ once: false }}
+              transition={{ type: "spring", stiffness: 190, damping: 17, delay: 0.15 }}
+              className={`absolute -top-5 -right-3 sm:-right-6 z-30 flex items-center gap-3 px-4 py-2.5 rounded-2xl border shadow-2xl backdrop-blur-xl ${
+                dark
+                  ? "border-emerald-500/30 bg-[#0d161a]/95 text-white shadow-emerald-950/40"
+                  : "border-emerald-500/25 bg-white/95 text-slate-900 shadow-xl"
+              }`}
+            >
+              <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 grid place-items-center text-base">
+                🚗
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] font-black flex items-center gap-1.5">
+                  <span>النداء الآلي الذكي</span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                </p>
+                <p className="text-[10px] text-slate-400">ولي أمر الطالب فهد وصل للبوابة 1</p>
+              </div>
+            </motion.div>
+
+            {/* 🌟 Floating 3D Pill 2: Academic Medal Badge */}
+            <motion.div
+              initial={{ opacity: 0, x: -35, y: 15, scale: 0.85 }}
+              whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              viewport={{ once: false }}
+              transition={{ type: "spring", stiffness: 190, damping: 17, delay: 0.3 }}
+              className={`absolute -bottom-5 -left-3 sm:-left-6 z-30 flex items-center gap-3 px-4 py-2.5 rounded-2xl border shadow-2xl backdrop-blur-xl ${
+                dark
+                  ? "border-[#f8ca14]/30 bg-[#161309]/95 text-white shadow-amber-950/40"
+                  : "border-amber-400/30 bg-white/95 text-slate-900 shadow-xl"
+              }`}
+            >
+              <div className="h-9 w-9 rounded-xl bg-[#f8ca14]/20 text-[#f8ca14] grid place-items-center text-base">
+                🌟
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] font-black text-amber-400">وسام التفوق والشهادات</p>
+                <p className="text-[10px] text-slate-400">تم رصد درجات الشهر بنجاح</p>
+              </div>
+            </motion.div>
+
             <div
               className={`rounded-[2.2rem] border p-4 sm:p-6 shadow-2xl transition duration-300 flex-1 flex flex-col justify-between ${
                 dark
