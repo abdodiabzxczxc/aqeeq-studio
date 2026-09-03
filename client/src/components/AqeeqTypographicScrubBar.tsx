@@ -7,12 +7,8 @@ interface AqeeqTypographicScrubBarProps {
   reverse?: boolean;
 }
 
-/**
- * AqeeqTypographicScrubBar — شريط الكتابة السينمائي البانورامي المتفاعل (Wellington Signature)
- * كتابة عربية وإنجليزية عملاقة مفرغة (Hollow Outlined Typography) تتحرك أفقياً مع حركة السكرول نزولاً وصعوداً.
- */
 export function AqeeqTypographicScrubBar({
-  text = "✦ مـدارس الـعـقـيـق الأهلـيـة والـدوليـة ✦ AL-AQEEQ SCHOOLS ✦ أصـالـة وتـمـيّـز ✦ INNOVATION & EXCELLENCE ✦",
+  text = "✦ AL-AQEEQ SCHOOLS · SINCE 1994 · EXCELLENCE & LEADERSHIP ✦",
   reverse = false,
 }: AqeeqTypographicScrubBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,30 +20,74 @@ export function AqeeqTypographicScrubBar({
     offset: ["start end", "end start"],
   });
 
-  const from = reverse ? "-15%" : "15%";
-  const to = reverse ? "15%" : "-15%";
-  const rawX = useTransform(scrollYProgress, [0, 1], [from, to]);
-  const x = useSpring(rawX, { stiffness: 90, damping: 24, mass: 0.4 });
+  // Layer 1: Giant headline — moves fast
+  const from1 = reverse ? "-35%" : "35%";
+  const to1   = reverse ? "35%"  : "-35%";
+  const rawX1 = useTransform(scrollYProgress, [0, 1], [from1, to1]);
+  const x1    = useSpring(rawX1, { stiffness: 85, damping: 22, mass: 0.4 });
+
+  // Layer 2: Sub-headline — moves slower same direction
+  const from2 = reverse ? "-15%" : "15%";
+  const to2   = reverse ? "15%"  : "-15%";
+  const rawX2 = useTransform(scrollYProgress, [0, 1], [from2, to2]);
+  const x2    = useSpring(rawX2, { stiffness: 70, damping: 22, mass: 0.5 });
+
+  // Layer 3: Micro-text — moves opposite direction (depth counter-parallax)
+  const from3 = reverse ? "10%"  : "-10%";
+  const to3   = reverse ? "-10%" : "10%";
+  const rawX3 = useTransform(scrollYProgress, [0, 1], [from3, to3]);
+  const x3    = useSpring(rawX3, { stiffness: 60, damping: 25, mass: 0.6 });
 
   return (
     <div
       ref={containerRef}
-      className={`relative z-20 -mt-10 sm:-mt-16 w-full overflow-hidden py-6 select-none pointer-events-none transition-colors duration-500 ${
-        dark ? "bg-black/60 backdrop-blur-md" : "bg-slate-100/80 backdrop-blur-md"
+      className={`relative z-20 w-full overflow-hidden select-none pointer-events-none transition-colors duration-500 flex flex-col justify-center ${
+        dark ? "bg-black/70 backdrop-blur-lg" : "bg-slate-50/90 backdrop-blur-lg"
       }`}
+      style={{ height: "clamp(200px, 30vw, 380px)" }}
     >
+      {/* Layer 1: Giant Text */}
       <motion.div
-        style={{ x }}
-        className="flex items-center gap-8 whitespace-nowrap will-change-transform"
+        style={{ x: x1 }}
+        className="flex items-center gap-16 whitespace-nowrap will-change-transform absolute inset-0 items-center"
       >
         <span
-          className={`text-5xl sm:text-7xl lg:text-8xl font-black tracking-widest uppercase ${
-            dark
-              ? "text-[#f8ca14]/[0.11]"
-              : "text-[#08467d]/[0.10]"
+          className={`font-black uppercase leading-none tracking-tight ${
+            dark ? "text-[#f8ca14]/[0.09]" : "text-[#08467d]/[0.08]"
           }`}
+          style={{ fontSize: "clamp(90px, 16vw, 220px)" }}
         >
-          {text} {text}
+          {text} {text} {text}
+        </span>
+      </motion.div>
+
+      {/* Layer 2: Mid-size counter text */}
+      <motion.div
+        style={{ x: x2 }}
+        className="flex items-center gap-10 whitespace-nowrap will-change-transform absolute inset-0 items-end pb-6"
+      >
+        <span
+          className={`font-black uppercase tracking-[0.25em] ${
+            dark ? "text-[#f8ca14]/[0.06]" : "text-[#08467d]/[0.05]"
+          }`}
+          style={{ fontSize: "clamp(22px, 3.5vw, 44px)" }}
+        >
+          {text} {text} {text} {text}
+        </span>
+      </motion.div>
+
+      {/* Layer 3: Micro counter-parallax */}
+      <motion.div
+        style={{ x: x3 }}
+        className="flex items-center gap-6 whitespace-nowrap will-change-transform absolute inset-0 items-start pt-5"
+      >
+        <span
+          className={`font-black uppercase tracking-[0.4em] ${
+            dark ? "text-white/[0.03]" : "text-[#08467d]/[0.03]"
+          }`}
+          style={{ fontSize: "clamp(14px, 2vw, 26px)" }}
+        >
+          {text} {text} {text} {text} {text}
         </span>
       </motion.div>
     </div>

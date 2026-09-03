@@ -778,8 +778,9 @@ export default function AlaqeeqStudioPublicPage() {
           <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
-                <button
+                <motion.button
                   key={story.id}
+                  initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   type="button"
                   onClick={() => setActiveStoryIndex(index)}
                   onMouseEnter={() => {
@@ -795,11 +796,11 @@ export default function AlaqeeqStudioPublicPage() {
                   onMouseLeave={() => triggerCursorPreview({ visible: false })}
                   className={"group flex flex-col items-center gap-1.5 shrink-0 text-center transition active:scale-95"}
                 >
-                  <div className={"relative p-[2.5px] rounded-full transition duration-300 group-hover:scale-105 " + (
+                  <div className={"relative p-[2.5px] rounded-full transition duration-300 group-hover:scale-[1.18] " + (
                     isNationalDay
                       ? "snd-story-ring bg-gradient-to-tr from-[#f8ca14] via-[#5aba1c] to-[#005A36] shadow-[0_0_14px_rgba(248,202,20,0.35)]"
                       : dark
-                      ? "bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] shadow-[0_0_12px_rgba(248,202,20,0.2)]"
+                      ? "bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] shadow-[0_0_12px_rgba(248,202,20,0.2)] group-hover:shadow-[0_0_22px_rgba(248,202,20,0.55)]"
                       : "bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] shadow-[0_0_10px_rgba(8,70,125,0.15)]"
                   )}>
 
@@ -853,7 +854,7 @@ export default function AlaqeeqStudioPublicPage() {
                   )}>
                     {story.title}
                   </p>
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -1543,7 +1544,7 @@ export default function AlaqeeqStudioPublicPage() {
             </p>
           </div>
 
-          <div className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
+          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: "-80px" }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className={"relative overflow-hidden rounded-[2.2rem] border p-8 sm:p-12 " + (
             isNationalDay
               ? dark ? "snd-editorial-card-dark" : "snd-editorial-card-light"
               : dark
@@ -1551,17 +1552,27 @@ export default function AlaqeeqStudioPublicPage() {
               : "border-[#08467d]/20 bg-white shadow-xl"
           )}>
 
+            {/* Ghost Watermark Quote */}
+            <div
+              className="pointer-events-none absolute -top-8 -right-4 select-none leading-none font-black opacity-[0.035] text-current"
+              style={{ fontSize: "clamp(200px, 35vw, 480px)", lineHeight: 1 }}
+              aria-hidden
+            >
+              «
+            </div>
             <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-8 items-center">
               <div>
-                <Quote size={40} className={dark ? "text-[#f8ca14]/30" : isNationalDay ? "text-[#005A36]/30" : "text-[#08467d]/25"} />
-                <VisualEditable
-                  id="studio-editorial-quote"
-                  tag="text"
-                  label="نص اقتباس صوت العقيق"
-                  defaultText={`«${orchestration?.editorialVoice?.quoteText || "في مدارس العقيق، لا نعلّم للعلم فحسب، بل نصنع قيادات المستقبل بوعي وطموح لا ينضب."}»`}
-                  as="h3"
-                  className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
-                />
+                <Quote size={60} className={dark ? "text-[#f8ca14]/30" : isNationalDay ? "text-[#005A36]/30" : "text-[#08467d]/25"} />
+                <motion.div initial={{ opacity: 0, x: -60 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false }} transition={{ duration: 0.8, delay: 0.15 }}>
+                  <VisualEditable
+                    id="studio-editorial-quote"
+                    tag="text"
+                    label="نص اقتباس صوت العقيق"
+                    defaultText={`«${orchestration?.editorialVoice?.quoteText || "في مدارس العقيق، لا نعلّم للعلم فحسب، بل نصنع قيادات المستقبل بوعي وطموح لا ينضب."}»`}
+                    as="h3"
+                    className={"mt-3 text-2xl sm:text-3xl lg:text-4xl font-black leading-relaxed " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
+                  />
+                </motion.div>
                 <VisualEditable
                   id="studio-editorial-author"
                   tag="text"
@@ -1615,7 +1626,7 @@ export default function AlaqeeqStudioPublicPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </VisualEditable>
 
@@ -1705,14 +1716,14 @@ export default function AlaqeeqStudioPublicPage() {
                     label={"بطاقة ذاكرة " + entry.title}
                     as="button"
                     onAction={entry.onOpen}
-                    className={"group relative h-[230px] sm:h-[300px] w-full overflow-hidden rounded-[1.5rem] border text-right transition duration-300 hover:-translate-y-1 " + (
-                      index === 1 ? "mt-6" : ""
+                    className={"group relative w-full overflow-hidden rounded-[1.5rem] border text-right transition duration-300 hover:-translate-y-1 " + (
+                      index === 1 ? "h-[280px] sm:h-[380px] mt-6" : "h-[230px] sm:h-[300px]"
                     ) + " " + (
                       dark
-                        ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
+                        ? "border-white/[0.1] bg-[#111111] shadow-[0_20px_48px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60 hover:shadow-[0_0_45px_rgba(248,202,20,0.2)]"
                         : isNationalDay
                         ? "border-emerald-500/20 bg-white shadow-[0_15px_35px_rgba(0,90,54,0.06)] hover:border-[#005A36]/60"
-                        : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50"
+                        : "border-black/[0.08] bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:border-[#08467d]/50 hover:shadow-[0_0_40px_rgba(8,70,125,0.15)]"
                     )}
                   >
                     <VisualImage
@@ -1722,9 +1733,9 @@ export default function AlaqeeqStudioPublicPage() {
                       alt={entry.title}
                       className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
                     />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16">
-                      <p className={"text-[9px] font-black " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
-                      <p className="mt-1 truncate text-xs font-black text-white">{entry.title}</p>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-4 pt-16 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                      <p className={"text-[9px] font-black transition-all duration-500 group-hover:-translate-y-1 " + (isNationalDay ? "text-emerald-400" : "text-[#f8ca14]")}>{entry.label}</p>
+                      <p className="mt-1 truncate text-xs font-black text-white transition-all duration-500 group-hover:-translate-y-1">{entry.title}</p>
                     </div>
                   </VisualEditable>
                 </motion.div>
