@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import QRCode from "qrcode";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { trpc } from "@/lib/trpc";
 
 interface AqeeqSchoolAppShowcaseSectionProps {
   dark?: boolean;
@@ -22,10 +23,19 @@ export default function AqeeqSchoolAppShowcaseSection({
   dark = false,
 }: AqeeqSchoolAppShowcaseSectionProps) {
   const { isNationalDay } = useSiteTheme();
+  const { data: orchestrationData } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    staleTime: 60000,
+  });
+
+  const appShowcase = orchestrationData?.appShowcase;
+  const isEnabled = appShowcase?.enabled ?? true;
+  const appDownloadUrl = appShowcase?.qrCodeUrl || "https://qr-codes.io/LQMip0";
+  const appStoreUrl = appShowcase?.appStoreUrl || appDownloadUrl;
+  const googlePlayUrl = appShowcase?.googlePlayUrl || appDownloadUrl;
+  const youtubeVideoId = appShowcase?.youtubeVideoId || "_h3K-q8cDUc";
+  const youtubeEmbedUrl = `https://www.youtube.com/embed/${youtubeVideoId}?rel=0&enablejsapi=1`;
+
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
-  const appDownloadUrl = "https://qr-codes.io/LQMip0";
-  const youtubeEmbedUrl =
-    "https://www.youtube.com/embed/_h3K-q8cDUc?rel=0&enablejsapi=1";
 
   useEffect(() => {
     QRCode.toDataURL(appDownloadUrl, {
@@ -38,7 +48,11 @@ export default function AqeeqSchoolAppShowcaseSection({
     })
       .then((url) => setQrDataUrl(url))
       .catch((err) => console.error("Failed to generate app QR:", err));
-  }, []);
+  }, [appDownloadUrl]);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   const features = [
     {
@@ -318,7 +332,7 @@ export default function AqeeqSchoolAppShowcaseSection({
 
                   {/* App Store Button */}
                   <a
-                    href={appDownloadUrl}
+                    href={appStoreUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-black hover:bg-slate-900 text-white transition active:scale-95 shadow-md border border-white/10"
@@ -336,7 +350,7 @@ export default function AqeeqSchoolAppShowcaseSection({
 
                   {/* Google Play Button */}
                   <a
-                    href={appDownloadUrl}
+                    href={googlePlayUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white transition active:scale-95 shadow-md"

@@ -63,6 +63,14 @@ export default function AqeeqSchoolAdmissionsPage() {
   });
   const [submitted, setSubmitted] = useState(false);
 
+  const { data: orchestrationData } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    staleTime: 60000,
+  });
+  const admissionsSettings = orchestrationData?.admissionsSettings;
+  const campuses = orchestrationData?.schoolCampuses;
+  const isRegistrationOpen = admissionsSettings?.isOpen ?? true;
+  const closedNoticeText = admissionsSettings?.closedNoticeText || "تم اكتمال المقاعد للعام الدراسي الحالي. بإمكانكم تسجيل بياناتكم في قائمة الانتظار.";
+
   const submitMutation = trpc.admissions.submit.useMutation({
     onSuccess: () => {
       setSubmitted(true);
@@ -96,13 +104,24 @@ export default function AqeeqSchoolAdmissionsPage() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const customFees = admissionsSettings?.tuitionFees;
+  const kgNatFee = customFees?.[0]?.nationalAnnual || 14500;
+  const priNatFee = customFees?.[1]?.nationalAnnual || 16800;
+  const midNatFee = customFees?.[3]?.nationalAnnual || 18900;
+  const secNatFee = customFees?.[4]?.nationalAnnual || 21500;
+
+  const kgIntFee = customFees?.[0]?.internationalAnnual || 18500;
+  const priIntFee = customFees?.[1]?.internationalAnnual || 22000;
+  const midIntFee = customFees?.[3]?.internationalAnnual || 25500;
+  const secIntFee = customFees?.[4]?.internationalAnnual || 29000;
+
   const feesNational = [
     {
       grade: "مرحلة رياض الأطفال (KG1 - KG3)",
       badge: "مرحلة التأسيس والاكتشاف",
-      fee: "14,500",
-      rawFee: 14500,
-      term: "4,833",
+      fee: kgNatFee.toLocaleString(),
+      rawFee: kgNatFee,
+      term: Math.round(kgNatFee / 3).toLocaleString(),
       notes: "شامل الأنشطة اللامنهجية وتأسيس اللغة والقرآن وتطوير الحواس والذكاء",
       perks: [
         "تأسيس لغوي وقرآني بمعايير متقدمة",
@@ -115,9 +134,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "المرحلة الابتدائية (الصفوف 1 - 6)",
       badge: "مرحلة البناء والمهارات",
-      fee: "16,800",
-      rawFee: 16800,
-      term: "5,600",
+      fee: priNatFee.toLocaleString(),
+      rawFee: priNatFee,
+      term: Math.round(priNatFee / 3).toLocaleString(),
       notes: "شامل مسار البرمجة والروبوت والأنشطة الإثرائية ومعامل الذكاء الاصطناعي",
       perks: [
         "معامل الذكاء الاصطناعي وأكاديمية الروبوت",
@@ -130,9 +149,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "المرحلة المتوسطة (الصفوف 7 - 9)",
       badge: "مرحلة التميز والقدرات",
-      fee: "18,900",
-      rawFee: 18900,
-      term: "6,300",
+      fee: midNatFee.toLocaleString(),
+      rawFee: midNatFee,
+      term: Math.round(midNatFee / 3).toLocaleString(),
       notes: "شامل برامج القدرات والتحصيلي ومعامل العلوم المتطورة وأندية الابتكار",
       perks: [
         "مختبرات STEM تطبيقية ومشاريع متقدمة",
@@ -145,9 +164,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "المرحلة الثانوية (الصفوف 10 - 12)",
       badge: "مرحلة الإعداد للجامعة",
-      fee: "21,500",
-      rawFee: 21500,
-      term: "7,166",
+      fee: secNatFee.toLocaleString(),
+      rawFee: secNatFee,
+      term: Math.round(secNatFee / 3).toLocaleString(),
       notes: "تأهيل متكامل لاختبارات قياس والتحصيلي والقبول الجامعي الأكاديمي المرموق",
       perks: [
         "برامج تدريب مكثفة لاجتياز القدرات والتحصيلي 90+",
@@ -163,9 +182,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "Kindergarten (KG1 - KG3)",
       badge: "Early Discovery & Phonics",
-      fee: "18,500",
-      rawFee: 18500,
-      term: "6,166",
+      fee: kgIntFee.toLocaleString(),
+      rawFee: kgIntFee,
+      term: Math.round(kgIntFee / 3).toLocaleString(),
       notes: "American Curriculum + Cognia Accredited Standards",
       perks: [
         "Full Native English Immersion & Phonics",
@@ -178,9 +197,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "Elementary School (Grades 1 - 6)",
       badge: "Foundations & Critical Thinking",
-      fee: "22,000",
-      rawFee: 22000,
-      term: "7,333",
+      fee: priIntFee.toLocaleString(),
+      rawFee: priIntFee,
+      term: Math.round(priIntFee / 3).toLocaleString(),
       notes: "STEM Curriculum + Native English Educators",
       perks: [
         "American Common Core Standards",
@@ -193,9 +212,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "Middle School (Grades 7 - 9)",
       badge: "Innovation & Global Leadership",
-      fee: "25,500",
-      rawFee: 25500,
-      term: "8,500",
+      fee: midIntFee.toLocaleString(),
+      rawFee: midIntFee,
+      term: Math.round(midIntFee / 3).toLocaleString(),
       notes: "Advanced Placement Preparation & SAT Foundations",
       perks: [
         "Pre-AP Academic Excellence Track",
@@ -208,9 +227,9 @@ export default function AqeeqSchoolAdmissionsPage() {
     {
       grade: "High School (Grades 10 - 12)",
       badge: "College Readiness & AP Programs",
-      fee: "29,000",
-      rawFee: 29000,
-      term: "9,666",
+      fee: secIntFee.toLocaleString(),
+      rawFee: secIntFee,
+      term: Math.round(secIntFee / 3).toLocaleString(),
       notes: "College Board SAT & ACT Center + IELTS Training",
       perks: [
         "Official SAT & ACT Test Center on Campus",
@@ -224,16 +243,18 @@ export default function AqeeqSchoolAdmissionsPage() {
 
   const activeFees = activeTrack === "national" ? feesNational : feesInternational;
 
-  // Calculation logic for siblings and instalments
+  // Calculation logic for siblings and instalments based on dashboard settings
   const selectedTier = activeFees[calcGradeIndex] || activeFees[0];
   const baseFee = selectedTier.rawFee;
   const totalBaseFee = baseFee * calcSiblingsCount;
   let siblingDiscountAmount = 0;
+  const disc1 = (admissionsSettings?.siblingDiscountFirst ?? 10) / 100;
+  const disc2 = (admissionsSettings?.siblingDiscountSecond ?? 15) / 100;
   if (calcSiblingsCount >= 2) {
-    siblingDiscountAmount += baseFee * 0.10; // 10% on 2nd child
+    siblingDiscountAmount += baseFee * disc1; // configured % on 2nd child
   }
   if (calcSiblingsCount >= 3) {
-    siblingDiscountAmount += baseFee * 0.15 * (calcSiblingsCount - 2); // 15% on 3rd+ child
+    siblingDiscountAmount += baseFee * disc2 * (calcSiblingsCount - 2); // configured % on 3rd+ child
   }
   const netTotalAnnual = totalBaseFee - siblingDiscountAmount;
   const netTermTotal = Math.round(netTotalAnnual / 3);
@@ -1010,6 +1031,17 @@ export default function AqeeqSchoolAdmissionsPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {!isRegistrationOpen && (
+                  <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-right space-y-1.5 mb-6">
+                    <div className="flex items-center gap-2 font-black text-sm text-amber-400">
+                      <ShieldCheck size={18} />
+                      <span>تنويه بخصوص حالة القبول والتسجيل</span>
+                    </div>
+                    <p className="text-xs font-bold leading-relaxed opacity-90">
+                      {closedNoticeText}
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-black mb-2">اسم الطالب / الطالبة الثلاثي *</label>
@@ -1130,7 +1162,11 @@ export default function AqeeqSchoolAdmissionsPage() {
                         : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-90 shadow-emerald-900/30"
                     }`}
                   >
-                    {submitMutation.isPending ? "جارِ إرسال الطلب..." : "تأكيد وإرسال طلب التسجيل ✦"}
+                    {submitMutation.isPending
+                      ? "جارِ إرسال الطلب..."
+                      : !isRegistrationOpen
+                      ? "تسجيل في قائمة الانتظار للعام الدراسي ✦"
+                      : "تأكيد وإرسال طلب التسجيل ✦"}
                   </Button>
                 </div>
               </form>

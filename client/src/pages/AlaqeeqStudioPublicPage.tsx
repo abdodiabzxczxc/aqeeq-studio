@@ -1843,9 +1843,9 @@ export default function AlaqeeqStudioPublicPage() {
                   <Youtube size={14} />
                 </a>
               )}
-              {(orchestration?.social?.telegramUrl || "https://t.me/alaqeeqschools") && (
+              {((orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools") && (
                 <a
-                  href={orchestration?.social?.telegramUrl || "https://t.me/alaqeeqschools"}
+                  href={(orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools"}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-8 w-8 place-items-center rounded-full border text-xs transition hover:scale-110 ${

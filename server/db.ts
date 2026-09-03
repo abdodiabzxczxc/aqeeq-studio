@@ -673,6 +673,33 @@ export type SiteOrchestrationConfig = {
     showCelebrationRibbon?: boolean;
     backgroundPatternOpacity?: number; // 0 to 100
   };
+  appShowcase?: {
+    enabled: boolean;
+    youtubeVideoId: string;
+    qrCodeUrl: string;
+    appStoreUrl?: string;
+    googlePlayUrl?: string;
+  };
+  schoolCampuses?: {
+    boysPhone: string;
+    girlsPhone: string;
+    boysAddress: string;
+    girlsAddress: string;
+    boysMapUrl?: string;
+    girlsMapUrl?: string;
+  };
+  admissionsSettings?: {
+    isOpen: boolean;
+    closedNoticeText?: string;
+    siblingDiscountFirst: number;
+    siblingDiscountSecond: number;
+    earlyPaymentDiscount: number;
+    tuitionFees?: Array<{
+      gradeLevel: string;
+      nationalAnnual: number;
+      internationalAnnual: number;
+    }>;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -753,6 +780,35 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     showCelebrationRibbon: true,
     backgroundPatternOpacity: 85,
   },
+  appShowcase: {
+    enabled: true,
+    youtubeVideoId: "_h3K-q8cDUc",
+    qrCodeUrl: "https://qr-codes.io/LQMip0",
+    appStoreUrl: "https://apps.apple.com",
+    googlePlayUrl: "https://play.google.com",
+  },
+  schoolCampuses: {
+    boysPhone: "0148131652",
+    girlsPhone: "0148644466",
+    boysAddress: "مجمع الرانوناء — ممشى الهجرة (خلف نايس برايس) بالمدينة المنورة",
+    girlsAddress: "مجمع الرانوناء — ممشى الهجرة (خلف نايس برايس) بالمدينة المنورة",
+    boysMapUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
+    girlsMapUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
+  },
+  admissionsSettings: {
+    isOpen: true,
+    closedNoticeText: "تم اكتمال المقاعد للعام الدراسي الحالي. بإمكانكم تسجيل بياناتكم في قائمة الانتظار.",
+    siblingDiscountFirst: 10,
+    siblingDiscountSecond: 15,
+    earlyPaymentDiscount: 5,
+    tuitionFees: [
+      { gradeLevel: "رياض الأطفال (KG1 - KG3)", nationalAnnual: 14500, internationalAnnual: 18500 },
+      { gradeLevel: "المرحلة الابتدائية (صفوف 1 - 3)", nationalAnnual: 16800, internationalAnnual: 21500 },
+      { gradeLevel: "المرحلة الابتدائية العليا (صفوف 4 - 6)", nationalAnnual: 17500, internationalAnnual: 22500 },
+      { gradeLevel: "المرحلة المتوسطة (صفوف 7 - 9)", nationalAnnual: 19500, internationalAnnual: 24500 },
+      { gradeLevel: "المرحلة الثانوية مسارات (صفوف 10 - 12)", nationalAnnual: 22000, internationalAnnual: 27500 },
+    ],
+  },
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -777,6 +833,9 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
           storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
           themeMode: { ...DEFAULT_SITE_ORCHESTRATION.themeMode, ...(parsed.themeMode || {}) },
+          appShowcase: { ...DEFAULT_SITE_ORCHESTRATION.appShowcase, ...(parsed.appShowcase || {}) },
+          schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
+          admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
         };
       }
     } catch (err) {
@@ -804,6 +863,9 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         customStoryIds: parsed.customStoryIds || DEFAULT_SITE_ORCHESTRATION.customStoryIds,
         storyExpiryMap: parsed.storyExpiryMap || DEFAULT_SITE_ORCHESTRATION.storyExpiryMap,
         themeMode: { ...DEFAULT_SITE_ORCHESTRATION.themeMode, ...(parsed.themeMode || {}) },
+        appShowcase: { ...DEFAULT_SITE_ORCHESTRATION.appShowcase, ...(parsed.appShowcase || {}) },
+        schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
+        admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
       };
     }
   } catch (err) {
@@ -826,6 +888,9 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     social: { ...current.social, ...(data.social || {}) },
     footer: { ...current.footer, ...(data.footer || {}) },
     location: { ...current.location, ...(data.location || {}) },
+    appShowcase: { ...(current.appShowcase || DEFAULT_SITE_ORCHESTRATION.appShowcase!), ...(data.appShowcase || {}) },
+    schoolCampuses: { ...(current.schoolCampuses || DEFAULT_SITE_ORCHESTRATION.schoolCampuses!), ...(data.schoolCampuses || {}) },
+    admissionsSettings: { ...(current.admissionsSettings || DEFAULT_SITE_ORCHESTRATION.admissionsSettings!), ...(data.admissionsSettings || {}) },
     hiddenStoryIds: data.hiddenStoryIds !== undefined ? data.hiddenStoryIds : current.hiddenStoryIds,
     customStoryIds: data.customStoryIds !== undefined ? data.customStoryIds : current.customStoryIds,
     storyExpiryMap: data.storyExpiryMap !== undefined
