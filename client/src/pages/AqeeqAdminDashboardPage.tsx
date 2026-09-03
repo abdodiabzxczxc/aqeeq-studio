@@ -778,7 +778,7 @@ const DEFAULT_ORCHESTRATION = {
   return (
     <div
       dir="rtl"
-      className={"min-h-screen transition-colors duration-300 font-[Tajawal,sans-serif] " + (
+      className={"min-h-screen w-full max-w-full overflow-x-hidden transition-colors duration-300 font-[Tajawal,sans-serif] " + (
         dark ? "bg-[#080808] text-white" : "bg-[#f4f6f9] text-slate-900"
       )}
     >
@@ -862,7 +862,7 @@ const DEFAULT_ORCHESTRATION = {
         </div>
 
         {/* Executive Navigation Tabs */}
-        <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-5 sm:px-8 overflow-x-auto scrollbar-none pb-2">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-3 sm:px-8 overflow-x-auto scrollbar-hide pb-2 pt-1">
           {[
             { key: "radar", label: "مركز القيادة والرادار", icon: LayoutDashboard },
             {
@@ -935,7 +935,7 @@ const DEFAULT_ORCHESTRATION = {
       </header>
 
       {/* Main Content Area */}
-      <main className="mx-auto max-w-[1440px] p-5 sm:p-8">
+      <main className="mx-auto max-w-[1440px] p-3 sm:p-8 w-full overflow-x-hidden">
         {/* ==================== TAB: ORCHESTRATION & CMS ==================== */}
         {activeTab === "orchestration" && (
           <div className="space-y-8 animate-in fade-in duration-300">
@@ -1282,13 +1282,13 @@ const DEFAULT_ORCHESTRATION = {
 
               {/* 1. HERO COVERS STUDIO (الرئيسية والصفحات الفرعية) */}
               <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
+                className={"rounded-3xl border p-4 sm:p-7 space-y-6 shadow-md overflow-hidden " + (
                   dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4 border-current/10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 border-current/10">
                   <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-white">
+                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-white shrink-0">
                       <BookOpen size={18} />
                     </div>
                     <div>
@@ -1298,7 +1298,7 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
 
                   {/* Sub-tab Navigation Pills */}
-                  <div className={"flex items-center gap-1 rounded-xl border p-1 text-[11px] font-black " + (
+                  <div className={"flex items-center gap-1 rounded-xl border p-1 text-[11px] font-black overflow-x-auto scrollbar-hide max-w-full " + (
                     dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-100"
                   )}>
                     {[
@@ -1313,7 +1313,7 @@ const DEFAULT_ORCHESTRATION = {
                         key={st.key}
                         type="button"
                         onClick={() => setHeroActiveCoverTab(st.key as typeof heroActiveCoverTab)}
-                        className={"rounded-lg px-2.5 py-1 transition " + (
+                        className={"rounded-lg px-2.5 py-1 transition shrink-0 whitespace-nowrap " + (
                           heroActiveCoverTab === st.key
                             ? dark
                               ? "bg-[#f8ca14] text-black shadow-sm"
@@ -7007,60 +7007,6 @@ const DEFAULT_ORCHESTRATION = {
       </Dialog>
 
       <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
-
-      {/* ===== Mobile Bottom Navigation Bar (lg:hidden) ===== */}
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t backdrop-blur-xl ${
-          dark ? "bg-[#0a0f14]/95 border-white/10" : "bg-white/95 border-black/10"
-        }`}
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-      >
-        <div className="flex items-center gap-0.5 px-1 py-1 overflow-x-auto">
-          {[
-            { tab: "radar" as TabKey,        icon: <LayoutDashboard size={17} />,  label: "الرادار"    },
-            { tab: "admissions" as TabKey,   icon: <GraduationCap  size={17} />,   label: "القبول"     },
-            { tab: "content" as TabKey,      icon: <BookOpen       size={17} />,   label: "المحتوى"    },
-            { tab: "podcast" as TabKey,      icon: <Radio          size={17} />,   label: "الصوتي"     },
-            { tab: "music" as TabKey,        icon: <Music          size={17} />,   label: "المزيكا"    },
-            { tab: "broadcast" as TabKey,    icon: <Megaphone      size={17} />,   label: "التواصل"    },
-            { tab: "orchestration" as TabKey,icon: <Sliders        size={17} />,   label: "الإعدادات"  },
-          ].map(({ tab, icon, label }) => {
-            const isActive =
-              activeTab === tab ||
-              (tab === "content" && activeTab === "articles") ||
-              (tab === "podcast" && activeTab === "audio_media") ||
-              (tab === "broadcast" && (activeTab === "whatsapp" || activeTab === "campaigns"));
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
-                  isActive
-                    ? "text-emerald-500 bg-emerald-500/10"
-                    : dark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                {icon}
-                <span>{label}</span>
-                {tab === "admissions" && admissionsList.filter((a: any) => a.status === "new" || a.status === "pending").length > 0 && (
-                  <span className="absolute top-1 right-1.5 h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
-                )}
-              </button>
-            );
-          })}
-          {/* AI Yearbook */}
-          <button
-            onClick={() => setIsYearbookOpen(true)}
-            className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl text-[9px] font-black shrink-0 transition ${
-              dark ? "text-[#f8ca14] bg-[#f8ca14]/10" : "text-[#08467d] bg-[#08467d]/08"
-            }`}
-          >
-            <Wand2 size={17} />
-            <span>AI ✨</span>
-          </button>
-        </div>
-      </div>
-
     </div>
   );
 }
