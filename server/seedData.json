@@ -667,82 +667,6 @@
       "updatedAt": "2026-09-01T10:36:19.837Z",
       "posts": [
         {
-          "id": 18,
-          "showcaseId": 1,
-          "driveFileId": "1xThWYMf3BNp69nhsdIBCgpVLnUPMOW29",
-          "mediaUrl": "/api/drive-proxy/1xThWYMf3BNp69nhsdIBCgpVLnUPMOW29",
-          "thumbnailUrl": "/api/drive-proxy/1xThWYMf3BNp69nhsdIBCgpVLnUPMOW29",
-          "fileName": "Screenshot_2026-08-26-11-12-05-541_com.ea.gp.fifamobile.jpg",
-          "mimeType": "image/jpeg",
-          "mediaType": "image",
-          "sourceType": "manual",
-          "externalUrl": null,
-          "title": null,
-          "description": null,
-          "isNew": true,
-          "postOrder": 17,
-          "viewCount": 2,
-          "createdAt": "2026-08-29T19:27:06.214Z",
-          "media": []
-        },
-        {
-          "id": 16,
-          "showcaseId": 1,
-          "driveFileId": "1hto57lxkTi_12v9oehlIV059ice8jQvy",
-          "mediaUrl": "/api/drive-proxy/1hto57lxkTi_12v9oehlIV059ice8jQvy",
-          "thumbnailUrl": "/api/drive-proxy/1hto57lxkTi_12v9oehlIV059ice8jQvy",
-          "fileName": "Screenshot_2026-08-25-09-28-07-794_com.ea.gp.fifamobile.jpg",
-          "mimeType": "image/jpeg",
-          "mediaType": "image",
-          "sourceType": "manual",
-          "externalUrl": null,
-          "title": null,
-          "description": null,
-          "isNew": true,
-          "postOrder": 15,
-          "viewCount": 0,
-          "createdAt": "2026-08-29T19:27:06.214Z",
-          "media": []
-        },
-        {
-          "id": 14,
-          "showcaseId": 1,
-          "driveFileId": "1rt8BNQ5qhQ1xDDHDd1omS5UyVJEKbLPz",
-          "mediaUrl": "/api/drive-proxy/1rt8BNQ5qhQ1xDDHDd1omS5UyVJEKbLPz",
-          "thumbnailUrl": "/api/drive-proxy/1rt8BNQ5qhQ1xDDHDd1omS5UyVJEKbLPz",
-          "fileName": "Screenshot_2026-08-18-21-53-04-964_tech.butterfly.app.jpg",
-          "mimeType": "image/jpeg",
-          "mediaType": "image",
-          "sourceType": "manual",
-          "externalUrl": null,
-          "title": null,
-          "description": null,
-          "isNew": true,
-          "postOrder": 13,
-          "viewCount": 0,
-          "createdAt": "2026-08-29T19:27:06.214Z",
-          "media": []
-        },
-        {
-          "id": 13,
-          "showcaseId": 1,
-          "driveFileId": "1lheSMFlLc0w7IrcpozomcEeUJG0l1ddy",
-          "mediaUrl": "/api/drive-proxy/1lheSMFlLc0w7IrcpozomcEeUJG0l1ddy",
-          "thumbnailUrl": "/api/drive-proxy/1lheSMFlLc0w7IrcpozomcEeUJG0l1ddy",
-          "fileName": "Screenshot_2026-08-18-01-51-43-025_com.droidhang.ad.jpg",
-          "mimeType": "image/jpeg",
-          "mediaType": "image",
-          "sourceType": "manual",
-          "externalUrl": null,
-          "title": null,
-          "description": null,
-          "isNew": true,
-          "postOrder": 12,
-          "viewCount": 0,
-          "createdAt": "2026-08-29T19:27:06.214Z",
-          "media": []
-        },
-        {
           "id": 12,
           "showcaseId": 1,
           "driveFileId": "1AxzjTKAkfsQWZWz8s07VhP4F40yjQRFS",
@@ -951,7 +875,8 @@
           "createdAt": "2026-08-29T18:45:43.434Z",
           "media": []
         }
-      ]
+      ],
+      "coverUrl": "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE"
     }
   ],
   "mediaAssets": [

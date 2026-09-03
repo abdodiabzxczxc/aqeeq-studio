@@ -279,6 +279,33 @@ export function resolveVisualIconName(value: string | null | undefined, fallback
   return VISUAL_ICON_COMPONENTS[candidate] ? candidate : fallback;
 }
 
+export function hashString(str: string): string {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+export function getElementPath(el: Element): string {
+  const parts: string[] = [];
+  let curr: Element | null = el;
+  while (curr && curr !== document.body && parts.length < 4) {
+    let name = curr.tagName.toLowerCase();
+    if (curr.id) {
+      name += "#" + curr.id;
+      parts.unshift(name);
+      break;
+    }
+    const idx = Array.from(curr.parentElement?.children || []).indexOf(curr);
+    name += `:nth-child(${idx + 1})`;
+    parts.unshift(name);
+    curr = curr.parentElement;
+  }
+  return parts.join(">");
+}
+
 function normalizedPath(pathname: string) {
   const path = pathname.split("?")[0];
   if (path === "/") return "/";
@@ -662,13 +689,34 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!selected) return;
     draftPreviewEnabled.current = false;
+
+    let defaultContent = currentOverride?.contentText ?? "";
+    let defaultMedia = currentOverride?.mediaUrl ?? "";
+    let defaultAlt = currentOverride?.altText ?? "";
+    let defaultTextColor = currentOverride?.textColor ?? "";
+
+    if (!currentOverride && typeof document !== "undefined") {
+      const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+      if (el) {
+        if (selected.tag === "image" && el instanceof HTMLImageElement) {
+          defaultMedia = el.src || "";
+          defaultAlt = el.alt || "";
+        } else if (selected.tag === "text") {
+          defaultContent = el.textContent?.trim() || "";
+          try {
+            defaultTextColor = window.getComputedStyle(el).color || "";
+          } catch {}
+        }
+      }
+    }
+
     setDraft({
-      contentText: currentOverride?.contentText ?? "",
-      mediaUrl: currentOverride?.mediaUrl ?? "",
-      altText: currentOverride?.altText ?? "",
+      contentText: defaultContent,
+      mediaUrl: defaultMedia,
+      altText: defaultAlt,
       linkUrl: currentOverride?.linkUrl ?? "",
       alignment: currentOverride?.alignment ?? "center",
-      textColor: currentOverride?.textColor ?? "",
+      textColor: defaultTextColor,
       bgColor: currentOverride?.bgColor ?? "",
       fontSize: currentOverride?.fontSize ?? "",
       padding: currentOverride?.padding ?? "",
@@ -912,6 +960,148 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     };
   }, [isEditing, layerMode, overrideMap]);
 
+  const selectElement = (elementId: string, elementTag: ElementTag, label: string, additive = false) => {
+    if (!isEditing || !isAdmin || !canManipulateLayer(overrideMap.get(elementId)?.isLocked)) return;
+    setSelected({ id: elementId, tag: elementTag, label });
+    setSelectedIds((current) => additive ? (current.includes(elementId) ? current.filter((id) => id !== elementId) : [...current, elementId]) : [elementId]);
+    setAddPanelOpen(false);
+    setLayersOpen(false);
+    setBuilderOpen(false);
+    setWorkspaceMediaOpen(false);
+    setPageMapOpen(false);
+    setPanelAnchorTop(null);
+  };
+
+  // ── Smart Auto-Detect Engine (المحرر الذكي الشامل) ──────────
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    if (isEditing) {
+      document.body.classList.add("aq-smart-editable-active");
+    } else {
+      document.body.classList.remove("aq-smart-editable-active");
+    }
+
+    const scanAndTag = () => {
+      const root = document.getElementById("root") || document.body;
+      if (!root) return;
+
+      // 1. Scan Images
+      const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
+      images.forEach((img, idx) => {
+        if (img.closest(".aq-editor-toolbar") || img.closest(".aq-editor-drawer") || img.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+
+        let id = img.dataset.visualId;
+        if (!id) {
+          const srcPath = img.getAttribute("src") || "";
+          const altText = img.alt || "";
+          id = `auto-img-${hashString(srcPath + altText + idx)}`;
+          img.dataset.visualId = id;
+          img.dataset.visualTag = "image";
+          img.dataset.visualLabel = altText || `صورة ${idx + 1}`;
+          img.dataset.visualAuto = "true";
+        }
+
+        const override = overrideMap.get(id);
+        if (override?.mediaUrl && img.src !== override.mediaUrl) {
+          img.src = override.mediaUrl;
+        }
+        if (override?.altText && img.alt !== override.altText) {
+          img.alt = override.altText;
+        }
+      });
+
+      // 2. Scan Text Elements (headings, paragraphs, buttons, spans, links)
+      const textNodes = Array.from(root.querySelectorAll<HTMLElement>(
+        "h1, h2, h3, h4, h5, h6, p, button, a, label, span"
+      ));
+      textNodes.forEach((node, idx) => {
+        if (node.closest(".aq-editor-toolbar") || node.closest(".aq-editor-drawer") || node.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+
+        // Check if node has direct text content
+        const directText = Array.from(node.childNodes)
+          .filter((n) => n.nodeType === Node.TEXT_NODE)
+          .map((n) => n.textContent || "")
+          .join("")
+          .trim();
+
+        if (!directText || directText.length < 1 || directText.length > 250) return;
+
+        let id = node.dataset.visualId;
+        if (!id) {
+          id = `auto-txt-${hashString(directText.slice(0, 30) + idx)}`;
+          node.dataset.visualId = id;
+          node.dataset.visualTag = "text";
+          node.dataset.visualLabel = directText.slice(0, 20);
+          node.dataset.visualAuto = "true";
+        }
+
+        const override = overrideMap.get(id);
+        if (override?.contentText) {
+          const textChild = Array.from(node.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
+          if (textChild && textChild.textContent !== override.contentText) {
+            textChild.textContent = override.contentText;
+          }
+        }
+        if (override?.textColor && node.style.color !== override.textColor) {
+          node.style.color = override.textColor;
+        }
+      });
+
+      // 3. Scan SVG Icons
+      const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
+      svgs.forEach((svg, idx) => {
+        if (svg.closest(".aq-editor-toolbar") || svg.closest(".aq-editor-drawer") || svg.closest("[data-visual-id]:not([data-visual-auto='true'])")) return;
+
+        let id = svg.dataset.visualId;
+        if (!id) {
+          id = `auto-icon-${hashString((svg.getAttribute("class") || "") + idx)}`;
+          svg.dataset.visualId = id;
+          svg.dataset.visualTag = "icon";
+          svg.dataset.visualLabel = `أيقونة ${idx + 1}`;
+          svg.dataset.visualAuto = "true";
+        }
+
+        const override = overrideMap.get(id);
+        if (override?.textColor) {
+          (svg as unknown as HTMLElement).style.color = override.textColor;
+        }
+      });
+    };
+
+    scanAndTag();
+
+    const handleCaptureClick = (e: globalThis.MouseEvent) => {
+      if (!isEditing) return;
+      const target = (e.target as Element)?.closest<HTMLElement>("[data-visual-auto='true']");
+      if (target && !target.closest(".aq-editor-toolbar") && !target.closest(".aq-editor-drawer")) {
+        e.preventDefault();
+        e.stopPropagation();
+        const autoId = target.dataset.visualId;
+        const autoTag = target.dataset.visualTag as ElementTag;
+        const autoLabel = target.dataset.visualLabel || "عنصر ذكي";
+        if (autoId && autoTag) {
+          selectElement(autoId, autoTag, autoLabel);
+        }
+      }
+    };
+
+    if (isEditing) {
+      window.addEventListener("click", handleCaptureClick, true);
+    }
+
+    const observer = new MutationObserver(() => {
+      scanAndTag();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener("click", handleCaptureClick, true);
+      observer.disconnect();
+      document.body.classList.remove("aq-smart-editable-active");
+    };
+  }, [isEditing, overrideMap, pagePath]);
+
   const saveLayer = (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => {
     if (!pagePath) return;
     const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(elementId)}"]`);
@@ -1140,17 +1330,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     backgroundAspectLocked,
     backgroundAutoArrange,
     groupTranslation,
-    select: (elementId, elementTag, label, additive = false) => {
-      if (!isEditing || !isAdmin || !canManipulateLayer(overrideMap.get(elementId)?.isLocked)) return;
-      setSelected({ id: elementId, tag: elementTag, label });
-      setSelectedIds((current) => additive ? (current.includes(elementId) ? current.filter((id) => id !== elementId) : [...current, elementId]) : [elementId]);
-      setAddPanelOpen(false);
-      setLayersOpen(false);
-      setBuilderOpen(false);
-      setWorkspaceMediaOpen(false);
-      setPageMapOpen(false);
-      setPanelAnchorTop(null);
-    },
+    select: selectElement,
     toggleEditing: () => { if (pagePath && isAdmin) { setIsEditing((current) => !current); setSelected(null); setSelectedIds([]); setLayerMode(false); } },
     openHomeEditor: () => { if (isAdmin) { if (pathname.split("?")[0] !== "/") { navigate("/?visual=1"); } else { setIsEditing(true); setSelected(null); setSelectedIds([]); setLayerMode(false); } } },
     toggleLayerMode: () => setLayerMode((current) => !current),
@@ -1493,6 +1673,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         <WorkspaceButton active={mobilePreview} label="معاينة الهاتف" icon={<Smartphone size={16} />} onClick={() => setMobilePreview((current) => !current)} />
         <WorkspaceButton active={false} label="معاينة كزائر" icon={<Eye size={16} />} onClick={() => setPreviewMode(true)} />
         <span className="aq-key-divider" aria-hidden="true" />
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-black pointer-events-none">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span>المحرر الذكي نشط (يتعرف على كل عنصر)</span>
+        </div>
         <WorkspaceButton active={false} label="حفظ ونشر" icon={<Check size={17} />} onClick={runPrePublishCheck} />
         <WorkspaceButton active={false} label="خروج" icon={<X size={17} />} onClick={() => { closeWorkspacePanels(); setIsEditing(false); setSelected(null); setSelectedIds([]); setLayerMode(false); setToolGroup(null); }} />
       </div>

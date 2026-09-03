@@ -2399,3 +2399,26 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
     cursor: text !important;
   }
 }
+
+/* ── Smart Auto-Detect Visual Editor Styles ─────────────────── */
+body.aq-smart-editable-active [data-visual-auto="true"] {
+  cursor: pointer !important;
+  transition: outline 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+body.aq-smart-editable-active [data-visual-auto="true"]:hover {
+  outline: 2px dashed #f59e0b !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+}
+
+body.aq-smart-editable-active img[data-visual-auto="true"]:hover {
+  outline: 2.5px solid #3b82f6 !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
+}
+
+body.aq-smart-editable-active [data-visual-tag="icon"][data-visual-auto="true"]:hover {
+  outline: 2px dashed #10b981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35) !important;
+}
+

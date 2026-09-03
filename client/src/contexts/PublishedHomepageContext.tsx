@@ -16,11 +16,23 @@ type PublishedHomepageState = {
 
 const PublishedHomepageContext = createContext<PublishedHomepageState>({ snapshot: undefined, isReady: false });
 
-const CACHE_KEY = "aqeeq-published-homepage-snapshot";
+const CACHE_KEY = "aqeeq-published-homepage-snapshot-v4";
 
 function getInitialSnapshot(): PublishedHomepageSnapshot | undefined {
   try {
     if (typeof window === "undefined") return undefined;
+    // Clear deprecated cache versions
+    localStorage.removeItem("aqeeq-published-homepage-snapshot");
+    localStorage.removeItem("aqeeq-published-homepage-snapshot-v2");
+    localStorage.removeItem("aqeeq-published-homepage-snapshot-v3");
+
+    // Purge any old overrides cache that contained junk screenshots
+    const oldHeroKey = "aqeeq-overrides-/";
+    const rawOverrides = localStorage.getItem(oldHeroKey);
+    if (rawOverrides && (rawOverrides.includes("1xThWYMf3BNp69nhsdIBCgpVLnUPMOW29") || rawOverrides.includes("1rt8BNQ5qhQ1xDDHDd1omS5UyVJEKbLPz") || rawOverrides.includes("butterfly.app") || rawOverrides.includes("fifamobile"))) {
+      localStorage.removeItem(oldHeroKey);
+    }
+
     const raw = localStorage.getItem(CACHE_KEY);
     return raw ? JSON.parse(raw) : undefined;
   } catch {

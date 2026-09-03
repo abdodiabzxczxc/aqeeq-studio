@@ -1122,7 +1122,7 @@ export default function AlaqeeqStudioPublicPage() {
                 <VisualImage
                   id="studio-hero-showcase-image"
                   label="صورة غلاف الأخبار"
-                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "")}
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE")}
                   alt="غلاف الأخبار والعروض"
                   className="h-full w-full object-cover"
                 />
