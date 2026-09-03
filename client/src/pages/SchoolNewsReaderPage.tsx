@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import SchoolNewsPager, { NewsPagerPage } from "@/components/SchoolNewsPager";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualIcon } from "@/components/VisualEditor";
 import { getJournalIssueShareUrl } from "@/lib/journalRoutes";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -62,9 +63,13 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#090b11]">
-        <Loader2 className="animate-spin text-amber-300" />
-      </div>
+      <main dir="rtl" className={`min-h-screen ${dark ? "bg-[#090b11] text-white" : "bg-white text-black"}`}>
+        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
+        <div className="container py-8 animate-pulse">
+          <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
+          <div className="mx-auto max-w-4xl h-[550px] rounded-3xl bg-current/5 border border-current/10" />
+        </div>
+      </main>
     );
   }
 
@@ -122,26 +127,25 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
       <div className={standalone ? "mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6" : "container py-6"}>
         {!standalone ? (
-          <VisualEditable
-            id="news-reader-back-action"
-            tag="button"
-            label="زر رجوع مكتبة المجلة"
-            defaultText="عودة إلى مجلة العقيق"
-            as="button"
-            onAction={() => navigate("/journal")}
-            className={`mb-4 inline-flex items-center gap-2 text-xs font-bold transition ${
-              isNationalDay
-                ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
-                : "text-slate-400 hover:text-amber-200"
-            }`}
-          >
-            {(text) => (
-              <>
-                <VisualIcon id="news-reader-back-icon" label="أيقونة رجوع المجلة" icon="external" size={16} />
-                {text}
-              </>
-            )}
-          </VisualEditable>
+          <nav className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
+              <span className="opacity-40">›</span>
+              <button onClick={() => navigate("/journal")} className="hover:text-current transition">مجلة العقيق</button>
+              <span className="opacity-40">›</span>
+              <span className={dark ? "text-white truncate max-w-xs" : "text-black truncate max-w-xs"}>{issue.title}</span>
+            </div>
+            <button
+              onClick={() => navigate("/journal")}
+              className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+                isNationalDay
+                  ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
+                  : "text-slate-400 hover:text-amber-300"
+              }`}
+            >
+              <span>← عودة للأعداد</span>
+            </button>
+          </nav>
         ) : null}
 
         {/* Master Luxury Reader Header - Exactly Matching Album Reader */}
@@ -324,6 +328,8 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
           )}
         </div>
       </div>
+
+      {!standalone && <AlaqeeqStudioSiteFooter />}
     </main>
   );
 }

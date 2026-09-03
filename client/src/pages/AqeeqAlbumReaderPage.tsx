@@ -3,6 +3,7 @@ import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { AqeeqUnifiedVideoFrame, AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
 import AqeeqAlbumSocialEmbed from "@/components/AqeeqAlbumSocialEmbed";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
@@ -324,7 +325,17 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     } catch { /* المتصفح قد يمنع ملء الشاشة */ }
   };
 
-  if (isLoading) return <div className="grid min-h-screen place-items-center bg-[#080b12]"><Loader2 className="animate-spin text-amber-300" /></div>;
+  if (isLoading) {
+    return (
+      <main dir="rtl" className={`min-h-screen ${dark ? "bg-[#080b12] text-white" : "bg-white text-black"}`}>
+        <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" />
+        <div className="mx-auto max-w-[1500px] px-4 py-8 animate-pulse">
+          <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
+          <div className="h-[550px] rounded-3xl bg-current/5 border border-current/10" />
+        </div>
+      </main>
+    );
+  }
   if (!album) return <main dir="rtl" className="grid min-h-screen place-items-center bg-[#080b12] p-6 text-center text-slate-400"><div><ImageIcon className="mx-auto text-amber-300" size={38} /><h1 className="mt-4 text-2xl font-black text-amber-50">هذا الألبوم غير متاح</h1><p className="mt-2 text-sm">قد يكون مسودة لم تُنشر بعد أو أن الرابط غير صحيح.</p></div></main>;
 
   const watermarkPlacement = album.watermarkPosition === "top-right" ? "right-[-10%] top-0" : album.watermarkPosition === "bottom-left" ? "bottom-[-8%] left-[-10%]" : album.watermarkPosition === "bottom-right" ? "bottom-[-8%] right-[-10%]" : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
@@ -824,6 +835,9 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         />
       )}
     </div>
+
+    {/* Unified Luxury Site Footer */}
+    <AlaqeeqStudioSiteFooter />
   </main>
   );
 }

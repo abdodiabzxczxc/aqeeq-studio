@@ -1,15 +1,16 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AqeeqArchiveControls } from "@/components/AqeeqArchiveControls";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
+import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, useVisualEditorState } from "@/components/VisualEditor";
 import VisualSections from "@/components/VisualSections";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
-import { AQEEQ_SORT_OPTIONS, searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
+import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { normalizeJournalCoverScale } from "@/lib/journalCover";
 import { getJournalIssuePath, getJournalIssueShareUrl } from "@/lib/journalRoutes";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, BookOpen, Eye, FolderArchive, LibraryBig, Loader2, ScanLine, Settings2, Share2, Sparkles } from "lucide-react";
+import { ArrowUpLeft, BookOpen, Eye, FolderArchive, LibraryBig, ScanLine, Settings2, Share2, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -19,15 +20,95 @@ function JournalCover({ issueCoverUrl, fillFrame = false }: { issueCoverUrl?: st
   const override = getOverride("journal-cover-art");
   const imageUrl = override?.mediaUrl || issueCoverUrl;
   const scale = normalizeJournalCoverScale(override?.fontSize);
-  return <VisualEditable id="journal-cover-art" tag="image" label="صورة غلاف واجهة المكتبة" as="div" className={`relative mx-auto overflow-hidden rounded-[1.35rem] border border-amber-100/60 bg-[#d9bd26] shadow-[0_32px_85px_rgba(0,0,0,.55)] transition duration-500 hover:scale-[1.02] ${fillFrame ? "h-full w-full" : "aspect-[3/4] w-[min(55vw,300px)]"}`}><div className="absolute inset-0 border-[10px] border-white opacity-65" /><div className="relative h-full w-full transition-transform duration-300" style={{ transform: `scale(${scale})` }}>{imageUrl ? <img src={imageUrl} alt="غلاف نشرة العقيق" className="h-full w-full object-cover" /> : <div className="flex h-full w-full flex-col justify-between bg-[linear-gradient(155deg,#ffffff,#d9bd26_56%,#085187)] p-7 text-black"><div className="text-[10px] font-black tracking-[.26em]">AL-AQEEQ JOURNAL</div><div><div className="text-4xl font-black leading-[1.15]">نشرة<br />الأخبار</div><div className="mt-4 h-px w-4/5 bg-black/45" /></div><div className="flex items-center justify-between text-[10px] font-black"><span>مدارس العقيق</span><span>2026</span></div></div>}</div></VisualEditable>;
+  return (
+    <VisualEditable
+      id="journal-cover-art"
+      tag="image"
+      label="صورة غلاف واجهة المكتبة"
+      as="div"
+      className={`relative mx-auto overflow-hidden rounded-[1.35rem] border border-amber-100/60 bg-[#d9bd26] shadow-[0_32px_85px_rgba(0,0,0,.55)] transition duration-500 hover:scale-[1.02] ${
+        fillFrame ? "h-full w-full" : "aspect-[3/4] w-[min(55vw,300px)]"
+      }`}
+    >
+      <div className="absolute inset-0 border-[10px] border-white opacity-65" />
+      <div className="relative h-full w-full transition-transform duration-300" style={{ transform: `scale(${scale})` }}>
+        {imageUrl ? (
+          <img src={imageUrl} alt="غلاف نشرة العقيق" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full flex-col justify-between bg-[linear-gradient(155deg,#ffffff,#d9bd26_56%,#085187)] p-7 text-black">
+            <div className="text-[10px] font-black tracking-[.26em]">AL-AQEEQ JOURNAL</div>
+            <div>
+              <div className="text-4xl font-black leading-[1.15]">نشرة<br />الأخبار</div>
+              <div className="mt-4 h-px w-4/5 bg-black/45" />
+            </div>
+            <div className="flex items-center justify-between text-[10px] font-black">
+              <span>مدارس العقيق</span>
+              <span>2026</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </VisualEditable>
+  );
 }
 
-function JournalCard({ issue, index, onOpen, onShare }: { issue: { id: number; slug: string; title: string; issueDate: string; description: string | null; coverUrl: string | null; pageCount: number; viewCount: number }; index: number; onOpen: () => void; onShare: () => void }) {
-  return <article className="group relative overflow-hidden rounded-[2rem] border border-amber-300/55 bg-[#080808] p-4 shadow-[0_28px_70px_rgba(0,0,0,.35)] transition duration-300 hover:-translate-y-1 hover:border-amber-200/80 md:p-5"><div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "linear-gradient(128deg,transparent 0 48%,rgba(255,255,255,.04) 48.1% 48.3%,transparent 48.4%)" }} /><div className="relative flex h-full flex-col gap-5 sm:flex-row"><button onClick={onOpen} className="relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border border-amber-300/35 bg-black shadow-inner sm:w-[45%]" aria-label={`فتح ${issue.title}`}><div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(217,189,38,.12),transparent_38%)]" /><div className="absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border border-amber-100/25 bg-black opacity-55 shadow-[0_14px_25px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>{issue.coverUrl ? <img src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}</div><div className="absolute bottom-[6%] right-[10%] top-[6%] w-[54%] overflow-hidden rounded-[1rem] border border-amber-100/70 bg-black p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)]" style={{ transform: "rotate(2deg)" }}>{issue.coverUrl ? <img src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className="text-amber-200" size={34} /></div>}</div></button><div className="flex min-w-0 flex-1 flex-col"><div className="flex items-start justify-between gap-3"><div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-300/45 bg-amber-300/[.08] text-amber-200"><BookOpen size={18} /></div><p className="pt-1 text-left text-[9px] font-black tracking-[.18em] text-amber-200">PUBLIC JOURNAL · {String(index + 1).padStart(2, "0")}</p></div><VisualEditable id={`journal-card-title-${issue.id}`} tag="text" label={`عنوان ${issue.title}`} defaultText={issue.title} as="h3" className="mt-4 text-2xl font-black text-amber-50" /><p className="mt-3 text-sm leading-7 text-slate-400">{issue.description || `عدد محفوظ من مجلة العقيق، يتضمن ${issue.pageCount} صفحة قابلة للقراءة والمشاركة.`}</p><div className="mt-auto flex items-end justify-between gap-3 border-t border-white/[.12] pt-4"><div><b className="block text-xl font-black text-amber-100">{String(issue.pageCount).padStart(2, "0")}</b><span className="text-[9px] font-black tracking-[.16em] text-slate-500">PAGES</span></div><span className="inline-flex items-center gap-1 text-[10px] font-black text-slate-400"><Eye size={13} />{issue.viewCount || 0}</span><div className="flex items-center gap-3"><button onClick={onShare} className="text-[10px] font-black text-slate-400 transition hover:text-amber-200" aria-label={`مشاركة ${issue.title}`}><Share2 size={14} /></button><button onClick={onOpen} className="inline-flex items-center gap-2 text-xs font-black text-amber-200">استكشف الآن <ArrowUpLeft size={15} /></button></div></div></div></div></article>;
+function JournalCard({
+  issue,
+  index,
+  onOpen,
+  onShare,
+}: {
+  issue: { id: number; slug: string; title: string; issueDate: string; description: string | null; coverUrl: string | null; pageCount: number; viewCount: number };
+  index: number;
+  onOpen: () => void;
+  onShare: () => void;
+}) {
+  return (
+    <article className="group relative overflow-hidden rounded-[2rem] border border-amber-300/55 bg-[#080808] p-4 shadow-[0_28px_70px_rgba(0,0,0,.35)] transition duration-300 hover:-translate-y-1 hover:border-amber-200/80 md:p-5">
+      <div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "linear-gradient(128deg,transparent 0 48%,rgba(255,255,255,.04) 48.1% 48.3%,transparent 48.4%)" }} />
+      <div className="relative flex h-full flex-col gap-5 sm:flex-row">
+        <button onClick={onOpen} className="relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border border-amber-300/35 bg-black shadow-inner sm:w-[45%]" aria-label={`فتح ${issue.title}`}>
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(217,189,38,.12),transparent_38%)]" />
+          <div className="absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border border-amber-100/25 bg-black opacity-55 shadow-[0_14px_25px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>
+            {issue.coverUrl ? <img src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
+          </div>
+          <div className="absolute bottom-[6%] right-[10%] top-[6%] w-[54%] overflow-hidden rounded-[1rem] border border-amber-100/70 bg-black p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)]" style={{ transform: "rotate(2deg)" }}>
+            {issue.coverUrl ? <img src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className="text-amber-200" size={34} /></div>}
+          </div>
+        </button>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-300/45 bg-amber-300/[.08] text-amber-200">
+              <BookOpen size={18} />
+            </div>
+            <p className="pt-1 text-left text-[9px] font-black tracking-[.18em] text-amber-200">PUBLIC JOURNAL · {String(index + 1).padStart(2, "0")}</p>
+          </div>
+          <VisualEditable id={`journal-card-title-${issue.id}`} tag="text" label={`عنوان ${issue.title}`} defaultText={issue.title} as="h3" className="mt-4 text-2xl font-black text-amber-50" />
+          <p className="mt-3 text-sm leading-7 text-slate-400">{issue.description || `عدد محفوظ من مجلة العقيق، يتضمن ${issue.pageCount} صفحة قابلة للقراءة والمشاركة.`}</p>
+          <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/[.12] pt-4">
+            <div>
+              <b className="block text-xl font-black text-amber-100">{String(issue.pageCount).padStart(2, "0")}</b>
+              <span className="text-[9px] font-black tracking-[.16em] text-slate-500">PAGES</span>
+            </div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-black text-slate-400"><Eye size={13} />{issue.viewCount || 0}</span>
+            <div className="flex items-center gap-3">
+              <button onClick={onShare} className="text-[10px] font-black text-slate-400 transition hover:text-amber-200" aria-label={`مشاركة ${issue.title}`}>
+                <Share2 size={14} />
+              </button>
+              <button onClick={onOpen} className="inline-flex items-center gap-2 text-xs font-black text-amber-200">
+                استكشف الآن <ArrowUpLeft size={15} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export default function JournalArchivePage() {
-  useAqeeqStudioTheme();
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
   const { user, isAuthenticated } = useAuth();
   const { snapshot } = usePublishedHomepage();
   const [, navigate] = useLocation();
@@ -41,7 +122,125 @@ export default function JournalArchivePage() {
   const journalLogoUrl = issues[0]?.headerLogoUrl || snapshot?.settings.school_logo || null;
   const featuredIssue = issues[0];
   const secondIssue = issues[1];
-  const copyIssue = async (slug: string) => { try { await navigator.clipboard.writeText(getJournalIssueShareUrl(window.location.origin, slug)); toast.success("تم نسخ رابط العدد"); } catch { toast.error("تعذر نسخ الرابط"); } };
-  if (isLoading) return <div className="aq-public-shell flex min-h-screen items-center justify-center bg-black"><Loader2 className="animate-spin text-amber-300" /></div>;
-  return <main dir="rtl" className="aq-public-shell overflow-x-hidden bg-black text-slate-100"><VisualEditable id="journal-header-shell" tag="section" label="شريط هوية المكتبة" as="section"><AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={journalLogoUrl} /></VisualEditable>{featuredIssue ? <><VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className="relative isolate overflow-hidden border-b border-amber-300/15 bg-black"><div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} /><div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16"><div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">{secondIssue ? <button onClick={() => navigate(getJournalIssuePath(secondIssue.slug))} className="absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border border-amber-100/15 bg-black p-2 opacity-60 shadow-[0_25px_50px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}><img src={secondIssue.coverUrl || ""} alt="" className="h-full w-full rounded-[1.12rem] object-cover" /></button> : null}<button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border border-amber-100/30 bg-black p-2 shadow-[0_30px_70px_rgba(0,0,0,.5)]" style={{ transform: "rotate(3deg)" }}><div className="relative h-full overflow-hidden rounded-[1.35rem]"><JournalCover issueCoverUrl={featuredIssue.coverUrl} fillFrame /><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/45 to-transparent px-4 pb-4 pt-16"><span className="text-[10px] font-black text-amber-100">{featuredIssue.pageCount} صفحة</span><h2 className="mt-1 text-lg font-black text-white">{featuredIssue.title}</h2></div></div></button></div><div className="order-1 md:order-2"><VisualEditable id="journal-hero-badge" tag="text" label="شارة المكتبة" defaultText="موسم العقيق · أرشيف الأعداد" as="div" className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/[.07] px-3 py-1.5 text-[11px] font-black text-amber-200">{(text) => <><Sparkles size={14} />{text}</>}</VisualEditable><VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className="mt-5 text-4xl font-black leading-[1.12] text-amber-50 md:text-6xl" /><VisualEditable id="journal-hero-title-second" tag="text" label="السطر الذهبي لعنوان المكتبة" defaultText="بنبض لحظته." as="h1" className="text-4xl font-black leading-[1.12] text-amber-300 md:text-6xl" /><VisualEditable id="journal-hero-description" tag="text" label="وصف واجهة المكتبة" defaultText="رفوف رقمية تحفظ أعداد النشرة، وتفتح كل صفحة كجزء من ذاكرة مدارس العقيق." as="p" className="mt-5 max-w-xl text-sm leading-8 text-slate-300" /><div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-300"><span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><BookOpen className="ml-1 inline text-amber-300" size={13} />{issues.length} عدد منشور</span><span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><ScanLine className="ml-1 inline text-amber-300" size={13} />{totalPages} صفحة محفوظة</span><span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><FolderArchive className="ml-1 inline text-amber-300" size={13} />{months} مواسم</span></div><div className="mt-7 flex flex-wrap gap-3"><button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="inline-flex items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-xs font-black text-black transition hover:bg-amber-200"><ArrowUpLeft size={16} />ابدأ بأحدث عدد</button>{isAdmin ? <button onClick={() => navigate("/news/manage")} className="inline-flex items-center gap-2 rounded-xl border border-amber-300/35 bg-amber-300/[.06] px-5 py-3 text-xs font-black text-amber-100 transition hover:bg-amber-300/[.13]"><Settings2 size={16} />إدارة أعداد المجلة</button> : null}</div></div></div></VisualEditable><VisualSections pagePath="/journal" anchorId="journal-after-hero" /><section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16"><VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section"><div className="mb-8 flex items-end justify-between gap-4 border-b border-amber-300/15 pb-5"><div><p className="aq-kicker">THE JOURNAL SHELF</p><h2 className="mt-2 text-2xl font-black text-amber-50">أعداد العقيق</h2></div><span className="text-xs text-slate-500">{visibleIssues.length} من {issues.length} عدد</span></div><AqeeqArchiveControls id="journal-archive-controls" label="البحث وترتيب أعداد المجلة" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />{visibleIssues.length ? <div className="grid gap-6 lg:grid-cols-2">{visibleIssues.map((issue, index) => <JournalCard key={issue.id} issue={issue} index={index} onOpen={() => navigate(getJournalIssuePath(issue.slug))} onShare={() => void copyIssue(issue.slug)} />)}</div> : <VisualEditable id="journal-search-empty" tag="text" label="رسالة عدم وجود نتائج للمجلة" defaultText="لا توجد أعداد مطابقة للبحث." as="p" className="rounded-2xl border border-dashed border-amber-300/30 p-8 text-center text-sm font-black text-amber-100" />}</VisualEditable></section></> : <section className="mx-auto max-w-[900px] px-5 py-28 text-center"><LibraryBig className="mx-auto text-amber-200" size={48} /><VisualEditable id="journal-empty-title" tag="text" label="عنوان المكتبة الفارغة" defaultText="المكتبة تجهز رفها الأول" as="h1" className="mt-6 text-3xl font-black text-amber-50" /><VisualEditable id="journal-empty-description" tag="text" label="وصف المكتبة الفارغة" defaultText="عند نشر أول نشرة ستظهر هنا كغلاف محفوظ ورابط قراءة مستقل يمكن مشاركته مع مجتمع مدارس العقيق." as="p" className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-400" />{isAdmin ? <button onClick={() => navigate("/news/manage")} className="mt-6 rounded-xl bg-amber-300 px-4 py-3 text-xs font-black text-black">إنشاء أول عدد</button> : null}</section>}<VisualSections pagePath="/journal" anchorId="page-end" /></main>;
+
+  const copyIssue = async (slug: string) => {
+    try {
+      await navigator.clipboard.writeText(getJournalIssueShareUrl(window.location.origin, slug));
+      toast.success("تم نسخ رابط العدد");
+    } catch {
+      toast.error("تعذر نسخ الرابط");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
+        <section className={`border-b py-12 px-5 sm:px-8 animate-pulse ${dark ? "border-white/10 bg-[#080808]" : "border-black/5 bg-slate-50"}`}>
+          <div className="mx-auto grid max-w-[1440px] items-center gap-8 md:grid-cols-[1fr_1.1fr]">
+            <div className={`h-[320px] md:h-[420px] rounded-[2rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+            <div className="space-y-4">
+              <div className={`h-6 w-36 rounded-full ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+              <div className={`h-10 w-3/4 rounded-2xl ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+              <div className={`h-4 w-full rounded-lg ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+              <div className={`h-4 w-2/3 rounded-lg ${dark ? "bg-white/5" : "bg-slate-200"}`} />
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main dir="rtl" className="aq-public-shell overflow-x-hidden bg-black text-slate-100">
+      <VisualEditable id="journal-header-shell" tag="section" label="شريط هوية المكتبة" as="section">
+        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={journalLogoUrl} />
+      </VisualEditable>
+      {featuredIssue ? (
+        <>
+          <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className="relative isolate overflow-hidden border-b border-amber-300/15 bg-black">
+            <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} />
+            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
+              <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
+                {secondIssue ? (
+                  <button onClick={() => navigate(getJournalIssuePath(secondIssue.slug))} className="absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border border-amber-100/15 bg-black p-2 opacity-60 shadow-[0_25px_50px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>
+                    <img src={secondIssue.coverUrl || ""} alt="" className="h-full w-full rounded-[1.12rem] object-cover" />
+                  </button>
+                ) : null}
+                <button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border border-amber-100/30 bg-black p-2 shadow-[0_30px_70px_rgba(0,0,0,.5)]" style={{ transform: "rotate(3deg)" }}>
+                  <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                    <JournalCover issueCoverUrl={featuredIssue.coverUrl} fillFrame />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/45 to-transparent px-4 pb-4 pt-16">
+                      <span className="text-[10px] font-black text-amber-100">{featuredIssue.pageCount} صفحة</span>
+                      <h2 className="mt-1 text-lg font-black text-white">{featuredIssue.title}</h2>
+                    </div>
+                  </div>
+                </button>
+              </div>
+              <div className="order-1 md:order-2">
+                <VisualEditable id="journal-hero-badge" tag="text" label="شارة المكتبة" defaultText="موسم العقيق · أرشيف الأعداد" as="div" className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/[.07] px-3 py-1.5 text-[11px] font-black text-amber-200">
+                  {(text) => <><Sparkles size={14} />{text}</>}
+                </VisualEditable>
+                <VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className="mt-5 text-4xl font-black leading-[1.12] text-amber-50 md:text-6xl" />
+                <VisualEditable id="journal-hero-title-second" tag="text" label="السطر الذهبي لعنوان المكتبة" defaultText="بنبض لحظته." as="h1" className="text-4xl font-black leading-[1.12] text-amber-300 md:text-6xl" />
+                <VisualEditable id="journal-hero-description" tag="text" label="وصف واجهة المكتبة" defaultText="رفوف رقمية تحفظ أعداد النشرة، وتفتح كل صفحة كجزء من ذاكرة مدارس العقيق." as="p" className="mt-5 max-w-xl text-sm leading-8 text-slate-300" />
+                <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-300">
+                  <span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><BookOpen className="ml-1 inline text-amber-300" size={13} />{issues.length} عدد منشور</span>
+                  <span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><ScanLine className="ml-1 inline text-amber-300" size={13} />{totalPages} صفحة محفوظة</span>
+                  <span className="rounded-full border border-white/[.1] bg-black/15 px-3 py-2"><FolderArchive className="ml-1 inline text-amber-300" size={13} />{months} مواسم</span>
+                </div>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="inline-flex items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-xs font-black text-black transition hover:bg-amber-200">
+                    <ArrowUpLeft size={16} />ابدأ بأحدث عدد
+                  </button>
+                  {isAdmin ? (
+                    <button onClick={() => navigate("/news/manage")} className="inline-flex items-center gap-2 rounded-xl border border-amber-300/35 bg-amber-300/[.06] px-5 py-3 text-xs font-black text-amber-100 transition hover:bg-amber-300/[.13]">
+                      <Settings2 size={16} />إدارة أعداد المجلة
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </VisualEditable>
+          <VisualSections pagePath="/journal" anchorId="journal-after-hero" />
+          <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+            <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section">
+              <div className="mb-8 flex items-end justify-between gap-4 border-b border-amber-300/15 pb-5">
+                <div>
+                  <p className="aq-kicker">THE JOURNAL SHELF</p>
+                  <h2 className="mt-2 text-2xl font-black text-amber-50">أعداد العقيق</h2>
+                </div>
+                <span className="text-xs text-slate-500">{visibleIssues.length} من {issues.length} عدد</span>
+              </div>
+              <AqeeqArchiveControls id="journal-archive-controls" label="البحث وترتيب أعداد المجلة" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />
+              {visibleIssues.length ? (
+                <div className="grid gap-6 lg:grid-cols-2">
+                  {visibleIssues.map((issue, index) => (
+                    <JournalCard key={issue.id} issue={issue} index={index} onOpen={() => navigate(getJournalIssuePath(issue.slug))} onShare={() => void copyIssue(issue.slug)} />
+                  ))}
+                </div>
+              ) : (
+                <VisualEditable id="journal-search-empty" tag="text" label="رسالة عدم وجود نتائج للمجلة" defaultText="لا توجد أعداد مطابقة للبحث." as="p" className="rounded-2xl border border-dashed border-amber-300/30 p-8 text-center text-sm font-black text-amber-100" />
+              )}
+            </VisualEditable>
+          </section>
+        </>
+      ) : (
+        <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
+          <LibraryBig className="mx-auto text-amber-200" size={48} />
+          <VisualEditable id="journal-empty-title" tag="text" label="عنوان المكتبة الفارغة" defaultText="المكتبة تجهز رفها الأول" as="h1" className="mt-6 text-3xl font-black text-amber-50" />
+          <VisualEditable id="journal-empty-description" tag="text" label="وصف المكتبة الفارغة" defaultText="عند نشر أول نشرة ستظهر هنا كغلاف محفوظ ورابط قراءة مستقل يمكن مشاركته مع مجتمع مدارس العقيق." as="p" className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-400" />
+          {isAdmin ? (
+            <button onClick={() => navigate("/news/manage")} className="mt-6 rounded-xl bg-amber-300 px-4 py-3 text-xs font-black text-black">
+              إنشاء أول عدد
+            </button>
+          ) : null}
+        </section>
+      )}
+      <VisualSections pagePath="/journal" anchorId="page-end" />
+
+      {/* Unified Luxury Site Footer */}
+      <AlaqeeqStudioSiteFooter />
+    </main>
+  );
 }
