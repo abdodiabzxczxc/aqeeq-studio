@@ -531,134 +531,106 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
           </div>
 
-          {/* Luxury Slide-Down Mobile Menu Drawer */}
+          {/* Mobile Menu Drawer */}
           {mobileMenuOpen && (
-            <div className={`absolute inset-x-3.5 sm:inset-x-5 top-[70px] max-h-[calc(100vh-85px)] overflow-y-auto scrollbar-none rounded-2xl border p-4 shadow-2xl backdrop-blur-2xl lg:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            <div dir="rtl" className={`absolute inset-x-3 sm:inset-x-5 top-[70px] max-h-[calc(100vh-90px)] overflow-y-auto rounded-2xl border p-4 shadow-2xl backdrop-blur-2xl lg:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
               dark
-                ? "border-[#f8ca14]/30 bg-black/95 shadow-[0_24px_55px_rgba(0,0,0,0.9)] text-white"
-                : "border-black/[0.08] bg-white/98 shadow-[0_24px_55px_rgba(0,0,0,0.15)] text-black"
+                ? "border-[#f8ca14]/25 bg-[#060a0f]/97 shadow-[0_24px_55px_rgba(0,0,0,0.95)] text-white"
+                : "border-black/[0.07] bg-white/99 shadow-[0_24px_55px_rgba(0,0,0,0.12)] text-black"
             }`}>
 
-              {/* User Bar / Status inside Drawer */}
-              <div className="flex items-center justify-between border-b pb-3 mb-3 border-current/10">
+              {/* الهيدر: اسم المستخدم + أزرار */}
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-current/10">
                 <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-                  <span className="text-xs font-black">{isAuthenticated ? (user?.name || "المشرف العام") : "زائر المدارس"}</span>
+                  <span className={`h-2 w-2 rounded-full ${isAuthenticated ? "bg-emerald-400 animate-pulse" : "bg-slate-400"}`} />
+                  <span className="text-xs font-black">{isAuthenticated ? (user?.name || "المشرف العام") : "زائر"}</span>
                 </div>
-                
                 <div className="flex items-center gap-1.5">
+                  {isAdmin && (
+                    <button
+                      onClick={() => go("/admin")}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black border transition ${
+                        dark
+                          ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                          : "border-[#08467d]/25 bg-[#08467d]/[.08] text-[#08467d]"
+                      }`}
+                    >
+                      <LayoutDashboard size={12} />
+                      <span>لوحة التحكم</span>
+                    </button>
+                  )}
                   <button
-                    type="button"
                     onClick={() => { setMobileMenuOpen(false); handleAuth(); }}
-                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-black transition ${
-                      dark ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    className={`rounded-xl px-3 py-1.5 text-xs font-black border transition ${
+                      dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/10 bg-slate-100 text-slate-600"
                     }`}
                   >
-                    <span>{isAuthenticated ? "خروج" : "دخول"}</span>
+                    {isAuthenticated ? "خروج" : "دخول"}
                   </button>
                 </div>
               </div>
 
-              {/* Primary Mobile CTA Button */}
-              <div className="mb-4">
-                <Button
-                  onClick={() => go("/admissions#admission-form-section")}
-                  className={`w-full rounded-xl py-3 text-xs font-black shadow-lg ${
-                    dark
-                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20"
-                      : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white shadow-emerald-950/20"
-                  }`}
-                >
-                  <Send size={15} className="ml-2" />
-                  <span>سجّل ابنك الآن في مدارس العقيق ✦</span>
-                </Button>
-              </div>
+              {/* زر سجّل الآن */}
+              <button
+                onClick={() => go("/admissions#admission-form-section")}
+                className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 mb-5 text-sm font-black shadow-lg transition active:scale-[.98] ${
+                  dark
+                    ? "bg-gradient-to-l from-[#f8ca14] to-amber-500 text-black"
+                    : "bg-gradient-to-l from-[#015a37] to-emerald-700 text-white"
+                }`}
+              >
+                <Send size={15} />
+                <span>سجّل ابنك الآن في مدارس العقيق</span>
+              </button>
 
-              {/* Mobile Sections Accordion */}
-              <div className="space-y-4">
-                {/* 1. مدارسنا */}
-                <div className="rounded-xl border border-current/10 p-2.5">
-                  <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5">
-                    <Building2 size={13} />
-                    <span>مدارسنا</span>
-                  </div>
-                  <div className="space-y-1">
-                    <button onClick={() => go("/about")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>عن مدارس العقيق</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <button onClick={() => go("/accreditations")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>الاعتمادات ومراكز الاختبارات (Cognia / IELTS)</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                  </div>
-                </div>
+              {/* الروابط — مسطحة بدون أسهم أو أيقونات */}
+              <div>
+                <p className={`px-1 pb-1 pt-1 text-[9px] font-black tracking-[0.18em] ${dark ? "text-slate-500" : "text-slate-400"}`}>مدارسنا</p>
+                {[
+                  { label: "عن مدارس العقيق", path: "/about" },
+                  { label: "الاعتمادات والجودة", path: "/accreditations" },
+                ].map(({ label, path }) => (
+                  <button key={path} onClick={() => go(path)} className={`w-full text-right px-2 py-2.5 rounded-xl text-sm font-bold transition ${dark ? "hover:bg-white/[.07] text-slate-100" : "hover:bg-slate-100 text-slate-800"}`}>
+                    {label}
+                  </button>
+                ))}
 
-                {/* 2. القبول والرسوم */}
-                <div className="rounded-xl border border-current/10 p-2.5">
-                  <div className="text-[11px] font-black text-[#f8ca14] mb-2 flex items-center gap-1.5">
-                    <Calculator size={13} />
-                    <span>القبول والتسجيل</span>
-                  </div>
-                  <div className="space-y-1">
-                    <button onClick={() => go("/admissions")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>جدول الرسوم الدراسية</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <button onClick={() => go("/admissions#admission-form-section")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>نموذج حجز مقعد دراسي</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <a href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php" target="_blank" rel="noreferrer" className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between text-amber-500 dark:text-amber-300">
-                      <span className="flex items-center gap-1.5">
-                        <FileText size={12} />
-                        <span>الخطط الدراسية الأسبوعية</span>
-                      </span>
-                      <ExternalLink size={12} className="opacity-40" />
-                    </a>
-                    <a href="https://qr-codes.io/LQMip0" target="_blank" rel="noreferrer" className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <Smartphone size={12} />
-                        <span>تحميل تطبيق أولياء الأمور</span>
-                      </span>
-                      <ExternalLink size={12} className="opacity-40" />
-                    </a>
-                  </div>
-                </div>
+                <div className="h-px bg-current/[.08] my-3" />
 
-                {/* 3. المركز الإعلامي */}
-                <div className="rounded-xl border border-current/10 p-2.5">
-                  <div className="text-[11px] font-black text-blue-500 mb-2 flex items-center gap-1.5">
-                    <BookOpen size={13} />
-                    <span>المركز الإعلامي والمحتوى</span>
-                  </div>
-                  <div className="space-y-1">
-                    <button onClick={() => go("/journal")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>المجلة</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <button onClick={() => go("/albums")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>الألبومات</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <button onClick={() => go("/atheer")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                      <span>أثير (البودكاست)</span>
-                      <ArrowRight size={13} className="opacity-40" />
-                    </button>
-                    <div className="border-t border-current/10 pt-1.5 mt-1">
-                      <div className="text-[10px] font-black text-slate-400 px-2 py-0.5 mb-1">
-                        أخبار ومقالات
-                      </div>
-                      <button onClick={() => go("/offers")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                        <span>الأخبار</span>
-                      </button>
-                      <button onClick={() => go("/articles")} className="w-full text-right p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 flex items-center justify-between">
-                        <span>المقالات</span>
-                      </button>
-                    </div>
-                  </div>
+                <p className={`px-1 pb-1 text-[9px] font-black tracking-[0.18em] ${dark ? "text-slate-500" : "text-slate-400"}`}>القبول والتسجيل</p>
+                {[
+                  { label: "جدول الرسوم الدراسية", path: "/admissions" },
+                  { label: "نموذج حجز مقعد دراسي", path: "/admissions#admission-form-section" },
+                ].map(({ label, path }) => (
+                  <button key={path} onClick={() => go(path)} className={`w-full text-right px-2 py-2.5 rounded-xl text-sm font-bold transition ${dark ? "hover:bg-white/[.07] text-slate-100" : "hover:bg-slate-100 text-slate-800"}`}>
+                    {label}
+                  </button>
+                ))}
+                <a href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php" target="_blank" rel="noreferrer"
+                  className={`w-full flex items-center justify-between px-2 py-2.5 rounded-xl text-sm font-bold transition ${dark ? "hover:bg-white/[.07] text-amber-400" : "hover:bg-slate-100 text-amber-700"}`}>
+                  <span>الخطط الدراسية الأسبوعية</span>
+                  <ExternalLink size={12} className="opacity-50 shrink-0" />
+                </a>
+                <a href="https://qr-codes.io/LQMip0" target="_blank" rel="noreferrer"
+                  className={`w-full flex items-center justify-between px-2 py-2.5 rounded-xl text-sm font-bold transition ${dark ? "hover:bg-white/[.07] text-slate-100" : "hover:bg-slate-100 text-slate-800"}`}>
+                  <span>تطبيق أولياء الأمور</span>
+                  <ExternalLink size={12} className="opacity-50 shrink-0" />
+                </a>
 
-                </div>
+                <div className="h-px bg-current/[.08] my-3" />
+
+                <p className={`px-1 pb-1 text-[9px] font-black tracking-[0.18em] ${dark ? "text-slate-500" : "text-slate-400"}`}>المحتوى والإعلام</p>
+                {[
+                  { label: "المجلة", path: "/journal" },
+                  { label: "الألبومات", path: "/albums" },
+                  { label: "أثير — البودكاست", path: "/atheer" },
+                  { label: "الأخبار", path: "/offers" },
+                  { label: "المقالات", path: "/articles" },
+                ].map(({ label, path }) => (
+                  <button key={path} onClick={() => go(path)} className={`w-full text-right px-2 py-2.5 rounded-xl text-sm font-bold transition ${dark ? "hover:bg-white/[.07] text-slate-100" : "hover:bg-slate-100 text-slate-800"}`}>
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
           )}
