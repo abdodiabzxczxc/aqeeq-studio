@@ -66,6 +66,7 @@ import {
   UserCheck,
   Building2,
   Smartphone,
+  ChevronDown,
 } from "lucide-react";
 
 import {
@@ -102,7 +103,7 @@ export default function AqeeqAdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
-  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "app" | "campuses" | "sections">("hero");
+  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "app" | "campuses" | "sections" | null>("hero");
   const [contentSubTab, setContentSubTab] = useState<"master" | "articles">("master");
   const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
   const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
@@ -110,13 +111,14 @@ export default function AqeeqAdminDashboardPage() {
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const utils = trpc.useUtils();
 
 
   // Admin Overview Queries
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = trpc.executiveAdmin.getOverviewStats.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   });
 
   const { data: usersList = [], refetch: refetchUsers } = trpc.executiveAdmin.getUsers.useQuery(undefined, {
@@ -147,7 +149,7 @@ export default function AqeeqAdminDashboardPage() {
 
   const { data: admissionsList = [], refetch: refetchAdmissions } = trpc.admissions.list.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   });
 
   const updateAdmissionStatusMutation = trpc.admissions.updateStatus.useMutation({
@@ -976,63 +978,18 @@ const DEFAULT_ORCHESTRATION = {
               </div>
             </div>
 
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
+            {/* Accordion 1: HERO COVERS & THEMES */}
+            <div className="border rounded-2xl overflow-hidden mb-3">
               <button
                 type="button"
-                onClick={() => setOrchestrationSubTab("hero")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  orchestrationSubTab === "hero"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
+                onClick={() => setOrchestrationSubTab(orchestrationSubTab === 'hero' ? null : 'hero')}
+                className={`w-full flex items-center justify-between p-4 font-bold text-right transition ${dark ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
               >
-                <Palette size={15} />
-                <span>أغلفة الهيرو ومناسبات الموقع 🎨</span>
+                <span>🎯 إعدادات الهيرو والأغطية</span>
+                <ChevronDown className={`transition-transform ${orchestrationSubTab === 'hero' ? 'rotate-180' : ''}`} size={16} />
               </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("app")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  orchestrationSubTab === "app"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Smartphone size={15} />
-                <span>تطبيق مدارس العقيق الذكي 📱</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("campuses")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  orchestrationSubTab === "campuses"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Building2 size={15} />
-                <span>مجمعاتنا وهوية المدارس 🏛️</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("sections")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  orchestrationSubTab === "sections"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <SlidersHorizontal size={15} />
-                <span>باقي السكاشن والمحتوى ⚙️</span>
-              </button>
-            </div>
-
-            {/* Subtab 1: HERO COVERS & THEMES */}
-            {orchestrationSubTab === "hero" && (
+              {orchestrationSubTab === "hero" && (
+                <div className="p-4 border-t border-current/10">
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
 
               {/* 🌟 0. GLOBAL OCCASION THEME ENGINE (سيمات ومناسبات الموقع) */}
@@ -1556,7 +1513,43 @@ const DEFAULT_ORCHESTRATION = {
                             <div className="flex items-center justify-between">
                               <label className="text-xs font-black text-slate-300">نمط اختيار غلاف المجلة</label>
                               <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
+                                <Button
+                          size="sm"
+                          type="button"
+                          variant="destructive"
+                          onClick={() => setBulkDeleteConfirmOpen(true)}
+                          className="rounded-xl h-8 text-[11px] font-bold gap-1 bg-red-600 hover:bg-red-700"
+                        >
+                          <span>حذف جماعي 🗑️</span>
+                        </Button>
+
+                        <Dialog open={bulkDeleteConfirmOpen} onOpenChange={setBulkDeleteConfirmOpen}>
+                          <DialogContent className="max-w-sm">
+                            <DialogHeader>
+                              <DialogTitle className="text-right">⚠️ تأكيد الحذف الجماعي</DialogTitle>
+                              <DialogDescription className="text-right">
+                                هل أنت متأكد من حذف {selectedLeadIds.length} طلب؟ هذا الإجراء لا يمكن التراجع عنه.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="gap-2 flex-row-reverse">
+                              <Button variant="destructive" onClick={async () => {
+                                for (const id of selectedLeadIds) {
+                                  await deleteAdmissionMutation.mutateAsync({ id });
+                                }
+                                toast.success(`تم حذف ${selectedLeadIds.length} طلبات بنجاح`);
+                                setSelectedLeadIds([]);
+                                setBulkDeleteConfirmOpen(false);
+                              }}>
+                                نعم، احذف
+                              </Button>
+                              <Button variant="outline" onClick={() => setBulkDeleteConfirmOpen(false)}>
+                                إلغاء
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+
+                        <button
                                   type="button"
                                   onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalMode: "auto" } })}
                                   className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.journalMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
@@ -2369,10 +2362,22 @@ const DEFAULT_ORCHESTRATION = {
                 })()}
               </div>
               </div>
-            )}
+                </div>
+              )}
+            </div>
 
-            {/* Subtab 2: SMART APP SHOWCASE */}
-            {orchestrationSubTab === "app" && (
+            {/* Accordion 2: SMART APP SHOWCASE */}
+            <div className="border rounded-2xl overflow-hidden mb-3">
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab(orchestrationSubTab === 'app' ? null : 'app')}
+                className={`w-full flex items-center justify-between p-4 font-bold text-right transition ${dark ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
+              >
+                <span>📱 تطبيق مدارس العقيق الذكي</span>
+                <ChevronDown className={`transition-transform ${orchestrationSubTab === 'app' ? 'rotate-180' : ''}`} size={16} />
+              </button>
+              {orchestrationSubTab === "app" && (
+                <div className="p-4 border-t border-current/10">
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
                   <div>
@@ -2548,10 +2553,22 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
               </div>
-            )}
+                </div>
+              )}
+            </div>
 
-            {/* Subtab 3: CAMPUSES & CONTACTS */}
-            {orchestrationSubTab === "campuses" && (
+            {/* Accordion 3: CAMPUSES & CONTACTS */}
+            <div className="border rounded-2xl overflow-hidden mb-3">
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab(orchestrationSubTab === 'campuses' ? null : 'campuses')}
+                className={`w-full flex items-center justify-between p-4 font-bold text-right transition ${dark ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
+              >
+                <span>🏛️ مجمعاتنا وهوية المدارس</span>
+                <ChevronDown className={`transition-transform ${orchestrationSubTab === 'campuses' ? 'rotate-180' : ''}`} size={16} />
+              </button>
+              {orchestrationSubTab === "campuses" && (
+                <div className="p-4 border-t border-current/10">
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
                   <div>
@@ -2727,10 +2744,22 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
               </div>
-            )}
+                </div>
+              )}
+            </div>
 
-            {/* Subtab 4: SECTIONS, BENTO, SOCIAL, FOOTER */}
-            {orchestrationSubTab === "sections" && (
+            {/* Accordion 4: SECTIONS, BENTO, SOCIAL, FOOTER */}
+            <div className="border rounded-2xl overflow-hidden mb-3">
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab(orchestrationSubTab === 'sections' ? null : 'sections')}
+                className={`w-full flex items-center justify-between p-4 font-bold text-right transition ${dark ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
+              >
+                <span>⚙️ باقي السكاشن والمحتوى</span>
+                <ChevronDown className={`transition-transform ${orchestrationSubTab === 'sections' ? 'rotate-180' : ''}`} size={16} />
+              </button>
+              {orchestrationSubTab === "sections" && (
+                <div className="p-4 border-t border-current/10">
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
 
               {/* 2. WEEKLY BENTO HIGHLIGHTS */}
@@ -3466,7 +3495,9 @@ const DEFAULT_ORCHESTRATION = {
                 </div>
               </div>
             </div>
-            )}
+                </div>
+              )}
+            </div>
 
             {/* Bottom Save Bar */}
             <div className="border-t pt-6 border-current/10 flex justify-end">
@@ -3533,10 +3564,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalViews?.toLocaleString() || 0}</p>
-                <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-emerald-500">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>تحديث لحظي مستمر</span>
-                </div>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>حي ومحدث الآن</span>
+                </p>
               </div>
 
               {/* 2. Magazines */}
@@ -3552,7 +3583,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalIssues || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">عدد مجلة منشور بالأرشيف</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
 
               {/* 3. Albums */}
@@ -3568,7 +3602,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalAlbums || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">ألبوم فعالية ومناسبة</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
 
               {/* 4. Media Files */}
@@ -3584,7 +3621,10 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalMediaFiles || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">صورة وفيديو ومنشور</p>
+                <p className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+                  <span>↑</span>
+                  <span>محدث الآن</span>
+                </p>
               </div>
             </div>
 
@@ -7007,6 +7047,40 @@ const DEFAULT_ORCHESTRATION = {
       </Dialog>
 
       <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
+
+      {/* Mobile Bottom Nav - Admin Dashboard */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 block lg:hidden border-t ${
+        dark ? 'bg-[#0a0f14]/95 border-white/10' : 'bg-white/95 border-black/10'
+      } backdrop-blur-xl`}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex items-center justify-around px-2 py-2">
+          <button onClick={() => setActiveTab('radar')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'radar' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <LayoutDashboard size={20} />
+            <span>الرادار</span>
+          </button>
+          <button onClick={() => setActiveTab('admissions')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'admissions' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <GraduationCap size={20} />
+            <span>القبول</span>
+          </button>
+          <button onClick={() => setActiveTab('content')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'content' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Layers size={20} />
+            <span>المحتوى</span>
+          </button>
+          <button onClick={() => setActiveTab('orchestration')} className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-bold transition ${
+            activeTab === 'orchestration' ? 'text-emerald-500 bg-emerald-500/10' : dark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <Sliders size={20} />
+            <span>الإعدادات</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
