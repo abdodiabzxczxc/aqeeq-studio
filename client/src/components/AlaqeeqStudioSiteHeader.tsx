@@ -39,6 +39,8 @@ import {
   ExternalLink,
   GraduationCap,
   Mail,
+  Menu,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -253,7 +255,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       </div>
 
       {/* 2. Main Executive Header */}
-      <header className={`aq-studio-share-header sticky top-0 z-40 border-b backdrop-blur-xl transition duration-200 ${
+      <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-xl transition duration-200 ${
         isNationalDay
           ? dark ? "border-emerald-500/20 bg-[#01140c]/90" : "border-emerald-200/80 bg-white/95"
           : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
@@ -536,28 +538,36 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
             {/* Mobile Hamburger Menu Button */}
             <button
-              onClick={() => setMobileMenuOpen((open) => !open)}
-              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition lg:hidden active:scale-95 ${
-                dark
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileMenuOpen((open) => !open);
+              }}
+              className={`grid h-10 w-10 place-items-center rounded-xl border transition lg:hidden active:scale-90 cursor-pointer ${
+                mobileMenuOpen
+                  ? "border-rose-500/50 bg-rose-500/15 text-rose-500"
+                  : dark
                   ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#015a37]/30 bg-[#015a37]/10 text-[#015a37]"
               }`}
-              aria-label="قائمة الموقع"
+              aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
             >
-              <VisualIcon id="aqeeq-studio-mobile-menu-icon" label="أيقونة القائمة" icon={mobileMenuOpen ? "close" : "menu"} size={18} />
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
+        </div>
+      </header>
 
-          {/* Full-Screen Immersive Mobile Menu Canvas */}
-          {mobileMenuOpen && (
-            <div
-              dir="rtl"
-              className={`fixed inset-x-0 bottom-0 top-[64px] sm:top-[74px] z-[120] lg:hidden animate-in fade-in slide-in-from-top-3 duration-200 backdrop-blur-3xl overflow-hidden ${
-                dark
-                  ? "bg-[#060a10]/99 text-white border-t border-white/10"
-                  : "bg-white/99 text-slate-900 border-t border-black/[0.08]"
-              }`}
-            >
+      {/* Full-Screen Immersive Mobile Menu Canvas */}
+      {mobileMenuOpen && (
+        <div
+          dir="rtl"
+          className={`fixed inset-x-0 bottom-0 top-[66px] sm:top-[78px] z-[120] lg:hidden animate-in fade-in slide-in-from-top-3 duration-200 backdrop-blur-3xl overflow-hidden ${
+            dark
+              ? "bg-[#060a10]/99 text-white border-t border-white/10"
+              : "bg-white/99 text-slate-900 border-t border-black/[0.08]"
+          }`}
+        >
               {/* Inner Scroll Container with Safe Bottom Space */}
               <div className="h-full overflow-y-auto overscroll-contain px-4 sm:px-6 pt-4 pb-36 max-w-lg mx-auto space-y-6 scrollbar-hide">
 
@@ -822,8 +832,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </div>
             </div>
           )}
-        </div>
-      </header>
 
       {/* Universal Spotlight Search Dialog */}
       <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
