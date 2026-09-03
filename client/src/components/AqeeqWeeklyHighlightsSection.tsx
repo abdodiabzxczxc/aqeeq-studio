@@ -108,7 +108,7 @@ export function AqeeqWeeklyHighlightsSection({
         {/* ============================================================ */}
         <div className="relative w-full">
           {/* 🎴 CARD 1: الحدث الرئيسي الأبرز */}
-          <div className="sticky top-20 sm:top-24 z-10 mb-28 sm:mb-36 will-change-transform">
+          <div className="sticky top-16 sm:top-20 z-10 mb-24 sm:mb-32 will-change-transform">
             <div
               className={`relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.8rem] border p-6 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-transform duration-300 ${
                 isNationalDay
@@ -185,8 +185,8 @@ export function AqeeqWeeklyHighlightsSection({
             </div>
           </div>
 
-          {/* 🎴 CARD 2: وسام التميز الأكاديمي (Stacks on top at top-32) */}
-          <div className="sticky top-28 sm:top-36 z-20 mb-28 sm:mb-36 will-change-transform">
+          {/* 🎴 CARD 2: وسام التميز الأكاديمي (Stacks on top at top-28) */}
+          <div className="sticky top-24 sm:top-28 z-20 mb-24 sm:mb-32 will-change-transform">
             <div
               className={`relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.8rem] border p-6 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-transform duration-300 ${
                 isNationalDay
@@ -258,8 +258,8 @@ export function AqeeqWeeklyHighlightsSection({
             </div>
           </div>
 
-          {/* 🎴 CARD 3: نبض المجتمع وتشجيع الطلاب (Stacks on top at top-44) */}
-          <div className="sticky top-36 sm:top-48 z-30 will-change-transform">
+          {/* 🎴 CARD 3: نبض المجتمع وتشجيع الطلاب (Stacks on top at top-36) */}
+          <div className="sticky top-32 sm:top-36 z-30 will-change-transform">
             <div
               className={`relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.8rem] border p-6 sm:p-10 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9)] backdrop-blur-2xl transition-transform duration-300 ${
                 isNationalDay

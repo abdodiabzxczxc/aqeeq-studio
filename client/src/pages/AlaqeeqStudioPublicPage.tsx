@@ -731,7 +731,7 @@ export default function AlaqeeqStudioPublicPage() {
   return (
     <main
       dir="rtl"
-      className={"aq-studio-share min-h-screen overflow-x-hidden relative " + (
+      className={"aq-studio-share min-h-screen overflow-x-clip relative " + (
         dark
           ? "aq-studio-share--dark text-white"
           : "aq-studio-share--light text-black"
