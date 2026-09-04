@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -177,6 +177,17 @@ export default function AqeeqSchoolAboutPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+
+  // فحص الشاشات الكبيرة لتفعيل فيزياء البعد الثالث على الكمبيوتر حصرياً
+  // وتجنب انبعاج أو ميلان نصوص القراءة على الموبايل
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   // Scroll Tracking for Smooth Parallax
   const { scrollY } = useScroll();
@@ -983,14 +994,14 @@ export default function AqeeqSchoolAboutPage() {
         </section>
       }
     >
-      {/* Quick Jump Anchor Command Bar */}
-      <div className={`sticky top-16 z-30 border-b py-3 px-4 backdrop-blur-xl transition ${
+      {/* Quick Jump Anchor Command Bar — غير لاصق على الموبايل لتجنب ملاحقة المستخدم وحجب المحتوى */}
+      <div className={`relative lg:sticky lg:top-[78px] z-30 border-b py-2.5 px-3 sm:px-4 backdrop-blur-xl transition ${
         dark ? "bg-black/80 border-white/10" : "bg-white/85 border-slate-200 shadow-sm"
       }`}>
-        <div className="container mx-auto max-w-5xl flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-xs font-black">
+        <div className="container mx-auto max-w-5xl flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-nowrap sm:flex-wrap text-xs font-black py-1">
           <a
             href="#timeline-section"
-            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
@@ -1000,7 +1011,7 @@ export default function AqeeqSchoolAboutPage() {
           </a>
           <a
             href="#campuses-section"
-            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
@@ -1010,7 +1021,7 @@ export default function AqeeqSchoolAboutPage() {
           </a>
           <a
             href="#vision-section"
-            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
@@ -1020,7 +1031,7 @@ export default function AqeeqSchoolAboutPage() {
           </a>
           <a
             href="#pillars-section"
-            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
@@ -1030,7 +1041,7 @@ export default function AqeeqSchoolAboutPage() {
           </a>
           <a
             href="#map-contact-section"
-            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
@@ -1117,17 +1128,17 @@ export default function AqeeqSchoolAboutPage() {
         {/* Dynamic Active Timeline Era Card with Scroll 3D Perspective */}
         <motion.div
           style={{
-            rotateX: timelineRotateX,
-            scale: timelineScale,
+            rotateX: isDesktop ? timelineRotateX : 0,
+            scale: isDesktop ? timelineScale : 1,
             transformPerspective: 1200,
           }}
-          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 will-change-transform ${
+          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden transition duration-500 will-change-transform ${
             dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}
         >
           {/* Holographic Watermark Year */}
           <span
-            className={`pointer-events-none absolute -left-4 -bottom-6 select-none font-black text-7xl sm:text-9xl leading-none transition-all duration-700 ${
+            className={`pointer-events-none absolute left-0 -bottom-4 select-none font-black text-6xl sm:text-8xl md:text-9xl leading-none transition-all duration-700 ${
               dark ? "text-white/[0.03]" : "text-black/[0.02]"
             }`}
           >
@@ -1175,16 +1186,16 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
 
                 {/* Key Metrics Row */}
-                <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
                   {activeEra.metrics.map((m, mIdx) => (
                     <div
                       key={mIdx}
-                      className={`p-3 rounded-xl border text-center transition hover:scale-105 ${
+                      className={`p-2 sm:p-3 rounded-xl border text-center transition hover:scale-105 ${
                         dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
                       }`}
                     >
                       <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
-                      <span className={`text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
+                      <span className={`text-[11px] sm:text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
                     </div>
                   ))}
                 </div>
@@ -1563,7 +1574,7 @@ export default function AqeeqSchoolAboutPage() {
       ======================================================== */}
       <section ref={visionSectionRef} id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div
-          className={`max-w-5xl mx-auto rounded-[3rem] border p-8 sm:p-14 shadow-2xl relative overflow-hidden ${
+          className={`max-w-5xl mx-auto rounded-[3rem] border p-5 sm:p-10 md:p-14 shadow-2xl relative overflow-hidden ${
             dark
               ? "border-emerald-500/30 bg-gradient-to-b from-[#0c141a] to-[#060a0e] ring-1 ring-emerald-500/20"
               : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8] ring-1 ring-emerald-900/10 shadow-xl"
@@ -1593,10 +1604,10 @@ export default function AqeeqSchoolAboutPage() {
             {/* Vision Plaque with Scroll 3D Wing Pivot */}
             <motion.div
               style={{
-                rotateY: visionWingLeft,
+                rotateY: isDesktop ? visionWingLeft : 0,
                 transformPerspective: 1400,
               }}
-              className={`rounded-3xl border p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-emerald-400/50 ${
+              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-emerald-400/50 ${
                 dark ? "border-emerald-500/20 bg-white/5" : "border-emerald-950/10 bg-emerald-50/40"
               }`}
             >
@@ -1617,10 +1628,10 @@ export default function AqeeqSchoolAboutPage() {
             {/* Mission Plaque with Scroll 3D Wing Pivot */}
             <motion.div
               style={{
-                rotateY: visionWingRight,
+                rotateY: isDesktop ? visionWingRight : 0,
                 transformPerspective: 1400,
               }}
-              className={`rounded-3xl border p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
+              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
                 dark ? "border-amber-500/20 bg-white/5" : "border-amber-950/10 bg-amber-50/30"
               }`}
             >
@@ -1705,7 +1716,7 @@ export default function AqeeqSchoolAboutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
           {/* Map Preview & Transportation Coverage Card (7 cols) */}
           <div
-            className={`lg:col-span-7 rounded-3xl border p-8 flex flex-col justify-between shadow-xl ${
+            className={`lg:col-span-7 rounded-3xl border p-5 sm:p-8 flex flex-col justify-between shadow-xl ${
               dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
             }`}
           >
@@ -1794,7 +1805,7 @@ export default function AqeeqSchoolAboutPage() {
 
           {/* Contact & Official Channels Card (5 cols) */}
           <div
-            className={`lg:col-span-5 rounded-3xl border p-8 flex flex-col justify-between shadow-xl ${
+            className={`lg:col-span-5 rounded-3xl border p-5 sm:p-8 flex flex-col justify-between shadow-xl ${
               dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
             }`}
           >

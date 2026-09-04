@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -151,17 +151,28 @@ function AqeeqCurtainHeroStage({
   const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 22, mass: 0.5 });
   const heroY = useSpring(rawY, { stiffness: 100, damping: 22, mass: 0.5 });
 
+  // فحص الشاشات الكبيرة لتفعيل التثبيت السينمائي على الكمبيوتر حصرياً
+  // وتوفير انسياب طبيعي بدون تداخل على الموبايل
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
     <div className="relative z-10 w-full">
-      {/* تثبيت الهيرو */}
-      <div ref={heroPinContainerRef} className="relative h-[115vh] w-full">
-        <div className="sticky top-0 z-0 w-full overflow-hidden">
+      {/* تثبيت الهيرو على الكمبيوتر وانسياب طبيعي على الموبايل */}
+      <div ref={heroPinContainerRef} className="relative h-auto lg:h-[115vh] w-full">
+        <div className="relative lg:sticky lg:top-0 z-0 w-full overflow-hidden">
           <motion.div
             style={{
-              scale: heroScale,
-              opacity: heroOpacity,
-              y: heroY,
-              filter: rawBlur,
+              scale: isDesktop ? heroScale : 1,
+              opacity: isDesktop ? heroOpacity : 1,
+              y: isDesktop ? heroY : 0,
+              filter: isDesktop ? rawBlur : "none",
               transformOrigin: "center top",
             }}
             className="w-full will-change-transform"
@@ -171,9 +182,9 @@ function AqeeqCurtainHeroStage({
         </div>
       </div>
 
-      {/* ستارة المحتوى الصاعدة */}
+      {/* ستارة المحتوى: تبدأ طبيعياً على الموبايل وتصعد فوق الهيرو على الكمبيوتر */}
       <div
-        className={`relative z-20 -mt-[30vh] w-full rounded-t-[2.8rem] sm:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
+        className={`relative z-20 mt-4 sm:mt-6 lg:-mt-[30vh] w-full rounded-t-[2.4rem] sm:rounded-t-[3.2rem] lg:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
           isNationalDay
             ? dark
               ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
