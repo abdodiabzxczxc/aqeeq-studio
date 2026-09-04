@@ -84,7 +84,7 @@ async function run() {
   const resPavilion = await send('Page.captureScreenshot', { format: 'png' });
   writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_pavilion.png', Buffer.from(resPavilion.data, 'base64'));
 
-  // 3. Scroll to Career Pipeline & Scanner
+  // 3. Scroll to Career Pipeline
   await send('Runtime.evaluate', {
     expression: `
       window.scrollBy(0, 900);
@@ -93,6 +93,26 @@ async function run() {
   await sleep(1000);
   const resPipeline = await send('Page.captureScreenshot', { format: 'png' });
   writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_pipeline.png', Buffer.from(resPipeline.data, 'base64'));
+
+  // 4. Scroll to 3D Radar Cockpit
+  await send('Runtime.evaluate', {
+    expression: `
+      window.scrollBy(0, 1100);
+    `
+  });
+  await sleep(1200);
+  const resRadar = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_radar_cockpit.png', Buffer.from(resRadar.data, 'base64'));
+
+  // 4.b Scroll down slightly to see the Passport
+  await send('Runtime.evaluate', {
+    expression: `
+      window.scrollBy(0, 420);
+    `
+  });
+  await sleep(800);
+  const resPassport = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_radar_passport.png', Buffer.from(resPassport.data, 'base64'));
 
   console.log('Accreditations screenshots captured successfully!');
   ws.close();

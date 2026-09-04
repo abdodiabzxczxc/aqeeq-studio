@@ -31,6 +31,11 @@ import {
   Zap,
   CheckCheck,
   Phone,
+  Radar,
+  Target,
+  Share2,
+  Layers,
+  Crosshair,
 } from "lucide-react";
 
 export default function AqeeqSchoolAccreditationsPage() {
@@ -112,6 +117,53 @@ export default function AqeeqSchoolAccreditationsPage() {
   const rawStaggerCol2 = useTransform(pipelineProgress, [0, 1], [-25, 25]);
   const staggerCol1 = useSpring(rawStaggerCol1, { stiffness: 85, damping: 20 });
   const staggerCol2 = useSpring(rawStaggerCol2, { stiffness: 85, damping: 20 });
+
+  // ========================================================
+  // 4. Interactive 3D Holographic Radar Cockpit Scroll Physics
+  // ========================================================
+  const radarSectionRef = useRef<HTMLDivElement>(null);
+  const [shockwaveKey, setShockwaveKey] = useState(0);
+  const { scrollYProgress: radarProgress } = useScroll({
+    target: radarSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const rawRadarRotateX = useTransform(radarProgress, [0, 0.45, 0.9], [22, 0, -12]);
+  const rawRadarScale = useTransform(radarProgress, [0, 0.45, 0.9], [0.93, 1, 0.96]);
+  const rawRadarRotateRing = useTransform(radarProgress, [0, 1], [0, 260]);
+
+  const radarRotateX = useSpring(rawRadarRotateX, { stiffness: 85, damping: 22 });
+  const radarScale = useSpring(rawRadarScale, { stiffness: 85, damping: 22 });
+  const radarRotateRing = useSpring(rawRadarRotateRing, { stiffness: 70, damping: 20 });
+
+  const selectScannerGrade = (grade: "primary" | "middle" | "high") => {
+    setScannerGrade(grade);
+    setShockwaveKey((prev) => prev + 1);
+  };
+
+  const selectScannerGoal = (goal: "stem" | "medicine" | "business") => {
+    setScannerGoal(goal);
+    setShockwaveKey((prev) => prev + 1);
+  };
+
+  const handleShareRadarWhatsapp = () => {
+    const gradeTitle =
+      scannerGrade === "high"
+        ? "المرحلة الثانوية"
+        : scannerGrade === "middle"
+        ? "المرحلة المتوسطة"
+        : "المرحلة الابتدائية";
+    const goalTitle =
+      scannerGoal === "stem"
+        ? "هندسة وذكاء اصطناعي (STEM)"
+        : scannerGoal === "medicine"
+        ? "طب وعلوم صحية"
+        : "قيادة وإدارة أعمال";
+    const text = `السلام عليكم ورحمة الله، قمت بفحص رادار الاعتمادات الأكاديمية لمدارس العقيق:
+📌 المرحلة الدراسية: ${gradeTitle}
+🎯 المسار المستهدف: ${goalTitle}
+أرغب في معرفة المزيد وحجز مقعد دراسي لابني في هذا المسار الأكاديمي الدولي المعتمد.`;
+    window.open(`https://wa.me/966531896000?text=${encodeURIComponent(text)}`, "_blank");
+  };
 
   return (
     <AqeeqLuxuryPageShell
@@ -1355,130 +1407,357 @@ export default function AqeeqSchoolAccreditationsPage() {
           مغلفة بـ AqeeqScrollRevealSection لترتفع كستارة ثالثة
       ======================================================== */}
       <AqeeqScrollRevealSection scrollVh={60} neonLine={true} className="py-14 sm:py-20">
-        {/* Parent Scanner */}
-        <div className="container mx-auto px-4 sm:px-6 mb-20">
-          <div
-            className={`max-w-4xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden ${
+        {/* ========================================================
+            STAGE 4: 3D HOLOGRAPHIC RADAR COCKPIT & STUDENT PASSPORT
+            رادار استشعار جاهزية الطالب مع المسح الدائري وميلان 3D بالسكرول
+        ======================================================== */}
+        <div className="container mx-auto px-4 sm:px-6 mb-24">
+          {/* Header */}
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-xs font-black text-emerald-400 mb-3 shadow-sm backdrop-blur-md">
+              <Radar size={15} className="animate-spin text-[#f8ca14]" style={{ animationDuration: "6s" }} />
+              <span>مصفوفة الاستشعار والرصد الأكاديمي المباشر 2030</span>
+            </div>
+            <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              رادار جاهزية ابنك: اكتشف خارطة اعتماداته المخصصة 🎯
+            </h3>
+            <p className={`text-xs sm:text-sm mt-3 leading-relaxed ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
+              اختر مرحلة ابنك وطموحه المستقبلي لتشاهد رادار الاعتمادات وهو يقفل في البعد الثالث على مسار القبول المعتمد والشهادات الدولية التي سيحصدها داخل المدارس.
+            </p>
+          </div>
+
+          {/* 3D Kinetic Cockpit Hull */}
+          <motion.div
+            ref={radarSectionRef}
+            style={{
+              rotateX: radarRotateX,
+              scale: radarScale,
+              transformStyle: "preserve-3d",
+            }}
+            className={`max-w-6xl mx-auto rounded-[2.8rem] border shadow-[0_30px_100px_rgba(0,0,0,0.85)] p-6 sm:p-10 relative overflow-hidden backdrop-blur-2xl will-change-transform ${
               dark
-                ? "border-emerald-500/30 bg-gradient-to-b from-[#081218] to-[#04080c]"
-                : "border-emerald-700/20 bg-white shadow-xl"
+                ? "border-emerald-500/35 bg-gradient-to-b from-[#07131b]/95 via-[#040a0f]/95 to-[#020508]/98 ring-1 ring-emerald-500/20"
+                : "border-emerald-700/25 bg-gradient-to-b from-white via-slate-50 to-emerald-50/20 shadow-emerald-950/10"
             }`}
           >
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-black text-emerald-400 mb-2">
-                <Sparkles size={14} />
-                <span>مستشار الاعتمادات التفاعلي لولي الأمر</span>
+            {/* Top Telemetry Diagnostic Status Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-5 mb-8 border-b border-white/10 text-[11px] font-mono">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="font-black text-emerald-400">TELEMETRY: RADAR ACTIVE</span>
+                <span className="text-slate-500 hidden sm:inline">|</span>
+                <span className="text-slate-400 hidden sm:inline">FREQUENCY: 5.8 GHz HUD</span>
               </div>
-              <h3 className={`text-xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                رادار جاهزية ابنك: اكتشف خارطة اعتماداته المخصصة 🎯
-              </h3>
-              <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                حدد مرحلة ابنك وطموحه المستقبلي لنعرض لك المسار التدريبي والشهادات التي سيحصدها داخل المدارس:
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-right">
-              {/* Step 1: Select Grade */}
-              <div>
-                <label className="block text-xs font-black text-slate-300 mb-2">المرحلة الدراسية الحالية:</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: "primary", label: "الابتدائية 🧸" },
-                    { id: "middle", label: "المتوسطة 🎒" },
-                    { id: "high", label: "الثانوية 🎓" },
-                  ].map((g) => (
-                    <button
-                      key={g.id}
-                      type="button"
-                      onClick={() => setScannerGrade(g.id as any)}
-                      className={`py-2.5 px-2 rounded-xl text-xs font-black border transition ${
-                        scannerGrade === g.id
-                          ? "border-[#f8ca14] bg-[#f8ca14]/15 text-[#f8ca14] shadow"
-                          : "border-white/10 bg-black/40 text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      {g.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Step 2: Select Goal */}
-              <div>
-                <label className="block text-xs font-black text-slate-300 mb-2">الطموح الجامعي والمهني:</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: "stem", label: "هندسة وذكاء اصطناعي 🤖" },
-                    { id: "medicine", label: "طب وعلوم صحية 🩺" },
-                    { id: "business", label: "قيادة وأعمال 🏛️" },
-                  ].map((goal) => (
-                    <button
-                      key={goal.id}
-                      type="button"
-                      onClick={() => setScannerGoal(goal.id as any)}
-                      className={`py-2.5 px-2 rounded-xl text-xs font-black border transition ${
-                        scannerGoal === goal.id
-                          ? "border-emerald-400 bg-emerald-500/15 text-emerald-400 shadow"
-                          : "border-white/10 bg-black/40 text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      {goal.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Radar Results Box */}
-            <div className="rounded-2xl border border-emerald-500/30 bg-black/60 p-6 text-right">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
-                <span className="text-xs font-black text-[#f8ca14] flex items-center gap-1.5">
-                  <CheckCheck size={16} />
-                  خارطة الاعتمادات والتأهيل المقترحة لابنك في مدارس العقيق:
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400">TARGET LOCKED:</span>
+                <span className="text-[#f8ca14] font-black uppercase">
+                  {scannerGoal === "stem" ? "STEM & AI EXCELLENCE" : scannerGoal === "medicine" ? "MEDICAL & HEALTH" : "GLOBAL LEADERSHIP"}
                 </span>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
-                  READY TO ENROLL
+                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 px-2 py-0.5 text-[10px] font-black">
+                  98.9% MATCH
                 </span>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                <div className="p-3 rounded-xl border border-white/10 bg-white/5">
-                  <span className="text-[10px] text-slate-400 block font-bold">الشهادة الأساسية</span>
-                  <span className="text-xs font-black text-white block mt-0.5">
-                    {scannerGrade === "high"
-                      ? "دبلومة كوجنيا الأمريكية + الثانوية العامة"
-                      : "شهادة التأسيس الدولي المعتمد من كوجنيا"}
-                  </span>
+            {/* Cockpit Core: Controls + 360° Circular Radar Display */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+              
+              {/* Left Column (5 cols): The 360° Live Holographic Radar Screen */}
+              <div className="lg:col-span-5 order-2 lg:order-1 relative">
+                <div className="relative mx-auto w-full max-w-[340px] sm:max-w-[390px] aspect-square rounded-full border-2 border-emerald-500/40 bg-[#03090e] p-3 shadow-[0_0_60px_rgba(16,185,129,0.25)] select-none">
+                  
+                  {/* Rotating Compass Outer Rim (driven by scroll) */}
+                  <motion.div
+                    style={{ rotate: radarRotateRing }}
+                    className="absolute inset-1 rounded-full border border-dashed border-emerald-400/30 pointer-events-none"
+                  >
+                    <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[9px] font-mono font-black text-emerald-400">N · 000°</span>
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-mono text-slate-500">S · 180°</span>
+                    <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500">E · 090°</span>
+                    <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500">W · 270°</span>
+                  </motion.div>
+
+                  {/* Concentric Radar Rings & Crosshairs */}
+                  <div className="relative h-full w-full rounded-full border border-emerald-500/30 overflow-hidden flex items-center justify-center">
+                    {/* Ring 1 (25%) */}
+                    <div className="absolute h-[25%] w-[25%] rounded-full border border-emerald-500/25" />
+                    {/* Ring 2 (50%) */}
+                    <div className="absolute h-[50%] w-[50%] rounded-full border border-emerald-500/30" />
+                    {/* Ring 3 (75%) */}
+                    <div className="absolute h-[75%] w-[75%] rounded-full border border-emerald-500/25" />
+                    {/* Radial Grid lines */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="h-full w-px bg-emerald-500/20" />
+                      <div className="w-full h-px bg-emerald-500/20 absolute" />
+                      <div className="w-full h-px bg-emerald-500/10 rotate-45 absolute" />
+                      <div className="w-full h-px bg-emerald-500/10 -rotate-45 absolute" />
+                    </div>
+
+                    {/* Continuous 360° Rotating Sweep Beam */}
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                      className="absolute inset-0 origin-center pointer-events-none"
+                    >
+                      <div
+                        className="h-1/2 w-1/2 absolute top-0 right-0 origin-bottom-left"
+                        style={{
+                          background: "conic-gradient(from 0deg at 0% 100%, rgba(16,185,129,0.35) 0deg, rgba(248,202,20,0.15) 35deg, transparent 75deg)",
+                        }}
+                      />
+                      <div className="h-1/2 w-0.5 bg-gradient-to-t from-emerald-400 to-transparent absolute top-0 right-1/2 origin-bottom shadow-[0_0_10px_#10b981]" />
+                    </motion.div>
+
+                    {/* Shockwave Pulse Ring (Triggered on click/change) */}
+                    <motion.div
+                      key={shockwaveKey}
+                      initial={{ scale: 0.1, opacity: 1 }}
+                      animate={{ scale: 2.2, opacity: 0 }}
+                      transition={{ duration: 0.85, ease: "easeOut" }}
+                      className="absolute h-32 w-32 rounded-full border-2 border-[#f8ca14] pointer-events-none shadow-[0_0_30px_#f8ca14]"
+                    />
+
+                    {/* BLIP 1: Cognia Seal (Top Right) */}
+                    <div className="absolute top-[22%] right-[20%] z-20 flex flex-col items-center pointer-events-none">
+                      <span className="relative flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border border-white shadow-[0_0_12px_#10b981]" />
+                      </span>
+                      <span className="mt-1 px-1.5 py-0.5 rounded bg-black/85 border border-emerald-500/40 text-[9px] font-black text-emerald-300 font-mono backdrop-blur-sm whitespace-nowrap">
+                        COGNIA · 99.2%
+                      </span>
+                    </div>
+
+                    {/* BLIP 2: IDP IELTS (Top Left) */}
+                    <div className="absolute top-[26%] left-[18%] z-20 flex flex-col items-center pointer-events-none">
+                      <span className="relative flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-blue-500 border border-white shadow-[0_0_12px_#3b82f6]" />
+                      </span>
+                      <span className="mt-1 px-1.5 py-0.5 rounded bg-black/85 border border-blue-500/40 text-[9px] font-black text-blue-300 font-mono backdrop-blur-sm whitespace-nowrap">
+                        IELTS IDP · 7.5+
+                      </span>
+                    </div>
+
+                    {/* BLIP 3: Digital SAT (Bottom Right) */}
+                    <div className="absolute bottom-[22%] right-[18%] z-20 flex flex-col items-center pointer-events-none">
+                      <span className="relative flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border border-white shadow-[0_0_12px_#f59e0b]" />
+                      </span>
+                      <span className="mt-1 px-1.5 py-0.5 rounded bg-black/85 border border-amber-500/40 text-[9px] font-black text-amber-300 font-mono backdrop-blur-sm whitespace-nowrap">
+                        SAT #68412 · 1400+
+                      </span>
+                    </div>
+
+                    {/* BLIP 4: STEM Robotics (Bottom Left) */}
+                    <div className="absolute bottom-[20%] left-[20%] z-20 flex flex-col items-center pointer-events-none">
+                      <span className="relative flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#f8ca14] border border-white shadow-[0_0_12px_#f8ca14]" />
+                      </span>
+                      <span className="mt-1 px-1.5 py-0.5 rounded bg-black/85 border border-yellow-500/40 text-[9px] font-black text-yellow-300 font-mono backdrop-blur-sm whitespace-nowrap">
+                        WRO 5TH · FLL 1ST
+                      </span>
+                    </div>
+
+                    {/* Center Radar Core Reticle */}
+                    <div className="relative z-30 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full border-2 border-[#f8ca14] bg-black/90 flex items-center justify-center shadow-[0_0_20px_rgba(248,202,20,0.5)]">
+                        <Target size={18} className="text-[#f8ca14] animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-3 rounded-xl border border-white/10 bg-white/5">
-                  <span className="text-[10px] text-slate-400 block font-bold">الاختبارات داخل المدرسة</span>
-                  <span className="text-xs font-black text-white block mt-0.5">
-                    {scannerGoal === "stem" ? "اختبار Digital SAT + IELTS IDP" : "اختبار IELTS IDP + تدريب القدرات"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-xl border border-white/10 bg-white/5">
-                  <span className="text-[10px] text-slate-400 block font-bold">الميزة التنافسية</span>
-                  <span className="text-xs font-black text-[#f8ca14] block mt-0.5">
-                    {scannerGrade === "high"
-                      ? "إعفاء من السنة التحضيرية بالجامعة"
-                      : "التأهل لبطولات الروبوت الوطنية والدولية"}
+
+                <div className="text-center mt-3">
+                  <span className="text-[10px] font-mono text-emerald-400/80 uppercase tracking-widest">
+                    ✦ 360° LIVE TARGET TELEMETRY LOCK · ALAQEEQ 2030 ✦
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-[11px] text-slate-400">
-                  💡 يستفيد طلاب العقيق من تخفيضات خاصة وورش عمل مجانية لجميع الاختبارات الدولية.
-                </p>
-                <Button
-                  onClick={() => navigate("/admissions")}
-                  className="bg-[#015a37] hover:bg-emerald-800 text-white text-xs font-black rounded-xl px-5 py-2 shadow"
-                >
-                  حجز مقعد دراسي ✦
-                </Button>
+              {/* Right Column (7 cols): Interactive Stage & Ambition Controllers */}
+              <div className="lg:col-span-7 order-1 lg:order-2 text-right">
+                
+                {/* Step 1: Current Grade Selection */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[11px] font-mono font-black text-[#f8ca14] uppercase">STEP 01 // المرحلة</span>
+                    <label className="text-xs font-black text-slate-200">المرحلة الدراسية الحالية لابنك:</label>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { id: "primary", label: "الابتدائية", sub: "تأسيس اللغات والـ STEM", icon: "🧸" },
+                      { id: "middle", label: "المتوسطة", sub: "الخوارزميات والبطولات", icon: "🎒" },
+                      { id: "high", label: "الثانوية", sub: "دبلومة Cognia والسات", icon: "🎓" },
+                    ].map((g) => {
+                      const isSelected = scannerGrade === g.id;
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => selectScannerGrade(g.id as any)}
+                          className={`p-3 rounded-2xl border text-right transition active:scale-95 relative overflow-hidden ${
+                            isSelected
+                              ? "border-[#f8ca14] bg-[#f8ca14]/15 text-white shadow-[0_0_20px_rgba(248,202,20,0.25)] ring-1 ring-[#f8ca14]/40"
+                              : dark
+                              ? "border-white/10 bg-black/40 text-slate-300 hover:border-white/20 hover:bg-white/5"
+                              : "border-slate-200 bg-white text-slate-800 hover:border-emerald-400"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-base">{g.icon}</span>
+                            {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14] animate-ping" />}
+                          </div>
+                          <span className="block font-black text-xs">{g.label}</span>
+                          <span className="block text-[10px] text-slate-400 truncate mt-0.5">{g.sub}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Step 2: Future Career Ambition Selection */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[11px] font-mono font-black text-emerald-400 uppercase">STEP 02 // الطموح</span>
+                    <label className="text-xs font-black text-slate-200">الوجهة والتخصص المستقبلي:</label>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { id: "stem", label: "هندسة وذكاء اصطناعي", sub: "روبوت وهندسة برمجيات", icon: "🤖" },
+                      { id: "medicine", label: "كليات الطب والعلوم", sub: "مسار صحي ولغات مكثفة", icon: "🩺" },
+                      { id: "business", label: "قيادة وريادة أعمال", sub: "إدارة واستراتيجية دولية", icon: "🏛️" },
+                    ].map((goal) => {
+                      const isSelected = scannerGoal === goal.id;
+                      return (
+                        <button
+                          key={goal.id}
+                          type="button"
+                          onClick={() => selectScannerGoal(goal.id as any)}
+                          className={`p-3 rounded-2xl border text-right transition active:scale-95 relative overflow-hidden ${
+                            isSelected
+                              ? "border-emerald-400 bg-emerald-500/15 text-white shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/40"
+                              : dark
+                              ? "border-white/10 bg-black/40 text-slate-300 hover:border-white/20 hover:bg-white/5"
+                              : "border-slate-200 bg-white text-slate-800 hover:border-emerald-400"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-base">{goal.icon}</span>
+                            {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />}
+                          </div>
+                          <span className="block font-black text-xs truncate">{goal.label}</span>
+                          <span className="block text-[10px] text-slate-400 truncate mt-0.5">{goal.sub}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Target Locked HUD Banner */}
+                <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/30 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-emerald-300 font-black">
+                    <Crosshair size={16} className="text-emerald-400 animate-spin" style={{ animationDuration: "10s" }} />
+                    <span>
+                      {scannerGrade === "high" ? "مسار التخرج والقبول الجامعي الفوري" : "مسار التأسيس الدولي الأولمبي"}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] text-emerald-400 font-bold bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                    STATUS: READY ✦
+                  </span>
+                </div>
+
               </div>
             </div>
-          </div>
+
+            {/* Bottom Console: «جواز العبور الأكاديمي الرقمي 2030 (Digital Student Academic Passport)» */}
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <div className={`rounded-3xl border p-6 sm:p-8 relative overflow-hidden ${
+                dark ? "border-emerald-500/40 bg-black/75 shadow-2xl ring-1 ring-emerald-500/25" : "border-slate-200 bg-white shadow-lg"
+              }`}>
+                {/* Laser Sweep Line on Passport */}
+                <motion.div
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ repeat: Infinity, duration: 4.5, ease: "linear" }}
+                  className="pointer-events-none absolute top-0 bottom-0 w-24 bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent skew-x-12"
+                />
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-white/10 text-right">
+                  <div>
+                    <span className="text-[10px] font-mono text-[#f8ca14] font-black block">ALAQEEQ ACADEMIC PASSPORT // 2030</span>
+                    <h4 className="text-base sm:text-lg font-black text-white mt-0.5">
+                      {scannerGrade === "high"
+                        ? scannerGoal === "stem"
+                          ? "مسار النخبة الدولية للذكاء الاصطناعي والهندسة 🤖"
+                          : scannerGoal === "medicine"
+                          ? "مسار العلوم الطبية والصحية المتقدم 🩺"
+                          : "مسار الرواد الدولي لإدارة الأعمال والقيادة 🏛️"
+                        : scannerGrade === "middle"
+                        ? "مسار الابتكار التأسيسي وبطولات الروبوت الوطنية 🎒"
+                        : "مسار التأسيس الدولي واللغات المكثفة المبكر 🧸"}
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-xl px-3 py-1 bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-mono text-xs font-black">
+                      PASSPORT #AQ-2030
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3 Core Accreditation Telemetry Pods */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-right">
+                  <div className="p-3.5 rounded-2xl border border-white/10 bg-white/5">
+                    <span className="text-[10px] text-slate-400 font-bold block mb-1">الاعتماد الأكاديمي المؤسسي</span>
+                    <span className="text-xs font-black text-white block">
+                      {scannerGrade === "high" ? "دبلومة Cognia الأمريكية + الثانوية العامة" : "شهادة التأسيس الدولي المعتمد من كوجنيا"}
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-bold mt-1 block">معترف بها رسمياً محلياً وعالمياً</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-white/10 bg-white/5">
+                    <span className="text-[10px] text-slate-400 font-bold block mb-1">الاختبارات المعتمدة داخل المدرسة</span>
+                    <span className="text-xs font-black text-white block">
+                      {scannerGoal === "stem" ? "اختبار Digital SAT + IELTS on Computer" : "اختبار IELTS IDP الرسمي + قياس"}
+                    </span>
+                    <span className="text-[10px] text-amber-400 font-bold mt-1 block">قاعات مجهزة بدون مراكز خارجية</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-white/10 bg-white/5">
+                    <span className="text-[10px] text-slate-400 font-bold block mb-1">الميزة التنافسية الكبرى</span>
+                    <span className="text-xs font-black text-[#f8ca14] block">
+                      {scannerGrade === "high" ? "إعفاء واجتياز مباشر للسنة التحضيرية" : "تأهيل للمنافسة في أولمبياد WRO و FLL"}
+                    </span>
+                    <span className="text-[10px] text-slate-300 font-bold mt-1 block">توفير سنة دراسية كاملة ومعدل 98%+</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+                  <p className="text-[11px] text-slate-300 font-medium">
+                    💡 يحصل طلاب مدارس العقيق على برامج تأهيل مكثفة مجانية لكافة الاختبارات الدولية المذكورة.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleShareRadarWhatsapp}
+                      className="inline-flex items-center gap-2 rounded-2xl border border-[#25D366]/40 bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] px-5 py-3 text-xs font-black transition active:scale-95 shadow"
+                    >
+                      <Share2 size={15} />
+                      <span>مشاركة الخطة عبر واتساب 📲</span>
+                    </button>
+                    <Button
+                      onClick={() => navigate("/admissions")}
+                      className="rounded-2xl bg-gradient-to-r from-[#015a37] to-emerald-700 hover:opacity-95 text-white px-7 py-3 text-xs font-black shadow-lg transition active:scale-95"
+                    >
+                      <span>حجز مقعد دراسي للمسار ✦</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Interactive FAQ Accordion */}
