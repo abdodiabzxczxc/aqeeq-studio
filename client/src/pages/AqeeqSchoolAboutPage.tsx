@@ -12,6 +12,13 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import {
   Building2,
+  Heart,
+  Radio,
+  Palette,
+  Microscope,
+  Trophy,
+  Cpu,
+  Waves,
   Sparkles,
   Target,
   Compass,
@@ -246,6 +253,8 @@ export default function AqeeqSchoolAboutPage() {
   const [activeCampusTab, setActiveCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
   const [activeTimelineIndex, setActiveTimelineIndex] = useState<number>(3);
+  const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
+  const [transitionMode, setTransitionMode] = useState<"accordion" | "coverflow" | "deck" | "blueprint">("accordion");
 
   // Pillars Data
   const pillars = [
@@ -363,72 +372,202 @@ export default function AqeeqSchoolAboutPage() {
     },
   ];
 
-  // Campus Facilities Data
+  // Campus Facilities Data with Visual Cockpit, Hotspots & Giant Metrics
   const campusFacilities = {
     boys: [
       {
         id: "pool",
         name: "المسبح شبه الأولمبي المغطى",
         tag: "رياضة ولياقة احترافية",
+        icon: Waves,
+        thumbnail: "/covers/student-lab-admissions.jpg",
         image: "/covers/student-lab-admissions.jpg",
-        desc: "مسبح مغطى ومكيف بمواصفات قياسية وتدفئة مياه شتوية، يشرف عليه كباتن سباحة معتمدون، مخصص لتدريب الطلاب من المراحل الأولية وحتى الثانوية.",
-        specs: [
-          { label: "المقاييس", val: "شبه أولمبي مغطى FINA" },
-          { label: "السلامة", val: "منقذون معتمدون 100%" },
-          { label: "المراحل", val: "الابتدائي، المتوسط، الثانوي" },
-          { label: "التدفئة", val: "أنظمة تحكم حراري ذكية 30°C" },
+        badge: "معايير FINA الدولية",
+        desc: "مسبح صرحي مغطى ومكيف بمواصفات قياسية وتدفئة مياه شتوية ذكية 30°C، يشرف عليه كباتن سباحة وإنقاذ معتمدون، مخصص لتدريب طلاب المراحل الأولية وحتى الثانوية في بيئة صحية وآمنة 100%.",
+        hotspots: [
+          {
+            id: "pool-fina",
+            x: 28,
+            y: 45,
+            title: "حوض شبه أولمبي 25m",
+            desc: "مصمم وفق مقاييس الاتحاد الدولي للسباحة FINA مع مسارات تدريبية ومدرجات للمنافسات المدرسية.",
+          },
+          {
+            id: "pool-heat",
+            x: 72,
+            y: 35,
+            title: "تدفئة حرارية ذكية 30°C",
+            desc: "أنظمة تدفئة مياه وضبط رطوبة أوتوماتيكية متطورة تضمن بيئة تدريب مثالية طوال أشهر الشتاء.",
+          },
+          {
+            id: "pool-safety",
+            x: 52,
+            y: 75,
+            title: "كادر إنقاذ وسلامة 100%",
+            desc: "إشراف مباشر ومستمر من مدربي ومنقذي سباحة محترفين ومعتمدين لضمان أعلى مستويات الأمان.",
+          },
+        ],
+        giantMetrics: [
+          { num: "25m", label: "شبه أولمبي مغطى", sub: "مقاييس FINA الدولية" },
+          { num: "30°C", label: "تدفئة مياه شتوية", sub: "تحكم رقمي بالحرارة" },
+          { num: "100%", label: "سلامة وإنقاذ", sub: "منقذون وكباتن محترفون" },
+          { num: "KG-12", label: "كافة المراحل", sub: "ابتدائي، متوسط، ثانوي" },
         ],
       },
       {
         id: "robotics",
         name: "معامل الذكاء الاصطناعي والروبوت (WRO)",
         tag: "الابتكار الرقمي والـ AI",
+        icon: Cpu,
+        thumbnail: "/covers/student-robotics-accreditations.jpg",
         image: "/covers/student-robotics-accreditations.jpg",
-        desc: "بيئة تكنولوجية متكاملة مزودة بأحدث حقائب الروبوت والذكاء الاصطناعي، ومحطات البرمجة 1:1، حيث حصد طلابنا المركز الخامس عالمياً في أولمبياد الروبوت الدولي.",
-        specs: [
-          { label: "الإنجاز", val: "المركز الخامس عالمياً WRO" },
-          { label: "التجهيز", val: "أجهزة حاسوب ذكية 1:1" },
-          { label: "المسار", val: "بايثون، C++، ميكاترونيكس" },
-          { label: "الاعتماد", val: "شراكات تقنية متقدمة" },
+        badge: "المركز الخامس عالمياً",
+        desc: "بيئة تكنولوجية متكاملة مزودة بأحدث حقائب الروبوت ومحطات البرمجة 1:1، حيث تُصنع العقول المبتكرة وحقق طلابنا من خلالها المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO.",
+        hotspots: [
+          {
+            id: "robotics-wro",
+            x: 35,
+            y: 48,
+            title: "محطات محاكاة أولمبياد WRO",
+            desc: "حلبات تدريب واختبار مطابقة للمواصفات الدولية لأولمبياد الروبوت مع تحديات سنوية محدثة.",
+          },
+          {
+            id: "robotics-pc",
+            x: 70,
+            y: 40,
+            title: "محطة حاسوب ذكية 1:1",
+            desc: "أجهزة حاسوب فائقة الأداء مخصصة لكل طالب لتعلم البرمجة بلغات بايثون، C++، والذكاء الاصطناعي.",
+          },
+          {
+            id: "robotics-kits",
+            x: 50,
+            y: 76,
+            title: "حقائب LEGO & VEX المتقدمة",
+            desc: "تجهيزات ميكانيكية وإلكترونية متطورة تدعم الهندسة العكسية وحل المشكلات الواقعية.",
+          },
+        ],
+        giantMetrics: [
+          { num: "5th", label: "أولمبياد الروبوت", sub: "المركز الخامس عالمياً WRO" },
+          { num: "1:1", label: "حواسيب مخصصة", sub: "محطة رقمية لكل طالب" },
+          { num: "Python", label: "برمجة ولغات AI", sub: "من المراحل المبكرة" },
+          { num: "+20", label: "بطولة وجائزة", sub: "محلية وإقليمية سنوياً" },
         ],
       },
       {
         id: "testing",
         name: "قاعات مراكز اختبارات IELTS و SAT الدولية",
-        tag: "الاعتماد الدولي",
+        tag: "الاعتماد الدولي والجامعي",
+        icon: GraduationCap,
+        thumbnail: "/covers/cover-accreditations.jpg",
         image: "/covers/cover-accreditations.jpg",
-        desc: "قاعات رسمية معتمدة لاختبارات اللغة الإنجليزية IELTS بالشراكة مع IDP، واختبارات القبول للجامعات الأمريكية والدولية SAT، لتأهيل الطلاب لأرقى الجامعات.",
-        specs: [
-          { label: "الشريك", val: "IDP IELTS & College Board" },
-          { label: "التجهيز", val: "أنظمة مراقبة وصوتيات دولية" },
-          { label: "الاعتماد", val: "كوجنيا الأمريكية Cognia" },
-          { label: "الخدمة", val: "مركز معتمد بالمدينة المنورة" },
+        badge: "مركز رسمي IDP & SAT",
+        desc: "قاعات مجهزة بأنظمة الصوتيات والمراقبة الصارمة، معتمدة رسمياً بالمدينة المنورة لاختبارات اللغة الإنجليزية IELTS بالشراكة مع IDP واختبارات SAT لتأهيل خريجينا للجامعات العالمية.",
+        hotspots: [
+          {
+            id: "testing-idp",
+            x: 30,
+            y: 45,
+            title: "شراكة رسمية مع IDP IELTS",
+            desc: "مركز رسمي معتمد لإجراء اختبارات الآيلتس الورقية والحاسوبية داخل المدينة المنورة.",
+          },
+          {
+            id: "testing-audio",
+            x: 65,
+            y: 35,
+            title: "أنظمة عزل صوتي واستماع دولية",
+            desc: "تجهيزات سمعية فردية عالية الدقة وعزل صوتي كامل وفق المعايير البريطانية والأمريكية.",
+          },
+          {
+            id: "testing-sat",
+            x: 48,
+            y: 72,
+            title: "الاعتماد الأمريكي كوجنيا Cognia",
+            desc: "حوكمة وإشراف دولي يضمن معادلة الشهادات وقبولها في كبرى جامعات المملكة والعالم.",
+          },
+        ],
+        giantMetrics: [
+          { num: "Official", label: "مركز اختبارات", sub: "شراكة IDP IELTS الرسمية" },
+          { num: "SAT", label: "College Board", sub: "اختبارات القبول الجامعي" },
+          { num: "+98%", label: "تقييم كوجنيا", sub: "معايير الجودة الأكاديمية" },
+          { num: "Top", label: "مسار الجامعات", sub: "تأهيل مباشر للابتعاث" },
         ],
       },
       {
         id: "sports",
         name: "الصالات الرياضية وملاعب العشب الصناعي",
-        tag: "الأنشطة وبناء الجسم",
+        tag: "اللياقة وبناء الجسم",
+        icon: Trophy,
+        thumbnail: "/covers/cover-about.jpg",
         image: "/covers/cover-about.jpg",
+        badge: "ملاعب نجيل وملاعب مغلقة",
         desc: "ملاعب كرة قدم بنجيل صناعي معتمد ومضاء بأبراج كاشفة، إلى جانب صالات جمباز وملاعب كرة طائرة وسلة وصالة كاراتيه للياقة البدنية المتكاملة.",
-        specs: [
-          { label: "الملاعب", val: "عشب صناعي + صالات مغلقة" },
-          { label: "الألعاب", val: "كرة قدم، سلة، طائرة، كاراتيه" },
-          { label: "الإضاءة", val: "أبراج كاشفة متكاملة" },
-          { label: "البرامج", val: "دوري المدارس والبطولات" },
+        hotspots: [
+          {
+            id: "sports-grass",
+            x: 40,
+            y: 55,
+            title: "أرضيات عشب صناعي معتمدة",
+            desc: "نجيل صناعي من الجيل المتقدم يمتص الصدمات ويقلل مخاطر الإصابات للطلاب أثناء اللعب.",
+          },
+          {
+            id: "sports-towers",
+            x: 75,
+            y: 30,
+            title: "أبراج كاشفة متكاملة",
+            desc: "إضاءة ليلية عالية الكفاءة تدعم البطولات المسائية والأنشطة المجتمعية ومهرجانات المدرسة.",
+          },
+          {
+            id: "sports-indoor",
+            x: 25,
+            y: 70,
+            title: "صالات الجمباز والكاراتيه",
+            desc: "صالات داخلية مكيفة مجهزة بأبسطة حماية وأجهزة تدريب للياقة البدنية والدفاع عن النفس.",
+          },
+        ],
+        giantMetrics: [
+          { num: "FIFA", label: "مواصفات الملاعب", sub: "نجيل صناعي ماص للصدمات" },
+          { num: "4+", label: "رياضات أساسية", sub: "قدم، سلة، طائرة، كاراتيه" },
+          { num: "Pro", label: "أبراج إضاءة", sub: "مواصفات الملاعب الحديثة" },
+          { num: "100%", label: "أنشطة وبطولات", sub: "دوري مدرسي منتظم" },
         ],
       },
       {
         id: "labs",
         name: "المختبرات العلمية الذكية",
         tag: "التجربة والتطبيق العملي",
+        icon: Microscope,
+        thumbnail: "/covers/student-excellence-about.jpg",
         image: "/covers/student-excellence-about.jpg",
+        badge: "تجهيز معملي ذكي",
         desc: "مختبرات فيزياء وكيمياء وأحياء مجهزة بأحدث أدوات السلامة والمجاهر الرقمية وشاشات العرض التفاعلية لربط المنهج النظري بالتطبيق العملي المعملي.",
-        specs: [
-          { label: "التخصصات", val: "فيزياء · كيمياء · أحياء" },
-          { label: "السلامة", val: "معايير بيئية وصحية قياسية" },
-          { label: "العرض", val: "شاشات لمس تفاعلية ذكية" },
-          { label: "التطبيق", val: "تجارب أسبوعية منتظمة" },
+        hotspots: [
+          {
+            id: "labs-micro",
+            x: 35,
+            y: 42,
+            title: "مجاهر رقمية وشاشات تفاعلية",
+            desc: "توصيل فوري بين المجاهر والشاشات لعرض عينات الخلايا والتفاعلات بدقة 4K.",
+          },
+          {
+            id: "labs-safety",
+            x: 70,
+            y: 50,
+            title: "خزانات كواشف وأنظمة إخلاء",
+            desc: "أنظمة شفط وتهوية كيميائية ومعايير أمان بيئي وصحي لحماية الطلاب في كل تجربة.",
+          },
+          {
+            id: "labs-pract",
+            x: 50,
+            y: 75,
+            title: "تجارب أسبوعية منتظمة",
+            desc: "تطبيق عملي لكل وحدة دراسية لترسيخ المفاهيم العلمية بأسلوب ستيم (STEM).",
+          },
+        ],
+        giantMetrics: [
+          { num: "3", label: "مختبرات متخصصة", sub: "فيزياء · كيمياء · أحياء" },
+          { num: "4K", label: "مجاهر رقمية", sub: "عرض تفاعلي عالي الدقة" },
+          { num: "STEM", label: "تكامل العلوم", sub: "ربط المعرفة بالتطبيق" },
+          { num: "100%", label: "أمان وسلامة", sub: "معايير بيئية وصحية قياسية" },
         ],
       },
     ],
@@ -437,65 +576,195 @@ export default function AqeeqSchoolAboutPage() {
         id: "early-childhood",
         name: "أقسام الطفولة المبكرة والروضة",
         tag: "غراس البدايات السعيدة",
+        icon: Heart,
+        thumbnail: "/covers/student-excellence-about.jpg",
         image: "/covers/student-excellence-about.jpg",
+        badge: "بيئة تنشئة تفاعلية",
         desc: "بيئة تعليمية وتربوية تفاعلية مصممة خصيصاً للأطفال لتنمية مهارات التفكير، والاستكشاف الحركي واللغوي، بإشراف معلمات متخصصات في رياض الأطفال.",
-        specs: [
-          { label: "الفئة", val: "الروضة والتمهيدي والطفولة المبكرة" },
-          { label: "المناهج", val: "منتسوري وتنمية الذكاءات المتعددة" },
-          { label: "الأمان", val: "أرضيات مطاطية وألعاب آمنة" },
-          { label: "الرعاية", val: "عيادة مدرسية وإشراف صحي" },
+        hotspots: [
+          {
+            id: "early-montessori",
+            x: 32,
+            y: 45,
+            title: "أركان التعلم ومنتسوري",
+            desc: "وسائل حسية وحركية تعزز استقلال الطفل وتنمي قدراته الذهنية في سنوات البناء الأولى.",
+          },
+          {
+            id: "early-play",
+            x: 68,
+            y: 40,
+            title: "مناطق لعب آمنة ومظللة",
+            desc: "أرضيات مطاطية ماصة للصدمات وألعاب حاصلة على شهادات السلامة العالمية.",
+          },
+          {
+            id: "early-clinic",
+            x: 50,
+            y: 75,
+            title: "إشراف ورعاية صحية متكاملة",
+            desc: "عيادة مدرسية مجهزة وكادر تمريض لمتابعة النمو والصحة العامة لأطفالنا.",
+          },
+        ],
+        giantMetrics: [
+          { num: "KG", label: "روضة وتمهيدي", sub: "تأسيس لغوي وقيمي راسخ" },
+          { num: "Mont.", label: "منتسوري وذكاءات", sub: "تنمية المواهب المبكرة" },
+          { num: "100%", label: "أمان وسلامة", sub: "أرضيات وألعاب مطابقة" },
+          { num: "Care", label: "رعاية وعيادة", sub: "متابعة صحية وتربوية" },
         ],
       },
       {
         id: "theater",
         name: "مسرح الاحتفالات وقاعات الإبداع والخطابة",
         tag: "بناء الشخصية والقيادة",
+        icon: Sparkles,
+        thumbnail: "/covers/cover-about.jpg",
         image: "/covers/cover-about.jpg",
+        badge: "قاعة كبرى للمناسبات",
         desc: "مسرح مدرسي صرحي مجهز بأحدث أنظمة الصوت والإضاءة الرقمية، لاحتضان الفعاليات والملتقيات، مسابقات الإلقاء، والمؤتمرات الطلابية باللغتين العربية والإنجليزية.",
-        specs: [
-          { label: "السعة", val: "قاعة كبرى للمناسبات" },
-          { label: "التقنية", val: "أنظمة صوتية وضوئية سينمائية" },
-          { label: "الأنشطة", val: "الخطابة والمسرح والمعارض" },
-          { label: "الخصوصية", val: "بيئة نسائية متكاملة" },
+        hotspots: [
+          {
+            id: "theater-stage",
+            x: 45,
+            y: 40,
+            title: "منصة عرض وإضاءة سينمائية",
+            desc: "أنظمة إضاءة رقمية ومؤثرات ضوئية حديثة تدعم العروض المسرحية والمحافل الرسمية.",
+          },
+          {
+            id: "theater-audio",
+            x: 75,
+            y: 50,
+            title: "صوتيات عازلة وميكروفونات لاسلكية",
+            desc: "توزيع صوتي محيطي يضمن وضوح الكلمة والإلقاء في كافة أرجاء القاعة الكبرى.",
+          },
+          {
+            id: "theater-privacy",
+            x: 25,
+            y: 75,
+            title: "خصوصية نسائية وبيئة نموذجية",
+            desc: "قاعات مستقلة ومجهزة بكافة المرافق اللوجستية لاحتضان احتفالات الطالبات وأمهاتهن.",
+          },
+        ],
+        giantMetrics: [
+          { num: "Mega", label: "قاعة ومسرح كبرى", sub: "لاحتضان المحافل الرسمية" },
+          { num: "Audio", label: "صوتيات احترافية", sub: "أنظمة رقمية متطورة" },
+          { num: "2 Lang", label: "خطابة وإلقاء", sub: "عربي وإنجليزي بطلاقة" },
+          { num: "100%", label: "خصوصية نسائية", sub: "بيئة مريحة ومستقلة" },
         ],
       },
       {
         id: "languages",
         name: "معامل اللغات والحاسوب المتقدمة",
         tag: "الطلاقة والتمكين الرقمي",
+        icon: Cpu,
+        thumbnail: "/covers/student-lab-admissions.jpg",
         image: "/covers/student-lab-admissions.jpg",
+        badge: "محطات حاسوب 1:1",
         desc: "معامل حاسوبية ذكية مدعومة بأحدث برمجيات التدريب على اللغة الإنجليزية والبرمجة والتصميم الجرافيكي، لإعداد طالبات يمتلكن المهارات الرقمية المتقدمة.",
-        specs: [
-          { label: "الأجهزة", val: "محطات حاسوب حديثة 1:1" },
-          { label: "اللغات", val: "برامج الاستماع والمحادثة الدولية" },
-          { label: "البرمجة", val: "سكراتش وبايثون ومونتاج" },
-          { label: "الاعتماد", val: "مناهج الدبلومة الأمريكية" },
+        hotspots: [
+          {
+            id: "lang-pc",
+            x: 35,
+            y: 45,
+            title: "محطات رقمية فردية 1:1",
+            desc: "أجهزة متصلة بالإنترنت الآمن ومنصات تعليم اللغات التفاعلية العالمية.",
+          },
+          {
+            id: "lang-soft",
+            x: 70,
+            y: 40,
+            title: "برمجيات الاستماع والطلاقة",
+            desc: "برامج متخصصة لقياس مخارج الحروف والتدريب على المحادثات الإنجليزية بطلاقة.",
+          },
+          {
+            id: "lang-code",
+            x: 52,
+            y: 75,
+            title: "أكاديميات البرمجة والمونتاج",
+            desc: "مسارات تدريبية في سكراتش، بايثون، وتصميم الجرافيك والمونتاج الرقمي.",
+          },
+        ],
+        giantMetrics: [
+          { num: "1:1", label: "محطات ذكية", sub: "حاسوب لكل طالبة" },
+          { num: "IELTS", label: "طلاقة لغوية", sub: "مناهج دولية معتمدة" },
+          { num: "Code", label: "برمجة وتصميم", sub: "سكراتش وبايثون ومونتاج" },
+          { num: "Cognia", label: "دبلومة أمريكية", sub: "تأهيل أكاديمي متقدم" },
         ],
       },
       {
         id: "playgrounds",
         name: "الملاعب والساحات الترفيهية المظللة بالكامل",
         tag: "حيوية وأمان تام",
+        icon: Trophy,
+        thumbnail: "/covers/first-lego-champions.png",
         image: "/covers/first-lego-champions.png",
+        badge: "تظليل عازل 100%",
         desc: "ساحات أنشطة وفسحة واسعة ومظللة بنسبة 100% لتوفير الحماية التامة والراحة، مع ملاعب مجهزة لممارسة الأنشطة الرياضية والترويحية الحركية.",
-        specs: [
-          { label: "التظليل", val: "مظلات عازلة للحرارة 100%" },
-          { label: "الأرضيات", val: "أرضيات مطاطية ماصة للصدمات" },
-          { label: "الأمان", val: "كاميرات وأنظمة سلامة شاملة" },
-          { label: "الأنشطة", val: "فسحة حركية وبرامج لياقة" },
+        hotspots: [
+          {
+            id: "play-shade",
+            x: 45,
+            y: 35,
+            title: "مظلات عازلة للحرارة 100%",
+            desc: "هياكل تظليل حديثة تحجب الأشعة فوق البنفسجية وتوفر أجواء معتدلة طوال اليوم.",
+          },
+          {
+            id: "play-rubber",
+            x: 75,
+            y: 60,
+            title: "أرضيات مطاطية ماصة للصدمات",
+            desc: "أرضيات بمواصفات أمان دولية لحماية الطالبات أثناء الركض والأنشطة الحركية.",
+          },
+          {
+            id: "play-cam",
+            x: 25,
+            y: 70,
+            title: "كاميرات مراقبة وإشراف متواصل",
+            desc: "منظومة أمان وكوادر إشرافية تتابع سلامة الطالبات في أوقات الفسحة والأنشطة.",
+          },
+        ],
+        giantMetrics: [
+          { num: "100%", label: "تظليل عازل", sub: "حماية تامة من الشمس" },
+          { num: "Safe", label: "أرضيات مطاطية", sub: "أعلى معايير الأمان" },
+          { num: "Sport", label: "ألعاب ولياقة", sub: "كرة طائرة وسلة وأنشطة" },
+          { num: "24/7", label: "أنظمة أمان", sub: "كاميرات ومتابعة مستمرة" },
         ],
       },
       {
         id: "art-studios",
         name: "استوديوهات الفنون والمختبرات العلمية",
         tag: "الفنون والعلوم التطبيقية",
+        icon: Palette,
+        thumbnail: "/covers/student-robotics-accreditations.jpg",
         image: "/covers/student-robotics-accreditations.jpg",
+        badge: "إبداع ومعامل علوم",
         desc: "أروقة مخصصة لإطلاق مواهب الرسم والأشغال اليدوية والخط العربي، إلى جانب مختبرات العلوم المتكاملة لتطبيق التجارب والاستكشاف العلمي.",
-        specs: [
-          { label: "الفنون", val: "الرسم التشكيلي والخط العربي" },
-          { label: "المعارض", val: "معارض سنوية لإنتاج الطالبات" },
-          { label: "المختبرات", val: "تجهيزات كيمياء وأحياء قياسية" },
-          { label: "التوجيه", val: "إشراف نخبة من المتخصصات" },
+        hotspots: [
+          {
+            id: "art-easels",
+            x: 35,
+            y: 45,
+            title: "مراسم الفن والخط العربي",
+            desc: "أركان مجهزة بالحوامل والألوان الزيتية والمائية وأدوات الخط العربي التراثي.",
+          },
+          {
+            id: "art-gallery",
+            x: 70,
+            y: 40,
+            title: "معارض سنوية لإنتاج الطالبات",
+            desc: "أروقة عرض تحتفي بلوحات ومجسمات وإبداعات الطالبات الفائزة في المسابقات.",
+          },
+          {
+            id: "art-science",
+            x: 52,
+            y: 75,
+            title: "مختبرات علوم متكاملة",
+            desc: "تجهيزات بيولوجية وكيميائية مدرسية لتطبيق التجارب والاستكشاف العلمي العملي.",
+          },
+        ],
+        giantMetrics: [
+          { num: "Art", label: "فنون تشكيلية", sub: "رسم وخزف وخط عربي" },
+          { num: "Expo", label: "معارض سنوية", sub: "احتفاء بإنتاج الطالبات" },
+          { num: "Lab", label: "مختبرات علوم", sub: "تجهيزات كيمياء وأحياء" },
+          { num: "Pro", label: "إشراف متخصص", sub: "نخبة من الأكاديميات" },
         ],
       },
     ],
@@ -981,32 +1250,38 @@ export default function AqeeqSchoolAboutPage() {
         </motion.div>
       </section>
 
-      {/* ========================================================
-          STAGE 2: Interactive 3D Campus Explorer & Facility Switcher
+                  {/* ========================================================
+          STAGE 2: Multi-Mode Next-Gen Architectural Campus Showcase
+          (Interactive Mode Switcher: Accordion | 3D Coverflow | 3D Deck | Blueprint Zoom)
       ======================================================== */}
       <section
         ref={campusSectionRef}
         id="campuses-section"
-        className={`py-20 border-y ${
-          dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
+        className={`py-20 border-y relative overflow-hidden ${
+          dark ? "border-white/10 bg-[#05080c]" : "border-emerald-950/10 bg-[#f5f8f5]"
         }`}
       >
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-10">
+        {/* Subtle Ambient Lighting Aura */}
+        <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-emerald-500" />
+        <div className="pointer-events-none absolute -bottom-40 left-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#f8ca14]" />
+
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6">
             <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
-              <Building2 size={14} />
-              <span>الصروح والمجمعات التعليمية النموذجية</span>
+              <Building2 size={15} />
+              <span>✦ الصروح والمجمعات التعليمية النموذجية · حي الرانوناء ✦</span>
             </div>
             <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
               استكشف مجمعاتنا بالمدينة المنورة 🏫
             </h2>
-            <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              مبانٍ مدرسية صرحية مستقلة بحي الرانوناء (ممشى الهجرة)، تضم تجهيزات أكاديمية ورياضية ومعملية بمعايير عالمية
+            <p className={`text-xs sm:text-sm mt-2 max-w-2xl mx-auto ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+              مبانٍ مدرسية صرحية مستقلة بمحاذاة ممشى الهجرة، تضم تجهيزات أكاديمية ورياضية ومعملية بمعايير عالمية للبنين والبنات.
             </p>
 
-            {/* Campus Switcher Tabs with Animated Sliding Pill */}
+            {/* Campus Switcher Tabs (Boys vs Girls) */}
             <div
-              className={`mt-8 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
+              className={`mt-6 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
                 dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
               }`}
             >
@@ -1015,6 +1290,7 @@ export default function AqeeqSchoolAboutPage() {
                 onClick={() => {
                   setActiveCampusTab("boys");
                   setActiveFacilityIndex(0);
+                  setActiveHotspotId(null);
                 }}
                 className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
@@ -1039,6 +1315,7 @@ export default function AqeeqSchoolAboutPage() {
                 onClick={() => {
                   setActiveCampusTab("girls");
                   setActiveFacilityIndex(0);
+                  setActiveHotspotId(null);
                 }}
                 className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
@@ -1060,147 +1337,634 @@ export default function AqeeqSchoolAboutPage() {
             </div>
           </div>
 
-          {/* Interactive Facilities Horizontal Pills */}
-          <div className="max-w-4xl mx-auto mb-8 flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {currentFacilities.map((fac, fIdx) => (
+          {/* Interactive Transition Mode Switcher (جرب كل الانتقالات الحية) */}
+          <div className="flex items-center justify-center gap-1.5 p-1.5 rounded-2xl border backdrop-blur-xl max-w-2xl mx-auto mb-8 bg-black/20 border-white/10 shadow-lg">
+            <span className="text-[11px] font-black px-2 text-slate-400 hidden sm:inline">
+              نمط الانتقال:
+            </span>
+            {[
+              { id: "accordion", label: "الستارة المعمارية 🏛️", hint: "تمدد ناعم" },
+              { id: "coverflow", label: "المسرح 3D 🪐", hint: "دوران مكاني" },
+              { id: "deck", label: "الكروت الطائرة 🎴", hint: "سحب ملكي" },
+              { id: "blueprint", label: "المخطط والزووم 📐", hint: "كاميرا سينمائية" },
+            ].map((mode) => (
               <button
-                key={fac.id}
+                key={mode.id}
                 type="button"
-                onClick={() => setActiveFacilityIndex(fIdx)}
-                className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition active:scale-95 border ${
-                  activeFacilityIndex === fIdx
-                    ? dark
-                      ? "border-[#f8ca14] bg-[#f8ca14]/15 text-[#f8ca14] shadow-sm ring-1 ring-[#f8ca14]/30"
-                      : "border-[#015a37] bg-[#015a37] text-white shadow-sm"
+                onClick={() => setTransitionMode(mode.id as any)}
+                className={`relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-black transition active:scale-95 ${
+                  transitionMode === mode.id
+                    ? "text-white"
                     : dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                    : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-600 hover:text-emerald-900 hover:bg-white/40"
                 }`}
               >
-                <span>{fac.name}</span>
+                {transitionMode === mode.id && (
+                  <motion.div
+                    layoutId="activeTransitionModePill"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 shadow-md ring-1 ring-[#f8ca14]/40"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10">{mode.label}</span>
               </button>
             ))}
           </div>
 
-          {/* Active Facility Spotlight Showcase Card with Scroll 3D Perspective */}
-          <motion.div
-            style={{
-              rotateX: campusRotateX,
-              scale: campusScale,
-              transformPerspective: 1200,
-            }}
-            className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl transition duration-500 will-change-transform ${
-              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-            }`}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeFacility.id}
-                initial={{ opacity: 0, y: 12, filter: "blur(3px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
-              >
-                {/* Info Column */}
-                <div className="lg:col-span-7">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span
-                      className={`rounded-xl px-3 py-1 text-xs font-black ${
-                        activeCampusTab === "boys"
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "bg-pink-500/10 text-pink-600 dark:text-pink-400"
+          {/* ========================================================
+              MODE 1: EXPANDING ARCHITECTURAL ACCORDION PANELS
+          ======================================================== */}
+          {transitionMode === "accordion" && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-6xl mx-auto"
+            >
+              {/* Desktop Expanding Panels (5 side-by-side columns) */}
+              <div className="hidden lg:flex h-[560px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#0b1218]/90 border-emerald-500/20">
+                {currentFacilities.map((fac, fIdx) => {
+                  const FacIcon = fac.icon;
+                  const isExpanded = activeFacilityIndex === fIdx;
+
+                  return (
+                    <motion.div
+                      key={fac.id}
+                      layout
+                      transition={{ type: "spring", stiffness: 220, damping: 26 }}
+                      onClick={() => {
+                        if (!isExpanded) {
+                          setActiveFacilityIndex(fIdx);
+                          setActiveHotspotId(null);
+                        }
+                      }}
+                      className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
+                        isExpanded
+                          ? "flex-[5] border-[#f8ca14]/40 shadow-2xl"
+                          : "flex-1 min-w-[76px] border-white/10 hover:border-white/30 cursor-pointer opacity-85 hover:opacity-100"
                       }`}
                     >
-                      {activeFacility.tag} ✦
-                    </span>
-                    <span className="text-xs font-bold text-slate-500">
-                      {activeCampusTab === "boys" ? "مجمع البنين — حي الرانوناء" : "مجمع البنات — ممشى الهجرة"}
-                    </span>
-                  </div>
-
-                  <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    {activeFacility.name}
-                  </h3>
-
-                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                    {activeFacility.desc}
-                  </p>
-
-                  {/* 4 Technical Specifications Micro-Chips */}
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {activeFacility.specs.map((sp, sIdx) => (
-                      <div
-                        key={sIdx}
-                        className={`p-3 rounded-xl border transition hover:scale-105 ${
-                          dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"
+                      {/* Background Photo */}
+                      <img
+                        src={fac.image}
+                        alt={fac.name}
+                        className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
+                          isExpanded ? "scale-105" : "grayscale-[30%] group-hover:scale-110"
                         }`}
-                      >
-                        <span className="block text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                          ✦ {sp.label}
-                        </span>
-                        <span className={`text-xs font-bold mt-0.5 block truncate ${dark ? "text-slate-200" : "text-slate-800"}`}>
-                          {sp.val}
+                      />
+                      {/* Rich Dark Gradient Overlay */}
+                      <div
+                        className={`absolute inset-0 transition-opacity duration-500 ${
+                          isExpanded
+                            ? "bg-gradient-to-t from-black/95 via-black/55 to-black/30"
+                            : "bg-black/75 hover:bg-black/60"
+                        }`}
+                      />
+
+                      {/* Expanded View Content */}
+                      {isExpanded ? (
+                        <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white">
+                          {/* Top Bar with Badge & Live Status */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="rounded-xl bg-[#015a37]/90 border border-emerald-400/40 px-3.5 py-1 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                                {fac.tag} ✦
+                              </span>
+                              <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
+                                {fac.badge}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-black/60 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
+                              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                              <span>مرفق حي مجهز 100%</span>
+                            </div>
+                          </div>
+
+                          {/* Center Story */}
+                          <div className="max-w-2xl my-auto py-4">
+                            <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
+                              {fac.name}
+                            </h3>
+                            <p className="text-sm leading-relaxed text-slate-200 font-medium drop-shadow mb-6">
+                              {fac.desc}
+                            </p>
+
+                            {/* 4 Giant Metrics Chips */}
+                            <div className="grid grid-cols-4 gap-3">
+                              {fac.giantMetrics.map((gm, gIdx) => (
+                                <div
+                                  key={gIdx}
+                                  className="p-3 rounded-2xl border border-white/15 bg-black/50 backdrop-blur-xl text-center"
+                                >
+                                  <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
+                                    {gm.num}
+                                  </span>
+                                  <span className="block text-[11px] font-black text-white truncate mt-0.5">
+                                    {gm.label}
+                                  </span>
+                                  <span className="block text-[10px] text-slate-300 truncate">
+                                    {gm.sub}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Bottom Action Suite */}
+                          <div className="flex items-center gap-3 pt-4 border-t border-white/15">
+                            <a
+                              href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
+                            >
+                              <MapPin size={15} />
+                              <span>فتح الموقع في Google Maps 📍</span>
+                            </a>
+                            <a
+                              href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold transition backdrop-blur-md"
+                            >
+                              <Phone size={14} />
+                              <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                            </a>
+                            <Button
+                              onClick={() => navigate("/admissions")}
+                              variant="outline"
+                              className="rounded-2xl text-xs font-black border-white/20 text-white hover:bg-white/10"
+                            >
+                              حجز جولة تعريفية في المرفق ✦
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Compressed Vertical Panel Spine */
+                        <div className="relative z-10 h-full flex flex-col items-center justify-between py-8">
+                          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-black/70 border border-white/20 text-[#f8ca14] shadow-md backdrop-blur-md">
+                            <FacIcon size={20} />
+                          </div>
+                          <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 select-none">
+                            {fac.name}
+                          </span>
+                          <span className="text-[10px] font-bold text-emerald-400 bg-black/70 border border-emerald-500/30 px-2.5 py-1 rounded-full backdrop-blur-md">
+                            ✦ تمدد
+                          </span>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Mobile Fallback for Accordion Mode */}
+              <div className="flex lg:hidden flex-col gap-3">
+                {currentFacilities.map((fac, fIdx) => {
+                  const FacIcon = fac.icon;
+                  const isExpanded = activeFacilityIndex === fIdx;
+
+                  return (
+                    <div
+                      key={fac.id}
+                      onClick={() => setActiveFacilityIndex(fIdx)}
+                      className={`rounded-3xl border overflow-hidden transition ${
+                        isExpanded
+                          ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
+                          : "border-white/10 bg-[#0b1015] p-3 cursor-pointer"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/60 border border-white/15 text-[#f8ca14]">
+                            <FacIcon size={18} />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-[#f8ca14] font-bold block">{fac.tag}</span>
+                            <h4 className="text-sm font-black text-white">{fac.name}</h4>
+                          </div>
+                        </div>
+                        <span className={`text-xs font-black transition-transform ${isExpanded ? "rotate-90 text-[#f8ca14]" : "text-slate-400"}`}>
+                          ❯
                         </span>
                       </div>
-                    ))}
-                  </div>
 
-                  {/* Facility Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <a
-                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
-                    >
-                      <MapPin size={15} />
-                      <span>فتح الموقع في Google Maps 📍</span>
-                    </a>
+                      {isExpanded && (
+                        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+                          <div className="rounded-2xl overflow-hidden aspect-video relative">
+                            <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
+                          </div>
+                          <p className="text-xs leading-relaxed text-slate-300 font-medium">{fac.desc}</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {fac.giantMetrics.map((gm, gIdx) => (
+                              <div key={gIdx} className="p-2.5 rounded-xl border border-white/10 bg-black/40 text-center">
+                                <span className="block text-lg font-black text-[#f8ca14]">{gm.num}</span>
+                                <span className="block text-[10px] font-bold text-white">{gm.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
 
-                    <a
-                      href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
-                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
-                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+          {/* ========================================================
+              MODE 2: 3D SPATIAL COVERFLOW CAROUSEL (Vision Pro Style)
+          ======================================================== */}
+          {transitionMode === "coverflow" && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-6xl mx-auto"
+            >
+              <div
+                style={{ perspective: 1200 }}
+                className="relative h-[620px] flex items-center justify-center overflow-hidden"
+              >
+                {currentFacilities.map((fac, fIdx) => {
+                  const offset = fIdx - activeFacilityIndex;
+                  const absOffset = Math.abs(offset);
+                  const isCenter = offset === 0;
+
+                  // 3D Spatial Position Calculations
+                  const x = offset * 210;
+                  const z = -absOffset * 180;
+                  const rotateY = offset * -32;
+                  const scale = Math.max(0.7, 1 - absOffset * 0.12);
+                  const opacity = Math.max(0.25, 1 - absOffset * 0.3);
+                  const zIndex = 30 - absOffset;
+
+                  return (
+                    <motion.div
+                      key={fac.id}
+                      animate={{
+                        x,
+                        z,
+                        rotateY,
+                        scale,
+                        opacity,
+                      }}
+                      transition={{ type: "spring", stiffness: 180, damping: 24 }}
+                      style={{
+                        zIndex,
+                        position: "absolute",
+                        transformStyle: "preserve-3d",
+                      }}
+                      onClick={() => {
+                        setActiveFacilityIndex(fIdx);
+                        setActiveHotspotId(null);
+                      }}
+                      className={`w-[340px] sm:w-[480px] rounded-[2.5rem] border p-5 shadow-2xl backdrop-blur-2xl transition duration-300 cursor-pointer ${
+                        isCenter
+                          ? "border-[#f8ca14]/60 bg-[#0c141a]/95 shadow-[0_25px_60px_rgba(1,90,55,0.4)] ring-2 ring-[#f8ca14]/40"
+                          : "border-white/10 bg-[#080d12]/90 hover:border-white/30"
                       }`}
                     >
-                      <Phone size={14} />
-                      <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
-                    </a>
+                      {/* Photo Display */}
+                      <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 group/cov">
+                        <img
+                          src={fac.image}
+                          alt={fac.name}
+                          className="h-full w-full object-cover transition duration-500 group-hover/cov:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <span className="absolute top-3 right-3 rounded-full bg-black/75 border border-white/20 px-3 py-1 text-[10px] font-black text-[#f8ca14]">
+                          {fac.tag}
+                        </span>
+                        <span className="absolute bottom-3 right-3 text-sm font-black text-white drop-shadow">
+                          {fac.name}
+                        </span>
+                      </div>
 
-                    <Button
-                      onClick={() => navigate("/admissions")}
-                      variant="outline"
-                      className="rounded-2xl text-xs font-black"
-                    >
-                      حجز جولة تعريفية في المرفق ✦
-                    </Button>
+                      {/* Detail View for Center Card */}
+                      {isCenter ? (
+                        <div className="space-y-4">
+                          <p className="text-xs leading-relaxed text-slate-300 font-medium line-clamp-2">
+                            {fac.desc}
+                          </p>
+
+                          {/* 4 Giant Metrics */}
+                          <div className="grid grid-cols-4 gap-2">
+                            {fac.giantMetrics.map((gm, gIdx) => (
+                              <div
+                                key={gIdx}
+                                className="p-2 rounded-xl border border-white/10 bg-black/40 text-center"
+                              >
+                                <span className="block text-base font-black text-[#f8ca14]">{gm.num}</span>
+                                <span className="block text-[9px] font-bold text-white truncate">{gm.label}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-2">
+                            <a
+                              href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex-1 text-center py-2.5 rounded-xl bg-[#015a37] text-white text-xs font-black shadow hover:bg-emerald-800 transition"
+                            >
+                              Google Maps 📍
+                            </a>
+                            <Button
+                              onClick={() => navigate("/admissions")}
+                              variant="outline"
+                              className="flex-1 py-2.5 rounded-xl text-xs font-black border-white/20 text-white"
+                            >
+                              حجز جولة ✦
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-2 text-xs font-bold text-slate-400">
+                          انقر للتدوير إلى المركز ✦
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Coverflow Navigation Bar */}
+              <div className="flex items-center justify-center gap-4 mt-2">
+                <button
+                  type="button"
+                  disabled={activeFacilityIndex === 0}
+                  onClick={() => setActiveFacilityIndex((i) => Math.max(0, i - 1))}
+                  className="px-4 py-2 rounded-xl border border-white/15 bg-white/5 text-xs font-black text-white hover:bg-white/10 disabled:opacity-30 transition"
+                >
+                  ❮ المرفق السابق
+                </button>
+                <span className="text-xs font-bold text-slate-400">
+                  {activeFacilityIndex + 1} من {currentFacilities.length}
+                </span>
+                <button
+                  type="button"
+                  disabled={activeFacilityIndex === currentFacilities.length - 1}
+                  onClick={() => setActiveFacilityIndex((i) => Math.min(currentFacilities.length - 1, i + 1))}
+                  className="px-4 py-2 rounded-xl border border-white/15 bg-white/5 text-xs font-black text-white hover:bg-white/10 disabled:opacity-30 transition"
+                >
+                  المرفق التالي ❯
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ========================================================
+              MODE 3: 3D DECK FAN-OUT & CARD FLIGHT (Royal Stack)
+          ======================================================== */}
+          {transitionMode === "deck" && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="relative min-h-[580px] flex flex-col items-center justify-center py-6">
+                {/* Visual Stack of Cards */}
+                <div className="relative w-full max-w-xl h-[460px]">
+                  {currentFacilities.map((fac, fIdx) => {
+                    const stackIndex = (fIdx - activeFacilityIndex + currentFacilities.length) % currentFacilities.length;
+                    const isTop = stackIndex === 0;
+
+                    return (
+                      <motion.div
+                        key={fac.id}
+                        animate={{
+                          y: stackIndex * 12,
+                          scale: 1 - stackIndex * 0.05,
+                          rotate: stackIndex * 3 - (stackIndex % 2 === 0 ? 1 : 0),
+                          opacity: stackIndex > 2 ? 0 : 1 - stackIndex * 0.25,
+                        }}
+                        transition={{ type: "spring", stiffness: 200, damping: 22 }}
+                        style={{
+                          zIndex: 20 - stackIndex,
+                          position: "absolute",
+                          inset: 0,
+                        }}
+                        className={`rounded-[2.5rem] border p-6 sm:p-8 shadow-2xl backdrop-blur-2xl flex flex-col justify-between ${
+                          isTop
+                            ? "border-[#f8ca14]/50 bg-[#0c141a] shadow-[0_20px_60px_rgba(0,0,0,0.8)] ring-1 ring-[#f8ca14]/30"
+                            : "border-white/10 bg-[#080d12]/90 pointer-events-none"
+                        }`}
+                      >
+                        <div>
+                          {/* Header */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="rounded-xl bg-[#015a37] text-white px-3 py-1 text-xs font-black">
+                              {fac.tag} ✦
+                            </span>
+                            <span className="text-xs font-bold text-slate-400">
+                              بطاقة {fIdx + 1} من {currentFacilities.length}
+                            </span>
+                          </div>
+
+                          {/* Image */}
+                          <div className="relative rounded-2xl overflow-hidden aspect-[16/9] mb-4">
+                            <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                            <span className="absolute bottom-3 right-3 text-lg font-black text-white">
+                              {fac.name}
+                            </span>
+                          </div>
+
+                          <p className="text-xs leading-relaxed text-slate-300 font-medium line-clamp-2">
+                            {fac.desc}
+                          </p>
+                        </div>
+
+                        {/* Metrics & Actions */}
+                        <div>
+                          <div className="grid grid-cols-4 gap-2 my-4">
+                            {fac.giantMetrics.map((gm, gIdx) => (
+                              <div key={gIdx} className="p-2 rounded-xl border border-white/10 bg-black/40 text-center">
+                                <span className="block text-sm font-black text-[#f8ca14]">{gm.num}</span>
+                                <span className="block text-[9px] font-bold text-white truncate">{gm.label}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => setActiveFacilityIndex((i) => (i + 1) % currentFacilities.length)}
+                              className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 hover:opacity-95 text-white text-xs font-black shadow-lg transition active:scale-95"
+                            >
+                              اقلب للمرفق التالي (سحب الكرت) 🎴 ❯
+                            </button>
+                            <Button
+                              onClick={() => navigate("/admissions")}
+                              variant="outline"
+                              className="py-3 rounded-xl text-xs font-black border-white/20 text-white"
+                            >
+                              حجز جولة ✦
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ========================================================
+              MODE 4: ARCHITECTURAL BLUEPRINT ZOOM (Tactical Schematic)
+          ======================================================== */}
+          {transitionMode === "blueprint" && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-6xl mx-auto"
+            >
+              <div className="rounded-[2.5rem] border border-emerald-500/30 bg-[#060c10] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+                {/* Blueprint Grid Lines Background */}
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-15"
+                  style={{
+                    backgroundImage: "linear-gradient(to right, #015a37 1px, transparent 1px), linear-gradient(to bottom, #015a37 1px, transparent 1px)",
+                    backgroundSize: "32px 32px",
+                  }}
+                />
+
+                {/* Tactical HUD Header */}
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-8 relative z-10 border-b border-emerald-500/20 pb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="h-3 w-3 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="font-mono text-xs font-black text-emerald-400 tracking-wider">
+                      SCHEMATIC ARCHITECTURE // AL-AQEEQ COMPLEX 24°28'N 39°36'E
+                    </span>
                   </div>
+                  <span className="text-xs font-black text-[#f8ca14] bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 rounded-xl">
+                    المخطط الهندسي التفاعلي لصروح العقيق
+                  </span>
                 </div>
 
-                {/* Photo Column with Specular Glare */}
-                <div className="lg:col-span-5">
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
-                    <img
-                      src={activeFacility.image}
-                      alt={activeFacility.name}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                  {/* Left: Sector Radar Navigation Buttons (5 cols) */}
+                  <div className="lg:col-span-5 space-y-3">
+                    <h4 className="text-xs font-black text-slate-400 mb-2">
+                      انقر على قطاع المجمع لزووم الكاميرا الفوري:
+                    </h4>
+                    {currentFacilities.map((fac, fIdx) => {
+                      const FacIcon = fac.icon;
+                      const isTarget = activeFacilityIndex === fIdx;
 
-                    <div className="absolute bottom-4 right-4 left-4 text-white">
-                      <span className="text-xs font-black text-[#f8ca14]">{activeFacility.name}</span>
-                      <p className="text-[11px] text-slate-300">{activeFacility.tag} · مدارس العقيق</p>
-                    </div>
+                      return (
+                        <button
+                          key={fac.id}
+                          type="button"
+                          onClick={() => setActiveFacilityIndex(fIdx)}
+                          className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all text-right ${
+                            isTarget
+                              ? "border-emerald-400 bg-emerald-500/15 text-white shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400"
+                              : "border-white/10 bg-black/40 text-slate-400 hover:border-white/20 hover:text-white"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`grid h-9 w-9 place-items-center rounded-xl border ${
+                              isTarget ? "border-emerald-400 text-emerald-400 bg-emerald-950" : "border-white/10 text-slate-400"
+                            }`}>
+                              <FacIcon size={16} />
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-mono text-emerald-400">SECTOR 0{fIdx + 1}</span>
+                              <span className="text-xs font-black">{fac.name}</span>
+                            </div>
+                          </div>
+                          <span className="font-mono text-[11px] font-bold text-slate-500">
+                            {isTarget ? "TARGET LOCKED" : "INSPECT"}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Right: Camera Zoom Telemetry Pod (7 cols) */}
+                  <div className="lg:col-span-7">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeFacility.id}
+                        initial={{ opacity: 0, scale: 0.94, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 1.06, filter: "blur(4px)" }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="rounded-3xl border border-emerald-500/30 bg-black/70 p-6 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                      >
+                        {/* Scope Crosshairs in Corners */}
+                        <div className="pointer-events-none absolute top-3 left-3 font-mono text-[10px] text-emerald-400/60">┌── 01</div>
+                        <div className="pointer-events-none absolute top-3 right-3 font-mono text-[10px] text-emerald-400/60">──┐ 02</div>
+                        <div className="pointer-events-none absolute bottom-3 left-3 font-mono text-[10px] text-emerald-400/60">└── 03</div>
+                        <div className="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] text-emerald-400/60">──┘ 04</div>
+
+                        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] mb-5 border border-emerald-500/20 shadow-inner">
+                          <img
+                            src={activeFacility.image}
+                            alt={activeFacility.name}
+                            className="h-full w-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
+                          <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white">
+                            <div>
+                              <span className="font-mono text-[10px] text-emerald-400 block">TACTICAL ZOOM ACTIVE</span>
+                              <h3 className="text-xl font-black">{activeFacility.name}</h3>
+                            </div>
+                            <span className="rounded-lg bg-emerald-600/90 px-2.5 py-1 text-[10px] font-mono font-bold">
+                              {activeFacility.badge}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-xs leading-relaxed text-slate-300 font-medium mb-5">
+                          {activeFacility.desc}
+                        </p>
+
+                        <div className="grid grid-cols-4 gap-2 mb-6">
+                          {activeFacility.giantMetrics.map((gm, gIdx) => (
+                            <div key={gIdx} className="p-2 rounded-xl border border-emerald-500/20 bg-emerald-950/30 text-center">
+                              <span className="block text-base font-black text-[#f8ca14]">{gm.num}</span>
+                              <span className="block text-[10px] font-bold text-white truncate">{gm.label}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <a
+                            href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 text-center py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-black shadow transition"
+                          >
+                            ملاحة GPS مباشرة 📍
+                          </a>
+                          <Button
+                            onClick={() => navigate("/admissions")}
+                            variant="outline"
+                            className="flex-1 py-3 rounded-xl text-xs font-black border-emerald-500/30 text-white"
+                          >
+                            حجز موعد زيارة ميدانية ✦
+                          </Button>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
 
-      {/* ========================================================
+{/* ========================================================
           STAGE 3: Royal Strategic Document: Vision & Mission 2030 (Dual-Wing 3D Pivot)
       ======================================================== */}
       <section ref={visionSectionRef} id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
