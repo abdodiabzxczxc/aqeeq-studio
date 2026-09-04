@@ -742,14 +742,24 @@ export default function AlaqeeqStudioPublicPage() {
     })),
   ].slice(0, 8);
 
+  // فحص الشاشات الكبيرة لضبط فيزياء تفتح الكروت (Desktop vs Mobile 3D Fan-out)
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   // فيزياء تفتح كروت الهيرو في البعد الثالث مع السكرول (3D Fan-out on Scroll)
   const { scrollY } = useScroll();
-  const rawHeroFrontCardX = useTransform(scrollY, [0, 500], [0, -40]);
-  const rawHeroFrontCardRotate = useTransform(scrollY, [0, 500], [0, -7]);
-  const rawHeroBackCardX = useTransform(scrollY, [0, 500], [0, 40]);
-  const rawHeroBackCardRotate = useTransform(scrollY, [0, 500], [0, 7]);
-  const rawHeroMiddleCardY = useTransform(scrollY, [0, 500], [0, -30]);
-  const rawHeroMiddleCardScale = useTransform(scrollY, [0, 500], [1, 1.06]);
+  const rawHeroFrontCardX = useTransform(scrollY, [0, 500], [0, isDesktop ? -40 : -10]);
+  const rawHeroFrontCardRotate = useTransform(scrollY, [0, 500], [0, isDesktop ? -7 : -2.5]);
+  const rawHeroBackCardX = useTransform(scrollY, [0, 500], [0, isDesktop ? 40 : 10]);
+  const rawHeroBackCardRotate = useTransform(scrollY, [0, 500], [0, isDesktop ? 7 : 2.5]);
+  const rawHeroMiddleCardY = useTransform(scrollY, [0, 500], [0, isDesktop ? -30 : -10]);
+  const rawHeroMiddleCardScale = useTransform(scrollY, [0, 500], [1, isDesktop ? 1.06 : 1.02]);
 
   const heroFrontCardX = useSpring(rawHeroFrontCardX, { stiffness: 100, damping: 20 });
   const heroFrontCardRotate = useSpring(rawHeroFrontCardRotate, { stiffness: 100, damping: 20 });

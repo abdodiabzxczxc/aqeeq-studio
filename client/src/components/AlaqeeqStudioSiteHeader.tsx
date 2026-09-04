@@ -199,7 +199,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   return (
     <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
       {/* 1. Top Executive Utility Bar */}
-      <div className={`hidden sm:block border-b text-[11px] font-bold py-1.5 transition-colors ${
+      <div className={`hidden sm:block relative z-[140] border-b text-[11px] font-bold py-1.5 transition-colors ${
         dark ? "border-white/5 bg-[#010f08]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
       }`}>
         <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
@@ -700,14 +700,50 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       {mobileMenuOpen && (
         <div
           dir="rtl"
-          className={`fixed inset-x-0 bottom-0 top-[66px] sm:top-[78px] z-[120] lg:hidden animate-in fade-in slide-in-from-top-3 duration-200 backdrop-blur-3xl overflow-hidden ${
+          className={`fixed inset-0 z-[150] lg:hidden animate-in fade-in duration-200 backdrop-blur-3xl overflow-hidden flex flex-col ${
             dark
-              ? "bg-[#060a10]/99 text-white border-t border-white/10"
-              : "bg-white/99 text-slate-900 border-t border-black/[0.08]"
+              ? "bg-[#060a10]/98 text-white"
+              : "bg-white/98 text-slate-900"
           }`}
         >
-              {/* Inner Scroll Container with Safe Bottom Space */}
-              <div className="h-full overflow-y-auto overscroll-contain px-4 sm:px-6 pt-3 pb-36 max-w-lg mx-auto space-y-4 scrollbar-hide">
+          {/* Header Bar inside Drawer to guarantee seamless header integration without overlap */}
+          <div className="flex items-center justify-between px-3.5 sm:px-6 h-[66px] sm:h-[78px] border-b border-black/[0.08] dark:border-white/10 shrink-0">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => { setMobileMenuOpen(false); navigate("/"); }}
+                className="flex h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px] items-center"
+              >
+                <img
+                  src={
+                    isNationalDay
+                      ? dark
+                        ? "/alaqeeq-logo-national-dark.png"
+                        : "/alaqeeq-logo-national-light.png"
+                      : activeLogo
+                  }
+                  alt="شعار مدارس العقيق"
+                  className={`max-h-full max-w-full object-contain ${
+                    dark ? "brightness-0 invert opacity-95" : ""
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="grid h-10 w-10 place-items-center rounded-xl border border-rose-500/50 bg-rose-500/15 text-rose-500 active:scale-90 transition cursor-pointer"
+                aria-label="إغلاق القائمة"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Inner Scroll Container with Safe Bottom Space */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pt-3 pb-36 max-w-lg mx-auto w-full space-y-4 scrollbar-hide">
 
                 {/* 1. Account / Admin Bar */}
                 <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${

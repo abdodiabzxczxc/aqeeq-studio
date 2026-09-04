@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -36,18 +36,29 @@ export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHe
   const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 20, mass: 0.5 });
   const heroY = useSpring(rawY, { stiffness: 100, damping: 20, mass: 0.5 });
 
+  // فحص الشاشات الكبيرة لتفعيل تجربة ويلينغتون السينمائية حصرياً على الكمبيوتر
+  // وتوفير انسياب طبيعي كامل على الموبايل لمنع ابتلاع الكفارات مبكراً
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
     <div className="relative w-full">
-      {/* 1. الحاوية لتثبيت الهيرو بدون تباعد رأسي زائد */}
-      <div ref={heroPinContainerRef} className="relative h-[135vh] w-full">
-        {/* الهيرو يبدأ مباشرة من الأعلى تحت القصص */}
-        <div className="sticky top-0 z-0 w-full overflow-hidden pt-0">
+      {/* 1. الحاوية: تثبيت سينمائي على الكمبيوتر (lg)، وانسياب طبيعي على الموبايل */}
+      <div ref={heroPinContainerRef} className="relative h-auto lg:h-[135vh] w-full">
+        {/* الهيرو يثبت على الكمبيوتر فقط ويتحرك بانسياب طبيعي على الموبايل */}
+        <div className="relative lg:sticky lg:top-0 z-0 w-full overflow-hidden pt-0">
           <motion.div
             style={{
-              scale: heroScale,
-              opacity: heroOpacity,
-              y: heroY,
-              filter: rawBlur,
+              scale: isDesktop ? heroScale : 1,
+              opacity: isDesktop ? heroOpacity : 1,
+              y: isDesktop ? heroY : 0,
+              filter: isDesktop ? rawBlur : "none",
               transformOrigin: "center top",
             }}
             className="w-full will-change-transform"
@@ -57,9 +68,9 @@ export function AqeeqCurtainHeroWrapper({ hero, curtainContent }: AqeeqCurtainHe
         </div>
       </div>
 
-      {/* 2. طبقة الستارة الملكية الصاعدة فوق الهيرو */}
+      {/* 2. طبقة الستارة الملكية: تصعد فوق الهيرو على الكمبيوتر، وتبدأ طبيعياً تحته على الموبايل */}
       <div
-        className={`relative z-20 -mt-[35vh] w-full rounded-t-[3rem] sm:rounded-t-[4.5rem] transition-colors duration-500 overflow-x-clip ${
+        className={`relative z-20 mt-4 sm:mt-6 lg:-mt-[35vh] w-full rounded-t-[2.5rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4.5rem] transition-colors duration-500 overflow-x-clip ${
           isNationalDay
             ? dark
               ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
