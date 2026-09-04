@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -26,27 +26,15 @@ import {
   CheckCircle2,
   MessageCircle,
   Milestone,
-  Check,
   ChevronRight,
   ChevronLeft,
-  Calendar,
-  Layers,
-  Activity,
-  BadgeCheck,
   Bus,
   Navigation,
-  Globe,
-  Sun,
-  Moon,
   Star,
-  Zap,
-  Eye,
-  Sliders,
-  Share2,
 } from "lucide-react";
 
 // ==========================================
-// 1. PillarCard with 3D Tilt & Specular Physics
+// 1. PillarCard with 3D Magnetic Tilt & Specular Physics
 // ==========================================
 function PillarCard({
   pillar,
@@ -175,271 +163,7 @@ function PillarCard({
 }
 
 // ==========================================
-// 2. STICKY TIME MACHINE SCROLLYTELLING STAGE
-// (Apple Keynote Style: Viewport Pins & Scroll Controls History)
-// ==========================================
-interface TimelineEra {
-  year: string;
-  shortYear: string;
-  label: string;
-  title: string;
-  desc: string;
-  highlight: string;
-  stats: string;
-  image: string;
-  quote: string;
-  metrics: { label: string; val: string }[];
-}
-
-function StickyTimelineStage({
-  timelineEras,
-  dark,
-  isNationalDay,
-}: {
-  timelineEras: TimelineEra[];
-  dark: boolean;
-  isNationalDay: boolean;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: mounted ? containerRef : undefined,
-    offset: ["start start", "end end"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 26,
-    mass: 0.4,
-  });
-
-  const [activeEraIndex, setActiveEraIndex] = useState(0);
-  const [manualLock, setManualLock] = useState(false);
-
-  // Sync scroll progress directly to active era index
-  useEffect(() => {
-    if (!mounted) return;
-    const unsubscribe = scrollYProgress.on("change", (v) => {
-      if (manualLock) return;
-      if (v < 0.28) {
-        setActiveEraIndex(0);
-      } else if (v < 0.56) {
-        setActiveEraIndex(1);
-      } else if (v < 0.82) {
-        setActiveEraIndex(2);
-      } else {
-        setActiveEraIndex(3);
-      }
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress, mounted, manualLock]);
-
-  const handleSelectEra = (idx: number) => {
-    setActiveEraIndex(idx);
-    setManualLock(true);
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const pageScrollY = window.pageYOffset || document.documentElement.scrollTop;
-      const targetScroll =
-        pageScrollY + rect.top + (idx / (timelineEras.length - 1)) * (rect.height - window.innerHeight);
-      window.scrollTo({ top: targetScroll, behavior: "smooth" });
-      setTimeout(() => setManualLock(false), 900);
-    }
-  };
-
-  const activeEra = timelineEras[activeEraIndex] || timelineEras[0];
-
-  return (
-    <div ref={containerRef} id="timeline-section" className="relative h-[320vh] sm:h-[360vh]">
-      {/* Sticky Viewport Window */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-center items-center px-4 sm:px-6 overflow-hidden">
-        {/* Subtle Background Radial Glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(1,90,55,0.12),transparent_70%)]" />
-
-        <div className="container mx-auto max-w-5xl relative z-10">
-          {/* Header & Era Progress Bar */}
-          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
-            <div
-              className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
-                dark ? "text-[#f8ca14]" : "text-[#c59b27]"
-              } mb-2`}
-            >
-              <Sparkles size={14} />
-              <span>رحلة 30 عاماً عبر عجلة السكرول التفاعلية 📜</span>
-            </div>
-            <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              مسيرة العقيق المضيئة عبر الزمن (1994 - 2026)
-            </h2>
-            <p className={`mt-2 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-              حرّك السكرول لأسفل لتشاهد كيف تتحول وتتطور صروح العقيق عبر ثلاثة عقود من الريادة
-            </p>
-
-            {/* Glowing Era Track */}
-            <div
-              className={`mt-5 grid grid-cols-4 gap-2 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-lg backdrop-blur-xl ${
-                dark ? "border-white/10 bg-[#0c141a]/80" : "border-slate-200/90 bg-white/90"
-              }`}
-            >
-              {timelineEras.map((eraItem, eraIdx) => (
-                <button
-                  key={eraItem.shortYear}
-                  type="button"
-                  onClick={() => handleSelectEra(eraIdx)}
-                  className={`relative p-2.5 rounded-xl text-center transition active:scale-95 ${
-                    activeEraIndex === eraIdx
-                      ? "text-white shadow-md"
-                      : dark
-                      ? "text-slate-400 hover:text-white"
-                      : "text-slate-700 hover:text-[#015a37]"
-                  }`}
-                >
-                  {activeEraIndex === eraIdx && (
-                    <motion.div
-                      layoutId="stickyTimelineEraBubble"
-                      transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                      className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/40"
-                    />
-                  )}
-                  <span
-                    className={`relative z-10 block text-xs sm:text-sm font-black ${
-                      activeEraIndex === eraIdx ? "text-[#f8ca14]" : ""
-                    }`}
-                  >
-                    {eraItem.shortYear}
-                  </span>
-                  <span className="relative z-10 text-[10px] sm:text-[11px] font-bold truncate block">
-                    {eraItem.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Scroll Progress Laser Indicator */}
-            <div className="mt-3 max-w-md mx-auto h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                style={{ scaleX: smoothProgress, transformOrigin: "right" }}
-                className="h-full bg-gradient-to-l from-[#f8ca14] to-emerald-500 rounded-full shadow-[0_0_12px_#f8ca14]"
-              />
-            </div>
-          </div>
-
-          {/* 3D Exploded Era Showcase Card with Smooth Spatial Transitions */}
-          <div style={{ perspective: 1400 }} className="w-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeEraIndex}
-                initial={{ opacity: 0, scale: 0.92, rotateX: 8, y: 30 }}
-                animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, rotateX: -8, y: -30 }}
-                transition={{ type: "spring", stiffness: 220, damping: 22 }}
-                className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition-all duration-500 backdrop-blur-2xl ${
-                  dark ? "border-emerald-500/25 bg-[#0c1218]/95 shadow-black/80" : "border-emerald-700/20 bg-white/95"
-                }`}
-              >
-                {/* Background Giant Holographic Year Watermark */}
-                <span
-                  className={`pointer-events-none absolute -left-4 -bottom-6 select-none font-black text-7xl sm:text-9xl leading-none transition-all duration-700 ${
-                    dark ? "text-white/[0.03]" : "text-black/[0.02]"
-                  }`}
-                >
-                  {activeEra.shortYear}
-                </span>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-center relative z-10">
-                  {/* Story & Details Column (7 cols) */}
-                  <div className="lg:col-span-7">
-                    <div className="flex items-center gap-3 mb-2.5">
-                      <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                        محطة تاريخية بارزة ✦
-                      </span>
-                      <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
-                        {activeEra.year}
-                      </span>
-                    </div>
-
-                    <h3 className={`text-xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                      {activeEra.title}
-                    </h3>
-
-                    <p
-                      className={`text-xs sm:text-sm leading-relaxed mb-4 ${
-                        dark ? "text-slate-300" : "text-slate-700 font-medium"
-                      }`}
-                    >
-                      {activeEra.desc}
-                    </p>
-
-                    {/* Quote Ribbon */}
-                    <div
-                      className={`p-3.5 sm:p-4 rounded-2xl border mb-4 text-xs font-bold leading-relaxed ${
-                        dark
-                          ? "border-white/10 bg-white/[0.03] text-emerald-300"
-                          : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
-                      }`}
-                    >
-                      <span className="text-base font-serif ml-1">❝</span>
-                      {activeEra.quote}
-                      <span className="text-base font-serif mr-1">❞</span>
-                    </div>
-
-                    {/* Key Metrics Row */}
-                    <div className="grid grid-cols-3 gap-2.5">
-                      {activeEra.metrics.map((m, mIdx) => (
-                        <div
-                          key={mIdx}
-                          className={`p-2.5 sm:p-3 rounded-xl border text-center ${
-                            dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
-                          }`}
-                        >
-                          <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
-                          <span
-                            className={`text-xs sm:text-sm font-black mt-0.5 block truncate ${
-                              dark ? "text-white" : "text-[#0a192f]"
-                            }`}
-                          >
-                            {m.val}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Photo & Milestone Visual Column (5 cols) */}
-                  <div className="lg:col-span-5">
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
-                      <img
-                        src={activeEra.image}
-                        alt={activeEra.title}
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
-
-                      <div className="absolute bottom-4 right-4 left-4 text-white">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Milestone size={16} className="text-[#f8ca14]" />
-                          <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-200 line-clamp-2">{activeEra.highlight}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 3. MAIN COMPONENT: AqeeqSchoolAboutPage
+// 2. MAIN COMPONENT: AqeeqSchoolAboutPage
 // ==========================================
 export default function AqeeqSchoolAboutPage() {
   const { theme } = useAqeeqStudioTheme();
@@ -447,22 +171,81 @@ export default function AqeeqSchoolAboutPage() {
   const dark = theme === "dark";
   const [, navigate] = useLocation();
 
-  // Scroll Progress for Smooth Parallax & 3D Depth on Hero
+  // Scroll Tracking for Smooth Parallax
   const { scrollY } = useScroll();
-  const rawHeroScale = useTransform(scrollY, [0, 450], [1, 0.93]);
-  const rawHeroRotateX = useTransform(scrollY, [0, 450], [0, 5]);
-  const rawHeroOpacity = useTransform(scrollY, [0, 480], [1, 0.6]);
 
-  const smoothHeroScale = useSpring(rawHeroScale, { stiffness: 90, damping: 20 });
-  const smoothHeroRotateX = useSpring(rawHeroRotateX, { stiffness: 90, damping: 20 });
-  const smoothHeroOpacity = useSpring(rawHeroOpacity, { stiffness: 90, damping: 20 });
+  // Hero Card 3D Scroll Physics
+  const rawHeroCardY = useTransform(scrollY, [0, 500], [0, 45]);
+  const rawHeroCardRotateX = useTransform(scrollY, [0, 500], [0, 6]);
+  const rawHeroCardScale = useTransform(scrollY, [0, 500], [1, 0.94]);
+  const heroCardY = useSpring(rawHeroCardY, { stiffness: 90, damping: 20 });
+  const heroCardRotateX = useSpring(rawHeroCardRotateX, { stiffness: 90, damping: 20 });
+  const heroCardScale = useSpring(rawHeroCardScale, { stiffness: 90, damping: 20 });
 
-  // Campus & Facility Explorer State
-  const [activeCampusTab, setActiveCampusTab] = useState<"boys" | "girls">("boys");
-  const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
+  // Floating Satellite Badges Counter-Parallax
+  const rawHeroBadge1Y = useTransform(scrollY, [0, 500], [0, -32]);
+  const rawHeroBadge2Y = useTransform(scrollY, [0, 500], [0, 32]);
+  const heroBadge1Y = useSpring(rawHeroBadge1Y, { stiffness: 85, damping: 20 });
+  const heroBadge2Y = useSpring(rawHeroBadge2Y, { stiffness: 85, damping: 20 });
 
   // 3D Tilt for Hero Showcase Card
   const { ref: heroCardRef, tilt: heroTilt, onMove: onHeroMove, onLeave: onHeroLeave } = useMagneticTilt(6);
+
+  // Timeline Section Ref & Scroll Physics
+  const timelineSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: timelineProgress } = useScroll({
+    target: timelineSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const rawTimelineRotateX = useTransform(timelineProgress, [0, 0.5, 1], [10, 0, -8]);
+  const rawTimelineScale = useTransform(timelineProgress, [0, 0.5, 1], [0.94, 1, 0.95]);
+  const rawTimelinePhotoY = useTransform(timelineProgress, [0, 1], [25, -25]);
+  const timelineRotateX = useSpring(rawTimelineRotateX, { stiffness: 85, damping: 22 });
+  const timelineScale = useSpring(rawTimelineScale, { stiffness: 85, damping: 22 });
+  const timelinePhotoY = useSpring(rawTimelinePhotoY, { stiffness: 85, damping: 22 });
+
+  // Campus Facilities Section Ref & Scroll Physics
+  const campusSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: campusProgress } = useScroll({
+    target: campusSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const rawCampusRotateX = useTransform(campusProgress, [0, 0.5, 1], [9, 0, -7]);
+  const rawCampusScale = useTransform(campusProgress, [0, 0.5, 1], [0.95, 1, 0.96]);
+  const campusRotateX = useSpring(rawCampusRotateX, { stiffness: 85, damping: 22 });
+  const campusScale = useSpring(rawCampusScale, { stiffness: 85, damping: 22 });
+
+  // Vision Section Ref & 3D Dual Wing Pivot
+  const visionSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: visionProgress } = useScroll({
+    target: visionSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const rawVisionWingLeft = useTransform(visionProgress, [0, 0.5, 1], [-7, 0, 6]);
+  const rawVisionWingRight = useTransform(visionProgress, [0, 0.5, 1], [7, 0, -6]);
+  const visionWingLeft = useSpring(rawVisionWingLeft, { stiffness: 85, damping: 22 });
+  const visionWingRight = useSpring(rawVisionWingRight, { stiffness: 85, damping: 22 });
+
+  // Pillars Section Ref & Staggered Scroll Parallax
+  const pillarsSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: pillarsProgress } = useScroll({
+    target: pillarsSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const rawPillar0Y = useTransform(pillarsProgress, [0, 1], [18, -18]);
+  const rawPillar1Y = useTransform(pillarsProgress, [0, 1], [-18, 18]);
+  const rawPillar2Y = useTransform(pillarsProgress, [0, 1], [18, -18]);
+  const rawPillar3Y = useTransform(pillarsProgress, [0, 1], [-18, 18]);
+  const pillar0Y = useSpring(rawPillar0Y, { stiffness: 85, damping: 22 });
+  const pillar1Y = useSpring(rawPillar1Y, { stiffness: 85, damping: 22 });
+  const pillar2Y = useSpring(rawPillar2Y, { stiffness: 85, damping: 22 });
+  const pillar3Y = useSpring(rawPillar3Y, { stiffness: 85, damping: 22 });
+  const pillarYOffsets = [pillar0Y, pillar1Y, pillar2Y, pillar3Y];
+
+  // Interactive States
+  const [activeCampusTab, setActiveCampusTab] = useState<"boys" | "girls">("boys");
+  const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
+  const [activeTimelineIndex, setActiveTimelineIndex] = useState<number>(3);
 
   // Pillars Data
   const pillars = [
@@ -513,7 +296,7 @@ export default function AqeeqSchoolAboutPage() {
   ];
 
   // Timeline Eras Data
-  const timelineEras: TimelineEra[] = [
+  const timelineEras = [
     {
       year: "1994 م — 1415 هـ",
       shortYear: "1994",
@@ -720,6 +503,7 @@ export default function AqeeqSchoolAboutPage() {
 
   const currentFacilities = campusFacilities[activeCampusTab];
   const activeFacility = currentFacilities[activeFacilityIndex] || currentFacilities[0];
+  const activeEra = timelineEras[activeTimelineIndex] || timelineEras[0];
 
   return (
     <AqeeqLuxuryPageShell
@@ -728,14 +512,7 @@ export default function AqeeqSchoolAboutPage() {
       useCurtain={true}
       curtainKicker="✦ استكشف صروح ومسيرة العقيق ✦"
       hero={
-        <motion.section
-          style={{
-            scale: smoothHeroScale,
-            rotateX: smoothHeroRotateX,
-            opacity: smoothHeroOpacity,
-            transformPerspective: 1200,
-            transformOrigin: "center top",
-          }}
+        <section
           className={`relative isolate overflow-hidden py-12 sm:py-20 ${
             isNationalDay ? (dark ? "snd-hero-dark" : "snd-hero-light") : ""
           }`}
@@ -817,148 +594,178 @@ export default function AqeeqSchoolAboutPage() {
                     dark ? "border-white/10 bg-white/[0.03]" : "border-emerald-950/10 bg-white/80"
                   }`}
                 >
-                  <div>
+                  <div className="p-2 rounded-xl transition hover:scale-105">
                     <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>منذ 1994</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>+30 عاماً من الريادة</span>
                   </div>
-                  <div>
+                  <div className="p-2 rounded-xl transition hover:scale-105">
                     <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#5aba1c]" : "text-[#08467d]"}`}>مجمعين</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>للبنين والبنات</span>
                   </div>
-                  <div>
+                  <div className="p-2 rounded-xl transition hover:scale-105">
                     <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>Cognia</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
                   </div>
-                  <div>
+                  <div className="p-2 rounded-xl transition hover:scale-105">
                     <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#5aba1c]" : "text-[#015a37]"}`}>KG - 12</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>كافة المراحل</span>
                   </div>
                 </div>
               </div>
 
-              {/* Left Column: 3D Magnetic Showcase Card (5 cols) */}
+              {/* Left Column: 3D Scroll Parallax Card with Floating Satellite Badges (5 cols) */}
               <div className="lg:col-span-5 relative">
-                <div
-                  ref={heroCardRef}
-                  onMouseMove={onHeroMove}
-                  onMouseLeave={onHeroLeave}
-                  style={{
-                    transform: `perspective(1000px) rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg)`,
-                    transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
-                  }}
-                  className={`group relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 shadow-2xl will-change-transform ${
-                    dark
-                      ? "border-emerald-500/20 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/10"
-                      : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
-                  }`}
+                {/* Floating Orbiting Satellite Badge 1 (Top-Right Parallax) */}
+                <motion.div
+                  style={{ y: heroBadge1Y }}
+                  className="absolute -top-6 -right-4 sm:-right-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-900/90 to-[#015a37]/90 text-white border border-emerald-400/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
                 >
-                  {/* Specular glare following cursor */}
+                  <ShieldCheck size={16} className="text-[#f8ca14]" />
+                  <span>Cognia USA · اعتماد دولي</span>
+                </motion.div>
+
+                {/* Floating Orbiting Satellite Badge 2 (Bottom-Left Parallax) */}
+                <motion.div
+                  style={{ y: heroBadge2Y }}
+                  className="absolute -bottom-6 -left-4 sm:-left-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0c1218]/95 to-black/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
+                >
+                  <Star size={14} className="text-[#f8ca14] fill-[#f8ca14]" />
+                  <span>30 عاماً من الريادة · 1994 - 2026</span>
+                </motion.div>
+
+                <motion.div
+                  style={{
+                    y: heroCardY,
+                    rotateX: heroCardRotateX,
+                    scale: heroCardScale,
+                    transformPerspective: 1200,
+                  }}
+                  className="w-full"
+                >
                   <div
-                    className="pointer-events-none absolute inset-0 z-20 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ref={heroCardRef}
+                    onMouseMove={onHeroMove}
+                    onMouseLeave={onHeroLeave}
                     style={{
-                      background: `radial-gradient(circle at ${heroTilt.gx}% ${heroTilt.gy}%, rgba(255,255,255,0.18) 0%, transparent 60%)`,
+                      transform: `perspective(1000px) rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg)`,
+                      transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
                     }}
-                  />
-
-                  {/* Close-Up Student Excellence Photo */}
-                  <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
-                    <VisualImage
-                      id="about-hero-student-photo"
-                      label="صورة طلاب العقيق المقربة في التكريم"
-                      src="/covers/student-excellence-about.jpg"
-                      alt="طلاب مدارس العقيق في حفل التميز والتكريم"
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
-
-                    {/* Top Floating Badge */}
-                    <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
-                      <Sparkles size={13} className="text-[#f8ca14]" />
-                      <span>{isNationalDay ? "🇸🇦 عزّنا بطبعنا · 94 عاماً من المجد" : "نلهم الأجيال · نصنع الأثر"}</span>
-                    </div>
-
-                    {/* Bottom Overlaid Details */}
-                    <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
-                      <div>
-                        <h4 className="text-sm font-black drop-shadow-md">صرح تعليمي وتربوي رائد</h4>
-                        <p className="text-[11px] text-emerald-300 drop-shadow-md">أصالة القيم ومعايير الاعتماد الدولي</p>
-                      </div>
-                      <span className="rounded-xl bg-emerald-600/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
-                        المدينة المنورة
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Overlapping Floating Trust Chip (Bottom) */}
-                  <div
-                    className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
-                      dark ? "border-white/10 bg-black/60 text-slate-200" : "border-emerald-950/10 bg-[#f4f7f4] text-slate-800"
+                    className={`group relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 shadow-2xl will-change-transform ${
+                      dark
+                        ? "border-emerald-500/25 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/15"
+                        : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
                     }`}
                   >
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <GraduationCap size={20} />
+                    {/* Specular glare following cursor */}
+                    <div
+                      className="pointer-events-none absolute inset-0 z-20 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        background: `radial-gradient(circle at ${heroTilt.gx}% ${heroTilt.gy}%, rgba(255,255,255,0.18) 0%, transparent 60%)`,
+                      }}
+                    />
+
+                    {/* Close-Up Student Excellence Photo */}
+                    <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
+                      <VisualImage
+                        id="about-hero-student-photo"
+                        label="صورة طلاب العقيق المقربة في التكريم"
+                        src="/covers/student-excellence-about.jpg"
+                        alt="طلاب مدارس العقيق في حفل التميز والتكريم"
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+
+                      {/* Top Floating Badge */}
+                      <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                        <Sparkles size={13} className="text-[#f8ca14]" />
+                        <span>{isNationalDay ? "🇸🇦 عزّنا بطبعنا · 94 عاماً من المجد" : "نلهم الأجيال · نصنع الأثر"}</span>
+                      </div>
+
+                      {/* Bottom Overlaid Details */}
+                      <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
+                        <div>
+                          <h4 className="text-sm font-black drop-shadow-md">صرح تعليمي وتربوي رائد</h4>
+                          <p className="text-[11px] text-emerald-300 drop-shadow-md">أصالة القيم ومعايير الاعتماد الدولي</p>
+                        </div>
+                        <span className="rounded-xl bg-emerald-600/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
+                          المدينة المنورة
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="text-xs font-black">مجمع البنين ومجمع البنات بالمدينة</h5>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
+
+                    {/* Overlapping Floating Trust Chip (Bottom) */}
+                    <div
+                      className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
+                        dark ? "border-white/10 bg-black/60 text-slate-200" : "border-emerald-950/10 bg-[#f4f7f4] text-slate-800"
+                      }`}
+                    >
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        <GraduationCap size={20} />
+                      </div>
+                      <div>
+                        <h5 className="text-xs font-black">مجمع البنين ومجمع البنات بالمدينة</h5>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
-        </motion.section>
+        </section>
       }
     >
-      {/* Quick Jump Anchor Bar */}
-      <div className={`border-b py-3 px-4 ${dark ? "bg-black/60 border-white/10" : "bg-white/80 border-slate-200"}`}>
-        <div className="container mx-auto max-w-6xl flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-xs font-bold">
+      {/* Quick Jump Anchor Command Bar */}
+      <div className={`sticky top-16 z-30 border-b py-3 px-4 backdrop-blur-xl transition ${
+        dark ? "bg-black/80 border-white/10" : "bg-white/85 border-slate-200 shadow-sm"
+      }`}>
+        <div className="container mx-auto max-w-5xl flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-xs font-black">
           <a
             href="#timeline-section"
-            className={`px-3 py-1.5 rounded-xl border transition ${
+            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
-                ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5"
-                : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
             }`}
           >
             مسيرة 30 عاماً 📜
           </a>
           <a
             href="#campuses-section"
-            className={`px-3 py-1.5 rounded-xl border transition ${
+            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
-                ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5"
-                : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
             }`}
           >
             مستكشف المجمعات والمرافق 🏫
           </a>
           <a
             href="#vision-section"
-            className={`px-3 py-1.5 rounded-xl border transition ${
+            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
-                ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5"
-                : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
             }`}
           >
             الرؤية والرسالة 2030 🎯
           </a>
           <a
             href="#pillars-section"
-            className={`px-3 py-1.5 rounded-xl border transition ${
+            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
-                ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5"
-                : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
             }`}
           >
             ركائزنا التربوية 💡
           </a>
           <a
             href="#map-contact-section"
-            className={`px-3 py-1.5 rounded-xl border transition ${
+            className={`px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
-                ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5"
-                : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"
+                ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
             }`}
           >
             الموقع والتواصل 📍
@@ -967,18 +774,218 @@ export default function AqeeqSchoolAboutPage() {
       </div>
 
       {/* ========================================================
-          STAGE 1: The 30-Year Legacy Time Machine (Sticky Scrollytelling Pinned Stage)
+          STAGE 1: The 30-Year Legacy Time Machine (Scroll-Driven Parallax + Luminous Conduit)
       ======================================================== */}
-      <StickyTimelineStage
-        timelineEras={timelineEras}
-        dark={dark}
-        isNationalDay={isNationalDay}
-      />
+      <section ref={timelineSectionRef} id="timeline-section" className="py-20 container mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <div
+            className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
+              dark ? "text-[#f8ca14]" : "text-[#c59b27]"
+            } mb-2`}
+          >
+            <Sparkles size={14} />
+            <span>ثلاثة عقود من العطاء التربوي بطيبة الطيبة</span>
+          </div>
+          <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+            مسيرة العقيق المضيئة عبر الزمن (1994 - 2026) 📜
+          </h2>
+          <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+            رحلة تربوية رائدة خطت خطواتها الأولى في المدينة المنورة قبل أكثر من 30 عاماً لتغدو اليوم منارة تعليمية بمعايير عالمية.
+          </p>
+
+          {/* Timeline Interactive Progress Conduit Track */}
+          <div className="relative max-w-xl mx-auto mt-8 mb-4 px-6 hidden sm:block">
+            <div className={`h-1.5 w-full rounded-full ${dark ? "bg-white/10" : "bg-emerald-950/10"} relative overflow-hidden`}>
+              <motion.div
+                className="h-full bg-gradient-to-r from-[#015a37] via-[#f8ca14] to-emerald-500 rounded-full transition-all duration-500"
+                style={{
+                  width: `${((activeTimelineIndex) / (timelineEras.length - 1)) * 100}%`,
+                }}
+              />
+            </div>
+            {/* Milestone Indicator Beads */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-6 right-6 flex justify-between pointer-events-none">
+              {timelineEras.map((era, idx) => (
+                <div
+                  key={era.shortYear}
+                  className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
+                    idx <= activeTimelineIndex
+                      ? "border-[#f8ca14] bg-[#015a37] scale-125 shadow-[0_0_12px_rgba(248,202,20,0.6)]"
+                      : dark ? "border-white/20 bg-[#0c1218]" : "border-slate-300 bg-white"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Era Buttons with Smooth Transitions */}
+          <div
+            className={`mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-sm transition ${
+              dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
+            }`}
+          >
+            {timelineEras.map((era, eraIdx) => (
+              <button
+                key={era.shortYear}
+                type="button"
+                onClick={() => setActiveTimelineIndex(eraIdx)}
+                className={`relative p-3 rounded-xl text-center transition active:scale-95 ${
+                  activeTimelineIndex === eraIdx
+                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
+                    : dark
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                }`}
+              >
+                <span className={`block text-base font-black ${activeTimelineIndex === eraIdx ? "text-[#f8ca14]" : ""}`}>
+                  {era.shortYear}
+                </span>
+                <span className="text-[11px] font-bold truncate block">{era.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Dynamic Active Timeline Era Card with Scroll 3D Perspective */}
+        <motion.div
+          style={{
+            rotateX: timelineRotateX,
+            scale: timelineScale,
+            transformPerspective: 1200,
+          }}
+          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 will-change-transform ${
+            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+          }`}
+        >
+          {/* Holographic Watermark Year */}
+          <span
+            className={`pointer-events-none absolute -left-4 -bottom-6 select-none font-black text-7xl sm:text-9xl leading-none transition-all duration-700 ${
+              dark ? "text-white/[0.03]" : "text-black/[0.02]"
+            }`}
+          >
+            {activeEra.shortYear}
+          </span>
+
+          {/* Era Content with Cinematic Cross-Fade */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeEra.shortYear}
+              initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -14, filter: "blur(4px)" }}
+              transition={{ duration: 0.32, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10"
+            >
+              {/* Story & Details Column */}
+              <div className="lg:col-span-7">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    محطة تاريخية بارزة ✦
+                  </span>
+                  <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                    {activeEra.year}
+                  </span>
+                </div>
+
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  {activeEra.title}
+                </h3>
+
+                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  {activeEra.desc}
+                </p>
+
+                {/* Quote Ribbon */}
+                <div
+                  className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
+                    dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
+                  }`}
+                >
+                  <span className="text-base font-serif ml-1">❝</span>
+                  {activeEra.quote}
+                  <span className="text-base font-serif mr-1">❞</span>
+                </div>
+
+                {/* Key Metrics Row */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {activeEra.metrics.map((m, mIdx) => (
+                    <div
+                      key={mIdx}
+                      className={`p-3 rounded-xl border text-center transition hover:scale-105 ${
+                        dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
+                      }`}
+                    >
+                      <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
+                      <span className={`text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Navigation Controls between Eras */}
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                  <button
+                    type="button"
+                    disabled={activeTimelineIndex === 0}
+                    onClick={() => setActiveTimelineIndex((idx) => Math.max(0, idx - 1))}
+                    className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                      activeTimelineIndex === 0
+                        ? "opacity-30 cursor-not-allowed"
+                        : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                    }`}
+                  >
+                    <ChevronRight size={16} />
+                    <span>المحطة السابقة</span>
+                  </button>
+
+                  <span className="text-[11px] font-black text-slate-400">
+                    {activeTimelineIndex + 1} من {timelineEras.length}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={activeTimelineIndex === timelineEras.length - 1}
+                    onClick={() => setActiveTimelineIndex((idx) => Math.min(timelineEras.length - 1, idx + 1))}
+                    className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                      activeTimelineIndex === timelineEras.length - 1
+                        ? "opacity-30 cursor-not-allowed"
+                        : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                    }`}
+                  >
+                    <span>المحطة التالية</span>
+                    <ChevronLeft size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Photo Column with Subtle Counter-Parallax */}
+              <div className="lg:col-span-5">
+                <motion.div style={{ y: timelinePhotoY }} className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                  <img
+                    src={activeEra.image}
+                    alt={activeEra.title}
+                    className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
+
+                  <div className="absolute bottom-4 right-4 left-4 text-white">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Milestone size={16} className="text-[#f8ca14]" />
+                      <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-200 line-clamp-2">{activeEra.highlight}</p>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </section>
 
       {/* ========================================================
           STAGE 2: Interactive 3D Campus Explorer & Facility Switcher
       ======================================================== */}
       <section
+        ref={campusSectionRef}
         id="campuses-section"
         className={`py-20 border-y ${
           dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
@@ -997,7 +1004,7 @@ export default function AqeeqSchoolAboutPage() {
               مبانٍ مدرسية صرحية مستقلة بحي الرانوناء (ممشى الهجرة)، تضم تجهيزات أكاديمية ورياضية ومعملية بمعايير عالمية
             </p>
 
-            {/* Campus Switcher Tabs with LayoutId Springs */}
+            {/* Campus Switcher Tabs with Animated Sliding Pill */}
             <div
               className={`mt-8 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
                 dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
@@ -1009,9 +1016,9 @@ export default function AqeeqSchoolAboutPage() {
                   setActiveCampusTab("boys");
                   setActiveFacilityIndex(0);
                 }}
-                className={`relative rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
-                    ? "text-white shadow-md"
+                    ? "text-white"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
@@ -1019,22 +1026,23 @@ export default function AqeeqSchoolAboutPage() {
               >
                 {activeCampusTab === "boys" && (
                   <motion.div
-                    layoutId="activeCampusPillMain"
+                    layoutId="campusActivePill"
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-md ring-1 ring-[#f8ca14]/30"
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/30"
                   />
                 )}
                 <span className="relative z-10">مجمع البنين (الأهلي والدولي) 🎓</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => {
                   setActiveCampusTab("girls");
                   setActiveFacilityIndex(0);
                 }}
-                className={`relative rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
-                    ? "text-white shadow-md"
+                    ? "text-white"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
@@ -1042,9 +1050,9 @@ export default function AqeeqSchoolAboutPage() {
               >
                 {activeCampusTab === "girls" && (
                   <motion.div
-                    layoutId="activeCampusPillMain"
+                    layoutId="campusActivePill"
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-md ring-1 ring-[#f8ca14]/30"
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/30"
                   />
                 )}
                 <span className="relative z-10">مجمع البنات والطفولة المبكرة 🌸</span>
@@ -1062,7 +1070,7 @@ export default function AqeeqSchoolAboutPage() {
                 className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition active:scale-95 border ${
                   activeFacilityIndex === fIdx
                     ? dark
-                      ? "border-[#f8ca14] bg-[#f8ca14]/15 text-[#f8ca14] shadow-sm"
+                      ? "border-[#f8ca14] bg-[#f8ca14]/15 text-[#f8ca14] shadow-sm ring-1 ring-[#f8ca14]/30"
                       : "border-[#015a37] bg-[#015a37] text-white shadow-sm"
                     : dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
@@ -1074,123 +1082,128 @@ export default function AqeeqSchoolAboutPage() {
             ))}
           </div>
 
-          {/* Active Facility Spotlight Showcase Card with 3D Exploded Depth */}
-          <div style={{ perspective: 1200 }} className="max-w-5xl mx-auto">
+          {/* Active Facility Spotlight Showcase Card with Scroll 3D Perspective */}
+          <motion.div
+            style={{
+              rotateX: campusRotateX,
+              scale: campusScale,
+              transformPerspective: 1200,
+            }}
+            className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl transition duration-500 will-change-transform ${
+              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+            }`}
+          >
             <AnimatePresence mode="wait">
               <motion.div
-                key={`${activeCampusTab}-${activeFacilityIndex}`}
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                transition={{ type: "spring", stiffness: 240, damping: 24 }}
-                className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl transition duration-500 backdrop-blur-2xl ${
-                  dark ? "border-emerald-500/25 bg-[#0c1218]/95 shadow-black/80" : "border-emerald-700/20 bg-white/95"
-                }`}
+                key={activeFacility.id}
+                initial={{ opacity: 0, y: 12, filter: "blur(3px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  {/* Info Column */}
-                  <div className="lg:col-span-7">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span
-                        className={`rounded-xl px-3 py-1 text-xs font-black ${
-                          activeCampusTab === "boys"
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-pink-500/10 text-pink-600 dark:text-pink-400"
-                        }`}
-                      >
-                        {activeFacility.tag} ✦
-                      </span>
-                      <span className="text-xs font-bold text-slate-500">
-                        {activeCampusTab === "boys" ? "مجمع البنين — حي الرانوناء" : "مجمع البنات — ممشى الهجرة"}
-                      </span>
-                    </div>
-
-                    <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                      {activeFacility.name}
-                    </h3>
-
-                    <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                      {activeFacility.desc}
-                    </p>
-
-                    {/* 4 Technical Specifications Micro-Chips */}
-                    <div className="grid grid-cols-2 gap-3 mb-8">
-                      {activeFacility.specs.map((sp, sIdx) => (
-                        <div
-                          key={sIdx}
-                          className={`p-3 rounded-xl border transition hover:border-emerald-500/30 ${
-                            dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"
-                          }`}
-                        >
-                          <span className="block text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                            ✦ {sp.label}
-                          </span>
-                          <span className={`text-xs font-bold mt-0.5 block truncate ${dark ? "text-slate-200" : "text-slate-800"}`}>
-                            {sp.val}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Facility Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-3">
-                      <a
-                        href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
-                      >
-                        <MapPin size={15} />
-                        <span>فتح الموقع في Google Maps 📍</span>
-                      </a>
-
-                      <a
-                        href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
-                        className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
-                          dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
-                        }`}
-                      >
-                        <Phone size={14} />
-                        <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
-                      </a>
-
-                      <Button
-                        onClick={() => navigate("/admissions")}
-                        variant="outline"
-                        className="rounded-2xl text-xs font-black"
-                      >
-                        حجز جولة تعريفية في المرفق ✦
-                      </Button>
-                    </div>
+                {/* Info Column */}
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span
+                      className={`rounded-xl px-3 py-1 text-xs font-black ${
+                        activeCampusTab === "boys"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "bg-pink-500/10 text-pink-600 dark:text-pink-400"
+                      }`}
+                    >
+                      {activeFacility.tag} ✦
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">
+                      {activeCampusTab === "boys" ? "مجمع البنين — حي الرانوناء" : "مجمع البنات — ممشى الهجرة"}
+                    </span>
                   </div>
 
-                  {/* Photo Column with Specular Glare */}
-                  <div className="lg:col-span-5">
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
-                      <img
-                        src={activeFacility.image}
-                        alt={activeFacility.name}
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                  <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    {activeFacility.name}
+                  </h3>
 
-                      <div className="absolute bottom-4 right-4 left-4 text-white">
-                        <span className="text-xs font-black text-[#f8ca14]">{activeFacility.name}</span>
-                        <p className="text-[11px] text-slate-300">{activeFacility.tag} · مدارس العقيق</p>
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    {activeFacility.desc}
+                  </p>
+
+                  {/* 4 Technical Specifications Micro-Chips */}
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    {activeFacility.specs.map((sp, sIdx) => (
+                      <div
+                        key={sIdx}
+                        className={`p-3 rounded-xl border transition hover:scale-105 ${
+                          dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"
+                        }`}
+                      >
+                        <span className="block text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                          ✦ {sp.label}
+                        </span>
+                        <span className={`text-xs font-bold mt-0.5 block truncate ${dark ? "text-slate-200" : "text-slate-800"}`}>
+                          {sp.val}
+                        </span>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Facility Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
+                    >
+                      <MapPin size={15} />
+                      <span>فتح الموقع في Google Maps 📍</span>
+                    </a>
+
+                    <a
+                      href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
+                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                      }`}
+                    >
+                      <Phone size={14} />
+                      <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                    </a>
+
+                    <Button
+                      onClick={() => navigate("/admissions")}
+                      variant="outline"
+                      className="rounded-2xl text-xs font-black"
+                    >
+                      حجز جولة تعريفية في المرفق ✦
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Photo Column with Specular Glare */}
+                <div className="lg:col-span-5">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
+                    <img
+                      src={activeFacility.image}
+                      alt={activeFacility.name}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-4 right-4 left-4 text-white">
+                      <span className="text-xs font-black text-[#f8ca14]">{activeFacility.name}</span>
+                      <p className="text-[11px] text-slate-300">{activeFacility.tag} · مدارس العقيق</p>
                     </div>
                   </div>
                 </div>
               </motion.div>
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ========================================================
-          STAGE 3: Royal Strategic Document: Vision & Mission 2030 (Dual-Wing 3D Book Pivot)
+          STAGE 3: Royal Strategic Document: Vision & Mission 2030 (Dual-Wing 3D Pivot)
       ======================================================== */}
-      <section id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section ref={visionSectionRef} id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div
           className={`max-w-5xl mx-auto rounded-[3rem] border p-8 sm:p-14 shadow-2xl relative overflow-hidden ${
             dark
@@ -1198,7 +1211,11 @@ export default function AqeeqSchoolAboutPage() {
               : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8] ring-1 ring-emerald-900/10 shadow-xl"
           }`}
         >
-          <div className="text-center max-w-xl mx-auto mb-12">
+          {/* Ambient Lighting Orbs */}
+          <div className="pointer-events-none absolute -top-24 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 left-1/4 w-80 h-80 bg-[#f8ca14]/10 rounded-full blur-3xl" />
+
+          <div className="text-center max-w-xl mx-auto mb-12 relative z-10">
             <div
               className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-3 border ${
                 isNationalDay
@@ -1214,12 +1231,14 @@ export default function AqeeqSchoolAboutPage() {
             </h3>
           </div>
 
-          <div style={{ perspective: 1200 }} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Vision Plaque with 3D Book Pivot */}
+          <div style={{ perspective: 1400 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+            {/* Vision Plaque with Scroll 3D Wing Pivot */}
             <motion.div
-              whileHover={{ rotateY: 3, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-              className={`rounded-3xl border p-8 relative overflow-hidden shadow-md ${
+              style={{
+                rotateY: visionWingLeft,
+                transformPerspective: 1400,
+              }}
+              className={`rounded-3xl border p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-emerald-400/50 ${
                 dark ? "border-emerald-500/20 bg-white/5" : "border-emerald-950/10 bg-emerald-50/40"
               }`}
             >
@@ -1237,11 +1256,13 @@ export default function AqeeqSchoolAboutPage() {
               </p>
             </motion.div>
 
-            {/* Mission Plaque with 3D Book Pivot */}
+            {/* Mission Plaque with Scroll 3D Wing Pivot */}
             <motion.div
-              whileHover={{ rotateY: -3, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-              className={`rounded-3xl border p-8 relative overflow-hidden shadow-md ${
+              style={{
+                rotateY: visionWingRight,
+                transformPerspective: 1400,
+              }}
+              className={`rounded-3xl border p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
                 dark ? "border-amber-500/20 bg-white/5" : "border-amber-950/10 bg-amber-50/30"
               }`}
             >
@@ -1263,9 +1284,10 @@ export default function AqeeqSchoolAboutPage() {
       </section>
 
       {/* ========================================================
-          STAGE 4: The 4 Institutional Pillars with 3D Tilt Cards
+          STAGE 4: The 4 Institutional Pillars with Staggered 3D Parallax Cards
       ======================================================== */}
       <section
+        ref={pillarsSectionRef}
         id="pillars-section"
         className={`py-20 border-y ${
           dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
@@ -1293,19 +1315,20 @@ export default function AqeeqSchoolAboutPage() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {pillars.map((pillar, idx) => (
-              <PillarCard
-                key={idx}
-                pillar={pillar}
-                index={idx}
-                dark={dark}
-              />
+              <motion.div key={idx} style={{ y: pillarYOffsets[idx] }}>
+                <PillarCard
+                  pillar={pillar}
+                  index={idx}
+                  dark={dark}
+                />
+              </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
       {/* ========================================================
-          STAGE 5: Medina Interactive Map & Campus Logistics
+          STAGE 5: Medina Interactive Map & Campus Logistics (Live Radar)
       ======================================================== */}
       <section id="map-contact-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-14">
@@ -1329,10 +1352,16 @@ export default function AqeeqSchoolAboutPage() {
             }`}
           >
             <div>
+              {/* Live Radar Pulse Indicator */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">موقع المجمعات حي ومتاح</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-3.5 w-3.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    تغطية النقل المدرسي نشطة وحية عبر 9 أحياء
+                  </span>
                 </div>
                 <span className="text-xs font-bold text-slate-500">طيبة الطيبة</span>
               </div>
