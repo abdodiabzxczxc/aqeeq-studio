@@ -986,6 +986,16 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setPanelAnchorTop(null);
   };
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.querySelectorAll("[data-visual-selected='true']").forEach((el) => {
+      el.removeAttribute("data-visual-selected");
+    });
+    if (selected?.id) {
+      const el = document.querySelector(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+      if (el) el.setAttribute("data-visual-selected", "true");
+    }
+  }, [selected?.id]);
 
   // ── Smart Auto-Detect Engine (المحرر الذكي الشامل) ──────────
   useEffect(() => {

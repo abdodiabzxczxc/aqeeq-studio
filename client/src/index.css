@@ -2401,24 +2401,34 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 }
 
 /* ── Smart Auto-Detect Visual Editor Styles ─────────────────── */
-body.aq-smart-editable-active [data-visual-auto="true"] {
+body.aq-smart-editable-active [data-visual-auto="true"],
+body.aq-smart-editable-active [data-visual-id]:not([data-aq-editor-properties] *):not(.aq-editor-toolbar *) {
   cursor: pointer !important;
   transition: outline 0.15s ease, box-shadow 0.15s ease !important;
 }
 
-body.aq-smart-editable-active [data-visual-auto="true"]:hover {
+body.aq-smart-editable-active [data-visual-auto="true"]:hover,
+body.aq-smart-editable-active [data-visual-id]:not([data-aq-editor-properties] *):not(.aq-editor-toolbar *):hover {
   outline: 2px dashed #f59e0b !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
 }
 
-body.aq-smart-editable-active img[data-visual-auto="true"]:hover {
+body.aq-smart-editable-active img[data-visual-auto="true"]:hover,
+body.aq-smart-editable-active img[data-visual-id]:not([data-aq-editor-properties] *):not(.aq-editor-toolbar *):hover {
   outline: 2.5px solid #3b82f6 !important;
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
 }
 
-body.aq-smart-editable-active [data-visual-tag="icon"][data-visual-auto="true"]:hover {
+body.aq-smart-editable-active [data-visual-tag="icon"]:hover,
+body.aq-smart-editable-active svg[data-visual-auto="true"]:hover {
   outline: 2px dashed #10b981 !important;
   box-shadow: 0 0 14px rgba(16, 185, 129, 0.35) !important;
+}
+
+body.aq-smart-editable-active [data-visual-selected="true"] {
+  outline: 2.5px solid #fbbf24 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(251, 191, 36, 0.25), 0 0 25px rgba(251, 191, 36, 0.4) !important;
 }
 

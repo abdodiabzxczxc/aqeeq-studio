@@ -965,10 +965,13 @@ export default function AlaqeeqStudioPublicPage() {
 
 
             {/* Quick Action CTA Buttons */}
-            <div data-no-visual-edit="true" className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
+                data-visual-id="hero-cta-admissions"
+                data-visual-tag="button"
+                data-visual-label="زر القبول والتسجيل في الهيرو"
                 className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black shadow-lg transition active:scale-95 ${
                   dark
                     ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
@@ -982,6 +985,9 @@ export default function AlaqeeqStudioPublicPage() {
               <button
                 type="button"
                 onClick={() => navigate("/accreditations")}
+                data-visual-id="hero-cta-accreditations"
+                data-visual-tag="button"
+                data-visual-label="زر الاعتمادات الدولية في الهيرو"
                 className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                   dark
                     ? "border-white/15 bg-white/5 text-white hover:bg-white/10"

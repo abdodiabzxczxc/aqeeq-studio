@@ -173,29 +173,69 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const activeLogo = logoUrl || "/alaqeeq-logo.png";
+  const logoOverride = editor?.getOverride?.("header-logo");
+  const activeLogo = logoOverride?.mediaUrl || logoUrl || "/alaqeeq-logo.png";
+
+  const topLocationText = editor?.getOverride?.("header-top-location")?.contentText || "المدينة المنورة — المملكة العربية السعودية";
+  const topPhoneText = editor?.getOverride?.("header-top-phone")?.contentText || "+966 53 189 6000";
+  const topPhoneLink = editor?.getOverride?.("header-top-phone")?.linkUrl || "tel:+966531896000";
+  const topEmailText = editor?.getOverride?.("header-top-email")?.contentText || "info@alaqeeqholding.com";
+  const topEmailLink = editor?.getOverride?.("header-top-email")?.linkUrl || "mailto:info@alaqeeqholding.com";
+  const topPortalsText = editor?.getOverride?.("header-top-portals")?.contentText || "بوابات الأنظمة والخدمات";
+  const topJobsText = editor?.getOverride?.("header-top-jobs")?.contentText || "بوابة التوظيف";
+  const topJobsLink = editor?.getOverride?.("header-top-jobs")?.linkUrl || "https://live.aqeeq.edu.sa/jobs";
+
+  const navHomeText = editor?.getOverride?.("header-nav-home")?.contentText || "الرئيسية";
+  const navAboutText = editor?.getOverride?.("header-nav-about")?.contentText || "مدارسنا";
+  const navAccreditationsText = editor?.getOverride?.("header-nav-accreditations")?.contentText || "الاعتمادات";
+  const navAdmissionsText = editor?.getOverride?.("header-nav-admissions")?.contentText || "القبول والتسجيل";
+  const navJournalText = editor?.getOverride?.("header-nav-journal")?.contentText || (orchestration?.nav?.journalLabel === "مجلة العقيق" ? "المجلة" : orchestration?.nav?.journalLabel || "المجلة");
+  const navAlbumsText = editor?.getOverride?.("header-nav-albums")?.contentText || (orchestration?.nav?.albumsLabel === "ألبوم العقيق" ? "الألبومات" : orchestration?.nav?.albumsLabel || "الألبومات");
+  const navPodcastText = editor?.getOverride?.("header-nav-podcast")?.contentText || ((orchestration?.nav as any)?.podcastLabel === "أثير العقيق" || (orchestration?.nav as any)?.podcastLabel === "أثير العقيق 🎙️" ? "أثير" : (orchestration?.nav as any)?.podcastLabel || "أثير");
+  const navArticlesText = editor?.getOverride?.("header-nav-articles")?.contentText || ((orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" || (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق" ? "المقالات" : (orchestration?.nav as any)?.articlesLabel || "المقالات");
+  const navOffersText = editor?.getOverride?.("header-nav-offers")?.contentText || (orchestration?.nav?.showcaseLabel === "الأخبار والعروض" ? "الأخبار" : orchestration?.nav?.showcaseLabel || "الأخبار");
+  const ctaButtonText = editor?.getOverride?.("header-cta-button")?.contentText || "سجّل الآن ✦";
 
   return (
-    <div data-no-visual-edit="true" dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
+    <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
       {/* 1. Top Executive Utility Bar */}
       <div className={`hidden sm:block border-b text-[11px] font-bold py-1.5 transition-colors ${
         dark ? "border-white/5 bg-[#010f08]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
       }`}>
         <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+            <span
+              data-visual-id="header-top-location"
+              data-visual-tag="text"
+              data-visual-label="موقع المدارس في الشريط العلوي"
+              className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"
+            >
               <MapPin size={12} />
-              <span>المدينة المنورة — المملكة العربية السعودية</span>
+              <span>{topLocationText}</span>
             </span>
             <span className="h-3 w-px bg-current opacity-20" />
-            <a href="tel:+966531896000" className="flex items-center gap-1.5 hover:text-emerald-600 transition" dir="ltr">
+            <a
+              href={topPhoneLink}
+              data-visual-id="header-top-phone"
+              data-visual-tag="text"
+              data-visual-label="هاتف المدارس في الشريط العلوي"
+              className="flex items-center gap-1.5 hover:text-emerald-600 transition"
+              dir="ltr"
+            >
               <PhoneCall size={12} />
-              <span>+966 53 189 6000</span>
+              <span>{topPhoneText}</span>
             </a>
             <span className="h-3 w-px bg-current opacity-20 hidden md:inline-block" />
-            <a href="mailto:info@alaqeeqholding.com" className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 transition" dir="ltr">
+            <a
+              href={topEmailLink}
+              data-visual-id="header-top-email"
+              data-visual-tag="text"
+              data-visual-label="إيميل المدارس في الشريط العلوي"
+              className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 transition"
+              dir="ltr"
+            >
               <Mail size={12} />
-              <span>info@alaqeeqholding.com</span>
+              <span>{topEmailText}</span>
             </a>
           </div>
 
@@ -205,10 +245,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <button
                 type="button"
                 onClick={() => { setPortalsOpen((prev) => !prev); setOptionsOpen(false); }}
+                data-visual-id="header-top-portals"
+                data-visual-tag="text"
+                data-visual-label="زر بوابات الخدمات"
                 className="flex items-center gap-1 hover:text-emerald-600 transition cursor-pointer"
               >
                 <Server size={12} className="text-emerald-500" />
-                <span>بوابات الأنظمة والخدمات</span>
+                <span>{topPortalsText}</span>
                 <ChevronDown size={11} className={`opacity-60 transition-transform ${portalsOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -308,8 +351,16 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </div>
 
             <span className="h-3 w-px bg-current opacity-20" />
-            <a href="https://live.aqeeq.edu.sa/jobs" target="_blank" rel="noreferrer" className="hover:text-emerald-600 transition">
-              بوابة التوظيف
+            <a
+              href={topJobsLink}
+              target="_blank"
+              rel="noreferrer"
+              data-visual-id="header-top-jobs"
+              data-visual-tag="text"
+              data-visual-label="رابط بوابة التوظيف"
+              className="hover:text-emerald-600 transition"
+            >
+              {topJobsText}
             </a>
           </div>
         </div>
@@ -327,6 +378,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             <button
               onClick={() => go("/")}
               aria-label={`العودة إلى ${title}`}
+              data-visual-id="header-logo-container"
+              data-visual-tag="button"
+              data-visual-label="حاوية الشعار"
               className="flex h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px] items-center transition hover:opacity-90"
             >
               <img
@@ -338,6 +392,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     : activeLogo
                 }
                 alt="شعار مدارس العقيق الأهلية والدولية"
+                data-visual-id="header-logo"
+                data-visual-tag="image"
+                data-visual-label="شعار مدارس العقيق"
                 className={`max-h-full max-w-full object-contain transition duration-200 ${
                   dark
                     ? "brightness-0 invert opacity-95"
@@ -370,83 +427,106 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* 1. الرئيسية */}
             <button
               onClick={() => go("/")}
+              data-visual-id="header-nav-home"
+              data-visual-tag="text"
+              data-visual-label="رابط الرئيسية"
               className={`aq-studio-toplink ${currentActive === "studio" ? "aq-studio-toplink--active" : ""}`}
             >
-              الرئيسية
+              {navHomeText}
             </button>
 
             {/* 2. مدارسنا */}
             <button
               onClick={() => go("/about")}
+              data-visual-id="header-nav-about"
+              data-visual-tag="text"
+              data-visual-label="رابط مدارسنا"
               className={`aq-studio-toplink ${
                 currentActive === "about" ? "aq-studio-toplink--active" : ""
               } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
-              مدارسنا
+              {navAboutText}
             </button>
 
             {/* 3. الاعتمادات */}
             <button
               onClick={() => go("/accreditations")}
+              data-visual-id="header-nav-accreditations"
+              data-visual-tag="text"
+              data-visual-label="رابط الاعتمادات"
               className={`aq-studio-toplink ${
                 currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
               } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
-              الاعتمادات
+              {navAccreditationsText}
             </button>
 
             {/* 4. القبول والتسجيل */}
             <button
               onClick={() => go("/admissions")}
+              data-visual-id="header-nav-admissions"
+              data-visual-tag="text"
+              data-visual-label="رابط القبول والتسجيل"
               className={`aq-studio-toplink ${
                 currentActive === "admissions" ? "aq-studio-toplink--active" : ""
               } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
             >
-              القبول والتسجيل
+              {navAdmissionsText}
             </button>
 
-            {/* 4. المجلة */}
+            {/* 5. المجلة */}
             <button
               onClick={() => go("/journal")}
+              data-visual-id="header-nav-journal"
+              data-visual-tag="text"
+              data-visual-label="رابط مجلة العقيق"
               className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
             >
-              {orchestration?.nav?.journalLabel === "مجلة العقيق" ? "المجلة" : orchestration?.nav?.journalLabel || "المجلة"}
+              {navJournalText}
             </button>
 
-            {/* 5. الألبومات */}
+            {/* 6. الألبومات */}
             <button
               onClick={() => go("/albums")}
+              data-visual-id="header-nav-albums"
+              data-visual-tag="text"
+              data-visual-label="رابط ألبومات العقيق"
               className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
             >
-              {orchestration?.nav?.albumsLabel === "ألبوم العقيق" ? "الألبومات" : orchestration?.nav?.albumsLabel || "الألبومات"}
+              {navAlbumsText}
             </button>
 
-            {/* 6. أثير */}
+            {/* 7. أثير */}
             <button
               onClick={() => go("/atheer")}
+              data-visual-id="header-nav-podcast"
+              data-visual-tag="text"
+              data-visual-label="رابط بودكاست أثير"
               className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
             >
-              {(orchestration?.nav as any)?.podcastLabel === "أثير العقيق" || (orchestration?.nav as any)?.podcastLabel === "أثير العقيق 🎙️"
-                ? "أثير"
-                : (orchestration?.nav as any)?.podcastLabel || "أثير"}
+              {navPodcastText}
             </button>
 
-            {/* 7. المقالات */}
+            {/* 8. المقالات */}
             <button
               onClick={() => go("/articles")}
+              data-visual-id="header-nav-articles"
+              data-visual-tag="text"
+              data-visual-label="رابط مقالات العقيق"
               className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
             >
-              {(orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" || (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق"
-                ? "المقالات"
-                : (orchestration?.nav as any)?.articlesLabel || "المقالات"}
+              {navArticlesText}
             </button>
 
-            {/* 8. الأخبار */}
+            {/* 9. الأخبار */}
             <button
               onClick={() => go("/offers")}
+              data-visual-id="header-nav-offers"
+              data-visual-tag="text"
+              data-visual-label="رابط الأخبار والعروض"
               className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
             >
-              {orchestration?.nav?.showcaseLabel === "الأخبار والعروض" ? "الأخبار" : orchestration?.nav?.showcaseLabel || "الأخبار"}
+              {navOffersText}
             </button>
           </nav>
 
@@ -457,13 +537,16 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* Primary Executive CTA Button */}
             <Button
               onClick={() => go("/admissions#admission-form-section")}
+              data-visual-id="header-cta-button"
+              data-visual-tag="button"
+              data-visual-label="زر القبول والتسجيل (الهيدر)"
               className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 ${
                 dark
                   ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
                   : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-95 shadow-emerald-950/25"
               }`}
             >
-              <span>سجّل الآن ✦</span>
+              <span>{ctaButtonText}</span>
             </Button>
 
             {/* Options Dropdown Menu OR Login Button (Desktop) */}
@@ -577,6 +660,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* Spotlight Search Trigger */}
             <button
               onClick={() => setSearchOpen(true)}
+              data-visual-id="header-icon-search"
+              data-visual-tag="icon"
+              data-visual-label="زر البحث الشامل"
               className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
