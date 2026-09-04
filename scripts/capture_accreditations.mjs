@@ -62,6 +62,14 @@ async function run() {
   const resHero = await send('Page.captureScreenshot', { format: 'png' });
   writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_hero.png', Buffer.from(resHero.data, 'base64'));
 
+  // 1.b Capture Hero Scrolled (to see 3D fan-out in action)
+  await send('Runtime.evaluate', { expression: 'window.scrollTo(0, 260);' });
+  await sleep(600);
+  const resHeroScrolled = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/accreditations_hero_scrolled.png', Buffer.from(resHeroScrolled.data, 'base64'));
+  await send('Runtime.evaluate', { expression: 'window.scrollTo(0, 0);' });
+  await sleep(300);
+
   // 2. Scroll to Cognia Pavilion
   await send('Runtime.evaluate', {
     expression: `
