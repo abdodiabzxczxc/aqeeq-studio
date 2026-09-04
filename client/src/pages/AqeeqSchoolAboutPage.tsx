@@ -4,7 +4,7 @@ import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
@@ -52,9 +52,11 @@ import {
 // ==========================================
 // Web Audio Soft Haptic & Chime Synthesizer
 // ==========================================
-function playTactileChime(type: "click" | "soft" | "sweep" = "soft") {
+function playTactileChime(type: "click" | "soft" | "sweep" | "laser" = "soft") {
   try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
     const osc = ctx.createOscillator();
@@ -80,6 +82,14 @@ function playTactileChime(type: "click" | "soft" | "sweep" = "soft") {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       osc.start(now);
       osc.stop(now + 0.15);
+    } else if (type === "laser") {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(980, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.12);
+      gain.gain.setValueAtTime(0.025, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.start(now);
+      osc.stop(now + 0.12);
     } else {
       osc.type = "sine";
       osc.frequency.setValueAtTime(520, now);
@@ -125,7 +135,8 @@ function PillarCard({
       onMouseLeave={onLeave}
       style={{
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+        transition:
+          "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
       }}
       className={`group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-7 backdrop-blur-2xl transition duration-300 will-change-transform flex flex-col justify-between ${
         isNationalDay
@@ -189,14 +200,19 @@ function PillarCard({
 
         {/* Subpoints List */}
         {expanded && (
-          <div className="mt-4 pt-4 border-t border-white/10 space-y-2 relative z-10 animate-in fade-in">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-4 pt-4 border-t border-white/10 space-y-2 relative z-10"
+          >
             {pillar.subPoints.map((pt, pIdx) => (
               <div key={pIdx} className="flex items-start gap-2 text-xs font-bold">
                 <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
                 <span className={dark ? "text-slate-200" : "text-slate-800"}>{pt}</span>
               </div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -229,6 +245,16 @@ export default function AqeeqSchoolAboutPage() {
   const dark = theme === "dark";
   const [, navigate] = useLocation();
 
+  // Scroll Progress for Smooth Parallax & 3D Depth
+  const { scrollY } = useScroll();
+  const rawHeroScale = useTransform(scrollY, [0, 400], [1, 0.94]);
+  const rawHeroRotateX = useTransform(scrollY, [0, 400], [0, 4]);
+  const rawHeroOpacity = useTransform(scrollY, [0, 450], [1, 0.65]);
+
+  const smoothHeroScale = useSpring(rawHeroScale, { stiffness: 90, damping: 20 });
+  const smoothHeroRotateX = useSpring(rawHeroRotateX, { stiffness: 90, damping: 20 });
+  const smoothHeroOpacity = useSpring(rawHeroOpacity, { stiffness: 90, damping: 20 });
+
   // 1. Campus Atmospheric Mode: Morning Sun vs Twilight Starlight
   const [atmosphere, setAtmosphere] = useState<"morning" | "twilight">("morning");
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -250,16 +276,16 @@ export default function AqeeqSchoolAboutPage() {
   // 6. Vision 2030 Neural Matrix Active Node
   const [activeVisionNode, setActiveVisionNode] = useState<number>(0);
 
-  // 7. VIP Campus Tour Builder State
+  // 7. VIP Campus Tour Builder State & Laser Key
   const [vipFocus, setVipFocus] = useState<string>("robotics");
   const [vipGrade, setVipGrade] = useState<string>("intermediate");
-  const [vipPassGenerated, setVipPassGenerated] = useState(true);
+  const [vipScanCount, setVipScanCount] = useState<number>(0);
 
   // 3D Tilt for Hero Showcase Card
   const { ref: heroCardRef, tilt: heroTilt, onMove: onHeroMove, onLeave: onHeroLeave } = useMagneticTilt(6);
 
   // Play chime safely if enabled
-  const triggerChime = (type: "click" | "soft" | "sweep" = "soft") => {
+  const triggerChime = (type: "click" | "soft" | "sweep" | "laser" = "soft") => {
     if (soundEnabled) playTactileChime(type);
   };
 
@@ -718,7 +744,14 @@ export default function AqeeqSchoolAboutPage() {
       useCurtain={true}
       curtainKicker="✦ استكشف صروح ومسيرة العقيق ✦"
       hero={
-        <section
+        <motion.section
+          style={{
+            scale: smoothHeroScale,
+            rotateX: smoothHeroRotateX,
+            opacity: smoothHeroOpacity,
+            transformPerspective: 1200,
+            transformOrigin: "center top",
+          }}
           className={`relative isolate overflow-hidden py-10 sm:py-16 transition-colors duration-700 ${
             atmosphere === "twilight"
               ? "bg-gradient-to-b from-[#03060a] via-[#060e18] to-[#04080e] text-white"
@@ -766,7 +799,7 @@ export default function AqeeqSchoolAboutPage() {
           </div>
 
           <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
-            {/* Top Atmospheric Control Bar */}
+            {/* Top Atmospheric Control Bar with Layout ID Springs */}
             <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
               {/* National Day or Institutional Pill */}
               <div
@@ -784,7 +817,7 @@ export default function AqeeqSchoolAboutPage() {
                 <span>{isNationalDay ? "مسيرة وطنية رائدة منذ عام 1994 · عزّنا بطبعنا" : "صرح العقيق التعليمي الرائد بالمدينة المنورة"}</span>
               </div>
 
-              {/* Atmosphere Switcher & Sound Toggle (Awwwards Grade) */}
+              {/* Atmosphere Switcher & Sound Toggle with Liquid Morphing */}
               <div className="flex items-center gap-2">
                 <div
                   className={`inline-flex items-center p-1 rounded-2xl border backdrop-blur-xl shadow-lg transition ${
@@ -797,12 +830,19 @@ export default function AqeeqSchoolAboutPage() {
                       triggerChime("sweep");
                       setAtmosphere("morning");
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition active:scale-95 ${
+                    className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition active:scale-95 ${
                       atmosphere === "morning"
-                        ? "bg-[#015a37] text-white shadow-md"
+                        ? "text-white shadow-md"
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
+                    {atmosphere === "morning" && (
+                      <motion.div
+                        layoutId="atmosphereActiveBubble"
+                        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                        className="absolute inset-0 rounded-xl bg-[#015a37] -z-10 shadow-lg"
+                      />
+                    )}
                     <Sun size={13} className="text-[#f8ca14]" />
                     <span className="hidden sm:inline">إشراقة الصباح ☀️</span>
                   </button>
@@ -813,12 +853,19 @@ export default function AqeeqSchoolAboutPage() {
                       triggerChime("sweep");
                       setAtmosphere("twilight");
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition active:scale-95 ${
+                    className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition active:scale-95 ${
                       atmosphere === "twilight"
-                        ? "bg-gradient-to-r from-indigo-900 to-purple-900 text-white shadow-md ring-1 ring-[#f8ca14]/40"
+                        ? "text-white shadow-md"
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
+                    {atmosphere === "twilight" && (
+                      <motion.div
+                        layoutId="atmosphereActiveBubble"
+                        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-900 to-purple-900 -z-10 shadow-lg ring-1 ring-[#f8ca14]/40"
+                      />
+                    )}
                     <Moon size={13} className="text-[#f8ca14]" />
                     <span className="hidden sm:inline">سكون المساء 🌙</span>
                   </button>
@@ -834,7 +881,7 @@ export default function AqeeqSchoolAboutPage() {
                   title={soundEnabled ? "كتم المؤثرات التفاعلية" : "تفعيل المؤثرات الصوتية التفاعلية"}
                   className={`grid h-9 w-9 place-items-center rounded-2xl border transition active:scale-95 backdrop-blur-md ${
                     soundEnabled
-                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
                       : "border-white/10 bg-black/40 text-slate-500"
                   }`}
                 >
@@ -1001,7 +1048,7 @@ export default function AqeeqSchoolAboutPage() {
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
       }
     >
       {/* ========================================================
@@ -1012,10 +1059,11 @@ export default function AqeeqSchoolAboutPage() {
           <div className="flex items-center justify-between gap-4 flex-wrap">
             {/* 3 Telemetry Pillars */}
             <div className="flex items-center gap-4 sm:gap-8 flex-wrap text-xs font-bold">
-              {/* Distance to Haram */}
-              <div className="flex items-center gap-2">
-                <div className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-500">
+              {/* Distance to Haram with Sonar Waves */}
+              <div className="flex items-center gap-2 group cursor-default">
+                <div className="relative grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-500">
                   <Navigation size={15} />
+                  <span className="absolute -inset-1 rounded-xl border border-emerald-500/40 animate-ping pointer-events-none opacity-60" />
                 </div>
                 <div>
                   <span className={`block font-black ${dark ? "text-white" : "text-slate-900"}`}>7.2 كم عن المسجد النبوي</span>
@@ -1023,10 +1071,15 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
               </div>
 
-              {/* Qibla Direction */}
-              <div className="flex items-center gap-2">
-                <div className="grid h-8 w-8 place-items-center rounded-xl bg-amber-500/10 text-amber-500">
-                  <Compass size={15} />
+              {/* Qibla Direction with Rotating Needle Animation */}
+              <div className="flex items-center gap-2 group cursor-default">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-amber-500/10 text-amber-500 overflow-hidden">
+                  <motion.div
+                    animate={{ rotate: [0, 180, 168] }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                  >
+                    <Compass size={16} />
+                  </motion.div>
                 </div>
                 <div>
                   <span className={`block font-black ${dark ? "text-white" : "text-slate-900"}`}>اتجاه القبلة: 168° جنوباً</span>
@@ -1055,7 +1108,7 @@ export default function AqeeqSchoolAboutPage() {
               }}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black border transition active:scale-95 shadow-sm ${
                 busRadarOpen
-                  ? "bg-emerald-600 text-white border-emerald-500"
+                  ? "bg-emerald-600 text-white border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
                   : dark
                   ? "border-white/15 bg-white/5 text-emerald-400 hover:bg-white/10"
                   : "border-emerald-700/20 bg-white text-emerald-700 hover:bg-slate-50"
@@ -1067,14 +1120,14 @@ export default function AqeeqSchoolAboutPage() {
             </button>
           </div>
 
-          {/* Expandable Live Bus Radar Drawer */}
+          {/* Expandable Live Bus Radar Drawer with Spatial Sweep */}
           <AnimatePresence>
             {busRadarOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="overflow-hidden mt-4 pt-4 border-t border-white/10"
               >
                 <div className={`p-4 sm:p-6 rounded-2xl border ${dark ? "bg-black/80 border-emerald-500/20" : "bg-white border-slate-200"}`}>
@@ -1092,9 +1145,10 @@ export default function AqeeqSchoolAboutPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {liveBuses.map((bus) => (
-                      <div
+                      <motion.div
                         key={bus.id}
-                        className={`p-3.5 rounded-xl border text-xs transition hover:border-emerald-500/40 ${
+                        whileHover={{ scale: 1.02 }}
+                        className={`p-3.5 rounded-xl border text-xs transition ${
                           dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                         }`}
                       >
@@ -1108,7 +1162,7 @@ export default function AqeeqSchoolAboutPage() {
                           <span className="text-emerald-400 font-bold">{bus.camera}</span>
                           <span>{bus.capacity}</span>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
@@ -1143,7 +1197,7 @@ export default function AqeeqSchoolAboutPage() {
       </div>
 
       {/* ========================================================
-          STAGE 1: The 15-Year Prodigy Journey Simulator (من الروضة للجامعة)
+          STAGE 1: The 15-Year Prodigy Journey Simulator (3D Spatial Card Flip)
       ======================================================== */}
       <section id="prodigy-simulator" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -1158,7 +1212,7 @@ export default function AqeeqSchoolAboutPage() {
             اختر المرحلة العمرية واكتشف كيف تُصقل شخصية ابنك وتتطور مهاراته عاماً بعد عام داخل صروح العقيق
           </p>
 
-          {/* Interactive Stage Step Pills */}
+          {/* Interactive Stage Step Pills with Layout ID Morph */}
           <div
             className={`mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-3xl mx-auto p-2 rounded-2xl border shadow-sm transition ${
               dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
@@ -1172,115 +1226,131 @@ export default function AqeeqSchoolAboutPage() {
                   triggerChime("click");
                   setProdigyStage(sIdx);
                 }}
-                className={`p-3 rounded-xl text-center transition active:scale-95 ${
+                className={`relative p-3 rounded-xl text-center transition active:scale-95 ${
                   prodigyStage === sIdx
-                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
+                    ? "text-white shadow-md"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                <span className={`block text-xs font-black ${prodigyStage === sIdx ? "text-[#f8ca14]" : ""}`}>
+                {prodigyStage === sIdx && (
+                  <motion.div
+                    layoutId="prodigyActiveIndicator"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/40"
+                  />
+                )}
+                <span className={`relative z-10 block text-xs font-black ${prodigyStage === sIdx ? "text-[#f8ca14]" : ""}`}>
                   {stg.ageRange}
                 </span>
-                <span className="text-[11px] font-bold truncate block mt-0.5">{stg.stageTitle.split(" ")[1] || stg.stageTitle}</span>
+                <span className="relative z-10 text-[11px] font-bold truncate block mt-0.5">{stg.stageTitle.split(" ")[1] || stg.stageTitle}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Morphing Prodigy Stage Showcase Card */}
-        <div
-          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 ${
-            dark ? "border-emerald-500/25 bg-[#0c1218]/95" : "border-emerald-700/20 bg-white/95"
-          }`}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Story & Skills Radar Column */}
-            <div className="lg:col-span-7">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                  {activeProdigy.milestoneBadge} ✦
-                </span>
-                <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
-                  الفئة العمرية: {activeProdigy.ageRange}
-                </span>
-              </div>
-
-              <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                {activeProdigy.stageTitle}
-              </h3>
-              <p className="text-xs font-black text-emerald-500 mb-4">{activeProdigy.kicker}</p>
-
-              <div
-                className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
-                  dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
-                }`}
-              >
-                <span className="text-base font-serif ml-1">❝</span>
-                {activeProdigy.quote}
-                <span className="text-base font-serif mr-1">❞</span>
-              </div>
-
-              {/* Acquired Skills Bars */}
-              <div className="space-y-3 mb-6">
-                <h5 className={`text-xs font-black ${dark ? "text-slate-300" : "text-slate-800"}`}>
-                  المكتسبات والمهارات التنافسية للطالب:
-                </h5>
-                {activeProdigy.skills.map((sk, skIdx) => (
-                  <div key={skIdx} className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-bold">
-                      <span className={dark ? "text-slate-300" : "text-slate-700"}>{sk.name}</span>
-                      <span className="text-emerald-500 font-black">{sk.pct}%</span>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${sk.pct}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#f8ca14]"
-                      />
-                    </div>
+        {/* 3D Spatial Flip Showcase Card */}
+        <div style={{ perspective: 1200 }} className="max-w-5xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={prodigyStage}
+              initial={{ rotateY: 90, opacity: 0, scale: 0.95 }}
+              animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+              exit={{ rotateY: -90, opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 220, damping: 22 }}
+              className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 ${
+                dark ? "border-emerald-500/25 bg-[#0c1218]/95" : "border-emerald-700/20 bg-white/95"
+              }`}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Story & Skills Radar Column */}
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                      {activeProdigy.milestoneBadge} ✦
+                    </span>
+                    <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                      الفئة العمرية: {activeProdigy.ageRange}
+                    </span>
                   </div>
-                ))}
-              </div>
 
-              {/* Competitions Badges */}
-              <div className="flex items-center gap-2 flex-wrap pt-4 border-t border-white/10">
-                <span className="text-[11px] font-black text-slate-400">أبرز المحافل والبطولات:</span>
-                {activeProdigy.competitions.map((cp, cpIdx) => (
-                  <span
-                    key={cpIdx}
-                    className={`px-3 py-1 rounded-xl text-[11px] font-black border ${
-                      dark ? "border-white/10 bg-white/5 text-slate-200" : "border-slate-200 bg-slate-100 text-slate-800"
+                  <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    {activeProdigy.stageTitle}
+                  </h3>
+                  <p className="text-xs font-black text-emerald-500 mb-4">{activeProdigy.kicker}</p>
+
+                  <div
+                    className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
+                      dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
                     }`}
                   >
-                    🏆 {cp}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Visual Avatar Card */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
-                <img
-                  src={activeProdigy.avatarImage}
-                  alt={activeProdigy.stageTitle}
-                  className="h-full w-full object-cover transition duration-700 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
-
-                <div className="absolute bottom-4 right-4 left-4 text-white">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles size={16} className="text-[#f8ca14]" />
-                    <span className="text-xs font-black text-[#f8ca14]">{activeProdigy.milestoneBadge}</span>
+                    <span className="text-base font-serif ml-1">❝</span>
+                    {activeProdigy.quote}
+                    <span className="text-base font-serif mr-1">❞</span>
                   </div>
-                  <p className="text-[11px] text-slate-200">{activeProdigy.stageTitle} · مدارس العقيق</p>
+
+                  {/* Acquired Skills Bars with Spring Fill */}
+                  <div className="space-y-3 mb-6">
+                    <h5 className={`text-xs font-black ${dark ? "text-slate-300" : "text-slate-800"}`}>
+                      المكتسبات والمهارات التنافسية للطالب:
+                    </h5>
+                    {activeProdigy.skills.map((sk, skIdx) => (
+                      <div key={skIdx} className="space-y-1">
+                        <div className="flex justify-between text-[11px] font-bold">
+                          <span className={dark ? "text-slate-300" : "text-slate-700"}>{sk.name}</span>
+                          <span className="text-emerald-500 font-black">{sk.pct}%</span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${sk.pct}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#f8ca14]"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Competitions Badges */}
+                  <div className="flex items-center gap-2 flex-wrap pt-4 border-t border-white/10">
+                    <span className="text-[11px] font-black text-slate-400">أبرز المحافل والبطولات:</span>
+                    {activeProdigy.competitions.map((cp, cpIdx) => (
+                      <span
+                        key={cpIdx}
+                        className={`px-3 py-1 rounded-xl text-[11px] font-black border ${
+                          dark ? "border-white/10 bg-white/5 text-slate-200" : "border-slate-200 bg-slate-100 text-slate-800"
+                        }`}
+                      >
+                        🏆 {cp}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Visual Avatar Card */}
+                <div className="lg:col-span-5">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                    <img
+                      src={activeProdigy.avatarImage}
+                      alt={activeProdigy.stageTitle}
+                      className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-4 right-4 left-4 text-white">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Sparkles size={16} className="text-[#f8ca14]" />
+                        <span className="text-xs font-black text-[#f8ca14]">{activeProdigy.milestoneBadge}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-200">{activeProdigy.stageTitle} · مدارس العقيق</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
 
@@ -1306,7 +1376,7 @@ export default function AqeeqSchoolAboutPage() {
               اضغط على أي مرفق، ثم المس النقاط النابضة على الصورة لاستكشاف المواصفات الهندسية والأكاديمية الدقيقة
             </p>
 
-            {/* Campus Switcher Tabs */}
+            {/* Campus Switcher Tabs with LayoutId Springs */}
             <div
               className={`mt-8 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
                 dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
@@ -1320,15 +1390,22 @@ export default function AqeeqSchoolAboutPage() {
                   setActiveFacilityIndex(0);
                   setActiveHotspotIndex(null);
                 }}
-                className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
-                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/30"
+                    ? "text-white shadow-md"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنين (الأهلي والدولي) 🎓
+                {activeCampusTab === "boys" && (
+                  <motion.div
+                    layoutId="activeCampusPill"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/30"
+                  />
+                )}
+                <span className="relative z-10">مجمع البنين (الأهلي والدولي) 🎓</span>
               </button>
               <button
                 type="button"
@@ -1338,15 +1415,22 @@ export default function AqeeqSchoolAboutPage() {
                   setActiveFacilityIndex(0);
                   setActiveHotspotIndex(null);
                 }}
-                className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
-                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/30"
+                    ? "text-white shadow-md"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنات والطفولة المبكرة 🌸
+                {activeCampusTab === "girls" && (
+                  <motion.div
+                    layoutId="activeCampusPill"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/30"
+                  />
+                )}
+                <span className="relative z-10">مجمع البنات والطفولة المبكرة 🌸</span>
               </button>
             </div>
           </div>
@@ -1463,13 +1547,15 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
               </div>
 
-              {/* Photo Column with Interactive Hotspots */}
+              {/* Photo Column with Interactive Hotspots & Zoom Effect */}
               <div className="lg:col-span-5">
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
-                  <img
+                  <motion.img
+                    animate={{ scale: activeHotspotIndex !== null ? 1.08 : 1.0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                     src={activeFacility.image}
                     alt={activeFacility.name}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover transition duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
 
@@ -1493,14 +1579,19 @@ export default function AqeeqSchoolAboutPage() {
                         }`}
                       >
                         <span className="text-[10px] font-black">✦</span>
-                        <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-40 animate-ping pointer-events-none" />
+                        <motion.span
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
+                          transition={{ repeat: Infinity, duration: 2 }}
+                          className="absolute -inset-1 rounded-full bg-emerald-400 pointer-events-none"
+                        />
                       </button>
 
-                      {/* Floating Hotspot Tooltip/Popover */}
+                      {/* Floating Hotspot Tooltip/Popover with Spring Expansion */}
                       {activeHotspotIndex === hIdx && (
                         <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          initial={{ opacity: 0, y: 10, scale: 0.9 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 22 }}
                           className="absolute right-0 bottom-full mb-3 w-60 rounded-2xl border border-emerald-500/40 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-xl z-30 pointer-events-auto"
                         >
                           <div className="flex items-center justify-between gap-1 mb-1">
@@ -1546,7 +1637,7 @@ export default function AqeeqSchoolAboutPage() {
             رحلة تربوية رائدة خطت خطواتها الأولى في المدينة المنورة قبل أكثر من 30 عاماً لتغدو اليوم منارة تعليمية بمعايير عالمية.
           </p>
 
-          {/* Interactive Era Buttons */}
+          {/* Interactive Era Buttons with LayoutId Morphing */}
           <div
             className={`mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-sm transition ${
               dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
@@ -1560,137 +1651,153 @@ export default function AqeeqSchoolAboutPage() {
                   triggerChime("click");
                   setActiveTimelineIndex(eraIdx);
                 }}
-                className={`p-3 rounded-xl text-center transition active:scale-95 ${
+                className={`relative p-3 rounded-xl text-center transition active:scale-95 ${
                   activeTimelineIndex === eraIdx
-                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
+                    ? "text-white shadow-md"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                <span className={`block text-base font-black ${activeTimelineIndex === eraIdx ? "text-[#f8ca14]" : ""}`}>
+                {activeTimelineIndex === eraIdx && (
+                  <motion.div
+                    layoutId="timelineActiveIndicator"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg ring-1 ring-[#f8ca14]/40"
+                  />
+                )}
+                <span className={`relative z-10 block text-base font-black ${activeTimelineIndex === eraIdx ? "text-[#f8ca14]" : ""}`}>
                   {era.shortYear}
                 </span>
-                <span className="text-[11px] font-bold truncate block">{era.label}</span>
+                <span className="relative z-10 text-[11px] font-bold truncate block">{era.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Dynamic Active Timeline Era Card with Full 3D Panorama */}
-        <div
-          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 ${
-            dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-          }`}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Story & Details Column */}
-            <div className="lg:col-span-7">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                  محطة تاريخية بارزة ✦
-                </span>
-                <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
-                  {activeEra.year}
-                </span>
-              </div>
+        {/* Dynamic Active Timeline Era Card with Parallax Depth Transition */}
+        <div style={{ perspective: 1200 }} className="max-w-5xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTimelineIndex}
+              initial={{ opacity: 0, scale: 0.94, y: 25 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: -25 }}
+              transition={{ type: "spring", stiffness: 240, damping: 24 }}
+              className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 ${
+                dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+              }`}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Story & Details Column */}
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                      محطة تاريخية بارزة ✦
+                    </span>
+                    <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                      {activeEra.year}
+                    </span>
+                  </div>
 
-              <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                {activeEra.title}
-              </h3>
+                  <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    {activeEra.title}
+                  </h3>
 
-              <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                {activeEra.desc}
-              </p>
+                  <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                    {activeEra.desc}
+                  </p>
 
-              {/* Quote Ribbon */}
-              <div
-                className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
-                  dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
-                }`}
-              >
-                <span className="text-base font-serif ml-1">❝</span>
-                {activeEra.quote}
-                <span className="text-base font-serif mr-1">❞</span>
-              </div>
-
-              {/* Key Metrics Row */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                {activeEra.metrics.map((m, mIdx) => (
+                  {/* Quote Ribbon */}
                   <div
-                    key={mIdx}
-                    className={`p-3 rounded-xl border text-center ${
-                      dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
+                    className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
+                      dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
                     }`}
                   >
-                    <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
-                    <span className={`text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
+                    <span className="text-base font-serif ml-1">❝</span>
+                    {activeEra.quote}
+                    <span className="text-base font-serif mr-1">❞</span>
                   </div>
-                ))}
-              </div>
 
-              {/* Navigation Controls between Eras */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                <button
-                  type="button"
-                  disabled={activeTimelineIndex === 0}
-                  onClick={() => {
-                    triggerChime("click");
-                    setActiveTimelineIndex((idx) => Math.max(0, idx - 1));
-                  }}
-                  className={`inline-flex items-center gap-1 text-xs font-black transition ${
-                    activeTimelineIndex === 0
-                      ? "opacity-30 cursor-not-allowed"
-                      : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
-                  }`}
-                >
-                  <ChevronRight size={16} />
-                  <span>المحطة السابقة</span>
-                </button>
-
-                <span className="text-[11px] font-black text-slate-400">
-                  {activeTimelineIndex + 1} من {timelineEras.length}
-                </span>
-
-                <button
-                  type="button"
-                  disabled={activeTimelineIndex === timelineEras.length - 1}
-                  onClick={() => {
-                    triggerChime("click");
-                    setActiveTimelineIndex((idx) => Math.min(timelineEras.length - 1, idx + 1));
-                  }}
-                  className={`inline-flex items-center gap-1 text-xs font-black transition ${
-                    activeTimelineIndex === timelineEras.length - 1
-                      ? "opacity-30 cursor-not-allowed"
-                      : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
-                  }`}
-                >
-                  <span>المحطة التالية</span>
-                  <ChevronLeft size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Photo & Milestone Visual Column */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
-                <img
-                  src={activeEra.image}
-                  alt={activeEra.title}
-                  className="h-full w-full object-cover transition duration-700 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
-
-                <div className="absolute bottom-4 right-4 left-4 text-white">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Milestone size={16} className="text-[#f8ca14]" />
-                    <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
+                  {/* Key Metrics Row */}
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    {activeEra.metrics.map((m, mIdx) => (
+                      <div
+                        key={mIdx}
+                        className={`p-3 rounded-xl border text-center ${
+                          dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
+                        }`}
+                      >
+                        <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
+                        <span className={`text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-[11px] text-slate-200 line-clamp-2">{activeEra.highlight}</p>
+
+                  {/* Navigation Controls between Eras */}
+                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      disabled={activeTimelineIndex === 0}
+                      onClick={() => {
+                        triggerChime("click");
+                        setActiveTimelineIndex((idx) => Math.max(0, idx - 1));
+                      }}
+                      className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                        activeTimelineIndex === 0
+                          ? "opacity-30 cursor-not-allowed"
+                          : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                      }`}
+                    >
+                      <ChevronRight size={16} />
+                      <span>المحطة السابقة</span>
+                    </button>
+
+                    <span className="text-[11px] font-black text-slate-400">
+                      {activeTimelineIndex + 1} من {timelineEras.length}
+                    </span>
+
+                    <button
+                      type="button"
+                      disabled={activeTimelineIndex === timelineEras.length - 1}
+                      onClick={() => {
+                        triggerChime("click");
+                        setActiveTimelineIndex((idx) => Math.min(timelineEras.length - 1, idx + 1));
+                      }}
+                      className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                        activeTimelineIndex === timelineEras.length - 1
+                          ? "opacity-30 cursor-not-allowed"
+                          : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                      }`}
+                    >
+                      <span>المحطة التالية</span>
+                      <ChevronLeft size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Photo & Milestone Visual Column */}
+                <div className="lg:col-span-5">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                    <img
+                      src={activeEra.image}
+                      alt={activeEra.title}
+                      className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-4 right-4 left-4 text-white">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Milestone size={16} className="text-[#f8ca14]" />
+                        <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-200 line-clamp-2">{activeEra.highlight}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
 
@@ -1711,7 +1818,7 @@ export default function AqeeqSchoolAboutPage() {
               اضغط على أي ركيزة وطنية لتشاهد كيف تترجمها مناهج ومنشآت العقيق إلى واقع يومي يعيشه الطالب
             </p>
 
-            {/* Vision 2030 Node Selector Pills */}
+            {/* Vision 2030 Node Selector Pills with LayoutId */}
             <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
               {vision2030Nodes.map((node, nIdx) => {
                 const NodeIcon = node.icon;
@@ -1723,69 +1830,85 @@ export default function AqeeqSchoolAboutPage() {
                       triggerChime("click");
                       setActiveVisionNode(nIdx);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black border transition active:scale-95 ${
+                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black border transition active:scale-95 ${
                       activeVisionNode === nIdx
-                        ? "bg-[#015a37] text-white border-emerald-400 shadow-md ring-2 ring-[#f8ca14]/40"
+                        ? "text-white border-emerald-400 shadow-md ring-2 ring-[#f8ca14]/40"
                         : dark
                         ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                         : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
                     }`}
                   >
-                    <NodeIcon size={14} className={activeVisionNode === nIdx ? "text-[#f8ca14]" : "text-emerald-500"} />
-                    <span>{node.title}</span>
+                    {activeVisionNode === nIdx && (
+                      <motion.div
+                        layoutId="visionActiveIndicator"
+                        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                        className="absolute inset-0 rounded-xl bg-[#015a37] shadow-lg"
+                      />
+                    )}
+                    <NodeIcon size={14} className={`relative z-10 ${activeVisionNode === nIdx ? "text-[#f8ca14]" : "text-emerald-500"}`} />
+                    <span className="relative z-10">{node.title}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Active Vision 2030 Deep Plaque */}
-          {(() => {
-            const currNode = vision2030Nodes[activeVisionNode];
-            const NodeIcon = currNode.icon;
-            return (
-              <div
-                className={`max-w-4xl mx-auto rounded-[2.5rem] border p-8 sm:p-10 shadow-2xl relative overflow-hidden transition duration-500 ${
-                  dark ? "border-emerald-500/30 bg-[#0a1218]" : "border-emerald-700/20 bg-white"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                      <NodeIcon size={22} />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-black text-[#f8ca14]">{currNode.badge}</span>
-                      <h3 className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-slate-900"}`}>
-                        {currNode.title}
-                      </h3>
-                    </div>
-                  </div>
+          {/* Active Vision 2030 Deep Plaque with Animated Pulse */}
+          <div style={{ perspective: 1200 }} className="max-w-4xl mx-auto">
+            <AnimatePresence mode="wait">
+              {(() => {
+                const currNode = vision2030Nodes[activeVisionNode];
+                const NodeIcon = currNode.icon;
+                return (
+                  <motion.div
+                    key={activeVisionNode}
+                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -15 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
+                    className={`rounded-[2.5rem] border p-8 sm:p-10 shadow-2xl relative overflow-hidden transition duration-500 ${
+                      dark ? "border-emerald-500/30 bg-[#0a1218]" : "border-emerald-700/20 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                          <NodeIcon size={22} />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-black text-[#f8ca14]">{currNode.badge}</span>
+                          <h3 className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-slate-900"}`}>
+                            {currNode.title}
+                          </h3>
+                        </div>
+                      </div>
 
-                  <div className="text-center px-4 py-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10">
-                    <span className="block text-xl font-black text-emerald-400">{currNode.statNumber}</span>
-                    <span className="text-[10px] font-bold text-slate-400">{currNode.statLabel}</span>
-                  </div>
-                </div>
+                      <div className="text-center px-4 py-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10">
+                        <span className="block text-xl font-black text-emerald-400">{currNode.statNumber}</span>
+                        <span className="text-[10px] font-bold text-slate-400">{currNode.statLabel}</span>
+                      </div>
+                    </div>
 
-                <div className="space-y-4 text-xs sm:text-sm leading-relaxed mb-6">
-                  <div>
-                    <span className="font-black text-slate-400 block mb-1">🎯 الهدف الوطني في رؤية 2030:</span>
-                    <p className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>{currNode.desc}</p>
-                  </div>
-                  <div className="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
-                    <span className="font-black text-emerald-500 block mb-1">✦ دور وتطبيق مدارس العقيق المباشر:</span>
-                    <p className={dark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{currNode.aqeeqImpact}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
+                    <div className="space-y-4 text-xs sm:text-sm leading-relaxed mb-6">
+                      <div>
+                        <span className="font-black text-slate-400 block mb-1">🎯 الهدف الوطني في رؤية 2030:</span>
+                        <p className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>{currNode.desc}</p>
+                      </div>
+                      <div className="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+                        <span className="font-black text-emerald-500 block mb-1">✦ دور وتطبيق مدارس العقيق المباشر:</span>
+                        <p className={dark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{currNode.aqeeqImpact}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })()}
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 
       {/* ========================================================
-          STAGE 5: Hall of Fame & Alumni Constellation
+          STAGE 5: Hall of Fame & Alumni Constellation (Zero-G Drift)
       ======================================================== */}
       <section id="hall-of-fame" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-14">
@@ -1803,12 +1926,15 @@ export default function AqeeqSchoolAboutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {alumniProfiles.map((alumni, aIdx) => (
-            <div
+            <motion.div
               key={aIdx}
-              className={`rounded-[2rem] border p-6 flex flex-col justify-between shadow-xl transition hover:-translate-y-1 ${
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 4 + aIdx * 0.8, repeat: Infinity, ease: "easeInOut" }}
+              whileHover={{ scale: 1.03, y: -10 }}
+              className={`rounded-[2rem] border p-6 flex flex-col justify-between shadow-xl transition-all ${
                 dark
-                  ? "border-white/10 bg-[#0c1218] text-white"
-                  : "border-emerald-950/10 bg-white text-slate-900"
+                  ? "border-white/10 bg-[#0c1218] text-white shadow-black/60 hover:border-emerald-500/40"
+                  : "border-emerald-950/10 bg-white text-slate-900 hover:border-emerald-700/40 shadow-emerald-950/5"
               }`}
             >
               <div>
@@ -1833,7 +1959,7 @@ export default function AqeeqSchoolAboutPage() {
               >
                 "{alumni.quote}"
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -1859,7 +1985,7 @@ export default function AqeeqSchoolAboutPage() {
       </section>
 
       {/* ========================================================
-          STAGE 6: VIP Custom Campus Tour Builder (أداة الجولة الذكية)
+          STAGE 6: VIP Custom Campus Tour Builder (Laser Scanner Effect)
       ======================================================== */}
       <section
         id="vip-tour-builder"
@@ -1903,12 +2029,13 @@ export default function AqeeqSchoolAboutPage() {
                       key={f.id}
                       type="button"
                       onClick={() => {
-                        triggerChime("click");
+                        triggerChime("laser");
                         setVipFocus(f.id);
+                        setVipScanCount((c) => c + 1);
                       }}
                       className={`p-3 rounded-xl text-xs font-black border text-right transition active:scale-95 ${
                         vipFocus === f.id
-                          ? "bg-[#015a37] text-white border-emerald-400 shadow"
+                          ? "bg-[#015a37] text-white border-emerald-400 shadow-lg ring-1 ring-[#f8ca14]/40"
                           : dark
                           ? "border-white/10 bg-white/5 text-slate-300"
                           : "border-slate-200 bg-slate-50 text-slate-800"
@@ -1933,12 +2060,13 @@ export default function AqeeqSchoolAboutPage() {
                       key={g.id}
                       type="button"
                       onClick={() => {
-                        triggerChime("click");
+                        triggerChime("laser");
                         setVipGrade(g.id);
+                        setVipScanCount((c) => c + 1);
                       }}
                       className={`p-3 rounded-xl text-xs font-black border text-right transition active:scale-95 ${
                         vipGrade === g.id
-                          ? "bg-[#015a37] text-white border-emerald-400 shadow"
+                          ? "bg-[#015a37] text-white border-emerald-400 shadow-lg ring-1 ring-[#f8ca14]/40"
                           : dark
                           ? "border-white/10 bg-white/5 text-slate-300"
                           : "border-slate-200 bg-slate-50 text-slate-800"
@@ -1950,7 +2078,7 @@ export default function AqeeqSchoolAboutPage() {
                 </div>
               </div>
 
-              {/* Generated VIP Pass Visual Card */}
+              {/* Generated VIP Pass Visual Card with Animated Laser Scan Beam */}
               <div>
                 <div
                   className={`rounded-3xl border p-6 relative overflow-hidden shadow-2xl ${
@@ -1959,7 +2087,19 @@ export default function AqeeqSchoolAboutPage() {
                       : "border-emerald-600/30 bg-gradient-to-br from-[#015a37] to-[#043d26] text-white shadow-emerald-950/20"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4 border-b border-white/15 pb-3">
+                  {/* Laser Scan Beam Triggered on Change */}
+                  <motion.div
+                    key={vipScanCount}
+                    initial={{ top: "-10%" }}
+                    animate={{ top: "110%" }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="pointer-events-none absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent shadow-[0_0_15px_#f8ca14] z-30"
+                  />
+
+                  {/* 45-degree Metallic Specular Sheen */}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-60" />
+
+                  <div className="flex items-center justify-between mb-4 border-b border-white/15 pb-3 relative z-10">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">🎫</span>
                       <div>
@@ -1972,7 +2112,7 @@ export default function AqeeqSchoolAboutPage() {
                     </span>
                   </div>
 
-                  <div className="space-y-2 text-xs mb-6">
+                  <div className="space-y-2 text-xs mb-6 relative z-10">
                     <div className="flex justify-between">
                       <span className="text-slate-300">المسار المختار:</span>
                       <span className="font-black text-[#f8ca14]">
@@ -2018,7 +2158,7 @@ export default function AqeeqSchoolAboutPage() {
                     )}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white py-3.5 text-xs font-black shadow-lg transition active:scale-95"
+                    className="relative z-10 w-full flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white py-3.5 text-xs font-black shadow-lg transition active:scale-95"
                   >
                     <MessageCircle size={16} />
                     <span>تأكيد وتفعيل بطاقة الزيارة عبر واتساب 💚</span>
@@ -2070,7 +2210,7 @@ export default function AqeeqSchoolAboutPage() {
                 المدينة المنورة — حي الرانوناء — ممشى الهجرة (خلف نايس برايس). سهولة في الوصول ومواقف فسيحة مخصصة لأولياء الأمور وباصات المدارس.
               </p>
 
-              {/* Transportation Coverage Chips */}
+              {/* Transportation Coverage Chips with Interactive Feedback */}
               <div className="mb-8">
                 <div className="flex items-center gap-2 text-xs font-black mb-3 text-slate-400">
                   <Bus size={15} />
@@ -2090,7 +2230,7 @@ export default function AqeeqSchoolAboutPage() {
                   ].map((hood, hIdx) => (
                     <span
                       key={hIdx}
-                      className={`px-3 py-1.5 rounded-xl border ${
+                      className={`px-3 py-1.5 rounded-xl border transition hover:scale-105 cursor-default ${
                         dark
                           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
                           : "border-emerald-950/10 bg-emerald-50 text-[#015a37]"
