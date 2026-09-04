@@ -37,7 +37,7 @@ export function AqeeqLuxuryPageShell({
   return (
     <div
       dir="rtl"
-      className={`relative min-h-screen aq-public-shell overflow-x-hidden selection:bg-[#f8ca14]/30 ${
+      className={`relative min-h-screen aq-public-shell overflow-x-clip selection:bg-[#f8ca14]/30 ${
         isNationalDay
           ? dark
             ? "bg-[#01140c] text-white"

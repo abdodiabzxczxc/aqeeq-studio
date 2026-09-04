@@ -822,7 +822,7 @@ body,
 
   .aq-public-shell {
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow-x: clip;
     background:
       radial-gradient(circle at 84% 0%, rgba(229,184,79,.12), transparent 26rem),
       radial-gradient(circle at 5% 64%, rgba(56,120,156,.10), transparent 30rem),
