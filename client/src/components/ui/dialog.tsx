@@ -24,7 +24,6 @@ function Dialog({
   children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  if (open === false) return null;
   const composingRef = React.useRef(false);
   const justEndedRef = React.useRef(false);
   const endTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -51,7 +50,9 @@ function Dialog({
 
   return (
     <DialogCompositionContext.Provider value={contextValue}>
-      <DialogPrimitive.Root data-slot="dialog" {...props} />
+      <DialogPrimitive.Root data-slot="dialog" open={open} {...props}>
+        {children}
+      </DialogPrimitive.Root>
     </DialogCompositionContext.Provider>
   );
 }

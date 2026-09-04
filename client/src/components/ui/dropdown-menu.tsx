@@ -5,11 +5,9 @@ import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function DropdownMenu({
-  open,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
-  if (open === false) return null;
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" open={open} {...props} />;
+  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
 function DropdownMenuPortal({

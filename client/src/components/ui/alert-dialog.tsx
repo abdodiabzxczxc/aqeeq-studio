@@ -5,11 +5,9 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 function AlertDialog({
-  open,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
-  if (open === false) return null;
-  return <AlertDialogPrimitive.Root data-slot="alert-dialog" open={open} {...props} />;
+  return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
 }
 
 function AlertDialogTrigger({

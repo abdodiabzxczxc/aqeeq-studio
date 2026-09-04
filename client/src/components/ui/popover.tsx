@@ -4,11 +4,9 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { cn } from "@/lib/utils";
 
 function Popover({
-  open,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
-  if (open === false) return null;
-  return <PopoverPrimitive.Root data-slot="popover" open={open} {...props} />;
+  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
 }
 
 function PopoverTrigger({

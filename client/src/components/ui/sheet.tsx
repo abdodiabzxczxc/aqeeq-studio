@@ -6,9 +6,8 @@ import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-function Sheet({ open, ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  if (open === false) return null;
-  return <SheetPrimitive.Root data-slot="sheet" open={open} {...props} />;
+function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
 function SheetTrigger({
