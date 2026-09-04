@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { AqeeqAdmissionsScrubReel } from "@/components/AqeeqAdmissionsScrubReel";
+import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
@@ -97,6 +99,57 @@ export default function AqeeqSchoolAdmissionsPage() {
   const [whatsappConfirmOpen, setWhatsappConfirmOpen] = useState(false);
   const [pendingWhatsappMsg, setPendingWhatsappMsg] = useState('');
 
+  // 3D Perspective scrubbing physics for the fees console
+  const feesConsoleRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: feesProgress } = useScroll({
+    target: feesConsoleRef,
+    offset: ["start end", "end start"],
+  });
+  const rawFeesRotateX = useTransform(feesProgress, [0, 0.45, 0.9], [12, 0, -6]);
+  const rawFeesRotateY = useTransform(feesProgress, [0, 0.45, 0.9], [-12, 0, 8]);
+  const rawFeesScale = useTransform(feesProgress, [0, 0.45, 0.9], [0.93, 1, 0.96]);
+  const rawFeesResultY = useTransform(feesProgress, [0, 1], [30, -30]);
+
+  const feesRotateX = useSpring(rawFeesRotateX, { stiffness: 85, damping: 22 });
+  const feesRotateY = useSpring(rawFeesRotateY, { stiffness: 85, damping: 22 });
+  const feesScale = useSpring(rawFeesScale, { stiffness: 85, damping: 22 });
+  const feesResultY = useSpring(rawFeesResultY, { stiffness: 85, damping: 22 });
+
+  // Kinetic laser progress line for roadmap steps
+  const roadmapRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: roadmapProgress } = useScroll({
+    target: roadmapRef,
+    offset: ["start end", "end start"],
+  });
+  const rawLaserLineWidth = useTransform(roadmapProgress, [0.15, 0.75], ["0%", "100%"]);
+  const laserLineWidth = useSpring(rawLaserLineWidth, { stiffness: 90, damping: 24 });
+
+  const handleSelectReelStage = (
+    track: "national" | "international",
+    grade: "kindergarten" | "primary" | "middle" | "high",
+    gradeIndex: number
+  ) => {
+    setActiveTrack(track);
+    setCalcGradeIndex(gradeIndex);
+    setFormData((prev) => ({
+      ...prev,
+      track,
+      gradeLevel: grade,
+    }));
+    scrollToSection("tuition-fees-section");
+    toast.success("تم تثبيت المرحلة وتحديث حاسبة الرسوم! بإمكانك مراجعة الأقساط وحجز المقعد.");
+  };
+
+  const marqueeItems = [
+    "بوابة القبول والتسجيل للعام الجديد 2026 - 2027 🎓",
+    "اعتماد كوجنيا الأمريكي Cognia USA لأعلى معايير الجودة 🇺🇸",
+    "خصومات الأخوة والسداد المبكر تصل إلى 15% ✦",
+    "تقسيط ميسر عبر تابي وتمارا والبطاقات الائتمانية 💳",
+    "المركز المعتمد لاختبارات SAT و ACT بالمدينة المنورة 📜",
+    "مركز اختبارات IELTS الحاسوبية الرسمي المعتمد 🌐",
+    "أكاديميات الذكاء الاصطناعي ومعامل الروبوت ومسابقات نافس 🤖",
+    "مسبح نصف أولمبي وملاعب رياضية متكاملة 🏊‍♂️",
+  ];
 
   const { data: orchestrationData } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     staleTime: 60000,
@@ -566,6 +619,25 @@ export default function AqeeqSchoolAdmissionsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Kinetic Admissions Ticker Bar */}
+      <div className={`py-3.5 border-y overflow-hidden relative backdrop-blur-md z-20 ${
+        isNationalDay
+          ? dark ? "bg-[#00140a] border-[#f8ca14]/20" : "bg-emerald-50 border-emerald-500/20"
+          : dark ? "bg-[#060a10] border-white/10" : "bg-slate-50 border-slate-200"
+      }`}>
+        <div className="flex w-max animate-marquee-rtl gap-8 items-center text-xs font-black">
+          {[...marqueeItems, ...marqueeItems].map((item, i) => (
+            <div key={i} className="flex items-center gap-3 shrink-0">
+              <span className={dark ? "text-[#f8ca14]" : "text-[#015a37]"}>✦</span>
+              <span className={dark ? "text-slate-200" : "text-slate-800"}>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Flagship Sticky Cinema Horizontal Scrub Section (260vh) */}
+      <AqeeqAdmissionsScrubReel onSelectStage={handleSelectReelStage} />
+
       {/* Tuition Fees & Calculator Section */}
       <section id="tuition-fees-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
@@ -631,17 +703,26 @@ export default function AqeeqSchoolAdmissionsPage() {
           </div>
         </div>
 
-        {/* 1. Interactive Tuition & Sibling Discounts Calculator */}
-        <div className={`mb-14 rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition ${
-          dark
-            ? "border-emerald-500/30 bg-gradient-to-br from-[#0c1218] via-[#091016] to-[#05080c] shadow-black/80"
-            : "border-emerald-700/20 bg-gradient-to-br from-white via-[#f7faf7] to-[#eef5ef] shadow-xl"
-        }`}>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* 1. Interactive Tuition & Sibling Discounts Calculator with 3D Perspective Rotation */}
+        <div ref={feesConsoleRef} style={{ perspective: "1200px" }} className="mb-14">
+          <motion.div
+            style={{
+              rotateX: feesRotateX,
+              rotateY: feesRotateY,
+              scale: feesScale,
+              transformStyle: "preserve-3d",
+            }}
+            className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition will-change-transform ${
+              dark
+                ? "border-emerald-500/30 bg-gradient-to-br from-[#0c1218] via-[#091016] to-[#05080c] shadow-black/80"
+                : "border-emerald-700/20 bg-gradient-to-br from-white via-[#f7faf7] to-[#eef5ef] shadow-xl"
+            }`}
+          >
+            <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Calculator Controls (7 cols) */}
-            <div className="lg:col-span-7">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Calculator Controls (7 cols) */}
+              <div className="lg:col-span-7">
               <div className="flex items-center gap-2 mb-3">
                 <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                   <Calculator size={17} />
@@ -718,13 +799,16 @@ export default function AqeeqSchoolAdmissionsPage() {
               </div>
             </div>
 
-            {/* Instant Calculation Result Card (5 cols) */}
+            {/* Instant Calculation Result Card (5 cols) with Parallax Float */}
             <div className="lg:col-span-5">
-              <div className={`rounded-3xl border p-6 shadow-xl relative overflow-hidden ${
-                dark
-                  ? "border-emerald-500/40 bg-black/70 ring-1 ring-emerald-500/20"
-                  : "border-emerald-700/25 bg-white ring-1 ring-emerald-900/5"
-              }`}>
+              <motion.div
+                style={{ y: feesResultY }}
+                className={`rounded-3xl border p-6 shadow-xl relative overflow-hidden ${
+                  dark
+                    ? "border-emerald-500/40 bg-black/70 ring-1 ring-emerald-500/20"
+                    : "border-emerald-700/25 bg-white ring-1 ring-emerald-900/5"
+                }`}
+              >
                 <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-4">
                   <span className="text-xs font-black text-slate-500">المرحلة المختارة:</span>
                   <span className={`text-xs font-black ${dark ? "text-emerald-400" : "text-[#015a37]"}`}>
@@ -832,10 +916,11 @@ export default function AqeeqSchoolAdmissionsPage() {
                     <span>واتساب الحسبة 💬</span>
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
+      </div>
 
         {/* View Mode Switcher Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -1071,11 +1156,11 @@ export default function AqeeqSchoolAdmissionsPage() {
       </section>
 
       {/* Interactive Admission Steps & Journey Roadmap */}
-      <section className={`py-20 border-y relative overflow-hidden ${
+      <section ref={roadmapRef} className={`py-20 border-y relative overflow-hidden ${
         dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
               <Sparkles size={14} />
               <span>رحلة القبول الميسرة</span>
@@ -1086,6 +1171,14 @@ export default function AqeeqSchoolAdmissionsPage() {
             <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
               4 خطوات سهلة ومدروسة تضمن انتقالاً سلساً ورعاية أكاديمية متكاملة لابنك
             </p>
+          </div>
+
+          {/* Kinetic Laser Timeline Progress Track (Desktop) */}
+          <div className="hidden lg:block relative max-w-5xl mx-auto h-2 bg-slate-200/80 dark:bg-white/10 rounded-full mb-10 overflow-hidden shadow-inner">
+            <motion.div
+              style={{ width: laserLineWidth }}
+              className="h-full bg-gradient-to-r from-[#015a37] via-[#f8ca14] to-emerald-400 rounded-full shadow-[0_0_15px_rgba(248,202,20,0.8)]"
+            />
           </div>
 
           {/* Connected Steps Grid */}
@@ -1122,9 +1215,11 @@ export default function AqeeqSchoolAdmissionsPage() {
             ].map((card, idx) => {
               const Icon = card.icon;
               return (
-                <div
+                <motion.div
                   key={idx}
-                  className={`relative rounded-[2rem] border p-6 sm:p-7 flex flex-col justify-between transition duration-300 hover:-translate-y-1 shadow-md ${
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                  className={`relative rounded-[2rem] border p-6 sm:p-7 flex flex-col justify-between transition duration-300 shadow-md ${
                     dark ? "border-white/10 bg-[#0c1218] hover:border-emerald-500/40" : "border-emerald-950/10 bg-white hover:shadow-xl"
                   }`}
                 >
@@ -1151,7 +1246,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                   <div className={`mt-2 pt-3 border-t text-[11px] font-bold ${dark ? "border-white/10 text-emerald-400" : "border-slate-100 text-[#015a37]"}`}>
                     ✦ {card.pill}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -1453,120 +1548,8 @@ export default function AqeeqSchoolAdmissionsPage() {
         </div>
       </section>
 
-      {/* Parents Mobile App Section */}
-      <section className={`py-20 border-t ${
-        dark ? "border-white/10 bg-gradient-to-b from-[#0c1218] to-[#06080d]" : "border-emerald-950/10 bg-gradient-to-b from-[#f5f8f5] to-[#fbfaf8]"
-      }`}>
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className={`rounded-[3rem] border p-8 sm:p-14 overflow-hidden relative ${
-            dark ? "border-emerald-500/20 bg-black/60 shadow-2xl" : "border-emerald-700/20 bg-white/95 shadow-2xl"
-          }`}>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              <div className="lg:col-span-7">
-                <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black mb-4 shadow-sm ${
-                  dark ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-emerald-700/25 bg-emerald-50 text-[#015a37]"
-                }`}>
-                  <Smartphone size={14} />
-                  <span>تطبيق أولياء الأمور الرسمي</span>
-                </div>
-
-                <h3 className={`text-2xl sm:text-4xl font-black tracking-tight leading-snug mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  كل ما يخص ابنك الدراسي والمالي في جيبك 📱
-                </h3>
-
-                <p className={`text-sm sm:text-base leading-relaxed mb-8 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                  طوّرت مدارس العقيق تطبيقاً متكاملاً للهواتف الذكية يمنح أولياء الأمور راحة بال مطلقة، وتجربة سلسة لإدارة شؤون أبنائهم في ثوانٍ معدودة.
-                </p>
-
-                {/* Features List */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  {[
-                    { icon: CreditCard, title: "سداد الرسوم فوري وآمن", desc: "الدفع بمدى وفيزا وماستركارد وتلقي الإيصالات مباشرة." },
-                    { icon: Volume2, title: "خاصية النداء الآلي للطلاب", desc: "طلب خروج ابنك من الفصل لحظة وصولك لبوابة المدرسة." },
-                    { icon: FileText, title: "مراجعة الفواتير والتقارير", desc: "كشف حساب مالي وأكاديمي شامل لكل ابن في أي وقت." },
-                    { icon: Bell, title: "إشعارات وأخبار حية", desc: "تنبيهات فورية بالواجبات، الغياب، والأنشطة المدرسية." },
-                  ].map((feat, idx) => {
-                    const Icon = feat.icon;
-                    return (
-                      <div key={idx} className="flex items-start gap-3">
-                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                          <Icon size={18} />
-                        </div>
-                        <div>
-                          <h5 className={`text-xs font-black ${dark ? "text-white" : "text-slate-900"}`}>{feat.title}</h5>
-                          <p className={`text-[11px] mt-0.5 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>{feat.desc}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Download CTA & Video Guide */}
-                <div className="flex flex-wrap items-center gap-3.5">
-                  <a
-                    href="https://qr-codes.io/LQMip0"
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3.5 text-xs font-black shadow-lg transition active:scale-95 ${
-                      dark ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-[#015a37] hover:bg-emerald-800 text-white"
-                    }`}
-                  >
-                    <Download size={16} />
-                    <span>تحميل تطبيق أولياء الأمور</span>
-                  </a>
-
-                  <a
-                    href="https://www.youtube.com/watch?v=_h3K-q8cDUc"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-3.5 text-xs font-black text-red-500 hover:bg-red-500/20 transition"
-                  >
-                    <Play size={15} />
-                    <span>فيديو شرح استخدام التطبيق والدفع 🎬</span>
-                  </a>
-
-                  <a
-                    href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-3.5 text-xs font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition"
-                  >
-                    <FileText size={15} />
-                    <span>الخطط والواجبات الأسبوعية 📝</span>
-                  </a>
-
-                  <a
-                    href="tel:+966531896000"
-                    className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-bold transition ${
-                      dark ? "border-white/10 text-slate-400 hover:text-white" : "border-slate-300 bg-white/80 text-slate-700 hover:text-slate-900 shadow-sm"
-                    }`}
-                  >
-                    <PhoneCall size={15} />
-                    <span>الدعم الفني للتطبيق: 966531896000+</span>
-                  </a>
-                </div>
-              </div>
-
-              {/* QR Code & Mockup Card */}
-              <div className="lg:col-span-5 text-center">
-                <div className={`inline-block p-6 sm:p-8 rounded-[2rem] border shadow-2xl backdrop-blur-xl ${
-                  dark ? "border-white/15 bg-black/80" : "border-emerald-950/10 bg-slate-50/90 shadow-xl"
-                }`}>
-                  <div className="bg-white p-4 rounded-2xl inline-block shadow-md">
-                    <img
-                      src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://qr-codes.io/LQMip0"
-                      alt="رمز الاستجابة السريعة لتحميل تطبيق مدارس العقيق"
-                      className="h-36 w-36 sm:h-44 sm:w-44 object-contain"
-                    />
-                  </div>
-                  <h4 className={`font-black text-sm mt-4 ${dark ? "text-white" : "text-slate-900"}`}>امسح الكود بكاميرا الجوال</h4>
-                  <p className={`text-xs mt-1 ${dark ? "text-slate-400" : "text-slate-600 font-bold"}`}>متاح مجاناً على App Store و Google Play</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 📱 قسم تطبيق مدارس العقيق الذكي — الهاتف ثلاثي الأبعاد الدوار، فيديو الشرح، ورمز QR التفاعلي */}
+      <AqeeqSchoolAppShowcaseSection dark={dark} />
 
       {/* Grand Finale CTA */}
       <AqeeqGrandFinaleCta
