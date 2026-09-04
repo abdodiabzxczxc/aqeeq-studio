@@ -1014,6 +1014,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         node.closest("[role='listbox']") ||
         node.closest("[role='tooltip']") ||
         node.closest("[data-no-visual-edit]") ||
+        node.closest("[data-interactive-fx]") ||
+        node.closest("[data-hover-preview]") ||
         node.closest("[data-aqeeq-video]") ||
         node.closest("[data-video-player]") ||
         node.closest(".group\\/screen") ||
@@ -1136,8 +1138,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const targetEl = e.target as Element | null;
       if (!targetEl || isEditorSystemUi(targetEl)) return;
 
-      // Allow videos and media elements to receive clicks freely
-      if (targetEl.closest("[data-no-visual-edit], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")) {
+      // Allow videos, media elements, and interactive FX to receive clicks freely
+      if (targetEl.closest("[data-no-visual-edit], [data-interactive-fx], [data-hover-preview], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")) {
         return;
       }
 

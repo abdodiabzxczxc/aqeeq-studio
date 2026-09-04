@@ -1347,26 +1347,47 @@ export default function AlaqeeqStudioPublicPage() {
           <>
 
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
-      <section className={`border-b py-3.5 sm:py-4 backdrop-blur-md transition ${
-        dark ? "border-white/10 bg-[#06080d]/90 text-white" : "border-black/5 bg-slate-50/90 text-slate-800"
-      }`}>
-        <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
-          <div className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
+      {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية (محمي من تطفل المحرر المرئي مع تثبيت تلقائي) */}
+      <section
+        data-no-visual-edit="true"
+        data-interactive-fx="true"
+        className={`border-b py-3.5 sm:py-4 backdrop-blur-md transition ${
+          dark ? "border-white/10 bg-[#06080d]/90 text-white" : "border-black/5 bg-slate-50/90 text-slate-800"
+        }`}
+      >
+        <div data-no-visual-edit="true" data-interactive-fx="true" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+          <div data-no-visual-edit="true" data-interactive-fx="true" className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
             {/* Cognia */}
-            <div className="flex items-center gap-1.5">
+            <div data-no-visual-edit="true" data-interactive-fx="true" className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => navigate(cogniaItem.targetUrl || "/accreditations")}
+                data-no-visual-edit="true"
+                data-interactive-fx="true"
+                onClick={() => {
+                  if (isEditorActive) {
+                    setEditingHoverItem(cogniaItem);
+                  } else {
+                    navigate(cogniaItem.targetUrl || "/accreditations");
+                  }
+                }}
                 onMouseEnter={() => triggerCursorPreview({
                   visible: true,
                   imageUrl: cogniaItem.imageUrl,
                   title: cogniaItem.title,
                   badge: cogniaItem.badge,
                   targetUrl: cogniaItem.targetUrl,
+                  isFrozen: isEditorActive,
                   onEdit: isEditorActive ? () => setEditingHoverItem(cogniaItem) : undefined,
                 })}
-                onMouseLeave={() => triggerCursorPreview({ visible: false })}
-                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+                onMouseLeave={() => {
+                  if (!isEditorActive) {
+                    triggerCursorPreview({ visible: false });
+                  }
+                }}
+                className={`flex items-center gap-2 transition cursor-pointer ${
+                  isEditorActive ? "ring-1 ring-amber-400/40 rounded-xl px-2 py-1 bg-amber-400/10 hover:bg-amber-400/20" : "hover:opacity-80"
+                }`}
+                title={isEditorActive ? "انقر لتعديل صورة كوجنيا والكلمة مباشرة" : undefined}
               >
                 <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
                   <Award size={16} />
@@ -1376,11 +1397,13 @@ export default function AlaqeeqStudioPublicPage() {
               {isEditorActive && (
                 <button
                   type="button"
+                  data-no-visual-edit="true"
+                  data-interactive-fx="true"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingHoverItem(cogniaItem);
                   }}
-                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
                   title="تعديل هذا العنصر وصورة الماوس"
                 >
                   <Edit3 size={13} />
@@ -1389,20 +1412,36 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
 
             {/* IELTS */}
-            <div className="hidden sm:flex items-center gap-1.5">
+            <div data-no-visual-edit="true" data-interactive-fx="true" className="hidden sm:flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => navigate(ieltsItem.targetUrl || "/accreditations")}
+                data-no-visual-edit="true"
+                data-interactive-fx="true"
+                onClick={() => {
+                  if (isEditorActive) {
+                    setEditingHoverItem(ieltsItem);
+                  } else {
+                    navigate(ieltsItem.targetUrl || "/accreditations");
+                  }
+                }}
                 onMouseEnter={() => triggerCursorPreview({
                   visible: true,
                   imageUrl: ieltsItem.imageUrl,
                   title: ieltsItem.title,
                   badge: ieltsItem.badge,
                   targetUrl: ieltsItem.targetUrl,
+                  isFrozen: isEditorActive,
                   onEdit: isEditorActive ? () => setEditingHoverItem(ieltsItem) : undefined,
                 })}
-                onMouseLeave={() => triggerCursorPreview({ visible: false })}
-                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+                onMouseLeave={() => {
+                  if (!isEditorActive) {
+                    triggerCursorPreview({ visible: false });
+                  }
+                }}
+                className={`flex items-center gap-2 transition cursor-pointer ${
+                  isEditorActive ? "ring-1 ring-amber-400/40 rounded-xl px-2 py-1 bg-amber-400/10 hover:bg-amber-400/20" : "hover:opacity-80"
+                }`}
+                title={isEditorActive ? "انقر لتعديل صورة آيلتس والكلمة مباشرة" : undefined}
               >
                 <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500">
                   <Globe2 size={16} />
@@ -1412,11 +1451,13 @@ export default function AlaqeeqStudioPublicPage() {
               {isEditorActive && (
                 <button
                   type="button"
+                  data-no-visual-edit="true"
+                  data-interactive-fx="true"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingHoverItem(ieltsItem);
                   }}
-                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
                   title="تعديل هذا العنصر وصورة الماوس"
                 >
                   <Edit3 size={13} />
@@ -1425,20 +1466,36 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
 
             {/* SAT */}
-            <div className="flex items-center gap-1.5">
+            <div data-no-visual-edit="true" data-interactive-fx="true" className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => navigate(satItem.targetUrl || "/accreditations")}
+                data-no-visual-edit="true"
+                data-interactive-fx="true"
+                onClick={() => {
+                  if (isEditorActive) {
+                    setEditingHoverItem(satItem);
+                  } else {
+                    navigate(satItem.targetUrl || "/accreditations");
+                  }
+                }}
                 onMouseEnter={() => triggerCursorPreview({
                   visible: true,
                   imageUrl: satItem.imageUrl,
                   title: satItem.title,
                   badge: satItem.badge,
                   targetUrl: satItem.targetUrl,
+                  isFrozen: isEditorActive,
                   onEdit: isEditorActive ? () => setEditingHoverItem(satItem) : undefined,
                 })}
-                onMouseLeave={() => triggerCursorPreview({ visible: false })}
-                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+                onMouseLeave={() => {
+                  if (!isEditorActive) {
+                    triggerCursorPreview({ visible: false });
+                  }
+                }}
+                className={`flex items-center gap-2 transition cursor-pointer ${
+                  isEditorActive ? "ring-1 ring-amber-400/40 rounded-xl px-2 py-1 bg-amber-400/10 hover:bg-amber-400/20" : "hover:opacity-80"
+                }`}
+                title={isEditorActive ? "انقر لتعديل صورة سات والكلمة مباشرة" : undefined}
               >
                 <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
                   <CheckCircle2 size={16} />
@@ -1448,11 +1505,13 @@ export default function AlaqeeqStudioPublicPage() {
               {isEditorActive && (
                 <button
                   type="button"
+                  data-no-visual-edit="true"
+                  data-interactive-fx="true"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingHoverItem(satItem);
                   }}
-                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
                   title="تعديل هذا العنصر وصورة الماوس"
                 >
                   <Edit3 size={13} />
@@ -1461,20 +1520,36 @@ export default function AlaqeeqStudioPublicPage() {
             </div>
 
             {/* Community */}
-            <div className="hidden md:flex items-center gap-1.5">
+            <div data-no-visual-edit="true" data-interactive-fx="true" className="hidden md:flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => navigate(communityItem.targetUrl || "/about")}
+                data-no-visual-edit="true"
+                data-interactive-fx="true"
+                onClick={() => {
+                  if (isEditorActive) {
+                    setEditingHoverItem(communityItem);
+                  } else {
+                    navigate(communityItem.targetUrl || "/about");
+                  }
+                }}
                 onMouseEnter={() => triggerCursorPreview({
                   visible: true,
                   imageUrl: communityItem.imageUrl,
                   title: communityItem.title,
                   badge: communityItem.badge,
                   targetUrl: communityItem.targetUrl,
+                  isFrozen: isEditorActive,
                   onEdit: isEditorActive ? () => setEditingHoverItem(communityItem) : undefined,
                 })}
-                onMouseLeave={() => triggerCursorPreview({ visible: false })}
-                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+                onMouseLeave={() => {
+                  if (!isEditorActive) {
+                    triggerCursorPreview({ visible: false });
+                  }
+                }}
+                className={`flex items-center gap-2 transition cursor-pointer ${
+                  isEditorActive ? "ring-1 ring-amber-400/40 rounded-xl px-2 py-1 bg-amber-400/10 hover:bg-amber-400/20" : "hover:opacity-80"
+                }`}
+                title={isEditorActive ? "انقر لتعديل صورة مجتمع العقيق والكلمة مباشرة" : undefined}
               >
                 <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
                   <Users size={16} />
@@ -1484,11 +1559,13 @@ export default function AlaqeeqStudioPublicPage() {
               {isEditorActive && (
                 <button
                   type="button"
+                  data-no-visual-edit="true"
+                  data-interactive-fx="true"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingHoverItem(communityItem);
                   }}
-                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
                   title="تعديل هذا العنصر وصورة الماوس"
                 >
                   <Edit3 size={13} />
@@ -1496,6 +1573,81 @@ export default function AlaqeeqStudioPublicPage() {
               )}
             </div>
           </div>
+
+          {/* ⚡ لوحة التثبيت التلقائي للبطاقات التفاعلية (تظهر تلقائياً في وضع المحرر) */}
+          {isEditorActive && (
+            <div data-no-visual-edit="true" data-interactive-fx="true" className="mt-5 pt-4 border-t border-amber-400/25 animate-in fade-in duration-300">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 px-1">
+                <div className="flex items-center gap-2 text-xs font-black text-[#f8ca14]">
+                  <Sparkles size={16} />
+                  <span>⚡ بطاقات التفاعل مُثبتة تلقائياً — انقر مباشرة على أي بطاقة لتعديل صورتها وكلمتها فوراً:</span>
+                </div>
+                <span className="inline-flex items-center gap-1 text-[11px] text-amber-200 bg-amber-500/15 border border-amber-400/30 px-3 py-1 rounded-xl font-bold w-fit">
+                  <span>❄️ مثبت تلقائياً</span>
+                  <span>·</span>
+                  <span>نقرة واحدة للتعديل</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+                {[
+                  { item: cogniaItem, num: 1 },
+                  { item: ieltsItem, num: 2 },
+                  { item: satItem, num: 3 },
+                  { item: communityItem, num: 4 },
+                ].map(({ item, num }) => (
+                  <div
+                    key={item.id}
+                    data-no-visual-edit="true"
+                    data-interactive-fx="true"
+                    onClick={() => setEditingHoverItem(item)}
+                    className="group relative overflow-hidden rounded-2xl border-2 border-amber-400/40 bg-black/85 hover:border-amber-400 hover:shadow-[0_0_25px_rgba(248,202,20,0.4)] hover:scale-[1.02] transition-all p-2.5 cursor-pointer shadow-lg"
+                    title={`انقر لتعديل ${item.triggerText}`}
+                  >
+                    {/* Image container */}
+                    <div className="relative h-28 w-full overflow-hidden rounded-xl bg-slate-900 border border-white/10">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                      {item.badge && (
+                        <div className="absolute top-1.5 right-1.5 rounded-full bg-black/80 border border-[#f8ca14]/50 px-2 py-0.5 text-[9px] font-black text-[#f8ca14]">
+                          {item.badge}
+                        </div>
+                      )}
+                      <div className="absolute bottom-1.5 inset-x-2">
+                        <p className="text-[10px] font-black text-white line-clamp-1 text-right">
+                          {item.title}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Trigger text and click button */}
+                    <div className="mt-2 text-right space-y-1.5">
+                      <p className="text-xs font-black text-white line-clamp-1">
+                        {item.triggerText}
+                      </p>
+                      <button
+                        type="button"
+                        data-no-visual-edit="true"
+                        data-interactive-fx="true"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingHoverItem(item);
+                        }}
+                        className="w-full py-1.5 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black text-[11px] font-black flex items-center justify-center gap-1.5 shadow transition active:scale-95"
+                      >
+                        <Edit3 size={12} />
+                        <span>تعديل الصورة والبيانات ✏️</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
