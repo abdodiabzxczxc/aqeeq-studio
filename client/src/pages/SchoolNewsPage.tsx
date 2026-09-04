@@ -10,6 +10,9 @@ import { ArrowUpLeft, BookOpen, CalendarDays, ChevronLeft, FolderArchive, Layers
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 
 type NewsIssue = {
   id: number;
@@ -57,15 +60,33 @@ function IssueCard({
   dark: boolean;
 }) {
   const { isNationalDay } = useSiteTheme();
+  const { ref, tilt, onMove, onLeave } = useMagneticTilt(8);
+
   return (
-    <article className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
-      isNationalDay
-        ? dark ? "snd-bento-card-dark text-white" : "snd-bento-card-light text-slate-900"
-        : dark
-        ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
-        : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
-    }`}>
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
+    <motion.article
+      variants={fadeUpSpring}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+      }}
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
+        isNationalDay
+          ? dark ? "snd-bento-card-dark text-white hover:border-emerald-500/50 hover:shadow-[0_24px_60px_rgba(0,90,54,0.35)]" : "snd-bento-card-light text-slate-900 hover:border-emerald-500/40"
+          : dark
+          ? "border-white/[0.08] bg-[#0c1017]/85 text-white shadow-[0_24px_60px_rgba(0,0,0,0.6)] hover:border-[#f8ca14]/60 hover:shadow-[0_24px_70px_rgba(248,202,20,0.22)]"
+          : "border-black/[0.06] bg-white/90 text-black shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:border-[#08467d]/40 hover:shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
+      }`}
+    >
+      {/* Specular glare following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+        }}
+      />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
         {/* Magazine Cover Preview Container */}
         <button
@@ -191,8 +212,7 @@ function IssueCard({
           </div>
         </div>
       </div>
-    </article>
-
+    </motion.article>
   );
 }
 
@@ -254,8 +274,9 @@ export default function SchoolNewsPage() {
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-        <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
+      <AqeeqLuxuryPageShell
+        header={<AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />}
+      >
         {/* Skeleton Hero */}
         <section className={`border-b py-12 px-5 sm:px-8 animate-pulse ${dark ? "border-white/10 bg-[#080808]" : "border-black/5 bg-slate-50"}`}>
           <div className="mx-auto grid max-w-[1440px] items-center gap-8 md:grid-cols-[1fr_1.1fr]">
@@ -284,24 +305,21 @@ export default function SchoolNewsPage() {
             ))}
           </div>
         </section>
-      </main>
+      </AqeeqLuxuryPageShell>
     );
   }
 
   return (
-
-    <main dir="rtl" className={`min-h-screen aq-public-shell ${
-      isNationalDay
-        ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
-        : dark ? "bg-black text-white" : "bg-white text-black"
-    }`}>
-      {/* Top Header Bar */}
-      <AlaqeeqStudioSiteHeader
-        title="مجلة العقيق"
-        active="journal"
-        logoUrl={featuredIssue?.headerLogoUrl}
-      />
-
+    <AqeeqLuxuryPageShell
+      header={
+        <AlaqeeqStudioSiteHeader
+          title="مجلة العقيق"
+          active="journal"
+          logoUrl={featuredIssue?.headerLogoUrl}
+        />
+      }
+      footer={<AlaqeeqStudioSiteFooter />}
+    >
       {featuredIssue ? (
         <>
           {/* Hero Section */}
@@ -611,7 +629,13 @@ export default function SchoolNewsPage() {
             />
 
             {visibleIssues.length ? (
-              <div className="grid gap-6 lg:grid-cols-2">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-40px" }}
+                className="grid gap-6 lg:grid-cols-2"
+              >
                 {visibleIssues.map((issue, index) => (
                   <IssueCard
                     key={issue.id}
@@ -621,7 +645,7 @@ export default function SchoolNewsPage() {
                     onOpen={() => navigate(`/journal/${issue.slug}`)}
                   />
                 ))}
-              </div>
+              </motion.div>
             ) : (
               <VisualEditable
                 id="journal-search-empty"
@@ -659,8 +683,6 @@ export default function SchoolNewsPage() {
         </section>
       )}
 
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }

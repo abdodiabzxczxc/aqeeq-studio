@@ -17,6 +17,9 @@ import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 
 type ShowcasePost = { id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mediaType: "image" | "video"; sourceType?: "drive" | "manual" | "x" | "instagram" | "youtube"; externalUrl?: string | null; title: string | null; description: string | null; viewCount: number; createdAt?: Date; media?: Array<{ id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mimeType: string; mediaType: "image" | "video" }> };
 type ContentType = "all" | "images" | "videos" | "social";
@@ -155,6 +158,7 @@ function MediaPostCard({
   const [isPlayingInline, setIsPlayingInline] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 3) + 7 : 18);
+  const { ref, tilt, onMove, onLeave } = useMagneticTilt(6);
 
   const active = groupItems[activeIndex] || groupItems[0];
   const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
@@ -187,15 +191,30 @@ function MediaPostCard({
   if (isVideo) {
     return (
       <>
-        <article
+        <motion.article
+          variants={fadeUpSpring}
+          ref={ref}
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          style={{
+            transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+            transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+          }}
           data-aqeeq-video="true"
           data-no-visual-edit="true"
-          className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+          className={`group/card relative mb-6 break-inside-avoid overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
             dark
-              ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] text-white shadow-[0_16px_45px_rgba(99,102,241,0.18)] hover:border-indigo-400/80 hover:shadow-[0_20px_60px_rgba(99,102,241,0.3)]"
-              : "border-indigo-300 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(99,102,241,0.1)] hover:border-indigo-500"
+              ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28]/90 via-[#090b14]/90 to-[#04060c] text-white shadow-[0_16px_45px_rgba(99,102,241,0.18)] hover:border-indigo-400 hover:shadow-[0_22px_65px_rgba(99,102,241,0.35)]"
+              : "border-indigo-300/80 bg-gradient-to-b from-indigo-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(99,102,241,0.1)] hover:border-indigo-500"
           }`}
         >
+          {/* Specular glare following cursor */}
+          <div
+            className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+            style={{
+              background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+            }}
+          />
           {/* Top Bar Header inside Card */}
           <div className="flex items-center justify-between border-b border-indigo-500/20 pb-2.5 mb-3.5">
             <div className="flex items-center gap-1.5">
@@ -294,7 +313,7 @@ function MediaPostCard({
               <ArrowUpLeft size={13} />
             </button>
           </div>
-        </article>
+        </motion.article>
       </>
     );
   }
@@ -302,13 +321,28 @@ function MediaPostCard({
   // 2) PHOTO / GALLERY CARD (لون الذهبي والعنبر الفاخر 📸)
   return (
     <>
-      <article
-        className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+      <motion.article
+        variants={fadeUpSpring}
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{
+          transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+          transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+        }}
+        className={`group/card relative mb-6 break-inside-avoid overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
           dark
-            ? "border-amber-500/35 bg-gradient-to-b from-[#181300] via-[#0e0c04] to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400/80 hover:shadow-[0_20px_60px_rgba(245,158,11,0.25)]"
-            : "border-amber-300 bg-gradient-to-b from-amber-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
+            ? "border-amber-500/35 bg-gradient-to-b from-[#181300]/90 via-[#0e0c04]/90 to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_22px_65px_rgba(245,158,11,0.3)]"
+            : "border-amber-300/80 bg-gradient-to-b from-amber-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
         }`}
       >
+        {/* Specular glare following cursor */}
+        <div
+          className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+          }}
+        />
         {/* Top Bar Header inside Card */}
         <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3.5">
           <div className="flex items-center gap-1.5">
@@ -422,7 +456,7 @@ function MediaPostCard({
             <ArrowUpLeft size={13} />
           </button>
         </div>
-      </article>
+      </motion.article>
 
       {/* Lightbox / Group Modal */}
       <Dialog open={groupOpen} onOpenChange={setGroupOpen}>
@@ -492,6 +526,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
   const isInstagram = post.sourceType === "instagram";
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 2) + 14 : 29);
+  const { ref, tilt, onMove, onLeave } = useMagneticTilt(6);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -506,13 +541,28 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
   };
 
   return (
-    <article
-      className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
+    <motion.article
+      variants={fadeUpSpring}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+      }}
+      className={`group/card relative mb-6 break-inside-avoid overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
         dark
-          ? "border-violet-500/40 bg-gradient-to-b from-[#150926] via-[#0d0718] to-[#04020a] text-white shadow-[0_16px_45px_rgba(139,92,246,0.18)] hover:border-violet-400/80 hover:shadow-[0_20px_60px_rgba(139,92,246,0.28)]"
-          : "border-violet-300 bg-gradient-to-b from-violet-50/70 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(139,92,246,0.08)] hover:border-violet-500"
+          ? "border-violet-500/40 bg-gradient-to-b from-[#150926]/90 via-[#0d0718]/90 to-[#04020a] text-white shadow-[0_16px_45px_rgba(139,92,246,0.18)] hover:border-violet-400 hover:shadow-[0_22px_60px_rgba(139,92,246,0.32)]"
+          : "border-violet-300/80 bg-gradient-to-b from-violet-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(139,92,246,0.08)] hover:border-violet-500"
       }`}
     >
+      {/* Specular glare following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+        }}
+      />
       {/* Top Bar Header inside Card */}
       <div className="flex items-center justify-between border-b border-violet-500/20 pb-2.5 mb-3.5">
         <div className="flex items-center gap-1.5">
@@ -559,7 +609,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
             className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
           />
         ) : (
-          <p className="mt-1 text-xs font-bold text-violet-400/80">من أخبار وعروض العقيق</p>
+          <p className="mt-1 text-xs font-bold text-violet-400/80">من منصات تواصل العقيق الرسمية</p>
         )}
       </div>
 
@@ -597,7 +647,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
           <ArrowUpLeft size={13} />
         </a>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -841,30 +891,33 @@ export default function AqeeqShowcasePage() {
     }
   };
 
-  if (showcaseLoading) return <div className={`grid min-h-screen place-items-center ${dark ? "bg-black text-white" : "bg-white text-black"}`}><Loader2 className="animate-spin text-[#f8ca14]" /></div>;
+  if (showcaseLoading) {
+    return (
+      <AqeeqLuxuryPageShell header={<AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={issues[0]?.headerLogoUrl} />}>
+        <div className="grid min-h-[60vh] place-items-center">
+          <Loader2 className="animate-spin text-[#f8ca14]" size={42} />
+        </div>
+      </AqeeqLuxuryPageShell>
+    );
+  }
 
   if (!showcase) {
     return (
-      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-        <AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={issues[0]?.headerLogoUrl} />
+      <AqeeqLuxuryPageShell header={<AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={issues[0]?.headerLogoUrl} />}>
         <section className="mx-auto max-w-3xl px-5 py-28 text-center">
           <Sparkles className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={48} />
           <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>الأخبار والعروض في الطريق</h1>
           {isAdmin ? <Button onClick={() => navigate("/offers/manage")} className={`mt-7 ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}><Settings2 className="ml-2" size={16} />فتح الاستوديو</Button> : null}
         </section>
-      </main>
+      </AqeeqLuxuryPageShell>
     );
   }
 
   return (
-
-    <main dir="rtl" className={`min-h-screen aq-public-shell ${
-      isNationalDay
-        ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
-        : dark ? "bg-black text-white" : "bg-white text-black"
-    }`}>
-      <AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={showcase.headerLogoUrl || issues[0]?.headerLogoUrl} />
-
+    <AqeeqLuxuryPageShell
+      header={<AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={showcase.headerLogoUrl || issues[0]?.headerLogoUrl} />}
+      footer={<AlaqeeqStudioSiteFooter />}
+    >
       {showcase.backgroundAudioUrl ? <audio ref={audioRef} src={showcase.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
       <UnifiedShowcaseHero
         showcase={showcase}
@@ -894,7 +947,13 @@ export default function AqeeqShowcasePage() {
         </div>
         <AqeeqArchiveControls id="showcase-archive-controls" label="البحث وترتيب الأخبار والعروض" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} typeOptions={typeOptionsWithCounts} activeType={contentType} onTypeChange={(value) => setContentType(value as ContentType)} />
         {visiblePosts.length ? (
-          <div className="columns-1 gap-5 sm:columns-2 xl:columns-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-40px" }}
+            className="columns-1 gap-5 sm:columns-2 xl:columns-3"
+          >
             {visiblePosts.map((post) =>
               isSocialPost(post) ? (
                 <SocialPostCard
@@ -915,7 +974,7 @@ export default function AqeeqShowcasePage() {
                 />
               )
             )}
-          </div>
+          </motion.div>
         ) : (
           <VisualEditable id="showcase-search-empty" tag="text" label="رسالة عدم وجود نتائج للأخبار" defaultText="لا توجد أخبار أو عروض مطابقة للبحث أو الفلتر." as="p" className={`rounded-2xl border border-dashed p-10 text-center text-sm font-black ${
             dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/30 text-[#08467d]"
@@ -988,9 +1047,6 @@ export default function AqeeqShowcasePage() {
           ) : null}
         </DialogContent>
       </Dialog>
-
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }

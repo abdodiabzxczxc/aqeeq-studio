@@ -13,6 +13,9 @@ import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
 
@@ -28,23 +31,43 @@ function directDriveImage(url: string | null) {
 function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: number; onOpen: () => void; dark: boolean }) {
   const { isNationalDay } = useSiteTheme();
   const cover = directDriveImage(album.coverUrl) || album.coverUrl;
+  const { ref, tilt, onMove, onLeave } = useMagneticTilt(8);
+
   return (
-    <article className={`group relative overflow-hidden rounded-[2rem] border p-4 transition duration-300 hover:-translate-y-1 md:p-5 ${
-      isNationalDay
-        ? dark ? "snd-bento-card-dark text-white" : "snd-bento-card-light text-slate-900"
-        : dark
-        ? "border-[#f8ca14]/30 bg-[#080808] text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/60"
-        : "border-[#08467d]/20 bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[#08467d]/50"
-    }`}>
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_45%,rgba(255,255,255,0.03)_46%,transparent_47%)]" />
+    <motion.article
+      variants={fadeUpSpring}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+      }}
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
+        isNationalDay
+          ? dark
+            ? "snd-bento-card-dark text-white hover:border-emerald-500/50 hover:shadow-[0_25px_60px_rgba(0,90,54,0.35)]"
+            : "snd-bento-card-light text-slate-900 hover:border-emerald-500/40 hover:shadow-[0_20px_50px_rgba(0,90,54,0.18)]"
+          : dark
+          ? "border-white/[0.08] bg-[#0c1017]/85 text-white shadow-[0_24px_60px_rgba(0,0,0,0.6)] hover:border-[#f8ca14]/60 hover:shadow-[0_24px_70px_rgba(248,202,20,0.22)]"
+          : "border-black/[0.06] bg-white/90 text-black shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:border-[#08467d]/40 hover:shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
+      }`}
+    >
+      {/* Specular glare following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+        }}
+      />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
-        <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] ${
+        <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] transition duration-500 group-hover:scale-[1.02] ${
           isNationalDay
             ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/15 bg-emerald-50/50"
             : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
         }`} aria-label={`فتح ${album.title}`}>
           {/* Back tilted image — hidden on mobile */}
-          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block ${
+          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
             isNationalDay
               ? dark ? "border-emerald-500/20 bg-[#002617]" : "border-emerald-500/20 bg-emerald-100/60"
               : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
@@ -52,7 +75,7 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
             {cover ? <VisualImage id={`albums-card-back-cover-${album.id}`} label="صورة خلفية بطاقة الألبوم" src={cover} alt="" className="h-full w-full object-cover" /> : null}
           </div>
           {/* Front cover — full on mobile, partial on sm+ */}
-          <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl ${
+          <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
             isNationalDay
               ? dark ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]" : "border-emerald-600/50 bg-white"
               : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
@@ -62,10 +85,10 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
         </button>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-3">
-            <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
+            <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors duration-300 ${
               isNationalDay
                 ? dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
-                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] group-hover:border-[#f8ca14] group-hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] group-hover:border-[#08467d] group-hover:bg-[#08467d]/20"
             }`}>
               <Camera size={18} />
             </div>
@@ -89,7 +112,7 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -157,24 +180,23 @@ export default function AqeeqAlbumsPage() {
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
-        <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />
+      <AqeeqLuxuryPageShell
+        header={<AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />}
+      >
         <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
           <div className="grid gap-6 lg:grid-cols-2">
             {[1, 2, 3, 4].map(i => <AlbumCardSkeleton key={i} dark={dark} />)}
           </div>
         </section>
-      </main>
+      </AqeeqLuxuryPageShell>
     );
   }
 
   return (
-    <main dir="rtl" className={`min-h-screen aq-public-shell ${
-      isNationalDay
-        ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
-        : dark ? "bg-black text-white" : "bg-white text-black"
-    }`}>
-      <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />
+    <AqeeqLuxuryPageShell
+      header={<AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />}
+      footer={<AlaqeeqStudioSiteFooter />}
+    >
       {featuredAlbum ? (
         <>
           <section className={`relative isolate overflow-hidden border-b ${
@@ -309,9 +331,15 @@ export default function AqeeqAlbumsPage() {
             </div>
             <AqeeqArchiveControls id="albums-archive-controls" label="البحث وترتيب الألبومات" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />
             {visibleAlbums.length ? (
-              <div className="grid gap-6 lg:grid-cols-2">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-40px" }}
+                className="grid gap-6 lg:grid-cols-2"
+              >
                 {visibleAlbums.map((album, index) => <AlbumCard key={album.id} album={album} index={index} dark={dark} onOpen={() => navigate(`/albums/${album.slug}`)} />)}
-              </div>
+              </motion.div>
             ) : (
               <VisualEditable id="albums-search-empty" tag="text" label="رسالة عدم وجود نتائج للألبومات" defaultText="لا توجد ألبومات مطابقة للبحث." as="p" className={`rounded-2xl border border-dashed p-8 text-center text-sm font-black ${
                 dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/30 text-[#08467d]"
@@ -347,9 +375,6 @@ export default function AqeeqAlbumsPage() {
       )}
 
       <AqeeqAiYearbookGenerator open={isWrappedOpen} onOpenChange={setIsWrappedOpen} />
-
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }

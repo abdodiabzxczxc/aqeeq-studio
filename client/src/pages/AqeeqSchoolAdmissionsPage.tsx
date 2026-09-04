@@ -2,6 +2,9 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
@@ -372,16 +375,10 @@ export default function AqeeqSchoolAdmissionsPage() {
   };
 
   return (
-    <main
-      dir="rtl"
-      className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        isNationalDay
-          ? dark ? "bg-[#01140c] text-white" : "bg-[#f7fbf9] text-[#032e1d]"
-          : dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
-      }`}
+    <AqeeqLuxuryPageShell
+      header={<AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />}
+      footer={<AlaqeeqStudioSiteFooter />}
     >
-      <AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />
-
       <Dialog open={whatsappConfirmOpen} onOpenChange={setWhatsappConfirmOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -1567,8 +1564,6 @@ export default function AqeeqSchoolAdmissionsPage() {
         </div>
       </section>
 
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
@@ -85,16 +88,10 @@ export default function AqeeqSchoolAboutPage() {
   ];
 
   return (
-    <main
-      dir="rtl"
-      className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        isNationalDay
-          ? dark ? "bg-[#01140c] text-white" : "bg-[#f7fbf9] text-[#032e1d]"
-          : dark ? "bg-[#05080c] text-white" : "bg-[#fbfaf8] text-slate-900"
-      }`}
+    <AqeeqLuxuryPageShell
+      header={<AlaqeeqStudioSiteHeader title="عن مدارس العقيق الأهلية والدولية" active="about" />}
+      footer={<AlaqeeqStudioSiteFooter />}
     >
-      <AlaqeeqStudioSiteHeader title="عن مدارس العقيق الأهلية والدولية" active="about" />
-
       {/* Hero Section: Modern Executive 2-Column Showcase */}
       <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
         isNationalDay
@@ -764,9 +761,7 @@ export default function AqeeqSchoolAboutPage() {
         </div>
       </section>
 
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }
 

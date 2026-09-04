@@ -8,6 +8,9 @@ import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
+import { motion } from "framer-motion";
 
 import {
   Play,
@@ -400,17 +403,10 @@ export default function AqeeqPodcastPage() {
   };
 
   return (
-    <main
-      dir="rtl"
-      className={`min-h-screen aq-public-shell font-[Tajawal,sans-serif] transition-colors duration-200 ${
-        isNationalDay
-          ? dark ? "bg-[#01140c] text-white" : "bg-[#f8faf9] text-slate-900"
-          : dark ? "bg-black text-white" : "bg-[#f8fafc] text-slate-900"
-      }`}
+    <AqeeqLuxuryPageShell
+      header={<AlaqeeqStudioSiteHeader title="أثير العقيق 🎙️" active="podcast" />}
+      footer={<AlaqeeqStudioSiteFooter />}
     >
-      {/* Top Header Bar */}
-      <AlaqeeqStudioSiteHeader title="أثير العقيق 🎙️" active="podcast" />
-
       {/* ==================== 1. 3D TILTED HERO COVER ==================== */}
       <section
         className={`relative isolate overflow-hidden border-b ${
@@ -2481,8 +2477,6 @@ export default function AqeeqPodcastPage() {
         </Dialog>
       )}
 
-      {/* Unified Luxury Site Footer */}
-      <AlaqeeqStudioSiteFooter />
-    </main>
+    </AqeeqLuxuryPageShell>
   );
 }
