@@ -80,7 +80,7 @@ export function AqeeqUnifiedVideoFrame({
     }
 
     let interval: any = null;
-    if ((isYouTube || isDrive) && !isIframePaused) {
+    if (isYouTube && !isIframePaused) {
       let currentProgress = 0;
       interval = setInterval(() => {
         currentProgress += 1;
@@ -203,22 +203,58 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 2) Google Drive Video
-  if (isDrive) {
+  // 2) Google Drive Video (native HTML5 streaming via fast CORS proxy)
+  if (isDrive && driveId) {
+    const streamSrc = `/api/drive-video-proxy/${driveId}`;
     return (
       <div className={`relative ${className}`}>
-        <iframe
-          ref={iframeRef}
+        <video
+          ref={videoRef}
           key={key}
-          src={previewUrl}
+          src={streamSrc}
+          poster={resolvedPoster || undefined}
           title={title}
-          className="h-full w-full border-0"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
+          controls
+          autoPlay
+          playsInline
+          preload="metadata"
+          onPlay={() => {
+            window.dispatchEvent(
+              new CustomEvent("aqeeq-video-start", {
+                detail: {
+                  id: sourceUrl,
+                  title: title || "تغطية مرئية",
+                  coverUrl: resolvedPoster,
+                  hostName: "جوجل درايف",
+                  mediaUrl: sourceUrl,
+                  sourceType: "drive",
+                },
+              })
+            );
+          }}
+          onPause={() => {
+            window.dispatchEvent(new CustomEvent("aqeeq-video-pause"));
+          }}
+          onTimeUpdate={(e) => {
+            window.dispatchEvent(
+              new CustomEvent("aqeeq-video-progress", {
+                detail: {
+                  currentTime: e.currentTarget.currentTime,
+                  duration: e.currentTarget.duration || 0,
+                },
+              })
+            );
+          }}
+          onEnded={() => {
+            window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
+          }}
+          onError={() => setLoadError(true)}
+          className="h-full w-full bg-black object-contain"
         />
       </div>
     );
   }
+
 
   // 3) Direct Native Video
   return (

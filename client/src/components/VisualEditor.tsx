@@ -308,9 +308,10 @@ export function getElementPath(el: Element): string {
 
 function normalizedPath(pathname: string) {
   const path = pathname.split("?")[0];
-  if (path === "/") return "/";
+  if (path === "/" || path === "/studio") return "/";
   return isAqeeqStudioVisualPath(path) || /^\/(?:dashboard|control|scan|live|live\/ideas|news|maison)$/.test(path) || /^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$/.test(path) || /^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|page\/[a-z0-9-]{3,96})$/.test(path) ? path : null;
 }
+
 
 export function resolveBackgroundSource(mediaUrl: string | null | undefined, bgColor: string | null | undefined, fallback?: string) {
   return mediaUrl || (bgColor ? undefined : fallback);
@@ -961,7 +962,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   }, [isEditing, layerMode, overrideMap]);
 
   const selectElement = (elementId: string, elementTag: ElementTag, label: string, additive = false) => {
-    if (!isEditing || !isAdmin || !canManipulateLayer(overrideMap.get(elementId)?.isLocked)) return;
+    if (!isEditing) return;
+    if (!isAdmin) {
+      toast.error("يرجى تسجيل الدخول بحساب المدير لتعديل وحفظ العناصر", {
+        action: {
+          label: "تسجيل الدخول",
+          onClick: () => navigate("/login"),
+        },
+      });
+      return;
+    }
+    if (!canManipulateLayer(overrideMap.get(elementId)?.isLocked)) {
+      toast.info("هذا العنصر مقفل — يمكنك إلغاء القفل من لوحة الطبقات");
+      return;
+    }
     setSelected({ id: elementId, tag: elementTag, label });
     setSelectedIds((current) => additive ? (current.includes(elementId) ? current.filter((id) => id !== elementId) : [...current, elementId]) : [elementId]);
     setAddPanelOpen(false);
@@ -972,15 +986,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setPanelAnchorTop(null);
   };
 
+
   // ── Smart Auto-Detect Engine (المحرر الذكي الشامل) ──────────
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    const isInteractiveOrSystemElement = (node: Element | null): boolean => {
+    // Only exclude editor chrome / drawers / modals
+    const isEditorSystemUi = (node: Element | null): boolean => {
       if (!node) return false;
       return Boolean(
-        node.closest("header") ||
-        node.closest("nav") ||
         node.closest(".aq-editor-toolbar") ||
         node.closest(".aq-editor-drawer") ||
         node.closest("[data-aq-editor-properties]") ||
@@ -989,17 +1003,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         node.closest("[role='menu']") ||
         node.closest("[role='listbox']") ||
         node.closest("[role='tooltip']") ||
-        node.closest(".aq-stories-bubble") ||
-        node.closest("[data-story-item]") ||
-        node.closest(".aq-podcast-player") ||
-        node.closest("[data-podcast-player]") ||
-        node.closest("audio") ||
-        node.closest("form") ||
-        node.closest("button") ||
-        node.closest("a") ||
-        node.closest("input, textarea, select") ||
         node.closest("[data-no-visual-edit]") ||
-        node.closest("[data-mobile-bar]")
+        node.closest("[data-mobile-bar]") ||
+        node.closest("input, textarea, select")
       );
     };
 
@@ -1013,10 +1019,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const root = document.getElementById("root") || document.body;
       if (!root) return;
 
-      // 1. Scan Images (exclude images inside navigation, buttons, player, or dialogs)
+      // 1. Scan Images anywhere on the page (except editor UI)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (isInteractiveOrSystemElement(img)) return;
+        if (isEditorSystemUi(img)) return;
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
@@ -1039,29 +1045,29 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      // 2. Scan Text Elements (headings, paragraphs, blockquotes — NOT interactive buttons or links)
+      // 2. Scan Text Elements (headings, paragraphs, spans, buttons, links, labels, badges)
       const textNodes = Array.from(root.querySelectorAll<HTMLElement>(
-        "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption"
+        "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, span, a, button, label, li, td, th"
       ));
       textNodes.forEach((node, idx) => {
-        if (isInteractiveOrSystemElement(node)) return;
+        if (isEditorSystemUi(node)) return;
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
-        // Check if node has direct text content
+        // Extract direct text content
         const directText = Array.from(node.childNodes)
           .filter((n) => n.nodeType === Node.TEXT_NODE)
           .map((n) => n.textContent || "")
           .join("")
           .trim();
 
-        if (!directText || directText.length < 1 || directText.length > 300) return;
+        if (!directText || directText.length < 1 || directText.length > 500) return;
 
         let id = node.dataset.visualId;
         if (!id) {
           id = `auto-txt-${hashString(directText.slice(0, 30) + idx)}`;
           node.dataset.visualId = id;
           node.dataset.visualTag = "text";
-          node.dataset.visualLabel = directText.slice(0, 20);
+          node.dataset.visualLabel = directText.slice(0, 24);
           node.dataset.visualAuto = "true";
         }
 
@@ -1077,12 +1083,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         if (override?.textColor && node.style.color !== override.textColor) {
           node.style.color = override.textColor;
         }
+        if (override?.fontSize && node.style.fontSize !== override.fontSize) {
+          node.style.fontSize = override.fontSize;
+        }
       });
 
-      // 3. Scan SVG Icons (only content icons, not button or navigation icons)
+      // 3. Scan SVG Icons anywhere on the page
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (isInteractiveOrSystemElement(svg)) return;
+        if (isEditorSystemUi(svg)) return;
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
@@ -1108,18 +1117,58 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (!isEditing || previewMode) return;
       if (e.metaKey || e.ctrlKey) return;
       const targetEl = e.target as Element | null;
-      if (!targetEl || isInteractiveOrSystemElement(targetEl)) return;
+      if (!targetEl || isEditorSystemUi(targetEl)) return;
 
-      const target = targetEl.closest<HTMLElement>("[data-visual-auto='true']");
-      if (target && !target.closest(".aq-editor-toolbar") && !target.closest(".aq-editor-drawer")) {
+      // 1. First priority: explicit visual element
+      const visualEl = targetEl.closest<HTMLElement>("[data-visual-id]");
+      if (visualEl && !isEditorSystemUi(visualEl)) {
         e.preventDefault();
         e.stopPropagation();
-        const autoId = target.dataset.visualId;
-        const autoTag = target.dataset.visualTag as ElementTag;
-        const autoLabel = target.dataset.visualLabel || "عنصر ذكي";
+        const id = visualEl.dataset.visualId!;
+        const tag = (visualEl.dataset.visualTag || "text") as ElementTag;
+        const label = visualEl.dataset.visualLabel || id;
+        selectElement(id, tag, label);
+        return;
+      }
+
+      // 2. Second priority: auto-tagged element
+      const autoTarget = targetEl.closest<HTMLElement>("[data-visual-auto='true']");
+      if (autoTarget && !isEditorSystemUi(autoTarget)) {
+        e.preventDefault();
+        e.stopPropagation();
+        const autoId = autoTarget.dataset.visualId;
+        const autoTag = (autoTarget.dataset.visualTag || "text") as ElementTag;
+        const autoLabel = autoTarget.dataset.visualLabel || "عنصر ذكي";
         if (autoId && autoTag) {
           selectElement(autoId, autoTag, autoLabel);
+          return;
         }
+      }
+
+      // 3. Third priority: direct image or svg or text click
+      if (targetEl.tagName === "IMG") {
+        const img = targetEl as HTMLImageElement;
+        e.preventDefault();
+        e.stopPropagation();
+        const id = img.dataset.visualId || `auto-img-${hashString((img.src || "") + (img.alt || ""))}`;
+        img.dataset.visualId = id;
+        img.dataset.visualTag = "image";
+        img.dataset.visualLabel = img.alt || "صورة";
+        img.dataset.visualAuto = "true";
+        selectElement(id, "image", img.dataset.visualLabel);
+        return;
+      }
+      if (targetEl.tagName === "svg" || targetEl.closest("svg")) {
+        const svg = (targetEl.tagName === "svg" ? targetEl : targetEl.closest("svg")) as unknown as HTMLElement;
+        e.preventDefault();
+        e.stopPropagation();
+        const id = svg.dataset?.visualId || `auto-icon-${hashString(svg.getAttribute?.("class") || "icon")}`;
+        svg.dataset.visualId = id;
+        svg.dataset.visualTag = "icon";
+        svg.dataset.visualLabel = "أيقونة";
+        svg.dataset.visualAuto = "true";
+        selectElement(id, "icon", "أيقونة");
+        return;
       }
     };
 
@@ -1137,7 +1186,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
-  }, [isEditing, previewMode, overrideMap, pagePath]);
+  }, [isEditing, previewMode, overrideMap, pagePath, isAdmin]);
+
 
   const saveLayer = (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => {
     if (!pagePath) return;
@@ -1454,15 +1504,35 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       ...current,
       ...Object.fromEntries(sharedTargets.map((elementId) => [`${pagePath}::${elementId}`, { ...optimisticOverride, elementId }])),
     }));
+    // Immediate direct DOM update for instant live responsiveness
+    const domNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+    if (domNode) {
+      if (payload.contentText !== null && payload.contentText !== undefined) {
+        const textChild = Array.from(domNode.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
+        if (textChild) textChild.textContent = payload.contentText;
+        else domNode.textContent = payload.contentText;
+      }
+      if (payload.mediaUrl && domNode.tagName === "IMG") {
+        (domNode as HTMLImageElement).src = payload.mediaUrl;
+      }
+      if (payload.textColor) {
+        domNode.style.color = payload.textColor;
+      }
+      if (payload.fontSize) {
+        domNode.style.fontSize = payload.fontSize;
+      }
+    }
+
     let savedCount = 0;
     sharedTargets.forEach((elementId) => {
       save.mutate({ ...payload, elementId: elementId as Parameters<typeof save.mutate>[0]["elementId"] }, {
         onSuccess: () => {
           publish.mutate({ pagePath, elementId: elementId as Parameters<typeof publish.mutate>[0]["elementId"] });
           savedCount += 1;
-          if (savedCount === sharedTargets.length) toast.success(isSharedHeroBackground(selected.id) ? "تم تطبيق خلفية الغلاف ونشرها للهاتف واللابتوب" : "تم تطبيق التعديل ونشره فوراً على الصفحة");
+          if (savedCount === sharedTargets.length) toast.success(isSharedHeroBackground(selected.id) ? "تم تطبيق خلفية الغلاف ونشرها للهاتف واللابتوب" : "تم حفظ التعديل ونشره فوراً على الصفحة");
         },
-        onError: () => {
+        onError: (err) => {
+          toast.error(err.message || "تعذر حفظ التعديل");
           setLocalOverrides((current) => {
             const next = { ...current };
             sharedTargets.forEach((target) => delete next[`${pagePath}::${target}`]);
@@ -1472,6 +1542,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       });
     });
   };
+
 
   const restoreSelectedOrigin = () => {
     if (!pagePath || !selected) return;
@@ -1520,15 +1591,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   };
 
   const selectMediaForDraft = (asset: { url: string; altText: string | null }) => {
-    if (shouldConfirmMediaReplacement(draft.mediaUrl, asset.url)) {
-      setPendingMediaAsset(asset);
-      setMediaLibraryOpen(false);
-      return;
-    }
     draftPreviewEnabled.current = true;
     stageSelectedBackground({ mediaUrl: asset.url, altText: asset.altText || draft.altText });
     setMediaLibraryOpen(false);
+    toast.success("تم اختيار الصورة كمعاينة مباشرة — اضغط «حفظ ونشر التعديل» لتطبيقها");
   };
+
 
   const confirmMediaReplacement = () => {
     if (!pendingMediaAsset) return;
@@ -2479,18 +2547,35 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
 export function VisualImage({ id, label, src, alt, className = "", linkUrl, style }: { id: string; label: string; src: string; alt: string; className?: string; linkUrl?: string; style?: React.CSSProperties }) {
   const { getOverride } = useContext(VisualEditorContext);
   const override = getOverride(id);
-  const resolvedSrc = override?.mediaUrl || src;
-  const resolvedAlt = override?.altText || alt;
-  const resolvedLink = override?.linkUrl || linkUrl;
-  const opensInNewTab = parseLayerBehavior(override?.customCss).openInNewTab;
-  const alignmentClass = override?.alignment === "start" ? "mr-0 ml-auto" : override?.alignment === "end" ? "ml-0 mr-auto" : override?.alignment === "stretch" ? "w-full" : "mx-auto";
+  const cachedOverride = useMemo(() => {
+    if (override?.mediaUrl) return override;
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("aqeeq-overrides-/");
+        if (raw) {
+          const list = JSON.parse(raw);
+          const found = list.find((item: any) => item.elementId === id);
+          if (found) return found;
+        }
+      }
+    } catch {}
+    return null;
+  }, [override, id]);
+
+  const activeOverride = override || cachedOverride;
+  const resolvedSrc = activeOverride?.mediaUrl || src;
+  const resolvedAlt = activeOverride?.altText || alt;
+  const resolvedLink = activeOverride?.linkUrl || linkUrl;
+  const opensInNewTab = parseLayerBehavior(activeOverride?.customCss).openInNewTab;
+  const alignmentClass = activeOverride?.alignment === "start" ? "mr-0 ml-auto" : activeOverride?.alignment === "end" ? "ml-0 mr-auto" : activeOverride?.alignment === "stretch" ? "w-full" : "mx-auto";
   const isBrandMark = /(?:logo|شعار|brand)/i.test(`${id} ${label}`);
-  const imageTransform = !isBrandMark && override?.backgroundSize && override.backgroundSize !== 100 ? `scale(${override.backgroundSize / 100})` : undefined;
+  const imageTransform = !isBrandMark && activeOverride?.backgroundSize && activeOverride.backgroundSize !== 100 ? `scale(${activeOverride.backgroundSize / 100})` : undefined;
   const fillHeight = /(?:^|\s)h-full(?:\s|$)/.test(className);
   const fillWidth = /(?:^|\s)w-full(?:\s|$)/.test(className);
-  const image = <img src={resolvedSrc} alt={resolvedAlt} referrerPolicy="no-referrer" className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"}`} style={isBrandMark ? style : { ...style, objectPosition: `${override?.backgroundPositionX ?? 50}% ${override?.backgroundPositionY ?? 50}%`, transform: imageTransform, transformOrigin: `${override?.backgroundPositionX ?? 50}% ${override?.backgroundPositionY ?? 50}%` }} />;
+  const image = <img src={resolvedSrc} alt={resolvedAlt} referrerPolicy="no-referrer" className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"}`} style={isBrandMark ? style : { ...style, objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`, transform: imageTransform, transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%` }} />;
   return <VisualEditable id={id} tag="image" label={label} as="div" className={visualImageWrapperClassName(className, isBrandMark)}>{resolvedLink ? <a href={resolvedLink} target={opensInNewTab ? "_blank" : undefined} rel={opensInNewTab ? "noopener noreferrer" : undefined} className={`${fillHeight ? "block h-full" : ""} ${fillWidth ? "w-full" : ""}`}>{image}</a> : image}</VisualEditable>;
 }
+
 
 export function VisualIcon({ id, label, icon = "sparkles", className = "", size = 20 }: { id: string; label: string; icon?: string; className?: string; size?: number }) {
   const { getOverride } = useContext(VisualEditorContext);

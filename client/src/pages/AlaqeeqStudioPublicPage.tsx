@@ -104,12 +104,17 @@ function StudioCardImage({
   alt: string;
   imageClassName?: string;
 }) {
+  const { getOverride } = useVisualEditorState();
+  const override = getOverride(id);
+  const resolvedSrc = override?.mediaUrl || src;
+  const resolvedAlt = override?.altText || alt;
   return (
     <VisualEditable id={id} tag="image" label={label} as="span" className="absolute inset-0 block overflow-hidden">
-      <img src={src} alt={alt} className={"h-full w-full " + imageClassName} />
+      <img src={resolvedSrc} alt={resolvedAlt} className={"h-full w-full " + imageClassName} />
     </VisualEditable>
   );
 }
+
 
 function ArchiveCard({
   id,

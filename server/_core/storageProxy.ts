@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import fs from "node:fs";
 import path from "node:path";
+import { Readable } from "node:stream";
 
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
 
@@ -367,26 +368,15 @@ function evictOldestAudio() {
       if (contentRange) res.setHeader("Content-Range", contentRange);
 
       if (finalRes.body) {
-        const reader = finalRes.body.getReader();
-        const pump = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                res.end();
-                break;
-              }
-              res.write(value);
-            }
-          } catch {
-            res.end();
-          }
-        };
-        await pump();
+        const stream = Readable.fromWeb(finalRes.body as any);
+        req.on("close", () => {
+          stream.destroy();
+        });
+        stream.pipe(res);
       } else {
-        const buf = Buffer.from(await finalRes.arrayBuffer());
-        res.send(buf);
+        res.status(502).send("No video body returned");
       }
+
     } catch (err) {
       console.warn("[DriveVideoProxy] Video streaming error:", err);
       res.redirect(`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`);
