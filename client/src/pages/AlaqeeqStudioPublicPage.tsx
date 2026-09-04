@@ -1121,9 +1121,11 @@ export default function AlaqeeqStudioPublicPage() {
                   navigate("/offers");
                 }}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (isEditorActive ? select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار") : navigate("/offers"))}
-                className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border cursor-pointer will-change-transform transition-all duration-300 " + (
+                className={"group absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border cursor-pointer will-change-transform transition-all duration-300 " + (
                   isEditorActive
-                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#6565e0] opacity-100 shadow-2xl"
+                    ? selectedId === "studio-hero-showcase-image"
+                      ? "z-30 ring-2 ring-[#6565e0] opacity-100 shadow-2xl scale-[1.04]"
+                      : "z-0 opacity-80 hover:opacity-100 hover:scale-[1.03] hover:ring-2 hover:ring-[#6565e0]/80"
                     : "z-0 opacity-75 hover:opacity-100 hover:scale-[1.03] duration-500 "
                 ) + (
                   isNationalDay
@@ -1140,7 +1142,7 @@ export default function AlaqeeqStudioPublicPage() {
                   className="h-full w-full object-cover"
                 />
                 {isEditorActive ? (
-                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#6565e0] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                  <div className={`absolute top-2.5 left-2.5 z-40 bg-[#6565e0] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none transition-opacity duration-200 ${selectedId === "studio-hero-showcase-image" ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                     <span>📰 غلاف الأخبار</span>
                   </div>
                 ) : isNationalDay ? (
@@ -1174,7 +1176,9 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 className={"group absolute bottom-[8%] left-[28%] top-[8%] w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 will-change-transform " + (
                   isEditorActive
-                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#5aba1c] shadow-2xl"
+                    ? selectedId === "studio-hero-album-image"
+                      ? "z-30 ring-2 ring-[#5aba1c] shadow-2xl scale-[1.04]"
+                      : "z-10 hover:scale-[1.03] hover:ring-2 hover:ring-[#5aba1c]/80"
                     : "z-10 hover:scale-[1.02]"
                 ) + " " + (
                   isNationalDay
@@ -1192,7 +1196,7 @@ export default function AlaqeeqStudioPublicPage() {
                   className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
                 />
                 {isEditorActive ? (
-                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#5aba1c] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                  <div className={`absolute top-2.5 left-2.5 z-40 bg-[#5aba1c] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none transition-opacity duration-200 ${selectedId === "studio-hero-album-image" ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                     <span>📸 غلاف الألبومات</span>
                   </div>
                 ) : isNationalDay ? (
@@ -1226,7 +1230,9 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 className={"group absolute bottom-[2%] left-[1%] top-[5%] w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 will-change-transform " + (
                   isEditorActive
-                    ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#f8ca14] shadow-2xl"
+                    ? selectedId === "studio-hero-journal-image"
+                      ? "z-30 ring-2 ring-[#f8ca14] shadow-2xl scale-[1.04]"
+                      : "z-20 hover:scale-[1.03] hover:ring-2 hover:ring-[#f8ca14]/80"
                     : "z-20 hover:scale-[1.02]"
                 ) + " " + (
                   isNationalDay
@@ -1246,7 +1252,7 @@ export default function AlaqeeqStudioPublicPage() {
                   className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
                 />
                 {isEditorActive ? (
-                  <div className="absolute top-2.5 left-2.5 z-40 bg-[#f8ca14] text-black text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
+                  <div className={`absolute top-2.5 left-2.5 z-40 bg-[#f8ca14] text-black text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none transition-opacity duration-200 ${selectedId === "studio-hero-journal-image" ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                     <span>📘 غلاف المجلة</span>
                   </div>
                 ) : isNationalDay ? (
