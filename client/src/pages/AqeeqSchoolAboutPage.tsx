@@ -33,7 +33,139 @@ import {
   Milestone,
   Check,
   ExternalLink,
+  ChevronRight,
+  ChevronLeft,
+  Calendar,
+  Layers,
+  Activity,
+  BadgeCheck,
+  Bus,
+  Navigation,
+  Globe,
 } from "lucide-react";
+
+// ==========================================
+// 1. PillarCard with 3D Tilt & Specular Physics
+// ==========================================
+function PillarCard({
+  pillar,
+  index,
+  dark,
+}: {
+  pillar: {
+    icon: any;
+    title: string;
+    desc: string;
+    badge: string;
+    subPoints: string[];
+  };
+  index: number;
+  dark: boolean;
+}) {
+  const { isNationalDay } = useSiteTheme();
+  const { ref, tilt, onMove, onLeave } = useMagneticTilt(8);
+  const [expanded, setExpanded] = useState(false);
+  const Icon = pillar.icon;
+
+  return (
+    <motion.div
+      variants={fadeUpSpring}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
+      }}
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-6 sm:p-7 backdrop-blur-2xl transition duration-300 will-change-transform flex flex-col justify-between ${
+        isNationalDay
+          ? dark
+            ? "border-emerald-500/25 bg-[#07170f]/90 text-white shadow-[0_20px_50px_rgba(0,90,54,0.3)] hover:border-emerald-400/50"
+            : "border-emerald-600/20 bg-white/95 text-slate-900 shadow-[0_15px_40px_rgba(0,90,54,0.08)] hover:border-emerald-600/40"
+          : dark
+          ? "border-white/[0.08] bg-[#0c1218]/90 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/50 hover:shadow-[0_20px_50px_rgba(248,202,20,0.15)]"
+          : "border-black/[0.06] bg-white/95 text-black shadow-[0_15px_35px_rgba(0,0,0,0.04)] hover:border-[#015a37]/35 hover:shadow-[0_15px_35px_rgba(1,90,55,0.1)]"
+      }`}
+    >
+      {/* Specular glare following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+        }}
+      />
+
+      {/* Giant Holographic Number in Background */}
+      <span
+        className={`pointer-events-none absolute -left-2 -bottom-4 select-none font-black text-7xl sm:text-8xl leading-none transition duration-500 group-hover:scale-105 ${
+          dark ? "text-white/[0.04] group-hover:text-[#f8ca14]/[0.08]" : "text-black/[0.03] group-hover:text-[#015a37]/[0.06]"
+        }`}
+      >
+        0{index + 1}
+      </span>
+
+      <div>
+        {/* Top Header with Icon & Badge */}
+        <div className="flex items-center justify-between mb-5 relative z-10">
+          <div
+            className={`grid h-14 w-14 place-items-center rounded-2xl border transition duration-500 group-hover:scale-110 shadow-sm ${
+              dark
+                ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                : "border-[#015a37]/20 bg-[#015a37]/10 text-[#015a37]"
+            }`}
+          >
+            <Icon size={26} />
+          </div>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-black border backdrop-blur-md ${
+              dark
+                ? "border-white/10 bg-white/5 text-slate-300"
+                : "border-black/5 bg-slate-100 text-slate-700"
+            }`}
+          >
+            {pillar.badge}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h4 className={`text-xl sm:text-2xl font-black mb-3 relative z-10 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+          {pillar.title}
+        </h4>
+
+        {/* Description */}
+        <p className={`text-xs sm:text-sm leading-relaxed mb-4 relative z-10 font-medium ${dark ? "text-slate-300" : "text-slate-600"}`}>
+          {pillar.desc}
+        </p>
+
+        {/* Subpoints List */}
+        {expanded && (
+          <div className="mt-4 pt-4 border-t border-white/10 space-y-2 relative z-10 animate-in fade-in">
+            {pillar.subPoints.map((pt, pIdx) => (
+              <div key={pIdx} className="flex items-start gap-2 text-xs font-bold">
+                <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                <span className={dark ? "text-slate-200" : "text-slate-800"}>{pt}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Expand / Details Button */}
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className={`mt-4 pt-3 border-t text-xs font-black flex items-center justify-between transition relative z-10 ${
+          dark
+            ? "border-white/10 text-[#f8ca14] hover:text-white"
+            : "border-black/10 text-[#015a37] hover:text-emerald-700"
+        }`}
+      >
+        <span>{expanded ? "طي التفاصيل" : "استكشف أبعاد الركيزة ✦"}</span>
+        <ChevronRight size={15} className={`transition-transform duration-300 ${expanded ? "-rotate-90" : "rotate-0"}`} />
+      </button>
+    </motion.div>
+  );
+}
 
 export default function AqeeqSchoolAboutPage() {
   const { theme } = useAqeeqStudioTheme();
@@ -42,7 +174,11 @@ export default function AqeeqSchoolAboutPage() {
   const [, navigate] = useLocation();
 
   const [activeCampusTab, setActiveCampusTab] = useState<"boys" | "girls">("boys");
+  const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
   const [activeTimelineIndex, setActiveTimelineIndex] = useState<number>(3);
+
+  // 3D Tilt for Hero Showcase Card
+  const { ref: heroCardRef, tilt: heroTilt, onMove: onHeroMove, onLeave: onHeroLeave } = useMagneticTilt(6);
 
   const pillars = [
     {
@@ -50,43 +186,254 @@ export default function AqeeqSchoolAboutPage() {
       title: "نُلهـــم الأجيــــــــال",
       desc: "نقدّم تعليماً نوعياً يُرسّخ المعرفة، ويُنمّي التفكير، ويُحفّز التعلّم المستمر، ليمنح طلابنا أساساً علمياً راسخاً، ويُهيئهم لمواصلة رحلتهم التعليمية بثقة وتميّز.",
       badge: "التعليم النوعي",
+      subPoints: [
+        "معايير أكاديمية معتمدة من كوجنيا (Cognia الأمريكية)",
+        "كوادر تعليمية وتربوية ذات كفاءة وخبرة عالية",
+        "تكامل بين أصالة اللغة والقيم والعلوم العصرية",
+      ],
     },
     {
       icon: Compass,
       title: "نُنمّـــــي القـــــدرات",
       desc: "نُمكّن طلابنا من اكتشاف إمكاناتهم، وتنمية مهاراتهم، وتوسيع آفاقهم، من خلال تجارب تعلّم حديثة تُعزّز الابتكار، وتُرسّخ التفكير النقدي، وتُهيئهم لمهارات المستقبل.",
       badge: "مهارات المستقبل",
+      subPoints: [
+        "مناهج الذكاء الاصطناعي والروبوت والبرمجة من المراحل المبكرة",
+        "مختبرات ذكية مجهزة لمحاكاة بيئات العمل والابتكار",
+        "أنشطة صقل الشخصية والخطابة والمناظرات الطلابية",
+      ],
     },
     {
       icon: Award,
       title: "نحتفــــي بالتميّـــــز",
       desc: "نُمكّن طلابنا من تحقيق التميّز عبر بيئة تعليمية داعمة تُعزّز الإنجاز، وتفتح آفاق المشاركة في المنافسات المحلية والدولية، ليقدّموا نماذج مشرّفة تعكس قدراتهم وطموحاتهم.",
       badge: "الإنجاز والريادة",
+      subPoints: [
+        "المركز الخامس عالمياً في أولمبياد الروبوت الدولي (WRO)",
+        "مراكز معتمدة لاختبارات IELTS و SAT بالمدينة المنورة",
+        "حصد جوائز التميز الوزارية والمحلية سنوياً",
+      ],
     },
     {
       icon: Target,
       title: "نصنــــع الأثـــــــــر",
       desc: "نُهيّئ طلابنا لمستقبل واعد، من خلال بناء المعرفة، وتنمية المهارات، وترسيخ القيم، ليصنعوا أثراً مستداماً، ويقودوا مستقبلهم بثقة وطموح متوافق مع رؤية المملكة 2030.",
-      badge: "أثر مستدام",
+      badge: "أثر مستدام 2030",
+      subPoints: [
+        "أكثر من 10,000 خريج وخريجة يخدمون الوطن في كافة المجالات",
+        "برامج ريادة الأعمال والمسؤولية المجتمعية التطوعية",
+        "مواءمة مستمرة مع مستهدفات برنامج تنمية القدرات البشرية",
+      ],
     },
   ];
 
-  const campuses = [
+  const timelineEras = [
     {
-      name: "مجمع البنين — مدارس العقيق الأهلية والدولية",
-      location: "المدينة المنورة — حي الرانوناء (ممشى الهجرة)",
-      stages: "الابتدائي · المتوسط · الثانوي (أهلي ودولي)",
-      facilities: "معامل حاسوب وذكاء اصطناعي، مسبح أولمبي مغطى، صالة رياضية، قاعات اختبارات دولية SAT و IELTS.",
-      phone: "+966 14 813 1652",
+      year: "1994 م — 1415 هـ",
+      shortYear: "1994",
+      label: "التأسيس والانطلاقة",
+      title: "غراس البدايات وتأسيس أول مجمع تعليمي بالمدينة المنورة",
+      desc: "انطلقت مدارس العقيق برؤية واضحة لتكون نموذجاً تعليمياً وتربوياً فريداً بطيبة الطيبة. بدأت المدارس بتأسيس المراحل التأسيسية وتخريج أجيال متمكنة في القرآن الكريم واللغة والعلوم، وتكريس منظومة القيم الأخلاقية الأصيلة.",
+      highlight: "نواة التميز والانطلاقة الأولى بالمدينة المنورة",
+      stats: "أكثر من 30 دفعة تخرجت منذ التأسيس",
+      image: "/covers/cover-about.jpg",
+      quote: "ثلاثون عاماً من غراس الخير في طيبة الطيبة، خرجت أجيالاً تقود الحاضر وتصنع المستقبل.",
+      metrics: [
+        { label: "سنة التأسيس", val: "1415 هـ / 1994 م" },
+        { label: "الدفعة الأولى", val: "أول صرح متكامل" },
+        { label: "الموقع الأصلي", val: "طيبة الطيبة" },
+      ],
     },
     {
-      name: "مجمع البنات — مدارس العقيق الأهلية والدولية",
-      location: "المدينة المنورة — حي الرانوناء (ممشى الهجرة)",
-      stages: "رياض الأطفال والطفولة المبكرة · الابتدائي · المتوسط · الثانوي",
-      facilities: "بيئة تعليمية وتربوية رائدة، معامل ذكية، مسرح احتفالات مدرسي، ساحات وملاعب آمنة ومظللة.",
-      phone: "+966 14 864 4466",
+      year: "2010 م — 1431 هـ",
+      shortYear: "2010",
+      label: "المجمعات والمسابح",
+      title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
+      desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل ومجمع البنات في حي الرانوناء بمحاذاة ممشى الهجرة، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
+      highlight: "مجمعات صرحية مستقلة بمواصفات هندسية وتعليمية قياسية",
+      stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
+      image: "/covers/student-lab-admissions.jpg",
+      quote: "صروح معمارية مستقلة صُممت لتكون بيئة حياة ونمو متكامل للطالب فكرياً وبدنياً.",
+      metrics: [
+        { label: "المساحة الإنشائية", val: "مجمعات نموذجية" },
+        { label: "المسابح المغطاة", val: "شبه أولمبية بمقاييس دولية" },
+        { label: "الصالات", val: "ملاعب عشبية وقاعات جمباز" },
+      ],
+    },
+    {
+      year: "2018 م — 1439 هـ",
+      shortYear: "2018",
+      label: "اعتماد كوجنيا (Cognia)",
+      title: "الاعتماد الأكاديمي الأمريكي من منظمة كوجنيا (Cognia USA)",
+      desc: "توجت مسيرة الجودة بحصول مدارس العقيق على الاعتماد الدولي الأمريكي من كوجنيا، ليصبح خريجو المدارس مؤهلين للحصول على شهادة الدبلومة الأمريكية المعتمدة دولياً، بالتزامن مع إطلاق نوادي وأكاديميات الروبوت والابتكار.",
+      highlight: "الريادة في التعليم الدولي والحوكمة الأكاديمية",
+      stats: "تقييم جودة معتمد عالمياً بنسبة تفوق 98%",
+      image: "/covers/cover-accreditations.jpg",
+      quote: "شهادة عالمية تؤكد أن ما نقدمه لأبنائنا يضاهي أرقى المعايير التعليمية في العالم.",
+      metrics: [
+        { label: "جهة الاعتماد", val: "Cognia USA العالمية" },
+        { label: "الشهادة الممنوحة", val: "American Diploma" },
+        { label: "نسبة التحقيق", val: "+98% معايير الجودة" },
+      ],
+    },
+    {
+      year: "2024 - 2026 م",
+      shortYear: "2026",
+      label: "مراكز الاختبارات والـ AI",
+      title: "اعتماد مراكز IELTS و SAT الدولية ومنظومة الذكاء الاصطناعي",
+      desc: "العصر الرقمي والريادة العالمية: اعتماد مدارس العقيق كمركز رسمي لاختبارات IELTS IDP و SAT بالمدينة المنورة، مع تتويج الطلاب بالمركز الخامس عالمياً في أولمبياد الروبوت WRO، وتكامل المناهج مع الذكاء الاصطناعي والتحول الرقمي.",
+      highlight: "مركز اختبارات دولي معتمد وحضور عالمي في منافسات الـ AI",
+      stats: "المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO",
+      image: "/covers/first-lego-champions.png",
+      quote: "من طيبة الطيبة إلى منصات التتويج العالمية، أبناؤنا ينافسون ويحصدون المراكز الأولى دولياً.",
+      metrics: [
+        { label: "مراكز الاختبارات", val: "IDP IELTS & SAT Official" },
+        { label: "أولمبياد الروبوت", val: "5th Globally WRO" },
+        { label: "الرؤية المستقبلية", val: "متوافقة 100% مع رؤية 2030" },
+      ],
     },
   ];
+
+  const campusFacilities = {
+    boys: [
+      {
+        id: "pool",
+        name: "المسبح شبه الأولمبي المغطى",
+        tag: "رياضة ولياقة احترافية",
+        image: "/covers/student-lab-admissions.jpg",
+        desc: "مسبح مغطى ومكيف بمواصفات قياسية وتدفئة مياه شتوية، يشرف عليه كباتن سباحة معتمدون، مخصص لتدريب الطلاب من المراحل الأولية وحتى الثانوية.",
+        specs: [
+          { label: "المقاييس", val: "شبه أولمبي مغطى" },
+          { label: "السلامة", val: "منقذون معتمدون 100%" },
+          { label: "المراحل", val: "الابتدائي، المتوسط، الثانوي" },
+          { label: "التدفئة", val: "أنظمة تحكم حراري ذكية" },
+        ],
+      },
+      {
+        id: "robotics",
+        name: "معامل الذكاء الاصطناعي والروبوت (WRO)",
+        tag: "الابتكار الرقمي والـ AI",
+        image: "/covers/student-robotics-accreditations.jpg",
+        desc: "بيئة تكنولوجية متكاملة مزودة بأحدث حقائب الروبوت والذكاء الاصطناعي، ومحطات البرمجة 1:1، حيث حصد طلابنا المركز الخامس عالمياً في أولمبياد الروبوت الدولي.",
+        specs: [
+          { label: "الإنجاز", val: "المركز الخامس عالمياً WRO" },
+          { label: "التجهيز", val: "أجهزة حاسوب ذكية 1:1" },
+          { label: "المسار", val: "بايثون، C++، ميكاترونيكس" },
+          { label: "الاعتماد", val: "شراكات تقنية متقدمة" },
+        ],
+      },
+      {
+        id: "testing",
+        name: "قاعات مراكز اختبارات IELTS و SAT الدولية",
+        tag: "الاعتماد الدولي",
+        image: "/covers/cover-accreditations.jpg",
+        desc: "قاعات رسمية معتمدة لاختبارات اللغة الإنجليزية IELTS بالشراكة مع IDP، واختبارات القبول للجامعات الأمريكية والدولية SAT، لتأهيل الطلاب لأرقى الجامعات.",
+        specs: [
+          { label: "الشريك", val: "IDP IELTS & College Board" },
+          { label: "التجهيز", val: "أنظمة مراقبة وصوتيات دولية" },
+          { label: "الاعتماد", val: "كوجنيا الأمريكية Cognia" },
+          { label: "الخدمة", val: "مركز معتمد بالمدينة المنورة" },
+        ],
+      },
+      {
+        id: "sports",
+        name: "الصالات الرياضية وملاعب العشب الصناعي",
+        tag: "الأنشطة وبناء الجسم",
+        image: "/covers/cover-about.jpg",
+        desc: "ملاعب كرة قدم بنجيل صناعي معتمد ومضاء بأبراج كاشفة، إلى جانب صالات جمباز وملاعب كرة طائرة وسلة وصالة كاراتيه للياقة البدنية المتكاملة.",
+        specs: [
+          { label: "الملاعب", val: "عشب صناعي + صالات مغلقة" },
+          { label: "الألعاب", val: "كرة قدم، سلة، طائرة، كاراتيه" },
+          { label: "الإضاءة", val: "أبراج كاشفة متكاملة" },
+          { label: "البرامج", val: "دوري المدارس والبطولات" },
+        ],
+      },
+      {
+        id: "labs",
+        name: "المختبرات العلمية الذكية",
+        tag: "التجربة والتطبيق العملي",
+        image: "/covers/student-excellence-about.jpg",
+        desc: "مختبرات فيزياء وكيمياء وأحياء مجهزة بأحدث أدوات السلامة والمجاهر الرقمية وشاشات العرض التفاعلية لربط المنهج النظري بالتطبيق العملي المعملي.",
+        specs: [
+          { label: "التخصصات", val: "فيزياء · كيمياء · أحياء" },
+          { label: "السلامة", val: "معايير بيئية وصحية قياسية" },
+          { label: "العرض", val: "شاشات لمس تفاعلية ذكية" },
+          { label: "التطبيق", val: "تجارب أسبوعية منتظمة" },
+        ],
+      },
+    ],
+    girls: [
+      {
+        id: "early-childhood",
+        name: "أقسام الطفولة المبكرة والروضة",
+        tag: "غراس البدايات السعيدة",
+        image: "/covers/student-excellence-about.jpg",
+        desc: "بيئة تعليمية وتربوية تفاعلية مصممة خصيصاً للأطفال لتنمية مهارات التفكير، والاستكشاف الحركي واللغوي، بإشراف معلمات متخصصات في رياض الأطفال.",
+        specs: [
+          { label: "الفئة", val: "الروضة والتمهيدي والطفولة المبكرة" },
+          { label: "المناهج", val: "منتسوري وتنمية الذكاءات المتعددة" },
+          { label: "الأمان", val: "أرضيات مطاطية وألعاب آمنة" },
+          { label: "الرعاية", val: "عيادة مدرسية وإشراف صحي" },
+        ],
+      },
+      {
+        id: "theater",
+        name: "مسرح الاحتفالات وقاعات الإبداع والخطابة",
+        tag: "بناء الشخصية والقيادة",
+        image: "/covers/cover-about.jpg",
+        desc: "مسرح مدرسي صرحي مجهز بأحدث أنظمة الصوت والإضاءة الرقمية، لاحتضان الفعاليات والملتقيات، مسابقات الإلقاء، والمؤتمرات الطلابية باللغتين العربية والإنجليزية.",
+        specs: [
+          { label: "السعة", val: "قاعة كبرى للمناسبات" },
+          { label: "التقنية", val: "أنظمة صوتية وضوئية سينمائية" },
+          { label: "الأنشطة", val: "الخطابة والمسرح والمعارض" },
+          { label: "الخصوصية", val: "بيئة نسائية متكاملة" },
+        ],
+      },
+      {
+        id: "languages",
+        name: "معامل اللغات والحاسوب المتقدمة",
+        tag: "الطلاقة والتمكين الرقمي",
+        image: "/covers/student-lab-admissions.jpg",
+        desc: "معامل حاسوبية ذكية مدعومة بأحدث برمجيات التدريب على اللغة الإنجليزية والبرمجة والتصميم الجرافيكي، لإعداد طالبات يمتلكن المهارات الرقمية المتقدمة.",
+        specs: [
+          { label: "الأجهزة", val: "محطات حاسوب حديثة 1:1" },
+          { label: "اللغات", val: "برامج الاستماع والمحادثة الدولية" },
+          { label: "البرمجة", val: "سكراتش وبايثون ومونتاج" },
+          { label: "الاعتماد", val: "مناهج الدبلومة الأمريكية" },
+        ],
+      },
+      {
+        id: "playgrounds",
+        name: "الملاعب والساحات الترفيهية المظللة بالكامل",
+        tag: "حيوية وأمان تام",
+        image: "/covers/first-lego-champions.png",
+        desc: "ساحات أنشطة وفسحة واسعة ومظللة بنسبة 100% لتوفير الحماية التامة والراحة، مع ملاعب مجهزة لممارسة الأنشطة الرياضية والترويحية الحركية.",
+        specs: [
+          { label: "التظليل", val: "مظلات عازلة للحرارة 100%" },
+          { label: "الأرضيات", val: "أرضيات مطاطية ماصة للصدمات" },
+          { label: "الأمان", val: "كاميرات وأنظمة سلامة شاملة" },
+          { label: "الأنشطة", val: "فسحة حركية وبرامج لياقة" },
+        ],
+      },
+      {
+        id: "art-studios",
+        name: "استوديوهات الفنون والمختبرات العلمية",
+        tag: "الفنون والعلوم التطبيقية",
+        image: "/covers/student-robotics-accreditations.jpg",
+        desc: "أروقة مخصصة لإطلاق مواهب الرسم والأشغال اليدوية والخط العربي، إلى جانب مختبرات العلوم المتكاملة لتطبيق التجارب والاستكشاف العلمي.",
+        specs: [
+          { label: "الفنون", val: "الرسم التشكيلي والخط العربي" },
+          { label: "المعارض", val: "معارض سنوية لإنتاج الطالبات" },
+          { label: "المختبرات", val: "تجهيزات كيمياء وأحياء قياسية" },
+          { label: "التوجيه", val: "إشراف نخبة من المتخصصات" },
+        ],
+      },
+    ],
+  };
+
+  const currentFacilities = campusFacilities[activeCampusTab];
+  const activeFacility = currentFacilities[activeFacilityIndex] || currentFacilities[0];
+  const activeEra = timelineEras[activeTimelineIndex] || timelineEras[0];
 
   return (
     <AqeeqLuxuryPageShell
@@ -195,13 +542,30 @@ export default function AqeeqSchoolAboutPage() {
               </div>
             </div>
 
-            {/* Left Column: Close-Up Visual Showcase Card (5 cols) */}
+            {/* Left Column: 3D Magnetic Showcase Card (5 cols) */}
             <div className="lg:col-span-5 relative">
-              <div className={`relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 hover:scale-[1.01] shadow-2xl ${
-                dark
-                  ? "border-emerald-500/20 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/10"
-                  : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
-              }`}>
+              <div
+                ref={heroCardRef}
+                onMouseMove={onHeroMove}
+                onMouseLeave={onHeroLeave}
+                style={{
+                  transform: `perspective(1000px) rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg)`,
+                  transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
+                }}
+                className={`group relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 shadow-2xl will-change-transform ${
+                  dark
+                    ? "border-emerald-500/20 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/10"
+                    : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
+                }`}
+              >
+                {/* Specular glare following cursor */}
+                <div
+                  className="pointer-events-none absolute inset-0 z-20 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: `radial-gradient(circle at ${heroTilt.gx}% ${heroTilt.gy}%, rgba(255,255,255,0.18) 0%, transparent 60%)`,
+                  }}
+                />
+
                 {/* Close-Up Student Excellence Photo */}
                 <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
                   <VisualImage
@@ -209,10 +573,10 @@ export default function AqeeqSchoolAboutPage() {
                     label="صورة طلاب العقيق المقربة في التكريم"
                     src="/covers/student-excellence-about.jpg"
                     alt="طلاب مدارس العقيق في حفل التميز والتكريم"
-                    className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />
                   {/* Subtle Gradient Shade at Bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
 
                   {/* Top Floating Badge */}
                   <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
@@ -243,7 +607,7 @@ export default function AqeeqSchoolAboutPage() {
                   </div>
                   <div>
                     <h5 className="text-xs font-black">مجمع البنين ومجمع البنات بالمدينة</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">بيئة نموذجية مجهزة بأحدث المرافق وقاعات الاختبارات</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
                   </div>
                 </div>
               </div>
@@ -254,8 +618,31 @@ export default function AqeeqSchoolAboutPage() {
       </section>
     }
   >
-    {/* The 30-Year Legacy Interactive Timeline (1994 - 2026) */}
-    <section className="py-20 container mx-auto px-4 sm:px-6">
+      {/* Quick Jump Anchor Bar */}
+      <div className={`border-b py-3 px-4 ${dark ? "bg-black/60 border-white/10" : "bg-white/80 border-slate-200"}`}>
+        <div className="container mx-auto max-w-6xl flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-xs font-bold">
+          <a href="#timeline-section" className={`px-3 py-1.5 rounded-xl border transition ${dark ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5" : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"}`}>
+            مسيرة 30 عاماً 📜
+          </a>
+          <a href="#campuses-section" className={`px-3 py-1.5 rounded-xl border transition ${dark ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5" : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"}`}>
+            مستكشف المجمعات والمرافق 🏫
+          </a>
+          <a href="#vision-section" className={`px-3 py-1.5 rounded-xl border transition ${dark ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5" : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"}`}>
+            الرؤية والرسالة 2030 🎯
+          </a>
+          <a href="#pillars-section" className={`px-3 py-1.5 rounded-xl border transition ${dark ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5" : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"}`}>
+            ركائزنا التربوية 💡
+          </a>
+          <a href="#map-contact-section" className={`px-3 py-1.5 rounded-xl border transition ${dark ? "border-white/10 text-slate-300 hover:text-white hover:bg-white/5" : "border-black/5 text-slate-700 hover:text-emerald-800 hover:bg-slate-100"}`}>
+            الموقع والتواصل 📍
+          </a>
+        </div>
+      </div>
+
+      {/* ========================================================
+          STAGE 1: The 30-Year Legacy Time Machine (1994 - 2026)
+      ======================================================== */}
+      <section id="timeline-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
             <Sparkles size={14} />
@@ -272,26 +659,21 @@ export default function AqeeqSchoolAboutPage() {
           <div className={`mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-sm transition ${
             dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
           }`}>
-            {[
-              { year: "1994", label: "التأسيس والانطلاقة", index: 0 },
-              { year: "2010", label: "المجمعات والمسابح", index: 1 },
-              { year: "2018", label: "اعتماد كوجنيا (Cognia)", index: 2 },
-              { year: "2026", label: "مراكز الاختبارات والـ AI", index: 3 },
-            ].map((era) => (
+            {timelineEras.map((era, eraIdx) => (
               <button
-                key={era.year}
+                key={era.shortYear}
                 type="button"
-                onClick={() => setActiveTimelineIndex(era.index)}
+                onClick={() => setActiveTimelineIndex(eraIdx)}
                 className={`p-3 rounded-xl text-center transition active:scale-95 ${
-                  activeTimelineIndex === era.index
+                  activeTimelineIndex === eraIdx
                     ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/40"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                <span className={`block text-base font-black ${activeTimelineIndex === era.index ? "text-[#f8ca14]" : ""}`}>
-                  {era.year}
+                <span className={`block text-base font-black ${activeTimelineIndex === eraIdx ? "text-[#f8ca14]" : ""}`}>
+                  {era.shortYear}
                 </span>
                 <span className="text-[11px] font-bold truncate block">{era.label}</span>
               </button>
@@ -299,86 +681,118 @@ export default function AqeeqSchoolAboutPage() {
           </div>
         </div>
 
-        {/* Dynamic Active Timeline Era Card */}
-        <div className={`max-w-4xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden animate-in fade-in transition duration-500 ${
+        {/* Dynamic Active Timeline Era Card with Full 3D Panorama */}
+        <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden transition duration-500 ${
           dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
         }`}>
-          {[
-            {
-              year: "1994 م — 1415 هـ",
-              title: "غراس البدايات وتأسيس أول مجمع تعليمي بالمدينة المنورة",
-              desc: "انطلقت مدارس العقيق برؤية واضحة لتكون نموذجاً تعليمياً وتربوياً فريداً بطيبة الطيبة. بدأت المدارس بتأسيس المراحل التأسيسية وتخريج أجيال متمكنة في القرآن الكريم واللغة والعلوم، وتكريس منظومة القيم الأخلاقية الأصيلة.",
-              highlight: "نواة التميز والانطلاقة الأولى بالمدينة المنورة",
-              stats: "أكثر من 30 دفعة تخرجت منذ التأسيس",
-            },
-            {
-              year: "2010 م — 1431 هـ",
-              title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
-              desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل ومجمع البنات في حي الرانوناء بمحاذاة ممشى الهجرة، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
-              highlight: "مجمعات صرحية مستقلة بمواصفات هندسية وتعليمية قياسية",
-              stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
-            },
-            {
-              year: "2018 م — 1439 هـ",
-              title: "الاعتماد الأكاديمي الأمريكي من منظمة كوجنيا (Cognia USA)",
-              desc: "توجت مسيرة الجودة بحصول مدارس العقيق على الاعتماد الدولي الأمريكي من كوجنيا، ليصبح خريجو المدارس مؤهلين للحصول على شهادة الدبلومة الأمريكية المعتمدة دولياً، بالتزامن مع إطلاق نوادي وأكاديميات الروبوت والابتكار.",
-              highlight: "الريادة في التعليم الدولي والحوكمة الأكاديمية",
-              stats: "تقييم جودة معتمد عالمياً بنسبة تفوق 98%",
-            },
-            {
-              year: "2024 - 2026 م",
-              title: "اعتماد مراكز IELTS و SAT الدولية ومنظومة الذكاء الاصطناعي",
-              desc: "العصر الرقمي والريادة العالمية: اعتماد مدارس العقيق كمركز رسمي لاختبارات IELTS IDP و SAT بالمدينة المنورة، مع تتويج الطلاب بالمركز الخامس عالمياً في أولمبياد الروبوت WRO، وتكامل المناهج مع الذكاء الاصطناعي والتحول الرقمي.",
-              highlight: "مركز اختبارات دولي معتمد وحضور عالمي في منافسات الـ AI",
-              stats: "المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO",
-            },
-          ].filter((_, idx) => idx === activeTimelineIndex).map((era, iIdx) => (
-            <div key={iIdx} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                    محطة تاريخية بارزة ✦
-                  </span>
-                  <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
-                    {era.year}
-                  </span>
-                </div>
-                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  {era.title}
-                </h3>
-                <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                  {era.desc}
-                </p>
-                <div className="flex flex-wrap items-center gap-4 text-xs font-black">
-                  <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 size={16} />
-                    {era.highlight}
-                  </span>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Story & Details Column */}
+            <div className="lg:col-span-7">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                  محطة تاريخية بارزة ✦
+                </span>
+                <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                  {activeEra.year}
+                </span>
               </div>
 
-              <div className="lg:col-span-4 text-center">
-                <div className={`p-6 rounded-3xl border shadow-inner ${
-                  dark ? "border-white/10 bg-black/40" : "border-emerald-950/10 bg-emerald-50/50"
-                }`}>
-                  <Milestone size={32} className={`mx-auto mb-3 ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`} />
-                  <span className={`block text-xl font-black mb-1 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    أثر ملموس
-                  </span>
-                  <p className="text-xs text-slate-500 font-bold">{era.stats}</p>
+              <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                {activeEra.title}
+              </h3>
+
+              <p className={`text-sm sm:text-base leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                {activeEra.desc}
+              </p>
+
+              {/* Quote Ribbon */}
+              <div className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
+                dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
+              }`}>
+                <span className="text-base font-serif ml-1">❝</span>
+                {activeEra.quote}
+                <span className="text-base font-serif mr-1">❞</span>
+              </div>
+
+              {/* Key Metrics Row */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {activeEra.metrics.map((m, mIdx) => (
+                  <div key={mIdx} className={`p-3 rounded-xl border text-center ${
+                    dark ? "border-white/5 bg-black/40" : "border-black/5 bg-slate-50"
+                  }`}>
+                    <span className="block text-[10px] text-slate-500 font-bold">{m.label}</span>
+                    <span className={`text-xs font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>{m.val}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Navigation Controls between Eras */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  disabled={activeTimelineIndex === 0}
+                  onClick={() => setActiveTimelineIndex((idx) => Math.max(0, idx - 1))}
+                  className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                    activeTimelineIndex === 0
+                      ? "opacity-30 cursor-not-allowed"
+                      : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                  }`}
+                >
+                  <ChevronRight size={16} />
+                  <span>المحطة السابقة</span>
+                </button>
+
+                <span className="text-[11px] font-black text-slate-400">
+                  {activeTimelineIndex + 1} من {timelineEras.length}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={activeTimelineIndex === timelineEras.length - 1}
+                  onClick={() => setActiveTimelineIndex((idx) => Math.min(timelineEras.length - 1, idx + 1))}
+                  className={`inline-flex items-center gap-1 text-xs font-black transition ${
+                    activeTimelineIndex === timelineEras.length - 1
+                      ? "opacity-30 cursor-not-allowed"
+                      : dark ? "text-slate-300 hover:text-[#f8ca14]" : "text-slate-700 hover:text-[#015a37]"
+                  }`}
+                >
+                  <span>المحطة التالية</span>
+                  <ChevronLeft size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Photo & Milestone Visual Column */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
+                <img
+                  src={activeEra.image}
+                  alt={activeEra.title}
+                  className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
+
+                <div className="absolute bottom-4 right-4 left-4 text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Milestone size={16} className="text-[#f8ca14]" />
+                    <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-200 line-clamp-2">{activeEra.highlight}</p>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* Interactive Campus Explorer (مستكشف المجمعات التفاعلي) */}
-      <section className={`py-20 border-y ${
+      {/* ========================================================
+          STAGE 2: Interactive 3D Campus Explorer & Facility Switcher
+      ======================================================== */}
+      <section id="campuses-section" className={`py-20 border-y ${
         dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
               <Building2 size={14} />
               <span>الصروح والمجمعات التعليمية النموذجية</span>
@@ -387,7 +801,7 @@ export default function AqeeqSchoolAboutPage() {
               استكشف مجمعاتنا بالمدينة المنورة 🏫
             </h2>
             <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              مبانٍ مدرسية صرحية مستقلة مصممة بأعلى المواصفات لتوفير بيئة تعليمية وتربوية ورياضية متكاملة
+              مبانٍ مدرسية صرحية مستقلة بحي الرانوناء (ممشى الهجرة)، تضم تجهيزات أكاديمية ورياضية ومعملية بمعايير عالمية
             </p>
 
             {/* Campus Switcher Tabs */}
@@ -396,210 +810,165 @@ export default function AqeeqSchoolAboutPage() {
             }`}>
               <button
                 type="button"
-                onClick={() => setActiveCampusTab("boys")}
+                onClick={() => {
+                  setActiveCampusTab("boys");
+                  setActiveFacilityIndex(0);
+                }}
                 className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
-                    ? "bg-[#015a37] text-white shadow-md"
+                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/30"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنين
+                مجمع البنين (الأهلي والدولي) 🎓
               </button>
               <button
                 type="button"
-                onClick={() => setActiveCampusTab("girls")}
+                onClick={() => {
+                  setActiveCampusTab("girls");
+                  setActiveFacilityIndex(0);
+                }}
                 className={`rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
-                    ? "bg-[#015a37] text-white shadow-md"
+                    ? "bg-[#015a37] text-white shadow-md ring-1 ring-[#f8ca14]/30"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
                 }`}
               >
-                مجمع البنات
+                مجمع البنات والطفولة المبكرة 🌸
               </button>
             </div>
           </div>
 
-          {/* Active Campus Panoramic Card */}
-          {activeCampusTab === "boys" && (
-            <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl animate-in fade-in transition duration-500 ${
-              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-            }`}>
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div className="lg:col-span-7">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                      مجمع البنين النموذجي
-                    </span>
-                    <span className="text-xs font-bold text-slate-500">القسم الأهلي والدولي</span>
-                  </div>
+          {/* Interactive Facilities Horizontal Pills */}
+          <div className="max-w-4xl mx-auto mb-8 flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {currentFacilities.map((fac, fIdx) => (
+              <button
+                key={fac.id}
+                type="button"
+                onClick={() => setActiveFacilityIndex(fIdx)}
+                className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition active:scale-95 border ${
+                  activeFacilityIndex === fIdx
+                    ? dark
+                      ? "border-[#f8ca14] bg-[#f8ca14]/15 text-[#f8ca14] shadow-sm"
+                      : "border-[#015a37] bg-[#015a37] text-white shadow-sm"
+                    : dark
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                    : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                <span>{fac.name}</span>
+              </button>
+            ))}
+          </div>
 
-                  <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    مجمع البنين — حي الرانوناء (ممشى الهجرة)
-                  </h3>
-
-                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                    يقع المجمع في موقع متميز بحي الرانوناء بالقرب من ممشى الهجرة (خلف نايس برايس)، ويضم مباني أكاديمية مستقلة للمراحل الابتدائية والمتوسطة والثانوية، ومزود بأحدث الصالات الرياضية والمسابح والمعامل التقنية وقاعات الاختبارات الدولية.
-                  </p>
-
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-xs font-bold">
-                    {[
-                      { title: "المسبح الأولمبي المغطى", sub: "تدريب سباحة احترافي بإشراف مدربين" },
-                      { title: "صالات الجمباز وملاعب العشب", sub: "ملاعب كرة قدم وصالات كاراتيه ولياقة" },
-                      { title: "معامل الذكاء الاصطناعي والروبوت", sub: "تجهيزات حاسوبية 1:1 لبطولات WRO" },
-                      { title: "قاعات IELTS & SAT الدولية", sub: "مركز الاختبارات المعتمد بالمدينة" },
-                    ].map((f, fIdx) => (
-                      <div key={fIdx} className={`p-3 rounded-xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
-                        <span className="block font-black text-emerald-600 dark:text-emerald-400">✦ {f.title}</span>
-                        <span className="text-[11px] text-slate-500 mt-0.5 block">{f.sub}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <a
-                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
-                    >
-                      <MapPin size={15} />
-                      <span>فتح الموقع في Google Maps 📍</span>
-                    </a>
-
-                    <a
-                      href="tel:+966148131652"
-                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
-                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
-                      }`}
-                    >
-                      <Phone size={14} />
-                      <span>هاتف المجمع: 0148131652</span>
-                    </a>
-
-                    <Button
-                      onClick={() => navigate("/admissions")}
-                      variant="outline"
-                      className="rounded-2xl text-xs font-black"
-                    >
-                      حجز مقعد بمجمع البنين ✦
-                    </Button>
-                  </div>
+          {/* Active Facility Spotlight Showcase Card */}
+          <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl transition duration-500 ${
+            dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
+          }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Info Column */}
+              <div className="lg:col-span-7">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`rounded-xl px-3 py-1 text-xs font-black ${
+                    activeCampusTab === "boys"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-pink-500/10 text-pink-600 dark:text-pink-400"
+                  }`}>
+                    {activeFacility.tag} ✦
+                  </span>
+                  <span className="text-xs font-bold text-slate-500">
+                    {activeCampusTab === "boys" ? "مجمع البنين — حي الرانوناء" : "مجمع البنات — ممشى الهجرة"}
+                  </span>
                 </div>
 
-                <div className="lg:col-span-5">
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
-                    <img
-                      src="/covers/student-lab-admissions.jpg"
-                      alt="مرافق مجمع البنين بمدارس العقيق"
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 right-4 left-4 text-white">
-                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنين — حي الرانوناء</span>
-                      <p className="text-[11px] text-slate-300">ممشى الهجرة · معامل الابتكار والمسابح والمراكز الدولية</p>
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  {activeFacility.name}
+                </h3>
+
+                <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  {activeFacility.desc}
+                </p>
+
+                {/* 4 Technical Specifications Micro-Chips */}
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  {activeFacility.specs.map((sp, sIdx) => (
+                    <div
+                      key={sIdx}
+                      className={`p-3 rounded-xl border transition ${
+                        dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"
+                      }`}
+                    >
+                      <span className="block text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                        ✦ {sp.label}
+                      </span>
+                      <span className={`text-xs font-bold mt-0.5 block truncate ${dark ? "text-slate-200" : "text-slate-800"}`}>
+                        {sp.val}
+                      </span>
                     </div>
+                  ))}
+                </div>
+
+                {/* Facility Action Buttons */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
+                  >
+                    <MapPin size={15} />
+                    <span>فتح الموقع في Google Maps 📍</span>
+                  </a>
+
+                  <a
+                    href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                    className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
+                      dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
+                    }`}
+                  >
+                    <Phone size={14} />
+                    <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                  </a>
+
+                  <Button
+                    onClick={() => navigate("/admissions")}
+                    variant="outline"
+                    className="rounded-2xl text-xs font-black"
+                  >
+                    حجز جولة تعريفية في المرفق ✦
+                  </Button>
+                </div>
+              </div>
+
+              {/* Photo Column with Specular Glare */}
+              <div className="lg:col-span-5">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] group">
+                  <img
+                    src={activeFacility.image}
+                    alt={activeFacility.name}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                  
+                  <div className="absolute bottom-4 right-4 left-4 text-white">
+                    <span className="text-xs font-black text-[#f8ca14]">{activeFacility.name}</span>
+                    <p className="text-[11px] text-slate-300">{activeFacility.tag} · مدارس العقيق</p>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-
-          {activeCampusTab === "girls" && (
-            <div className={`max-w-5xl mx-auto rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl animate-in fade-in transition duration-500 ${
-              dark ? "border-emerald-500/25 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
-            }`}>
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div className="lg:col-span-7">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="rounded-xl bg-pink-500/10 px-3 py-1 text-xs font-black text-pink-600 dark:text-pink-400">
-                      مجمع البنات النموذجي
-                    </span>
-                    <span className="text-xs font-bold text-slate-500">من الروضة إلى الثانوي</span>
-                  </div>
-
-                  <h3 className={`text-2xl sm:text-3xl font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    مجمع البنات — حي الرانوناء (ممشى الهجرة)
-                  </h3>
-
-                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                    صرح تربوي متكامل في حي الرانوناء بممشى الهجرة يجمع بين الخصوصية التامة وتوفير أحدث التجهيزات، يضم أقسام الطفولة المبكرة ورياض الأطفال، والمراحل الابتدائية والمتوسطة والثانوية بقاعاتها ومعاملها وملاعبها المظللة.
-                  </p>
-
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-xs font-bold">
-                    {[
-                      { title: "أقسام الطفولة المبكرة والروضة", sub: "بيئة مرحة ومحفزة لتنمية المهارات الحسية" },
-                      { title: "المسرح المدرسي وقاعات الأنشطة", sub: "احتفالات الخطابة وملتقيات الإبداع واللغات" },
-                      { title: "معامل العلوم واللغات المتطورة", sub: "تجارب معملية ومناهج دولية مكثفة" },
-                      { title: "ملاعب آمنة ومظللة بالكامل", sub: "ساحات أنشطة وفسحة رياضية مريحة وآمنة" },
-                    ].map((f, fIdx) => (
-                      <div key={fIdx} className={`p-3 rounded-xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
-                        <span className="block font-black text-emerald-600 dark:text-emerald-400">✦ {f.title}</span>
-                        <span className="text-[11px] text-slate-500 mt-0.5 block">{f.sub}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <a
-                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-md transition active:scale-95"
-                    >
-                      <MapPin size={15} />
-                      <span>فتح الموقع في Google Maps 📍</span>
-                    </a>
-
-                    <a
-                      href="tel:+966148644466"
-                      className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition ${
-                        dark ? "border-white/10 text-slate-300 hover:bg-white/5" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
-                      }`}
-                    >
-                      <Phone size={14} />
-                      <span>هاتف مجمع البنات: 0148644466</span>
-                    </a>
-
-                    <Button
-                      onClick={() => navigate("/admissions")}
-                      variant="outline"
-                      className="rounded-2xl text-xs font-black"
-                    >
-                      حجز مقعد بمجمع البنات ✦
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-5">
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3]">
-                    <img
-                      src="/covers/student-excellence-about.jpg"
-                      alt="مرافق مجمع البنات بمدارس العقيق"
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 right-4 left-4 text-white">
-                      <span className="text-xs font-black text-[#f8ca14]">مجمع البنات — حي الرانوناء</span>
-                      <p className="text-[11px] text-slate-300">ممشى الهجرة · الطفولة المبكرة والمراحل التعليمية</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* Royal Strategic Document: Vision & Mission */}
-      <section className="py-20 container mx-auto px-4 sm:px-6">
+      {/* ========================================================
+          STAGE 3: Royal Strategic Document: Vision & Mission 2030
+      ======================================================== */}
+      <section id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className={`max-w-5xl mx-auto rounded-[3rem] border p-8 sm:p-14 shadow-2xl relative overflow-hidden ${
           dark
             ? "border-emerald-500/30 bg-gradient-to-b from-[#0c141a] to-[#060a0e] ring-1 ring-emerald-500/20"
@@ -615,22 +984,22 @@ export default function AqeeqSchoolAboutPage() {
               <span>{isNationalDay ? "🇸🇦 رؤية وطنية راسخة · عزّنا بطبعنا" : "المرتكزات الاستراتيجية للصرح"}</span>
             </div>
             <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              الرؤية والرسالة المؤسسية
+              الرؤية والرسالة المؤسسية ومستهدفات 2030
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Vision Plaque */}
-            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 ${
+            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 shadow-md ${
               dark ? "border-emerald-500/20 bg-white/5" : "border-emerald-950/10 bg-emerald-50/40"
             }`}>
               <div className="flex items-center gap-3 mb-4">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <Compass size={20} />
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <Compass size={24} />
                 </div>
                 <div>
                   <h4 className={`text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>الرؤية الاستراتيجية (Vision)</h4>
-                  <span className="text-[11px] text-slate-500">أصالة القيم وريادة المستقبل</span>
+                  <span className="text-[11px] text-slate-500 font-bold">أصالة القيم وريادة المستقبل</span>
                 </div>
               </div>
               <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
@@ -639,16 +1008,16 @@ export default function AqeeqSchoolAboutPage() {
             </div>
 
             {/* Mission Plaque */}
-            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 ${
+            <div className={`rounded-3xl border p-8 relative overflow-hidden transition hover:-translate-y-1 shadow-md ${
               dark ? "border-amber-500/20 bg-white/5" : "border-amber-950/10 bg-amber-50/30"
             }`}>
               <div className="flex items-center gap-3 mb-4">
-                <div className={`grid h-10 w-10 place-items-center rounded-xl ${dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/15 text-[#c59b27]"}`}>
-                  <Target size={20} />
+                <div className={`grid h-12 w-12 place-items-center rounded-2xl ${dark ? "bg-amber-500/10 text-[#f8ca14]" : "bg-amber-500/15 text-[#c59b27]"}`}>
+                  <Target size={24} />
                 </div>
                 <div>
                   <h4 className={`text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>الرسالة التربوية (Mission)</h4>
-                  <span className="text-[11px] text-slate-500">جودة التعليم وبناء الشخصية</span>
+                  <span className="text-[11px] text-slate-500 font-bold">جودة التعليم وبناء الشخصية</span>
                 </div>
               </div>
               <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
@@ -659,8 +1028,10 @@ export default function AqeeqSchoolAboutPage() {
         </div>
       </section>
 
-      {/* The 4 Institutional Pillars */}
-      <section className={`py-20 border-y ${
+      {/* ========================================================
+          STAGE 4: The 4 Institutional Pillars with 3D Tilt Cards
+      ======================================================== */}
+      <section id="pillars-section" className={`py-20 border-y ${
         dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
       }`}>
         <div className="container mx-auto px-4 sm:px-6">
@@ -669,96 +1040,188 @@ export default function AqeeqSchoolAboutPage() {
               <Sparkles size={14} />
               <span>ركائز مسيرة العقيق</span>
             </div>
-            <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>ركائزنا التربوية الأربعة</h2>
+            <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+              ركائزنا التربوية الأربعة 🏛️
+            </h2>
             <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
               منظومة متكاملة من القيم والمهارات تصوغ رحلة الطالب اليومية في مدارس العقيق
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {pillars.map((pillar, idx) => {
-              const Icon = pillar.icon;
-              return (
-                <div
-                  key={idx}
-                  className={`rounded-3xl border p-6 transition duration-300 hover:-translate-y-1 ${
-                    dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <Icon size={22} />
-                    </div>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-black ${
-                      dark ? "bg-emerald-500/10 text-emerald-400" : "bg-[#015a37]/10 text-[#015a37]"
-                    }`}>
-                      {pillar.badge}
-                    </span>
-                  </div>
-                  <h4 className={`text-lg font-black mb-3 ${dark ? "text-white" : "text-[#0a192f]"}`}>{pillar.title}</h4>
-                  <p className={`text-xs leading-relaxed ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>{pillar.desc}</p>
-                </div>
-              );
-            })}
-          </div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {pillars.map((pillar, idx) => (
+              <PillarCard
+                key={idx}
+                pillar={pillar}
+                index={idx}
+                dark={dark}
+              />
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* Careers & Contact Section */}
-      <section className="py-20 container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          {/* Careers */}
-          <div className={`rounded-3xl border p-8 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+      {/* ========================================================
+          STAGE 5: Medina Interactive Map & Campus Logistics
+      ======================================================== */}
+      <section id="map-contact-section" className="py-20 container mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
+            <MapPin size={14} />
+            <span>الموقع الجغرافي والوصول المباشر</span>
+          </div>
+          <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+            في قلب المدينة المنورة — حي الرانوناء 📍
+          </h2>
+          <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+            بمحاذاة ممشى الهجرة (خلف نايس برايس) مع تغطية شاملة لأسطول النقل المدرسي لكافة أحياء طيبة الطيبة
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
+          {/* Map Preview & Transportation Coverage Card (7 cols) */}
+          <div className={`lg:col-span-7 rounded-3xl border p-8 flex flex-col justify-between shadow-xl ${
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
           }`}>
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-500/10 text-blue-500 mb-4">
-              <Briefcase size={22} />
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">موقع المجمعات حي ومتاح</span>
+                </div>
+                <span className="text-xs font-bold text-slate-500">طيبة الطيبة</span>
+              </div>
+
+              <h3 className={`text-xl sm:text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                مجمعات العقيق الأهلية والدولية (بنين وبنات)
+              </h3>
+              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                المدينة المنورة — حي الرانوناء — ممشى الهجرة (خلف نايس برايس). سهولة في الوصول ومواقف فسيحة مخصصة لأولياء الأمور وباصات المدارس.
+              </p>
+
+              {/* Transportation Coverage Chips */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 text-xs font-black mb-3 text-slate-400">
+                  <Bus size={15} />
+                  <span>تغطية أسطول النقل المدرسي المكيف والآمن:</span>
+                </div>
+                <div className="flex flex-wrap gap-2 text-[11px] font-bold">
+                  {[
+                    "حي الرانوناء",
+                    "ممشى الهجرة",
+                    "حي العزيزية",
+                    "حي باقدو",
+                    "طريق الهجرة",
+                    "المنطقة المركزية (الحرم)",
+                    "حي الخالدية",
+                    "حي قباء",
+                    "حي شوران",
+                  ].map((hood, hIdx) => (
+                    <span
+                      key={hIdx}
+                      className={`px-3 py-1.5 rounded-xl border ${
+                        dark
+                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+                          : "border-emerald-950/10 bg-emerald-50 text-[#015a37]"
+                      }`}
+                    >
+                      ✓ {hood}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
-            <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>انضم إلى فريق مدارس العقيق</h3>
-            <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              نستقطب باستمرار أفضل الكفاءات التعليمية والإدارية والتقنية الشغوفة بصناعة الأثر في حياة الأجيال.
-            </p>
-            <a
-              href="https://live.aqeeq.edu.sa/jobs"
-              target="_blank"
-              rel="noreferrer"
-              className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black transition ${
-                dark ? "bg-blue-600 hover:bg-blue-500 text-white" : "bg-blue-700 hover:bg-blue-800 text-white"
-              }`}
-            >
-              <span>بوابة التوظيف الرسمية</span>
-              <ArrowRight size={14} />
-            </a>
+
+            {/* Direct Routing Action */}
+            <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-3">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-6 py-3.5 text-xs font-black shadow-lg transition active:scale-95"
+              >
+                <Navigation size={16} />
+                <span>فتح اتجاهات القيادة المباشرة في Google Maps</span>
+              </a>
+
+              <a
+                href="https://wa.me/966531896000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D9%85%D9%88%D9%82%D8%B9%20%D9%85%D8%AF%D8%A7%D8%B1%D8%B3%20%D8%A7%D9%84%D8%B9%D9%82%D9%8A%D9%82%20%D9%88%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D8%A7%D9%84%D9%86%D9%82%D9%84"
+                target="_blank"
+                rel="noreferrer"
+                className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-black transition ${
+                  dark ? "border-white/10 bg-white/5 text-emerald-400 hover:bg-white/10" : "border-emerald-700/20 bg-white text-emerald-700 hover:bg-slate-50"
+                }`}
+              >
+                <MessageCircle size={15} />
+                <span>واتساب الاستقبال المباشر</span>
+              </a>
+            </div>
           </div>
 
-          {/* Quick Contact Info */}
-          <div className={`rounded-3xl border p-8 ${
-            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white/95 shadow-md hover:shadow-lg"
+          {/* Contact & Official Channels Card (5 cols) */}
+          <div className={`lg:col-span-5 rounded-3xl border p-8 flex flex-col justify-between shadow-xl ${
+            dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
           }`}>
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4">
-              <Phone size={22} />
+            <div>
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4">
+                <Phone size={22} />
+              </div>
+              <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                أرقام المجمعات المباشرة
+              </h3>
+              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+                فريق القبول والاستقبال جاهز لخدمتكم يومياً من الأحد إلى الخميس.
+              </p>
+
+              <div className={`space-y-4 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
+                <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-black text-emerald-600 dark:text-emerald-400">مجمع البنين (الأهلي والدولي)</span>
+                    <Phone size={14} className="text-slate-400" />
+                  </div>
+                  <a href="tel:+966148131652" className="text-sm font-black hover:underline dir-ltr block text-right">0148131652</a>
+                </div>
+
+                <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-black text-emerald-600 dark:text-emerald-400">مجمع البنات والطفولة المبكرة</span>
+                    <Phone size={14} className="text-slate-400" />
+                  </div>
+                  <a href="tel:+966148644466" className="text-sm font-black hover:underline dir-ltr block text-right">0148644466</a>
+                </div>
+
+                <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-black text-[#f8ca14]">الواتساب الموحد للقبول والتسجيل</span>
+                    <MessageCircle size={14} className="text-emerald-500" />
+                  </div>
+                  <a href="tel:+966531896000" className="text-sm font-black hover:underline dir-ltr block text-right">0531896000</a>
+                </div>
+              </div>
             </div>
-            <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>تواصل معنا مباشرة</h3>
-            <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              يسعدنا الرد على كافة استفساراتكم واستقبالكم في مجمعاتنا خلال أوقات الدوام الرسمي.
-            </p>
-            <div className={`space-y-3 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
-              <div className="flex items-center gap-2">
-                <Phone size={15} className="text-emerald-500" />
-                <span>الهاتف الموحد: <a href="tel:+966531896000" className="hover:underline">966531896000+</a></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={15} className="text-emerald-500" />
-                <span>البريد الرسمي: <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock size={15} className="text-emerald-500" />
-                <span>أوقات العمل: الأحد - الخميس | 7:00 ص - 2:30 م</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sky-500">📢</span>
-                <span>قناة تيليجرام المدرسية: <a href="https://t.me/alaqeeqschools" target="_blank" rel="noreferrer" className="text-sky-500 hover:underline">t.me/alaqeeqschools</a></span>
-              </div>
+
+            {/* Careers Callout */}
+            <div className="pt-6 border-t border-white/10 mt-6">
+              <a
+                href="https://live.aqeeq.edu.sa/jobs"
+                target="_blank"
+                rel="noreferrer"
+                className={`flex items-center justify-between p-3.5 rounded-2xl border transition ${
+                  dark ? "border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20" : "border-blue-200 bg-blue-50 text-blue-900 hover:bg-blue-100"
+                }`}
+              >
+                <div className="flex items-center gap-2 text-xs font-black">
+                  <Briefcase size={16} />
+                  <span>انضم لفريق العمل · بوابة التوظيف الرسمية</span>
+                </div>
+                <ArrowRight size={14} />
+              </a>
             </div>
           </div>
         </div>
