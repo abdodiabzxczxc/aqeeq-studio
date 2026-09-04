@@ -1266,7 +1266,7 @@ export default function AqeeqSchoolAboutPage() {
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-6">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
               <Building2 size={15} />
               <span>✦ الصروح والمجمعات التعليمية النموذجية · حي الرانوناء ✦</span>
@@ -1334,41 +1334,6 @@ export default function AqeeqSchoolAboutPage() {
                 <span className="relative z-10">مجمع البنات والطفولة المبكرة 🌸</span>
               </button>
             </div>
-          </div>
-
-          {/* Quick Facility Selector Pills (Desktop / Tablet) */}
-          <div className="hidden sm:flex items-center justify-center flex-wrap gap-2 mb-8 max-w-4xl mx-auto">
-            {currentFacilities.map((fac, fIdx) => {
-              const FacIcon = fac.icon;
-              const isSelected = activeFacilityIndex === fIdx;
-              return (
-                <button
-                  key={fac.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveFacilityIndex(fIdx);
-                    setActiveHotspotId(null);
-                  }}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition active:scale-95 border ${
-                    isSelected
-                      ? "border-[#f8ca14]/50 bg-emerald-950/70 text-white shadow-lg ring-1 ring-[#f8ca14]/30"
-                      : dark
-                      ? "border-white/10 bg-black/40 text-slate-300 hover:text-white hover:border-white/20"
-                      : "border-black/10 bg-white/70 text-slate-700 hover:text-black hover:border-black/20"
-                  }`}
-                >
-                  <FacIcon size={14} className={isSelected ? "text-[#f8ca14]" : "text-slate-400"} />
-                  <span>{fac.name}</span>
-                  {isSelected && (
-                    <motion.div
-                      layoutId="activeFacilitySubPill"
-                      className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#f8ca14] rounded-full"
-                      transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
           </div>
 
           {/* ========================================================
