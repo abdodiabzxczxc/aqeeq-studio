@@ -254,7 +254,6 @@ export default function AqeeqSchoolAboutPage() {
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
   const [activeTimelineIndex, setActiveTimelineIndex] = useState<number>(3);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
-  const [transitionMode, setTransitionMode] = useState<"accordion" | "coverflow" | "deck" | "blueprint">("accordion");
 
   // Pillars Data
   const pillars = [
@@ -1337,220 +1336,220 @@ export default function AqeeqSchoolAboutPage() {
             </div>
           </div>
 
-          {/* Interactive Transition Mode Switcher (جرب كل الانتقالات الحية) */}
-          <div className="flex items-center justify-center gap-1.5 p-1.5 rounded-2xl border backdrop-blur-xl max-w-2xl mx-auto mb-8 bg-black/20 border-white/10 shadow-lg">
-            <span className="text-[11px] font-black px-2 text-slate-400 hidden sm:inline">
-              نمط الانتقال:
-            </span>
-            {[
-              { id: "accordion", label: "الستارة المعمارية 🏛️", hint: "تمدد ناعم" },
-              { id: "coverflow", label: "المسرح 3D 🪐", hint: "دوران مكاني" },
-              { id: "deck", label: "الكروت الطائرة 🎴", hint: "سحب ملكي" },
-              { id: "blueprint", label: "المخطط والزووم 📐", hint: "كاميرا سينمائية" },
-            ].map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                onClick={() => setTransitionMode(mode.id as any)}
-                className={`relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-black transition active:scale-95 ${
-                  transitionMode === mode.id
-                    ? "text-white"
-                    : dark
-                    ? "text-slate-400 hover:text-white hover:bg-white/5"
-                    : "text-slate-600 hover:text-emerald-900 hover:bg-white/40"
-                }`}
-              >
-                {transitionMode === mode.id && (
-                  <motion.div
-                    layoutId="activeTransitionModePill"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 shadow-md ring-1 ring-[#f8ca14]/40"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <span className="relative z-10">{mode.label}</span>
-              </button>
-            ))}
+          {/* Quick Facility Selector Pills (Desktop / Tablet) */}
+          <div className="hidden sm:flex items-center justify-center flex-wrap gap-2 mb-8 max-w-4xl mx-auto">
+            {currentFacilities.map((fac, fIdx) => {
+              const FacIcon = fac.icon;
+              const isSelected = activeFacilityIndex === fIdx;
+              return (
+                <button
+                  key={fac.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveFacilityIndex(fIdx);
+                    setActiveHotspotId(null);
+                  }}
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition active:scale-95 border ${
+                    isSelected
+                      ? "border-[#f8ca14]/50 bg-emerald-950/70 text-white shadow-lg ring-1 ring-[#f8ca14]/30"
+                      : dark
+                      ? "border-white/10 bg-black/40 text-slate-300 hover:text-white hover:border-white/20"
+                      : "border-black/10 bg-white/70 text-slate-700 hover:text-black hover:border-black/20"
+                  }`}
+                >
+                  <FacIcon size={14} className={isSelected ? "text-[#f8ca14]" : "text-slate-400"} />
+                  <span>{fac.name}</span>
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeFacilitySubPill"
+                      className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#f8ca14] rounded-full"
+                      transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* ========================================================
-              MODE 1: EXPANDING ARCHITECTURAL ACCORDION PANELS
+              ARCHITECTURAL EXPANDING ACCORDION (الستارة المعمارية)
           ======================================================== */}
-          {transitionMode === "accordion" && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="max-w-6xl mx-auto"
-            >
-              {/* Desktop Expanding Panels (5 side-by-side columns) */}
-              <div className="hidden lg:flex h-[560px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#0b1218]/90 border-emerald-500/20">
-                {currentFacilities.map((fac, fIdx) => {
-                  const FacIcon = fac.icon;
-                  const isExpanded = activeFacilityIndex === fIdx;
+          <div className="max-w-6xl mx-auto">
+            {/* Desktop Expanding Panels (5 side-by-side columns) */}
+            <div className="hidden lg:flex h-[580px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-emerald-500/25">
+              {currentFacilities.map((fac, fIdx) => {
+                const FacIcon = fac.icon;
+                const isExpanded = activeFacilityIndex === fIdx;
 
-                  return (
-                    <motion.div
-                      key={fac.id}
-                      layout
-                      transition={{ type: "spring", stiffness: 220, damping: 26 }}
-                      onClick={() => {
-                        if (!isExpanded) {
-                          setActiveFacilityIndex(fIdx);
-                          setActiveHotspotId(null);
-                        }
-                      }}
-                      className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
-                        isExpanded
-                          ? "flex-[5] border-[#f8ca14]/40 shadow-2xl"
-                          : "flex-1 min-w-[76px] border-white/10 hover:border-white/30 cursor-pointer opacity-85 hover:opacity-100"
+                return (
+                  <motion.div
+                    key={fac.id}
+                    layout
+                    transition={{ type: "spring", stiffness: 220, damping: 26, mass: 0.9 }}
+                    onClick={() => {
+                      if (!isExpanded) {
+                        setActiveFacilityIndex(fIdx);
+                        setActiveHotspotId(null);
+                      }
+                    }}
+                    className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
+                      isExpanded
+                        ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
+                        : "flex-1 min-w-[76px] border-white/10 hover:border-emerald-400/40 cursor-pointer opacity-85 hover:opacity-100 group"
+                    }`}
+                  >
+                    {/* Background Photo */}
+                    <img
+                      src={fac.image}
+                      alt={fac.name}
+                      className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
+                        isExpanded ? "scale-105" : "grayscale-[25%] group-hover:scale-110"
                       }`}
-                    >
-                      {/* Background Photo */}
-                      <img
-                        src={fac.image}
-                        alt={fac.name}
-                        className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
-                          isExpanded ? "scale-105" : "grayscale-[30%] group-hover:scale-110"
-                        }`}
-                      />
-                      {/* Rich Dark Gradient Overlay */}
-                      <div
-                        className={`absolute inset-0 transition-opacity duration-500 ${
-                          isExpanded
-                            ? "bg-gradient-to-t from-black/95 via-black/55 to-black/30"
-                            : "bg-black/75 hover:bg-black/60"
-                        }`}
-                      />
-
-                      {/* Expanded View Content */}
-                      {isExpanded ? (
-                        <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white">
-                          {/* Top Bar with Badge & Live Status */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="rounded-xl bg-[#015a37]/90 border border-emerald-400/40 px-3.5 py-1 text-xs font-black text-white shadow-lg backdrop-blur-md">
-                                {fac.tag} ✦
-                              </span>
-                              <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
-                                {fac.badge}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-black/60 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
-                              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                              <span>مرفق حي مجهز 100%</span>
-                            </div>
-                          </div>
-
-                          {/* Center Story */}
-                          <div className="max-w-2xl my-auto py-4">
-                            <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
-                              {fac.name}
-                            </h3>
-                            <p className="text-sm leading-relaxed text-slate-200 font-medium drop-shadow mb-6">
-                              {fac.desc}
-                            </p>
-
-                            {/* 4 Giant Metrics Chips */}
-                            <div className="grid grid-cols-4 gap-3">
-                              {fac.giantMetrics.map((gm, gIdx) => (
-                                <div
-                                  key={gIdx}
-                                  className="p-3 rounded-2xl border border-white/15 bg-black/50 backdrop-blur-xl text-center"
-                                >
-                                  <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
-                                    {gm.num}
-                                  </span>
-                                  <span className="block text-[11px] font-black text-white truncate mt-0.5">
-                                    {gm.label}
-                                  </span>
-                                  <span className="block text-[10px] text-slate-300 truncate">
-                                    {gm.sub}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Bottom Action Suite */}
-                          <div className="flex items-center gap-3 pt-4 border-t border-white/15">
-                            <a
-                              href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
-                            >
-                              <MapPin size={15} />
-                              <span>فتح الموقع في Google Maps 📍</span>
-                            </a>
-                            <a
-                              href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
-                              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold transition backdrop-blur-md"
-                            >
-                              <Phone size={14} />
-                              <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
-                            </a>
-                            <Button
-                              onClick={() => navigate("/admissions")}
-                              variant="outline"
-                              className="rounded-2xl text-xs font-black border-white/20 text-white hover:bg-white/10"
-                            >
-                              حجز جولة تعريفية في المرفق ✦
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Compressed Vertical Panel Spine */
-                        <div className="relative z-10 h-full flex flex-col items-center justify-between py-8">
-                          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-black/70 border border-white/20 text-[#f8ca14] shadow-md backdrop-blur-md">
-                            <FacIcon size={20} />
-                          </div>
-                          <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 select-none">
-                            {fac.name}
-                          </span>
-                          <span className="text-[10px] font-bold text-emerald-400 bg-black/70 border border-emerald-500/30 px-2.5 py-1 rounded-full backdrop-blur-md">
-                            ✦ تمدد
-                          </span>
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {/* Mobile Fallback for Accordion Mode */}
-              <div className="flex lg:hidden flex-col gap-3">
-                {currentFacilities.map((fac, fIdx) => {
-                  const FacIcon = fac.icon;
-                  const isExpanded = activeFacilityIndex === fIdx;
-
-                  return (
+                    />
+                    {/* Rich Cinematic Dark Gradient Overlay */}
                     <div
-                      key={fac.id}
-                      onClick={() => setActiveFacilityIndex(fIdx)}
-                      className={`rounded-3xl border overflow-hidden transition ${
+                      className={`absolute inset-0 transition-opacity duration-500 ${
                         isExpanded
-                          ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
-                          : "border-white/10 bg-[#0b1015] p-3 cursor-pointer"
+                          ? "bg-gradient-to-t from-black/95 via-black/60 to-black/30"
+                          : "bg-black/75 group-hover:bg-black/60"
                       }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/60 border border-white/15 text-[#f8ca14]">
-                            <FacIcon size={18} />
+                    />
+
+                    {/* Expanded View Content */}
+                    {isExpanded ? (
+                      <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white">
+                        {/* Top Bar with Badges & Live Status */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-xl bg-[#015a37]/90 border border-emerald-400/40 px-3.5 py-1 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                              {fac.tag} ✦
+                            </span>
+                            <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
+                              {fac.badge}
+                            </span>
                           </div>
-                          <div>
-                            <span className="text-[10px] text-[#f8ca14] font-bold block">{fac.tag}</span>
-                            <h4 className="text-sm font-black text-white">{fac.name}</h4>
+                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-black/60 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
+                            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>مرفق حي مجهز 100%</span>
                           </div>
                         </div>
-                        <span className={`text-xs font-black transition-transform ${isExpanded ? "rotate-90 text-[#f8ca14]" : "text-slate-400"}`}>
-                          ❯
+
+                        {/* Center Story */}
+                        <div className="max-w-2xl my-auto py-4">
+                          <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
+                            {fac.name}
+                          </h3>
+                          <p className="text-sm leading-relaxed text-slate-200 font-medium drop-shadow mb-6">
+                            {fac.desc}
+                          </p>
+
+                          {/* 4 Giant Metrics Chips */}
+                          <div className="grid grid-cols-4 gap-3">
+                            {fac.giantMetrics.map((gm, gIdx) => (
+                              <div
+                                key={gIdx}
+                                className="p-3 rounded-2xl border border-white/15 bg-black/50 backdrop-blur-xl text-center"
+                              >
+                                <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
+                                  {gm.num}
+                                </span>
+                                <span className="block text-[11px] font-black text-white truncate mt-0.5">
+                                  {gm.label}
+                                </span>
+                                <span className="block text-[10px] text-slate-300 truncate">
+                                  {gm.sub}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Bottom Action Suite */}
+                        <div className="flex items-center gap-3 pt-4 border-t border-white/15">
+                          <a
+                            href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
+                          >
+                            <MapPin size={15} />
+                            <span>فتح الموقع في Google Maps 📍</span>
+                          </a>
+                          <a
+                            href={activeCampusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                            className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold transition backdrop-blur-md"
+                          >
+                            <Phone size={14} />
+                            <span>{activeCampusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                          </a>
+                          <Button
+                            onClick={() => navigate("/admissions")}
+                            variant="outline"
+                            className="rounded-2xl text-xs font-black border-white/20 text-white hover:bg-white/10"
+                          >
+                            حجز جولة تعريفية في المرفق ✦
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Compressed Vertical Panel Spine */
+                      <div className="relative z-10 h-full flex flex-col items-center justify-between py-8">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-black/70 border border-white/20 text-[#f8ca14] shadow-md backdrop-blur-md group-hover:border-[#f8ca14]/40 transition">
+                          <FacIcon size={20} />
+                        </div>
+                        <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 select-none group-hover:text-[#f8ca14] transition">
+                          {fac.name}
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-400 bg-black/70 border border-emerald-500/30 px-2.5 py-1 rounded-full backdrop-blur-md">
+                          ✦ انقر للعرض
                         </span>
                       </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
 
+            {/* Mobile & Tablet Fallback for Accordion Mode */}
+            <div className="flex lg:hidden flex-col gap-3">
+              {currentFacilities.map((fac, fIdx) => {
+                const FacIcon = fac.icon;
+                const isExpanded = activeFacilityIndex === fIdx;
+
+                return (
+                  <div
+                    key={fac.id}
+                    onClick={() => setActiveFacilityIndex(fIdx)}
+                    className={`rounded-3xl border overflow-hidden transition ${
+                      isExpanded
+                        ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
+                        : "border-white/10 bg-[#0b1015] p-3.5 cursor-pointer"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/60 border border-white/15 text-[#f8ca14]">
+                          <FacIcon size={18} />
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[#f8ca14] font-bold block">{fac.tag}</span>
+                          <h4 className="text-sm font-black text-white">{fac.name}</h4>
+                        </div>
+                      </div>
+                      <span className={`text-xs font-black transition-transform ${isExpanded ? "rotate-90 text-[#f8ca14]" : "text-slate-400"}`}>
+                        ❯
+                      </span>
+                    </div>
+
+                    <AnimatePresence>
                       {isExpanded && (
-                        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-4 pt-4 border-t border-white/10 space-y-4"
+                        >
                           <div className="rounded-2xl overflow-hidden aspect-video relative">
                             <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
                           </div>
@@ -1563,408 +1562,38 @@ export default function AqeeqSchoolAboutPage() {
                               </div>
                             ))}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ========================================================
-              MODE 2: 3D SPATIAL COVERFLOW CAROUSEL (Vision Pro Style)
-          ======================================================== */}
-          {transitionMode === "coverflow" && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="max-w-6xl mx-auto"
-            >
-              <div
-                style={{ perspective: 1200 }}
-                className="relative h-[620px] flex items-center justify-center overflow-hidden"
-              >
-                {currentFacilities.map((fac, fIdx) => {
-                  const offset = fIdx - activeFacilityIndex;
-                  const absOffset = Math.abs(offset);
-                  const isCenter = offset === 0;
-
-                  // 3D Spatial Position Calculations
-                  const x = offset * 210;
-                  const z = -absOffset * 180;
-                  const rotateY = offset * -32;
-                  const scale = Math.max(0.7, 1 - absOffset * 0.12);
-                  const opacity = Math.max(0.25, 1 - absOffset * 0.3);
-                  const zIndex = 30 - absOffset;
-
-                  return (
-                    <motion.div
-                      key={fac.id}
-                      animate={{
-                        x,
-                        z,
-                        rotateY,
-                        scale,
-                        opacity,
-                      }}
-                      transition={{ type: "spring", stiffness: 180, damping: 24 }}
-                      style={{
-                        zIndex,
-                        position: "absolute",
-                        transformStyle: "preserve-3d",
-                      }}
-                      onClick={() => {
-                        setActiveFacilityIndex(fIdx);
-                        setActiveHotspotId(null);
-                      }}
-                      className={`w-[340px] sm:w-[480px] rounded-[2.5rem] border p-5 shadow-2xl backdrop-blur-2xl transition duration-300 cursor-pointer ${
-                        isCenter
-                          ? "border-[#f8ca14]/60 bg-[#0c141a]/95 shadow-[0_25px_60px_rgba(1,90,55,0.4)] ring-2 ring-[#f8ca14]/40"
-                          : "border-white/10 bg-[#080d12]/90 hover:border-white/30"
-                      }`}
-                    >
-                      {/* Photo Display */}
-                      <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 group/cov">
-                        <img
-                          src={fac.image}
-                          alt={fac.name}
-                          className="h-full w-full object-cover transition duration-500 group-hover/cov:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                        <span className="absolute top-3 right-3 rounded-full bg-black/75 border border-white/20 px-3 py-1 text-[10px] font-black text-[#f8ca14]">
-                          {fac.tag}
-                        </span>
-                        <span className="absolute bottom-3 right-3 text-sm font-black text-white drop-shadow">
-                          {fac.name}
-                        </span>
-                      </div>
-
-                      {/* Detail View for Center Card */}
-                      {isCenter ? (
-                        <div className="space-y-4">
-                          <p className="text-xs leading-relaxed text-slate-300 font-medium line-clamp-2">
-                            {fac.desc}
-                          </p>
-
-                          {/* 4 Giant Metrics */}
-                          <div className="grid grid-cols-4 gap-2">
-                            {fac.giantMetrics.map((gm, gIdx) => (
-                              <div
-                                key={gIdx}
-                                className="p-2 rounded-xl border border-white/10 bg-black/40 text-center"
-                              >
-                                <span className="block text-base font-black text-[#f8ca14]">{gm.num}</span>
-                                <span className="block text-[9px] font-bold text-white truncate">{gm.label}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="flex items-center gap-2 pt-2">
+                          <div className="flex flex-col sm:flex-row gap-2 pt-2">
                             <a
                               href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                               target="_blank"
                               rel="noreferrer"
-                              className="flex-1 text-center py-2.5 rounded-xl bg-[#015a37] text-white text-xs font-black shadow hover:bg-emerald-800 transition"
+                              className="text-center py-2.5 rounded-xl bg-[#015a37] text-white text-xs font-black"
                             >
-                              Google Maps 📍
+                              فتح الموقع في Google Maps 📍
                             </a>
                             <Button
-                              onClick={() => navigate("/admissions")}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate("/admissions");
+                              }}
                               variant="outline"
-                              className="flex-1 py-2.5 rounded-xl text-xs font-black border-white/20 text-white"
+                              className="text-xs font-black border-white/20 text-white"
                             >
-                              حجز جولة ✦
+                              حجز جولة تعريفية ✦
                             </Button>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-2 text-xs font-bold text-slate-400">
-                          انقر للتدوير إلى المركز ✦
-                        </div>
+                        </motion.div>
                       )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {/* Coverflow Navigation Bar */}
-              <div className="flex items-center justify-center gap-4 mt-2">
-                <button
-                  type="button"
-                  disabled={activeFacilityIndex === 0}
-                  onClick={() => setActiveFacilityIndex((i) => Math.max(0, i - 1))}
-                  className="px-4 py-2 rounded-xl border border-white/15 bg-white/5 text-xs font-black text-white hover:bg-white/10 disabled:opacity-30 transition"
-                >
-                  ❮ المرفق السابق
-                </button>
-                <span className="text-xs font-bold text-slate-400">
-                  {activeFacilityIndex + 1} من {currentFacilities.length}
-                </span>
-                <button
-                  type="button"
-                  disabled={activeFacilityIndex === currentFacilities.length - 1}
-                  onClick={() => setActiveFacilityIndex((i) => Math.min(currentFacilities.length - 1, i + 1))}
-                  className="px-4 py-2 rounded-xl border border-white/15 bg-white/5 text-xs font-black text-white hover:bg-white/10 disabled:opacity-30 transition"
-                >
-                  المرفق التالي ❯
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ========================================================
-              MODE 3: 3D DECK FAN-OUT & CARD FLIGHT (Royal Stack)
-          ======================================================== */}
-          {transitionMode === "deck" && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="max-w-4xl mx-auto"
-            >
-              <div className="relative min-h-[580px] flex flex-col items-center justify-center py-6">
-                {/* Visual Stack of Cards */}
-                <div className="relative w-full max-w-xl h-[460px]">
-                  {currentFacilities.map((fac, fIdx) => {
-                    const stackIndex = (fIdx - activeFacilityIndex + currentFacilities.length) % currentFacilities.length;
-                    const isTop = stackIndex === 0;
-
-                    return (
-                      <motion.div
-                        key={fac.id}
-                        animate={{
-                          y: stackIndex * 12,
-                          scale: 1 - stackIndex * 0.05,
-                          rotate: stackIndex * 3 - (stackIndex % 2 === 0 ? 1 : 0),
-                          opacity: stackIndex > 2 ? 0 : 1 - stackIndex * 0.25,
-                        }}
-                        transition={{ type: "spring", stiffness: 200, damping: 22 }}
-                        style={{
-                          zIndex: 20 - stackIndex,
-                          position: "absolute",
-                          inset: 0,
-                        }}
-                        className={`rounded-[2.5rem] border p-6 sm:p-8 shadow-2xl backdrop-blur-2xl flex flex-col justify-between ${
-                          isTop
-                            ? "border-[#f8ca14]/50 bg-[#0c141a] shadow-[0_20px_60px_rgba(0,0,0,0.8)] ring-1 ring-[#f8ca14]/30"
-                            : "border-white/10 bg-[#080d12]/90 pointer-events-none"
-                        }`}
-                      >
-                        <div>
-                          {/* Header */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="rounded-xl bg-[#015a37] text-white px-3 py-1 text-xs font-black">
-                              {fac.tag} ✦
-                            </span>
-                            <span className="text-xs font-bold text-slate-400">
-                              بطاقة {fIdx + 1} من {currentFacilities.length}
-                            </span>
-                          </div>
-
-                          {/* Image */}
-                          <div className="relative rounded-2xl overflow-hidden aspect-[16/9] mb-4">
-                            <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                            <span className="absolute bottom-3 right-3 text-lg font-black text-white">
-                              {fac.name}
-                            </span>
-                          </div>
-
-                          <p className="text-xs leading-relaxed text-slate-300 font-medium line-clamp-2">
-                            {fac.desc}
-                          </p>
-                        </div>
-
-                        {/* Metrics & Actions */}
-                        <div>
-                          <div className="grid grid-cols-4 gap-2 my-4">
-                            {fac.giantMetrics.map((gm, gIdx) => (
-                              <div key={gIdx} className="p-2 rounded-xl border border-white/10 bg-black/40 text-center">
-                                <span className="block text-sm font-black text-[#f8ca14]">{gm.num}</span>
-                                <span className="block text-[9px] font-bold text-white truncate">{gm.label}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 pt-2">
-                            <button
-                              type="button"
-                              onClick={() => setActiveFacilityIndex((i) => (i + 1) % currentFacilities.length)}
-                              className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 hover:opacity-95 text-white text-xs font-black shadow-lg transition active:scale-95"
-                            >
-                              اقلب للمرفق التالي (سحب الكرت) 🎴 ❯
-                            </button>
-                            <Button
-                              onClick={() => navigate("/admissions")}
-                              variant="outline"
-                              className="py-3 rounded-xl text-xs font-black border-white/20 text-white"
-                            >
-                              حجز جولة ✦
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ========================================================
-              MODE 4: ARCHITECTURAL BLUEPRINT ZOOM (Tactical Schematic)
-          ======================================================== */}
-          {transitionMode === "blueprint" && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="max-w-6xl mx-auto"
-            >
-              <div className="rounded-[2.5rem] border border-emerald-500/30 bg-[#060c10] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-                {/* Blueprint Grid Lines Background */}
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-15"
-                  style={{
-                    backgroundImage: "linear-gradient(to right, #015a37 1px, transparent 1px), linear-gradient(to bottom, #015a37 1px, transparent 1px)",
-                    backgroundSize: "32px 32px",
-                  }}
-                />
-
-                {/* Tactical HUD Header */}
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-8 relative z-10 border-b border-emerald-500/20 pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-emerald-400 animate-ping" />
-                    <span className="font-mono text-xs font-black text-emerald-400 tracking-wider">
-                      SCHEMATIC ARCHITECTURE // AL-AQEEQ COMPLEX 24°28'N 39°36'E
-                    </span>
-                  </div>
-                  <span className="text-xs font-black text-[#f8ca14] bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 rounded-xl">
-                    المخطط الهندسي التفاعلي لصروح العقيق
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-                  {/* Left: Sector Radar Navigation Buttons (5 cols) */}
-                  <div className="lg:col-span-5 space-y-3">
-                    <h4 className="text-xs font-black text-slate-400 mb-2">
-                      انقر على قطاع المجمع لزووم الكاميرا الفوري:
-                    </h4>
-                    {currentFacilities.map((fac, fIdx) => {
-                      const FacIcon = fac.icon;
-                      const isTarget = activeFacilityIndex === fIdx;
-
-                      return (
-                        <button
-                          key={fac.id}
-                          type="button"
-                          onClick={() => setActiveFacilityIndex(fIdx)}
-                          className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all text-right ${
-                            isTarget
-                              ? "border-emerald-400 bg-emerald-500/15 text-white shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400"
-                              : "border-white/10 bg-black/40 text-slate-400 hover:border-white/20 hover:text-white"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`grid h-9 w-9 place-items-center rounded-xl border ${
-                              isTarget ? "border-emerald-400 text-emerald-400 bg-emerald-950" : "border-white/10 text-slate-400"
-                            }`}>
-                              <FacIcon size={16} />
-                            </div>
-                            <div>
-                              <span className="block text-[10px] font-mono text-emerald-400">SECTOR 0{fIdx + 1}</span>
-                              <span className="text-xs font-black">{fac.name}</span>
-                            </div>
-                          </div>
-                          <span className="font-mono text-[11px] font-bold text-slate-500">
-                            {isTarget ? "TARGET LOCKED" : "INSPECT"}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Right: Camera Zoom Telemetry Pod (7 cols) */}
-                  <div className="lg:col-span-7">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeFacility.id}
-                        initial={{ opacity: 0, scale: 0.94, filter: "blur(4px)" }}
-                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                        exit={{ opacity: 0, scale: 1.06, filter: "blur(4px)" }}
-                        transition={{ duration: 0.35, ease: "easeOut" }}
-                        className="rounded-3xl border border-emerald-500/30 bg-black/70 p-6 backdrop-blur-xl shadow-2xl relative overflow-hidden"
-                      >
-                        {/* Scope Crosshairs in Corners */}
-                        <div className="pointer-events-none absolute top-3 left-3 font-mono text-[10px] text-emerald-400/60">┌── 01</div>
-                        <div className="pointer-events-none absolute top-3 right-3 font-mono text-[10px] text-emerald-400/60">──┐ 02</div>
-                        <div className="pointer-events-none absolute bottom-3 left-3 font-mono text-[10px] text-emerald-400/60">└── 03</div>
-                        <div className="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] text-emerald-400/60">──┘ 04</div>
-
-                        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] mb-5 border border-emerald-500/20 shadow-inner">
-                          <img
-                            src={activeFacility.image}
-                            alt={activeFacility.name}
-                            className="h-full w-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
-                          <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white">
-                            <div>
-                              <span className="font-mono text-[10px] text-emerald-400 block">TACTICAL ZOOM ACTIVE</span>
-                              <h3 className="text-xl font-black">{activeFacility.name}</h3>
-                            </div>
-                            <span className="rounded-lg bg-emerald-600/90 px-2.5 py-1 text-[10px] font-mono font-bold">
-                              {activeFacility.badge}
-                            </span>
-                          </div>
-                        </div>
-
-                        <p className="text-xs leading-relaxed text-slate-300 font-medium mb-5">
-                          {activeFacility.desc}
-                        </p>
-
-                        <div className="grid grid-cols-4 gap-2 mb-6">
-                          {activeFacility.giantMetrics.map((gm, gIdx) => (
-                            <div key={gIdx} className="p-2 rounded-xl border border-emerald-500/20 bg-emerald-950/30 text-center">
-                              <span className="block text-base font-black text-[#f8ca14]">{gm.num}</span>
-                              <span className="block text-[10px] font-bold text-white truncate">{gm.label}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <a
-                            href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex-1 text-center py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-black shadow transition"
-                          >
-                            ملاحة GPS مباشرة 📍
-                          </a>
-                          <Button
-                            onClick={() => navigate("/admissions")}
-                            variant="outline"
-                            className="flex-1 py-3 rounded-xl text-xs font-black border-emerald-500/30 text-white"
-                          >
-                            حجز موعد زيارة ميدانية ✦
-                          </Button>
-                        </div>
-                      </motion.div>
                     </AnimatePresence>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
-{/* ========================================================
+      {/* ========================================================
           STAGE 3: Royal Strategic Document: Vision & Mission 2030 (Dual-Wing 3D Pivot)
       ======================================================== */}
       <section ref={visionSectionRef} id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
