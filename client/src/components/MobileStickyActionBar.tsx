@@ -77,7 +77,9 @@ export function MobileStickyActionBar() {
   return (
     <div
       dir="rtl"
-      className={`fixed bottom-0 inset-x-0 z-40 lg:hidden transition-all duration-300 ease-out ${
+      data-no-visual-edit="true"
+      data-mobile-bar="true"
+      className={`aq-mobile-bar fixed bottom-0 inset-x-0 z-40 lg:hidden transition-all duration-300 ease-out ${
         visible
           ? "translate-y-0 opacity-100 pointer-events-auto"
           : "translate-y-full opacity-0 pointer-events-none"

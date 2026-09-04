@@ -1050,9 +1050,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       <>
       <div
         dir="rtl"
+        data-no-visual-edit="true"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="fixed right-3.5 sm:right-6 z-50 select-none transition-[bottom] duration-300 ease-out"
+        className="aq-podcast-player fixed right-3.5 sm:right-6 z-50 select-none transition-[bottom] duration-300 ease-out"
         style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
       >
           <div className="relative flex items-center gap-3">

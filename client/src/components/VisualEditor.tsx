@@ -976,7 +976,34 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    if (isEditing) {
+    const isInteractiveOrSystemElement = (node: Element | null): boolean => {
+      if (!node) return false;
+      return Boolean(
+        node.closest("header") ||
+        node.closest("nav") ||
+        node.closest(".aq-editor-toolbar") ||
+        node.closest(".aq-editor-drawer") ||
+        node.closest("[data-aq-editor-properties]") ||
+        node.closest("[data-radix-popper-content-wrapper]") ||
+        node.closest("[role='dialog']") ||
+        node.closest("[role='menu']") ||
+        node.closest("[role='listbox']") ||
+        node.closest("[role='tooltip']") ||
+        node.closest(".aq-stories-bubble") ||
+        node.closest("[data-story-item]") ||
+        node.closest(".aq-podcast-player") ||
+        node.closest("[data-podcast-player]") ||
+        node.closest("audio") ||
+        node.closest("form") ||
+        node.closest("button") ||
+        node.closest("a") ||
+        node.closest("input, textarea, select") ||
+        node.closest("[data-no-visual-edit]") ||
+        node.closest("[data-mobile-bar]")
+      );
+    };
+
+    if (isEditing && !previewMode) {
       document.body.classList.add("aq-smart-editable-active");
     } else {
       document.body.classList.remove("aq-smart-editable-active");
@@ -986,10 +1013,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const root = document.getElementById("root") || document.body;
       if (!root) return;
 
-      // 1. Scan Images
+      // 1. Scan Images (exclude images inside navigation, buttons, player, or dialogs)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (img.closest(".aq-editor-toolbar") || img.closest(".aq-editor-drawer") || img.closest("[data-aq-editor-properties]") || img.closest("[data-radix-popper-content-wrapper]")) return;
+        if (isInteractiveOrSystemElement(img)) return;
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
@@ -1012,12 +1039,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      // 2. Scan Text Elements (headings, paragraphs, buttons, spans, links)
+      // 2. Scan Text Elements (headings, paragraphs, blockquotes — NOT interactive buttons or links)
       const textNodes = Array.from(root.querySelectorAll<HTMLElement>(
-        "h1, h2, h3, h4, h5, h6, p, button, a, label, span"
+        "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption"
       ));
       textNodes.forEach((node, idx) => {
-        if (node.closest(".aq-editor-toolbar") || node.closest(".aq-editor-drawer") || node.closest("[data-aq-editor-properties]") || node.closest("[data-radix-popper-content-wrapper]")) return;
+        if (isInteractiveOrSystemElement(node)) return;
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Check if node has direct text content
@@ -1027,7 +1054,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           .join("")
           .trim();
 
-        if (!directText || directText.length < 1 || directText.length > 250) return;
+        if (!directText || directText.length < 1 || directText.length > 300) return;
 
         let id = node.dataset.visualId;
         if (!id) {
@@ -1052,10 +1079,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      // 3. Scan SVG Icons
+      // 3. Scan SVG Icons (only content icons, not button or navigation icons)
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (svg.closest(".aq-editor-toolbar") || svg.closest(".aq-editor-drawer") || svg.closest("[data-aq-editor-properties]") || svg.closest("[data-radix-popper-content-wrapper]")) return;
+        if (isInteractiveOrSystemElement(svg)) return;
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
@@ -1078,8 +1105,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     scanAndTag();
 
     const handleCaptureClick = (e: globalThis.MouseEvent) => {
-      if (!isEditing) return;
-      const target = (e.target as Element)?.closest<HTMLElement>("[data-visual-auto='true']");
+      if (!isEditing || previewMode) return;
+      if (e.metaKey || e.ctrlKey) return;
+      const targetEl = e.target as Element | null;
+      if (!targetEl || isInteractiveOrSystemElement(targetEl)) return;
+
+      const target = targetEl.closest<HTMLElement>("[data-visual-auto='true']");
       if (target && !target.closest(".aq-editor-toolbar") && !target.closest(".aq-editor-drawer")) {
         e.preventDefault();
         e.stopPropagation();
@@ -1092,7 +1123,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    if (isEditing) {
+    if (isEditing && !previewMode) {
       window.addEventListener("click", handleCaptureClick, true);
     }
 
@@ -1106,7 +1137,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
-  }, [isEditing, overrideMap, pagePath]);
+  }, [isEditing, previewMode, overrideMap, pagePath]);
 
   const saveLayer = (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => {
     if (!pagePath) return;

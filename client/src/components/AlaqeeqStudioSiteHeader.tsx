@@ -176,7 +176,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const activeLogo = logoUrl || "/alaqeeq-logo.png";
 
   return (
-    <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
+    <div data-no-visual-edit="true" dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
       {/* 1. Top Executive Utility Bar */}
       <div className={`hidden sm:block border-b text-[11px] font-bold py-1.5 transition-colors ${
         dark ? "border-white/5 bg-[#010f08]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
@@ -406,81 +406,48 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
 
             {/* 4. المجلة */}
-            <VisualEditable
-              id="aqeeq-studio-nav-journal"
-              tag="button"
-              label="اسم رابط المجلة"
-              defaultText={
-                orchestration?.nav?.journalLabel === "مجلة العقيق"
-                  ? "المجلة"
-                  : orchestration?.nav?.journalLabel || "المجلة"
-              }
-              as="button"
-              onAction={() => go("/journal")}
+            <button
+              onClick={() => go("/journal")}
               className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
-            />
+            >
+              {orchestration?.nav?.journalLabel === "مجلة العقيق" ? "المجلة" : orchestration?.nav?.journalLabel || "المجلة"}
+            </button>
 
             {/* 5. الألبومات */}
-            <VisualEditable
-              id="aqeeq-studio-nav-albums"
-              tag="button"
-              label="اسم رابط الألبوم"
-              defaultText={
-                orchestration?.nav?.albumsLabel === "ألبوم العقيق"
-                  ? "الألبومات"
-                  : orchestration?.nav?.albumsLabel || "الألبومات"
-              }
-              as="button"
-              onAction={() => go("/albums")}
+            <button
+              onClick={() => go("/albums")}
               className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
-            />
+            >
+              {orchestration?.nav?.albumsLabel === "ألبوم العقيق" ? "الألبومات" : orchestration?.nav?.albumsLabel || "الألبومات"}
+            </button>
 
             {/* 6. أثير */}
-            <VisualEditable
-              id="aqeeq-studio-nav-podcast"
-              tag="button"
-              label="اسم رابط أثير"
-              defaultText={
-                (orchestration?.nav as any)?.podcastLabel === "أثير العقيق" ||
-                (orchestration?.nav as any)?.podcastLabel === "أثير العقيق 🎙️"
-                  ? "أثير"
-                  : (orchestration?.nav as any)?.podcastLabel || "أثير"
-              }
-              as="button"
-              onAction={() => go("/atheer")}
+            <button
+              onClick={() => go("/atheer")}
               className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
-            />
+            >
+              {(orchestration?.nav as any)?.podcastLabel === "أثير العقيق" || (orchestration?.nav as any)?.podcastLabel === "أثير العقيق 🎙️"
+                ? "أثير"
+                : (orchestration?.nav as any)?.podcastLabel || "أثير"}
+            </button>
 
             {/* 7. المقالات */}
-            <VisualEditable
-              id="aqeeq-studio-nav-articles"
-              tag="button"
-              label="اسم رابط المقالات"
-              defaultText={
-                (orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" ||
-                (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق"
-                  ? "المقالات"
-                  : (orchestration?.nav as any)?.articlesLabel || "المقالات"
-              }
-              as="button"
-              onAction={() => go("/articles")}
+            <button
+              onClick={() => go("/articles")}
               className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
-            />
+            >
+              {(orchestration?.nav as any)?.articlesLabel === "المقالات ✍️" || (orchestration?.nav as any)?.articlesLabel === "مقالات وأقلام العقيق"
+                ? "المقالات"
+                : (orchestration?.nav as any)?.articlesLabel || "المقالات"}
+            </button>
 
             {/* 8. الأخبار */}
-            <VisualEditable
-              id="aqeeq-studio-nav-showcase"
-              tag="button"
-              label="اسم رابط الأخبار"
-              defaultText={
-                orchestration?.nav?.showcaseLabel === "الأخبار والعروض"
-                  ? "الأخبار"
-                  : orchestration?.nav?.showcaseLabel || "الأخبار"
-              }
-              as="button"
-              onAction={() => go("/offers")}
+            <button
+              onClick={() => go("/offers")}
               className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
-            />
+            >
+              {orchestration?.nav?.showcaseLabel === "الأخبار والعروض" ? "الأخبار" : orchestration?.nav?.showcaseLabel || "الأخبار"}
+            </button>
           </nav>
 
 

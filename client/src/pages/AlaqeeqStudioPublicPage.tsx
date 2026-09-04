@@ -268,7 +268,8 @@ export default function AlaqeeqStudioPublicPage() {
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay, backgroundPatternUrl, backgroundPatternOpacity, customBadgeText, variantInfo } = useSiteTheme();
   const dark = theme === "dark";
-  const { isEditing, select, selectedId } = useVisualEditorState();
+  const { isEditing, isPreviewing, select, selectedId } = useVisualEditorState();
+  const isEditorActive = isEditing && !isPreviewing;
 
   const { data: issues = [], isLoading: issuesLoading } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: albums = [], isLoading: albumsLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -784,7 +785,7 @@ export default function AlaqeeqStudioPublicPage() {
 
       {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) */}
       {storiesList.length > 0 ? (
-        <section className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
+        <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
           isNationalDay
             ? dark ? "border-[#f8ca14]/10 bg-[#010f08]/90" : "border-[#005A36]/10 bg-[#f0fdf4]/90"
             : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
@@ -956,7 +957,7 @@ export default function AlaqeeqStudioPublicPage() {
 
 
             {/* Quick Action CTA Buttons */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div data-no-visual-edit="true" className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
@@ -1044,7 +1045,7 @@ export default function AlaqeeqStudioPublicPage() {
           {/* Overlapping Hero Covers with 3D Fan-out on Scroll & 3D Interactive Mouse Tilt */}
           <div className="relative">
             {/* Quick Hero Covers Direct Edit Bar in Visual Editor Mode */}
-            {isEditing && (
+            {isEditorActive && (
               <div className="mb-5 mx-auto w-fit z-50 flex flex-wrap items-center justify-center gap-2 bg-[#0b0f17]/95 border-2 border-amber-400/80 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-xl">
                 <span className="text-xs font-black text-amber-400 ml-1">تعديل الأغلفة الثلاثة مباشرة:</span>
                 <button
@@ -1093,9 +1094,9 @@ export default function AlaqeeqStudioPublicPage() {
             )}
 
             <motion.div
-              onMouseMove={isEditing ? undefined : handleHeroMouseMove}
-              onMouseLeave={isEditing ? undefined : handleHeroMouseLeave}
-              style={isEditing ? {} : { rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
+              onMouseMove={isEditorActive ? undefined : handleHeroMouseMove}
+              onMouseLeave={isEditorActive ? undefined : handleHeroMouseLeave}
+              style={isEditorActive ? {} : { rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
               className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
             >
               {/* Back Card: Showcase / Vision & Excellence */}
@@ -1104,16 +1105,16 @@ export default function AlaqeeqStudioPublicPage() {
                 role="button"
                 tabIndex={0}
                 onClick={(e) => {
-                  if (isEditing) {
+                  if (isEditorActive) {
                     e.stopPropagation();
                     select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار");
                     return;
                   }
                   navigate("/offers");
                 }}
-                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (isEditing ? select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار") : navigate("/offers"))}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (isEditorActive ? select("studio-hero-showcase-image", "image", "صورة غلاف الأخبار") : navigate("/offers"))}
                 className={"absolute bottom-[12%] right-[1%] top-[14%] w-[45%] overflow-hidden rounded-[1.6rem] border cursor-pointer will-change-transform transition-all duration-300 " + (
-                  isEditing
+                  isEditorActive
                     ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#6565e0] opacity-100 shadow-2xl"
                     : "z-0 opacity-75 hover:opacity-100 hover:scale-[1.03] duration-500 "
                 ) + (
@@ -1130,7 +1131,7 @@ export default function AlaqeeqStudioPublicPage() {
                   alt="غلاف الأخبار والعروض"
                   className="h-full w-full object-cover"
                 />
-                {isEditing ? (
+                {isEditorActive ? (
                   <div className="absolute top-2.5 left-2.5 z-40 bg-[#6565e0] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
                     <span>📰 غلاف الأخبار</span>
                   </div>
@@ -1147,7 +1148,7 @@ export default function AlaqeeqStudioPublicPage() {
                 role="button"
                 tabIndex={0}
                 onClick={(e) => {
-                  if (isEditing) {
+                  if (isEditorActive) {
                     e.stopPropagation();
                     select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
                     return;
@@ -1156,7 +1157,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
-                    if (isEditing) {
+                    if (isEditorActive) {
                       select("studio-hero-album-image", "image", "صورة غلاف الألبومات");
                       return;
                     }
@@ -1164,7 +1165,7 @@ export default function AlaqeeqStudioPublicPage() {
                   }
                 }}
                 className={"group absolute bottom-[8%] left-[28%] top-[8%] w-[53%] cursor-pointer overflow-hidden rounded-[1.8rem] border transition duration-300 will-change-transform " + (
-                  isEditing
+                  isEditorActive
                     ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#5aba1c] shadow-2xl"
                     : "z-10 hover:scale-[1.02]"
                 ) + " " + (
@@ -1182,7 +1183,7 @@ export default function AlaqeeqStudioPublicPage() {
                   alt="غلاف ألبوم العقيق"
                   className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
                 />
-                {isEditing ? (
+                {isEditorActive ? (
                   <div className="absolute top-2.5 left-2.5 z-40 bg-[#5aba1c] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
                     <span>📸 غلاف الألبومات</span>
                   </div>
@@ -1199,7 +1200,7 @@ export default function AlaqeeqStudioPublicPage() {
                 role="button"
                 tabIndex={0}
                 onClick={(e) => {
-                  if (isEditing) {
+                  if (isEditorActive) {
                     e.stopPropagation();
                     select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
                     return;
@@ -1208,7 +1209,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
-                    if (isEditing) {
+                    if (isEditorActive) {
                       select("studio-hero-journal-image", "image", "صورة غلاف المجلة");
                       return;
                     }
@@ -1216,7 +1217,7 @@ export default function AlaqeeqStudioPublicPage() {
                   }
                 }}
                 className={"group absolute bottom-[2%] left-[1%] top-[5%] w-[48%] cursor-pointer overflow-hidden rounded-[1.9rem] border p-2 transition duration-300 will-change-transform " + (
-                  isEditing
+                  isEditorActive
                     ? "z-30 hover:z-[60] hover:scale-[1.08] ring-2 ring-[#f8ca14] shadow-2xl"
                     : "z-20 hover:scale-[1.02]"
                 ) + " " + (
@@ -1236,7 +1237,7 @@ export default function AlaqeeqStudioPublicPage() {
                   alt="غلاف مجلة العقيق"
                   className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
                 />
-                {isEditing ? (
+                {isEditorActive ? (
                   <div className="absolute top-2.5 left-2.5 z-40 bg-[#f8ca14] text-black text-[10px] font-black px-2 py-0.5 rounded-lg shadow-xl flex items-center gap-1 pointer-events-none">
                     <span>📘 غلاف المجلة</span>
                   </div>
