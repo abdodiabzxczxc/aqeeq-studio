@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -54,6 +54,15 @@ export default function AqeeqSchoolAdmissionsPage() {
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const [activeTrack, setActiveTrack] = useState<TrackType>("national");
   const [feesViewMode, setFeesViewMode] = useState<"cards" | "table">("cards");
@@ -707,10 +716,10 @@ export default function AqeeqSchoolAdmissionsPage() {
         <div ref={feesConsoleRef} style={{ perspective: "1200px" }} className="mb-14">
           <motion.div
             style={{
-              rotateX: feesRotateX,
-              rotateY: feesRotateY,
-              scale: feesScale,
-              transformStyle: "preserve-3d",
+              rotateX: isDesktop ? feesRotateX : 0,
+              rotateY: isDesktop ? feesRotateY : 0,
+              scale: isDesktop ? feesScale : 1,
+              transformStyle: isDesktop ? "preserve-3d" : "flat",
             }}
             className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition will-change-transform ${
               dark

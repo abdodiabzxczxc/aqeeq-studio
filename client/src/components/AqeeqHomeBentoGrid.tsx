@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Play, BookOpen, ImageIcon, Mic, Newspaper, Sparkles, ArrowUpLeft, Disc, Volume2 } from "lucide-react";
@@ -46,6 +46,15 @@ export function AqeeqHomeBentoGrid({
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const { playEpisode } = usePodcastPlayer();
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const [isAlbumHovered, setIsAlbumHovered] = useState(false);
   const [isJournalHovered, setIsJournalHovered] = useState(false);
@@ -169,16 +178,16 @@ export function AqeeqHomeBentoGrid({
             {latestAlbum && (
               <motion.div
                 ref={c1.ref}
-                onMouseMove={(e) => { c1.onMove(e); setIsAlbumHovered(true); }}
-                onMouseLeave={() => { c1.onLeave(); setIsAlbumHovered(false); }}
+                onMouseMove={(e) => { if (isDesktop) { c1.onMove(e); setIsAlbumHovered(true); } }}
+                onMouseLeave={() => { if (isDesktop) { c1.onLeave(); setIsAlbumHovered(false); } }}
                 style={{
-                  y: albumY,
-                  rotateX: c1.tilt.x,
-                  rotateY: c1.tilt.y,
-                  transformStyle: "preserve-3d",
-                  perspective: 1200,
+                  y: isDesktop ? albumY : 0,
+                  rotateX: isDesktop ? c1.tilt.x : 0,
+                  rotateY: isDesktop ? c1.tilt.y : 0,
+                  transformStyle: isDesktop ? "preserve-3d" : "flat",
+                  perspective: isDesktop ? 1200 : undefined,
                 }}
-                whileHover={{ y: -10, scale: 1.015 }}
+                whileHover={isDesktop ? { y: -10, scale: 1.015 } : undefined}
                 transition={{ type: "spring", stiffness: 220, damping: 18 }}
                 className="md:col-span-2 lg:col-span-2 lg:row-span-2 will-change-transform relative"
               >
@@ -288,16 +297,16 @@ export function AqeeqHomeBentoGrid({
                 {latestIssue && (
                   <motion.div
                     ref={c2.ref}
-                    onMouseMove={(e) => { c2.onMove(e); setIsJournalHovered(true); }}
-                    onMouseLeave={() => { c2.onLeave(); setIsJournalHovered(false); }}
+                    onMouseMove={(e) => { if (isDesktop) { c2.onMove(e); setIsJournalHovered(true); } }}
+                    onMouseLeave={() => { if (isDesktop) { c2.onLeave(); setIsJournalHovered(false); } }}
                     style={{
-                      y: journalY,
-                      rotateX: c2.tilt.x,
-                      rotateY: c2.tilt.y,
-                      transformStyle: "preserve-3d",
-                      perspective: 1000,
+                      y: isDesktop ? journalY : 0,
+                      rotateX: isDesktop ? c2.tilt.x : 0,
+                      rotateY: isDesktop ? c2.tilt.y : 0,
+                      transformStyle: isDesktop ? "preserve-3d" : "flat",
+                      perspective: isDesktop ? 1000 : undefined,
                     }}
-                    whileHover={{ y: -8, scale: 1.02 }}
+                    whileHover={isDesktop ? { y: -8, scale: 1.02 } : undefined}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 lg:col-span-2 will-change-transform relative"
                   >
@@ -367,16 +376,16 @@ export function AqeeqHomeBentoGrid({
                 {latestPodcast && (
                   <motion.div
                     ref={c3.ref}
-                    onMouseMove={(e) => { c3.onMove(e); setIsPodcastHovered(true); }}
-                    onMouseLeave={() => { c3.onLeave(); setIsPodcastHovered(false); }}
+                    onMouseMove={(e) => { if (isDesktop) { c3.onMove(e); setIsPodcastHovered(true); } }}
+                    onMouseLeave={() => { if (isDesktop) { c3.onLeave(); setIsPodcastHovered(false); } }}
                     style={{
-                      y: podY,
-                      rotateX: c3.tilt.x,
-                      rotateY: c3.tilt.y,
-                      transformStyle: "preserve-3d",
-                      perspective: 1000,
+                      y: isDesktop ? podY : 0,
+                      rotateX: isDesktop ? c3.tilt.x : 0,
+                      rotateY: isDesktop ? c3.tilt.y : 0,
+                      transformStyle: isDesktop ? "preserve-3d" : "flat",
+                      perspective: isDesktop ? 1000 : undefined,
                     }}
-                    whileHover={{ y: -8, scale: 1.02 }}
+                    whileHover={isDesktop ? { y: -8, scale: 1.02 } : undefined}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 will-change-transform relative overflow-visible"
                   >
@@ -454,16 +463,16 @@ export function AqeeqHomeBentoGrid({
                 {latestArticle && (
                   <motion.div
                     ref={c4.ref}
-                    onMouseMove={(e) => { c4.onMove(e); setIsArticleHovered(true); }}
-                    onMouseLeave={() => { c4.onLeave(); setIsArticleHovered(false); }}
+                    onMouseMove={(e) => { if (isDesktop) { c4.onMove(e); setIsArticleHovered(true); } }}
+                    onMouseLeave={() => { if (isDesktop) { c4.onLeave(); setIsArticleHovered(false); } }}
                     style={{
-                      y: artY,
-                      rotateX: c4.tilt.x,
-                      rotateY: c4.tilt.y,
-                      transformStyle: "preserve-3d",
-                      perspective: 1000,
+                      y: isDesktop ? artY : 0,
+                      rotateX: isDesktop ? c4.tilt.x : 0,
+                      rotateY: isDesktop ? c4.tilt.y : 0,
+                      transformStyle: isDesktop ? "preserve-3d" : "flat",
+                      perspective: isDesktop ? 1000 : undefined,
                     }}
-                    whileHover={{ y: -8, scale: 1.02 }}
+                    whileHover={isDesktop ? { y: -8, scale: 1.02 } : undefined}
                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
                     className="md:col-span-1 will-change-transform relative"
                   >

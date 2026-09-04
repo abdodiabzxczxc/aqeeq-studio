@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -43,6 +43,15 @@ export default function AqeeqSchoolAccreditationsPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   // Interactive Tab States
   const [activeHubTab, setActiveHubTab] = useState<"cognia" | "ielts" | "sat" | "stem">("cognia");
@@ -284,20 +293,20 @@ export default function AqeeqSchoolAccreditationsPage() {
               {/* Left Column: Overlapping 3D Credential Covers with 3D Mouse Tilt & Scroll Fan-out (5 cols) */}
               <div className="lg:col-span-5 relative">
                 <motion.div
-                  onMouseMove={handleHeroMouseMove}
-                  onMouseLeave={handleHeroMouseLeave}
+                  onMouseMove={(e) => { if (isDesktop) handleHeroMouseMove(e); }}
+                  onMouseLeave={() => { if (isDesktop) handleHeroMouseLeave(); }}
                   style={{
-                    rotateX: heroTiltX,
-                    rotateY: heroTiltY,
-                    transformStyle: "preserve-3d",
+                    rotateX: isDesktop ? heroTiltX : 0,
+                    rotateY: isDesktop ? heroTiltY : 0,
+                    transformStyle: isDesktop ? "preserve-3d" : "flat",
                   }}
                   className="relative mx-auto h-[320px] w-full max-w-[560px] sm:h-[400px] lg:h-[430px] perspective-1000 will-change-transform select-none"
                 >
                   {/* Card 1 (Back Right on Scroll): WRO World Robot Olympiad */}
                   <motion.div
                     style={{
-                      x: heroBackCardX,
-                      rotate: heroBackCardRotate,
+                      x: isDesktop ? heroBackCardX : 0,
+                      rotate: isDesktop ? heroBackCardRotate : 0,
                       zIndex: 10,
                     }}
                     className={`absolute bottom-[10%] right-[1%] top-[12%] w-[47%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition duration-300 ${
@@ -329,8 +338,8 @@ export default function AqeeqSchoolAccreditationsPage() {
                   {/* Card 2 (Middle Elevated on Scroll): Cognia USA Official Seal Plaque */}
                   <motion.div
                     style={{
-                      y: heroMiddleCardY,
-                      scale: heroMiddleCardScale,
+                      y: isDesktop ? heroMiddleCardY : 0,
+                      scale: isDesktop ? heroMiddleCardScale : 1,
                       zIndex: 30,
                     }}
                     className={`absolute bottom-[6%] left-[26%] top-[6%] w-[53%] rounded-[2rem] sm:rounded-[2.4rem] p-3 sm:p-4 border shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col justify-between overflow-hidden cursor-pointer backdrop-blur-2xl ${
@@ -384,8 +393,8 @@ export default function AqeeqSchoolAccreditationsPage() {
                   {/* Card 3 (Front Left on Scroll): FIRST LEGO League Champions */}
                   <motion.div
                     style={{
-                      x: heroFrontCardX,
-                      rotate: heroFrontCardRotate,
+                      x: isDesktop ? heroFrontCardX : 0,
+                      rotate: isDesktop ? heroFrontCardRotate : 0,
                       zIndex: 20,
                     }}
                     className={`absolute bottom-[2%] left-[1%] top-[3%] w-[49%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition duration-300 ${
