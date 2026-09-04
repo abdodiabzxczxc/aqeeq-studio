@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset, deletePageSection, deleteVisualFreeformElement, deleteVisualElementOverride, getCustomPageBySlug, listCustomPageHistory, listCustomPages, listMediaAssets, listPageSectionHistory, listPageSections, listVisualElementTrash, listVisualFreeformElements, listVisualElementOverrideHistory, listVisualElementOverrides, logAudit, moveVisualElementToTrash, permanentlyDeleteVisualElementTrash, publishPageSection, publishVisualFreeformElement, publishVisualElementOverride, reorderPageSections, restoreCustomPageHistory, restorePageSectionHistory, restoreVisualElementTrash, restoreVisualElementOverrideHistory, updateCustomPage, upsertPageSection, upsertVisualFreeformElement, upsertVisualElementOverride } from "../db";
+import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset, deletePageSection, deleteVisualFreeformElement, deleteVisualElementOverride, getCustomPageBySlug, listCustomPageHistory, listCustomPages, listMediaAssets, listPageSectionHistory, listPageSections, listVisualElementTrash, listVisualFreeformElements, listVisualElementOverrideHistory, listVisualElementOverrides, listAllVisualElementOverrides, logAudit, moveVisualElementToTrash, permanentlyDeleteVisualElementTrash, publishPageSection, publishVisualFreeformElement, publishVisualElementOverride, publishAllVisualElementOverrides, reorderPageSections, restoreCustomPageHistory, restorePageSectionHistory, restoreVisualElementTrash, restoreVisualElementOverrideHistory, updateCustomPage, upsertPageSection, upsertVisualFreeformElement, upsertVisualElementOverride } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 
@@ -50,6 +50,12 @@ function safeFileName(fileName: string) {
 export const visualEditorRouter = router({
   publicList: publicProcedure.input(z.object({ pagePath: pagePathSchema })).query(({ input }) => listVisualElementOverrides(input.pagePath, "published")),
   list: adminProcedure.input(z.object({ pagePath: pagePathSchema })).query(({ input }) => listVisualElementOverrides(input.pagePath, "all")),
+  listAll: adminProcedure.query(() => listAllVisualElementOverrides("all")),
+  publishAll: adminProcedure.mutation(async ({ ctx }) => {
+    const result = await publishAllVisualElementOverrides(ctx.user.id);
+    await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.publish_all", details: JSON.stringify(result) });
+    return result;
+  }),
 
   save: adminProcedure.input(z.object({
     pagePath: pagePathSchema,

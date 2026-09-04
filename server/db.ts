@@ -700,6 +700,22 @@ export type SiteOrchestrationConfig = {
       internationalAnnual: number;
     }>;
   };
+  emergencyBanner?: {
+    enabled: boolean;
+    type: "urgent" | "notice" | "celebration";
+    text: string;
+    linkUrl?: string;
+    linkText?: string;
+  };
+  marketingPixels?: {
+    snapchatPixelId?: string;
+    metaPixelId?: string;
+    tiktokPixelId?: string;
+    googleAnalyticsId?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImageUrl?: string;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -711,6 +727,22 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     articlesLabel: "المقالات ✍️",
     podcastLabel: "أثير العقيق 🎙️",
     logoUrl: "/alaqeeq-logo.png",
+  },
+  emergencyBanner: {
+    enabled: false,
+    type: "urgent",
+    text: "",
+    linkUrl: "",
+    linkText: "",
+  },
+  marketingPixels: {
+    snapchatPixelId: "",
+    metaPixelId: "",
+    tiktokPixelId: "",
+    googleAnalyticsId: "",
+    ogTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
+    ogDescription: "الريادة في التعليم وصناعة المستقبل منذ عام 1994",
+    ogImageUrl: "/alaqeeq-logo.png",
   },
   heroCovers: {
     journalMode: "auto",
@@ -1489,6 +1521,48 @@ export async function listVisualElementOverrides(pagePath: string, scope: "all" 
     if (!row.publishedSnapshot) return [];
     try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return []; }
   });
+}
+
+export async function listAllVisualElementOverrides(scope: "all" | "published" = "all") {
+  const db = await getDb();
+  if (!db) {
+    const overrides = getLocalDb().overrides || {};
+    const rows = Object.values(overrides);
+    if (scope === "all") return rows;
+    return rows.filter((r: any) => r.status === "published");
+  }
+  const rows = await db.select().from(visualElementOverrides).orderBy(visualElementOverrides.pagePath, visualElementOverrides.elementId);
+  if (scope === "all") return rows;
+  return rows.flatMap((row) => {
+    if (row.status === "published") return [row];
+    if (!row.publishedSnapshot) return [];
+    try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return []; }
+  });
+}
+
+export async function publishAllVisualElementOverrides(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    const local = getLocalDb();
+    if (local.overrides) {
+      Object.values(local.overrides).forEach((item: any) => {
+        item.status = "published";
+        item.publishedAt = new Date().toISOString();
+      });
+      saveLocalDb();
+    }
+    return { success: true, count: Object.keys(local.overrides || {}).length };
+  }
+  const rows = await db.select().from(visualElementOverrides);
+  for (const row of rows) {
+    await db.update(visualElementOverrides).set({
+      status: "published",
+      publishedSnapshot: JSON.stringify(visualSnapshot(row)),
+      publishedAt: new Date(),
+      updatedBy: userId,
+    }).where(eq(visualElementOverrides.id, row.id));
+  }
+  return { success: true, count: rows.length };
 }
 
 export async function upsertVisualElementOverride(input: VisualOverrideInput) {

@@ -67,7 +67,14 @@ import {
   Building2,
   Smartphone,
   Rocket,
+  Compass,
+  TrendingUp,
+  Database,
+  Upload,
 } from "lucide-react";
+
+import { VisualOverridesDashboardManager } from "@/components/VisualOverridesDashboardManager";
+import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
 
 import {
   Dialog,
@@ -103,16 +110,29 @@ export default function AqeeqAdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
-  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "app" | "campuses" | "sections">("hero");
+  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "header_nav" | "visual_overrides" | "marketing" | "backup" | "app" | "campuses" | "sections">("hero");
   const [contentSubTab, setContentSubTab] = useState<"master" | "articles">("master");
   const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
   const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
   const utils = trpc.useUtils();
+
+  // Keyboard shortcut listener for Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const deployMutation = trpc.deploy.syncToLive.useMutation({
     onSuccess: () => {
@@ -187,10 +207,41 @@ export default function AqeeqAdminDashboardPage() {
 const DEFAULT_ORCHESTRATION = {
   nav: {
     homeLabel: "الرئيسية",
+    aboutLabel: "مدارسنا",
+    accreditationsLabel: "الاعتمادات",
+    admissionsLabel: "القبول والتسجيل",
     journalLabel: "مجلة العقيق",
     albumsLabel: "ألبوم العقيق",
     showcaseLabel: "الأخبار والعروض",
+    articlesLabel: "المقالات ✍️",
+    podcastLabel: "أثير العقيق 🎙️",
+    offersLabel: "العروض والخصومات",
     logoUrl: "/alaqeeq-logo.png",
+    phone: "0148131652",
+    whatsapp: "966500000000",
+    email: "info@alaqeeq.edu.sa",
+    locationText: "المدينة المنورة · ممشى الهجرة",
+    portalsUrl: "https://alaqeeq.edu.sa/portals",
+    jobsUrl: "https://alaqeeq.edu.sa/jobs",
+    ctaButtonText: "القبول والتسجيل 🎓",
+    ctaButtonUrl: "/admissions",
+    hiddenNavKeys: [] as string[],
+  },
+  emergencyBanner: {
+    enabled: false,
+    type: "urgent" as "urgent" | "notice" | "celebration",
+    text: "",
+    linkUrl: "",
+    linkText: "",
+  },
+  marketingPixels: {
+    snapchatPixelId: "",
+    metaPixelId: "",
+    tiktokPixelId: "",
+    googleAnalyticsId: "",
+    ogTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
+    ogDescription: "الريادة في التعليم وصناعة المستقبل منذ عام 1994",
+    ogImageUrl: "/alaqeeq-logo.png",
   },
   heroCovers: {
     journalMode: "auto",
@@ -395,6 +446,8 @@ const DEFAULT_ORCHESTRATION = {
         ...DEFAULT_ORCHESTRATION,
         ...orchestrationData,
         nav: { ...DEFAULT_ORCHESTRATION.nav, ...(orchestrationData.nav || {}) },
+        emergencyBanner: { ...DEFAULT_ORCHESTRATION.emergencyBanner, ...(orchestrationData.emergencyBanner || {}) },
+        marketingPixels: { ...DEFAULT_ORCHESTRATION.marketingPixels, ...(orchestrationData.marketingPixels || {}) },
         heroCovers: { ...DEFAULT_ORCHESTRATION.heroCovers, ...(orchestrationData.heroCovers || {}) },
         weeklyBento: { ...DEFAULT_ORCHESTRATION.weeklyBento, ...(orchestrationData.weeklyBento || {}) },
         sections: { ...DEFAULT_ORCHESTRATION.sections, ...(orchestrationData.sections || {}) },
@@ -821,7 +874,25 @@ const DEFAULT_ORCHESTRATION = {
           </div>
 
           {/* Quick Actions & Profile */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Quick Command Palette (Ctrl+K) */}
+            <button
+              type="button"
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition " + (
+                dark
+                  ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                  : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
+              )}
+              title="البحث السريع وشريط الأوامر (Ctrl + K)"
+            >
+              <Search size={14} className="text-amber-400" />
+              <span className="hidden md:inline">بحث سريع...</span>
+              <kbd className="hidden sm:inline-block rounded border border-current/20 px-1.5 py-0.5 text-[9px] font-mono text-slate-400">
+                ⌘K
+              </kbd>
+            </button>
+
             {/* View Live Site Button */}
             <button
               onClick={() => navigate("/")}
@@ -1013,7 +1084,7 @@ const DEFAULT_ORCHESTRATION = {
               <button
                 type="button"
                 onClick={() => setOrchestrationSubTab("hero")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
                   orchestrationSubTab === "hero"
                     ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
@@ -1025,8 +1096,63 @@ const DEFAULT_ORCHESTRATION = {
 
               <button
                 type="button"
+                onClick={() => setOrchestrationSubTab("header_nav")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
+                  orchestrationSubTab === "header_nav"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Compass size={15} />
+                <span>استوديو الهيدر وشريط الطوارئ 🧭</span>
+                {orchestrationForm.emergencyBanner?.enabled && (
+                  <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab("visual_overrides")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
+                  orchestrationSubTab === "visual_overrides"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Sparkles size={15} />
+                <span>التعديلات المرئية (Overrides Hub) ⚡</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab("marketing")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
+                  orchestrationSubTab === "marketing"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <TrendingUp size={15} />
+                <span>أكواد البكسل وSEO 📈</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab("backup")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
+                  orchestrationSubTab === "backup"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Database size={15} />
+                <span>النسخ الاحتياطي 🛡️</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setOrchestrationSubTab("app")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
                   orchestrationSubTab === "app"
                     ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
@@ -1039,7 +1165,7 @@ const DEFAULT_ORCHESTRATION = {
               <button
                 type="button"
                 onClick={() => setOrchestrationSubTab("campuses")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
                   orchestrationSubTab === "campuses"
                     ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
@@ -1052,7 +1178,7 @@ const DEFAULT_ORCHESTRATION = {
               <button
                 type="button"
                 onClick={() => setOrchestrationSubTab("sections")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
                   orchestrationSubTab === "sections"
                     ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
@@ -3498,6 +3624,664 @@ const DEFAULT_ORCHESTRATION = {
                 </div>
               </div>
             </div>
+            )}
+
+            {/* ==================== SUBTAB: HEADER & NAVIGATION & EMERGENCY ==================== */}
+            {orchestrationSubTab === "header_nav" && (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                {/* 1. Emergency Alert Bar Section */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden ${
+                  orchestrationForm.emergencyBanner?.enabled
+                    ? orchestrationForm.emergencyBanner?.type === "urgent"
+                      ? dark ? "border-rose-500/40 bg-gradient-to-br from-rose-950/40 to-[#121212]" : "border-rose-300 bg-rose-50/50"
+                      : orchestrationForm.emergencyBanner?.type === "celebration"
+                      ? dark ? "border-amber-500/40 bg-gradient-to-br from-amber-950/40 to-[#121212]" : "border-amber-300 bg-amber-50/50"
+                      : dark ? "border-sky-500/40 bg-gradient-to-br from-sky-950/40 to-[#121212]" : "border-sky-300 bg-sky-50/50"
+                    : dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-current/10 pb-5">
+                    <div>
+                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-rose-500/10 text-rose-400 mb-2 border border-rose-500/20">
+                        <Megaphone size={14} />
+                        <span>شريط الإعلانات والطوارئ الفوري في قمة الموقع</span>
+                      </div>
+                      <h3 className="text-xl font-black">شريط التنبيهات العاجل والإعلانات المدرسية</h3>
+                      <p className="text-xs text-slate-400 mt-1 font-bold">
+                        يظهر في أعلى الهيدر مباشرة لجميع الزوار مع خلفية مميزة وأزرار توجيه فورية.
+                      </p>
+                    </div>
+
+                    <label className="relative inline-flex cursor-pointer items-center shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(orchestrationForm.emergencyBanner?.enabled)}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            emergencyBanner: {
+                              ...orchestrationForm.emergencyBanner,
+                              enabled: e.target.checked,
+                            },
+                          })
+                        }
+                        className="peer sr-only"
+                      />
+                      <div className="peer h-7 w-12 rounded-full bg-slate-700 after:absolute after:top-[3px] after:right-[3px] after:h-5.5 after:w-5.5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:-translate-x-5" />
+                    </label>
+                  </div>
+
+                  {orchestrationForm.emergencyBanner?.enabled && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                      <div className="md:col-span-3">
+                        <label className="block text-xs font-black mb-1.5">نوع ومظهر التنبيه:</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: "urgent", label: "🚨 عاجل أحمر (تعليق دراسة / طوارئ)" },
+                            { id: "celebration", label: "✨ مناسبة وتكريم ذهبي" },
+                            { id: "notice", label: "📢 إعلان رسمي أزرق (تسجيل / فعاليات)" },
+                          ].map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() =>
+                                setOrchestrationForm({
+                                  ...orchestrationForm,
+                                  emergencyBanner: {
+                                    ...orchestrationForm.emergencyBanner,
+                                    type: t.id,
+                                  },
+                                })
+                              }
+                              className={`px-4 py-2 rounded-xl text-xs font-black transition border ${
+                                orchestrationForm.emergencyBanner?.type === t.id
+                                  ? "bg-white text-black border-white shadow"
+                                  : dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/10 bg-slate-100 text-slate-700"
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-black mb-1">نص التنبيه:</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.emergencyBanner?.text || ""}
+                          onChange={(e) =>
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              emergencyBanner: {
+                                ...orchestrationForm.emergencyBanner,
+                                text: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="مثال: إعلان عاجل: تعليق الدراسة الحضورية غداً وتحويلها عن بُعد عبر منصة مدرستي"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black mb-1">رابط التوجيه (اختياري):</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.emergencyBanner?.linkUrl || ""}
+                          onChange={(e) =>
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              emergencyBanner: {
+                                ...orchestrationForm.emergencyBanner,
+                                linkUrl: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="/news أو رابط خارجي"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Main Navigation Links (The 9 Links) */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
+                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-amber-400/10 text-amber-500 mb-2 border border-amber-400/20">
+                      <Compass size={14} />
+                      <span>قوائم التنقل الرئيسية الـ 9</span>
+                    </div>
+                    <h3 className="text-xl font-black">إدارة روابط قائمة الهيدر</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      يمكنك تعديل اسم كل صفحة في القائمة الرئيسية أو إخفاء أي صفحة مؤقتاً بنقرة زر واحدة.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[
+                      { key: "homeLabel", defaultVal: "الرئيسية", path: "/", id: "nav-home" },
+                      { key: "aboutLabel", defaultVal: "مدارسنا", path: "/about", id: "nav-about" },
+                      { key: "accreditationsLabel", defaultVal: "الاعتمادات", path: "/accreditations", id: "nav-accreditations" },
+                      { key: "admissionsLabel", defaultVal: "القبول والتسجيل", path: "/admissions", id: "nav-admissions" },
+                      { key: "journalLabel", defaultVal: "صحيفة ومجلة العقيق", path: "/journal", id: "nav-journal" },
+                      { key: "albumsLabel", defaultVal: "ألبوم العقيق", path: "/albums", id: "nav-albums" },
+                      { key: "podcastLabel", defaultVal: "أثير وبودكاست العقيق", path: "/podcast", id: "nav-podcast" },
+                      { key: "articlesLabel", defaultVal: "المقالات والأخبار", path: "/articles", id: "nav-articles" },
+                      { key: "offersLabel", defaultVal: "العروض والخصومات", path: "/offers", id: "nav-offers" },
+                    ].map((item, idx) => {
+                      const isHidden = (orchestrationForm.nav?.hiddenNavKeys || []).includes(item.id);
+                      return (
+                        <div
+                          key={item.key}
+                          className={`rounded-2xl border p-4 transition ${
+                            isHidden
+                              ? "opacity-50 border-dashed"
+                              : dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50/80"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-black text-amber-500 font-mono">#{idx + 1} {item.path}</span>
+                            <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-400">
+                              <input
+                                type="checkbox"
+                                checked={!isHidden}
+                                onChange={(e) => {
+                                  const currentHidden = orchestrationForm.nav?.hiddenNavKeys || [];
+                                  const updatedHidden = e.target.checked
+                                    ? currentHidden.filter((k: string) => k !== item.id)
+                                    : [...currentHidden, item.id];
+                                  setOrchestrationForm({
+                                    ...orchestrationForm,
+                                    nav: {
+                                      ...orchestrationForm.nav,
+                                      hiddenNavKeys: updatedHidden,
+                                    },
+                                  });
+                                }}
+                                className="rounded"
+                              />
+                              <span>ظاهر</span>
+                            </label>
+                          </div>
+                          <label className="block text-[11px] font-black text-slate-400 mb-1">اسم الرابط بالقائمة:</label>
+                          <input
+                            type="text"
+                            value={orchestrationForm.nav?.[item.key] || item.defaultVal}
+                            onChange={(e) =>
+                              setOrchestrationForm({
+                                ...orchestrationForm,
+                                nav: {
+                                  ...orchestrationForm.nav,
+                                  [item.key]: e.target.value,
+                                },
+                              })
+                            }
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                            }`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 3. Top Bar Contact Info & Logo */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
+                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <h3 className="text-xl font-black">شعار الموقع وبيانات الشريط العلوي (Top Bar)</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      أرقام التواصل والبريد وروابط البوابات السريعة التي تظهر في أعلى الهيدر.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">شعار المدارس (Logo URL):</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.nav?.logoUrl || "/alaqeeq-logo.png"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, logoUrl: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">هاتف الاتصال الرئيسي:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.nav?.phone || "0148131652"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, phone: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">واتساب المدارس:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.nav?.whatsapp || "966500000000"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, whatsapp: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">البريد الإلكتروني:</label>
+                      <input
+                        type="email"
+                        value={orchestrationForm.nav?.email || "info@alaqeeq.edu.sa"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, email: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">رابط بوابات الدخول (Portals):</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.nav?.portalsUrl || "https://alaqeeq.edu.sa/portals"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, portalsUrl: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 mb-1">نص زر الإجراء بالهيدر (CTA):</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.nav?.ctaButtonText || "القبول والتسجيل 🎓"}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            nav: { ...orchestrationForm.nav, ctaButtonText: e.target.value },
+                          })
+                        }
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ==================== SUBTAB: VISUAL OVERRIDES HUB ==================== */}
+            {orchestrationSubTab === "visual_overrides" && (
+              <div className="animate-in fade-in duration-300">
+                <VisualOverridesDashboardManager onNavigateToPage={(p) => navigate(p)} />
+              </div>
+            )}
+
+            {/* ==================== SUBTAB: MARKETING & PIXELS & SEO ==================== */}
+            {orchestrationSubTab === "marketing" && (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                {/* Pixels Section */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
+                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-purple-500/10 text-purple-400 mb-2 border border-purple-500/20">
+                      <TrendingUp size={14} />
+                      <span>تتبع الحملات الإعلانية ومعدلات التحويل</span>
+                    </div>
+                    <h3 className="text-xl font-black">أكواد وبكسل منصات التسويق (Tracking Pixels)</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      ضع معرفات البكسل الخاصة بحملاتك الإعلانية؛ ليتم تفعيلها تلقائياً لتتبع الزيارات ونماذج القبول والتسجيل.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-amber-400 mb-1">Snapchat Pixel ID 👻:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.snapchatPixelId || ""}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            marketingPixels: {
+                              ...orchestrationForm.marketingPixels,
+                              snapchatPixelId: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-sky-400 mb-1">Meta / Facebook Pixel ID 🔵:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.metaPixelId || ""}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            marketingPixels: {
+                              ...orchestrationForm.marketingPixels,
+                              metaPixelId: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="123456789012345"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-rose-400 mb-1">TikTok Pixel ID 🎵:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.tiktokPixelId || ""}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            marketingPixels: {
+                              ...orchestrationForm.marketingPixels,
+                              tiktokPixelId: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="CXXXXXXXXXXXXXXXXX"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-emerald-400 mb-1">Google Analytics ID (GA4) 📊:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.googleAnalyticsId || ""}
+                        onChange={(e) =>
+                          setOrchestrationForm({
+                            ...orchestrationForm,
+                            marketingPixels: {
+                              ...orchestrationForm.marketingPixels,
+                              googleAnalyticsId: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="G-XXXXXXXXXX"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* OpenGraph & Social Preview Section */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
+                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <h3 className="text-xl font-black">معاينة الروابط في واتساب وشبكات التواصل (Social Share Card)</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      العنوان، الوصف، وصورة الغلاف التي تظهر تلقائياً عندما يقوم أولياء الأمور أو الطلاب بنشر رابط الموقع.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-black mb-1">عنوان المشاركة (OG Title):</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.marketingPixels?.ogTitle || "مدارس العقيق الأهلية والدولية بالمدينة المنورة"}
+                          onChange={(e) =>
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              marketingPixels: {
+                                ...orchestrationForm.marketingPixels,
+                                ogTitle: e.target.value,
+                              },
+                            })
+                          }
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black mb-1">وصف المشاركة (OG Description):</label>
+                        <textarea
+                          rows={3}
+                          value={orchestrationForm.marketingPixels?.ogDescription || "الريادة في التعليم وصناعة المستقبل منذ عام 1994"}
+                          onChange={(e) =>
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              marketingPixels: {
+                                ...orchestrationForm.marketingPixels,
+                                ogDescription: e.target.value,
+                              },
+                            })
+                          }
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-black mb-1">رابط صورة الغلاف (OG Image URL):</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.marketingPixels?.ogImageUrl || "/alaqeeq-logo.png"}
+                          onChange={(e) =>
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              marketingPixels: {
+                                ...orchestrationForm.marketingPixels,
+                                ogImageUrl: e.target.value,
+                              },
+                            })
+                          }
+                          className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Live Preview Card */}
+                    <div>
+                      <span className="block text-[11px] font-black text-slate-400 mb-2">معاينة شكل البطاقة في واتساب وتويتر:</span>
+                      <div className={`rounded-2xl border overflow-hidden shadow-lg ${
+                        dark ? "border-white/10 bg-[#090b0e]" : "border-black/10 bg-slate-50"
+                      }`}>
+                        <div className="h-36 bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] flex items-center justify-center p-4 relative overflow-hidden">
+                          {orchestrationForm.marketingPixels?.ogImageUrl ? (
+                            <img
+                              src={orchestrationForm.marketingPixels.ogImageUrl}
+                              alt="معاينة"
+                              className="max-h-24 max-w-full object-contain drop-shadow"
+                            />
+                          ) : (
+                            <span className="font-black text-white text-lg">مدارس العقيق</span>
+                          )}
+                        </div>
+                        <div className="p-4 space-y-1 text-right">
+                          <span className="text-[10px] text-amber-500 font-mono block">alaqeeq.edu.sa</span>
+                          <h4 className="text-xs font-black line-clamp-1">
+                            {orchestrationForm.marketingPixels?.ogTitle || "مدارس العقيق الأهلية والدولية"}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 line-clamp-2">
+                            {orchestrationForm.marketingPixels?.ogDescription || "الريادة في التعليم وصناعة المستقبل منذ عام 1994"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ==================== SUBTAB: SYSTEM BACKUP & RESTORE ==================== */}
+            {orchestrationSubTab === "backup" && (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
+                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-emerald-500/10 text-emerald-400 mb-2 border border-emerald-500/20">
+                      <Database size={14} />
+                      <span>حماية وأمان المنظومة الشامل</span>
+                    </div>
+                    <h3 className="text-xl font-black">النسخ الاحتياطي واستعادة الموقع (System Backup & Restore)</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      يمكنك تنزيل لقطة كاملة (Full Snapshot) تحتوي على كل إعدادات الواجهة، المقالات، الألبومات، التعديلات المرئية، ورسوم القبول في ملف JSON مشفر للرجوع إليها في أي وقت.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {/* Backup Download */}
+                    <div className={`rounded-2xl border p-6 space-y-4 ${
+                      dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/10 text-amber-500 font-black">
+                          <Download size={22} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black">تنزيل نسخة احتياطية كاملة</h4>
+                          <p className="text-[11px] text-slate-400">تصدير snapshot لكامل بيانات الموقع بضغطة زر</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            const fullSnapshot = {
+                              timestamp: new Date().toISOString(),
+                              orchestration: orchestrationForm,
+                              exportedBy: user?.name || "admin",
+                            };
+                            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullSnapshot, null, 2));
+                            const downloadAnchor = document.createElement("a");
+                            downloadAnchor.setAttribute("href", dataStr);
+                            downloadAnchor.setAttribute("download", `alaqeeq-system-snapshot-${new Date().toISOString().slice(0, 10)}.json`);
+                            document.body.appendChild(downloadAnchor);
+                            downloadAnchor.click();
+                            downloadAnchor.remove();
+                            toast.success("✅ تم تصدير النسخة الاحتياطية بنجاح!");
+                          } catch {
+                            toast.error("فشل تصدير النسخة الاحتياطية");
+                          }
+                        }}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 py-3 text-xs font-black text-black hover:bg-yellow-400 transition shadow-lg shadow-amber-400/20"
+                      >
+                        <Download size={16} />
+                        <span>تحميل ملف النسخة الاحتياطية (JSON) 💾</span>
+                      </button>
+                    </div>
+
+                    {/* Backup Restore */}
+                    <div className={`rounded-2xl border p-6 space-y-4 ${
+                      dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-400/10 text-sky-400 font-black">
+                          <Upload size={22} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black">استعادة نسخة احتياطية سابقة</h4>
+                          <p className="text-[11px] text-slate-400">استرجاع الإعدادات والتعديلات من ملف تم تنزيله سابقاً</p>
+                        </div>
+                      </div>
+
+                      <label className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border py-3 text-xs font-black cursor-pointer transition ${
+                        dark
+                          ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                          : "border-black/10 bg-white text-slate-700 hover:bg-slate-100 shadow-sm"
+                      }`}>
+                        <Upload size={16} />
+                        <span>رفع ملف استعادة النسخة 📥</span>
+                        <input
+                          type="file"
+                          accept=".json"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = async (event) => {
+                              try {
+                                const parsed = JSON.parse(event.target?.result as string);
+                                if (parsed.orchestration) {
+                                  setOrchestrationForm(parsed.orchestration);
+                                  await setOrchestrationMutation.mutateAsync(parsed.orchestration);
+                                  toast.success("🚀 تمت استعادة النسخة الاحتياطية وحفظها بنجاح!");
+                                } else {
+                                  toast.error("الملف لا يحتوي على بنية نسخة احتياطية صالحة");
+                                }
+                              } catch {
+                                toast.error("تعذر قراءة أو استعادة الملف");
+                              }
+                            };
+                            reader.readAsText(file);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Bottom Save Bar */}
@@ -7173,6 +7957,26 @@ const DEFAULT_ORCHESTRATION = {
       </Dialog>
 
       <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
+
+      {/* Quick Command Palette (Ctrl+K) */}
+      <AqeeqAdminCommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTab={(tab, subTab) => {
+          setActiveTab(tab);
+          if (subTab) {
+            if (tab === "admissions") setAdmissionsSubTab(subTab as any);
+            if (tab === "orchestration") setOrchestrationSubTab(subTab as any);
+            if (tab === "broadcast") setCommsSubTab(subTab as any);
+          }
+        }}
+        onTriggerDeploy={() => {
+          if (isDeploying) return;
+          setIsDeploying(true);
+          deployMutation.mutate();
+        }}
+        admissionsList={admissionsList}
+      />
     </div>
   );
 }

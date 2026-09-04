@@ -8,14 +8,31 @@ export function AqeeqBroadcastBanner() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+  });
+
   const [dismissed, setDismissed] = useState(false);
 
-  if (!broadcast?.enabled || !broadcast.message || dismissed) {
+  const activeBanner = (broadcast?.enabled && broadcast.message)
+    ? broadcast
+    : (orchestration?.emergencyBanner?.enabled && orchestration.emergencyBanner.text)
+    ? {
+        enabled: true,
+        message: orchestration.emergencyBanner.text,
+        type: orchestration.emergencyBanner.type || "urgent",
+        link: orchestration.emergencyBanner.linkUrl || null,
+        linkText: orchestration.emergencyBanner.linkText || "عرض التفاصيل",
+      }
+    : null;
+
+  if (!activeBanner?.enabled || !activeBanner.message || dismissed) {
     return null;
   }
 
-  const isUrgent = broadcast.type === "urgent";
-  const isCelebration = broadcast.type === "celebration";
+  const isUrgent = activeBanner.type === "urgent";
+  const isCelebration = activeBanner.type === "celebration";
 
   return (
     <div
@@ -50,13 +67,13 @@ export function AqeeqBroadcastBanner() {
             {isUrgent ? "تنبيه عاجل" : isCelebration ? "إعلان تهنئة" : "إشعار هام"}
           </span>
 
-          <p className="truncate text-xs sm:text-sm font-black">{broadcast.message}</p>
+          <p className="truncate text-xs sm:text-sm font-black">{activeBanner.message}</p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {broadcast.link ? (
+          {activeBanner.link ? (
             <a
-              href={broadcast.link}
+              href={activeBanner.link}
               target="_blank"
               rel="noreferrer"
               className={"inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition " + (
@@ -67,7 +84,7 @@ export function AqeeqBroadcastBanner() {
                   : "bg-white text-[#08467d] hover:bg-white/90"
               )}
             >
-              <span>{broadcast.linkText || "عرض التفاصيل"}</span>
+              <span>{activeBanner.linkText || "عرض التفاصيل"}</span>
               <ArrowUpLeft size={13} />
             </a>
           ) : null}
