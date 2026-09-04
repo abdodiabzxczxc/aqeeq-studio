@@ -991,7 +991,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    // Only exclude editor chrome / drawers / modals
+    // Exclude editor chrome / drawers / modals / video players / interactive media
     const isEditorSystemUi = (node: Element | null): boolean => {
       if (!node) return false;
       return Boolean(
@@ -1004,6 +1004,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         node.closest("[role='listbox']") ||
         node.closest("[role='tooltip']") ||
         node.closest("[data-no-visual-edit]") ||
+        node.closest("[data-aqeeq-video]") ||
+        node.closest("[data-video-player]") ||
+        node.closest(".group\\/screen") ||
+        node.closest(".group\\/yt") ||
+        node.closest("video") ||
+        node.closest("iframe") ||
+        node.closest("audio") ||
         node.closest("[data-mobile-bar]") ||
         node.closest("input, textarea, select")
       );
@@ -1019,10 +1026,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const root = document.getElementById("root") || document.body;
       if (!root) return;
 
-      // 1. Scan Images anywhere on the page (except editor UI)
+      // 1. Scan Images anywhere on the page (except editor UI and video players)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (isEditorSystemUi(img)) return;
+        if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
@@ -1050,7 +1057,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, span, a, button, label, li, td, th"
       ));
       textNodes.forEach((node, idx) => {
-        if (isEditorSystemUi(node)) return;
+        if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Extract direct text content
@@ -1091,7 +1098,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 3. Scan SVG Icons anywhere on the page
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (isEditorSystemUi(svg)) return;
+        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
@@ -1118,6 +1125,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (e.metaKey || e.ctrlKey) return;
       const targetEl = e.target as Element | null;
       if (!targetEl || isEditorSystemUi(targetEl)) return;
+
+      // Allow videos and media elements to receive clicks freely
+      if (targetEl.closest("[data-no-visual-edit], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")) {
+        return;
+      }
 
       // 1. First priority: explicit visual element
       const visualEl = targetEl.closest<HTMLElement>("[data-visual-id]");
@@ -1176,12 +1188,21 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       window.addEventListener("click", handleCaptureClick, true);
     }
 
+    let scanTimer: ReturnType<typeof setTimeout> | null = null;
+    const debouncedScan = () => {
+      if (scanTimer) clearTimeout(scanTimer);
+      scanTimer = setTimeout(() => {
+        scanAndTag();
+      }, 300);
+    };
+
     const observer = new MutationObserver(() => {
-      scanAndTag();
+      debouncedScan();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
+      if (scanTimer) clearTimeout(scanTimer);
       window.removeEventListener("click", handleCaptureClick, true);
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");

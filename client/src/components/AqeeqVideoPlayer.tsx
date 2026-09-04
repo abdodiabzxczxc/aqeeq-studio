@@ -61,6 +61,7 @@ export function AqeeqUnifiedVideoFrame({
   const fallbackUrl = isDrive ? getAqeeqDriveFallbackUrl(sourceUrl) : sourceUrl;
 
   const resolvedPoster = posterUrl || ytThumbnail || (isDrive ? getAqeeqDriveThumbnailUrl(sourceUrl) : null);
+  const [useIframeFallback, setUseIframeFallback] = useState(false);
 
   // ─── مزامنة مع المشغل العائم ──────────────────────────────────────────────
   useEffect(() => {
@@ -203,14 +204,43 @@ export function AqeeqUnifiedVideoFrame({
     );
   }
 
-  // 2) Google Drive Video (native HTML5 streaming via fast CORS proxy)
+  // 2) Google Drive Video (native HTML5 streaming via fast proxy with automatic Drive fallback)
   if (isDrive && driveId) {
     const streamSrc = `/api/drive-video-proxy/${driveId}`;
+
+    if (useIframeFallback) {
+      return (
+        <div className={`relative ${className}`} data-aqeeq-video="true">
+          <iframe
+            ref={iframeRef}
+            key={`drive-iframe-${key}`}
+            src={previewUrl}
+            title={title}
+            className="h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            onError={() => setLoadError(true)}
+          />
+          <div className="absolute top-3 left-3 z-20">
+            <button
+              type="button"
+              onClick={() => setUseIframeFallback(false)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-1 text-[11px] font-black text-amber-300 backdrop-blur-md border border-amber-300/30 hover:bg-black transition"
+              title="التبديل إلى البث المباشر الأصلي 4K"
+            >
+              <span>مشغل Drive</span>
+              <span className="text-[9px] text-white/70">· اضغط للبث المباشر 4K</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className}`} data-aqeeq-video="true">
         <video
           ref={videoRef}
-          key={key}
+          key={`drive-video-${key}`}
           src={streamSrc}
           poster={resolvedPoster || undefined}
           title={title}
@@ -248,9 +278,23 @@ export function AqeeqUnifiedVideoFrame({
           onEnded={() => {
             window.dispatchEvent(new CustomEvent("aqeeq-video-ended"));
           }}
-          onError={() => setLoadError(true)}
+          onError={(e) => {
+            console.warn("[DriveVideoProxy] Native streaming fallback triggered for:", sourceUrl, e);
+            setUseIframeFallback(true);
+          }}
           className="h-full w-full bg-black object-contain"
         />
+        <div className="absolute top-3 left-3 z-20 pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => setUseIframeFallback(true)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-black text-emerald-300 backdrop-blur-md border border-emerald-400/30 hover:bg-black transition"
+            title="بث مباشر عالي السرعة (اضغط للتبديل لمشغل Drive)"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>بث 4K مباشر</span>
+          </button>
+        </div>
       </div>
     );
   }
@@ -316,12 +360,13 @@ function VideoPosterCardBody({
   const directPoster = posterUrl || (isAqeeqDriveVideo(sourceUrl) ? getAqeeqDriveThumbnailUrl(sourceUrl) : null);
 
   return (
-    <>
+    <div data-aqeeq-video="true" data-no-visual-edit="true" className="relative h-full w-full">
       {directPoster ? (
         <img
           src={directPoster}
           alt={title}
           loading="lazy"
+          data-no-visual-edit="true"
           className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] ${imageClassName}`}
         />
       ) : (
@@ -330,8 +375,9 @@ function VideoPosterCardBody({
       <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/30" />
 
       {/* زر تشغيل موحد وأنيق */}
-      <span className="absolute inset-0 grid place-items-center">
+      <span className="absolute inset-0 grid place-items-center" data-no-visual-edit="true">
         <span
+          data-no-visual-edit="true"
           className={`grid place-items-center rounded-full border border-amber-300/60 bg-black/65 text-amber-300 shadow-[0_12px_30px_rgba(0,0,0,0.7)] backdrop-blur-md transition duration-300 group-hover:scale-110 group-hover:bg-amber-300 group-hover:text-slate-950 group-active:scale-95 ${playSizes[playSize]}`}
         >
           <Play fill="currentColor" className="translate-x-[-1px]" />
@@ -344,7 +390,7 @@ function VideoPosterCardBody({
         {title}
       </span>
       {footer}
-    </>
+    </div>
   );
 }
 
@@ -399,7 +445,10 @@ export function AqeeqVideoPlayer({
 
   const containerClassName = `group relative block h-full w-full overflow-hidden rounded-[1.4rem] bg-black text-right text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${className}`;
 
-  const launch = () => {
+  const launch = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     if (onOpen) {
       onOpen();
     } else {
@@ -408,7 +457,7 @@ export function AqeeqVideoPlayer({
   };
 
   if (!interactive) {
-    return <div className={containerClassName}>{cardBody}</div>;
+    return <div data-aqeeq-video="true" data-no-visual-edit="true" className={containerClassName}>{cardBody}</div>;
   }
 
   return (
@@ -416,6 +465,8 @@ export function AqeeqVideoPlayer({
       <button
         type="button"
         onClick={launch}
+        data-aqeeq-video="true"
+        data-no-visual-edit="true"
         className={containerClassName}
         aria-label={`تشغيل فيديو: ${title}`}
       >
@@ -426,6 +477,7 @@ export function AqeeqVideoPlayer({
       {open && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent
+            data-no-visual-edit="true"
             className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-amber-400/40 bg-[#070a12]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(248,202,20,0.12)] backdrop-blur-3xl flex flex-col"
           >
             <DialogTitle className="sr-only">{title}</DialogTitle>

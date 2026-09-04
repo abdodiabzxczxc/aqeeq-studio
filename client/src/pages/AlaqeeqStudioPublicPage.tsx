@@ -5,6 +5,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
+import { isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
@@ -242,6 +243,7 @@ type StoryItem = {
   targetUrl: string;
   buttonLabel: string;
   youtubeId?: string | null;
+  videoUrl?: string | null;
   isPinned?: boolean;
 };
 
@@ -503,15 +505,17 @@ export default function AlaqeeqStudioPublicPage() {
         });
       } else {
         const img = directDriveImage(post.thumbnailUrl) || post.thumbnailUrl || post.mediaUrl;
+        const isVid = post.mediaType === "video" || isAqeeqDriveVideo(post.mediaUrl);
         items.push({
           id,
           title: post.title || post.fileName.replace(/\.[^.]+$/, ""),
-          category: post.mediaType === "video" ? "فيديو جديد" : "خبر جديد",
+          category: isVid ? "فيديو جديد" : "خبر جديد",
           imageUrl: img || null,
           time: label,
-          sourceType: "post",
+          sourceType: isVid ? "showcase" : "post",
           targetUrl: "/offers",
-          buttonLabel: "فتح الخبر والتغطية الكاملة",
+          buttonLabel: isVid ? "مشاهدة الفيديو والتغطية" : "فتح الخبر والتغطية الكاملة",
+          videoUrl: isVid ? post.mediaUrl : null,
           isPinned,
           timestamp: ts,
         });
@@ -1668,6 +1672,14 @@ export default function AlaqeeqStudioPublicPage() {
                   <AqeeqUnifiedVideoFrame
                     sourceUrl={"https://www.youtube.com/watch?v=" + storiesList[activeStoryIndex].youtubeId}
                     title={storiesList[activeStoryIndex].title}
+                  />
+                </div>
+              ) : storiesList[activeStoryIndex].videoUrl ? (
+                <div className="w-full aspect-video overflow-hidden rounded-2xl">
+                  <AqeeqUnifiedVideoFrame
+                    sourceUrl={storiesList[activeStoryIndex].videoUrl!}
+                    title={storiesList[activeStoryIndex].title}
+                    posterUrl={storiesList[activeStoryIndex].imageUrl}
                   />
                 </div>
               ) : storiesList[activeStoryIndex].imageUrl ? (

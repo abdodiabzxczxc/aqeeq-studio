@@ -188,6 +188,8 @@ function MediaPostCard({
     return (
       <>
         <article
+          data-aqeeq-video="true"
+          data-no-visual-edit="true"
           className={`mb-6 break-inside-avoid overflow-hidden rounded-[2rem] border p-4 sm:p-5 transition duration-300 hover:-translate-y-1 ${
             dark
               ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] text-white shadow-[0_16px_45px_rgba(99,102,241,0.18)] hover:border-indigo-400/80 hover:shadow-[0_20px_60px_rgba(99,102,241,0.3)]"
@@ -210,18 +212,24 @@ function MediaPostCard({
           {/* 16:9 Cinema Box Screen */}
           <div
             onClick={openPost}
-            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)]"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPost(); } }}
+            data-aqeeq-video="true"
+            data-no-visual-edit="true"
+            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           >
             <img
               src={getAqeeqShowcaseDisplaySource(post)}
               alt=""
               loading="lazy"
+              data-no-visual-edit="true"
               className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
 
             {/* Centered Glowing Play Button */}
-            <div className="absolute inset-0 grid place-items-center">
+            <div className="absolute inset-0 grid place-items-center pointer-events-none">
               <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(6,182,212,0.9)] group-active:scale-95">
                 <Play size={22} className="mr-0.5 fill-current" />
               </div>
@@ -276,7 +284,10 @@ function MediaPostCard({
             </div>
 
             <button
-              onClick={onOpen}
+              type="button"
+              onClick={openPost}
+              data-aqeeq-video="true"
+              data-no-visual-edit="true"
               className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
             >
               <span>عرض كامل</span>
@@ -423,7 +434,7 @@ function MediaPostCard({
           <DialogTitle className="sr-only">{post.title || "مجموعة وسائط"}</DialogTitle>
           <div dir="rtl">
             <div className="relative bg-black">
-              {active?.mediaType === "video" ? (
+              {active?.mediaType === "video" || isEmbeddableVideo(active?.mediaUrl) || isAqeeqDriveVideo(active?.mediaUrl) ? (
                 <AqeeqUnifiedVideoFrame sourceUrl={active.mediaUrl} title={active.fileName || post.title || "فيديو"} />
               ) : (
                 <ShowcaseMedia post={active as ShowcasePost} className="max-h-[74svh] object-contain" />
@@ -919,7 +930,7 @@ export default function AqeeqShowcasePage() {
           {selected ? (
             <div ref={showcaseModalRef} dir="rtl" className="flex flex-col h-full w-full bg-black">
               <div className="relative bg-black aspect-video w-full overflow-hidden flex-1 min-h-0">
-                {selected.mediaType === "video" ? (
+                {selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl) ? (
                   <AqeeqUnifiedVideoFrame sourceUrl={selected.mediaUrl} title={selected.title || selected.fileName} posterUrl={getAqeeqShowcaseDisplaySource(selected)} />
                 ) : (
                   <ShowcaseMedia post={selected} className="max-h-[74svh] object-contain" />
@@ -932,7 +943,7 @@ export default function AqeeqShowcasePage() {
                     {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {selected.mediaType === "video" && (
+                    {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && (
                       <button
                         type="button"
                         onClick={toggleShowcaseFullscreen}
@@ -945,7 +956,7 @@ export default function AqeeqShowcasePage() {
                         <span className="hidden sm:inline">{isShowcaseFullscreen ? "تصغير" : "ملء الشاشة"}</span>
                       </button>
                     )}
-                    {selected.mediaType === "video" && isAqeeqDriveVideo(selected.mediaUrl) ? (
+                    {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && isAqeeqDriveVideo(selected.mediaUrl) ? (
                       <a
                         href={getAqeeqDriveFallbackUrl(selected.mediaUrl)}
                         target="_blank"

@@ -366,6 +366,9 @@ function evictOldestAudio() {
       res.setHeader("Cache-Control", "public, max-age=86400");
       if (contentLength) res.setHeader("Content-Length", contentLength);
       if (contentRange) res.setHeader("Content-Range", contentRange);
+      if (req.method === "HEAD") {
+        return res.end();
+      }
 
       if (finalRes.body) {
         const stream = Readable.fromWeb(finalRes.body as any);
