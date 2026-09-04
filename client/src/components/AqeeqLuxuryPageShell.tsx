@@ -34,22 +34,6 @@ export function AqeeqLuxuryPageShell({
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
 
-  const heroPinContainerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: heroPinContainerRef,
-    offset: ["start start", "end start"],
-  });
-
-  const rawScale = useTransform(scrollYProgress, [0, 0.65], [1, 0.92]);
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.35]);
-  const rawY = useTransform(scrollYProgress, [0, 0.65], ["0px", "-35px"]);
-  const rawBlur = useTransform(scrollYProgress, [0, 0.65], ["blur(0px)", "blur(6px)"]);
-
-  const heroScale = useSpring(rawScale, { stiffness: 100, damping: 22, mass: 0.5 });
-  const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 22, mass: 0.5 });
-  const heroY = useSpring(rawY, { stiffness: 100, damping: 22, mass: 0.5 });
-
   return (
     <div
       dir="rtl"
@@ -113,63 +97,14 @@ export function AqeeqLuxuryPageShell({
 
       {/* ── محتوى الصفحة (مع أو بدون ستارة الهيرو) ── */}
       {useCurtain && hero ? (
-        <div className="relative z-10 w-full">
-          {/* تثبيت الهيرو */}
-          <div ref={heroPinContainerRef} className="relative h-[115vh] w-full">
-            <div className="sticky top-0 z-0 w-full overflow-hidden">
-              <motion.div
-                style={{
-                  scale: heroScale,
-                  opacity: heroOpacity,
-                  y: heroY,
-                  filter: rawBlur,
-                  transformOrigin: "center top",
-                }}
-                className="w-full will-change-transform"
-              >
-                {hero}
-              </motion.div>
-            </div>
-          </div>
-
-          {/* ستارة المحتوى الصاعدة */}
-          <div
-            className={`relative z-20 -mt-[30vh] w-full rounded-t-[2.8rem] sm:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
-              isNationalDay
-                ? dark
-                  ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
-                  : "bg-[#f8faf8] shadow-[0_-30px_80px_rgba(0,90,54,0.18)] border-t-2 border-emerald-500/30"
-                : dark
-                ? "bg-[#07090e] shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t-2 border-white/15"
-                : "bg-white shadow-[0_-30px_80px_rgba(0,0,0,0.12)] border-t-2 border-black/10"
-            }`}
-          >
-            {/* خط النيون الذهبي المتوهج */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-            />
-
-            {/* مقبض الستارة والشارة */}
-            <div className="flex flex-col items-center justify-center pt-5 pb-3 gap-1.5">
-              <div
-                className={`h-1.5 w-14 rounded-full transition ${
-                  dark ? "bg-white/25" : "bg-black/20"
-                }`}
-              />
-              <span
-                className={`text-[10px] font-black tracking-widest uppercase ${
-                  dark ? "text-[#f8ca14]/90" : "text-[#08467d]/90"
-                }`}
-              >
-                {curtainKicker}
-              </span>
-            </div>
-
-            {/* محتوى الستارة */}
-            <div className="relative z-10 w-full">{children}</div>
-          </div>
-        </div>
+        <AqeeqCurtainHeroStage
+          hero={hero}
+          curtainKicker={curtainKicker}
+          dark={dark}
+          isNationalDay={isNationalDay}
+        >
+          {children}
+        </AqeeqCurtainHeroStage>
       ) : (
         <div className="relative z-10 w-full">
           {hero}
@@ -179,6 +114,100 @@ export function AqeeqLuxuryPageShell({
 
       {/* ── تذييل الصفحة (Footer) ── */}
       {footer && <div className="relative z-30">{footer}</div>}
+    </div>
+  );
+}
+
+/**
+ * ستارة الهيرو الفاخرة ذات التثبيت البصري (Pinned Parallax)
+ * منفصلة في مكون مستقل لضمان hydration الـ Ref قبل تشغيل useScroll
+ */
+function AqeeqCurtainHeroStage({
+  hero,
+  children,
+  curtainKicker,
+  dark,
+  isNationalDay,
+}: {
+  hero: React.ReactNode;
+  children: React.ReactNode;
+  curtainKicker: string;
+  dark: boolean;
+  isNationalDay: boolean;
+}) {
+  const heroPinContainerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: heroPinContainerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const rawScale = useTransform(scrollYProgress, [0, 0.65], [1, 0.92]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.35]);
+  const rawY = useTransform(scrollYProgress, [0, 0.65], ["0px", "-35px"]);
+  const rawBlur = useTransform(scrollYProgress, [0, 0.65], ["blur(0px)", "blur(6px)"]);
+
+  const heroScale = useSpring(rawScale, { stiffness: 100, damping: 22, mass: 0.5 });
+  const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 22, mass: 0.5 });
+  const heroY = useSpring(rawY, { stiffness: 100, damping: 22, mass: 0.5 });
+
+  return (
+    <div className="relative z-10 w-full">
+      {/* تثبيت الهيرو */}
+      <div ref={heroPinContainerRef} className="relative h-[115vh] w-full">
+        <div className="sticky top-0 z-0 w-full overflow-hidden">
+          <motion.div
+            style={{
+              scale: heroScale,
+              opacity: heroOpacity,
+              y: heroY,
+              filter: rawBlur,
+              transformOrigin: "center top",
+            }}
+            className="w-full will-change-transform"
+          >
+            {hero}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ستارة المحتوى الصاعدة */}
+      <div
+        className={`relative z-20 -mt-[30vh] w-full rounded-t-[2.8rem] sm:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
+          isNationalDay
+            ? dark
+              ? "bg-[#020b06] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
+              : "bg-[#f8faf8] shadow-[0_-30px_80px_rgba(0,90,54,0.18)] border-t-2 border-emerald-500/30"
+            : dark
+            ? "bg-[#07090e] shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t-2 border-white/15"
+            : "bg-white shadow-[0_-30px_80px_rgba(0,0,0,0.12)] border-t-2 border-black/10"
+        }`}
+      >
+        {/* خط النيون الذهبي المتوهج */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+        />
+
+        {/* مقبض الستارة والشارة */}
+        <div className="flex flex-col items-center justify-center pt-5 pb-3 gap-1.5">
+          <div
+            className={`h-1.5 w-14 rounded-full transition ${
+              dark ? "bg-white/25" : "bg-black/20"
+            }`}
+          />
+          <span
+            className={`text-[10px] font-black tracking-widest uppercase ${
+              dark ? "text-[#f8ca14]/90" : "text-[#08467d]/90"
+            }`}
+          >
+            {curtainKicker}
+          </span>
+        </div>
+
+        {/* محتوى الستارة */}
+        <div className="relative z-10 w-full">{children}</div>
+      </div>
     </div>
   );
 }

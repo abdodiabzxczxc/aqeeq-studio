@@ -73,7 +73,7 @@ export default function AqeeqSchoolAppShowcaseSection({
   }, [appDownloadUrl]);
 
   if (!isEnabled) {
-    return null;
+    return <div ref={sectionRef} className="hidden" aria-hidden="true" />;
   }
 
   const features = [

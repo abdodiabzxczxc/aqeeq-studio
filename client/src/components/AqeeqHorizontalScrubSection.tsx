@@ -67,7 +67,9 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
     });
   }, [scrollYProgress, items.length]);
 
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) {
+    return <div ref={containerRef} className="hidden" aria-hidden="true" />;
+  }
 
   return (
     <section
