@@ -71,10 +71,12 @@ import {
   TrendingUp,
   Database,
   Upload,
+  Pin,
 } from "lucide-react";
 
 import { VisualOverridesDashboardManager } from "@/components/VisualOverridesDashboardManager";
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
+import { type InteractiveHoverItem, DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
 
 import {
   Dialog,
@@ -110,7 +112,7 @@ export default function AqeeqAdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
-  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "header_nav" | "visual_overrides" | "marketing" | "backup" | "app" | "campuses" | "sections">("hero");
+  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "header_nav" | "visual_overrides" | "interactive_fx" | "marketing" | "backup" | "app" | "campuses" | "sections">("hero");
   const [contentSubTab, setContentSubTab] = useState<"master" | "articles">("master");
   const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
   const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
@@ -233,6 +235,9 @@ const DEFAULT_ORCHESTRATION = {
     text: "",
     linkUrl: "",
     linkText: "",
+  },
+  interactiveFx: {
+    wellingtonHoverItems: DEFAULT_WELLINGTON_HOVER_ITEMS,
   },
   marketingPixels: {
     snapchatPixelId: "",
@@ -459,6 +464,7 @@ const DEFAULT_ORCHESTRATION = {
         appShowcase: (orchestrationData as any).appShowcase || DEFAULT_ORCHESTRATION.appShowcase,
         schoolCampuses: (orchestrationData as any).schoolCampuses || DEFAULT_ORCHESTRATION.schoolCampuses,
         admissionsSettings: (orchestrationData as any).admissionsSettings || DEFAULT_ORCHESTRATION.admissionsSettings,
+        interactiveFx: (orchestrationData as any).interactiveFx || DEFAULT_ORCHESTRATION.interactiveFx,
       });
     }
   }, [orchestrationData]);
@@ -472,6 +478,75 @@ const DEFAULT_ORCHESTRATION = {
       toast.error(err.message || "تعذر حفظ التعديلات");
     },
   });
+
+  // Interactive FX Handlers
+  const currentHoverItems: InteractiveHoverItem[] = (
+    orchestrationForm.interactiveFx?.wellingtonHoverItems || DEFAULT_WELLINGTON_HOVER_ITEMS
+  );
+
+  const handleUpdateHoverItem = (index: number, field: keyof InteractiveHoverItem, value: any) => {
+    const updated = [...currentHoverItems];
+    updated[index] = { ...updated[index], [field]: value };
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      interactiveFx: {
+        ...(prev.interactiveFx || {}),
+        wellingtonHoverItems: updated,
+      },
+    }));
+  };
+
+  const handleAddHoverItem = () => {
+    const newItem: InteractiveHoverItem = {
+      id: "hover-" + Date.now(),
+      triggerText: "عنصر تفاعلي جديد",
+      title: "عنوان البطاقة التفاعلية",
+      badge: "شارة العقيق",
+      imageUrl: "/articles/is-quality-important-school-accreditation.jpg",
+      targetUrl: "/accreditations",
+    };
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      interactiveFx: {
+        ...(prev.interactiveFx || {}),
+        wellingtonHoverItems: [...currentHoverItems, newItem],
+      },
+    }));
+    toast.success("تمت إضافة عنصر تفاعلي جديد! يمكنك تعديل تفاصيله وحفظه.");
+  };
+
+  const handleDeleteHoverItem = (index: number) => {
+    if (currentHoverItems.length <= 1) {
+      toast.error("يجب الإبقاء على عنصر تفاعلي واحد على الأقل.");
+      return;
+    }
+    const updated = currentHoverItems.filter((_, i) => i !== index);
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      interactiveFx: {
+        ...(prev.interactiveFx || {}),
+        wellingtonHoverItems: updated,
+      },
+    }));
+    toast.success("تم حذف العنصر التفاعلي.");
+  };
+
+  const handleFileUploadForHoverItem = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("الحد الأقصى لحجم الصورة هو 8 ميجابايت");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        handleUpdateHoverItem(index, "imageUrl", reader.result);
+        toast.success("✅ تم اختيار الصورة من جهازك بنجاح!");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Hero Covers Sub-tab State
   const [heroActiveCoverTab, setHeroActiveCoverTab] = useState<"home" | "journal" | "albums" | "showcase" | "articles" | "podcasts">("home");
@@ -1121,6 +1196,19 @@ const DEFAULT_ORCHESTRATION = {
               >
                 <Sparkles size={15} />
                 <span>التعديلات المرئية (Overrides Hub) ⚡</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrchestrationSubTab("interactive_fx")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
+                  orchestrationSubTab === "interactive_fx"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Pin size={15} />
+                <span>عناصر الماوس والسكرول (Interactive FX) 🎯</span>
               </button>
 
               <button
@@ -3955,6 +4043,275 @@ const DEFAULT_ORCHESTRATION = {
             {orchestrationSubTab === "visual_overrides" && (
               <div className="animate-in fade-in duration-300">
                 <VisualOverridesDashboardManager onNavigateToPage={(p) => navigate(p)} />
+              </div>
+            )}
+
+            {/* ==================== SUBTAB: INTERACTIVE FX STUDIO ==================== */}
+            {orchestrationSubTab === "interactive_fx" && (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                {/* 1. Header Banner */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-4 shadow-xl ${
+                  dark ? "border-white/10 bg-[#0c1017]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-black text-amber-400">
+                        <Sparkles size={13} />
+                        <span>استوديو عناصر الماوس والسكرول التفاعلية · INTERACTIVE FX</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black">
+                        التحكم في تلميحات الماوس (Hover Cards) ومؤثرات السكرول
+                      </h2>
+                      <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+                        عدّل الصور والنصوص والروابط التي تظهر عند تمرير مؤشر الفأرة على عناصر الموقع (مثل اعتمادات كوجنيا، آيلتس، وسات). يمكنك رفع الصور مباشرة من حاسوبك أو اختيارها من مكتبة الوسائط، مع دعم ميزة التجميد (Freeze FX) أثناء تصفح الموقع.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handleAddHoverItem}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 text-xs font-black shadow-md transition cursor-pointer"
+                      >
+                        <Plus size={15} />
+                        <span>إضافة بطاقة جديدة</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                        disabled={setOrchestrationMutation.isPending}
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black px-5 py-2.5 text-xs font-black shadow-md transition cursor-pointer disabled:opacity-50"
+                      >
+                        <CheckCircle2 size={15} />
+                        <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ عناصر التفاعل ✨"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Tip Box */}
+                  <div className={`flex items-start gap-3 rounded-2xl p-4 text-xs font-bold ${
+                    dark ? "bg-cyan-950/30 border border-cyan-500/20 text-cyan-200" : "bg-cyan-50 border border-cyan-200 text-cyan-900"
+                  }`}>
+                    <Pin size={16} className="shrink-0 mt-0.5 text-cyan-400" />
+                    <p className="leading-relaxed">
+                      💡 <strong>طريقة التعديل من واجهة الموقع:</strong> عند تفعيل المحرر المرئي في الصفحة الرئيسية، ستظهر لك أيقونة قلم ✏️ بجوار كل كلمة تفاعلية لتعديلها فوراً، كما يمكنك تحريك الماوس فوق البطاقة والنقر على زر <strong>«تثبيت ❄️»</strong> لتجميدها والتعديل المباشر عليها!
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. Interactive Hover Items Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {currentHoverItems.map((item, index) => (
+                    <div
+                      key={item.id || index}
+                      className={`rounded-3xl border p-5 sm:p-6 space-y-5 shadow-lg relative transition-all ${
+                        dark ? "border-white/10 bg-[#0c1017] hover:border-amber-400/30" : "border-black/5 bg-white hover:border-amber-500/40"
+                      }`}
+                    >
+                      {/* Top Bar with Number & Delete */}
+                      <div className="flex items-center justify-between pb-3 border-b border-current/10">
+                        <div className="flex items-center gap-2">
+                          <span className="grid h-6 w-6 place-items-center rounded-lg bg-amber-400/20 text-amber-400 text-xs font-black">
+                            {index + 1}
+                          </span>
+                          <span className="text-xs font-black">عنصر تفاعلي #{index + 1}</span>
+                        </div>
+
+                        {currentHoverItems.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHoverItem(index)}
+                            className="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-500/10 transition cursor-pointer"
+                            title="حذف هذا العنصر التفاعلي"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Live Preview Card */}
+                      <div>
+                        <label className="block text-[11px] font-black text-slate-400 mb-1.5">
+                          معاينة حية لشكل البطاقة عند الوقوف بالماوس:
+                        </label>
+                        <div className="relative h-44 w-full overflow-hidden rounded-2xl border border-white/15 bg-black shadow-inner">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title || "Preview"}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex flex-col items-center justify-center text-slate-400 text-xs gap-1 bg-gradient-to-br from-black to-slate-900">
+                              <ImageIcon size={28} className="opacity-30" />
+                              <span>لا توجد صورة محددة</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                          {item.badge && (
+                            <div className="absolute top-2.5 right-2.5 rounded-full bg-black/75 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md">
+                              {item.badge}
+                            </div>
+                          )}
+                          {item.title && (
+                            <div className="absolute bottom-2.5 inset-x-3">
+                              <p className="text-right text-xs font-black text-white line-clamp-2 leading-snug">
+                                {item.title}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Image Control Bar (Upload + Library + URL) */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-black text-slate-400">
+                            صورة البطاقة التفاعلية 🖼️:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            {/* Hidden native input for this item */}
+                            <input
+                              type="file"
+                              id={`hover-file-${index}`}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => handleFileUploadForHoverItem(index, e)}
+                            />
+                            <label
+                              htmlFor={`hover-file-${index}`}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-400/30 bg-blue-500/10 px-2.5 py-1 text-[11px] font-black text-blue-400 hover:bg-blue-500/20 transition cursor-pointer"
+                            >
+                              <Upload size={13} />
+                              <span>رفع من جهازك 📤</span>
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openMediaPicker("اختيار صورة التلميح التفاعلي", item.imageUrl, (media) => {
+                                  if (media?.url) {
+                                    handleUpdateHoverItem(index, "imageUrl", media.url);
+                                  }
+                                })
+                              }
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-black text-amber-400 hover:bg-amber-500/20 transition cursor-pointer"
+                            >
+                              <ImageIcon size={13} />
+                              <span>المكتبة 🖼️</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <input
+                          type="text"
+                          value={item.imageUrl}
+                          onChange={(e) => handleUpdateHoverItem(index, "imageUrl", e.target.value)}
+                          placeholder="https://... أو /articles/image.jpg"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-mono font-bold outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white focus:border-amber-400" : "border-black/10 bg-white focus:border-amber-500"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Trigger Text */}
+                      <div>
+                        <label className="block text-[11px] font-black text-slate-400 mb-1">
+                          الكلمة / النص المعروض في الصفحة:
+                        </label>
+                        <input
+                          type="text"
+                          value={item.triggerText}
+                          onChange={(e) => handleUpdateHoverItem(index, "triggerText", e.target.value)}
+                          placeholder="مثال: معتمدة من كوجنيا الأمريكية (Cognia)"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-black/40 text-white focus:border-amber-400" : "border-black/10 bg-white focus:border-amber-500"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Title & Badge Row */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-400 mb-1">
+                            عنوان البطاقة المنبثقة:
+                          </label>
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => handleUpdateHoverItem(index, "title", e.target.value)}
+                            placeholder="مثال: اعتماد كوجنيا الأمريكي..."
+                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-400 mb-1">
+                            الشارة العلوية (Badge):
+                          </label>
+                          <input
+                            type="text"
+                            value={item.badge}
+                            onChange={(e) => handleUpdateHoverItem(index, "badge", e.target.value)}
+                            placeholder="مثال: Cognia USA Accredited"
+                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Target Link */}
+                      <div>
+                        <label className="block text-[11px] font-black text-slate-400 mb-1">
+                          الرابط المستهدف عند النقر:
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={item.targetUrl || ""}
+                            onChange={(e) => handleUpdateHoverItem(index, "targetUrl", e.target.value)}
+                            placeholder="/accreditations أو /about"
+                            className={`flex-1 rounded-xl border p-2.5 text-xs font-mono font-bold outline-none ${
+                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                            }`}
+                          />
+                          {item.targetUrl && (
+                            <a
+                              href={item.targetUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-2.5 rounded-xl border border-current/10 hover:bg-white/5 transition"
+                              title="فتح الرابط"
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 3. Bottom Save Bar */}
+                <div className={`rounded-3xl border p-6 flex items-center justify-between shadow-xl ${
+                  dark ? "border-white/10 bg-[#0c1017]" : "border-black/5 bg-white"
+                }`}>
+                  <div className="text-xs text-slate-400 font-bold">
+                    💡 التعديلات المحفوظة هنا تُطبَّق فوراً على جميع زوار الموقع.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                    disabled={setOrchestrationMutation.isPending}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black px-6 py-3 text-xs font-black shadow-lg shadow-[#f8ca14]/20 transition cursor-pointer disabled:opacity-50"
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر جميع عناصر التفاعل 🚀"}</span>
+                  </button>
+                </div>
               </div>
             )}
 

@@ -716,6 +716,30 @@ export type SiteOrchestrationConfig = {
     ogDescription?: string;
     ogImageUrl?: string;
   };
+  interactiveFx?: {
+    wellingtonHoverItems?: Array<{
+      id: string;
+      triggerText: string;
+      title: string;
+      badge: string;
+      imageUrl: string;
+      targetUrl: string;
+    }>;
+    scrollScrubItems?: Array<{
+      id: string;
+      title: string;
+      category: string;
+      imageUrl: string;
+      targetUrl: string;
+    }>;
+    timelineMilestones?: Array<{
+      id: string;
+      year: string;
+      title: string;
+      description: string;
+      imageUrl?: string;
+    }>;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -743,6 +767,42 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     ogTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
     ogDescription: "الريادة في التعليم وصناعة المستقبل منذ عام 1994",
     ogImageUrl: "/alaqeeq-logo.png",
+  },
+  interactiveFx: {
+    wellingtonHoverItems: [
+      {
+        id: "wellington-cognia",
+        triggerText: "معتمدة من كوجنيا الأمريكية (Cognia)",
+        title: "اعتماد كوجنيا الأمريكي لأعلى معايير الجودة التعليمية",
+        badge: "Cognia USA Accredited",
+        imageUrl: "/articles/is-quality-important-school-accreditation.jpg",
+        targetUrl: "/accreditations",
+      },
+      {
+        id: "wellington-ielts",
+        triggerText: "مركز اختبارات IELTS المعتمد بالمدينة المنورة",
+        title: "مركز اختبارات IELTS الرسمي والحاسوبي بالمدينة المنورة",
+        badge: "IELTS on Computer · IDP",
+        imageUrl: "/covers/student-lab-admissions.jpg",
+        targetUrl: "/accreditations",
+      },
+      {
+        id: "wellington-sat",
+        triggerText: "مراكز معتمدة لاختبارات SAT و ACT",
+        title: "المركز الدولي المعتمد لاختبارات SAT و ACT",
+        badge: "SAT & ACT Testing Hub",
+        imageUrl: "/covers/student-robotics-accreditations.jpg",
+        targetUrl: "/accreditations",
+      },
+      {
+        id: "wellington-community",
+        triggerText: "+10,000 ولي أمر يثقون بمدارسنا",
+        title: "مجتمع العقيق: فخر وثقة أكثر من 10,000 أسرة بطيبة الطيبة",
+        badge: "مجتمع العقيق · 1994",
+        imageUrl: "/covers/student-excellence-about.jpg",
+        targetUrl: "/about",
+      },
+    ],
   },
   heroCovers: {
     journalMode: "auto",
@@ -898,6 +958,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         appShowcase: { ...DEFAULT_SITE_ORCHESTRATION.appShowcase, ...(parsed.appShowcase || {}) },
         schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
         admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
+        interactiveFx: { ...DEFAULT_SITE_ORCHESTRATION.interactiveFx, ...(parsed.interactiveFx || {}) },
       };
     }
   } catch (err) {
@@ -923,6 +984,9 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     appShowcase: { ...(current.appShowcase || DEFAULT_SITE_ORCHESTRATION.appShowcase!), ...(data.appShowcase || {}) },
     schoolCampuses: { ...(current.schoolCampuses || DEFAULT_SITE_ORCHESTRATION.schoolCampuses!), ...(data.schoolCampuses || {}) },
     admissionsSettings: { ...(current.admissionsSettings || DEFAULT_SITE_ORCHESTRATION.admissionsSettings!), ...(data.admissionsSettings || {}) },
+    interactiveFx: data.interactiveFx !== undefined
+      ? { ...(current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx!), ...data.interactiveFx }
+      : (current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx),
     hiddenStoryIds: data.hiddenStoryIds !== undefined ? data.hiddenStoryIds : current.hiddenStoryIds,
     customStoryIds: data.customStoryIds !== undefined ? data.customStoryIds : current.customStoryIds,
     storyExpiryMap: data.storyExpiryMap !== undefined

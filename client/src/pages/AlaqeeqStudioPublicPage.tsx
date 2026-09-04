@@ -13,6 +13,8 @@ import { AqeeqMemoryWallSection } from "@/components/AqeeqMemoryWallSection";
 import { AqeeqLiveArchiveSection } from "@/components/AqeeqLiveArchiveSection";
 import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
+import { AqeeqInteractiveFxModal, type InteractiveHoverItem, DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
+import { AqeeqUniversalMediaPickerModal, type MediaPickerItem } from "@/components/AqeeqUniversalMediaPickerModal";
 import {
   ArrowUp,
   ArrowUpLeft,
@@ -25,6 +27,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clapperboard,
+  Edit3,
   Flame,
   Heart,
   Instagram,
@@ -282,7 +285,74 @@ export default function AlaqeeqStudioPublicPage() {
   const { data: showcases = [], isLoading: showcasesLoading } = trpc.aqeeqShowcases.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, { refetchOnWindowFocus: false });
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
-  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
+  const { data: orchestration, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
+
+  // Interactive FX Modal & Media Picker State
+  const [editingHoverItem, setEditingHoverItem] = useState<InteractiveHoverItem | null>(null);
+  const [mediaPickerConfig, setMediaPickerConfig] = useState<{
+    open: boolean;
+    title: string;
+    currentUrl?: string | null;
+    onSelect: (item: MediaPickerItem) => void;
+  }>({
+    open: false,
+    title: "اختيار صورة أو غلاف",
+    currentUrl: null,
+    onSelect: () => {},
+  });
+
+  const openMediaPicker = (title: string, currentUrl: string | null | undefined, onSelect: (item: MediaPickerItem) => void) => {
+    setMediaPickerConfig({
+      open: true,
+      title,
+      currentUrl,
+      onSelect: (item) => {
+        onSelect(item);
+        setMediaPickerConfig((prev) => ({ ...prev, open: false }));
+      },
+    });
+  };
+
+  const setOrchestrationMutation = trpc.executiveAdmin.setSiteOrchestration.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ وتحديث العنصر التفاعلي بنجاح! ✨");
+      void refetchOrchestration();
+    },
+    onError: (err) => {
+      toast.error(err.message || "تعذر حفظ التعديل");
+    },
+  });
+
+  const handleSaveHoverItem = async (updatedItem: InteractiveHoverItem) => {
+    const currentItems = (((orchestration?.interactiveFx as any)?.wellingtonHoverItems as InteractiveHoverItem[])?.length
+      ? ((orchestration?.interactiveFx as any)?.wellingtonHoverItems as InteractiveHoverItem[])
+      : DEFAULT_WELLINGTON_HOVER_ITEMS);
+
+    const nextItems = currentItems.map((item) =>
+      item.id === updatedItem.id ? updatedItem : item
+    );
+
+    if (!nextItems.some((item) => item.id === updatedItem.id)) {
+      nextItems.push(updatedItem);
+    }
+
+    await setOrchestrationMutation.mutateAsync({
+      interactiveFx: {
+        ...((orchestration?.interactiveFx as any) || {}),
+        wellingtonHoverItems: nextItems,
+      },
+    });
+  };
+
+  const hoverItems = useMemo(() => {
+    const items = ((orchestration?.interactiveFx as any)?.wellingtonHoverItems as InteractiveHoverItem[]) || [];
+    return items.length > 0 ? items : DEFAULT_WELLINGTON_HOVER_ITEMS;
+  }, [orchestration?.interactiveFx]);
+
+  const cogniaItem = hoverItems.find((it) => it.id === "wellington-cognia") || DEFAULT_WELLINGTON_HOVER_ITEMS[0];
+  const ieltsItem = hoverItems.find((it) => it.id === "wellington-ielts") || DEFAULT_WELLINGTON_HOVER_ITEMS[1];
+  const satItem = hoverItems.find((it) => it.id === "wellington-sat") || DEFAULT_WELLINGTON_HOVER_ITEMS[2];
+  const communityItem = hoverItems.find((it) => it.id === "wellington-community") || DEFAULT_WELLINGTON_HOVER_ITEMS[3];
 
   const issue = issues[0];
   const album = albums[0];
@@ -1282,57 +1352,149 @@ export default function AlaqeeqStudioPublicPage() {
       }`}>
         <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
           <div className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
-            <button
-              type="button"
-              onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/articles/is-quality-important-school-accreditation.jpg", title: "اعتماد كوجنيا الأمريكي لأعلى معايير الجودة التعليمية", badge: "Cognia USA Accredited" })}
-              onMouseLeave={() => triggerCursorPreview({ visible: false })}
-              className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
-            >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
-                <Award size={16} />
-              </span>
-              <span>معتمدة من كوجنيا الأمريكية (Cognia)</span>
-            </button>
+            {/* Cognia */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => navigate(cogniaItem.targetUrl || "/accreditations")}
+                onMouseEnter={() => triggerCursorPreview({
+                  visible: true,
+                  imageUrl: cogniaItem.imageUrl,
+                  title: cogniaItem.title,
+                  badge: cogniaItem.badge,
+                  targetUrl: cogniaItem.targetUrl,
+                  onEdit: isEditorActive ? () => setEditingHoverItem(cogniaItem) : undefined,
+                })}
+                onMouseLeave={() => triggerCursorPreview({ visible: false })}
+                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                  <Award size={16} />
+                </span>
+                <span>{cogniaItem.triggerText}</span>
+              </button>
+              {isEditorActive && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingHoverItem(cogniaItem);
+                  }}
+                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  title="تعديل هذا العنصر وصورة الماوس"
+                >
+                  <Edit3 size={13} />
+                </button>
+              )}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-lab-admissions.jpg", title: "مركز اختبارات IELTS الرسمي والحاسوبي بالمدينة المنورة", badge: "IELTS on Computer · IDP" })}
-              onMouseLeave={() => triggerCursorPreview({ visible: false })}
-              className="hidden sm:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
-            >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500">
-                <Globe2 size={16} />
-              </span>
-              <span>مركز اختبارات IELTS المعتمد بالمدينة المنورة</span>
-            </button>
+            {/* IELTS */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => navigate(ieltsItem.targetUrl || "/accreditations")}
+                onMouseEnter={() => triggerCursorPreview({
+                  visible: true,
+                  imageUrl: ieltsItem.imageUrl,
+                  title: ieltsItem.title,
+                  badge: ieltsItem.badge,
+                  targetUrl: ieltsItem.targetUrl,
+                  onEdit: isEditorActive ? () => setEditingHoverItem(ieltsItem) : undefined,
+                })}
+                onMouseLeave={() => triggerCursorPreview({ visible: false })}
+                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500">
+                  <Globe2 size={16} />
+                </span>
+                <span>{ieltsItem.triggerText}</span>
+              </button>
+              {isEditorActive && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingHoverItem(ieltsItem);
+                  }}
+                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  title="تعديل هذا العنصر وصورة الماوس"
+                >
+                  <Edit3 size={13} />
+                </button>
+              )}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => navigate("/accreditations")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-robotics-accreditations.jpg", title: "المركز الدولي المعتمد لاختبارات SAT و ACT", badge: "SAT & ACT Testing Hub" })}
-              onMouseLeave={() => triggerCursorPreview({ visible: false })}
-              className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
-            >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
-                <CheckCircle2 size={16} />
-              </span>
-              <span>مراكز معتمدة لاختبارات SAT و ACT</span>
-            </button>
+            {/* SAT */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => navigate(satItem.targetUrl || "/accreditations")}
+                onMouseEnter={() => triggerCursorPreview({
+                  visible: true,
+                  imageUrl: satItem.imageUrl,
+                  title: satItem.title,
+                  badge: satItem.badge,
+                  targetUrl: satItem.targetUrl,
+                  onEdit: isEditorActive ? () => setEditingHoverItem(satItem) : undefined,
+                })}
+                onMouseLeave={() => triggerCursorPreview({ visible: false })}
+                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-[#f8ca14]">
+                  <CheckCircle2 size={16} />
+                </span>
+                <span>{satItem.triggerText}</span>
+              </button>
+              {isEditorActive && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingHoverItem(satItem);
+                  }}
+                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  title="تعديل هذا العنصر وصورة الماوس"
+                >
+                  <Edit3 size={13} />
+                </button>
+              )}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => navigate("/about")}
-              onMouseEnter={() => triggerCursorPreview({ visible: true, imageUrl: "/covers/student-excellence-about.jpg", title: "مجتمع العقيق: فخر وثقة أكثر من 10,000 أسرة بطيبة الطيبة", badge: "مجتمع العقيق · 1994" })}
-              onMouseLeave={() => triggerCursorPreview({ visible: false })}
-              className="hidden md:flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
-            >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
-                <Users size={16} />
-              </span>
-              <span>+10,000 ولي أمر يثقون بمدارسنا</span>
-            </button>
+            {/* Community */}
+            <div className="hidden md:flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => navigate(communityItem.targetUrl || "/about")}
+                onMouseEnter={() => triggerCursorPreview({
+                  visible: true,
+                  imageUrl: communityItem.imageUrl,
+                  title: communityItem.title,
+                  badge: communityItem.badge,
+                  targetUrl: communityItem.targetUrl,
+                  onEdit: isEditorActive ? () => setEditingHoverItem(communityItem) : undefined,
+                })}
+                onMouseLeave={() => triggerCursorPreview({ visible: false })}
+                className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
+                  <Users size={16} />
+                </span>
+                <span>{communityItem.triggerText}</span>
+              </button>
+              {isEditorActive && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingHoverItem(communityItem);
+                  }}
+                  className="p-1 rounded-lg bg-[#f8ca14] hover:bg-yellow-400 text-black shadow-sm transition cursor-pointer"
+                  title="تعديل هذا العنصر وصورة الماوس"
+                >
+                  <Edit3 size={13} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -1784,6 +1946,27 @@ export default function AlaqeeqStudioPublicPage() {
 
       {/* Wellington-style Interactive Cursor Hover Preview */}
       <AqeeqCursorHoverPreview />
+
+      {/* Interactive FX Edit Modal */}
+      <AqeeqInteractiveFxModal
+        isOpen={Boolean(editingHoverItem)}
+        onClose={() => setEditingHoverItem(null)}
+        item={editingHoverItem}
+        onSave={handleSaveHoverItem}
+        isSaving={setOrchestrationMutation.isPending}
+        dark={dark}
+        openMediaPicker={openMediaPicker}
+      />
+
+      {/* Universal Media Picker Modal for Visual Editor */}
+      <AqeeqUniversalMediaPickerModal
+        open={mediaPickerConfig.open}
+        onOpenChange={(open) => setMediaPickerConfig((prev) => ({ ...prev, open }))}
+        title={mediaPickerConfig.title}
+        currentSelectedUrl={mediaPickerConfig.currentUrl}
+        onSelect={mediaPickerConfig.onSelect}
+        dark={dark}
+      />
     </main>
   );
 }
