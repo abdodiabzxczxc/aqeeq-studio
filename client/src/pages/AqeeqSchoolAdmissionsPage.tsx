@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -378,32 +379,11 @@ export default function AqeeqSchoolAdmissionsPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      <Dialog open={whatsappConfirmOpen} onOpenChange={setWhatsappConfirmOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-right">إرسال عبر واتساب 💚</DialogTitle>
-            <DialogDescription className="text-right text-sm">
-              سيتم فتح واتساب مع كشف حساب الأقساط جاهزاً للإرسال.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 flex-row-reverse">
-            <Button onClick={() => {
-              const whatsappNum = orchestrationData?.social?.whatsappNumber || "0531896000";
-              const cleanPhone = whatsappNum.replace(/[^0-9]/g, "");
-              const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(pendingWhatsappMsg)}`;
-              window.open(url, '_blank');
-              setWhatsappConfirmOpen(false);
-            }} className="bg-[#25D366] hover:bg-[#20b558] text-white font-bold">
-              📤 إرسال الآن
-            </Button>
-            <Button variant="outline" onClick={() => setWhatsappConfirmOpen(false)}>إلغاء</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
+      useCurtain={true}
+      curtainKicker="✦ استكشف حاسبة الرسوم ونموذج التسجيل ✦"
+      hero={
+        /* Hero Section: Modern Executive 2-Column Showcase */
+        <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
         isNationalDay
           ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
           : dark ? "border-white/[0.08]" : "border-black/[0.08]"
@@ -561,6 +541,30 @@ export default function AqeeqSchoolAdmissionsPage() {
           </div>
         </div>
       </section>
+    }
+    >
+      <Dialog open={whatsappConfirmOpen} onOpenChange={setWhatsappConfirmOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-right">إرسال عبر واتساب 💚</DialogTitle>
+            <DialogDescription className="text-right text-sm">
+              سيتم فتح واتساب مع كشف حساب الأقساط جاهزاً للإرسال.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 flex-row-reverse">
+            <Button onClick={() => {
+              const whatsappNum = orchestrationData?.social?.whatsappNumber || "0531896000";
+              const cleanPhone = whatsappNum.replace(/[^0-9]/g, "");
+              const url = `https://wa.me/966${cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(pendingWhatsappMsg)}`;
+              window.open(url, '_blank');
+              setWhatsappConfirmOpen(false);
+            }} className="bg-[#25D366] hover:bg-[#20b558] text-white font-bold">
+              📤 إرسال الآن
+            </Button>
+            <Button variant="outline" onClick={() => setWhatsappConfirmOpen(false)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Tuition Fees & Calculator Section */}
       <section id="tuition-fees-section" className="py-20 container mx-auto px-4 sm:px-6">
@@ -1564,6 +1568,16 @@ export default function AqeeqSchoolAdmissionsPage() {
         </div>
       </section>
 
+      {/* Grand Finale CTA */}
+      <AqeeqGrandFinaleCta
+        badge="✦ القبول والتسجيل المباشر ✦"
+        title="احجز مقعد ابنك في صرح العقيق للعام الدراسي القادم"
+        subtitle="انضم لأكثر من 30 عاماً من الريادة والاعتمادات الدولية في قلب المدينة المنورة، واستفد من خطط السداد المرنة وخصومات الأخوة والسداد المبكر."
+        primaryActionText="تقديم طلب تسجيل جديد"
+        primaryActionHref="#registration-form"
+        secondaryActionText="تواصل مع مستشار القبول عبر واتساب"
+        secondaryActionHref="https://wa.me/966531896000"
+      />
     </AqeeqLuxuryPageShell>
   );
 }

@@ -11,7 +11,6 @@ import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
 import { AqeeqMemoryWallSection } from "@/components/AqeeqMemoryWallSection";
 import { AqeeqLiveArchiveSection } from "@/components/AqeeqLiveArchiveSection";
-import { AqeeqTypographicScrubBar } from "@/components/AqeeqTypographicScrubBar";
 import { AqeeqCursorHoverPreview, triggerCursorPreview } from "@/components/AqeeqCursorHoverPreview";
 import { useVisualEditorState, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import {

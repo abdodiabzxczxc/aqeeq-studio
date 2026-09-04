@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -51,13 +52,14 @@ export default function AqeeqSchoolAccreditationsPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="الاعتمادات والشراكات الدولية" active="accreditations" />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
-        isNationalDay
-          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
-          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
-      }`}>
+      useCurtain={true}
+      curtainKicker="✦ استكشف قاعة الاعتمادات ومراكز الاختبارات ✦"
+      hero={
+        <section className={`relative isolate overflow-hidden py-12 sm:py-20 ${
+          isNationalDay
+            ? dark ? "snd-hero-dark" : "snd-hero-light"
+            : ""
+        }`}>
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
 
@@ -242,9 +244,10 @@ export default function AqeeqSchoolAccreditationsPage() {
           </div>
         </div>
       </section>
-
-      {/* Interactive Testing & Accreditations Hub */}
-      <section id="cognia-section" className="py-20 container mx-auto px-4 sm:px-6">
+    }
+  >
+    {/* Interactive Testing & Accreditations Hub */}
+    <section id="cognia-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
             <Award size={14} />
@@ -990,6 +993,19 @@ export default function AqeeqSchoolAccreditationsPage() {
           </div>
         </div>
       </section>
+
+      {/* Stage 5: Grand Interactive Finale & Action */}
+      <AqeeqGrandFinaleCta
+        badge="✦ جودة تعليمية عالمية موثقة ✦"
+        title="امنح أبناءك شهادات معتمدة تفتح لهم أبواب كبرى الجامعات محلياً وعالمياً"
+        subtitle="مدارس العقيق معتمدة رسمياً من Cognia الأمريكية ومقر معتمد لاختبارات IELTS و SAT و ACT بالمدينة المنورة."
+        primaryActionText="قدّم طلب التسجيل الآن"
+        primaryActionHref="/admissions"
+        onPrimaryAction={() => navigate("/admissions")}
+        secondaryActionText="استكشف مجمعاتنا التعليمية"
+        secondaryActionHref="/about"
+        onSecondaryAction={() => navigate("/about")}
+      />
 
     </AqeeqLuxuryPageShell>
   );

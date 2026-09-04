@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 
@@ -917,24 +918,30 @@ export default function AqeeqShowcasePage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={showcase.headerLogoUrl || issues[0]?.headerLogoUrl} />}
       footer={<AlaqeeqStudioSiteFooter />}
+      useCurtain={true}
+      curtainKicker="✦ استكشف مسرح الأخبار والعروض ✦"
+      hero={
+        <div className="relative w-full">
+          {showcase.backgroundAudioUrl ? <audio ref={audioRef} src={showcase.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
+          <UnifiedShowcaseHero
+            showcase={showcase}
+            posts={posts}
+            customPostId={orchestration?.heroCovers?.showcaseMode === "custom" ? orchestration?.heroCovers?.customShowcasePostId : undefined}
+            secondaryPostId={orchestration?.heroCovers?.showcaseSecondaryPostId}
+            customTag={orchestration?.heroCovers?.showcaseCustomTag}
+            customTitle={orchestration?.heroCovers?.showcaseCustomTitle}
+            customSubtitle={orchestration?.heroCovers?.showcaseCustomSubtitle}
+            customDesc={orchestration?.heroCovers?.showcaseCustomDesc}
+            soundEnabled={soundEnabled}
+            isAdmin={isAdmin}
+            onExplore={() => document.getElementById("aqeeq-showcase-feed")?.scrollIntoView({ behavior: "smooth" })}
+            onSound={() => void toggleSound()}
+            onOpenStudio={() => navigate("/offers/manage")}
+            dark={dark}
+          />
+        </div>
+      }
     >
-      {showcase.backgroundAudioUrl ? <audio ref={audioRef} src={showcase.backgroundAudioUrl} loop autoPlay preload="auto" onEnded={() => setSoundEnabled(false)} /> : null}
-      <UnifiedShowcaseHero
-        showcase={showcase}
-        posts={posts}
-        customPostId={orchestration?.heroCovers?.showcaseMode === "custom" ? orchestration?.heroCovers?.customShowcasePostId : undefined}
-        secondaryPostId={orchestration?.heroCovers?.showcaseSecondaryPostId}
-        customTag={orchestration?.heroCovers?.showcaseCustomTag}
-        customTitle={orchestration?.heroCovers?.showcaseCustomTitle}
-        customSubtitle={orchestration?.heroCovers?.showcaseCustomSubtitle}
-        customDesc={orchestration?.heroCovers?.showcaseCustomDesc}
-        soundEnabled={soundEnabled}
-        isAdmin={isAdmin}
-        onExplore={() => document.getElementById("aqeeq-showcase-feed")?.scrollIntoView({ behavior: "smooth" })}
-        onSound={() => void toggleSound()}
-        onOpenStudio={() => navigate("/offers/manage")}
-        dark={dark}
-      />
       <section id="aqeeq-showcase-feed" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
         <div className={`mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
           <div>
@@ -1047,6 +1054,20 @@ export default function AqeeqShowcasePage() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      {/* Stage 5: Grand Interactive Finale & Action */}
+      <AqeeqGrandFinaleCta
+        badge="✦ منصة التغطيات الحية ✦"
+        title="تابع أحدث تغطيات وفعاليات العقيق لحظة بلحظة عبر كافة المنصات"
+        subtitle="نشارككم قصص النجاح وإبداعات الطلاب أولاً بأول عبر قنواتنا الرسمية وأقسام الميديا المتجددة."
+        primaryActionText="استمع لبودكاست أثير"
+        primaryActionHref="/atheer"
+        onPrimaryAction={() => navigate("/atheer")}
+        secondaryActionText="استكشف الألبومات والمعارض"
+        secondaryActionHref="/albums"
+        onSecondaryAction={() => navigate("/albums")}
+      />
+
     </AqeeqLuxuryPageShell>
   );
 }

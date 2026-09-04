@@ -11,6 +11,7 @@ import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 
@@ -319,10 +320,11 @@ export default function SchoolNewsPage() {
         />
       }
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      {featuredIssue ? (
-        <>
-          {/* Hero Section */}
+      useCurtain={Boolean(featuredIssue)}
+      curtainKicker="✦ استكشف صحيفة ومجلة العقيق ✦"
+      hero={
+        featuredIssue ? (
+          /* Hero Section */
           <section className={`relative isolate overflow-hidden border-b ${
             isNationalDay
               ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
@@ -522,7 +524,11 @@ export default function SchoolNewsPage() {
               </div>
             </div>
           </section>
-
+        ) : null
+      }
+    >
+      {featuredIssue ? (
+        <>
           {/* Monthly Booklets Section */}
           {monthGroups.length > 0 ? (
             <section className={`border-b py-10 ${
@@ -683,6 +689,18 @@ export default function SchoolNewsPage() {
         </section>
       )}
 
+      {/* Grand Finale CTA */}
+      <AqeeqGrandFinaleCta
+        badge="✦ إصدارات العقيق الدورية ✦"
+        title="وثّق أجمل اللحظات والإنجازات في صفحات مجلة العقيق"
+        subtitle="تصفح أرشيف المجلات الأسبوعية والكتيبات الشهرية التفاعلية وشارك مسيرة التفوق التعليمي لأبنائنا وبناتنا."
+        primaryActionText="استكشف كواليس وألبومات العقيق"
+        primaryActionHref="/albums"
+        onPrimaryAction={() => navigate("/albums")}
+        secondaryActionText="استمع لحلقات أثير العقيق"
+        secondaryActionHref="/podcasts"
+        onSecondaryAction={() => navigate("/podcasts")}
+      />
     </AqeeqLuxuryPageShell>
   );
 }

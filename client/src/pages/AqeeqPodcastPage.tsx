@@ -9,6 +9,7 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 
@@ -406,15 +407,16 @@ export default function AqeeqPodcastPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="أثير العقيق 🎙️" active="podcast" />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      {/* ==================== 1. 3D TILTED HERO COVER ==================== */}
-      <section
-        className={`relative isolate overflow-hidden border-b ${
-          isNationalDay
-            ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
-            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-        }`}
-      >
+      useCurtain={true}
+      curtainKicker="✦ استكشف استوديو أثير الصوتي ✦"
+      hero={
+        <section
+          className={`relative isolate overflow-hidden py-8 sm:py-14 ${
+            isNationalDay
+              ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
+              : dark ? "bg-black text-white" : "bg-white text-black"
+          }`}
+        >
         {isNationalDay ? (
           <>
             <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
@@ -688,6 +690,8 @@ export default function AqeeqPodcastPage() {
           </div>
         </div>
       </section>
+    }
+  >
 
       {/* ==================== 🌟 2. MAIN IMPERIAL PAVILIONS (أروقة أثير العقيق الملكية) ==================== */}
       <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-8 space-y-10">
@@ -2476,6 +2480,19 @@ export default function AqeeqPodcastPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Stage 5: Grand Interactive Finale & Action */}
+      <AqeeqGrandFinaleCta
+        badge="✦ استوديو أثير العقيق ✦"
+        title="استمع إلى حوارات وتجارب تصنع الإلهام في مجتمعنا المدرسي"
+        subtitle="حلقات أسبوعية نناقش فيها القيادة التربوية، تجارب التميز، وإبداعات الطلاب والمعلمين."
+        primaryActionText="استكشف المقالات والمدونة"
+        primaryActionHref="/articles"
+        onPrimaryAction={() => navigate("/articles")}
+        secondaryActionText="شاهد المعارض والفعاليات"
+        secondaryActionHref="/albums"
+        onSecondaryAction={() => navigate("/albums")}
+      />
 
     </AqeeqLuxuryPageShell>
   );

@@ -31,6 +31,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 
@@ -395,16 +396,16 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="articles" />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-
-      {/* Hero Section matching Journal & Albums */}
-      <section
-        className={`relative isolate overflow-hidden border-b ${
-          isNationalDay
-            ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
-            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-        }`}
-      >
+      useCurtain={true}
+      curtainKicker="✦ استكشف أقلام ومقالات العقيق ✦"
+      hero={
+        <section
+          className={`relative isolate overflow-hidden py-8 sm:py-14 ${
+            isNationalDay
+              ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
+              : dark ? "bg-black text-white" : "bg-white text-black"
+          }`}
+        >
         {isNationalDay ? (
           <>
             <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
@@ -640,9 +641,10 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
           </div>
         </div>
       </section>
-
-      {/* Articles Feed Section */}
-      <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+    }
+  >
+    {/* Articles Feed Section */}
+    <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
         <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
           dark ? "border-white/[0.08]" : "border-black/[0.08]"
         }`}>

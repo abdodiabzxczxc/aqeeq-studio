@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -91,13 +92,14 @@ export default function AqeeqSchoolAboutPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="عن مدارس العقيق الأهلية والدولية" active="about" />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      {/* Hero Section: Modern Executive 2-Column Showcase */}
-      <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
-        isNationalDay
-          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-emerald-600/20"
-          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
-      }`}>
+      useCurtain={true}
+      curtainKicker="✦ استكشف صروح ومسيرة العقيق ✦"
+      hero={
+        <section className={`relative isolate overflow-hidden py-12 sm:py-20 ${
+          isNationalDay
+            ? dark ? "snd-hero-dark" : "snd-hero-light"
+            : ""
+        }`}>
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
 
@@ -250,9 +252,10 @@ export default function AqeeqSchoolAboutPage() {
           </div>
         </div>
       </section>
-
-      {/* The 30-Year Legacy Interactive Timeline (1994 - 2026) */}
-      <section className="py-20 container mx-auto px-4 sm:px-6">
+    }
+  >
+    {/* The 30-Year Legacy Interactive Timeline (1994 - 2026) */}
+    <section className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
             <Sparkles size={14} />
@@ -760,6 +763,19 @@ export default function AqeeqSchoolAboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Stage 5: Grand Interactive Finale & Action */}
+      <AqeeqGrandFinaleCta
+        badge="✦ انضم إلى مجتمع العقيق ✦"
+        title="اصنع مستقبل أبنائك في بيئة تعليمية تليق بطموحاتهم"
+        subtitle="أبواب القبول والتسجيل مفتوحة لجميع المراحل الدراسية للبنين والبنات مع توفير كافة التسهيلات وأنظمة السداد."
+        primaryActionText="سجّل ابنك الآن"
+        primaryActionHref="/admissions"
+        onPrimaryAction={() => navigate("/admissions")}
+        secondaryActionText="استكشف الاعتمادات الدولية"
+        secondaryActionHref="/accreditations"
+        onSecondaryAction={() => navigate("/accreditations")}
+      />
 
     </AqeeqLuxuryPageShell>
   );

@@ -14,6 +14,7 @@ import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator"
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
+import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
 
@@ -196,13 +197,14 @@ export default function AqeeqAlbumsPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />}
       footer={<AlaqeeqStudioSiteFooter />}
-    >
-      {featuredAlbum ? (
-        <>
-          <section className={`relative isolate overflow-hidden border-b ${
+      useCurtain={Boolean(featuredAlbum)}
+      curtainKicker="✦ استكشف أرشيف الذاكرة الحية ✦"
+      hero={
+        featuredAlbum ? (
+          <section className={`relative isolate overflow-hidden py-8 sm:py-14 ${
             isNationalDay
-              ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
-              : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+              ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
+              : dark ? "bg-black text-white" : "bg-white text-black"
           }`}>
             {isNationalDay ? (
               <>
@@ -321,7 +323,10 @@ export default function AqeeqAlbumsPage() {
               </div>
             </div>
           </section>
-          <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+        ) : undefined
+      }
+    >
+      <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
             <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
               <div>
                 <VisualEditable id="albums-archive-kicker" tag="text" label="شارة أرشيف الألبومات" defaultText="THE MEMORY WALL" as="p" className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
@@ -346,15 +351,15 @@ export default function AqeeqAlbumsPage() {
               }`} />
             )}
           </section>
-        </>
-      ) : (
-        <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
-          <Camera className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={48} />
-          <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>أول ألبوم في الطريق</h1>
-          <p className={`mx-auto mt-3 max-w-md text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}>بعد نشر أول ألبوم، ستظهر هنا فعاليات وذكريات مدارس العقيق.</p>
-          {isAdmin ? <button onClick={() => navigate("/albums/manage")} className={`mt-6 rounded-xl px-4 py-3 text-xs font-black ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}>إنشاء أول ألبوم</button> : null}
-        </section>
-      )}
+
+          {albums.length === 0 && (
+            <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
+              <Camera className={`mx-auto ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={48} />
+              <h1 className={`mt-6 text-3xl font-black ${dark ? "text-white" : "text-black"}`}>أول ألبوم في الطريق</h1>
+              <p className={`mx-auto mt-3 max-w-md text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`}>بعد نشر أول ألبوم، ستظهر هنا فعاليات وذكريات مدارس العقيق.</p>
+              {isAdmin ? <button onClick={() => navigate("/albums/manage")} className={`mt-6 rounded-xl px-4 py-3 text-xs font-black ${dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"}`}>إنشاء أول ألبوم</button> : null}
+            </section>
+          )}
 
       {isTvMode && isAllMediaLoading && (
         <div className="fixed inset-0 z-[100] bg-black text-white flex items-center justify-center">
@@ -373,6 +378,19 @@ export default function AqeeqAlbumsPage() {
           onClose={() => setIsTvMode(false)}
         />
       )}
+
+      {/* Stage 5: Grand Interactive Finale & Action */}
+      <AqeeqGrandFinaleCta
+        badge="✦ استوديو التوثيق والإنتاج ✦"
+        title="وثّق لحظات التميز وشارك في صناعة المحتوى البصري لمدارس العقيق"
+        subtitle="فريق العقيق الإعلامي يوثق كافة الأنشطة والمناسبات المدرسية بأحدث تقنيات التصوير السينمائي."
+        primaryActionText="استكشف الفيديوهات والعروض"
+        primaryActionHref="/offers"
+        onPrimaryAction={() => navigate("/offers")}
+        secondaryActionText="استمع لبودكاست أثير"
+        secondaryActionHref="/atheer"
+        onSecondaryAction={() => navigate("/atheer")}
+      />
 
       <AqeeqAiYearbookGenerator open={isWrappedOpen} onOpenChange={setIsWrappedOpen} />
     </AqeeqLuxuryPageShell>
