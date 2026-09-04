@@ -1298,27 +1298,27 @@ export default function AqeeqSchoolAccreditationsPage() {
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">الآيلتس المباشر</span>
-                      <span className="font-black text-sm text-emerald-400">تحقيق Band 6.5 - 7.5</span>
-                      <p className="text-[11px] text-slate-400 mt-1">اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>الآيلتس المباشر</span>
+                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>تحقيق Band 6.5 - 7.5</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">القدرات والتحصيلي</span>
-                      <span className="font-black text-sm text-emerald-400">معدلات 90+ و 95+</span>
-                      <p className="text-[11px] text-slate-400 mt-1">برامج تدريب يومية متخصصة ومحاكاة دورية</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>القدرات والتحصيلي</span>
+                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>معدلات 90+ و 95+</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>برامج تدريب يومية متخصصة ومحاكاة دورية</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">السنة التحضيرية</span>
-                      <span className="font-black text-sm text-emerald-400">إعفاء واجتياز مباشر</span>
-                      <p className="text-[11px] text-slate-400 mt-1">بفضل مناهج العلوم واللغات المتطورة</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>السنة التحضيرية</span>
+                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>إعفاء واجتياز مباشر</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>بفضل مناهج العلوم واللغات المتطورة</p>
                     </div>
                   </div>
                 </div>
@@ -1340,27 +1340,27 @@ export default function AqeeqSchoolAccreditationsPage() {
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">شهادة كوجنيا الأمريكية</span>
-                      <span className="font-black text-sm text-amber-400">High School Diploma</span>
-                      <p className="text-[11px] text-slate-400 mt-1">معادلة ومقبولة فورياً عالمياً ومحلياً</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>شهادة كوجنيا الأمريكية</span>
+                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>High School Diploma</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>معادلة ومقبولة فورياً عالمياً ومحلياً</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">اختبارات SAT الرسمية</span>
-                      <span className="font-black text-sm text-amber-400">درجات تنافسية 1350+</span>
-                      <p className="text-[11px] text-slate-400 mt-1">مركز الاختبارات الرسمي داخل المدرسة</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>اختبارات SAT الرسمية</span>
+                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>درجات تنافسية 1350+</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>مركز الاختبارات الرسمي داخل المدرسة</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">الإرشاد الجامعي الدولي</span>
-                      <span className="font-black text-sm text-amber-400">College Counseling</span>
-                      <p className="text-[11px] text-slate-400 mt-1">خطابات توصية وسيرة ذاتية متكاملة للمنح</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>الإرشاد الجامعي الدولي</span>
+                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>College Counseling</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>خطابات توصية وسيرة ذاتية متكاملة للمنح</p>
                     </div>
                   </div>
                 </div>
@@ -1381,27 +1381,27 @@ export default function AqeeqSchoolAccreditationsPage() {
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">ساعات AP المعتمدة</span>
-                      <span className="font-black text-sm text-blue-400">Advanced Placement</span>
-                      <p className="text-[11px] text-slate-400 mt-1">معادلة مقررات الجامعة المبكرة وتوفير سنة</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>ساعات AP المعتمدة</span>
+                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>Advanced Placement</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>معادلة مقررات الجامعة المبكرة وتوفير سنة</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">المعامل والبحث العلمي</span>
-                      <span className="font-black text-sm text-blue-400">STEM Research</span>
-                      <p className="text-[11px] text-slate-400 mt-1">تجارب معملية وبحوث موثقة تنمي الابتكار</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>المعامل والبحث العلمي</span>
+                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>STEM Research</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>تجارب معملية وبحوث موثقة تنمي الابتكار</p>
                     </div>
                     <div
                       className={`p-4 rounded-2xl border ${
                         dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs text-slate-400 font-bold mb-1">اللغة الإنجليزية التخصصية</span>
-                      <span className="font-black text-sm text-blue-400">Academic Fluency</span>
-                      <p className="text-[11px] text-slate-400 mt-1">طلاقة كاملة في المصطلحات الطبية والهندسية</p>
+                      <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>اللغة الإنجليزية التخصصية</span>
+                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>Academic Fluency</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>طلاقة كاملة في المصطلحات الطبية والهندسية</p>
                     </div>
                   </div>
                 </div>

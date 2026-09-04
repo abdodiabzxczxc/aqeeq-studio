@@ -89,12 +89,16 @@ export function AlaqeeqStudioSiteFooter() {
 
           <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="max-w-2xl text-right">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-black text-emerald-400 mb-2 shadow-sm">
+              <div className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-0.5 text-[10px] font-black mb-2 shadow-sm ${
+                dark
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                  : "border-emerald-600/30 bg-emerald-50 text-emerald-800"
+              }`}>
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dark ? "bg-emerald-400" : "bg-emerald-600"}`} />
+                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dark ? "bg-emerald-500" : "bg-emerald-600"}`} />
                 </span>
-                <Sparkles size={11} className="text-[#f8ca14]" />
+                <Sparkles size={11} className={dark ? "text-[#f8ca14]" : "text-amber-600"} />
                 <VisualEditable
                   id="studio-prefooter-kicker"
                   tag="text"

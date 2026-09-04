@@ -1003,7 +1003,7 @@ export default function AqeeqSchoolAdmissionsPage() {
 
                   {/* Perks list */}
                   <div className="space-y-2 mb-6">
-                    <span className="text-[11px] font-black text-slate-400 block mb-1">المزايا المشمولة:</span>
+                    <span className={`text-[11px] font-black block mb-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>المزايا المشمولة:</span>
                     {tier.perks.map((perk, pIdx) => (
                       <div key={pIdx} className="flex items-start gap-2 text-xs">
                         <Check size={14} className="text-emerald-600 shrink-0 mt-0.5" />
@@ -1373,17 +1373,17 @@ export default function AqeeqSchoolAdmissionsPage() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black transition-all ${
                         formStep > step ? 'bg-emerald-500 text-white' :
                         formStep === step ? (dark ? 'bg-[#f8ca14] text-black' : 'bg-[#08467d] text-white') :
-                        dark ? 'bg-white/10 text-slate-400' : 'bg-black/10 text-slate-400'
+                        dark ? 'bg-white/10 text-slate-400' : 'bg-slate-200 text-slate-600'
                       }`}>
                         {formStep > step ? '✓' : step}
                       </div>
                       {step < 3 && <div className={`flex-1 h-0.5 ${
-                        formStep > step ? 'bg-emerald-500' : dark ? 'bg-white/10' : 'bg-black/10'
+                        formStep > step ? 'bg-emerald-500' : dark ? 'bg-white/10' : 'bg-slate-200'
                       }`} />}
                     </div>
                   ))}
                 </div>
-                <div className="text-sm text-center mb-6 font-bold text-slate-400">
+                <div className={`text-sm text-center mb-6 font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
                   {formStep === 1 && 'الخطوة 1 من 3 — بيانات الطالب'}
                   {formStep === 2 && 'الخطوة 2 من 3 — بيانات ولي الأمر'}
                   {formStep === 3 && 'الخطوة 3 من 3 — مراجعة وإرسال'}

@@ -104,7 +104,7 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
           <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${isNationalDay ? (dark ? "border-[#5aba1c]/20" : "border-emerald-500/15") : dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
             <div>
               <b className={`block text-xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>{String(album.mediaCount || 0).padStart(2, "0")}</b>
-              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? (dark ? "text-[#5aba1c]" : "text-emerald-700") : dark ? "text-slate-500" : "text-slate-400"}`}>FILES</span>
+              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? (dark ? "text-[#5aba1c]" : "text-emerald-700") : dark ? "text-slate-500" : "text-slate-600"}`}>FILES</span>
             </div>
             <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-800/80" : "text-slate-500"}`}><Eye size={13} />{album.viewCount || 0}</span>
             <button onClick={onOpen} className={`inline-flex items-center gap-2 text-xs font-black transition ${
@@ -332,7 +332,7 @@ export default function AqeeqAlbumsPage() {
                 <VisualEditable id="albums-archive-kicker" tag="text" label="شارة أرشيف الألبومات" defaultText="THE MEMORY WALL" as="p" className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
                 <VisualEditable id="albums-archive-title" tag="text" label="عنوان أرشيف الألبومات" defaultText="ألبومات العقيق" as="h2" className={`mt-2 text-2xl font-black ${dark ? "text-white" : "text-black"}`} />
               </div>
-              <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>{visibleAlbums.length} من {albums.length} ألبوم</span>
+              <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-600 font-bold"}`}>{visibleAlbums.length} من {albums.length} ألبوم</span>
             </div>
             <AqeeqArchiveControls id="albums-archive-controls" label="البحث وترتيب الألبومات" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />
             {visibleAlbums.length ? (

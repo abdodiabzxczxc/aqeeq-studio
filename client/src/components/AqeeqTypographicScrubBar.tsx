@@ -29,7 +29,7 @@ export function AqeeqTypographicScrubBar({
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="relative w-full overflow-hidden py-4 select-none pointer-events-none"
+      className="hidden lg:block relative w-full overflow-hidden py-4 select-none pointer-events-none"
     >
       <motion.div
         style={{ x }}

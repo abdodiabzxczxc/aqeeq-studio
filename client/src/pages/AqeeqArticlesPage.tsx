@@ -239,7 +239,7 @@ function ArticleCard({
           <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-3.5 ${
             isNationalDay ? (dark ? "border-[#5aba1c]/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
           }`}>
-            <div className="flex items-center gap-3 text-[10px] font-black text-slate-400">
+            <div className={`flex items-center gap-3 text-[10px] font-black ${dark ? "text-slate-400" : "text-slate-600"}`}>
               <span className="flex items-center gap-1">
                 <Eye size={12} />
                 <span>{article.viewCount || 0}</span>
@@ -249,7 +249,7 @@ function ArticleCard({
                 <span>{article.likesCount || 0}</span>
               </span>
               {readingTime && (
-                <span className={`flex items-center gap-1 ${dark ? "text-slate-500" : isNationalDay ? "text-emerald-800/70" : "text-slate-400"}`}>
+                <span className={`flex items-center gap-1 ${dark ? "text-slate-500" : isNationalDay ? "text-emerald-800/80" : "text-slate-600"}`}>
                   <Clock size={12} />
                   <span>{readingTime} د قراءة</span>
                 </span>
@@ -557,7 +557,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             />
 
             {/* Stats pills */}
-            <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
+            <div className={`mt-6 flex flex-wrap gap-2 text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
               <span
                 className={`rounded-full border px-3 py-2 ${
                   isNationalDay
@@ -656,7 +656,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               مقالات وأقلام العقيق
             </h2>
           </div>
-          <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+          <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-600 font-bold"}`}>
             {articles.length} من {rawArticles.length} مقال
           </span>
         </div>
@@ -667,28 +667,28 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             dark ? "border-[#f8ca14]/30 bg-black/60 shadow-lg shadow-[#f8ca14]/5" : "border-[#08467d]/20 bg-white shadow-sm"
           }`}
         >
-          <div className="text-[10px] font-black tracking-[.18em] uppercase text-amber-400 mb-2">
+          <div className={`text-[10px] font-black tracking-[.18em] uppercase mb-2 ${dark ? "text-amber-400" : "text-[#08467d]"}`}>
             FIND & SORT · البحث وترتيب المقالات
           </div>
 
           <div className="flex flex-col lg:flex-row items-center gap-3">
             {/* Search Input */}
             <div className="relative w-full lg:flex-1">
-              <Search size={16} className="absolute top-3.5 right-3.5 text-slate-400" />
+              <Search size={16} className={`absolute top-3.5 right-3.5 ${dark ? "text-slate-400" : "text-slate-500"}`} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ابحث بالاسم أو المحتوى أو الكاتب..."
                 className={`w-full rounded-xl border pr-10 pl-4 py-2.5 text-xs font-bold outline-none transition ${
-                  dark ? "border-white/10 bg-black text-white focus:border-[#f8ca14]" : "border-black/10 bg-slate-50 text-black focus:border-[#08467d]"
+                  dark ? "border-white/10 bg-black text-white focus:border-[#f8ca14]" : "border-black/10 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-[#08467d]"
                 }`}
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute top-3 left-3 text-slate-400 hover:text-white"
+                  className={`absolute top-3 left-3 ${dark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-black"}`}
                 >
                   <X size={14} />
                 </button>
@@ -697,7 +697,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
             {/* Sort Switcher */}
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs font-bold text-slate-400">ترتيب:</span>
+              <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ترتيب:</span>
               <button
                 type="button"
                 onClick={() => setSortBy("newest")}
@@ -706,7 +706,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     ? dark
                       ? "bg-[#f8ca14] text-black"
                       : "bg-[#08467d] text-white"
-                    : "text-slate-400 hover:text-current"
+                    : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 الأحدث
@@ -719,7 +719,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     ? dark
                       ? "bg-[#f8ca14] text-black"
                       : "bg-[#08467d] text-white"
-                    : "text-slate-400 hover:text-current"
+                    : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 الأكثر قراءة
@@ -732,7 +732,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     ? dark
                       ? "bg-[#f8ca14] text-black"
                       : "bg-[#08467d] text-white"
-                    : "text-slate-400 hover:text-current"
+                    : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 الأعلى إعجاباً
@@ -741,8 +741,10 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
           </div>
 
           {/* Category Filter Pills */}
-          <div className="mt-3 pt-3 border-t border-white/10 flex overflow-x-auto scrollbar-hide flex-nowrap pb-1 items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-400 ml-2">التصنيف:</span>
+          <div className={`mt-3 pt-3 border-t flex overflow-x-auto scrollbar-hide flex-nowrap pb-1 items-center gap-1.5 ${
+            dark ? "border-white/10" : "border-slate-200"
+          }`}>
+            <span className={`text-[11px] font-bold ml-2 ${dark ? "text-slate-400" : "text-slate-600"}`}>التصنيف:</span>
             {CATEGORIES.map((cat) => {
               const active = selectedCategory === cat.id;
               return (
@@ -834,7 +836,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
           >
             <div className="space-y-6">
               {/* Breadcrumb Navigation */}
-              <nav className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+              <nav className={`flex items-center gap-1.5 text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
                 <button type="button" onClick={() => { handleCloseArticle(); navigate("/"); }} className="hover:text-current transition">الرئيسية</button>
                 <span className="opacity-40">›</span>
                 <button type="button" onClick={handleCloseArticle} className="hover:text-current transition">المقالات</button>
@@ -850,7 +852,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 }`}>
                   {readingArticle.category}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">
+                <span className={`text-xs font-mono ${dark ? "text-slate-400" : "text-slate-600"}`}>
                   تاريخ النشر: {new Date(readingArticle.publishedAt || readingArticle.createdAt).toLocaleDateString("ar-SA")}
                 </span>
               </div>
@@ -1005,7 +1007,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     <span>أعجبني ({readingArticle.likesCount})</span>
                   </button>
 
-                  <span className="text-xs text-slate-400 font-bold">
+                  <span className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
                     👁️ {readingArticle.viewCount} قراءة
                   </span>
                 </div>
@@ -1014,7 +1016,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                   type="button"
                   variant="ghost"
                   onClick={handleCloseArticle}
-                  className="text-xs text-slate-400 hover:text-white"
+                  className={`text-xs ${dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"}`}
                 >
                   إغلاق القراءة
                 </Button>

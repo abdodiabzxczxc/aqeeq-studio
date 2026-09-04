@@ -340,9 +340,15 @@ export function AqeeqHomeBentoGrid({
                         />
                       </motion.div>
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+                      <div className={`absolute inset-0 z-10 ${
+                        dark
+                          ? "bg-gradient-to-t from-black/90 via-black/40 to-transparent"
+                          : "bg-gradient-to-t from-amber-50 via-amber-50/75 to-transparent"
+                      }`} />
 
-                      <div className="absolute inset-0 p-6 flex flex-col justify-between z-20">
+                      <div className={`absolute inset-0 p-6 flex flex-col justify-between z-20 ${
+                        dark ? "text-white" : "text-slate-900"
+                      }`}>
                         <div className="flex items-center justify-between">
                           <div className={`flex items-center gap-1.5 font-bold text-xs px-3.5 py-1 rounded-full border ${
                             dark ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "bg-amber-100 text-amber-900 border-amber-300"
@@ -350,7 +356,7 @@ export function AqeeqHomeBentoGrid({
                             <BookOpen size={14} />
                             <VisualEditable id="studio-highlights-journal-tag" tag="text" label="وسم مجلة البينتو" defaultText="أحدث الأعداد الرسمية" as="span" />
                           </div>
-                          <span className="text-[10px] font-mono text-amber-400 font-black">إصدار دوري ✦</span>
+                          <span className={`text-[10px] font-mono font-black ${dark ? "text-amber-400" : "text-amber-800"}`}>إصدار دوري ✦</span>
                         </div>
 
                         <div>
@@ -360,7 +366,7 @@ export function AqeeqHomeBentoGrid({
                             label="عنوان مجلة البينتو"
                             defaultText={latestIssue.title}
                             as="h3"
-                            className={`text-base sm:text-xl font-black leading-snug mb-2 line-clamp-2 font-cairo ${dark ? "text-white" : "text-black"}`}
+                            className={`text-base sm:text-xl font-black leading-snug mb-2 line-clamp-2 font-cairo ${dark ? "text-white" : "text-slate-900"}`}
                           />
                           <span className={`inline-flex items-center gap-1 text-xs font-black group-hover:underline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                             <span>تصفح أوراق العدد</span>
@@ -426,15 +432,23 @@ export function AqeeqHomeBentoGrid({
                         alt={latestPodcast.title}
                         className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-108 transition-transform duration-700 mix-blend-overlay"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent z-10" />
+                      <div className={`absolute inset-0 z-10 ${
+                        dark
+                          ? "bg-gradient-to-t from-black/95 via-black/40 to-transparent"
+                          : "bg-gradient-to-t from-indigo-50 via-indigo-50/75 to-transparent"
+                      }`} />
 
-                      <div className="absolute inset-0 p-6 flex flex-col justify-between z-20 text-white">
+                      <div className={`absolute inset-0 p-6 flex flex-col justify-between z-20 ${
+                        dark ? "text-white" : "text-slate-900"
+                      }`}>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-indigo-300 font-bold text-xs bg-indigo-500/20 border border-indigo-500/30 px-3 py-1 rounded-full">
+                          <div className={`flex items-center gap-1.5 font-bold text-xs px-3.5 py-1 rounded-full border ${
+                            dark ? "text-indigo-300 bg-indigo-500/20 border-indigo-500/30" : "text-indigo-800 bg-indigo-100 border-indigo-200"
+                          }`}>
                             <Mic size={14} />
                             <VisualEditable id="studio-highlights-podcast-tag" tag="text" label="وسم بودكاست البينتو" defaultText="صوت العقيق" as="span" />
                           </div>
-                          {isPodcastHovered && <Volume2 size={16} className="text-indigo-400 animate-pulse" />}
+                          {isPodcastHovered && <Volume2 size={16} className={dark ? "text-indigo-400 animate-pulse" : "text-indigo-600 animate-pulse"} />}
                         </div>
 
                         <div>
@@ -444,13 +458,19 @@ export function AqeeqHomeBentoGrid({
                             label="عنوان بودكاست البينتو"
                             defaultText={latestPodcast.title}
                             as="h3"
-                            className="text-sm sm:text-base font-black leading-snug line-clamp-2 font-cairo mb-3"
+                            className={`text-sm sm:text-base font-black leading-snug line-clamp-2 font-cairo mb-3 ${
+                              dark ? "text-white" : "text-slate-900"
+                            }`}
                           />
                           <button
                             type="button"
-                            className="bg-[#f8ca14] text-black font-black px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs hover:scale-105 transition-transform w-fit shadow-md active:scale-95"
+                            className={`font-black px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs hover:scale-105 transition-transform w-fit shadow-md active:scale-95 ${
+                              dark
+                                ? "bg-[#f8ca14] text-black hover:bg-[#e6b90f]"
+                                : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/20"
+                            }`}
                           >
-                            <Play size={12} className="fill-black" />
+                            <Play size={12} className={dark ? "fill-black" : "fill-white"} />
                             <VisualEditable id="studio-highlights-podcast-btn" tag="text" label="زر بودكاست البينتو" defaultText="استمع للحلقة" as="span" />
                           </button>
                         </div>
@@ -495,9 +515,15 @@ export function AqeeqHomeBentoGrid({
                         alt={latestArticle.title}
                         className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-108 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent z-10" />
+                      <div className={`absolute inset-0 z-10 ${
+                        dark
+                          ? "bg-gradient-to-t from-black/95 via-black/40 to-transparent"
+                          : "bg-gradient-to-t from-rose-50 via-rose-50/75 to-transparent"
+                      }`} />
 
-                      <div className="absolute inset-0 p-6 flex flex-col justify-between z-20">
+                      <div className={`absolute inset-0 p-6 flex flex-col justify-between z-20 ${
+                        dark ? "text-white" : "text-slate-900"
+                      }`}>
                         <div className="flex items-center justify-between">
                           <div className={`flex items-center gap-1.5 font-bold text-xs px-3 py-1 rounded-full border ${
                             dark ? "bg-rose-500/20 text-rose-300 border-rose-500/30" : "bg-rose-100 text-rose-800 border-rose-300"
@@ -505,7 +531,7 @@ export function AqeeqHomeBentoGrid({
                             <Newspaper size={14} />
                             <VisualEditable id="studio-highlights-article-tag" tag="text" label="وسم مقال البينتو" defaultText="مقال وتحليل" as="span" />
                           </div>
-                          <span className="text-[10px] font-mono text-rose-400 font-bold">قراءة سريعة ⏱️</span>
+                          <span className={`text-[10px] font-mono font-bold ${dark ? "text-rose-400" : "text-rose-700"}`}>قراءة سريعة ⏱️</span>
                         </div>
 
                         <div>
@@ -515,9 +541,11 @@ export function AqeeqHomeBentoGrid({
                             label="عنوان مقال البينتو"
                             defaultText={latestArticle.title}
                             as="h3"
-                            className={`text-sm sm:text-base font-black leading-snug line-clamp-3 font-cairo mb-2 ${dark ? "text-white" : "text-black"}`}
+                            className={`text-sm sm:text-base font-black leading-snug line-clamp-3 font-cairo mb-2 ${dark ? "text-white" : "text-slate-900"}`}
                           />
-                          <span className="inline-flex items-center gap-1.5 text-xs font-black text-rose-400 group-hover:underline">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-black group-hover:underline ${
+                            dark ? "text-rose-400" : "text-rose-700"
+                          }`}>
                             <span>قراءة المقال الآن</span>
                             <ArrowUpLeft size={14} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
                           </span>

@@ -13,10 +13,26 @@ export function getAqeeqStudioTheme(): AqeeqStudioTheme {
   return window.localStorage.getItem(storageKey) === "light" ? "light" : "dark";
 }
 
+function applyThemeClasses(theme: AqeeqStudioTheme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.aqeeqTheme = theme;
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("light");
+    document.body.classList.add("dark");
+    document.body.classList.remove("light");
+  } else {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("light");
+    document.body.classList.remove("dark");
+    document.body.classList.add("light");
+  }
+}
+
 export function setAqeeqStudioTheme(theme: AqeeqStudioTheme) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(storageKey, theme);
-  document.documentElement.dataset.aqeeqTheme = theme;
+  applyThemeClasses(theme);
   window.dispatchEvent(new Event(eventName));
 }
 
@@ -25,7 +41,7 @@ export function useAqeeqStudioTheme() {
   useEffect(() => {
     const sync = () => {
       const next = getAqeeqStudioTheme();
-      document.documentElement.dataset.aqeeqTheme = next;
+      applyThemeClasses(next);
       setTheme(next);
     };
     sync();
