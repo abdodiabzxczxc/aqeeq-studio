@@ -42,6 +42,7 @@ import {
   Mail,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -100,7 +101,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
   const dark = theme === "dark";
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("manus.space"));
-  const isAdmin = (isAuthenticated && user?.role === "admin") || isLocalhost || (typeof window !== "undefined" && (window.location.search.includes("visual=1") || localStorage.getItem("aqeeq-admin-mode") === "true"));
+  const isAdmin = Boolean(isAuthenticated && (user?.role === "admin" || user?.openId === "admin"));
   const go = (path: string) => { setMobileMenuOpen(false); navigate(path); };
 
   const campuses = orchestration?.schoolCampuses;
@@ -132,6 +133,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
   const handleAuth = () => {
     if (isAuthenticated) {
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("aqeeq-admin-mode");
+        } catch {}
+      }
       void logout();
       return;
     }
@@ -377,6 +383,21 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>اجتماعات العقيق المرئية</span>
+                    <ExternalLink size={12} className="opacity-60" />
+                  </a>
+                  <a
+                    href={isAdmin ? "/admin" : "/login"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPortalsOpen(false);
+                      navigate(isAdmin ? "/admin" : "/login");
+                    }}
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10 text-slate-400 hover:text-white transition cursor-pointer"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Shield size={12} className="text-[#f8ca14]" />
+                      <span>{isAdmin ? "لوحة الإدارة والتحكم" : "بوابة دخول المشرفين"}</span>
+                    </span>
                     <ExternalLink size={12} className="opacity-60" />
                   </a>
                 </div>
@@ -661,127 +682,129 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
               </button>
 
-              {/* ⚙️ قائمة المشرف والمحرر البصري والداش بورد (دائمة ومتاحة في كل الأوضاع) */}
-              <div ref={optionsRef} className="relative shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOptionsOpen((prev) => !prev);
-                    setPortalsOpen(false);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
-                    optionsOpen
-                      ? "border-[#f8ca14] bg-[#f8ca14]/25 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
-                      : editor.isEditing
-                      ? "border-emerald-500 bg-emerald-500/20 text-emerald-400 animate-pulse"
-                      : dark
-                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
-                      : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10 hover:text-black"
-                  }`}
-                  aria-label="قائمة المشرف والمحرر"
-                  title="المحرر البصري ولوحة الإدارة"
-                >
-                  <Settings2 size={16} />
-                </button>
-
-                {optionsOpen && (
-                  <div
-                    dir="rtl"
-                    className={`absolute left-0 top-full mt-2 w-64 rounded-2xl border shadow-2xl backdrop-blur-xl z-[160] p-2.5 ${
-                      dark ? "bg-[#0c0c0c]/95 border-white/15 text-white" : "bg-white/98 border-slate-200 text-slate-900 shadow-2xl"
+              {/* ⚙️ قائمة المشرف والمحرر البصري والداش بورد (خاصة بالمشرف المسجل فقط) */}
+              {isAdmin && (
+                <div ref={optionsRef} className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOptionsOpen((prev) => !prev);
+                      setPortalsOpen(false);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                      optionsOpen
+                        ? "border-[#f8ca14] bg-[#f8ca14]/25 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
+                        : editor.isEditing
+                        ? "border-emerald-500 bg-emerald-500/20 text-emerald-400 animate-pulse"
+                        : dark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                        : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10 hover:text-black"
                     }`}
+                    aria-label="قائمة المشرف والمحرر"
+                    title="المحرر البصري ولوحة الإدارة"
                   >
-                    <div className="flex items-center justify-between pb-2 border-b border-black/5 dark:border-white/10">
-                      <span className="text-xs font-black text-[#f8ca14] flex items-center gap-1.5">
-                        <span>👑</span>
-                        <span>أدوات المشرف العام</span>
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        {user?.name || "المشرف"}
-                      </span>
-                    </div>
+                    <Settings2 size={16} />
+                  </button>
 
-                    <div className="space-y-1.5 mt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOptionsOpen(false);
-                          editor.toggleEditing();
-                        }}
-                        className={`w-full flex items-center justify-between py-2.5 px-3 cursor-pointer font-black text-xs ${
-                          editor.isEditing
-                            ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/40"
-                            : dark
-                            ? "bg-white/5 hover:bg-white/10 text-white border border-white/5"
-                            : "bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200"
-                        } rounded-xl transition`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <PencilRuler size={15} className="text-[#f8ca14] shrink-0" />
-                          <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري للتعديل"}</span>
+                  {optionsOpen && (
+                    <div
+                      dir="rtl"
+                      className={`absolute left-0 top-full mt-2 w-64 rounded-2xl border shadow-2xl backdrop-blur-xl z-[160] p-2.5 ${
+                        dark ? "bg-[#0c0c0c]/95 border-white/15 text-white" : "bg-white/98 border-slate-200 text-slate-900 shadow-2xl"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between pb-2 border-b border-black/5 dark:border-white/10">
+                        <span className="text-xs font-black text-[#f8ca14] flex items-center gap-1.5">
+                          <span>👑</span>
+                          <span>أدوات المشرف العام</span>
                         </span>
-                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
-                          editor.isEditing ? "bg-emerald-500 text-white" : dark ? "bg-white/10 text-slate-400" : "bg-slate-200 text-slate-600"
-                        }`}>
-                          {editor.isEditing ? "ON" : "OFF"}
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                          {user?.name || "المشرف"}
                         </span>
-                      </button>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOptionsOpen(false);
-                          navigate("/admin");
-                        }}
-                        className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
-                          dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
-                        } rounded-xl transition text-right`}
-                      >
-                        <LayoutDashboard size={15} className="text-blue-500 shrink-0" />
-                        <span>لوحة التحكم للإدارة (Admin)</span>
-                      </button>
-
-                      {isLocalhost && (
+                      <div className="space-y-1.5 mt-2">
                         <button
                           type="button"
                           onClick={() => {
-                            if (isDeploying) return;
-                            if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                            setIsDeploying(true);
-                            deployMutation.mutate();
+                            setOptionsOpen(false);
+                            editor.toggleEditing();
                           }}
-                          disabled={isDeploying}
+                          className={`w-full flex items-center justify-between py-2.5 px-3 cursor-pointer font-black text-xs ${
+                            editor.isEditing
+                              ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/40"
+                              : dark
+                              ? "bg-white/5 hover:bg-white/10 text-white border border-white/5"
+                              : "bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200"
+                          } rounded-xl transition`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <PencilRuler size={15} className="text-[#f8ca14] shrink-0" />
+                            <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري للتعديل"}</span>
+                          </span>
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
+                            editor.isEditing ? "bg-emerald-500 text-white" : dark ? "bg-white/10 text-slate-400" : "bg-slate-200 text-slate-600"
+                          }`}>
+                            {editor.isEditing ? "ON" : "OFF"}
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOptionsOpen(false);
+                            navigate("/admin");
+                          }}
                           className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
                             dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
                           } rounded-xl transition text-right`}
                         >
-                          <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
-                          <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
+                          <LayoutDashboard size={15} className="text-blue-500 shrink-0" />
+                          <span>لوحة التحكم للإدارة (Admin)</span>
                         </button>
-                      )}
+
+                        {isLocalhost && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isDeploying) return;
+                              if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                              setIsDeploying(true);
+                              deployMutation.mutate();
+                            }}
+                            disabled={isDeploying}
+                            className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
+                              dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
+                            } rounded-xl transition text-right`}
+                          >
+                            <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
+                            <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className={`h-px my-2 ${dark ? "bg-white/10" : "bg-black/10"}`} />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOptionsOpen(false);
+                          handleAuth();
+                        }}
+                        className={`w-full flex items-center gap-3 py-2 px-3 cursor-pointer font-bold text-xs ${
+                          isAuthenticated
+                            ? dark ? "hover:bg-[#de191e]/20 text-[#de191e]" : "hover:bg-[#de191e]/10 text-[#de191e]"
+                            : dark ? "hover:bg-white/5 text-slate-300" : "hover:bg-slate-100 text-slate-700"
+                        } rounded-xl text-right transition`}
+                      >
+                        <LogOut size={15} className="shrink-0" />
+                        <span>{isAuthenticated ? "تسجيل الخروج" : "تسجيل الدخول كمسؤول"}</span>
+                      </button>
                     </div>
-
-                    <div className={`h-px my-2 ${dark ? "bg-white/10" : "bg-black/10"}`} />
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOptionsOpen(false);
-                        handleAuth();
-                      }}
-                      className={`w-full flex items-center gap-3 py-2 px-3 cursor-pointer font-bold text-xs ${
-                        isAuthenticated
-                          ? dark ? "hover:bg-[#de191e]/20 text-[#de191e]" : "hover:bg-[#de191e]/10 text-[#de191e]"
-                          : dark ? "hover:bg-white/5 text-slate-300" : "hover:bg-slate-100 text-slate-700"
-                      } rounded-xl text-right transition`}
-                    >
-                      <LogOut size={15} className="shrink-0" />
-                      <span>{isAuthenticated ? "تسجيل الخروج" : "تسجيل الدخول كمسؤول"}</span>
-                    </button>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Fluid entry on desktop without snap, always visible on mobile */}
               <div className={`transition-[max-width,opacity,transform] duration-300 ease-out overflow-hidden ${
@@ -1133,83 +1156,85 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     <ExternalLink size={12} className="opacity-60" />
                   </a>
 
-                  {/* 5. 👑 خامساً: أجنحة المشرف وإدارة المحتوى والمحرر البصري (Admin Suite) */}
-                  <div className={`p-3 rounded-2xl border space-y-2 ${
-                    dark ? "bg-[#f8ca14]/[0.06] border-[#f8ca14]/30" : "bg-amber-50/80 border-amber-300/60 shadow-xs"
-                  }`}>
-                    <div className="flex items-center justify-between pb-1 border-b border-black/5 dark:border-white/5">
-                      <span className="text-xs font-black text-[#f8ca14] dark:text-[#f8ca14] flex items-center gap-1.5">
-                        <span>👑</span>
-                        <span>أدوات المشرف العام والتحكم بالموقع</span>
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        {isAuthenticated ? (user?.name || "المشرف") : "متاح للمشرف"}
-                      </span>
-                    </div>
+                  {/* 5. 👑 خامساً: أجنحة المشرف وإدارة المحتوى والمحرر البصري (Admin Suite - مخصص للمشرفين فقط) */}
+                  {isAdmin && (
+                    <div className={`p-3 rounded-2xl border space-y-2 ${
+                      dark ? "bg-[#f8ca14]/[0.06] border-[#f8ca14]/30" : "bg-amber-50/80 border-amber-300/60 shadow-xs"
+                    }`}>
+                      <div className="flex items-center justify-between pb-1 border-b border-black/5 dark:border-white/5">
+                        <span className="text-xs font-black text-[#f8ca14] dark:text-[#f8ca14] flex items-center gap-1.5">
+                          <span>👑</span>
+                          <span>أدوات المشرف العام والتحكم بالموقع</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                          {user?.name || "المشرف"}
+                        </span>
+                      </div>
 
-                    {/* زر المحرر البصري — Direct Visual Editor Toggle */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        editor.toggleEditing();
-                      }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl border text-xs font-black transition cursor-pointer ${
-                        editor.isEditing
-                          ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
-                          : dark
-                          ? "bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                          : "bg-white border-slate-200 hover:bg-slate-50 text-slate-800"
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <PencilRuler size={14} className="text-[#f8ca14]" />
-                        <span>{editor.isEditing ? "إنهاء التعديل البصري (نشط الآن)" : "تفعيل المحرر البصري للتعديل"}</span>
-                      </span>
-                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
-                        editor.isEditing ? "bg-emerald-500 text-white" : dark ? "bg-white/10 text-slate-400" : "bg-slate-200 text-slate-600"
-                      }`}>
-                        {editor.isEditing ? "ON" : "OFF"}
-                      </span>
-                    </button>
-
-                    {/* زر الداشبورد والتحكم */}
-                    <div className={isLocalhost ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
+                      {/* زر المحرر البصري — Direct Visual Editor Toggle */}
                       <button
                         type="button"
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          go("/admin");
+                          editor.toggleEditing();
                         }}
-                        className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black border transition cursor-pointer ${
-                          dark
-                            ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
-                            : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800"
+                        className={`w-full flex items-center justify-between p-2 rounded-xl border text-xs font-black transition cursor-pointer ${
+                          editor.isEditing
+                            ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                            : dark
+                            ? "bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                            : "bg-white border-slate-200 hover:bg-slate-50 text-slate-800"
                         }`}
                       >
-                        <LayoutDashboard size={14} className="text-blue-500" />
-                        <span>لوحة الإدارة</span>
+                        <span className="flex items-center gap-2">
+                          <PencilRuler size={14} className="text-[#f8ca14]" />
+                          <span>{editor.isEditing ? "إنهاء التعديل البصري (نشط الآن)" : "تفعيل المحرر البصري للتعديل"}</span>
+                        </span>
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
+                          editor.isEditing ? "bg-emerald-500 text-white" : dark ? "bg-white/10 text-slate-400" : "bg-slate-200 text-slate-600"
+                        }`}>
+                          {editor.isEditing ? "ON" : "OFF"}
+                        </span>
                       </button>
 
-                      {/* زر النشر المباشر — خاص باللوكال فقط */}
-                      {isLocalhost && (
+                      {/* زر الداشبورد والتحكم */}
+                      <div className={isLocalhost ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
                         <button
                           type="button"
                           onClick={() => {
-                            if (isDeploying) return;
-                            if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                            setIsDeploying(true);
-                            deployMutation.mutate();
+                            setMobileMenuOpen(false);
+                            go("/admin");
                           }}
-                          disabled={isDeploying}
-                          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
+                          className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black border transition cursor-pointer ${
+                            dark
+                              ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                              : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800"
+                          }`}
                         >
-                          <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
-                          <span>نشر مباشر 🚀</span>
+                          <LayoutDashboard size={14} className="text-blue-500" />
+                          <span>لوحة الإدارة</span>
                         </button>
-                      )}
+
+                        {/* زر النشر المباشر — خاص باللوكال فقط */}
+                        {isLocalhost && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isDeploying) return;
+                              if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                              setIsDeploying(true);
+                              deployMutation.mutate();
+                            }}
+                            disabled={isDeploying}
+                            className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
+                          >
+                            <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
+                            <span>نشر مباشر 🚀</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* 6. 📞 سادساً: قنوات التواصل المباشر وبوابة أولياء الأمور */}
                   <div className={`p-3.5 rounded-2xl border space-y-2.5 ${
@@ -1248,6 +1273,22 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a>
                     </div>
                   </div>
+
+                  {/* رابط هادئ لدخول المشرفين والموظفين للعامة */}
+                  {!isAdmin && (
+                    <div className="pt-2 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate("/login");
+                        }}
+                        className="text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium transition cursor-pointer"
+                      >
+                        دخول المشرفين والموظفين
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

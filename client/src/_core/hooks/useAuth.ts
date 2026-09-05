@@ -58,6 +58,7 @@ export function useAuth(options?: UseAuthOptions) {
     } finally {
       try {
         sessionStorage.removeItem("app_session_id");
+        localStorage.removeItem("aqeeq-admin-mode");
       } catch {}
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();

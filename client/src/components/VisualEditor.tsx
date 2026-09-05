@@ -390,9 +390,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [pathname, navigate] = useLocation();
   const pagePath = normalizedPath(pathname);
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("manus.space"));
-  const isAdmin = (isAuthenticated && user?.role === "admin") || isLocalhost || (typeof window !== "undefined" && (window.location.search.includes("visual=1") || localStorage.getItem("aqeeq-admin-mode") === "true"));
+  const isAdmin = Boolean(isAuthenticated && (user?.role === "admin" || user?.openId === "admin"));
   const [isEditing, setIsEditing] = useState(false);
   const [layerMode, setLayerMode] = useState(false);
+
+  useEffect(() => {
+    if (!isAdmin && isEditing) {
+      setIsEditing(false);
+      setSelected(null);
+      setSelectedIds([]);
+      setLayerMode(false);
+    }
+  }, [isAdmin, isEditing]);
   const [gridEnabled, setGridEnabled] = useState(true);
   const [magnetEnabled, setMagnetEnabled] = useState(true);
   const [backgroundPreferences, setBackgroundPreferences] = useState<Record<string, BackgroundEditorPreferences>>(() => {
@@ -1444,12 +1453,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     groupTranslation,
     select: selectElement,
     toggleEditing: () => {
+      if (!isAdmin) return;
       if (pagePath) {
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.setItem("aqeeq-admin-mode", "true");
-          } catch {}
-        }
         setIsEditing((current) => !current);
         setSelected(null);
         setSelectedIds([]);
@@ -1457,11 +1462,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       }
     },
     openHomeEditor: () => {
-      if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem("aqeeq-admin-mode", "true");
-        } catch {}
-      }
+      if (!isAdmin) return;
       if (pathname.split("?")[0] !== "/") {
         navigate("/?visual=1");
       } else {
