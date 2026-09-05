@@ -176,6 +176,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
   // ── Compression on scroll (Wellington-inspired luxury header) ──
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeMenuTab, setActiveMenuTab] = useState<"about" | "admissions" | "media" | "services" | "contact">("about");
 
   useEffect(() => {
     let ticking = false;
@@ -781,26 +782,26 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </div>
             </div>
 
-          {/* ── Contextual Anchored Bento Popover (Directly Below the Button) ── */}
+          {/* ── Dual-Pane Interactive Cockpit Popover ── */}
           {mobileMenuOpen && (
             <>
-              {/* Dimming Backdrop */}
+              {/* Invisible Click-Outside Dismiss Layer (Zero Blur, Site stays 100% visible & bright) */}
               <div
                 onClick={() => setMobileMenuOpen(false)}
-                className="fixed inset-0 z-[140] bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+                className="fixed inset-0 z-[140] bg-transparent cursor-default"
                 aria-label="إغلاق القائمة"
               />
 
-              {/* The Floating Bento Cockpit Popover — Attached directly below the Left Island */}
+              {/* The Dual-Pane Cockpit Container — Anchored under Left Island */}
               <div
                 dir="rtl"
-                className={`absolute top-full mt-2.5 left-0 z-[150] w-[min(430px,calc(100vw-24px))] max-h-[82vh] flex flex-col rounded-[2rem] border shadow-2xl backdrop-blur-2xl backdrop-saturate-[180%] overflow-hidden animate-in zoom-in-95 fade-in slide-in-from-top-3 duration-250 ease-out origin-top-left pointer-events-auto ${
+                className={`absolute top-full mt-2.5 left-0 z-[150] w-[min(650px,calc(100vw-24px))] max-h-[85vh] flex flex-col rounded-[2rem] border shadow-2xl backdrop-blur-2xl backdrop-saturate-[180%] overflow-hidden animate-in zoom-in-95 fade-in slide-in-from-top-3 duration-250 ease-out origin-top-left pointer-events-auto ${
                   dark
-                    ? "bg-[#070c14]/92 text-white border-white/15 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_1.5px_rgba(255,255,255,0.12)]"
-                    : "bg-white/88 text-slate-900 border-black/10 shadow-[0_25px_60px_-15px_rgba(8,70,125,0.2),inset_0_1px_1.5px_rgba(255,255,255,0.85)]"
+                    ? "bg-[#070c14]/94 text-white border-white/15 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]"
+                    : "bg-white/94 text-slate-900 border-black/10 shadow-[0_25px_60px_-15px_rgba(8,70,125,0.25),0_0_0_1px_rgba(0,0,0,0.05)]"
                 }`}
               >
-                {/* Bento Cockpit Header with Brand & Close Button */}
+                {/* 1. Cockpit Header with Logo, Search Trigger & Close */}
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-black/[0.08] dark:border-white/10 shrink-0 bg-white/40 dark:bg-black/30 backdrop-blur-md">
                   <div className="flex items-center gap-2.5">
                     <img
@@ -819,313 +820,473 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         بوابة مدارس العقيق الذكية
                       </span>
                       <span className="text-[10px] font-bold text-[#08467d] dark:text-[#f8ca14] leading-tight">
-                        المدينة المنورة ✦ 1446-1447هـ
+                        دليل الصروح والخدمات التعليمية ✦ 1446-1447هـ
                       </span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="grid h-8 w-8 place-items-center rounded-xl border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-[#de191e]/15 hover:text-[#de191e] hover:border-[#de191e]/30 active:scale-90 transition cursor-pointer"
-                    aria-label="إغلاق القائمة"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
 
-                {/* Living Bento Grid Scroll Area */}
-                <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-5 py-4 space-y-3.5 pb-8 scrollbar-hide">
-                  
-                  {/* 1. 🏛️ أولاً: خارطة المدارس والتنقل الأساسي (Primary Navigation First) */}
-                  <div className={`rounded-2xl border p-3.5 space-y-2.5 ${
-                    dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50/90 border-slate-200/80 shadow-sm"
-                  }`}>
-                    <div className="flex items-center justify-between pb-1 border-b border-black/5 dark:border-white/5">
-                      <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} flex items-center gap-1.5`}>
-                        <span>🏛️</span>
-                        <span>خارطة صروح ومسارات العقيق</span>
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-bold">تصفح سريع</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => go("/")}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "studio"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">🏠</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">الصفحة الرئيسية</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">بوابة المدارس</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => go("/about")}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "about"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">🏛️</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">عن مدارس العقيق</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">الرؤية والصروح</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => go("/accreditations")}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "accreditations"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">🏆</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">الاعتمادات الدولية</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">Cognia و IELTS</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => go("/articles")}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "articles"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">✍️</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">مقالات العقيق</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">أقلام تربوية وثقافية</div>
-                        </div>
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    {/* Quick Spotlight Search Trigger inside menu */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setSearchOpen(true);
+                      }}
+                      className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                        dark
+                          ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300"
+                          : "border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700"
+                      }`}
+                      title="البحث الشامل (Ctrl+K)"
+                    >
+                      <Search size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                      <span>بحث سريع</span>
+                      <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono">⌘K</kbd>
+                    </button>
 
                     <button
                       type="button"
-                      onClick={() => go("/offers")}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-[11px] font-bold transition cursor-pointer ${
-                        currentActive === "showcase"
-                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
-                          : dark ? "bg-white/5 hover:bg-white/10 text-slate-200" : "bg-white hover:bg-slate-50 text-slate-700 shadow-xs"
-                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="grid h-8 w-8 place-items-center rounded-xl border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-[#de191e]/15 hover:text-[#de191e] hover:border-[#de191e]/30 active:scale-90 transition cursor-pointer"
+                      aria-label="إغلاق القائمة"
                     >
-                      <span className="flex items-center gap-1.5">
-                        <span>📰</span>
-                        <span>الأخبار والإعلانات المدرسية والعروض</span>
-                      </span>
-                      <ArrowLeft size={12} className="opacity-60" />
+                      <X size={16} />
                     </button>
                   </div>
+                </div>
 
-                  {/* 2. 🎓 ثانياً: البطاقة الملكية للقبول والتسجيل (Flagship Admissions Hero) */}
-                  <div className={`relative overflow-hidden rounded-2xl p-4 transition duration-300 hover:scale-[1.01] border ${
-                    dark
-                      ? "bg-gradient-to-br from-[#08467d]/90 via-[#042442] to-[#021424] border-[#f8ca14]/30 text-white shadow-[0_12px_30px_rgba(8,70,125,0.4)]"
-                      : "bg-gradient-to-br from-[#08467d] via-[#073661] to-[#042442] border-[#f8ca14]/40 text-white shadow-[0_12px_30px_rgba(8,70,125,0.25)]"
-                  }`}>
-                    <div className="relative z-10 flex items-start justify-between">
-                      <div>
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#f8ca14] text-slate-950 mb-2">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping" />
-                          <span>القبول والتسجيل متاح الآن</span>
-                        </span>
-                        <h3 className="text-sm font-black tracking-tight leading-snug">
-                          احجز مقعد ابنك للعام الجديد
-                        </h3>
-                        <p className="text-[11px] text-white/80 mt-0.5 font-medium">
-                          تعليم أهلي ودولي معتمد بمناهج عالمية
-                        </p>
-                      </div>
-                      <GraduationCap className="text-[#f8ca14] opacity-80 shrink-0" size={28} />
-                    </div>
+                {/* 2. Mobile Responsive Tab Bar (< sm screens) */}
+                <div className="flex sm:hidden overflow-x-auto scrollbar-hide border-b border-black/[0.06] dark:border-white/10 p-2 gap-1.5 shrink-0 bg-black/[0.02] dark:bg-white/[0.02]">
+                  {[
+                    { id: "about" as const, label: "🏛️ الصروح" },
+                    { id: "admissions" as const, label: "🎓 القبول والرسوم" },
+                    { id: "media" as const, label: "🎨 الإعلام والمجلة" },
+                    { id: "services" as const, label: "💻 البوابات والخطط" },
+                    { id: "contact" as const, label: "📞 التواصل" },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveMenuTab(tab.id)}
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-black transition ${
+                        activeMenuTab === tab.id
+                          ? dark
+                            ? "bg-[#f8ca14] text-slate-950 shadow-sm"
+                            : "bg-[#08467d] text-white shadow-sm"
+                          : dark
+                          ? "bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
 
-                    <div className="relative z-10 mt-3.5 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => go("/admissions#admission-form-section")}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black bg-[#f8ca14] hover:bg-amber-400 text-slate-950 shadow-md transition active:scale-95 cursor-pointer"
-                      >
-                        <span>سجّل الآن فوري</span>
-                        <ArrowLeft size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => go("/admissions")}
-                        className="px-3 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
-                      >
-                        جدول الرسوم
-                      </button>
-                    </div>
+                {/* 3. Dual-Pane Content Area */}
+                <div className="flex-1 min-h-0 flex flex-col sm:grid sm:grid-cols-[210px_1fr] divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-black/[0.06] dark:divide-white/[0.08] overflow-hidden">
+                  
+                  {/* Right Column (Desktop Master Doors Navigation) */}
+                  <div className="hidden sm:flex flex-col p-2.5 gap-1 overflow-y-auto scrollbar-hide bg-slate-50/60 dark:bg-white/[0.02]">
+                    {[
+                      {
+                        id: "about" as const,
+                        title: "صروح ومدارس العقيق",
+                        subtitle: "الرؤية والفروع والاعتمادات",
+                        icon: Building2,
+                        badge: "٤ مسارات",
+                      },
+                      {
+                        id: "admissions" as const,
+                        title: "القبول والرسوم الدراسية",
+                        subtitle: "حجز المقاعد والخصومات",
+                        icon: GraduationCap,
+                        badge: "متاح الآن",
+                        badgeClass: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+                      },
+                      {
+                        id: "media" as const,
+                        title: "المركز الإعلامي والمجلة",
+                        subtitle: "البودكاست، الألبومات، المقالات",
+                        icon: BookOpen,
+                        badge: "أثير والمجلة",
+                      },
+                      {
+                        id: "services" as const,
+                        title: "بوابات الطلاب والخدمات",
+                        subtitle: "الخطط الأسبوعية والتوظيف",
+                        icon: Server,
+                        badge: "خدمات ذكية",
+                      },
+                      {
+                        id: "contact" as const,
+                        title: "التواصل الفوري والموقع",
+                        subtitle: "الهاتف والواتساب واللوكيشن",
+                        icon: PhoneCall,
+                        badge: "24/7",
+                      },
+                    ].map((door) => {
+                      const Icon = door.icon;
+                      const isActive = activeMenuTab === door.id;
+                      return (
+                        <button
+                          key={door.id}
+                          type="button"
+                          onMouseEnter={() => setActiveMenuTab(door.id)}
+                          onClick={() => setActiveMenuTab(door.id)}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-2xl text-right transition-all cursor-pointer ${
+                            isActive
+                              ? dark
+                                ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/40 shadow-sm"
+                                : "bg-[#08467d]/10 text-[#08467d] border border-[#08467d]/25 shadow-sm"
+                              : dark
+                              ? "text-slate-300 hover:bg-white/5 border border-transparent"
+                              : "text-slate-700 hover:bg-white border border-transparent"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className={`h-8 w-8 rounded-xl grid place-items-center shrink-0 transition ${
+                              isActive
+                                ? dark
+                                  ? "bg-[#f8ca14] text-slate-950 font-black shadow-xs"
+                                  : "bg-[#08467d] text-white shadow-xs"
+                                : dark
+                                ? "bg-white/5 text-slate-400"
+                                : "bg-slate-200/60 text-slate-600"
+                            }`}>
+                              <Icon size={16} />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-xs font-black leading-tight truncate">{door.title}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{door.subtitle}</div>
+                            </div>
+                          </div>
+                          {door.badge && (
+                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full shrink-0 ${
+                              door.badgeClass || (dark ? "bg-white/10 text-slate-300" : "bg-slate-200 text-slate-700")
+                            }`}>
+                              {door.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {/* 3. 🎙️ & 📖 ثالثاً: المركز الإعلامي والثقافي (Media & Culture) */}
-                  {/* ويدجت البودكاست الحي (أثير العقيق) */}
-                  <div
-                    onClick={() => go("/atheer")}
-                    className={`group cursor-pointer rounded-2xl p-3.5 border transition-all duration-300 hover:scale-[1.01] ${
-                      dark
-                        ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                        : "bg-white/80 hover:bg-white border-black/[0.08] shadow-sm"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl grid place-items-center bg-gradient-to-tr from-[#de191e] to-rose-500 text-white shadow-md group-hover:scale-105 transition">
-                          <Mic size={18} />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#de191e] transition">
-                              أثير العقيق 🎙️
-                            </span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold">
-                              بودكاست حي
-                            </span>
+                  {/* Left Column (Dynamic Interactive Content & Curated Links) */}
+                  <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto scrollbar-hide space-y-3">
+                    
+                    {/* Tab 1: About & Campuses */}
+                    {activeMenuTab === "about" && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        <div className={`p-3 rounded-2xl border ${
+                          dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50 border-slate-200 shadow-xs"
+                        }`}>
+                          <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <Building2 size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                            <span>صروح مدارس العقيق الأهلية والدولية</span>
                           </div>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium line-clamp-1">
-                            حوارات ملهمة وقصص إبداعية من صميم المدارس
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            بيئة تعليمية رائدة بالمدينة المنورة تجمع بين أصالة القيم والمعايير العالمية لصناعة قادة الغد.
                           </p>
                         </div>
-                      </div>
 
-                      {/* Animated Waveform Bars */}
-                      <div className="flex items-end gap-[2.5px] h-4">
-                        <span className="w-[3px] bg-rose-500 rounded-full animate-pulse h-3" />
-                        <span className="w-[3px] bg-rose-500 rounded-full animate-pulse h-4" />
-                        <span className="w-[3px] bg-rose-500 rounded-full animate-pulse h-2" />
-                        <span className="w-[3px] bg-rose-500 rounded-full animate-pulse h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ثنائي المجلة والألبومات */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div
-                      onClick={() => go("/journal")}
-                      className={`group cursor-pointer rounded-2xl p-3 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between min-h-[100px] ${
-                        dark
-                          ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                          : "bg-white/80 hover:bg-white border-black/[0.08] shadow-sm"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="h-8 w-8 rounded-lg grid place-items-center bg-gradient-to-tr from-[#f8ca14] to-amber-500 text-slate-950 font-black shadow-sm">
-                          <BookOpen size={16} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {[
+                            { title: "الصفحة الرئيسية", desc: "بوابة المدارس وصناع المستقبل", href: "/", icon: "🏠" },
+                            { title: "عن مدارس العقيق", desc: "الرؤية والرسالة والتاريخ", href: "/about", icon: "🏛️" },
+                            { title: "الاعتمادات الدولية", desc: "اعتماد Cognia وضمان الجودة", href: "/accreditations", icon: "🏆" },
+                            { title: "الفروع والمراحل", desc: "بنين، بنات، دولي، أهلي، وروضة", href: "/about#campuses", icon: "🏫" },
+                          ].map((item, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => go(item.href)}
+                              className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-right transition cursor-pointer ${
+                                dark
+                                  ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                                  : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                              }`}
+                            >
+                              <span className="text-base shrink-0 mt-0.5">{item.icon}</span>
+                              <div className="min-w-0">
+                                <div className="text-xs font-black leading-tight text-slate-900 dark:text-white">{item.title}</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.desc}</div>
+                              </div>
+                            </button>
+                          ))}
                         </div>
-                        <span className="text-[10px] text-slate-400 font-bold group-hover:translate-x-[-2px] transition">
-                          ←
-                        </span>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#08467d] dark:group-hover:text-[#f8ca14] transition">
-                          مجلة العقيق
-                        </h4>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1 mt-0.5">
-                          الأعداد الدورية الرقمية
-                        </p>
-                      </div>
-                    </div>
+                    )}
 
-                    <div
-                      onClick={() => go("/albums")}
-                      className={`group cursor-pointer rounded-2xl p-3 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between min-h-[100px] ${
-                        dark
-                          ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                          : "bg-white/80 hover:bg-white border-black/[0.08] shadow-sm"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="h-8 w-8 rounded-lg grid place-items-center bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-black shadow-sm">
-                          <Camera size={16} />
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-bold group-hover:translate-x-[-2px] transition">
-                          ←
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#08467d] dark:group-hover:text-[#f8ca14] transition">
-                          ألبومات الأنشطة
-                        </h4>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1 mt-0.5">
-                          معرض الصور والفعاليات
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4. 📞 رابعاً: قنوات التواصل المباشر وبوابة أولياء الأمور */}
-                  <div className={`p-3.5 rounded-2xl border space-y-2.5 ${
-                    dark ? "bg-white/[0.04] border-white/10" : "bg-white border-slate-200 shadow-sm"
-                  }`}>
-                    <div className="flex items-center justify-between text-xs font-black">
-                      <span className={dark ? "text-white" : "text-slate-900"}>خدمات أولياء الأمور والتواصل</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">متاح 24/7</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <a
-                        href={`tel:${cleanPhone}`}
-                        className={`flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-black border transition ${
+                    {/* Tab 2: Admissions & Tuition */}
+                    {activeMenuTab === "admissions" && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        {/* Admissions Hero Flagship Card */}
+                        <div className={`p-3.5 rounded-2xl border relative overflow-hidden ${
                           dark
-                            ? "border-white/15 bg-white/5 text-slate-200 hover:bg-white/10"
-                            : "border-slate-300 bg-slate-50 text-slate-800 hover:bg-slate-100"
-                        }`}
-                      >
-                        <PhoneCall size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                        <span>اتصال فوري</span>
-                      </a>
-                      <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-black bg-[#25D366] text-white shadow-sm hover:bg-[#20bd59] transition"
-                      >
-                        <MessageCircle size={14} />
-                        <span>واتساب القبول</span>
-                      </a>
-                    </div>
+                            ? "bg-gradient-to-br from-[#08467d]/90 via-[#042442] to-[#021424] border-[#f8ca14]/30 text-white shadow-md"
+                            : "bg-gradient-to-br from-[#08467d] via-[#073661] to-[#042442] border-[#f8ca14]/40 text-white shadow-md"
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black bg-[#f8ca14] text-slate-950 mb-1.5">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping" />
+                                <span>القبول والتسجيل متاح الآن</span>
+                              </span>
+                              <h4 className="text-sm font-black leading-tight">احجز مقعد ابنك للعام الجديد</h4>
+                              <p className="text-[10px] text-white/80 mt-0.5">تعليم أهلي ودولي بمعايير عالمية</p>
+                            </div>
+                            <GraduationCap className="text-[#f8ca14] opacity-90 shrink-0" size={24} />
+                          </div>
 
-                    <a
-                      href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-[11px] font-bold transition ${
-                        dark ? "bg-amber-400/10 text-amber-300 hover:bg-amber-400/20" : "bg-amber-50 text-amber-800 hover:bg-amber-100"
-                      }`}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <FileText size={13} />
-                        <span>الخطط الدراسية الأسبوعية للطلاب</span>
-                      </span>
-                      <ExternalLink size={12} className="opacity-60" />
-                    </a>
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => go("/admissions#admission-form-section")}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14] hover:bg-amber-400 text-slate-950 shadow-sm transition active:scale-95 cursor-pointer"
+                            >
+                              <span>سجّل الآن فوري</span>
+                              <ArrowLeft size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => go("/admissions#fees-table")}
+                              className="px-3 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
+                            >
+                              جدول الرسوم
+                            </button>
+                          </div>
+                        </div>
 
-                    {/* Admin Quick Entry if logged in */}
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => go("/admin")}
-                        className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-bold bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30 hover:bg-[#f8ca14]/25 transition cursor-pointer"
-                      >
-                        <LayoutDashboard size={13} />
-                        <span>لوحة تحكم الإدارة</span>
-                      </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {[
+                            { title: "جدول الرسوم المعتمد", desc: "كشف رسوم جميع المراحل", href: "/admissions#fees-table", icon: "💳" },
+                            { title: "حاسبة الأقساط والخصومات", desc: "خصم الأشقاء وتسهيلات السداد", href: "/admissions#fees-calculator", icon: "🧮" },
+                            { title: "شروط وسياسة القبول", desc: "المستندات وإجراءات المقابلة", href: "/admissions#requirements", icon: "📄" },
+                            { title: "استفسارات القبول المباشرة", desc: "تواصل مع شؤون الطلاب", href: `tel:${cleanPhone}`, icon: "📞" },
+                          ].map((item, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => go(item.href)}
+                              className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-right transition cursor-pointer ${
+                                dark
+                                  ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                                  : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                              }`}
+                            >
+                              <span className="text-base shrink-0 mt-0.5">{item.icon}</span>
+                              <div className="min-w-0">
+                                <div className="text-xs font-black leading-tight text-slate-900 dark:text-white">{item.title}</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.desc}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 3: Media & Culture Hub */}
+                    {activeMenuTab === "media" && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        {/* Podcast Mini Banner */}
+                        <div
+                          onClick={() => go("/podcast")}
+                          className={`p-3 rounded-2xl border flex items-center justify-between cursor-pointer transition hover:scale-[1.01] ${
+                            dark ? "bg-white/[0.04] border-white/10" : "bg-slate-50 border-slate-200 shadow-xs"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-9 w-9 rounded-xl grid place-items-center bg-gradient-to-tr from-[#de191e] to-rose-500 text-white shadow-xs">
+                              <Mic size={16} />
+                            </div>
+                            <div>
+                              <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                                <span>أثير العقيق 🎙️</span>
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-500 font-bold">حي ومحدث</span>
+                              </div>
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">بودكاست المدارس وحوارات ملهمة</p>
+                            </div>
+                          </div>
+                          <ArrowLeft size={13} className="text-slate-400" />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {[
+                            { title: "مجلة العقيق الدورية", desc: "الإصدارات الرقمية التفاعلية", href: "/journal", icon: "📖" },
+                            { title: "أرشيف أعداد المجلة", desc: "تصفح أعداد الأعوام السابقة", href: "/journal/archive", icon: "📚" },
+                            { title: "ألبومات الفعاليات", desc: "معارض الصور والأنشطة", href: "/albums", icon: "📸" },
+                            { title: "مقالات وأقلام العقيق", desc: "كتابات تربوية وثقافية", href: "/articles", icon: "✍️" },
+                            { title: "الأخبار والعروض", desc: "مستجدات وإعلانات المدارس", href: "/showcase", icon: "📰" },
+                            { title: "أثير البودكاست", desc: "استمع لكافة الحلقات", href: "/podcast", icon: "🎙️" },
+                          ].map((item, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => go(item.href)}
+                              className={`flex items-start gap-2.5 p-2 rounded-xl border text-right transition cursor-pointer ${
+                                dark
+                                  ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                                  : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                              }`}
+                            >
+                              <span className="text-base shrink-0 mt-0.5">{item.icon}</span>
+                              <div className="min-w-0">
+                                <div className="text-xs font-black leading-tight text-slate-900 dark:text-white">{item.title}</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.desc}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 4: Portals & Student Services */}
+                    {activeMenuTab === "services" && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        <div className={`p-3 rounded-2xl border ${
+                          dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50 border-slate-200 shadow-xs"
+                        }`}>
+                          <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <Server size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                            <span>بوابات الأنظمة والخدمات الإلكترونية</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            روابط مباشرة للأنظمة المدرسية، الخطط الدراسية، وبوابات أولياء الأمور والتوظيف.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2">
+                          <a
+                            href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`flex items-center justify-between p-2.5 rounded-xl border transition ${
+                              dark ? "bg-amber-400/10 border-amber-400/20 text-amber-300 hover:bg-amber-400/20" : "bg-amber-50 border-amber-200 text-amber-900 hover:bg-amber-100"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 text-xs font-black">
+                              <FileText size={15} />
+                              <span>الخطط الدراسية الأسبوعية للطلاب</span>
+                            </span>
+                            <ExternalLink size={13} className="opacity-60" />
+                          </a>
+
+                          <a
+                            href="https://live.aqeeq.edu.sa/jobs"
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`flex items-center justify-between p-2.5 rounded-xl border transition ${
+                              dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 text-xs font-black">
+                              <Briefcase size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                              <span>بوابة التوظيف واستقطاب الكفاءات</span>
+                            </span>
+                            <ExternalLink size={13} className="opacity-60" />
+                          </a>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMobileMenuOpen(false);
+                              setSearchOpen(true);
+                            }}
+                            className={`flex items-center justify-between p-2.5 rounded-xl border text-right transition cursor-pointer ${
+                              dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 text-xs font-black">
+                              <Search size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                              <span>البحث الشامل في الموقع والمحتوى</span>
+                            </span>
+                            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono">⌘K</kbd>
+                          </button>
+
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => go("/admin")}
+                              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30 hover:bg-[#f8ca14]/25 transition cursor-pointer"
+                            >
+                              <LayoutDashboard size={14} />
+                              <span>لوحة تحكم الإدارة والأوركسترا</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 5: Direct Connect & Location */}
+                    {activeMenuTab === "contact" && (
+                      <div className="space-y-3 animate-in fade-in duration-200">
+                        <div className={`p-3 rounded-2xl border ${
+                          dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50 border-slate-200 shadow-xs"
+                        }`}>
+                          <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <PhoneCall size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                            <span>قنوات التواصل المباشر وخدمة المستفيدين</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            يسعدنا استقبال استفساراتكم والتواصل معكم عبر القنوات الرسمية طوال أيام الأسبوع.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <a
+                            href={`tel:${cleanPhone}`}
+                            className={`flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-black border transition ${
+                              dark
+                                ? "border-white/15 bg-white/5 text-slate-200 hover:bg-white/10"
+                                : "border-slate-300 bg-slate-50 text-slate-800 hover:bg-slate-100"
+                            }`}
+                          >
+                            <PhoneCall size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                            <span>اتصال فوري</span>
+                          </a>
+                          <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-black bg-[#25D366] text-white shadow-xs hover:bg-[#20bd59] transition"
+                          >
+                            <MessageCircle size={14} />
+                            <span>واتساب القبول</span>
+                          </a>
+                        </div>
+
+                        <div className="space-y-1.5 text-[11px]">
+                          <div className={`p-2 rounded-xl flex items-center gap-2 ${
+                            dark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-700"
+                          }`}>
+                            <MapPin size={13} className="text-[#f8ca14] shrink-0" />
+                            <span>المدينة المنورة — المملكة العربية السعودية</span>
+                          </div>
+                          <a
+                            href="mailto:info@alaqeeqholding.com"
+                            className={`p-2 rounded-xl flex items-center gap-2 transition ${
+                              dark ? "bg-white/5 text-slate-300 hover:text-white" : "bg-slate-100 text-slate-700 hover:text-black"
+                            }`}
+                          >
+                            <Mail size={13} className="text-blue-400 shrink-0" />
+                            <span>info@alaqeeqholding.com</span>
+                          </a>
+                        </div>
+                      </div>
                     )}
                   </div>
+                </div>
+
+                {/* 4. Bottom Cockpit Quick Bar */}
+                <div className="px-5 py-2.5 border-t border-black/[0.06] dark:border-white/10 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-bold bg-white/30 dark:bg-black/20 shrink-0">
+                  <span>ساعات العمل: الأحد – الخميس (7:00 ص – 2:00 م)</span>
+                  <span className="flex items-center gap-1 text-[#08467d] dark:text-[#f8ca14]">
+                    <span>✦</span>
+                    <span>مدارس العقيق — ريادة تعليمية</span>
+                  </span>
                 </div>
               </div>
             </>
