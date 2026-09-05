@@ -172,6 +172,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // ── Compression on scroll (Wellington-inspired luxury header) ──
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 40);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const logoOverride = editor?.getOverride?.("header-logo");
   const activeLogo = logoOverride?.mediaUrl || logoUrl || "/alaqeeq-logo.png";
 
@@ -365,22 +383,32 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         </div>
       </div>
 
-      {/* 2. Main Executive Header */}
-      <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-xl transition duration-200 ${
-        isNationalDay
+      {/* 2. Main Executive Header — Collapses to Wellington-Style Compact Luxury on Scroll */}
+      <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-2xl transition-all duration-300 ease-out ${
+        isScrolled
+          ? dark
+            ? "border-white/[0.08] bg-[#060a10]/95 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+            : "border-black/[0.06] bg-white/95 shadow-[0_4px_20px_rgba(8,70,125,0.06)]"
+          : isNationalDay
           ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
           : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
       }`}>
-        <div className="relative mx-auto h-[66px] sm:h-[78px] max-w-[1380px] px-3.5 sm:px-6 md:px-8 flex items-center justify-between">
-          {/* Logo with clean branding */}
-          <div className="flex items-center gap-3">
+        <div className={`relative mx-auto max-w-[1380px] px-3.5 sm:px-6 md:px-8 flex items-center justify-between transition-all duration-300 ease-out ${
+          isScrolled ? "h-[50px] sm:h-[54px]" : "h-[66px] sm:h-[78px]"
+        }`}>
+          {/* Logo with clean branding — Pinned on the far right */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             <button
               onClick={() => go("/")}
               aria-label={`العودة إلى ${title}`}
               data-visual-id="header-logo-container"
               data-visual-tag="button"
               data-visual-label="حاوية الشعار"
-              className="flex h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px] items-center transition hover:opacity-90"
+              className={`flex items-center transition-all duration-300 hover:opacity-90 ${
+                isScrolled
+                  ? "h-[32px] sm:h-[38px] max-w-[130px] sm:max-w-[180px]"
+                  : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
+              }`}
             >
               <img
                 src={
@@ -398,13 +426,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   dark
                     ? "brightness-0 invert opacity-95"
                     : isNationalDay
-                    ? "drop-shadow-[0_1px_3px_rgba(1,90,55,0.18)]"
+                    ? "drop-shadow-[0_1px_3px_rgba(8,70,125,0.18)]"
                     : ""
                 }`}
               />
             </button>
 
-            {isNationalDay && (
+            {isNationalDay && !isScrolled && (
               <button
                 type="button"
                 onClick={() => triggerNationalCelebration()}
@@ -421,135 +449,140 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             )}
           </div>
 
-          {/* Center 9 Core Navigation Links (Desktop) */}
-          <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif]">
-            {/* 1. الرئيسية */}
-            <button
-              onClick={() => go("/")}
-              data-visual-id="header-nav-home"
-              data-visual-tag="text"
-              data-visual-label="رابط الرئيسية"
-              className={`aq-studio-toplink ${currentActive === "studio" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navHomeText}
-            </button>
+          {/* Center 9 Core Navigation Links (Desktop) — Hidden on scroll */}
+          {!isScrolled && (
+            <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] animate-in fade-in duration-200">
+              {/* 1. الرئيسية */}
+              <button
+                onClick={() => go("/")}
+                data-visual-id="header-nav-home"
+                data-visual-tag="text"
+                data-visual-label="رابط الرئيسية"
+                className={`aq-studio-toplink ${currentActive === "studio" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navHomeText}
+              </button>
 
-            {/* 2. مدارسنا */}
-            <button
-              onClick={() => go("/about")}
-              data-visual-id="header-nav-about"
-              data-visual-tag="text"
-              data-visual-label="رابط مدارسنا"
-              className={`aq-studio-toplink ${
-                currentActive === "about" ? "aq-studio-toplink--active" : ""
-              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
-            >
-              {navAboutText}
-            </button>
+              {/* 2. مدارسنا */}
+              <button
+                onClick={() => go("/about")}
+                data-visual-id="header-nav-about"
+                data-visual-tag="text"
+                data-visual-label="رابط مدارسنا"
+                className={`aq-studio-toplink ${
+                  currentActive === "about" ? "aq-studio-toplink--active" : ""
+                } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+              >
+                {navAboutText}
+              </button>
 
-            {/* 3. الاعتمادات */}
-            <button
-              onClick={() => go("/accreditations")}
-              data-visual-id="header-nav-accreditations"
-              data-visual-tag="text"
-              data-visual-label="رابط الاعتمادات"
-              className={`aq-studio-toplink ${
-                currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
-              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
-            >
-              {navAccreditationsText}
-            </button>
+              {/* 3. الاعتمادات */}
+              <button
+                onClick={() => go("/accreditations")}
+                data-visual-id="header-nav-accreditations"
+                data-visual-tag="text"
+                data-visual-label="رابط الاعتمادات"
+                className={`aq-studio-toplink ${
+                  currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
+                } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+              >
+                {navAccreditationsText}
+              </button>
 
-            {/* 4. القبول والتسجيل */}
-            <button
-              onClick={() => go("/admissions")}
-              data-visual-id="header-nav-admissions"
-              data-visual-tag="text"
-              data-visual-label="رابط القبول والتسجيل"
-              className={`aq-studio-toplink ${
-                currentActive === "admissions" ? "aq-studio-toplink--active" : ""
-              } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
-            >
-              {navAdmissionsText}
-            </button>
+              {/* 4. القبول والتسجيل */}
+              <button
+                onClick={() => go("/admissions")}
+                data-visual-id="header-nav-admissions"
+                data-visual-tag="text"
+                data-visual-label="رابط القبول والتسجيل"
+                className={`aq-studio-toplink ${
+                  currentActive === "admissions" ? "aq-studio-toplink--active" : ""
+                } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+              >
+                {navAdmissionsText}
+              </button>
 
-            {/* 5. المجلة */}
-            <button
-              onClick={() => go("/journal")}
-              data-visual-id="header-nav-journal"
-              data-visual-tag="text"
-              data-visual-label="رابط مجلة العقيق"
-              className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navJournalText}
-            </button>
+              {/* 5. المجلة */}
+              <button
+                onClick={() => go("/journal")}
+                data-visual-id="header-nav-journal"
+                data-visual-tag="text"
+                data-visual-label="رابط مجلة العقيق"
+                className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navJournalText}
+              </button>
 
-            {/* 6. الألبومات */}
-            <button
-              onClick={() => go("/albums")}
-              data-visual-id="header-nav-albums"
-              data-visual-tag="text"
-              data-visual-label="رابط ألبومات العقيق"
-              className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navAlbumsText}
-            </button>
+              {/* 6. الألبومات */}
+              <button
+                onClick={() => go("/albums")}
+                data-visual-id="header-nav-albums"
+                data-visual-tag="text"
+                data-visual-label="رابط ألبومات العقيق"
+                className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navAlbumsText}
+              </button>
 
-            {/* 7. أثير */}
-            <button
-              onClick={() => go("/atheer")}
-              data-visual-id="header-nav-podcast"
-              data-visual-tag="text"
-              data-visual-label="رابط بودكاست أثير"
-              className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navPodcastText}
-            </button>
+              {/* 7. أثير */}
+              <button
+                onClick={() => go("/atheer")}
+                data-visual-id="header-nav-podcast"
+                data-visual-tag="text"
+                data-visual-label="رابط بودكاست أثير"
+                className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navPodcastText}
+              </button>
 
-            {/* 8. المقالات */}
-            <button
-              onClick={() => go("/articles")}
-              data-visual-id="header-nav-articles"
-              data-visual-tag="text"
-              data-visual-label="رابط مقالات العقيق"
-              className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navArticlesText}
-            </button>
+              {/* 8. المقالات */}
+              <button
+                onClick={() => go("/articles")}
+                data-visual-id="header-nav-articles"
+                data-visual-tag="text"
+                data-visual-label="رابط مقالات العقيق"
+                className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navArticlesText}
+              </button>
 
-            {/* 9. الأخبار */}
-            <button
-              onClick={() => go("/offers")}
-              data-visual-id="header-nav-offers"
-              data-visual-tag="text"
-              data-visual-label="رابط الأخبار والعروض"
-              className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
-            >
-              {navOffersText}
-            </button>
-          </nav>
+              {/* 9. الأخبار */}
+              <button
+                onClick={() => go("/offers")}
+                data-visual-id="header-nav-offers"
+                data-visual-tag="text"
+                data-visual-label="رابط الأخبار والعروض"
+                className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
+              >
+                {navOffersText}
+              </button>
+            </nav>
+          )}
 
 
 
           {/* Left Action Buttons & Primary CTA */}
-          <div dir="ltr" className="flex items-center gap-2 sm:gap-3">
-            {/* Primary Executive CTA Button */}
-            <Button
-              onClick={() => go("/admissions#admission-form-section")}
-              data-visual-id="header-cta-button"
-              data-visual-tag="button"
-              data-visual-label="زر القبول والتسجيل (الهيدر)"
-              className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 ${
-                dark
-                  ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                  : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
-              }`}
-            >
-              <span>{ctaButtonText}</span>
-            </Button>
+          {/* Left Action Buttons — On scroll: Compresses to Theme Toggle + 3 Lines Menu */}
+          <div dir="ltr" className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Primary Executive CTA Button — Hidden on scroll */}
+            {!isScrolled && (
+              <Button
+                onClick={() => go("/admissions#admission-form-section")}
+                data-visual-id="header-cta-button"
+                data-visual-tag="button"
+                data-visual-label="زر القبول والتسجيل (الهيدر)"
+                className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 ${
+                  dark
+                    ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
+                    : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
+                }`}
+              >
+                <span>{ctaButtonText}</span>
+              </Button>
+            )}
 
-            {/* Options Dropdown Menu OR Login Button (Desktop) */}
-            {isAuthenticated ? (
+            {/* Options Dropdown Menu OR Login Button (Desktop) — Hidden on scroll */}
+            {!isScrolled && isAuthenticated ? (
               <div ref={optionsRef} className="hidden sm:block relative">
                 <button
                   type="button"
@@ -622,8 +655,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </div>
             ) : null}
 
-            {/* Deploy to Live — للمشرف فقط */}
-            {isAdmin && isLocalhost ? (
+            {/* Deploy to Live — للمشرف فقط — Hidden on scroll */}
+            {!isScrolled && isAdmin && isLocalhost ? (
               <button
                 onClick={() => {
                   if (isDeploying) return;
@@ -643,63 +676,74 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </button>
             ) : null}
 
-            {/* Theme Toggle */}
+            {/* Spotlight Search Trigger — Hidden on scroll */}
+            {!isScrolled && (
+              <button
+                onClick={() => setSearchOpen(true)}
+                data-visual-id="header-icon-search"
+                data-visual-tag="icon"
+                data-visual-label="زر البحث الشامل"
+                className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
+                  dark
+                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                    : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                }`}
+                title="البحث الشامل (Ctrl+K)"
+                aria-label="البحث الشامل"
+              >
+                <Search size={16} />
+              </button>
+            )}
+
+            {/* ☀️ / 🌙 زر الإضاءة (Theme Toggle) — Always visible, compact on scroll */}
             <button
               onClick={toggleTheme}
-              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
+              className={`grid ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                  : "border-[#015a37]/20 bg-[#015a37]/[0.08] text-[#015a37] hover:bg-[#015a37] hover:text-white"
+                  : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
               }`}
               title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
             >
               <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
             </button>
 
-            {/* Spotlight Search Trigger */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              data-visual-id="header-icon-search"
-              data-visual-tag="icon"
-              data-visual-label="زر البحث الشامل"
-              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
-                dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                  : "border-[#015a37]/20 bg-[#015a37]/[0.08] text-[#015a37] hover:bg-[#015a37] hover:text-white"
-              }`}
-              title="البحث الشامل (Ctrl+K)"
-              aria-label="البحث الشامل"
-            >
-              <Search size={16} />
-            </button>
-
-            {/* Mobile Hamburger Menu Button */}
+            {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Visible on ALL screens when isScrolled */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setMobileMenuOpen((open) => !open);
               }}
-              className={`grid h-10 w-10 place-items-center rounded-xl border transition lg:hidden active:scale-90 cursor-pointer ${
+              className={`group grid ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5 flex" : "h-9 w-9 sm:h-10 sm:w-10 lg:hidden"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
                 mobileMenuOpen
                   ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
                   : dark
-                  ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : "border-[#015a37]/30 bg-[#015a37]/10 text-[#015a37]"
+                  ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]"
+                  : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]"
               }`}
               aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+              title="القائمة الشاملة"
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? (
+                <X size={18} />
+              ) : (
+                <div className="flex flex-col justify-center items-center gap-[3.5px] w-4">
+                  <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                  <span className="h-[2px] w-2.5 rounded-full bg-current transition-all duration-300 group-hover:w-4" />
+                  <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                </div>
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Full-Screen Immersive Mobile Menu Canvas */}
+      {/* Full-Screen Immersive Menu Canvas (Mobile & Desktop) */}
       {mobileMenuOpen && (
         <div
           dir="rtl"
-          className={`fixed inset-0 z-[150] lg:hidden animate-in fade-in duration-200 backdrop-blur-3xl overflow-hidden flex flex-col ${
+          className={`fixed inset-0 z-[150] animate-in fade-in duration-200 backdrop-blur-3xl overflow-hidden flex flex-col ${
             dark
               ? "bg-[#060a10]/98 text-white"
               : "bg-white/98 text-slate-900"
