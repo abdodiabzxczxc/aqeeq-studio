@@ -172,53 +172,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // ── Dynamic Island Morph & Smart Stealth Header Mechanics (Ideas 1 + 2) ──
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.scrollY;
-          const deltaY = currentY - lastScrollY.current;
-
-          // 1. Is user scrolled away from the very top? (triggers morph to Floating Island)
-          if (currentY > 35) {
-            setIsScrolled(true);
-          } else {
-            setIsScrolled(false);
-            setIsHidden(false);
-          }
-
-          // 2. Smart Stealth: auto-hide on scroll down, reveal on scroll up
-          if (currentY > 130) {
-            if (deltaY > 6) {
-              // Scrolling down -> hide smoothly to clear the entire viewport
-              setIsHidden(true);
-            } else if (deltaY < -6) {
-              // Scrolling up -> drop down smoothly as floating luxury island
-              setIsHidden(false);
-            }
-          } else {
-            setIsHidden(false);
-          }
-
-          lastScrollY.current = currentY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const shouldShowHeader = !isHidden || mobileMenuOpen || searchOpen || faceSearchOpen || optionsOpen || portalsOpen;
-
   const logoOverride = editor?.getOverride?.("header-logo");
   const activeLogo = logoOverride?.mediaUrl || logoUrl || "/alaqeeq-logo.png";
 
@@ -412,49 +365,22 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         </div>
       </div>
 
-      {/* 2. Main Executive Header — Dynamic Island Morph & Smart Stealth Header */}
-      <header className={`aq-studio-share-header sticky top-0 z-[130] transition-all duration-300 ease-out ${
-        isScrolled
-          ? "pt-2 sm:pt-3.5 px-3 sm:px-6 pointer-events-none bg-transparent border-transparent"
-          : `pt-0 px-0 w-full pointer-events-auto border-b backdrop-blur-xl ${
-              isNationalDay
-                ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
-                : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
-            }`
+      {/* 2. Main Executive Header */}
+      <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-xl transition duration-200 ${
+        isNationalDay
+          ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
+          : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
       }`}>
-        <div className={`relative mx-auto flex items-center justify-between transition-all duration-300 ease-out ${
-          isScrolled
-            ? `pointer-events-auto h-[54px] sm:h-[64px] max-w-[1340px] px-3.5 sm:px-6 rounded-2xl sm:rounded-full border shadow-2xl backdrop-blur-2xl ${
-                shouldShowHeader ? "translate-y-0 opacity-100" : "-translate-y-[150%] opacity-0 pointer-events-none"
-              } ${
-                isNationalDay
-                  ? dark
-                    ? "border-[#f8ca14]/30 bg-[#0c1218]/92 shadow-[0_16px_40px_rgba(0,0,0,0.85)]"
-                    : "border-[#08467d]/20 bg-white/94 shadow-[0_12px_36px_rgba(8,70,125,0.12)]"
-                  : dark
-                  ? "border-white/15 bg-[#060a10]/90 shadow-[0_16px_40px_rgba(0,0,0,0.9)]"
-                  : "border-[#08467d]/15 bg-white/94 shadow-[0_12px_36px_rgba(8,70,125,0.10)]"
-              }`
-            : "w-full h-[66px] sm:h-[78px] max-w-[1380px] px-3.5 sm:px-6 md:px-8 translate-y-0 opacity-100"
-        }`}>
-          {/* Subtle Golden Laser Hairline Accent when in Island Mode */}
-          {isScrolled && (
-            <div className="pointer-events-none absolute bottom-0 inset-x-8 sm:inset-x-16 h-[1.5px] bg-gradient-to-r from-transparent via-[#f8ca14]/60 to-transparent rounded-full shadow-[0_0_8px_rgba(248,202,20,0.4)]" />
-          )}
-
+        <div className="relative mx-auto h-[66px] sm:h-[78px] max-w-[1380px] px-3.5 sm:px-6 md:px-8 flex items-center justify-between">
           {/* Logo with clean branding */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => go("/")}
               aria-label={`العودة إلى ${title}`}
               data-visual-id="header-logo-container"
               data-visual-tag="button"
               data-visual-label="حاوية الشعار"
-              className={`flex items-center transition-all duration-300 hover:opacity-90 ${
-                isScrolled
-                  ? "h-[36px] sm:h-[46px] max-w-[130px] sm:max-w-[190px]"
-                  : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
-              }`}
+              className="flex h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px] items-center transition hover:opacity-90"
             >
               <img
                 src={
@@ -472,7 +398,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   dark
                     ? "brightness-0 invert opacity-95"
                     : isNationalDay
-                    ? "drop-shadow-[0_1px_3px_rgba(8,70,125,0.18)]"
+                    ? "drop-shadow-[0_1px_3px_rgba(1,90,55,0.18)]"
                     : ""
                 }`}
               />
@@ -720,10 +646,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={`grid ${isScrolled ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition active:scale-95 ${
+              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                  : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                  : "border-[#015a37]/20 bg-[#015a37]/[0.08] text-[#015a37] hover:bg-[#015a37] hover:text-white"
               }`}
               title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
             >
@@ -736,10 +662,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-icon-search"
               data-visual-tag="icon"
               data-visual-label="زر البحث الشامل"
-              className={`grid ${isScrolled ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition active:scale-95 ${
+              className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                  : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                  : "border-[#015a37]/20 bg-[#015a37]/[0.08] text-[#015a37] hover:bg-[#015a37] hover:text-white"
               }`}
               title="البحث الشامل (Ctrl+K)"
               aria-label="البحث الشامل"
@@ -754,12 +680,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 e.stopPropagation();
                 setMobileMenuOpen((open) => !open);
               }}
-              className={`grid ${isScrolled ? "h-9 w-9" : "h-10 w-10"} place-items-center rounded-xl border transition lg:hidden active:scale-90 cursor-pointer ${
+              className={`grid h-10 w-10 place-items-center rounded-xl border transition lg:hidden active:scale-90 cursor-pointer ${
                 mobileMenuOpen
                   ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
                   : dark
                   ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
+                  : "border-[#015a37]/30 bg-[#015a37]/10 text-[#015a37]"
               }`}
               aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
             >
