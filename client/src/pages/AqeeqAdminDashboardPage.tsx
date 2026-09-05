@@ -109,6 +109,7 @@ export default function AqeeqAdminDashboardPage() {
   const { user, isAuthenticated, loading, login, logout } = useAuth();
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
@@ -1037,24 +1038,26 @@ const DEFAULT_ORCHESTRATION = {
               </div>
             </div>
 
-            {/* Deploy to Live Button — يعمل من أي جهاز ومن داخل لوحة التحكم */}
-            <button
-              onClick={() => {
-                if (isDeploying) return;
-                setIsDeploying(true);
-                deployMutation.mutate();
-              }}
-              disabled={isDeploying}
-              className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 ${
-                isDeploying
-                  ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
-                  : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
-              }`}
-              title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
-            >
-              <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
-              <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للموقع المباشر 🚀"}</span>
-            </button>
+            {/* Deploy to Live Button — خاص باللوكال هوست فقط لنشر التعديلات لريندر */}
+            {isLocalhost && (
+              <button
+                onClick={() => {
+                  if (isDeploying) return;
+                  setIsDeploying(true);
+                  deployMutation.mutate();
+                }}
+                disabled={isDeploying}
+                className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 ${
+                  isDeploying
+                    ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
+                    : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
+                }`}
+                title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
+              >
+                <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
+                <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للموقع المباشر 🚀"}</span>
+              </button>
+            )}
 
             {/* Logout */}
             <button

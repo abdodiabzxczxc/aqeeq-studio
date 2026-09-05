@@ -742,22 +742,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         <span>لوحة التحكم للإدارة (Admin)</span>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isDeploying) return;
-                          if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                          setIsDeploying(true);
-                          deployMutation.mutate();
-                        }}
-                        disabled={isDeploying}
-                        className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
-                          dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
-                        } rounded-xl transition text-right`}
-                      >
-                        <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
-                        <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
-                      </button>
+                      {isLocalhost && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isDeploying) return;
+                            if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                            setIsDeploying(true);
+                            deployMutation.mutate();
+                          }}
+                          disabled={isDeploying}
+                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
+                            dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
+                          } rounded-xl transition text-right`}
+                        >
+                          <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
+                          <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
+                        </button>
+                      )}
                     </div>
 
                     <div className={`h-px my-2 ${dark ? "bg-white/10" : "bg-black/10"}`} />
@@ -1172,7 +1174,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     </button>
 
                     {/* زر الداشبورد والتحكم */}
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className={isLocalhost ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
                       <button
                         type="button"
                         onClick={() => {
@@ -1189,21 +1191,23 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         <span>لوحة الإدارة</span>
                       </button>
 
-                      {/* زر النشر المباشر */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isDeploying) return;
-                          if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                          setIsDeploying(true);
-                          deployMutation.mutate();
-                        }}
-                        disabled={isDeploying}
-                        className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
-                      >
-                        <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
-                        <span>نشر مباشر 🚀</span>
-                      </button>
+                      {/* زر النشر المباشر — خاص باللوكال فقط */}
+                      {isLocalhost && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isDeploying) return;
+                            if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                            setIsDeploying(true);
+                            deployMutation.mutate();
+                          }}
+                          disabled={isDeploying}
+                          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
+                        >
+                          <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
+                          <span>نشر مباشر 🚀</span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
