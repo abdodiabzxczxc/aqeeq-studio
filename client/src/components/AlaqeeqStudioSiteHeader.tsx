@@ -858,7 +858,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono">⌘K</kbd>
                   </button>
 
-                  {/* 1. 🏛️ أولاً: شبكة التصفح السريع لكافة الصروح والمسارات (Navigation Hub) */}
+                  {/* 1. 🏛️ أولاً: الصروح والمسارات المؤسسية لمدارس العقيق */}
                   <div className={`rounded-2xl border p-3 space-y-2 ${
                     dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50/90 border-slate-200/80 shadow-xs"
                   }`}>
@@ -867,7 +867,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         <span>🏛️</span>
                         <span>صروح ومسارات مدارس العقيق</span>
                       </span>
-                      <span className="text-[10px] text-slate-500 font-bold">تصفح شامل</span>
+                      <span className="text-[10px] text-slate-500 font-bold">بوابات رسمية</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
@@ -919,38 +919,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         </div>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => go("/articles")}
-                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "articles"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">✍️</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">مقالات العقيق</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">أقلام تربوية وثقافية</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => go("/showcase")}
-                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
-                          currentActive === "showcase"
-                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
-                        }`}
-                      >
-                        <span className="text-base">📰</span>
-                        <div>
-                          <div className="text-[11px] font-black leading-tight">الأخبار والعروض</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400">المستجدات والإعلانات</div>
-                        </div>
-                      </button>
-
                       <a
                         href="https://live.aqeeq.edu.sa/jobs"
                         target="_blank"
@@ -972,32 +940,32 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   </div>
 
                   {/* 2. 🎓 ثانياً: البطاقة الملكية للقبول والتسجيل والرسوم (Flagship Admissions) */}
-                  <div className={`relative overflow-hidden rounded-2xl p-4 transition duration-300 hover:scale-[1.01] border ${
+                  <div className={`relative overflow-hidden rounded-2xl p-3.5 transition duration-300 hover:scale-[1.01] border ${
                     dark
                       ? "bg-gradient-to-br from-[#08467d]/90 via-[#042442] to-[#021424] border-[#f8ca14]/30 text-white shadow-[0_12px_30px_rgba(8,70,125,0.4)]"
                       : "bg-gradient-to-br from-[#08467d] via-[#073661] to-[#042442] border-[#f8ca14]/40 text-white shadow-[0_12px_30px_rgba(8,70,125,0.25)]"
                   }`}>
                     <div className="relative z-10 flex items-start justify-between">
                       <div>
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#f8ca14] text-slate-950 mb-2">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#f8ca14] text-slate-950 mb-1.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping" />
                           <span>القبول والتسجيل متاح الآن</span>
                         </span>
-                        <h3 className="text-sm font-black tracking-tight leading-snug">
+                        <h3 className="text-xs sm:text-sm font-black tracking-tight leading-snug">
                           احجز مقعد ابنك للعام الجديد
                         </h3>
-                        <p className="text-[11px] text-white/80 mt-0.5 font-medium">
+                        <p className="text-[10px] text-white/80 mt-0.5 font-medium">
                           تعليم أهلي ودولي معتمد بمناهج عالمية
                         </p>
                       </div>
-                      <GraduationCap className="text-[#f8ca14] opacity-80 shrink-0" size={28} />
+                      <GraduationCap className="text-[#f8ca14] opacity-80 shrink-0" size={26} />
                     </div>
 
-                    <div className="relative z-10 mt-3.5 flex flex-wrap items-center gap-2">
+                    <div className="relative z-10 mt-3 flex flex-wrap items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => go("/admissions#admission-form-section")}
-                        className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14] hover:bg-amber-400 text-slate-950 shadow-md transition active:scale-95 cursor-pointer"
+                        className="flex-1 min-w-[110px] flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-xl text-xs font-black bg-[#f8ca14] hover:bg-amber-400 text-slate-950 shadow-md transition active:scale-95 cursor-pointer"
                       >
                         <span>سجّل الآن فوري</span>
                         <ArrowLeft size={13} />
@@ -1005,112 +973,130 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <button
                         type="button"
                         onClick={() => go("/admissions#fees-table")}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
                       >
                         جدول الرسوم
                       </button>
                       <button
                         type="button"
                         onClick={() => go("/admissions#fees-calculator")}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/20 text-white transition cursor-pointer"
                       >
                         حاسبة الأقساط
                       </button>
                     </div>
                   </div>
 
-                  {/* 3. 🎨 ثالثاً: المركز الإعلامي والثقافي (Media & Culture Hub) */}
-                  <div
-                    onClick={() => go("/podcast")}
-                    className={`group cursor-pointer rounded-2xl p-3 border transition-all duration-300 hover:scale-[1.01] ${
-                      dark
-                        ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                        : "bg-white/80 hover:bg-white border-black/[0.08] shadow-xs"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl grid place-items-center bg-gradient-to-tr from-[#de191e] to-rose-500 text-white shadow-sm group-hover:scale-105 transition shrink-0">
-                          <Mic size={17} />
-                        </div>
+                  {/* 3. 🎨 ثالثاً: المركز الإعلامي والثقافي الموحد (Compact Media Hub) */}
+                  <div className={`rounded-2xl border p-3 space-y-2 ${
+                    dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50/90 border-slate-200/80 shadow-xs"
+                  }`}>
+                    <div className="flex items-center justify-between pb-1 border-b border-black/5 dark:border-white/5">
+                      <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} flex items-center gap-1.5`}>
+                        <span>🎨</span>
+                        <span>المركز الإعلامي والإنتاج الثقافي</span>
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-bold">5 أقسام حية</span>
+                    </div>
+
+                    {/* المربعات الأنيقة المدمجة: الأخبار، المقالات، المجلة، الألبومات */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => go("/showcase")}
+                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
+                          currentActive === "showcase"
+                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                        }`}
+                      >
+                        <span className="text-base">📰</span>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#de191e] transition">
-                              أثير العقيق 🎙️
-                            </span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold">
-                              بودكاست حي
+                          <div className="text-[11px] font-black leading-tight">الأخبار والعروض</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">المستجدات والإعلانات</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => go("/articles")}
+                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
+                          currentActive === "articles"
+                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                        }`}
+                      >
+                        <span className="text-base">✍️</span>
+                        <div>
+                          <div className="text-[11px] font-black leading-tight">مقالات العقيق</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">أقلام تربوية وثقافية</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => go("/journal")}
+                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
+                          currentActive === "journal"
+                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                        }`}
+                      >
+                        <span className="text-base">📖</span>
+                        <div>
+                          <div className="text-[11px] font-black leading-tight">مجلة العقيق</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">الأعداد والأرشيف</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => go("/albums")}
+                        className={`flex items-center gap-2 p-2 rounded-xl border text-right transition cursor-pointer ${
+                          currentActive === "albums"
+                            ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                            : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                        }`}
+                      >
+                        <span className="text-base">📸</span>
+                        <div>
+                          <div className="text-[11px] font-black leading-tight">ألبومات الفعاليات</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">معرض الصور والأنشطة</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* أثير العقيق (بودكاست مدمج أنيق بكامل العرض وبدون هدر للمساحة) */}
+                    <button
+                      type="button"
+                      onClick={() => go("/podcast")}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl border text-right transition cursor-pointer ${
+                        currentActive === "podcast"
+                          ? dark ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                          : dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-white" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🎙️</span>
+                        <div>
+                          <div className="text-[11px] font-black leading-tight flex items-center gap-1.5">
+                            <span>أثير العقيق — بودكاست حي</span>
+                            <span className="text-[8px] px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-black">
+                              Live
                             </span>
                           </div>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium line-clamp-1">
-                            حوارات ملهمة وقصص إبداعية من صميم المدارس
-                          </p>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">حوارات وإبداعات من صميم المدارس</div>
                         </div>
                       </div>
 
                       {/* Animated Waveform Bars */}
-                      <div className="flex items-end gap-[2.5px] h-3.5 shrink-0">
-                        <span className="w-[2.5px] bg-rose-500 rounded-full animate-pulse h-2.5" />
-                        <span className="w-[2.5px] bg-rose-500 rounded-full animate-pulse h-3.5" />
-                        <span className="w-[2.5px] bg-rose-500 rounded-full animate-pulse h-1.5" />
-                        <span className="w-[2.5px] bg-rose-500 rounded-full animate-pulse h-3" />
+                      <div className="flex items-end gap-[2px] h-3 shrink-0 mr-1">
+                        <span className="w-[2px] bg-rose-500 rounded-full animate-pulse h-2" />
+                        <span className="w-[2px] bg-rose-500 rounded-full animate-pulse h-3" />
+                        <span className="w-[2px] bg-rose-500 rounded-full animate-pulse h-1.5" />
+                        <span className="w-[2px] bg-rose-500 rounded-full animate-pulse h-2.5" />
                       </div>
-                    </div>
-                  </div>
-
-                  {/* ثنائي المجلة والألبومات */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div
-                      onClick={() => go("/journal")}
-                      className={`group cursor-pointer rounded-2xl p-3 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between min-h-[90px] ${
-                        dark
-                          ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                          : "bg-white/80 hover:bg-white border-black/[0.08] shadow-xs"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="h-7 w-7 rounded-lg grid place-items-center bg-gradient-to-tr from-[#f8ca14] to-amber-500 text-slate-950 font-black shadow-xs">
-                          <BookOpen size={14} />
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-bold group-hover:translate-x-[-2px] transition">
-                          ←
-                        </span>
-                      </div>
-                      <div className="mt-2">
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#08467d] dark:group-hover:text-[#f8ca14] transition">
-                          مجلة العقيق
-                        </h4>
-                        <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1 mt-0.5">
-                          الأعداد الدورية الرقمية والأرشيف
-                        </p>
-                      </div>
-                    </div>
-
-                    <div
-                      onClick={() => go("/albums")}
-                      className={`group cursor-pointer rounded-2xl p-3 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between min-h-[90px] ${
-                        dark
-                          ? "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
-                          : "bg-white/80 hover:bg-white border-black/[0.08] shadow-xs"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="h-7 w-7 rounded-lg grid place-items-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black shadow-xs">
-                          <Camera size={14} />
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-bold group-hover:translate-x-[-2px] transition">
-                          ←
-                        </span>
-                      </div>
-                      <div className="mt-2">
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white group-hover:text-[#08467d] dark:group-hover:text-[#f8ca14] transition">
-                          ألبومات الأنشطة
-                        </h4>
-                        <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1 mt-0.5">
-                          معرض الصور والفعاليات
-                        </p>
-                      </div>
-                    </div>
+                    </button>
                   </div>
 
                   {/* 4. 📑 رابعاً: الخدمات الطلابية والخطط الدراسية */}
