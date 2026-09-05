@@ -10,6 +10,36 @@ import { streamAqeeqAlbumMedia, streamAqeeqAlbumVideo, streamAqeeqAlbumZip, stre
 import { createAlbumSocialPreviewHtml, createSiteSocialPreviewHtml } from "../albumSocialPreview";
 import { createJournalSocialPreviewHtml, isJournalSocialCrawler } from "../journalSocialPreview";
 
+async function serveOgImage(req: express.Request, res: express.Response, next: express.NextFunction) {
+  try {
+    const config = await getSiteOrchestration();
+    const rawImage = config?.marketingPixels?.ogImageUrl?.trim();
+    if (rawImage && rawImage.startsWith("data:image/")) {
+      const commaIndex = rawImage.indexOf(",");
+      const meta = rawImage.slice(0, commaIndex);
+      const mime = meta.match(/data:([^;]+);/)?.[1] || "image/png";
+      const buffer = Buffer.from(rawImage.slice(commaIndex + 1), "base64");
+      res.status(200).set({
+        "Content-Type": mime,
+        "Content-Length": String(buffer.length),
+        "Cache-Control": "public, max-age=86400",
+      }).end(buffer);
+      return;
+    }
+    const publicDir = process.env.NODE_ENV === "development"
+      ? path.resolve(import.meta.dirname, "../../client/public")
+      : path.resolve(import.meta.dirname, "public");
+    const previewPath = path.join(publicDir, "og-preview.png");
+    if (fs.existsSync(previewPath)) {
+      res.sendFile(previewPath);
+    } else {
+      res.redirect("/alaqeeq-logo.png");
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function serveUniversalSiteSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (!isJournalSocialCrawler(req.get("user-agent") || "")) return next();
   try {
@@ -111,6 +141,7 @@ export async function setupVite(app: Express, server: Server) {
   app.get("/api/albums/:slug/media/:mediaId/stream", serveAqeeqAlbumVideo);
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
   app.use(vite.middlewares);
+  app.get("/api/og-image.png", serveOgImage);
   app.get("/journal/issue/:slug", serveJournalSocialPreview);
   app.get("/albums/:slug", serveAlbumSocialPreview);
   app.get("*", serveUniversalSiteSocialPreview);
@@ -155,6 +186,7 @@ export function serveStatic(app: Express) {
   app.get("/api/albums/:slug/media/:mediaId/download", serveAqeeqAlbumMedia);
   app.get("/api/albums/:slug/media/:mediaId/stream", serveAqeeqAlbumVideo);
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
+  app.get("/api/og-image.png", serveOgImage);
   app.get("/journal/issue/:slug", serveJournalSocialPreview);
   app.get("/albums/:slug", serveAlbumSocialPreview);
   app.get("*", serveUniversalSiteSocialPreview);

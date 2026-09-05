@@ -49,10 +49,12 @@ export function createSiteSocialPreviewHtml(
   customConfig?: { ogTitle?: string; ogDescription?: string; ogImageUrl?: string }
 ) {
   const canonicalUrl = absoluteUrl(targetPath, origin);
-  const imageSource = customConfig?.ogImageUrl?.trim() || "/og-preview.png";
-  const imageUrl = absoluteUrl(imageSource, origin);
-  const title = customConfig?.ogTitle?.trim() || "مدارس العقيق الأهلية والدولية | المنصة الرسمية";
-  const description = customConfig?.ogDescription?.trim() || "الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - القبول والتسجيل، مجلة العقيق، ألبومات الفعاليات، وأحدث الأخبار والمقالات.";
+  const rawImage = customConfig?.ogImageUrl?.trim() || "/og-preview.png";
+  const imageUrl = rawImage.startsWith("data:")
+    ? absoluteUrl("/api/og-image.png", origin)
+    : absoluteUrl(rawImage, origin);
+  const title = customConfig?.ogTitle?.trim() || "مدارس العقيق الأهلية والدولية بالمدينة المنورة";
+  const description = customConfig?.ogDescription?.trim() || "الريادة في التعليم وصناعة المستقبل منذ عام 1994";
 
   return `<!doctype html>
 <html lang="ar" dir="rtl">
