@@ -507,8 +507,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                 dark
-                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                  : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+                  ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]"
+                  : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
               }`}>
                 <span className="text-sm">🇸🇦</span>
                 <span className="font-black">مقالات وأقلام العقيق · هوية اليوم الوطني</span>
@@ -523,37 +523,29 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                   dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                    : "border-[#08467d]/25 bg-white text-[#08467d]"
                 }`}
-              >
-                {(text) => (
-                  <>
-                    <Sparkles size={14} />
-                    <span>{text}</span>
-                  </>
-                )}
-              </VisualEditable>
+              />
             )}
 
             <VisualEditable
               id="articles-hero-title"
               tag="text"
-              label="عنوان صفحة المقالات"
-              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام تفيض فكراً وإبداعاً."}
+              label="عنوان هيرو المقالات"
+              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام العقيق ومقالات الموسم"}
               as="h1"
-              className={`mt-5 text-4xl font-black leading-[1.14] md:text-6xl ${
-                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+              className={`text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.25] ${
+                dark ? "text-white" : "text-[#0a192f]"
               }`}
             />
 
             <VisualEditable
               id="articles-hero-desc"
               tag="text"
-              label="وصف صفحة المقالات"
-              defaultText={orchestration?.heroCovers?.articlesCustomDesc ||
-                "رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق الموهوبين، ورؤى المعلمين والقيادات، وتجارب أولياء الأمور الملهمة."}
+              label="وصف هيرو المقالات"
+              defaultText={orchestration?.heroCovers?.articlesCustomDesc || "منصة فكرية وتربوية توثق رؤى المعلمين وإبداعات الطلاب وقصص النجاح في مسيرة مدارس العقيق بالمدينة المنورة."}
               as="p"
-              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
+              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"}`}
             />
 
             {/* Stats pills */}
@@ -561,31 +553,31 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               <span
                 className={`rounded-full border px-3 py-2 ${
                   isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                 }`}
               >
-                <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {rawArticles.length} مقال منشور
               </span>
               <span
                 className={`rounded-full border px-3 py-2 ${
                   isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                 }`}
               >
-                <User className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <User className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 {new Set(rawArticles.map((a) => a.authorName)).size || 1} كاتب وقلم
               </span>
               <span
                 className={`rounded-full border px-3 py-2 ${
                   isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                    : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                 }`}
               >
-                <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                 إبداعات وتجارب
               </span>
             </div>
@@ -887,17 +879,17 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     onClick={(e) => handleCopyLink(readingArticle, e)}
                     className={`grid h-9 w-9 place-items-center rounded-xl border transition ${
                       copiedId === readingArticle.id
-                        ? "bg-emerald-600 border-emerald-600 text-white"
+                        ? "bg-[#f8ca14] border-[#f8ca14] text-black font-black shadow-md"
                         : "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300"
                     }`}
                     title="نسخ الرابط"
                   >
-                    {copiedId === readingArticle.id ? <Check size={14} /> : <Bookmark size={14} />}
+                    {copiedId === readingArticle.id ? <Check size={14} className="text-black" /> : <Bookmark size={14} />}
                   </button>
                   <button
                     type="button"
                     onClick={(e) => handleShare(readingArticle, e)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 px-3.5 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] hover:bg-[#20b558] text-white font-black text-xs h-9 px-3.5 transition shadow-sm active:scale-95"
                   >
                     <Share2 size={13} />
                     <span>مشاركة واتساب</span>

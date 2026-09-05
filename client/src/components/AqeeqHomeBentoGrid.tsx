@@ -219,7 +219,7 @@ export function AqeeqHomeBentoGrid({
                   as="div"
                   onClick={() => navigate(`/albums/${latestAlbum.slug}`)}
                   className={`h-[320px] sm:h-[380px] md:h-full md:min-h-[580px] relative overflow-hidden rounded-[2.5rem] cursor-pointer group shadow-2xl border transition-all duration-500 ${
-                    dark ? "bg-[#091216] border-white/15 hover:border-emerald-400/50 shadow-black/90" : "bg-emerald-50/80 border-slate-200 hover:border-emerald-500/40 shadow-xl"
+                    dark ? "bg-[#091216] border-white/15 hover:border-[#f8ca14]/50 shadow-black/90" : "bg-slate-50 border-slate-200 hover:border-[#08467d]/40 shadow-xl"
                   }`}
                 >
                   {/* Diagonal Liquid Glare Line */}
@@ -231,7 +231,7 @@ export function AqeeqHomeBentoGrid({
                   <div
                     className="pointer-events-none absolute inset-0 rounded-[inherit] z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                     style={{
-                      background: `radial-gradient(circle 220px at ${c1.tilt.gx}% ${c1.tilt.gy}%, rgba(16,185,129,0.18), transparent 70%)`,
+                      background: `radial-gradient(circle 220px at ${c1.tilt.gx}% ${c1.tilt.gy}%, rgba(248,202,20,0.18), transparent 70%)`,
                     }}
                   />
 
@@ -270,7 +270,7 @@ export function AqeeqHomeBentoGrid({
                           dark
                             ? "bg-[#f8ca14] text-black shadow-[#f8ca14]/25 hover:bg-[#e6b90f]"
                             : isNationalDay
-                            ? "bg-[#005A36] text-white hover:bg-[#003822] shadow-emerald-950/20"
+                            ? "bg-[#08467d] text-white hover:bg-[#042442] shadow-[#08467d]/20"
                             : "bg-[#08467d] text-white hover:bg-[#063863]"
                         }`}
                       >

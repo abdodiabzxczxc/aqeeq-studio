@@ -75,7 +75,7 @@ function IssueCard({
       }}
       className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
         isNationalDay
-          ? dark ? "snd-bento-card-dark text-white hover:border-emerald-500/50 hover:shadow-[0_24px_60px_rgba(0,90,54,0.35)]" : "snd-bento-card-light text-slate-900 hover:border-emerald-500/40"
+          ? dark ? "snd-bento-card-dark text-white hover:border-[#f8ca14]/50 hover:shadow-[0_24px_60px_rgba(0,0,0,0.5)]" : "snd-bento-card-light text-slate-900 hover:border-[#08467d]/40"
           : dark
           ? "border-white/[0.08] bg-[#0c1017]/85 text-white shadow-[0_24px_60px_rgba(0,0,0,0.6)] hover:border-[#f8ca14]/60 hover:shadow-[0_24px_70px_rgba(248,202,20,0.22)]"
           : "border-black/[0.06] bg-white/90 text-black shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:border-[#08467d]/40 hover:shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
@@ -94,7 +94,7 @@ function IssueCard({
           onClick={onOpen}
           className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] transition duration-500 group-hover:scale-[1.02] ${
             isNationalDay
-              ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/15 bg-emerald-50/50"
+              ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]" : "border-[#08467d]/15 bg-slate-50/50"
               : dark ? "border-white/[0.08] bg-[#0c0c0c]" : "border-black/[0.06] bg-[#f8f8f8]"
           }`}
           aria-label={`قراءة ${issue.title}`}
@@ -103,7 +103,7 @@ function IssueCard({
           <div
             className={`absolute bottom-[9%] left-[8%] top-[9%] w-[50%] overflow-hidden rounded-[1rem] border opacity-50 hidden sm:block transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
               isNationalDay
-                ? dark ? "border-emerald-500/20 bg-[#002617]" : "border-emerald-500/20 bg-emerald-100/60"
+                ? dark ? "border-[#f8ca14]/20 bg-[#141414]" : "border-[#08467d]/20 bg-slate-100/60"
                 : dark ? "border-white/[0.1] bg-[#141414]" : "border-black/[0.08] bg-[#ebebeb]"
             }`}
             style={{ transform: "rotate(-7deg)" }}
@@ -124,7 +124,7 @@ function IssueCard({
           <div
             className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[60%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-xl transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
               isNationalDay
-                ? dark ? "border-[#f8ca14] bg-[#001f13] shadow-[0_12px_30px_rgba(0,90,54,0.5)]" : "border-emerald-600/50 bg-white"
+                ? dark ? "border-[#f8ca14] bg-[#141414] shadow-[0_12px_30px_rgba(0,0,0,0.5)]" : "border-[#08467d]/40 bg-white"
                 : dark ? "border-[#f8ca14]/60 bg-[#141414]" : "border-[#08467d]/40 bg-white"
             }`}
             style={{ transform: "rotate(0deg)" }}
@@ -138,7 +138,7 @@ function IssueCard({
                 className="h-full w-full rounded-[.7rem] object-cover"
               />
             ) : (
-              <div className={`grid h-full place-items-center ${dark ? "bg-[#161616] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
+              <div className={`grid h-full place-items-center ${dark ? "bg-[#161616] text-[#f8ca14]" : isNationalDay ? "bg-slate-100 text-[#08467d]" : "bg-slate-100 text-[#08467d]"}`}>
                 <Newspaper size={34} />
               </div>
             )}
@@ -150,13 +150,13 @@ function IssueCard({
           <div className="flex items-start justify-between gap-3">
             <div className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${
               isNationalDay
-                ? dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-emerald-600/30 bg-emerald-50 text-[#005A36]"
+                ? dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
                 : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}>
               <BookOpen size={18} />
             </div>
             <p className={`pt-1 text-left text-[9px] font-black tracking-[.18em] ${
-              isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")
+              isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#08467d]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")
             }`}>
               {isNationalDay ? "NATIONAL ISSUE" : "ISSUE"} · {String(index + 1).padStart(2, "0")}
             </p>
@@ -168,7 +168,7 @@ function IssueCard({
             label="عنوان العدد"
             defaultText={issue.title}
             as="h3"
-            className={`mt-4 text-2xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
+            className={`mt-4 text-2xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#08467d]" : "text-black"}`}
           />
 
           <VisualEditable
@@ -180,22 +180,22 @@ function IssueCard({
               "عدد أسبوعي من مجلة العقيق، يوثق أنشطة وفعاليات مدارس العقيق بتجربة قراءة تفاعلية."
             }
             as="p"
-            className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-950/80" : "text-slate-600"}`}
+            className={`mt-3 text-sm leading-7 ${dark ? "text-slate-400" : isNationalDay ? "text-slate-600 font-medium" : "text-slate-600"}`}
           />
 
           <div className={`mt-auto flex items-end justify-between gap-3 border-t pt-4 ${
-            isNationalDay ? (dark ? "border-[#5aba1c]/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
+            isNationalDay ? (dark ? "border-[#f8ca14]/20" : "border-[#08467d]/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
           }`}>
             <div>
-              <b className={`block text-xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>
+              <b className={`block text-xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#08467d]" : "text-black"}`}>
                 {String(issue.pageCount || 0).padStart(2, "0")}
               </b>
-              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? (dark ? "text-[#5aba1c]" : "text-emerald-700") : (dark ? "text-slate-500" : "text-slate-400")}`}>
+              <span className={`text-[9px] font-black tracking-[.16em] ${isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#08467d]") : (dark ? "text-slate-500" : "text-slate-400")}`}>
                 PAGES
               </span>
             </div>
 
-            <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-800/80" : "text-slate-500"}`}>
+            <span className={`inline-flex items-center gap-1 text-[10px] font-black ${dark ? "text-slate-400" : isNationalDay ? "text-[#08467d] font-bold" : "text-slate-500"}`}>
               <CalendarDays size={13} />
               {issue.issueDate}
             </span>
@@ -327,13 +327,13 @@ export default function SchoolNewsPage() {
           /* Hero Section */
           <section className={`relative isolate overflow-hidden border-b ${
             isNationalDay
-              ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
+              ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
               : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
           }`}>
             {isNationalDay ? (
               <>
                 <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+                <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#08467d]/30 via-[#f8ca14]/10 to-transparent blur-[120px]" />
               </>
             ) : (
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
@@ -347,7 +347,7 @@ export default function SchoolNewsPage() {
                     onClick={() => navigate(`/journal/${secondIssue.slug}`)}
                     className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl ${
                       isNationalDay
-                        ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                        ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]" : "border-[#08467d]/20 bg-white"
                         : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
                     }`}
                     style={{ transform: "rotate(-7deg)" }}
@@ -370,8 +370,8 @@ export default function SchoolNewsPage() {
                   className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
                     isNationalDay
                       ? dark
-                        ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                        : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                        ? "border-[#f8ca14]/70 bg-[#0c1218] shadow-[0_20px_50px_rgba(8,70,125,0.4)]"
+                        : "border-[#08467d]/30 bg-white shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
                       : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
                   }`}
                   style={{ transform: "rotate(3deg)" }}
@@ -387,7 +387,7 @@ export default function SchoolNewsPage() {
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                       />
                     ) : (
-                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
+                      <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"}`}>
                         <Newspaper size={42} />
                       </div>
                     )}
@@ -414,8 +414,8 @@ export default function SchoolNewsPage() {
                 {isNationalDay ? (
                   <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                     dark
-                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                      : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+                      ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]"
+                      : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
                   }`}>
                     <span className="text-sm">🇸🇦</span>
                     <span className="font-black">مجلة العقيق · هوية اليوم الوطني</span>
@@ -462,26 +462,26 @@ export default function SchoolNewsPage() {
                 <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
                   <span className={`rounded-full border px-3 py-2 ${
                     isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}>
-                    <BookOpen className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {issues.length} عدد منشور
                   </span>
                   <span className={`rounded-full border px-3 py-2 ${
                     isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}>
-                    <Layers className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {totalPages} صفحة
                   </span>
                   <span className={`rounded-full border px-3 py-2 ${
                     isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}>
-                    <FolderArchive className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
+                    <FolderArchive className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                     {monthGroups.length} كتيب شهري
                   </span>
                 </div>
@@ -542,7 +542,7 @@ export default function SchoolNewsPage() {
                       الكتيبات الشهرية المجمعة
                     </h3>
                   </div>
-                  <span className={`text-xs ${dark ? "text-slate-500" : isNationalDay ? "text-emerald-800/70" : "text-slate-400"}`}>
+                  <span className={`text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-[#08467d]/80" : "text-slate-500"}`}>
                     تتكون تلقائياً من أعداد كل شهر
                   </span>
                 </div>
@@ -554,18 +554,18 @@ export default function SchoolNewsPage() {
                       className={`group flex items-center justify-between rounded-2xl border p-4 transition ${
                         isNationalDay
                           ? dark
-                            ? "border-emerald-500/20 bg-[#001c10] hover:border-emerald-400"
-                            : "border-emerald-500/20 bg-white hover:border-[#005A36] shadow-sm"
+                            ? "border-[#f8ca14]/20 bg-[#0c1218] hover:border-[#f8ca14]/50"
+                            : "border-[#08467d]/15 bg-white hover:border-[#08467d] shadow-sm"
                           : dark
                           ? "border-white/[0.08] bg-[#111111] hover:border-[#f8ca14]/40"
                           : "border-black/[0.08] bg-white hover:border-[#08467d]/40 shadow-sm"
                       }`}
                     >
                       <div>
-                        <h4 className={`font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}>
+                        <h4 className={`font-black ${dark ? "text-white" : isNationalDay ? "text-[#08467d]" : "text-black"}`}>
                           كتيب {monthName(monthKey)}
                         </h4>
-                        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-emerald-950/70" : "text-slate-500"}`}>
+                        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : isNationalDay ? "text-[#08467d]/70" : "text-slate-500"}`}>
                           {entries.length} أعداد ·{" "}
                           {entries.reduce(
                             (sum, i) => sum + Number(i.pageCount || 0),
@@ -579,8 +579,6 @@ export default function SchoolNewsPage() {
                         className={`inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-bold transition ${
                           dark
                             ? "bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                            : isNationalDay
-                            ? "bg-emerald-50 text-[#005A36] hover:bg-[#005A36] hover:text-white"
                             : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
                         }`}
                       >
@@ -597,7 +595,7 @@ export default function SchoolNewsPage() {
           {/* Issues Archive Grid Section */}
           <section className="mx-auto max-w-[1320px] px-5 py-12 md:px-8 md:py-16">
             <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
-              isNationalDay ? (dark ? "border-emerald-500/20" : "border-emerald-500/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
+              isNationalDay ? (dark ? "border-[#f8ca14]/20" : "border-[#08467d]/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
             }`}>
               <div>
                 <VisualEditable

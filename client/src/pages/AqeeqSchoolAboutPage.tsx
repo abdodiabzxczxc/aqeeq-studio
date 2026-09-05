@@ -81,7 +81,7 @@ function PillarCard({
             : "border-emerald-600/20 bg-white/95 text-slate-900 shadow-[0_15px_40px_rgba(0,90,54,0.08)] hover:border-emerald-600/40"
           : dark
           ? "border-white/[0.08] bg-[#0c1218]/90 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:border-[#f8ca14]/50 hover:shadow-[0_20px_50px_rgba(248,202,20,0.15)]"
-          : "border-black/[0.06] bg-white/95 text-black shadow-[0_15px_35px_rgba(0,0,0,0.04)] hover:border-[#015a37]/35 hover:shadow-[0_15px_35px_rgba(1,90,55,0.1)]"
+          : "border-black/[0.06] bg-white/95 text-black shadow-[0_15px_35px_rgba(0,0,0,0.04)] hover:border-[#08467d]/40 hover:shadow-[0_15px_35px_rgba(8,70,125,0.1)]"
       }`}
     >
       {/* Specular glare following cursor */}
@@ -95,7 +95,7 @@ function PillarCard({
       {/* Giant Holographic Number in Background */}
       <span
         className={`pointer-events-none absolute -left-2 -bottom-4 select-none font-black text-7xl sm:text-8xl leading-none transition duration-500 group-hover:scale-105 ${
-          dark ? "text-white/[0.04] group-hover:text-[#f8ca14]/[0.08]" : "text-black/[0.03] group-hover:text-[#015a37]/[0.06]"
+          dark ? "text-white/[0.04] group-hover:text-[#f8ca14]/[0.08]" : "text-black/[0.03] group-hover:text-[#08467d]/[0.06]"
         }`}
       >
         0{index + 1}
@@ -108,7 +108,7 @@ function PillarCard({
             className={`grid h-14 w-14 place-items-center rounded-2xl border transition duration-500 group-hover:scale-110 shadow-sm ${
               dark
                 ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                : "border-[#015a37]/20 bg-[#015a37]/10 text-[#015a37]"
+                : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
             }`}
           >
             <Icon size={26} />
@@ -144,7 +144,7 @@ function PillarCard({
           >
             {pillar.subPoints.map((pt, pIdx) => (
               <div key={pIdx} className="flex items-start gap-2 text-xs font-bold">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
                 <span className={dark ? "text-slate-200" : "text-slate-800"}>{pt}</span>
               </div>
             ))}
@@ -159,7 +159,7 @@ function PillarCard({
         className={`mt-4 pt-3 border-t text-xs font-black flex items-center justify-between transition relative z-10 ${
           dark
             ? "border-white/10 text-[#f8ca14] hover:text-white"
-            : "border-black/10 text-[#015a37] hover:text-emerald-700"
+            : "border-[#08467d]/15 text-[#08467d] hover:text-[#f8ca14]"
         }`}
       >
         <span>{expanded ? "طي التفاصيل" : "استكشف أبعاد الركيزة ✦"}</span>
@@ -808,10 +808,10 @@ export default function AqeeqSchoolAboutPage() {
                     isNationalDay
                       ? dark
                         ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                        : "border-[#005A36]/30 bg-emerald-50 text-[#005A36]"
+                        : "border-[#08467d]/30 bg-blue-50 text-[#08467d]"
                       : dark
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                      : "border-emerald-700/25 bg-white/95 text-[#015a37]"
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                      : "border-[#08467d]/25 bg-white text-[#08467d]"
                   }`}
                 >
                   {isNationalDay ? <span>🇸🇦</span> : <Building2 size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />}
@@ -836,7 +836,7 @@ export default function AqeeqSchoolAboutPage() {
                   defaultText="صرح تعليمي رائد للبنين والبنات في طيبة الطيبة. نهتم بتأهيل جيل متميز بأخلاق إسلامية راسخة وعلوم عصرية متقدمة، يجمع بين أصالة القيم ومعايير الاعتماد الدولي."
                   as="p"
                   className={`text-base sm:text-lg font-medium leading-relaxed max-w-2xl mb-8 ${
-                    dark ? "text-slate-300" : "text-slate-700"
+                    dark ? "text-slate-300" : "text-slate-700 font-medium"
                   }`}
                 />
 
@@ -847,7 +847,7 @@ export default function AqeeqSchoolAboutPage() {
                     className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
                       dark
                         ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                        : "bg-gradient-to-r from-[#015a37] to-[#027a4b] text-white hover:opacity-95 shadow-[#015a37]/25"
+                        : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
                     }`}
                   >
                     <span>القبول والتسجيل والرسوم</span>
@@ -870,15 +870,15 @@ export default function AqeeqSchoolAboutPage() {
                 {/* Quick Metrics Bar */}
                 <div
                   className={`grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border backdrop-blur-md shadow-sm ${
-                    dark ? "border-white/10 bg-white/[0.03]" : "border-emerald-950/10 bg-white/80"
+                    dark ? "border-white/10 bg-white/[0.03]" : "border-[#08467d]/15 bg-white shadow-md"
                   }`}
                 >
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>منذ 1994</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>منذ 1994</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>+30 عاماً من الريادة</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#5aba1c]" : "text-[#08467d]"}`}>مجمعين</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>مجمعين</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>للبنين والبنات</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
@@ -886,7 +886,7 @@ export default function AqeeqSchoolAboutPage() {
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#5aba1c]" : "text-[#015a37]"}`}>KG - 12</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>KG - 12</span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>كافة المراحل</span>
                   </div>
                 </div>
@@ -897,7 +897,7 @@ export default function AqeeqSchoolAboutPage() {
                 {/* Floating Orbiting Satellite Badge 1 (Top-Right Parallax) */}
                 <motion.div
                   style={{ y: heroBadge1Y }}
-                  className="absolute -top-6 -right-4 sm:-right-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-900/90 to-[#015a37]/90 text-white border border-emerald-400/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
+                  className="absolute -top-6 -right-4 sm:-right-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d]/95 to-[#042442]/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
                 >
                   <ShieldCheck size={16} className="text-[#f8ca14]" />
                   <span>Cognia USA · اعتماد دولي</span>
@@ -931,8 +931,8 @@ export default function AqeeqSchoolAboutPage() {
                     }}
                     className={`group relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 shadow-2xl will-change-transform ${
                       dark
-                        ? "border-emerald-500/25 bg-[#0b1218] shadow-black/80 ring-1 ring-emerald-500/15"
-                        : "border-emerald-950/10 bg-white shadow-emerald-950/15 ring-1 ring-emerald-900/5"
+                        ? "border-[#f8ca14]/30 bg-[#0b1218] shadow-black/80 ring-1 ring-[#f8ca14]/20"
+                        : "border-[#08467d]/15 bg-white shadow-xl ring-1 ring-[#08467d]/10"
                     }`}
                   >
                     {/* Specular glare following cursor */}
@@ -964,9 +964,9 @@ export default function AqeeqSchoolAboutPage() {
                       <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
                         <div>
                           <h4 className="text-sm font-black drop-shadow-md">صرح تعليمي وتربوي رائد</h4>
-                          <p className="text-[11px] text-emerald-300 drop-shadow-md">أصالة القيم ومعايير الاعتماد الدولي</p>
+                          <p className="text-[11px] text-[#f8ca14] drop-shadow-md">أصالة القيم ومعايير الاعتماد الدولي</p>
                         </div>
-                        <span className="rounded-xl bg-emerald-600/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
+                        <span className="rounded-xl bg-[#08467d]/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow text-white">
                           المدينة المنورة
                         </span>
                       </div>
@@ -975,15 +975,15 @@ export default function AqeeqSchoolAboutPage() {
                     {/* Overlapping Floating Trust Chip (Bottom) */}
                     <div
                       className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
-                        dark ? "border-white/10 bg-black/60 text-slate-200" : "border-emerald-950/10 bg-[#f4f7f4] text-slate-800"
+                        dark ? "border-white/10 bg-black/60 text-slate-200" : "border-[#08467d]/15 bg-slate-50 text-slate-800"
                       }`}
                     >
-                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f8ca14]/15 text-[#f8ca14]">
                         <GraduationCap size={20} />
                       </div>
                       <div>
-                        <h5 className="text-xs font-black">مجمع البنين ومجمع البنات بالمدينة</h5>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
+                        <h5 className={`text-xs font-black ${dark ? "text-white" : "text-[#08467d]"}`}>مجمع البنين ومجمع البنات بالمدينة</h5>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
                       </div>
                     </div>
                   </div>
@@ -1004,7 +1004,7 @@ export default function AqeeqSchoolAboutPage() {
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
-                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
             مسيرة 30 عاماً 📜
@@ -1014,7 +1014,7 @@ export default function AqeeqSchoolAboutPage() {
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
-                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
             مستكشف المجمعات والمرافق 🏫
@@ -1024,7 +1024,7 @@ export default function AqeeqSchoolAboutPage() {
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
-                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
             الرؤية والرسالة 2030 🎯
@@ -1034,7 +1034,7 @@ export default function AqeeqSchoolAboutPage() {
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
-                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
             ركائزنا التربوية 💡
@@ -1044,7 +1044,7 @@ export default function AqeeqSchoolAboutPage() {
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40 hover:bg-white/10"
-                : "border-black/5 bg-slate-50 text-slate-700 hover:text-emerald-800 hover:border-emerald-600/30 hover:bg-white"
+                : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
             الموقع والتواصل 📍
@@ -1158,7 +1158,7 @@ export default function AqeeqSchoolAboutPage() {
               {/* Story & Details Column */}
               <div className="lg:col-span-7">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                  <span className="rounded-full bg-[#f8ca14]/15 px-3.5 py-1 text-xs font-black text-[#f8ca14]">
                     محطة تاريخية بارزة ✦
                   </span>
                   <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
@@ -1166,7 +1166,7 @@ export default function AqeeqSchoolAboutPage() {
                   </span>
                 </div>
 
-                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#08467d]"}`}>
                   {activeEra.title}
                 </h3>
 
@@ -1177,7 +1177,7 @@ export default function AqeeqSchoolAboutPage() {
                 {/* Quote Ribbon */}
                 <div
                   className={`p-4 rounded-2xl border mb-6 text-xs font-bold leading-relaxed ${
-                    dark ? "border-white/10 bg-white/[0.03] text-emerald-300" : "border-emerald-950/10 bg-emerald-50/60 text-[#015a37]"
+                    dark ? "border-white/10 bg-white/[0.03] text-[#f8ca14]" : "border-[#08467d]/15 bg-[#08467d]/5 text-[#08467d]"
                   }`}
                 >
                   <span className="text-base font-serif ml-1">❝</span>
@@ -1268,17 +1268,17 @@ export default function AqeeqSchoolAboutPage() {
         ref={campusSectionRef}
         id="campuses-section"
         className={`py-20 border-y relative overflow-hidden ${
-          dark ? "border-white/10 bg-[#05080c]" : "border-emerald-950/10 bg-[#f5f8f5]"
+          dark ? "border-white/10 bg-[#05080c]" : "border-[#08467d]/15 bg-white"
         }`}
       >
         {/* Subtle Ambient Lighting Aura */}
-        <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-emerald-500" />
+        <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#08467d]" />
         <div className="pointer-events-none absolute -bottom-40 left-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#f8ca14]" />
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-            <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
+            <div className="inline-flex items-center gap-2 text-xs font-black text-[#f8ca14] mb-2">
               <Building2 size={15} />
               <span>✦ الصروح والمجمعات التعليمية النموذجية · حي الرانوناء ✦</span>
             </div>
@@ -1304,16 +1304,16 @@ export default function AqeeqSchoolAboutPage() {
                 }}
                 className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "boys"
-                    ? "text-white"
+                    ? "text-[#f8ca14]"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
-                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                    : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
                 }`}
               >
                 {activeCampusTab === "boys" && (
                   <motion.div
                     layoutId="campusActivePill"
-                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-md ring-1 ring-[#f8ca14]/30"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
@@ -1329,16 +1329,16 @@ export default function AqeeqSchoolAboutPage() {
                 }}
                 className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                   activeCampusTab === "girls"
-                    ? "text-white"
+                    ? "text-[#f8ca14]"
                     : dark
                     ? "text-slate-400 hover:text-white hover:bg-white/5"
-                    : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                    : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
                 }`}
               >
                 {activeCampusTab === "girls" && (
                   <motion.div
                     layoutId="campusActivePill"
-                    className="absolute inset-0 rounded-xl bg-[#015a37] shadow-md ring-1 ring-[#f8ca14]/30"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
@@ -1352,7 +1352,7 @@ export default function AqeeqSchoolAboutPage() {
           ======================================================== */}
           <div className="max-w-6xl mx-auto">
             {/* Desktop Expanding Panels (5 side-by-side columns) */}
-            <div className="hidden lg:flex h-[580px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-emerald-500/25">
+            <div className="hidden lg:flex h-[580px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-[#08467d]/30">
               {currentFacilities.map((fac, fIdx) => {
                 const FacIcon = fac.icon;
                 const isExpanded = activeFacilityIndex === fIdx;
@@ -1371,7 +1371,7 @@ export default function AqeeqSchoolAboutPage() {
                     className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
                       isExpanded
                         ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
-                        : "flex-1 min-w-[76px] border-white/10 hover:border-emerald-400/40 cursor-pointer opacity-85 hover:opacity-100 group"
+                        : "flex-1 min-w-[76px] border-white/10 hover:border-[#f8ca14]/40 cursor-pointer opacity-85 hover:opacity-100 group"
                     }`}
                   >
                     {/* Background Photo */}
@@ -1397,15 +1397,15 @@ export default function AqeeqSchoolAboutPage() {
                         {/* Top Bar with Badges & Live Status */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="rounded-xl bg-[#015a37]/90 border border-emerald-400/40 px-3.5 py-1 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                            <span className="rounded-xl bg-[#08467d]/90 border border-[#f8ca14]/40 px-3.5 py-1 text-xs font-black text-[#f8ca14] shadow-lg backdrop-blur-md">
                               {fac.tag} ✦
                             </span>
                             <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
                               {fac.badge}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-black/60 px-3 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md">
-                            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <div className="flex items-center gap-2 text-xs font-bold text-[#f8ca14] bg-black/60 px-3 py-1 rounded-full border border-[#f8ca14]/30 backdrop-blur-md">
+                            <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
                             <span>مرفق حي مجهز 100%</span>
                           </div>
                         </div>
@@ -1415,10 +1415,9 @@ export default function AqeeqSchoolAboutPage() {
                           <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
                             {fac.name}
                           </h3>
-                          <p className="text-sm leading-relaxed text-slate-200 font-medium drop-shadow mb-6">
+                          <p className="text-sm sm:text-base leading-relaxed text-slate-200 font-medium mb-6 drop-shadow">
                             {fac.desc}
                           </p>
-
                           {/* 4 Giant Metrics Chips */}
                           <div className="grid grid-cols-4 gap-3">
                             {fac.giantMetrics.map((gm, gIdx) => (
@@ -1440,13 +1439,13 @@ export default function AqeeqSchoolAboutPage() {
                           </div>
                         </div>
 
-                        {/* Bottom Action Suite */}
-                        <div className="flex items-center gap-3 pt-4 border-t border-white/15">
+                        {/* Bottom CTA Row */}
+                        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
                           <a
                             href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d] to-[#042442] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/30 px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
                           >
                             <MapPin size={15} />
                             <span>فتح الموقع في Google Maps 📍</span>
@@ -1476,7 +1475,7 @@ export default function AqeeqSchoolAboutPage() {
                         <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 select-none group-hover:text-[#f8ca14] transition">
                           {fac.name}
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-400 bg-black/70 border border-emerald-500/30 px-2.5 py-1 rounded-full backdrop-blur-md">
+                        <span className="text-[10px] font-bold text-[#f8ca14] bg-black/70 border border-[#f8ca14]/30 px-2.5 py-1 rounded-full backdrop-blur-md">
                           ✦ انقر للعرض
                         </span>
                       </div>
@@ -1581,7 +1580,7 @@ export default function AqeeqSchoolAboutPage() {
           }`}
         >
           {/* Ambient Lighting Orbs */}
-          <div className="pointer-events-none absolute -top-24 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute -top-24 right-1/4 w-80 h-80 bg-[#08467d]/10 rounded-full blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 left-1/4 w-80 h-80 bg-[#f8ca14]/10 rounded-full blur-3xl" />
 
           <div className="text-center max-w-xl mx-auto mb-12 relative z-10">
@@ -1607,12 +1606,12 @@ export default function AqeeqSchoolAboutPage() {
                 rotateY: isDesktop ? visionWingLeft : 0,
                 transformPerspective: 1400,
               }}
-              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-emerald-400/50 ${
-                dark ? "border-emerald-500/20 bg-white/5" : "border-emerald-950/10 bg-emerald-50/40"
+              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
+                dark ? "border-white/10 bg-white/5" : "border-[#08467d]/15 bg-[#08467d]/[0.03]"
               }`}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d]/10 text-[#08467d] dark:bg-[#f8ca14]/15 dark:text-[#f8ca14]">
                   <Compass size={24} />
                 </div>
                 <div>
@@ -1632,7 +1631,7 @@ export default function AqeeqSchoolAboutPage() {
                 transformPerspective: 1400,
               }}
               className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
-                dark ? "border-amber-500/20 bg-white/5" : "border-amber-950/10 bg-amber-50/30"
+                dark ? "border-amber-500/20 bg-white/5" : "border-[#f8ca14]/20 bg-[#f8ca14]/[0.03]"
               }`}
             >
               <div className="flex items-center gap-3 mb-4">
@@ -1659,7 +1658,7 @@ export default function AqeeqSchoolAboutPage() {
         ref={pillarsSectionRef}
         id="pillars-section"
         className={`py-20 border-y ${
-          dark ? "border-white/10 bg-[#06080d]" : "border-emerald-950/10 bg-[#f5f8f5]"
+          dark ? "border-white/10 bg-[#06080d]" : "border-[#08467d]/15 bg-white"
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6">
@@ -1701,7 +1700,7 @@ export default function AqeeqSchoolAboutPage() {
       ======================================================== */}
       <section id="map-contact-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">
+          <div className="inline-flex items-center gap-2 text-xs font-black text-[#08467d] dark:text-[#f8ca14] mb-2">
             <MapPin size={14} />
             <span>الموقع الجغرافي والوصول المباشر</span>
           </div>
@@ -1717,7 +1716,7 @@ export default function AqeeqSchoolAboutPage() {
           {/* Map Preview & Transportation Coverage Card (7 cols) */}
           <div
             className={`lg:col-span-7 rounded-3xl border p-5 sm:p-8 flex flex-col justify-between shadow-xl ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
+              dark ? "border-white/10 bg-[#0c1218]" : "border-[#08467d]/15 bg-white"
             }`}
           >
             <div>
@@ -1725,10 +1724,10 @@ export default function AqeeqSchoolAboutPage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
                   <span className="relative flex h-3.5 w-3.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f8ca14] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#f8ca14]"></span>
                   </span>
-                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                  <span className="text-xs font-black text-[#08467d] dark:text-[#f8ca14]">
                     تغطية النقل المدرسي نشطة وحية عبر 9 أحياء
                   </span>
                 </div>
@@ -1738,7 +1737,7 @@ export default function AqeeqSchoolAboutPage() {
               <h3 className={`text-xl sm:text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>
                 مجمعات العقيق الأهلية والدولية (بنين وبنات)
               </h3>
-              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+              <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${dark ? "text-slate-300" : "text-slate-600 font-medium"}`}>
                 المدينة المنورة — حي الرانوناء — ممشى الهجرة (خلف نايس برايس). سهولة في الوصول ومواقف فسيحة مخصصة لأولياء الأمور وباصات المدارس.
               </p>
 
@@ -1764,8 +1763,8 @@ export default function AqeeqSchoolAboutPage() {
                       key={hIdx}
                       className={`px-3 py-1.5 rounded-xl border transition hover:scale-105 cursor-default ${
                         dark
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
-                          : "border-emerald-950/10 bg-emerald-50 text-[#015a37]"
+                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                          : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                       }`}
                     >
                       ✓ {hood}
@@ -1781,7 +1780,7 @@ export default function AqeeqSchoolAboutPage() {
                 href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#015a37] hover:bg-emerald-800 text-white px-6 py-3.5 text-xs font-black shadow-lg transition active:scale-95"
+                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d] to-[#042442] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/30 px-6 py-3.5 text-xs font-black shadow-lg transition active:scale-95"
               >
                 <Navigation size={16} />
                 <span>فتح اتجاهات القيادة المباشرة في Google Maps</span>
@@ -1793,8 +1792,8 @@ export default function AqeeqSchoolAboutPage() {
                 rel="noreferrer"
                 className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3.5 text-xs font-black transition ${
                   dark
-                    ? "border-white/10 bg-white/5 text-emerald-400 hover:bg-white/10"
-                    : "border-emerald-700/20 bg-white text-emerald-700 hover:bg-slate-50"
+                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                    : "border-[#08467d]/20 bg-white text-[#08467d] hover:bg-slate-50"
                 }`}
               >
                 <MessageCircle size={15} />
@@ -1806,11 +1805,11 @@ export default function AqeeqSchoolAboutPage() {
           {/* Contact & Official Channels Card (5 cols) */}
           <div
             className={`lg:col-span-5 rounded-3xl border p-5 sm:p-8 flex flex-col justify-between shadow-xl ${
-              dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white"
+              dark ? "border-white/10 bg-[#0c1218]" : "border-[#08467d]/15 bg-white"
             }`}
           >
             <div>
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d]/10 text-[#08467d] dark:bg-[#f8ca14]/15 dark:text-[#f8ca14] mb-4">
                 <Phone size={22} />
               </div>
               <h3 className={`text-2xl font-black mb-2 ${dark ? "text-white" : "text-[#0a192f]"}`}>
@@ -1823,7 +1822,7 @@ export default function AqeeqSchoolAboutPage() {
               <div className={`space-y-4 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
                 <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-black text-emerald-600 dark:text-emerald-400">مجمع البنين (الأهلي والدولي)</span>
+                    <span className="font-black text-[#08467d] dark:text-[#f8ca14]">مجمع البنين (الأهلي والدولي)</span>
                     <Phone size={14} className="text-slate-400" />
                   </div>
                   <a href="tel:+966148131652" className="text-sm font-black hover:underline dir-ltr block text-right">
@@ -1833,7 +1832,7 @@ export default function AqeeqSchoolAboutPage() {
 
                 <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-black text-emerald-600 dark:text-emerald-400">مجمع البنات والطفولة المبكرة</span>
+                    <span className="font-black text-[#08467d] dark:text-[#f8ca14]">مجمع البنات والطفولة المبكرة</span>
                     <Phone size={14} className="text-slate-400" />
                   </div>
                   <a href="tel:+966148644466" className="text-sm font-black hover:underline dir-ltr block text-right">

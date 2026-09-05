@@ -937,7 +937,7 @@ export default function AlaqeeqStudioPublicPage() {
                           <BookOpen size={22} />
                         </div>
                       ) : story.sourceType === "album" ? (
-                        <div className="grid h-full w-full place-items-center bg-emerald-500/20 text-emerald-400">
+                        <div className="grid h-full w-full place-items-center bg-[#08467d]/20 text-[#f8ca14]">
                           <Camera size={22} />
                         </div>
                       ) : (
@@ -974,7 +974,7 @@ export default function AlaqeeqStudioPublicPage() {
             as="section"
             className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 " + (
               isNationalDay
-                ? dark ? "snd-hero-dark border-emerald-500/30 text-white" : "snd-hero-light border-emerald-200 text-slate-900"
+                ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
                 : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
             )}
           >
@@ -982,7 +982,7 @@ export default function AlaqeeqStudioPublicPage() {
         {isNationalDay ? (
           <>
             <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-70" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#08467d]/30 via-[#f8ca14]/10 to-transparent blur-[120px]" />
           </>
         ) : (
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
@@ -994,12 +994,12 @@ export default function AlaqeeqStudioPublicPage() {
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                 dark
-                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-emerald-950/20"
-                  : "bg-emerald-50 border-emerald-500/30 text-[#005A36] shadow-emerald-950/5"
+                  ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]"
+                  : "bg-slate-50 border-[#08467d]/20 text-[#08467d]"
               }`}>
                 <span className="text-sm">🇸🇦</span>
-                <span className={`font-black ${dark ? "text-emerald-300" : "text-[#005A36]"}`}>{customBadgeText}</span>
-                <span className={`font-normal mr-1 ${dark ? "text-white/60" : "text-emerald-800/70"}`}>· هوية اليوم الوطني</span>
+                <span className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>{customBadgeText}</span>
+                <span className={`font-normal mr-1 ${dark ? "text-white/60" : "text-[#08467d]/70"}`}>· هوية اليوم الوطني</span>
               </div>
             ) : (
               <VisualEditable
@@ -1014,12 +1014,12 @@ export default function AlaqeeqStudioPublicPage() {
 
             <h1 className={"mt-4 text-4xl font-black leading-[1.1] md:text-6xl " + (
               isNationalDay
-                ? dark ? "text-white" : "text-[#032e1d]"
+                ? dark ? "text-white" : "text-[#08467d]"
                 : dark ? "text-white" : "text-black"
             )}>
               <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي" defaultText="ذاكرة العقيق" as="span" />
               <br />
-              <span className={isNationalDay ? "snd-text-gradient" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
+              <span className={isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#08467d]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
                 <VisualEditable
                   id="studio-hero-accent"
                   tag="text"
@@ -1038,7 +1038,7 @@ export default function AlaqeeqStudioPublicPage() {
               as="p"
               className={"mt-5 max-w-xl text-sm leading-8 " + (
                 isNationalDay
-                  ? dark ? "text-emerald-100/80" : "text-slate-700"
+                  ? dark ? "text-slate-300" : "text-slate-600"
                   : dark ? "text-slate-300" : "text-slate-600"
               )}
             />
@@ -1055,7 +1055,7 @@ export default function AlaqeeqStudioPublicPage() {
                 className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black shadow-lg transition active:scale-95 ${
                   dark
                     ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
-                    : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white shadow-[#015a37]/25 hover:opacity-95"
+                    : "bg-gradient-to-r from-[#08467d] to-[#052c52] text-white shadow-[#08467d]/25 hover:opacity-95"
                 }`}
               >
                 <Send size={15} />
@@ -1084,8 +1084,8 @@ export default function AlaqeeqStudioPublicPage() {
             <div className={"mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-4 " + (
               isNationalDay
                 ? dark
-                  ? "divide-emerald-500/20 border-emerald-500/20 bg-emerald-950/20 rounded-2xl px-3 backdrop-blur-sm"
-                  : "divide-emerald-300/40 border-emerald-300/40 bg-emerald-50/60 rounded-2xl px-3 backdrop-blur-sm"
+                  ? "divide-[#f8ca14]/20 border-[#f8ca14]/20 bg-[#0c1218] rounded-2xl px-3 backdrop-blur-sm"
+                  : "divide-[#08467d]/15 border-[#08467d]/15 bg-slate-50/80 rounded-2xl px-3 backdrop-blur-sm"
                 : dark ? "divide-white/[0.1] border-white/[0.1]" : "divide-black/[0.08] border-black/[0.08]"
             )}>
               <div className="pl-3">
@@ -1399,7 +1399,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }`}
                 title={isEditorActive ? "انقر لتعديل صورة كوجنيا والكلمة مباشرة" : undefined}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#f8ca14]/15 text-[#f8ca14]">
                   <Award size={16} />
                 </span>
                 <span>{cogniaItem.triggerText}</span>

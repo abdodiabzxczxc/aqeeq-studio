@@ -199,10 +199,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                     isNationalDay
                       ? dark
                         ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                        : "border-[#005A36]/30 bg-emerald-50 text-[#005A36]"
+                        : "border-[#08467d]/30 bg-blue-50 text-[#08467d]"
                       : dark
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                      : "border-emerald-700/25 bg-white/95 text-[#015a37]"
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                      : "border-[#08467d]/25 bg-white text-[#08467d]"
                   }`}
                 >
                   {isNationalDay ? (
@@ -345,12 +345,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                     className={`absolute bottom-[6%] left-[26%] top-[6%] w-[53%] rounded-[2rem] sm:rounded-[2.4rem] p-3 sm:p-4 border shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col justify-between overflow-hidden cursor-pointer backdrop-blur-2xl ${
                       dark
                         ? "border-[#f8ca14]/60 bg-[#09151e]/95 ring-2 ring-[#f8ca14]/30"
-                        : "border-amber-600/30 bg-white"
+                        : "border-[#08467d]/20 bg-white shadow-xl ring-1 ring-[#f8ca14]/40"
                     }`}
                   >
-                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <div className={`flex items-center justify-between pb-2 border-b ${dark ? "border-white/10" : "border-slate-100"}`}>
                       <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="bg-white p-1.5 rounded-xl shadow-sm border border-black/5">
+                        <div className="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200">
                           <img
                             src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
                             alt="شعار اعتماد كوجنيا"
@@ -358,33 +358,45 @@ export default function AqeeqSchoolAccreditationsPage() {
                           />
                         </div>
                         <div className="text-right">
-                          <h4 className="text-[10px] sm:text-xs font-black text-white truncate">كوجنيا الأمريكية</h4>
-                          <span className="text-[9px] sm:text-[10px] font-mono text-emerald-400">SCORE: 99.2%</span>
+                          <h4 className={`text-[10px] sm:text-xs font-black truncate ${dark ? "text-white" : "text-[#08467d]"}`}>كوجنيا الأمريكية</h4>
+                          <span className={`text-[9px] sm:text-[10px] font-mono font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>SCORE: 99.2%</span>
                         </div>
                       </div>
-                      <span className="rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 px-2 py-0.5 text-[9px] sm:text-[10px] font-black">
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-black border ${
+                        dark
+                          ? "bg-[#367453]/25 border-[#367453]/60 text-[#367453]"
+                          : "bg-[#367453]/10 border-[#367453]/40 text-[#367453]"
+                      }`}>
                         معتمد ✦
                       </span>
                     </div>
 
                     <div className="space-y-1.5 my-auto py-1 text-right">
-                      <p className="text-[11px] sm:text-xs font-black text-white leading-tight">الترخيص الأكاديمي الدولي</p>
-                      <p className="text-[10px] sm:text-[11px] text-slate-300 leading-tight line-clamp-2">
+                      <p className={`text-[11px] sm:text-xs font-black leading-tight ${dark ? "text-white" : "text-[#08467d]"}`}>الترخيص الأكاديمي الدولي</p>
+                      <p className={`text-[10px] sm:text-[11px] leading-tight line-clamp-2 ${dark ? "text-slate-300" : "text-slate-600 font-medium"}`}>
                         شهادات تخرج دولية معترفاً بها ومقبولة فوراً في كبرى جامعات المملكة والعالم.
                       </p>
                       <div className="grid grid-cols-2 gap-1.5 pt-1">
-                        <div className="p-1.5 rounded-xl bg-black/40 border border-white/10 text-center">
+                        <div className={`p-1.5 rounded-xl border text-center transition ${
+                          dark
+                            ? "bg-black/60 border-[#f8ca14]/30"
+                            : "bg-[#08467d]/[0.04] border-[#08467d]/15 shadow-sm"
+                        }`}>
                           <span className="block text-sm sm:text-base font-black text-[#f8ca14]">99.2%</span>
-                          <span className="block text-[8px] sm:text-[9px] text-slate-400 font-bold">كفاءة الأكاديميا</span>
+                          <span className={`block text-[8px] sm:text-[9px] font-bold mt-0.5 ${dark ? "text-slate-400" : "text-[#08467d]"}`}>كفاءة الأكاديميا</span>
                         </div>
-                        <div className="p-1.5 rounded-xl bg-black/40 border border-white/10 text-center">
-                          <span className="block text-sm sm:text-base font-black text-emerald-400">100%</span>
-                          <span className="block text-[8px] sm:text-[9px] text-slate-400 font-bold">قبول جامعي</span>
+                        <div className={`p-1.5 rounded-xl border text-center transition ${
+                          dark
+                            ? "bg-black/60 border-[#f8ca14]/30"
+                            : "bg-[#08467d]/[0.04] border-[#08467d]/15 shadow-sm"
+                        }`}>
+                          <span className="block text-sm sm:text-base font-black text-[#f8ca14]">100%</span>
+                          <span className={`block text-[8px] sm:text-[9px] font-bold mt-0.5 ${dark ? "text-slate-400" : "text-[#08467d]"}`}>قبول جامعي</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1.5 border-t border-white/10 text-[9px] sm:text-[10px] text-[#f8ca14] font-black">
+                    <div className={`flex items-center justify-between pt-1.5 border-t ${dark ? "border-white/10" : "border-slate-100"} text-[9px] sm:text-[10px] text-[#f8ca14] font-black`}>
                       <span>✦ المسار الأكاديمي المباشر</span>
                       <span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14] animate-ping" />
                     </div>
@@ -489,7 +501,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       {isActive && (
                         <motion.div
                           layoutId="activeHubPortalPill"
-                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 shadow-md ring-1 ring-[#f8ca14]/40"
+                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] shadow-md ring-1 ring-[#f8ca14]/50"
                           transition={{ type: "spring", stiffness: 350, damping: 28 }}
                         />
                       )}
@@ -499,7 +511,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       </div>
                       <span
                         className={`relative z-10 text-[10px] font-bold ${
-                          isActive ? "text-emerald-200" : "text-slate-500"
+                          isActive ? "text-[#f8ca14]" : "text-slate-500"
                         }`}
                       >
                         {tab.badge}
@@ -529,7 +541,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                     <div className="lg:col-span-7 text-right">
                       <div className="flex items-center gap-3 mb-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 px-3.5 py-1.5 text-xs font-black text-emerald-400 border border-emerald-500/30">
+                        <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#367453]/15 px-3.5 py-1.5 text-xs font-black text-[#367453] border border-[#367453]/35">
                           <ShieldCheck size={16} />
                           <span>اعتماد أكاديمي مؤسسي رسمي</span>
                         </span>
@@ -538,7 +550,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                         </span>
                       </div>
 
-                      <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                      <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#08467d]"}`}>
                         اعتماد كوجنيا الأمريكية (Cognia) لأعلى معايير جودة التعليم
                       </h3>
 
@@ -560,7 +572,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                           "مناهج دولية متطورة تلبي متطلبات الثورة الصناعية الرابعة",
                         ].map((item, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs font-bold">
-                            <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                            <CheckCircle2 size={16} className="text-[#367453] shrink-0 mt-0.5" />
                             <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
                           </div>
                         ))}
@@ -607,12 +619,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                         <motion.div
                           animate={{ y: [0, 240, 0] }}
                           transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                          className="pointer-events-none absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-50 blur-xs"
+                          className="pointer-events-none absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent opacity-60 blur-xs"
                         />
 
                         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-6">
                           <div className="flex items-center gap-3">
-                            <div className="bg-white p-2.5 rounded-xl shadow-sm border border-black/5">
+                            <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
                               <img
                                 src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
                                 alt="شعار اعتماد كوجنيا"
@@ -620,11 +632,11 @@ export default function AqeeqSchoolAccreditationsPage() {
                               />
                             </div>
                             <div className="text-right">
-                              <h5 className="font-black text-xs">بطاقة تقييم الجودة الأكاديمية</h5>
+                              <h5 className={`font-black text-xs ${dark ? "text-white" : "text-[#08467d]"}`}>بطاقة تقييم الجودة الأكاديمية</h5>
                               <p className="text-[10px] text-slate-500">Cognia Performance Scorecard</p>
                             </div>
                           </div>
-                          <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-black text-emerald-400 border border-emerald-500/30">
+                          <span className="rounded-full bg-[#367453]/15 px-3 py-1 text-[11px] font-black text-[#367453] border border-[#367453]/35">
                             معتمد رسمي ✦
                           </span>
                         </div>
@@ -639,15 +651,15 @@ export default function AqeeqSchoolAccreditationsPage() {
                           ].map((crit, cIdx) => (
                             <div key={cIdx}>
                               <div className="flex justify-between mb-1.5 text-[11px] font-bold">
-                                <span>{crit.title}</span>
-                                <span className="text-emerald-400 font-black">{crit.score}</span>
+                                <span className={dark ? "text-slate-200" : "text-slate-800"}>{crit.title}</span>
+                                <span className="text-[#f8ca14] font-black">{crit.score}</span>
                               </div>
                               <div className="h-2.5 w-full rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                                 <motion.div
                                   initial={{ width: 0 }}
                                   animate={{ width: crit.score }}
                                   transition={{ duration: 0.8, delay: cIdx * 0.15 }}
-                                  className="h-full bg-gradient-to-r from-[#015a37] to-emerald-400 rounded-full shadow-md"
+                                  className="h-full bg-gradient-to-r from-[#08467d] to-[#f8ca14] rounded-full shadow-md"
                                 />
                               </div>
                             </div>
@@ -757,10 +769,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                       >
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
                           <div className="flex items-center gap-2">
-                            <Calendar size={18} className="text-blue-400" />
-                            <h5 className="font-black text-xs text-white">مواعيد الاختبارات القادمة (IELTS on Computer)</h5>
+                            <Calendar size={18} className="text-[#08467d] dark:text-[#f8ca14]" />
+                            <h5 className={`font-black text-xs ${dark ? "text-white" : "text-[#08467d]"}`}>مواعيد الاختبارات القادمة (IELTS on Computer)</h5>
                           </div>
-                          <span className="text-[10px] font-black text-blue-400 bg-blue-500/15 px-2.5 py-0.5 rounded-full border border-blue-500/30">
+                          <span className="text-[10px] font-black text-[#08467d] dark:text-[#f8ca14] bg-[#08467d]/10 dark:bg-[#f8ca14]/15 px-2.5 py-0.5 rounded-full border border-[#08467d]/30 dark:border-[#f8ca14]/30">
                             مركز المدينة المنورة
                           </span>
                         </div>
@@ -772,41 +784,41 @@ export default function AqeeqSchoolAccreditationsPage() {
                               time: "09:00 صباحاً",
                               hall: "معمل الحاسوب (A)",
                               seats: "متاح الحجز",
-                              statusColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                              statusColor: "text-[#367453] bg-[#367453]/10 border-[#367453]/30",
                             },
                             {
                               date: "الأربعاء، 16 سبتمبر 2026",
                               time: "01:30 ظهراً",
                               hall: "معمل الحاسوب (B)",
                               seats: "متبقي 4 مقاعد",
-                              statusColor: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+                              statusColor: "text-[#f8ca14] bg-[#f8ca14]/10 border-[#f8ca14]/30",
                             },
                             {
                               date: "السبت، 19 سبتمبر 2026",
                               time: "09:00 صباحاً",
                               hall: "معمل الحاسوب (A)",
                               seats: "متاح الحجز",
-                              statusColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                              statusColor: "text-[#367453] bg-[#367453]/10 border-[#367453]/30",
                             },
                             {
                               date: "الأربعاء، 23 سبتمبر 2026",
                               time: "01:30 ظهراً",
                               hall: "معمل الحاسوب (B)",
                               seats: "متاح الحجز",
-                              statusColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                              statusColor: "text-[#367453] bg-[#367453]/10 border-[#367453]/30",
                             },
                           ].map((session, sIdx) => (
                             <div
                               key={sIdx}
                               className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition ${
                                 dark
-                                  ? "border-white/10 bg-white/5 hover:border-blue-400/40"
-                                  : "border-slate-200 bg-white hover:border-blue-400"
+                                  ? "border-white/10 bg-white/5 hover:border-[#f8ca14]/40"
+                                  : "border-slate-200 bg-white hover:border-[#08467d]/40 shadow-xs"
                               }`}
                             >
                               <div className="text-right">
-                                <p className="font-black text-[12px] text-white">{session.date}</p>
-                                <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                                <p className={`font-black text-[12px] ${dark ? "text-white" : "text-[#08467d]"}`}>{session.date}</p>
+                                <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
                                   <span className="flex items-center gap-1">
                                     <Clock size={11} /> {session.time}
                                   </span>
@@ -1109,7 +1121,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                         "حاضنات لمشاريع الذكاء الاصطناعي وحلول الطاقة",
                       ].map((item, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs font-bold text-right">
-                          <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                          <CheckCircle2 size={16} className="text-[#f8ca14] shrink-0 mt-0.5" />
                           <span className={dark ? "text-slate-200" : "text-slate-800 font-bold"}>{item}</span>
                         </div>
                       ))}
@@ -1182,14 +1194,14 @@ export default function AqeeqSchoolAccreditationsPage() {
                       {isActive && (
                         <motion.div
                           layoutId="activePathwayPill"
-                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 shadow-md ring-1 ring-[#f8ca14]/30"
+                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] shadow-md ring-1 ring-[#f8ca14]/40"
                           transition={{ type: "spring", stiffness: 350, damping: 28 }}
                         />
                       )}
                       <span className="relative z-10 block truncate">{p.label}</span>
                       <span
                         className={`relative z-10 block text-[10px] mt-0.5 truncate ${
-                          isActive ? "text-emerald-200" : "text-slate-500"
+                          isActive ? "text-[#f8ca14]" : "text-slate-500"
                         }`}
                       >
                         {p.sub}
@@ -1208,7 +1220,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-white/10 -translate-y-1/2 z-0">
                 <motion.div
                   style={{ width: beamHeight }}
-                  className="h-full bg-gradient-to-r from-[#015a37] via-emerald-400 to-[#f8ca14] shadow-[0_0_15px_rgba(16,185,129,0.9)]"
+                  className="h-full bg-gradient-to-r from-[#08467d] via-[#f8ca14] to-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.8)]"
                 />
               </div>
 
@@ -1219,7 +1231,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   badge: "المعايير الدولية",
                   desc: "تأسيس لغوي وعلمي متقدم وفق معايير كوجنيا وروبوتات STEM المعتمدة.",
                   icon: Building2,
-                  accent: "text-emerald-400 border-emerald-500/40 bg-emerald-950/40",
+                  accent: "text-[#08467d] border-[#08467d]/30 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/40 dark:bg-[#f8ca14]/10",
                   offset: staggerCol1,
                 },
                 {
@@ -1228,7 +1240,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   badge: "الدبلومة المعتمدة",
                   desc: "اختبار الطالب داخل المدرسة والحصول على Band 7.5+ و 1400+ في SAT.",
                   icon: Award,
-                  accent: "text-amber-400 border-amber-500/40 bg-amber-950/40",
+                  accent: "text-[#f8ca14] border-[#f8ca14]/40 bg-[#f8ca14]/10",
                   offset: staggerCol2,
                 },
                 {
@@ -1246,7 +1258,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   badge: "القبول النهائي",
                   desc: "القبول المباشر دون قيود، والإعفاء من السنة التحضيرية كقائد لرؤية 2030.",
                   icon: Trophy,
-                  accent: "text-[#f8ca14] border-[#f8ca14]/50 bg-yellow-950/40",
+                  accent: "text-[#f8ca14] border-[#f8ca14]/50 bg-[#f8ca14]/15",
                   offset: staggerCol2,
                 },
               ].map((station, sIdx) => {
@@ -1266,9 +1278,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                         <StationIcon size={18} />
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-400 block mb-1">{station.badge}</span>
-                    <h4 className="text-base font-black text-white mb-2">{station.title}</h4>
-                    <p className="text-xs leading-relaxed text-slate-300 font-medium">{station.desc}</p>
+                    <span className="text-[10px] font-bold text-[#f8ca14] block mb-1">{station.badge}</span>
+                    <h4 className={`text-base font-black mb-2 ${dark ? "text-white" : "text-[#08467d]"}`}>{station.title}</h4>
+                    <p className={`text-xs leading-relaxed font-medium ${dark ? "text-slate-300" : "text-slate-600"}`}>{station.desc}</p>
                   </motion.div>
                 );
               })}
@@ -1278,13 +1290,13 @@ export default function AqeeqSchoolAccreditationsPage() {
             <div
               className={`mt-14 rounded-3xl border p-8 sm:p-10 shadow-2xl relative overflow-hidden ${
                 dark
-                  ? "border-emerald-500/30 bg-gradient-to-b from-[#0c161d] to-[#080d12]"
-                  : "border-emerald-700/20 bg-white shadow-xl"
+                  ? "border-[#f8ca14]/30 bg-gradient-to-b from-[#0c161d] to-[#080d12]"
+                  : "border-[#08467d]/20 bg-white shadow-xl"
               }`}
             >
               {activePathway === "saudi" && (
                 <div className="space-y-4 text-right">
-                  <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     القبول في جامعة الملك فهد للبترول والمعادن (KFUPM)، كاوست (KAUST)، وجامعة الملك سعود:
                   </h4>
                   <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
@@ -1299,7 +1311,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>الآيلتس المباشر</span>
-                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>تحقيق Band 6.5 - 7.5</span>
+                      <span className="font-black text-sm text-[#f8ca14]">تحقيق Band 6.5 - 7.5</span>
                       <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
                     </div>
                     <div
@@ -1308,7 +1320,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>القدرات والتحصيلي</span>
-                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>معدلات 90+ و 95+</span>
+                      <span className="font-black text-sm text-[#f8ca14]">معدلات 90+ و 95+</span>
                       <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>برامج تدريب يومية متخصصة ومحاكاة دورية</p>
                     </div>
                     <div
@@ -1317,7 +1329,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>السنة التحضيرية</span>
-                      <span className={`font-black text-sm ${dark ? "text-emerald-400" : "text-emerald-700"}`}>إعفاء واجتياز مباشر</span>
+                      <span className="font-black text-sm text-[#f8ca14]">إعفاء واجتياز مباشر</span>
                       <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>بفضل مناهج العلوم واللغات المتطورة</p>
                     </div>
                   </div>
@@ -1422,7 +1434,7 @@ export default function AqeeqSchoolAccreditationsPage() {
         <div className="container mx-auto px-4 sm:px-6 mb-16">
           {/* Section Header (Compact) */}
           <div className="text-center max-w-xl mx-auto mb-7">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-[11px] font-black text-emerald-400 mb-2 shadow-sm">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 text-[11px] font-black text-[#f8ca14] mb-2 shadow-sm">
               <Radar size={13} className="animate-spin text-[#f8ca14]" style={{ animationDuration: "6s" }} />
               <span>مصفوفة الرصد الأكاديمي المباشر 2030</span>
             </div>
@@ -1444,16 +1456,16 @@ export default function AqeeqSchoolAccreditationsPage() {
             }}
             className={`max-w-4xl mx-auto rounded-[2rem] border shadow-2xl p-5 sm:p-7 relative overflow-hidden backdrop-blur-xl will-change-transform ${
               dark
-                ? "border-emerald-500/30 bg-[#071118]/95 ring-1 ring-emerald-500/20"
-                : "border-emerald-700/20 bg-white/95 shadow-emerald-950/5"
+                ? "border-[#f8ca14]/30 bg-[#071118]/95 ring-1 ring-[#f8ca14]/20"
+                : "border-[#08467d]/20 bg-white shadow-xl"
             }`}
           >
             {/* Top Segmented Controls Row (Apple/Linear Style) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 mb-5 border-b border-white/10 text-right">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 mb-5 border-b text-right ${dark ? "border-white/10" : "border-slate-200"}`}>
               {/* Grade Selector */}
               <div>
-                <span className="text-[10px] font-bold text-slate-400 block mb-1.5">المرحلة الدراسية:</span>
-                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10">
+                <span className={`text-[10px] font-bold block mb-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>المرحلة الدراسية:</span>
+                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-xl border ${dark ? "bg-black/50 border-white/10" : "bg-slate-100 border-slate-200"}`}>
                   {[
                     { id: "primary", label: "الابتدائية 🧸" },
                     { id: "middle", label: "المتوسطة 🎒" },
@@ -1466,7 +1478,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                       className={`py-1.5 px-2 rounded-lg text-xs font-black transition active:scale-95 text-center truncate ${
                         scannerGrade === g.id
                           ? "bg-[#f8ca14] text-black shadow font-black"
-                          : "text-slate-400 hover:text-white"
+                          : dark
+                          ? "text-slate-400 hover:text-white"
+                          : "text-slate-600 hover:text-black font-bold"
                       }`}
                     >
                       {g.label}
@@ -1477,8 +1491,8 @@ export default function AqeeqSchoolAccreditationsPage() {
 
               {/* Ambition Selector */}
               <div>
-                <span className="text-[10px] font-bold text-slate-400 block mb-1.5">الطموح المستقبلي:</span>
-                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10">
+                <span className={`text-[10px] font-bold block mb-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>الطموح المستقبلي:</span>
+                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-xl border ${dark ? "bg-black/50 border-white/10" : "bg-slate-100 border-slate-200"}`}>
                   {[
                     { id: "stem", label: "ذكاء اصطناعي 🤖" },
                     { id: "medicine", label: "طب وعلوم 🩺" },
@@ -1490,8 +1504,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                       onClick={() => selectScannerGoal(goal.id as any)}
                       className={`py-1.5 px-2 rounded-lg text-xs font-black transition active:scale-95 text-center truncate ${
                         scannerGoal === goal.id
-                          ? "bg-emerald-500 text-white shadow font-black"
-                          : "text-slate-400 hover:text-white"
+                          ? "bg-[#f8ca14] text-black shadow font-black"
+                          : dark
+                          ? "text-slate-400 hover:text-white"
+                          : "text-slate-600 hover:text-black font-bold"
                       }`}
                     >
                       {goal.label}
@@ -1506,27 +1522,27 @@ export default function AqeeqSchoolAccreditationsPage() {
               
               {/* Left Column: Sleek Miniature Holographic Radar Screen (5 cols) */}
               <div className="md:col-span-5 flex flex-col items-center justify-center order-2 md:order-1">
-                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border border-emerald-500/40 bg-[#03080c] p-2 shadow-[0_0_35px_rgba(16,185,129,0.2)] select-none">
+                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border border-[#08467d]/50 bg-[#03080c] p-2 shadow-[0_0_35px_rgba(8,70,125,0.3)] select-none">
                   
                   {/* Rotating Compass Outer Rim */}
                   <motion.div
                     style={{ rotate: radarRotateRing }}
-                    className="absolute inset-0.5 rounded-full border border-dashed border-emerald-400/25 pointer-events-none"
+                    className="absolute inset-0.5 rounded-full border border-dashed border-[#f8ca14]/30 pointer-events-none"
                   >
-                    <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono font-black text-emerald-400">N</span>
+                    <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono font-black text-[#f8ca14]">N</span>
                     <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-slate-600">S</span>
                     <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-600">E</span>
                     <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-600">W</span>
                   </motion.div>
 
                   {/* Concentric Rings & Crosshairs */}
-                  <div className="relative h-full w-full rounded-full border border-emerald-500/25 overflow-hidden flex items-center justify-center">
-                    <div className="absolute h-[30%] w-[30%] rounded-full border border-emerald-500/20" />
-                    <div className="absolute h-[60%] w-[60%] rounded-full border border-emerald-500/25" />
-                    <div className="absolute h-[90%] w-[90%] rounded-full border border-emerald-500/20" />
+                  <div className="relative h-full w-full rounded-full border border-[#08467d]/35 overflow-hidden flex items-center justify-center">
+                    <div className="absolute h-[30%] w-[30%] rounded-full border border-[#08467d]/30" />
+                    <div className="absolute h-[60%] w-[60%] rounded-full border border-[#08467d]/35" />
+                    <div className="absolute h-[90%] w-[90%] rounded-full border border-[#08467d]/30" />
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="h-full w-px bg-emerald-500/15" />
-                      <div className="w-full h-px bg-emerald-500/15 absolute" />
+                      <div className="h-full w-px bg-[#08467d]/25" />
+                      <div className="w-full h-px bg-[#08467d]/25 absolute" />
                     </div>
 
                     {/* Continuous 360° Rotating Sweep */}
@@ -1538,10 +1554,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                       <div
                         className="h-1/2 w-1/2 absolute top-0 right-0 origin-bottom-left"
                         style={{
-                          background: "conic-gradient(from 0deg at 0% 100%, rgba(16,185,129,0.3) 0deg, transparent 65deg)",
+                          background: "conic-gradient(from 0deg at 0% 100%, rgba(248,202,20,0.2) 0deg, transparent 65deg)",
                         }}
                       />
-                      <div className="h-1/2 w-0.5 bg-gradient-to-t from-emerald-400 to-transparent absolute top-0 right-1/2 origin-bottom shadow-[0_0_8px_#10b981]" />
+                      <div className="h-1/2 w-0.5 bg-gradient-to-t from-[#f8ca14] to-transparent absolute top-0 right-1/2 origin-bottom shadow-[0_0_8px_#f8ca14]" />
                     </motion.div>
 
                     {/* Shockwave Pulse */}
@@ -1556,8 +1572,8 @@ export default function AqeeqSchoolAccreditationsPage() {
                     {/* Compact Blips */}
                     <div className="absolute top-[20%] right-[22%] z-20 pointer-events-none">
                       <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f8ca14] opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#f8ca14]" />
                       </span>
                     </div>
                     <div className="absolute top-[28%] left-[22%] z-20 pointer-events-none">
@@ -1586,7 +1602,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   </div>
                 </div>
 
-                <span className="text-[9px] font-mono text-emerald-400/70 mt-2 tracking-wider uppercase">
+                <span className={`text-[9px] font-mono mt-2 tracking-wider uppercase ${dark ? "text-[#f8ca14]/80" : "text-[#08467d] font-bold"}`}>
                   RADAR LOCKED · 98.9% MATCH
                 </span>
               </div>
@@ -1595,12 +1611,12 @@ export default function AqeeqSchoolAccreditationsPage() {
               <div className="md:col-span-7 text-right order-1 md:order-2">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span className="text-[10px] font-mono font-black text-[#f8ca14]">PASSPORT #AQ-2030</span>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  <span className="text-[10px] font-mono text-[#f8ca14] bg-[#f8ca14]/10 px-2 py-0.5 rounded-md border border-[#f8ca14]/30 font-bold">
                     TARGET ACQUIRED
                   </span>
                 </div>
 
-                <h4 className="text-base sm:text-lg font-black text-white mb-2">
+                <h4 className={`text-base sm:text-lg font-black mb-2 ${dark ? "text-white" : "text-[#08467d]"}`}>
                   {scannerGrade === "high"
                     ? scannerGoal === "stem"
                       ? "مسار النخبة للذكاء الاصطناعي والهندسة 🤖"
@@ -1615,21 +1631,21 @@ export default function AqeeqSchoolAccreditationsPage() {
                 {/* 3 Clean Bullet Highlights */}
                 <div className="space-y-1.5 text-xs mb-4">
                   <div className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-                    <span className="text-slate-300">
-                      <strong className="text-white">اعتماد كوجنيا (Cognia):</strong> دبلومة دولية معتمدة ومقبولة محلياً وعالمياً.
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-amber-400 shrink-0 mt-0.5" />
-                    <span className="text-slate-300">
-                      <strong className="text-white">مراكز IELTS & SAT:</strong> أداء الاختبارات الرسمية داخل قاعات المدارس.
+                    <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
+                    <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
+                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>اعتماد كوجنيا (Cognia):</strong> دبلومة دولية معتمدة ومقبولة محلياً وعالمياً.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
                     <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
-                    <span className="text-slate-300">
-                      <strong className="text-white">توفير سنة كاملة:</strong> إعفاء مباشر من السنة التحضيرية في الجامعات.
+                    <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
+                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>مراكز IELTS & SAT:</strong> أداء الاختبارات الرسمية داخل قاعات المدارس.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
+                    <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
+                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>توفير سنة كاملة:</strong> إعفاء مباشر من السنة التحضيرية في الجامعات.
                     </span>
                   </div>
                 </div>
@@ -1638,7 +1654,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
                   <Button
                     onClick={() => navigate("/admissions")}
-                    className="rounded-xl bg-gradient-to-r from-[#015a37] to-emerald-700 hover:opacity-95 text-white px-5 py-2.5 text-xs font-black shadow-md transition active:scale-95"
+                    className="rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/40 px-5 py-2.5 text-xs font-black shadow-md transition active:scale-95"
                   >
                     <span>حجز مقعد دراسي ✦</span>
                   </Button>
@@ -1696,7 +1712,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                 <div
                   key={fIdx}
                   className={`rounded-2xl border transition overflow-hidden ${
-                    dark ? "border-white/10 bg-[#0c1218]" : "border-emerald-950/10 bg-white shadow-sm"
+                    dark ? "border-white/10 bg-[#0c1218]" : "border-[#08467d]/15 bg-white shadow-sm"
                   }`}
                 >
                   <button
@@ -1704,12 +1720,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                     onClick={() => setOpenFaqIndex(openFaqIndex === fIdx ? null : fIdx)}
                     className="w-full p-5 text-right font-black text-sm flex items-center justify-between gap-4"
                   >
-                    <span className={dark ? "text-white" : "text-[#0a192f]"}>{faq.q}</span>
+                    <span className={dark ? "text-white" : "text-[#08467d]"}>{faq.q}</span>
                     <ChevronDown
                       size={16}
-                      className={`shrink-0 text-emerald-500 transition duration-300 ${
-                        openFaqIndex === fIdx ? "rotate-180" : ""
-                      }`}
+                      className={`shrink-0 transition duration-300 ${
+                        dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                      } ${openFaqIndex === fIdx ? "rotate-180" : ""}`}
                     />
                   </button>
                   {openFaqIndex === fIdx && (

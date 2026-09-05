@@ -200,7 +200,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
       {/* 1. Top Executive Utility Bar */}
       <div className={`hidden sm:block relative z-[140] border-b text-[11px] font-bold py-1.5 transition-colors ${
-        dark ? "border-white/5 bg-[#010f08]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
+        dark ? "border-white/5 bg-[#0c1218]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
       }`}>
         <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
           <div className="flex items-center gap-4">
@@ -208,7 +208,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-top-location"
               data-visual-tag="text"
               data-visual-label="موقع المدارس في الشريط العلوي"
-              className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"
+              className={`flex items-center gap-1.5 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
             >
               <MapPin size={12} />
               <span>{topLocationText}</span>
@@ -219,7 +219,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-top-phone"
               data-visual-tag="text"
               data-visual-label="هاتف المدارس في الشريط العلوي"
-              className="flex items-center gap-1.5 hover:text-emerald-600 transition"
+              className="flex items-center gap-1.5 hover:text-[#f8ca14] transition"
               dir="ltr"
             >
               <PhoneCall size={12} />
@@ -231,7 +231,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-top-email"
               data-visual-tag="text"
               data-visual-label="إيميل المدارس في الشريط العلوي"
-              className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 transition"
+              className="hidden md:flex items-center gap-1.5 hover:text-[#f8ca14] transition"
               dir="ltr"
             >
               <Mail size={12} />
@@ -248,9 +248,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-id="header-top-portals"
                 data-visual-tag="text"
                 data-visual-label="زر بوابات الخدمات"
-                className="flex items-center gap-1 hover:text-emerald-600 transition cursor-pointer"
+                className="flex items-center gap-1 hover:text-[#f8ca14] transition cursor-pointer"
               >
-                <Server size={12} className="text-emerald-500" />
+                <Server size={12} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
                 <span>{topPortalsText}</span>
                 <ChevronDown size={11} className={`opacity-60 transition-transform ${portalsOpen ? "rotate-180" : ""}`} />
               </button>
@@ -262,7 +262,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
                   }`}
                 >
-                  <div className="text-[10px] text-emerald-500 font-black px-2 py-1 flex items-center gap-1.5">
+                  <div className={`text-[10px] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-black px-2 py-1 flex items-center gap-1.5`}>
                     <GraduationCap size={12} />
                     <span>خدمات أولياء الأمور والطلاب</span>
                   </div>
@@ -271,7 +271,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-700 dark:text-amber-300"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10 text-amber-700 dark:text-amber-300"
                   >
                     <span className="flex items-center gap-1.5">
                       <FileText size={12} />
@@ -284,7 +284,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span className="flex items-center gap-1.5">
                       <Smartphone size={12} />
@@ -301,7 +301,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>نظام Odoo الإداري</span>
                     <ExternalLink size={12} className="opacity-60" />
@@ -311,7 +311,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>البريد الإلكتروني الرسمي</span>
                     <ExternalLink size={12} className="opacity-60" />
@@ -321,7 +321,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>سحابة العقيق الرقمية</span>
                     <ExternalLink size={12} className="opacity-60" />
@@ -331,7 +331,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>بوابة التذاكر والصيانة</span>
                     <ExternalLink size={12} className="opacity-60" />
@@ -341,7 +341,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
                   >
                     <span>اجتماعات العقيق المرئية</span>
                     <ExternalLink size={12} className="opacity-60" />
@@ -358,7 +358,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-top-jobs"
               data-visual-tag="text"
               data-visual-label="رابط بوابة التوظيف"
-              className="hover:text-emerald-600 transition"
+              className="hover:text-[#f8ca14] transition"
             >
               {topJobsText}
             </a>
@@ -369,7 +369,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       {/* 2. Main Executive Header */}
       <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-xl transition duration-200 ${
         isNationalDay
-          ? dark ? "border-emerald-500/20 bg-[#01140c]/90" : "border-emerald-200/80 bg-white/95"
+          ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
           : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
       }`}>
         <div className="relative mx-auto h-[66px] sm:h-[78px] max-w-[1380px] px-3.5 sm:px-6 md:px-8 flex items-center justify-between">
@@ -412,12 +412,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
                 className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
                   dark
-                    ? "bg-gradient-to-r from-[#005A36]/30 to-[#5aba1c]/20 border-[#5aba1c]/40 text-[#5aba1c]"
-                    : "bg-emerald-50 border-emerald-600/30 text-[#005A36]"
+                    ? "bg-gradient-to-r from-[#08467d]/30 to-[#042442]/20 border-[#f8ca14]/40 text-[#f8ca14]"
+                    : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
                 }`}
               >
                 <span>🇸🇦</span>
-                <span className={`font-bold ${dark ? "text-white" : "text-[#005A36]"}`}>عزّنا بطبعنا</span>
+                <span className={`font-bold ${dark ? "text-white" : "text-[#08467d]"}`}>عزّنا بطبعنا</span>
               </button>
             )}
           </div>
@@ -543,7 +543,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 ${
                 dark
                   ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                  : "bg-gradient-to-r from-[#015a37] to-emerald-700 text-white hover:opacity-95 shadow-emerald-950/25"
+                  : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
               }`}
             >
               <span>{ctaButtonText}</span>
@@ -588,7 +588,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                             dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
                           } rounded-xl mb-1 text-right transition`}
                         >
-                          <PencilRuler size={15} className="text-emerald-500 shrink-0" />
+                          <PencilRuler size={15} className="text-[#f8ca14] shrink-0" />
                           <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
                         </button>
 
@@ -635,8 +635,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 disabled={isDeploying}
                 className={`hidden sm:grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
                   isDeploying
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 cursor-wait opacity-70"
-                    : "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400 hover:shadow-emerald-500/20"
+                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] cursor-wait opacity-70"
+                    : "border-[#f8ca14]/50 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14] hover:shadow-[#f8ca14]/20"
                 }`}
                 title="نشر التعديلات على الموقع المباشر 🚀"
               >
@@ -750,7 +750,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   dark ? "bg-white/[0.04] border-white/10" : "bg-slate-100/90 border-slate-200/80"
                 }`}>
                   <div className="flex items-center gap-2.5">
-                    <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-slate-400"}`} />
+                    <span className={`h-2.5 w-2.5 rounded-full ${isAuthenticated ? "bg-[#f8ca14] animate-pulse shadow-[0_0_8px_rgba(248,202,20,0.7)]" : "bg-slate-400"}`} />
                     <div>
                       <span className={`text-xs font-black block leading-tight ${dark ? "text-white" : "text-slate-900"}`}>
                         {isAuthenticated ? (user?.name || "المشرف العام") : "مرحباً بك في مدارس العقيق"}
@@ -797,7 +797,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   className={`w-full flex items-center justify-center gap-2 rounded-2xl h-12 text-sm font-black shadow-lg transition active:scale-[.98] ${
                     dark
                       ? "bg-gradient-to-l from-[#f8ca14] via-amber-400 to-amber-500 text-slate-950 shadow-amber-400/20"
-                      : "bg-gradient-to-l from-[#015a37] via-emerald-700 to-emerald-800 text-white shadow-emerald-950/25"
+                      : "bg-gradient-to-l from-[#08467d] via-[#063560] to-[#042442] text-white shadow-[#08467d]/25"
                   }`}
                 >
                   <Send size={16} />
@@ -806,7 +806,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
                 {/* 3. Group 1: المسار الأكاديمي والمدارس */}
                 <div>
-                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className={`px-2 pb-1.5 text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} uppercase tracking-wider flex items-center gap-1.5`}>
                     <span>🏛️</span>
                     <span>مدارسنا والمسار التعليمي</span>
                   </div>
@@ -820,12 +820,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "studio"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>الصفحة الرئيسية</span>
-                      {currentActive === "studio" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "studio" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -833,12 +833,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/about")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "about"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>عن مدارس العقيق الأهلية والدولية</span>
-                      {currentActive === "about" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "about" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -846,19 +846,19 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/accreditations")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "accreditations"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>الاعتمادات ومراكز الاختبارات (Cognia / IELTS)</span>
-                      {currentActive === "accreditations" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "accreditations" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
                   </div>
                 </div>
 
                 {/* 4. Group 2: القبول والتسجيل وبوابة أولياء الأمور */}
                 <div>
-                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className={`px-2 pb-1.5 text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} uppercase tracking-wider flex items-center gap-1.5`}>
                     <span>🎓</span>
                     <span>القبول والتسجيل وخدمات أولياء الأمور</span>
                   </div>
@@ -872,12 +872,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/admissions")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "admissions"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>جدول الرسوم الدراسية المعتمد</span>
-                      {currentActive === "admissions" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "admissions" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -888,7 +888,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       }`}
                     >
                       <span>نموذج حجز مقعد دراسي فوري</span>
-                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">متاح الآن</span>
+                      <span className={`text-[10px] font-bold ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>متاح الآن</span>
                     </button>
 
                     <a
@@ -919,7 +919,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
                 {/* 5. Group 3: المركز الإعلامي والمحتوى */}
                 <div>
-                  <div className="px-2 pb-1.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className={`px-2 pb-1.5 text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} uppercase tracking-wider flex items-center gap-1.5`}>
                     <span>📰</span>
                     <span>المركز الإعلامي والمحتوى</span>
                   </div>
@@ -933,12 +933,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/journal")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "journal"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>مجلة العقيق الدورية</span>
-                      {currentActive === "journal" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "journal" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -946,12 +946,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/albums")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "albums"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>ألبومات الفعاليات والأنشطة</span>
-                      {currentActive === "albums" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "albums" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -959,12 +959,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/atheer")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "podcast"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>أثير — الاستوديو الصوتي والبودكاست</span>
-                      {currentActive === "podcast" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "podcast" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -972,12 +972,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/offers")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "showcase"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>الأخبار والإعلانات المدرسية</span>
-                      {currentActive === "showcase" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "showcase" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
 
                     <button
@@ -985,12 +985,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       onClick={() => go("/articles")}
                       className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-black transition ${
                         currentActive === "articles"
-                          ? dark ? "bg-emerald-500/15 text-[#f8ca14]" : "bg-emerald-50 text-[#015a37]"
+                          ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
                           : dark ? "text-slate-100 hover:bg-white/5" : "text-slate-900 hover:bg-white"
                       }`}
                     >
                       <span>المقالات وأقلام المعلمين والطلاب</span>
-                      {currentActive === "articles" && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">الحالية</span>}
+                      {currentActive === "articles" && <span className={`text-[10px] px-2 py-0.5 rounded-full bg-[#f8ca14]/20 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-bold`}>الحالية</span>}
                     </button>
                   </div>
                 </div>
@@ -1013,7 +1013,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                           : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm"
                       }`}
                     >
-                      <PhoneCall size={15} className="text-emerald-600" />
+                      <PhoneCall size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
                       <span>اتصال هاتفي</span>
                     </a>
                     <a

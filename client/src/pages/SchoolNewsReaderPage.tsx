@@ -185,7 +185,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
             onClick={() => navigate("/journal")}
             className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
               isNationalDay
-                ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
+                ? dark ? "text-[#f8ca14] hover:text-white" : "text-[#08467d] hover:text-[#042442]"
                 : dark ? "text-slate-400 hover:text-amber-300" : "text-[#08467d] hover:text-[#063560]"
             }`}
           >
@@ -198,8 +198,8 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
           className={`flex flex-col gap-3 rounded-[1.65rem] border p-3 md:flex-row md:items-center md:justify-between md:p-4 ${
             isNationalDay
               ? dark
-                ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
-                : "border-emerald-600/20 bg-white/95 shadow-md shadow-emerald-950/5 backdrop-blur-md text-slate-900"
+                ? "border-[#f8ca14]/40 bg-[#0c1218]/90 shadow-[0_15px_40px_rgba(0,0,0,0.5)] backdrop-blur-md"
+                : "border-[#08467d]/20 bg-white/95 shadow-md shadow-[#08467d]/5 backdrop-blur-md text-slate-900"
               : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-200 bg-white shadow-sm"
           }`}
         >
@@ -336,7 +336,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                       ? "bg-gradient-to-r from-[#f8ca14] to-[#facc15] text-black font-black shadow-md"
                       : "bg-amber-300 text-slate-950"
                     : isNationalDay
-                    ? "text-emerald-300 hover:text-white"
+                    ? dark ? "text-[#f8ca14] hover:text-white" : "text-[#08467d] hover:text-[#042442]"
                     : dark ? "text-slate-400" : "text-slate-500"
                 }`}
               />
