@@ -12,32 +12,19 @@
   }
 }
 
-/* ── 🚀 120 FPS / 60 FPS Fluidity & Hardware Acceleration Engine ── */
+/* ── Native Instant Scroll & Performance ─────────────────── */
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  touch-action: manipulation;
 }
 
 body {
   overflow-x: clip;
-  -webkit-overflow-scrolling: touch;
 }
 
-/* Zero touch latency on all interactive controls across mobile */
-button, a, input, select, textarea, [role="button"], label {
-  touch-action: manipulation;
+button, a, input, select, textarea, [role="button"] {
   -webkit-tap-highlight-color: transparent;
-}
-
-/* GPU Compositing Layer for high refresh rate screens */
-.gpu-fluid {
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-  will-change: transform;
 }
 
 /* ── Scrollbar Utilities ─────────────────────────────────── */

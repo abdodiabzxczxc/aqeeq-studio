@@ -180,13 +180,10 @@ function App() {
 
 import { useSiteTheme } from "./lib/useSiteTheme";
 import { useAqeeqStudioTheme } from "./lib/aqeeqStudioTheme";
-import { useAqeeqSmoothScroll } from "./lib/useAqeeqSmoothScroll";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
 import { AqeeqMagneticCursor } from "./components/AqeeqMagneticCursor";
 
 function StudioAppShell() {
-  // تفعيل محرك السلاسة الفائقة للكمبيوتر والموبايل
-  useAqeeqSmoothScroll(true);
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
   const { activeItem } = usePodcastPlayer();
