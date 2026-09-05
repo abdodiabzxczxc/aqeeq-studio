@@ -719,19 +719,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
               {/* 🔍 زر البحث الشامل (Spotlight Search) — Always visible in Left Island */}
               <button
-                onClick={() => setSearchOpen(true)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setSearchOpen((open) => !open);
+                }}
                 data-visual-id="header-icon-search"
                 data-visual-tag="icon"
                 data-visual-label="زر البحث الشامل"
                 className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
-                  dark
+                  searchOpen
+                    ? "border-[#f8ca14] bg-[#f8ca14]/20 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
+                    : dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
                     : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
                 title="البحث الشامل (Ctrl+K)"
                 aria-label="البحث الشامل"
               >
-                <Search size={16} />
+                {searchOpen ? <X size={16} /> : <Search size={16} />}
               </button>
 
               {/* ☀️ / 🌙 زر الإضاءة (Theme Toggle) — Always visible, silky smooth */}
@@ -757,6 +762,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setSearchOpen(false);
                     setMobileMenuOpen((open) => !open);
                   }}
                   className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
@@ -838,26 +844,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 {/* 2. Living Bento Scroll Area */}
                 <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-5 py-3.5 space-y-3 pb-6 scrollbar-hide">
                   
-                  {/* Quick Search Bar inside Menu */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setSearchOpen(true);
-                    }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      dark
-                        ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300"
-                        : "border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Search size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                      <span>ابحث عن أي قسم، مرحلة، أو خدمة...</span>
-                    </span>
-                    <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono">⌘K</kbd>
-                  </button>
-
                   {/* 1. 🏛️ أولاً: الصروح والمسارات المؤسسية لمدارس العقيق */}
                   <div className={`rounded-2xl border p-3 space-y-2 ${
                     dark ? "bg-white/[0.03] border-white/10" : "bg-slate-50/90 border-slate-200/80 shadow-xs"
@@ -1236,6 +1222,9 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </div>
             </>
           )}
+
+          {/* 🔍 Anchored Spotlight Search Cockpit — Drops down right under Search Island */}
+          <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
         </div>
       </div>
     </header>
@@ -1243,9 +1232,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
     {/* Static Spacer in DOM so page content starts cleanly below fixed header */}
     <div className="h-[66px] sm:h-[108px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
-
-      {/* Universal Spotlight Search Dialog */}
-      <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
 
       {/* Global AI Face Recognition Modal */}
       <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
