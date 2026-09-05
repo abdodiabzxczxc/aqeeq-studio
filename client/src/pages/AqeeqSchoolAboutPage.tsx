@@ -994,8 +994,8 @@ export default function AqeeqSchoolAboutPage() {
         </section>
       }
     >
-      {/* Quick Jump Anchor Command Bar — غير لاصق على الموبايل لتجنب ملاحقة المستخدم وحجب المحتوى */}
-      <div className={`relative lg:sticky lg:top-[78px] z-30 border-b py-2.5 px-3 sm:px-4 backdrop-blur-xl transition ${
+      {/* Quick Jump Anchor Command Bar — ثابت في مكانه الطبيعي ولا ينزل مع السكرول */}
+      <div className={`relative z-20 border-b py-2.5 px-3 sm:px-4 backdrop-blur-xl transition ${
         dark ? "bg-black/80 border-white/10" : "bg-white/85 border-slate-200 shadow-sm"
       }`}>
         <div className="container mx-auto max-w-5xl flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-nowrap sm:flex-wrap text-xs font-black py-1">
