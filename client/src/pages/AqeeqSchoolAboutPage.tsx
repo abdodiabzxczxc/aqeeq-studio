@@ -1291,7 +1291,7 @@ export default function AqeeqSchoolAboutPage() {
 
             {/* Campus Switcher Tabs (Boys vs Girls) */}
             <div
-              className={`mt-6 inline-flex items-center rounded-2xl border p-1.5 shadow-sm transition ${
+              className={`mt-6 inline-flex max-w-full items-center rounded-2xl border p-1 sm:p-1.5 shadow-sm transition overflow-hidden ${
                 dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
               }`}
             >
@@ -1302,7 +1302,7 @@ export default function AqeeqSchoolAboutPage() {
                   setActiveFacilityIndex(0);
                   setActiveHotspotId(null);
                 }}
-                className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative z-10 rounded-xl px-3 sm:px-8 py-2 sm:py-2.5 text-xs sm:text-sm font-black transition active:scale-95 min-w-0 ${
                   activeCampusTab === "boys"
                     ? "text-[#f8ca14]"
                     : dark
@@ -1317,7 +1317,10 @@ export default function AqeeqSchoolAboutPage() {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span className="relative z-10">مجمع البنين (الأهلي والدولي) 🎓</span>
+                <span className="relative z-10 block truncate">
+                  <span className="sm:hidden">مجمع البنين 🎓</span>
+                  <span className="hidden sm:inline">مجمع البنين (الأهلي والدولي) 🎓</span>
+                </span>
               </button>
 
               <button
@@ -1327,7 +1330,7 @@ export default function AqeeqSchoolAboutPage() {
                   setActiveFacilityIndex(0);
                   setActiveHotspotId(null);
                 }}
-                className={`relative z-10 rounded-xl px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+                className={`relative z-10 rounded-xl px-3 sm:px-8 py-2 sm:py-2.5 text-xs sm:text-sm font-black transition active:scale-95 min-w-0 ${
                   activeCampusTab === "girls"
                     ? "text-[#f8ca14]"
                     : dark
@@ -1342,7 +1345,10 @@ export default function AqeeqSchoolAboutPage() {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span className="relative z-10">مجمع البنات والطفولة المبكرة 🌸</span>
+                <span className="relative z-10 block truncate">
+                  <span className="sm:hidden">مجمع البنات 🌸</span>
+                  <span className="hidden sm:inline">مجمع البنات والطفولة المبكرة 🌸</span>
+                </span>
               </button>
             </div>
           </div>

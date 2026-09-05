@@ -478,10 +478,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                 }`}
               >
                 {[
-                  { id: "cognia", label: "اعتماد كوجنيا الأمريكية", icon: ShieldCheck, badge: "USA 🇺🇸" },
-                  { id: "ielts", label: "مركز اختبارات IELTS", icon: Globe2, badge: "IDP 🌐" },
-                  { id: "sat", label: "مراكز SAT & ACT الرقمية", icon: BookOpenCheck, badge: "Code #68412" },
-                  { id: "stem", label: "الروبوت والذكاء الاصطناعي", icon: Trophy, badge: "بطل المملكة 🏆" },
+                  { id: "cognia", label: "اعتماد كوجنيا الأمريكية", shortLabel: "اعتماد كوجنيا", icon: ShieldCheck, badge: "USA 🇺🇸" },
+                  { id: "ielts", label: "مركز اختبارات IELTS", shortLabel: "اختبارات IELTS", icon: Globe2, badge: "IDP 🌐" },
+                  { id: "sat", label: "مراكز SAT & ACT الرقمية", shortLabel: "مراكز SAT & ACT", icon: BookOpenCheck, badge: "Code #68412" },
+                  { id: "stem", label: "الروبوت والذكاء الاصطناعي", shortLabel: "الروبوت والذكاء", icon: Trophy, badge: "بطل المملكة 🏆" },
                 ].map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeHubTab === tab.id;
@@ -490,12 +490,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveHubTab(tab.id as any)}
-                      className={`relative flex flex-col items-center justify-center gap-1 rounded-xl py-3 px-2 text-center text-xs font-black transition active:scale-95 ${
+                      className={`relative flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 sm:py-3 sm:px-2 text-center text-xs font-black transition active:scale-95 min-w-0 w-full overflow-hidden ${
                         isActive
                           ? "text-white"
                           : dark
                           ? "text-slate-400 hover:text-white hover:bg-white/5"
-                          : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                          : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
                       }`}
                     >
                       {isActive && (
@@ -505,12 +505,15 @@ export default function AqeeqSchoolAccreditationsPage() {
                           transition={{ type: "spring", stiffness: 350, damping: 28 }}
                         />
                       )}
-                      <div className="relative z-10 flex items-center gap-1.5">
-                        <Icon size={16} className={isActive ? "text-[#f8ca14]" : "text-slate-400"} />
-                        <span className="truncate">{tab.label}</span>
+                      <div className="relative z-10 flex items-center justify-center gap-1 w-full min-w-0 max-w-full px-1">
+                        <Icon size={14} className={`shrink-0 ${isActive ? "text-[#f8ca14]" : "text-slate-400"}`} />
+                        <span className="truncate text-[11px] sm:text-xs font-black leading-tight">
+                          <span className="sm:hidden">{tab.shortLabel}</span>
+                          <span className="hidden sm:inline">{tab.label}</span>
+                        </span>
                       </div>
                       <span
-                        className={`relative z-10 text-[10px] font-bold ${
+                        className={`relative z-10 text-[9.5px] sm:text-[10px] font-bold truncate max-w-full px-1 ${
                           isActive ? "text-[#f8ca14]" : "text-slate-500"
                         }`}
                       >
@@ -1173,9 +1176,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                 }`}
               >
                 {[
-                  { id: "saudi", label: "الجامعات السعودية 🇸🇦", sub: "KFUPM & كاوست" },
-                  { id: "scholarship", label: "برنامج الابتعاث ✈️", sub: "مسار الرواد" },
-                  { id: "global", label: "الجامعات الدولية 🌐", sub: "Harvard & Oxford" },
+                  { id: "saudi", label: "الجامعات السعودية 🇸🇦", shortLabel: "السعودية 🇸🇦", sub: "KFUPM & كاوست" },
+                  { id: "scholarship", label: "برنامج الابتعاث ✈️", shortLabel: "الابتعاث ✈️", sub: "مسار الرواد" },
+                  { id: "global", label: "الجامعات الدولية 🌐", shortLabel: "الدولية 🌐", sub: "Harvard & Oxford" },
                 ].map((p) => {
                   const isActive = activePathway === p.id;
                   return (
@@ -1183,12 +1186,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={p.id}
                       type="button"
                       onClick={() => setActivePathway(p.id as any)}
-                      className={`relative rounded-xl py-2.5 px-2 text-xs font-black transition active:scale-95 text-center ${
+                      className={`relative rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 text-xs font-black transition active:scale-95 text-center min-w-0 w-full overflow-hidden ${
                         isActive
                           ? "text-white"
                           : dark
                           ? "text-slate-400 hover:text-white hover:bg-white/5"
-                          : "text-slate-700 hover:text-[#015a37] hover:bg-slate-50"
+                          : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
                       }`}
                     >
                       {isActive && (
@@ -1198,9 +1201,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                           transition={{ type: "spring", stiffness: 350, damping: 28 }}
                         />
                       )}
-                      <span className="relative z-10 block truncate">{p.label}</span>
+                      <span className="relative z-10 block truncate text-[11px] sm:text-xs font-black">
+                        <span className="sm:hidden">{p.shortLabel}</span>
+                        <span className="hidden sm:inline">{p.label}</span>
+                      </span>
                       <span
-                        className={`relative z-10 block text-[10px] mt-0.5 truncate ${
+                        className={`relative z-10 block text-[9.5px] sm:text-[10px] mt-0.5 truncate px-0.5 ${
                           isActive ? "text-[#f8ca14]" : "text-slate-500"
                         }`}
                       >
