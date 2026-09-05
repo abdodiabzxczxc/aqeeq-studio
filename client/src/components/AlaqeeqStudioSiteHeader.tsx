@@ -408,13 +408,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
             }`
       }`}>
-        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between transition-[height,padding] duration-300 ease-out ${
+        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between lg:grid lg:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
           isScrolled
-            ? "px-3 sm:px-6 h-[54px] sm:h-[62px] pointer-events-none"
+            ? "px-3.5 sm:px-6 md:px-8 h-[54px] sm:h-[62px] pointer-events-none"
             : "px-3.5 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
           {/* Logo with clean branding — Permanently rounded pill island, zero circle morphing */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 lg:justify-self-start">
             <div className={`rounded-full flex items-center transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${
               isScrolled
                 ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-3 sm:px-4 py-1.5 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
@@ -474,13 +474,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </div>
           </div>
 
-          {/* Center 9 Core Navigation Links (Desktop) — Liquid exit/enter animation on scroll */}
+          {/* Center 9 Core Navigation Links (Desktop) — Isolated in Grid Center with zero horizontal drift */}
           <nav
             dir="rtl"
-            className={`hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-[opacity,transform,max-height] duration-300 ease-out ${
+            className={`hidden lg:flex items-center justify-self-center gap-2 xl:gap-4 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-[opacity,transform] duration-250 ease-out ${
               isScrolled
-                ? "opacity-0 -translate-y-2 pointer-events-none max-h-0 overflow-hidden"
-                : "opacity-100 translate-y-0 pointer-events-auto max-h-16"
+                ? "opacity-0 -translate-y-2 pointer-events-none"
+                : "opacity-100 translate-y-0 pointer-events-auto"
             }`}
           >
               {/* 1. الرئيسية */}
@@ -590,7 +590,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </nav>
 
           {/* Left Action Buttons — Permanently rounded pill island, zero circle morphing */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 lg:justify-self-end">
             <div
               dir="ltr"
               className={`rounded-full flex items-center shrink-0 transition-[background-color,border-color,box-shadow,padding,gap] duration-300 ease-out ${
@@ -601,10 +601,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             >
               {/* Desktop Collapsible Extra Action Items (Glide away smoothly on scroll without layout snap) */}
               <div
-                className={`hidden sm:flex items-center gap-2 transition-[max-width,opacity,transform] duration-300 ease-out overflow-hidden ${
+                className={`hidden sm:flex items-center gap-2 transition-[max-width,opacity] duration-300 ease-out overflow-hidden ${
                   isScrolled
-                    ? "max-w-0 opacity-0 -translate-x-3 pointer-events-none"
-                    : "max-w-[420px] opacity-100 translate-x-0 pointer-events-auto"
+                    ? "max-w-0 opacity-0 pointer-events-none"
+                    : "max-w-[420px] opacity-100 pointer-events-auto"
                 }`}
               >
                 {/* Primary Executive CTA Button */}
