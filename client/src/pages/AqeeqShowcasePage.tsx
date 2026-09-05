@@ -95,7 +95,7 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
       <div className="absolute inset-0 grid place-items-center">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-[0_0_30px_rgba(225,29,72,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/yt:scale-110 group-hover/yt:shadow-[0_0_45px_rgba(244,63,94,0.9)]">
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-red-600 to-[#de191e] text-white shadow-[0_0_30px_rgba(225,29,72,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/yt:scale-110 group-hover/yt:shadow-[0_0_45px_rgba(244,63,94,0.9)]">
           <Play size={22} className="mr-0.5 fill-current" />
         </div>
       </div>
@@ -205,8 +205,8 @@ function MediaPostCard({
           data-no-visual-edit="true"
           className={`group/card relative mb-6 break-inside-avoid overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
             dark
-              ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28]/90 via-[#090b14]/90 to-[#04060c] text-white shadow-[0_16px_45px_rgba(99,102,241,0.18)] hover:border-indigo-400 hover:shadow-[0_22px_65px_rgba(99,102,241,0.35)]"
-              : "border-indigo-300/80 bg-gradient-to-b from-indigo-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(99,102,241,0.1)] hover:border-indigo-500"
+              ? "border-[#08467d]/40 bg-gradient-to-b from-[#06182e]/90 via-[#030d19]/90 to-[#02070e] text-white shadow-[0_16px_45px_rgba(8,70,125,0.25)] hover:border-[#f8ca14] hover:shadow-[0_22px_65px_rgba(248,202,20,0.25)]"
+              : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
           }`}
         >
           {/* Specular glare following cursor */}
@@ -217,14 +217,16 @@ function MediaPostCard({
             }}
           />
           {/* Top Bar Header inside Card */}
-          <div className="flex items-center justify-between border-b border-indigo-500/20 pb-2.5 mb-3.5">
+          <div className="flex items-center justify-between border-b border-[#08467d]/20 pb-2.5 mb-3.5">
             <div className="flex items-center gap-1.5">
-              <span className="grid h-6 w-6 place-items-center rounded-lg bg-indigo-600 text-white shadow-sm">
+              <span className="grid h-6 w-6 place-items-center rounded-lg bg-[#08467d] text-[#f8ca14] shadow-sm">
                 <Video size={12} />
               </span>
-              <span className="text-[11px] font-black text-indigo-400">تغطية مرئية 4K</span>
+              <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>تغطية مرئية 4K</span>
             </div>
-            <span className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[9px] font-black text-indigo-300 border border-indigo-500/30">
+            <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-black border ${
+              dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/20"
+            }`}>
               فيديو
             </span>
           </div>
@@ -237,7 +239,7 @@ function MediaPostCard({
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPost(); } }}
             data-aqeeq-video="true"
             data-no-visual-edit="true"
-            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#08467d]"
           >
             <img
               src={getAqeeqShowcaseDisplaySource(post)}
@@ -250,7 +252,7 @@ function MediaPostCard({
 
             {/* Centered Glowing Play Button */}
             <div className="absolute inset-0 grid place-items-center pointer-events-none">
-              <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(6,182,212,0.9)] group-active:scale-95">
+              <div className="grid h-14 w-14 place-items-center rounded-full bg-[#08467d] text-[#f8ca14] shadow-[0_0_30px_rgba(8,70,125,0.8)] ring-4 ring-white/30 transition-all duration-300 group-hover/screen:scale-110 group-hover/screen:shadow-[0_0_45px_rgba(248,202,20,0.6)] group-active:scale-95">
                 <Play size={22} className="mr-0.5 fill-current" />
               </div>
             </div>
@@ -276,14 +278,14 @@ function MediaPostCard({
                 className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
               />
             ) : (
-              <p className="mt-1 text-xs font-bold text-indigo-400/80">من أخبار وعروض العقيق</p>
+              <p className={`mt-1 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من أخبار وعروض العقيق</p>
             )}
           </div>
 
           {/* Bottom Action Capsule */}
           <div
             className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
-              dark ? "border-indigo-500/20 bg-black/40" : "border-indigo-200 bg-white shadow-sm"
+              dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -292,12 +294,12 @@ function MediaPostCard({
                 onClick={handleLike}
                 className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
                   liked
-                    ? "bg-rose-500/20 text-rose-400"
-                    : "text-slate-400 hover:text-rose-400"
+                    ? "bg-[#de191e]/20 text-[#de191e]"
+                    : "text-slate-400 hover:text-[#de191e]"
                 }`}
                 title="إعجاب"
               >
-                <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+                <Heart size={12} className={liked ? "fill-[#de191e] text-[#de191e]" : ""} />
                 <span>{likeCount}</span>
               </button>
               <ViewCount post={post} />
@@ -308,7 +310,7 @@ function MediaPostCard({
               onClick={openPost}
               data-aqeeq-video="true"
               data-no-visual-edit="true"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#08467d] hover:bg-[#063560] text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
             >
               <span>عرض كامل</span>
               <ArrowUpLeft size={13} />
@@ -345,14 +347,14 @@ function MediaPostCard({
           }}
         />
         {/* Top Bar Header inside Card */}
-        <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3.5">
+        <div className={`flex items-center justify-between border-b pb-2.5 mb-3.5 ${dark ? "border-amber-500/20" : "border-amber-200"}`}>
           <div className="flex items-center gap-1.5">
             <span className="grid h-6 w-6 place-items-center rounded-lg bg-amber-500 text-black shadow-sm">
               <ImageIcon size={12} />
             </span>
-            <span className="text-[11px] font-black text-amber-400">معرض صور HD</span>
+            <span className={`text-[11px] font-black ${dark ? "text-amber-400" : "text-amber-800"}`}>معرض صور HD</span>
           </div>
-          <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[9px] font-black text-amber-300 border border-amber-500/30">
+          <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-black border ${dark ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-amber-100 text-amber-900 border-amber-300"}`}>
             {hasMultiple ? `${groupItems.length} صور` : "صورة"}
           </span>
         </div>
@@ -422,7 +424,7 @@ function MediaPostCard({
               className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
             />
           ) : (
-            <p className="mt-1 text-xs font-bold text-amber-400/80">من أخبار وعروض العقيق</p>
+            <p className={`mt-1 text-xs font-bold ${dark ? "text-amber-400/80" : "text-amber-800"}`}>من أخبار وعروض العقيق</p>
           )}
         </div>
 
@@ -438,12 +440,12 @@ function MediaPostCard({
               onClick={handleLike}
               className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
                 liked
-                  ? "bg-rose-500/20 text-rose-400"
-                  : "text-slate-400 hover:text-rose-400"
+                  ? "bg-[#de191e]/20 text-[#de191e]"
+                  : "text-slate-400 hover:text-[#de191e]"
               }`}
               title="إعجاب"
             >
-              <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+              <Heart size={12} className={liked ? "fill-[#de191e] text-[#de191e]" : ""} />
               <span>{likeCount}</span>
             </button>
             <ViewCount post={post} />
@@ -553,8 +555,8 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
       }}
       className={`group/card relative mb-6 break-inside-avoid overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
         dark
-          ? "border-violet-500/40 bg-gradient-to-b from-[#150926]/90 via-[#0d0718]/90 to-[#04020a] text-white shadow-[0_16px_45px_rgba(139,92,246,0.18)] hover:border-violet-400 hover:shadow-[0_22px_60px_rgba(139,92,246,0.32)]"
-          : "border-violet-300/80 bg-gradient-to-b from-violet-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(139,92,246,0.08)] hover:border-violet-500"
+          ? "border-[#08467d]/35 bg-gradient-to-b from-[#051120]/90 via-[#030b14]/90 to-[#010408] text-white shadow-[0_16px_45px_rgba(8,70,125,0.2)] hover:border-[#f8ca14] hover:shadow-[0_22px_60px_rgba(248,202,20,0.25)]"
+          : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
       }`}
     >
       {/* Specular glare following cursor */}
@@ -565,22 +567,24 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
         }}
       />
       {/* Top Bar Header inside Card */}
-      <div className="flex items-center justify-between border-b border-violet-500/20 pb-2.5 mb-3.5">
+      <div className="flex items-center justify-between border-b border-[#08467d]/20 pb-2.5 mb-3.5">
         <div className="flex items-center gap-1.5">
-          <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-r from-violet-600 to-rose-600 text-white shadow-sm">
+          <span className="grid h-6 w-6 place-items-center rounded-lg bg-[#08467d] text-[#f8ca14] shadow-sm">
             <Share2 size={12} />
           </span>
-          <span className="text-[11px] font-black text-violet-400">
+          <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
             {post.sourceType === "x" ? "منصة 𝕏 الرسمية" : isInstagram ? "إنستغرام العقيق" : "يوتيوب العقيق"}
           </span>
         </div>
-        <span className="rounded-full bg-violet-500/20 px-2.5 py-0.5 text-[9px] font-black text-violet-300 border border-violet-500/30">
+        <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-black border ${
+          dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/20"
+        }`}>
           {post.sourceType === "x" ? "X" : isInstagram ? "Instagram" : "YouTube"}
         </span>
       </div>
 
       {/* Embed Frame */}
-      <div className="overflow-hidden rounded-2xl border border-violet-500/30 bg-black">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
         {post.sourceType === "x" ? (
           <XPostEmbed post={post} dark={dark} />
         ) : isInstagram ? (
@@ -610,14 +614,14 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
             className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
           />
         ) : (
-          <p className="mt-1 text-xs font-bold text-violet-400/80">من منصات تواصل العقيق الرسمية</p>
+          <p className={`mt-1 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من منصات تواصل العقيق الرسمية</p>
         )}
       </div>
 
       {/* Bottom Action Capsule */}
       <div
         className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
-          dark ? "border-violet-500/20 bg-black/40" : "border-violet-200 bg-white shadow-sm"
+          dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
         }`}
       >
         <div className="flex items-center gap-2">
@@ -626,12 +630,12 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
             onClick={handleLike}
             className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
               liked
-                ? "bg-rose-500/20 text-rose-400"
-                : "text-slate-400 hover:text-rose-400"
+                ? "bg-[#de191e]/20 text-[#de191e]"
+                : "text-slate-400 hover:text-[#de191e]"
             }`}
             title="إعجاب"
           >
-            <Heart size={12} className={liked ? "fill-rose-500 text-rose-500" : ""} />
+            <Heart size={12} className={liked ? "fill-[#de191e] text-[#de191e]" : ""} />
             <span>{likeCount}</span>
           </button>
           <ViewCount post={post} />
@@ -642,7 +646,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
           href={postUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-rose-600 hover:from-violet-500 hover:to-rose-500 text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#08467d] hover:bg-[#063560] text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
         >
           <span>فتح المصدر</span>
           <ArrowUpLeft size={13} />

@@ -71,8 +71,8 @@ export function MobileStickyActionBar() {
       ? "from-[#f8ca14] to-amber-500 text-black shadow-amber-500/25"
       : "from-[#005a37] to-emerald-700 text-white shadow-emerald-900/30"
     : dark
-    ? "from-emerald-500 to-[#005a37] text-white shadow-emerald-900/40"
-    : "from-[#005a37] to-emerald-700 text-white shadow-emerald-900/25";
+    ? "from-[#f8ca14] to-amber-500 text-black shadow-amber-500/30"
+    : "from-[#08467d] to-[#063560] text-white shadow-[#08467d]/25";
 
   return (
     <div

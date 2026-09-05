@@ -75,19 +75,19 @@
   background: #34d399;
 }
 
-/* Colors for Video Theater (Indigo / Sky) */
+/* Colors for Video Theater (Royal Navy) */
 .scroll-indigo {
-  scrollbar-color: rgba(99, 102, 241, 0.7) rgba(255, 255, 255, 0.06);
+  scrollbar-color: rgba(8, 70, 125, 0.7) rgba(255, 255, 255, 0.06);
 }
 .scroll-indigo::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #6366f1, #38bdf8);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(90deg, #08467d, #0a589e);
+  box-shadow: 0 0 10px rgba(8, 70, 125, 0.4);
 }
 .scroll-indigo.custom-scroll-y::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #6366f1, #38bdf8);
+  background: linear-gradient(180deg, #08467d, #0a589e);
 }
 .scroll-indigo::-webkit-scrollbar-thumb:hover {
-  background: #818cf8;
+  background: #08467d;
 }
 
 /* Colors for Anthems & Vinyl (Amber / Gold) */
@@ -114,7 +114,7 @@
   scrollbar-color: #059669 rgba(0, 0, 0, 0.08);
 }
 :root:not(.dark) .scroll-indigo {
-  scrollbar-color: #4f46e5 rgba(0, 0, 0, 0.08);
+  scrollbar-color: #08467d rgba(0, 0, 0, 0.08);
 }
 :root:not(.dark) .scroll-amber {
   scrollbar-color: #d97706 rgba(0, 0, 0, 0.08);
@@ -880,11 +880,39 @@ body.light #root {
     transition: transform 240ms var(--aq-ease), border-color 240ms var(--aq-ease), box-shadow 240ms var(--aq-ease);
   }
 
+  html.light .aq-public-header,
+  body.light .aq-public-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+  }
+
+  html.light .aq-header-link,
+  body.light .aq-header-link {
+    color: #334155;
+  }
+  html.light .aq-header-link:hover,
+  body.light .aq-header-link:hover {
+    color: #08467d;
+  }
+
+  html.light .aq-editorial-panel,
+  body.light .aq-editorial-panel {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+  }
+
   .aq-chapter-label {
     color: var(--aq-gold);
     font-size: .69rem;
     font-weight: 900;
     letter-spacing: .14em;
+  }
+
+  html.light .aq-chapter-label,
+  body.light .aq-chapter-label {
+    color: #08467d;
   }
 
   .aq-action {
@@ -900,6 +928,19 @@ body.light #root {
   .aq-action:hover { transform: translateY(-2px); }
   .aq-action-gold { background: var(--aq-gold); color: #17120a; }
   .aq-action-dark { border: 1px solid rgba(229,184,79,.4); background: rgba(229,184,79,.06); color: #f7e9bd; }
+
+  html.light .aq-action-gold,
+  body.light .aq-action-gold {
+    background: #08467d;
+    color: #ffffff;
+  }
+
+  html.light .aq-action-dark,
+  body.light .aq-action-dark {
+    border: 1px solid rgba(8, 70, 125, 0.25);
+    background: rgba(8, 70, 125, 0.08);
+    color: #08467d;
+  }
 
   .aq-admin-surface {
     background:

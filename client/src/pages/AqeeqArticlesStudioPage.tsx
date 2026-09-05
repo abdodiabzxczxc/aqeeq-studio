@@ -367,7 +367,7 @@ export default function AqeeqArticlesStudioPage() {
                             <div className="grid h-full place-items-center text-slate-500 font-black text-xs">✍️</div>
                           )}
                           <span className={`absolute top-1 right-1 h-2 w-2 rounded-full ${
-                            art.status === "published" ? "bg-emerald-400" : art.status === "pending" ? "bg-amber-400 animate-ping" : "bg-rose-500"
+                            art.status === "published" ? "bg-emerald-400" : art.status === "pending" ? "bg-amber-400 animate-ping" : "bg-[#de191e]"
                           }`} />
                         </div>
 
@@ -404,7 +404,7 @@ export default function AqeeqArticlesStudioPage() {
                           ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
                           : selectedArticle.status === "pending"
                           ? "border-amber-500/40 bg-amber-500/10 text-amber-400"
-                          : "border-rose-500/40 bg-rose-500/10 text-rose-400"
+                          : "border-[#de191e]/40 bg-[#de191e]/10 text-[#de191e]"
                       }`}>
                         {selectedArticle.status === "published" ? "✅ منشور للجميع" : selectedArticle.status === "pending" ? "⏳ بانتظار الاعتماد والمراجعة" : "❌ مرفوض"}
                       </span>
@@ -447,7 +447,7 @@ export default function AqeeqArticlesStudioPage() {
                             status: "rejected",
                           })
                         }
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-3.5 py-2 text-xs font-bold transition"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-[#de191e]/30 bg-[#de191e]/10 hover:bg-[#de191e]/20 text-[#de191e] px-3.5 py-2 text-xs font-bold transition"
                       >
                         <XCircle size={15} />
                         <span>رفض</span>
@@ -461,7 +461,7 @@ export default function AqeeqArticlesStudioPage() {
                           deleteMutation.mutate({ id: selectedArticle.id });
                         }
                       }}
-                      className="grid h-9 w-9 place-items-center rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 transition"
+                      className="grid h-9 w-9 place-items-center rounded-xl border border-[#de191e]/30 bg-[#de191e]/10 hover:bg-[#de191e] hover:text-white text-[#de191e] transition"
                       title="حذف المقال"
                     >
                       <Trash2 size={15} />
@@ -534,7 +534,7 @@ export default function AqeeqArticlesStudioPage() {
                             })
                           }
                           disabled={aiPolishMutation.isPending}
-                          className="flex items-center gap-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm"
+                          className="flex items-center gap-1.5 rounded-xl bg-[#08467d]/20 hover:bg-[#08467d]/30 border border-[#f8ca14]/40 text-[#f8ca14] px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm"
                         >
                           {aiPolishMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
                           <span>{aiPolishMutation.isPending ? "المساعد التحريري يكتب..." : "المساعد التحريري (تحسين وصياغة)"}</span>
@@ -588,7 +588,7 @@ export default function AqeeqArticlesStudioPage() {
                             <button
                               type="button"
                               onClick={() => setEditCoverUrl(null)}
-                              className="text-[11px] text-rose-400 hover:underline"
+                              className="text-[11px] text-[#de191e] hover:underline"
                             >
                               إزالة الغلاف
                             </button>
@@ -732,7 +732,7 @@ export default function AqeeqArticlesStudioPage() {
                       })
                     }
                     disabled={aiPolishMutation.isPending || !newContent}
-                    className="flex items-center gap-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#08467d]/20 hover:bg-[#08467d]/30 border border-[#f8ca14]/40 text-[#f8ca14] px-3 py-1.5 text-xs font-bold transition backdrop-blur-sm disabled:opacity-50"
                   >
                     {aiPolishMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
                     <span>{aiPolishMutation.isPending ? "المساعد التحريري يكتب..." : "المساعد التحريري (تحسين وصياغة)"}</span>

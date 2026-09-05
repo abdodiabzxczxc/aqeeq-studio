@@ -237,7 +237,7 @@ export function VisualOverridesDashboardManager({ onNavigateToPage }: VisualOver
           </div>
           <div className={`p-4 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-black/5 bg-white"}`}>
             <span className="text-[11px] font-bold text-slate-400">النصوص المعدلة</span>
-            <p className="text-2xl font-black mt-1 text-sky-500">
+            <p className="text-2xl font-black mt-1 text-[#08467d] dark:text-[#f8ca14]">
               {allOverrides.filter((o: any) => o.elementTag === "text" || !o.elementTag).length}
             </p>
           </div>
@@ -249,7 +249,7 @@ export function VisualOverridesDashboardManager({ onNavigateToPage }: VisualOver
           </div>
           <div className={`p-4 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-black/5 bg-white"}`}>
             <span className="text-[11px] font-bold text-slate-400">الأزرار والروابط</span>
-            <p className="text-2xl font-black mt-1 text-purple-500">
+            <p className="text-2xl font-black mt-1 text-[#08467d] dark:text-[#f8ca14]">
               {allOverrides.filter((o: any) => o.elementTag === "button").length}
             </p>
           </div>
@@ -397,12 +397,12 @@ export function VisualOverridesDashboardManager({ onNavigateToPage }: VisualOver
                             </>
                           ) : item.elementTag === "button" ? (
                             <>
-                              <MousePointerClick size={13} className="text-purple-400" />
+                              <MousePointerClick size={13} className="text-[#08467d] dark:text-[#f8ca14]" />
                               <span>زر</span>
                             </>
                           ) : (
                             <>
-                              <Type size={13} className="text-sky-400" />
+                              <Type size={13} className="text-[#f8ca14]" />
                               <span>نص</span>
                             </>
                           )}
@@ -492,7 +492,7 @@ export function VisualOverridesDashboardManager({ onNavigateToPage }: VisualOver
                             )}
 
                             {item.linkUrl && (
-                              <span className="text-[10px] text-sky-400 font-mono block mt-1">
+                              <span className="text-[10px] text-[#08467d] dark:text-[#f8ca14] font-mono block mt-1">
                                 الرابط: {item.linkUrl}
                               </span>
                             )}
@@ -536,7 +536,7 @@ export function VisualOverridesDashboardManager({ onNavigateToPage }: VisualOver
                                 resetMutation.mutate({ pagePath: item.pagePath, elementId: item.elementId });
                               }
                             }}
-                            className="rounded-lg p-1.5 text-rose-400 hover:bg-rose-500/10 transition"
+                            className="rounded-lg p-1.5 text-[#de191e] hover:bg-[#de191e]/10 transition"
                             title="استعادة الأصل (حذف التعديل)"
                           >
                             <RotateCcw size={13} />

@@ -55,25 +55,25 @@ function ResultCard({ state, onReset }: { state: ScanState; onReset: () => void 
     not_found: {
       bg: "oklch(55% 0.22 25 / 0.12)",
       border: "oklch(55% 0.22 25 / 0.4)",
-      icon: <HelpCircle size={48} className="text-rose-400" />,
+      icon: <HelpCircle size={48} className="text-[#de191e]" />,
       title: "رمز غير موجود ✗",
-      titleColor: "text-rose-400",
+      titleColor: "text-[#de191e]",
       pulse: "oklch(55% 0.22 25 / 0.3)",
     },
     error: {
       bg: "oklch(55% 0.22 25 / 0.12)",
       border: "oklch(55% 0.22 25 / 0.4)",
-      icon: <XCircle size={48} className="text-rose-400" />,
+      icon: <XCircle size={48} className="text-[#de191e]" />,
       title: "خطأ في المعالجة",
-      titleColor: "text-rose-400",
+      titleColor: "text-[#de191e]",
       pulse: "oklch(55% 0.22 25 / 0.3)",
     },
     offline_pending: {
       bg: "oklch(70% 0.14 220 / 0.12)",
       border: "oklch(70% 0.14 220 / 0.45)",
-      icon: <Clock size={48} className="text-sky-300" />,
+      icon: <Clock size={48} className="text-[#f8ca14]" />,
       title: "تم الحفظ دون اتصال",
-      titleColor: "text-sky-300",
+      titleColor: "text-[#f8ca14]",
       pulse: "oklch(70% 0.14 220 / 0.3)",
     },
   };
@@ -390,7 +390,7 @@ export default function ScanGate() {
             )}
             <button
               onClick={() => logout()}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all hover:bg-rose-400/5 text-slate-400 hover:text-rose-400"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all hover:bg-[#de191e]/5 text-slate-400 hover:text-[#de191e]"
               style={{ borderColor: "oklch(28% 0.025 250)" }}
             >
               <LogOut size={14} />
@@ -407,7 +407,7 @@ export default function ScanGate() {
           </div>
         )}
         {isOnline && offlinePending > 0 && (
-          <div className={`mb-4 rounded-xl border px-4 py-3 text-center text-xs ${syncState === "error" ? "border-rose-400/30 bg-rose-400/10 text-rose-200" : "border-sky-400/30 bg-sky-400/10 text-sky-200"}`}>
+          <div className={`mb-4 rounded-xl border px-4 py-3 text-center text-xs ${syncState === "error" ? "border-[#de191e]/30 bg-[#de191e]/10 text-red-200" : "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-amber-200"}`}>
             {syncState === "syncing" ? `تتم مزامنة ${offlinePending} عملية مسح محفوظة محلياً...` : syncState === "error" ? `تعذر مزامنة بعض العمليات. المتبقي: ${offlinePending}` : `عمليات مسح محفوظة محلياً: ${offlinePending}`}
           </div>
         )}
@@ -419,7 +419,7 @@ export default function ScanGate() {
           {[
             { icon: Users, label: "الضيوف", value: stats?.total ?? 0, color: "text-amber-400" },
             { icon: CheckCircle2, label: "الحاضرون", value: stats?.attended ?? 0, color: "text-emerald-400" },
-            { icon: Scan, label: "نسبة الحضور", value: `${attendanceRate}%`, color: "text-sky-400" },
+            { icon: Scan, label: "نسبة الحضور", value: `${attendanceRate}%`, color: "text-[#f8ca14]" },
           ].map((s, i) => (
             <div key={i} className="card-gold-border rounded-xl p-3 flex flex-col items-center gap-1 text-center">
               <s.icon size={18} className={s.color} />

@@ -407,14 +407,14 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           ? dark
             ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
             : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
-          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
+          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f8fafc] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
       <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
         {/* Breadcrumb */}
         <nav className={`flex items-center justify-between gap-2 text-xs font-bold mb-4 ${
-          dark ? 'text-slate-400' : 'text-slate-500'
+          dark ? 'text-slate-400' : 'text-slate-600'
         }`}>
           <div className="flex items-center gap-2">
             <button onClick={() => navigate('/')} className="hover:text-current transition">الرئيسية</button>
@@ -428,7 +428,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
               isNationalDay
                 ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
-                : dark ? "text-amber-400 hover:text-amber-300" : "text-amber-600 hover:text-amber-700"
+                : dark ? "text-amber-400 hover:text-amber-300" : "text-[#08467d] hover:text-[#063560]"
             }`}
           >
             <span>← عودة للألبومات</span>
@@ -441,7 +441,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
               ? dark
                 ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
                 : "border-emerald-600/20 bg-white/95 shadow-md shadow-emerald-950/5 backdrop-blur-md text-slate-900"
-              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
+              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-200 bg-white shadow-sm"
           }`}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -452,7 +452,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                 label="شارة قارئ الألبوم"
                 defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}ألبوم العقيق · ${album.albumDate}`}
                 as="div"
-                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : "text-amber-300")}
+                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-amber-300" : "text-[#08467d] font-black"))}
               />
               <VisualEditable id="album-reader-title" tag="text" label="عنوان الألبوم في القارئ" defaultText={album.title} as="h1" className="truncate text-lg font-black md:text-2xl" />
             </div>
@@ -521,25 +521,31 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
           {isAdmin ? <VisualEditable id="album-reader-manage-action" tag="button" label="زر إدارة الألبوم" defaultText="إدارة الألبوم" as="button" onAction={() => navigate(`/albums/manage?album=${album.slug}`)} className={`grid h-9 w-9 place-items-center rounded-xl border ${dark ? "border-white/10 text-amber-200" : "border-slate-900/10 text-slate-600"}`}><VisualIcon id="album-reader-manage-icon" label="أيقونة إدارة الألبوم" icon="settings" size={16} /></VisualEditable> : null}
         </div>
       </header>
-      <div className="mt-3 flex justify-end"><nav className={`inline-flex rounded-xl border p-1 ${dark ? "border-white/10 bg-[#10141f]" : "border-slate-900/10 bg-white"}`}>{([ ["spread", "الألبوم"], ["scroll", "قراءة طولية"], ["gallery", "كل الصور"] ] as const).map(([id, label]) => <VisualEditable key={id} id={`album-reader-mode-${id}`} tag="button" label={`زر وضع قراءة ${label}`} defaultText={label} as="button" onAction={() => setMode(id)} className={`rounded-lg px-3 py-2 text-[11px] font-black transition ${mode === id ? "bg-amber-300 text-slate-950" : dark ? "text-slate-400" : "text-slate-500"}`} />)}</nav></div>
+      <div className="mt-3 flex justify-end"><nav className={`inline-flex rounded-xl border p-1 ${dark ? "border-white/10 bg-[#10141f]" : "border-slate-200 bg-white shadow-sm"}`}>{([ ["spread", "الألبوم"], ["scroll", "قراءة طولية"], ["gallery", "كل الصور"] ] as const).map(([id, label]) => <VisualEditable key={id} id={`album-reader-mode-${id}`} tag="button" label={`زر وضع قراءة ${label}`} defaultText={label} as="button" onAction={() => setMode(id)} className={`rounded-lg px-3 py-2 text-[11px] font-black transition ${mode === id ? "bg-amber-300 text-slate-950" : dark ? "text-slate-400" : "text-slate-600"}`} />)}</nav></div>
       {album.description ? <VisualEditable id="album-reader-description" tag="text" label="وصف الألبوم في القارئ" defaultText={album.description} as="p" className={`mx-auto mt-4 max-w-4xl text-center text-sm leading-7 ${dark ? "text-slate-400" : "text-slate-600"}`} /> : null}
-      <section className={`relative mt-5 overflow-hidden rounded-[1.9rem] border ${dark ? "border-amber-300/20 bg-[#0d111b]" : "border-amber-700/15 bg-white"}`}>
+      <section className={`relative mt-5 overflow-hidden rounded-[1.9rem] border ${dark ? "border-amber-300/20 bg-[#0d111b]" : "border-slate-200 bg-white shadow-md"}`}>
         {watermark ? <VisualImage id="album-reader-watermark" label="العلامة المائية للألبوم" src={watermark} alt="" className={`pointer-events-none absolute z-0 ${watermarkPlacement} ${dark ? "brightness-0 invert" : ""}`} style={watermarkStyle} /> : null}
 
         {mode === "gallery" ? (
           <div className="relative z-10 space-y-4 p-4 md:p-6">
             {/* Gallery Stats & Action Bar */}
-            <div className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 ${dark ? "border-white/10 bg-[#111522]/90" : "border-slate-900/10 bg-white/90 shadow-sm"}`}>
+            <div className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 ${dark ? "border-white/10 bg-[#111522]/90" : "border-slate-200 bg-white/90 shadow-sm"}`}>
               <div className="flex items-center gap-2">
-                <LayoutGrid size={18} className="text-amber-400" />
+                <LayoutGrid size={18} className={dark ? "text-amber-400" : "text-[#08467d]"} />
                 <span className={`text-xs font-black ${dark ? "text-amber-100" : "text-slate-900"}`}>معرض كل صور الألبوم</span>
-                <span className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[11px] font-bold text-amber-300">{album.media.length} عنصر</span>
+                <span className={`rounded-lg border px-2 py-0.5 text-[11px] font-bold ${
+                  dark ? "border-amber-300/30 bg-amber-300/10 text-amber-300" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                }`}>{album.media.length} عنصر</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => { setIndex(0); setMode("spread"); }}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/40 bg-amber-300/[.08] px-3 py-1.5 text-xs font-black text-amber-200 transition hover:bg-amber-300 hover:text-black active:scale-95"
+                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 ${
+                    dark
+                      ? "border-amber-300/40 bg-amber-300/[.08] text-amber-200 hover:bg-amber-300 hover:text-black"
+                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                  }`}
                 >
                   <BookOpen size={14} />
                   <span>فتح في الألبوم المجسم</span>
@@ -548,7 +554,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                   type="button"
                   onClick={() => download()}
                   className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition active:scale-95 ${
-                    dark ? "border-white/10 text-slate-300 hover:border-amber-300 hover:text-amber-200" : "border-slate-900/10 text-slate-700 hover:bg-amber-50"
+                    dark ? "border-white/10 text-slate-300 hover:border-amber-300 hover:text-amber-200" : "border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
                 >
                   <Download size={14} />
@@ -635,7 +641,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         {mode === "scroll" ? (
           <div className="relative z-10 mx-auto max-w-4xl space-y-5 p-4 md:p-8">
             {(album.media as AlbumItem[]).map((item, mediaIndex) => (
-              <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.8rem] border ${dark ? "border-indigo-500/30 bg-[#090b14]/80" : "border-slate-900/10 bg-white"}`}>
+              <figure id={`aq-album-media-${mediaIndex}`} key={item.id} className={`relative overflow-hidden rounded-[1.8rem] border ${dark ? "border-[#08467d]/30 bg-[#090b14]/80" : "border-slate-900/10 bg-white"}`}>
                 <button type="button" onClick={() => download(item.id)} className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-xl border border-white/25 bg-black/55 text-white shadow-lg transition hover:border-amber-300 hover:bg-amber-300 hover:text-slate-950" title="تحميل الصورة" aria-label="تحميل الصورة"><Download size={16} /></button>
                 <div className={item.mediaType === "video" ? "relative w-full h-[320px] sm:h-[440px] bg-black overflow-hidden" : "max-h-[88vh] bg-black"}>
                   <AlbumMedia item={item} />
@@ -659,8 +665,8 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             onTouchEnd={handleTouchEnd}
           >
             {active?.mediaType === "video" ? (
-              <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] p-4 sm:p-6 shadow-[0_16px_45px_rgba(99,102,241,0.25)]">
-                <div className="relative w-full h-[320px] sm:h-[480px] rounded-2xl overflow-hidden bg-black border border-indigo-500/30">
+              <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-[#08467d]/40 bg-gradient-to-b from-[#08467d]/20 via-[#090b14] to-[#04060c] p-4 sm:p-6 shadow-[0_16px_45px_rgba(8,70,125,0.25)]">
+                <div className="relative w-full h-[320px] sm:h-[480px] rounded-2xl overflow-hidden bg-black border border-[#08467d]/30">
                   <AqeeqVideoPoster
                     sourceUrl={active.mediaUrl}
                     posterUrl={getAqeeqAlbumImageSource(active)}
@@ -670,7 +676,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <h3 className="text-lg font-black text-white">{active.caption || active.fileName}</h3>
-                  <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black text-indigo-300 border border-indigo-500/30">
+                  <span className="rounded-full bg-[#08467d]/30 px-3 py-1 text-xs font-black text-[#f8ca14] border border-[#f8ca14]/30">
                     🎬 تغطية مرئية 4K
                   </span>
                 </div>
@@ -785,7 +791,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
 
             {/* Magazine-style Footer Bar with centered Flip Controls and Page Counter */}
             <div className={`aq-dark-reader-footer relative mx-auto mt-3 flex max-w-5xl flex-col gap-4 rounded-2xl border p-3 md:flex-row md:items-center md:justify-between transition-colors ${
-              dark ? "border-white/10 bg-[#0d1019]/95" : "border-slate-900/10 bg-white/95 shadow-sm"
+              dark ? "border-white/10 bg-[#0d1019]/95" : "border-slate-200 bg-white/95 shadow-md"
             }`}>
               <div className="min-w-0 text-center md:text-right">
                 <div className={`truncate text-xs font-bold ${dark ? "text-slate-100" : "text-slate-800"}`}>

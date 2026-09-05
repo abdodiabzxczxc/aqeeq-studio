@@ -197,7 +197,7 @@ export default function LogoSettingsPage() {
                   onChange={(e) => handleFileUpload(e, "ceremony")}
                 />
               </label>
-              <button onClick={() => setMediaTarget("ceremony")} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-sky-400/30 py-2.5 text-xs font-bold text-sky-200 transition hover:bg-sky-400/[0.06]"><ImageIcon size={15} />اختيار من مكتبة الوسائط</button>
+              <button onClick={() => setMediaTarget("ceremony")} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#08467d]/40 py-2.5 text-xs font-bold text-[#f8ca14] transition hover:bg-[#08467d]/[0.15]"><ImageIcon size={15} />اختيار من مكتبة الوسائط</button>
             </div>
           </div>
 
@@ -235,7 +235,7 @@ export default function LogoSettingsPage() {
                   onChange={(e) => handleFileUpload(e, "school")}
                 />
               </label>
-              <button onClick={() => setMediaTarget("school")} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-sky-400/30 py-2.5 text-xs font-bold text-sky-200 transition hover:bg-sky-400/[0.06]"><ImageIcon size={15} />اختيار من مكتبة الوسائط</button>
+              <button onClick={() => setMediaTarget("school")} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#08467d]/40 py-2.5 text-xs font-bold text-[#f8ca14] transition hover:bg-[#08467d]/[0.15]"><ImageIcon size={15} />اختيار من مكتبة الوسائط</button>
             </div>
           </div>
         </div>

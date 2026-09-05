@@ -41,7 +41,7 @@ export function AqeeqGrandFinaleCta({
               : "border-emerald-600/20 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 shadow-[0_20px_80px_rgba(0,90,54,0.1)]"
             : dark
             ? "border-white/10 bg-gradient-to-br from-[#0a0d16] via-[#080b12] to-[#05070a] shadow-[0_20px_80px_rgba(0,0,0,0.8)]"
-            : "border-black/10 bg-gradient-to-br from-slate-50 via-white to-sky-50/40 shadow-[0_20px_80px_rgba(8,70,125,0.08)]"
+            : "border-black/10 bg-gradient-to-br from-slate-50 via-white to-[#08467d]/5 shadow-[0_20px_80px_rgba(8,70,125,0.08)]"
         }`}
       >
         {/* هالة ضوئية خلفية نيونية */}

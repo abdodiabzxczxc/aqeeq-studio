@@ -259,7 +259,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <div
                   dir="rtl"
                   className={`absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 ${
-                    dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"
+                    dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
                   }`}
                 >
                   <div className="text-[10px] text-emerald-500 font-black px-2 py-1 flex items-center gap-1.5">
@@ -271,7 +271,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-500 dark:text-amber-300"
+                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-emerald-500/10 text-amber-700 dark:text-amber-300"
                   >
                     <span className="flex items-center gap-1.5">
                       <FileText size={12} />
@@ -295,7 +295,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
                   <div className="h-px bg-current/10 my-1" />
 
-                  <div className="text-[10px] text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</div>
                   <a
                     href="https://live.aqeeq.edu.sa"
                     target="_blank"
@@ -570,13 +570,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   <div
                     dir="rtl"
                     className={`absolute left-0 top-full mt-2 w-56 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 p-1.5 ${
-                      dark ? "bg-[#0c0c0c]/95 border-white/10 text-white" : "bg-white/95 border-black/10 text-black"
+                      dark ? "bg-[#0c0c0c]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-2xl"
                     }`}
                   >
-                    <div className="font-black text-xs text-center py-2 text-slate-400">
+                    <div className="font-black text-xs text-center py-2 text-slate-500 dark:text-slate-400">
                       {user?.name || "المشرف العام"}
                     </div>
-                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-black/10"}`} />
+                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-slate-200"}`} />
 
                     {/* Admin Only Actions */}
                     {isAdmin && (
@@ -612,7 +612,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       type="button"
                       onClick={() => { setOptionsOpen(false); handleAuth(); }}
                       className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
-                        dark ? "hover:bg-rose-500/20 text-rose-400" : "hover:bg-rose-50 text-rose-600"
+                        dark ? "hover:bg-[#de191e]/20 text-[#de191e]" : "hover:bg-[#de191e]/10 text-[#de191e]"
                       } rounded-xl text-right transition`}
                     >
                       <LogOut size={15} className="shrink-0" />
@@ -683,7 +683,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               }}
               className={`grid h-10 w-10 place-items-center rounded-xl border transition lg:hidden active:scale-90 cursor-pointer ${
                 mobileMenuOpen
-                  ? "border-rose-500/50 bg-rose-500/15 text-rose-500"
+                  ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
                   : dark
                   ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#015a37]/30 bg-[#015a37]/10 text-[#015a37]"
@@ -734,7 +734,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="grid h-10 w-10 place-items-center rounded-xl border border-rose-500/50 bg-rose-500/15 text-rose-500 active:scale-90 transition cursor-pointer"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e] active:scale-90 transition cursor-pointer"
                 aria-label="إغلاق القائمة"
               >
                 <X size={20} />

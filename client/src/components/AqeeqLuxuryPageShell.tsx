@@ -84,7 +84,7 @@ export function AqeeqLuxuryPageShell({
                 : "bg-emerald-300/30"
               : dark
               ? "bg-[#08467d]/35"
-              : "bg-sky-200/40"
+              : "bg-[#08467d]/10"
           }`}
         />
 

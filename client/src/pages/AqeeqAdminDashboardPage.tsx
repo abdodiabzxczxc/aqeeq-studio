@@ -1094,7 +1094,7 @@ const DEFAULT_ORCHESTRATION = {
                   <span
                     className={"rounded-md px-1.5 py-0.5 text-[10px] font-black " + (
                       tab.key === "admissions"
-                        ? "bg-rose-500 text-white animate-pulse shadow-sm shadow-rose-500/50"
+                        ? "bg-[#de191e] text-white animate-pulse shadow-sm shadow-[#de191e]/50"
                         : active
                         ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white"
                         : dark ? "bg-white/10 text-slate-300" : "bg-slate-200 text-slate-700"
@@ -1181,7 +1181,7 @@ const DEFAULT_ORCHESTRATION = {
                 <Compass size={15} />
                 <span>استوديو الهيدر وشريط الطوارئ 🧭</span>
                 {orchestrationForm.emergencyBanner?.enabled && (
-                  <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+                  <span className="h-2 w-2 rounded-full bg-[#de191e] animate-ping" />
                 )}
               </button>
 
@@ -1327,7 +1327,7 @@ const DEFAULT_ORCHESTRATION = {
                     }}
                     className={`text-xs font-black rounded-2xl px-6 py-2.5 transition shadow-lg gap-2 ${
                       themeForm.activeTheme === "saudi-national-day"
-                        ? "bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-emerald-600/30"
+                        ? "bg-gradient-to-r from-[#005A36] via-[#367453] to-[#2d5e43] hover:from-[#00482b] hover:to-[#254f38] text-white shadow-[#367453]/30"
                         : "bg-white/10 hover:bg-white/20 text-white"
                     }`}
                   >
@@ -2445,8 +2445,8 @@ const DEFAULT_ORCHESTRATION = {
                             dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
                           )}>
                             <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-purple-400">معاينة هيرو صفحة أثير العقيق (/atheer)</span>
-                              <a href="/podcast" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-400 hover:underline">
+                              <span className="text-xs font-black text-[#f8ca14]">معاينة هيرو صفحة أثير العقيق (/atheer)</span>
+                              <a href="/podcast" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#f8ca14] hover:underline">
                                 <span>معاينة الصفحة الحية</span>
                                 <ArrowUpLeft size={13} />
                               </a>
@@ -2484,7 +2484,7 @@ const DEFAULT_ORCHESTRATION = {
                                     });
                                   });
                                 }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-purple-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
+                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-[#f8ca14] bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
                                 style={{ transform: "rotate(3deg)" }}
                                 title="انقر لتغيير حلقة البودكاست المميزة"
                               >
@@ -2492,7 +2492,7 @@ const DEFAULT_ORCHESTRATION = {
                                   {resolvedPodcastCover ? (
                                     <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" />
                                   ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-purple-400 font-bold">الحلقة المميزة</div>
+                                    <div className="grid h-full place-items-center text-[10px] text-[#f8ca14] font-bold">الحلقة المميزة</div>
                                   )}
                                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
                                     <p className="text-[10px] font-black text-white truncate">{resolvedPod?.title || "أحدث حلقة بودكاست"}</p>
@@ -2527,7 +2527,7 @@ const DEFAULT_ORCHESTRATION = {
                             {/* Pickers */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                               <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-purple-400">الحلقة الرئيسية (الغلاف الأول)</label>
+                                <label className="block text-[11px] font-black text-[#f8ca14]">الحلقة الرئيسية (الغلاف الأول)</label>
                                 <div className="flex items-center gap-2">
                                   <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
                                     {resolvedPodcastCover ? <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" /> : null}
@@ -2542,7 +2542,7 @@ const DEFAULT_ORCHESTRATION = {
                                         });
                                       });
                                     }}
-                                    className="flex-1 truncate rounded-xl border border-purple-400/30 bg-purple-400/10 px-3 py-2 text-xs font-black text-purple-400 hover:bg-purple-400 hover:text-black transition text-right"
+                                    className="flex-1 truncate rounded-xl border border-[#f8ca14]/30 bg-[#f8ca14]/10 px-3 py-2 text-xs font-black text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition text-right"
                                   >
                                     {resolvedPod?.title || "اختر من الحلقات..."}
                                   </button>
@@ -2900,9 +2900,9 @@ const DEFAULT_ORCHESTRATION = {
                   </div>
 
                   {/* Girls Campus Card */}
-                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-purple-500/20 bg-[#120f18]" : "border-purple-700/15 bg-white shadow-sm"}`}>
+                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-[#08467d]/40 bg-[#08467d]/10" : "border-[#08467d]/20 bg-white shadow-sm"}`}>
                     <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-purple-500/10 text-purple-400">
+                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#08467d]/20 text-[#08467d] dark:text-[#f8ca14]">
                         <Building2 size={20} />
                       </div>
                       <div>
@@ -3153,7 +3153,7 @@ const DEFAULT_ORCHESTRATION = {
                 )}
               >
                 <div className="flex items-center gap-3 border-b pb-4 border-current/10">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#0b5c9e] text-white">
                     <Layers size={18} />
                   </div>
                   <div>
@@ -3299,7 +3299,7 @@ const DEFAULT_ORCHESTRATION = {
                         setSelectedTrackIds({});
                         setIsImportAudioFolderOpen(true);
                       }}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-xs hover:from-emerald-400 hover:to-teal-400 transition shadow-md shrink-0"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#08467d] text-white font-black text-xs hover:bg-[#063560] transition shadow-md shrink-0"
                       title="استيراد مجلد أغانٍ كامل من Google Drive"
                     >
                       <FolderSync size={15} />
@@ -3362,7 +3362,7 @@ const DEFAULT_ORCHESTRATION = {
                             setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
                             toast.info("تم حذف الأغنية من القائمة مؤقتاً، اضغط حفظ التعديلات لتأكيد الحفظ.");
                           }}
-                          className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition"
+                          className="p-1.5 rounded-lg text-[#de191e] hover:bg-[#de191e]/10 transition"
                           title="حذف الأغنية"
                         >
                           <Trash2 size={15} />
@@ -3388,7 +3388,7 @@ const DEFAULT_ORCHESTRATION = {
                 )}
               >
                 <div className="flex items-center gap-3 border-b pb-4 border-current/10">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#08467d] text-white">
                     <Sliders size={18} />
                   </div>
                   <div>
@@ -3721,15 +3721,15 @@ const DEFAULT_ORCHESTRATION = {
                 <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden ${
                   orchestrationForm.emergencyBanner?.enabled
                     ? orchestrationForm.emergencyBanner?.type === "urgent"
-                      ? dark ? "border-rose-500/40 bg-gradient-to-br from-rose-950/40 to-[#121212]" : "border-rose-300 bg-rose-50/50"
+                      ? dark ? "border-[#de191e]/40 bg-gradient-to-br from-[#de191e]/20 to-[#121212]" : "border-[#de191e]/30 bg-red-50/50"
                       : orchestrationForm.emergencyBanner?.type === "celebration"
                       ? dark ? "border-amber-500/40 bg-gradient-to-br from-amber-950/40 to-[#121212]" : "border-amber-300 bg-amber-50/50"
-                      : dark ? "border-sky-500/40 bg-gradient-to-br from-sky-950/40 to-[#121212]" : "border-sky-300 bg-sky-50/50"
+                      : dark ? "border-[#08467d]/40 bg-gradient-to-br from-[#08467d]/30 to-[#121212]" : "border-[#08467d]/30 bg-blue-50/50"
                     : dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
                 }`}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-current/10 pb-5">
                     <div>
-                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-rose-500/10 text-rose-400 mb-2 border border-rose-500/20">
+                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-[#de191e]/10 text-[#de191e] mb-2 border border-[#de191e]/20">
                         <Megaphone size={14} />
                         <span>شريط الإعلانات والطوارئ الفوري في قمة الموقع</span>
                       </div>
@@ -3754,7 +3754,7 @@ const DEFAULT_ORCHESTRATION = {
                         }
                         className="peer sr-only"
                       />
-                      <div className="peer h-7 w-12 rounded-full bg-slate-700 after:absolute after:top-[3px] after:right-[3px] after:h-5.5 after:w-5.5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:-translate-x-5" />
+                      <div className="peer h-7 w-12 rounded-full bg-slate-700 after:absolute after:top-[3px] after:right-[3px] after:h-5.5 after:w-5.5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#de191e] peer-checked:after:-translate-x-5" />
                     </label>
                   </div>
 
@@ -4091,9 +4091,9 @@ const DEFAULT_ORCHESTRATION = {
 
                   {/* Quick Tip Box */}
                   <div className={`flex items-start gap-3 rounded-2xl p-4 text-xs font-bold ${
-                    dark ? "bg-cyan-950/30 border border-cyan-500/20 text-cyan-200" : "bg-cyan-50 border border-cyan-200 text-cyan-900"
+                    dark ? "bg-[#08467d]/20 border border-[#08467d]/40 text-[#f8ca14]" : "bg-blue-50 border border-[#08467d]/20 text-[#08467d]"
                   }`}>
-                    <Pin size={16} className="shrink-0 mt-0.5 text-cyan-400" />
+                    <Pin size={16} className="shrink-0 mt-0.5 text-[#f8ca14]" />
                     <p className="leading-relaxed">
                       💡 <strong>طريقة التعديل من واجهة الموقع:</strong> عند تفعيل المحرر المرئي في الصفحة الرئيسية، ستظهر لك أيقونة قلم ✏️ بجوار كل كلمة تفاعلية لتعديلها فوراً، كما يمكنك تحريك الماوس فوق البطاقة والنقر على زر <strong>«تثبيت ❄️»</strong> لتجميدها والتعديل المباشر عليها!
                     </p>
@@ -4122,7 +4122,7 @@ const DEFAULT_ORCHESTRATION = {
                           <button
                             type="button"
                             onClick={() => handleDeleteHoverItem(index)}
-                            className="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-500/10 transition cursor-pointer"
+                            className="text-slate-400 hover:text-[#de191e] p-1 rounded-lg hover:bg-[#de191e]/10 transition cursor-pointer"
                             title="حذف هذا العنصر التفاعلي"
                           >
                             <Trash2 size={15} />
@@ -4323,7 +4323,7 @@ const DEFAULT_ORCHESTRATION = {
                   dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
                 }`}>
                   <div className="border-b border-current/10 pb-4">
-                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-purple-500/10 text-purple-400 mb-2 border border-purple-500/20">
+                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-[#08467d]/20 text-[#f8ca14] mb-2 border border-[#f8ca14]/30">
                       <TrendingUp size={14} />
                       <span>تتبع الحملات الإعلانية ومعدلات التحويل</span>
                     </div>
@@ -4356,7 +4356,7 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-black text-sky-400 mb-1">Meta / Facebook Pixel ID 🔵:</label>
+                      <label className="block text-xs font-black text-[#08467d] dark:text-blue-300 mb-1">Meta / Facebook Pixel ID 🔵:</label>
                       <input
                         type="text"
                         value={orchestrationForm.marketingPixels?.metaPixelId || ""}
@@ -4377,7 +4377,7 @@ const DEFAULT_ORCHESTRATION = {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-black text-rose-400 mb-1">TikTok Pixel ID 🎵:</label>
+                      <label className="block text-xs font-black text-[#de191e] mb-1">TikTok Pixel ID 🎵:</label>
                       <input
                         type="text"
                         value={orchestrationForm.marketingPixels?.tiktokPixelId || ""}
@@ -4592,7 +4592,7 @@ const DEFAULT_ORCHESTRATION = {
                       dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
                     }`}>
                       <div className="flex items-center gap-3">
-                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-400/10 text-sky-400 font-black">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d]/15 text-[#08467d] dark:text-[#f8ca14] font-black">
                           <Upload size={22} />
                         </div>
                         <div>
@@ -4736,7 +4736,7 @@ const DEFAULT_ORCHESTRATION = {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-slate-400">ألبومات الفعاليات</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#367453] text-white">
                     <Camera size={18} />
                   </div>
                 </div>
@@ -4752,7 +4752,7 @@ const DEFAULT_ORCHESTRATION = {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-slate-400">الأخبار والوسائط الموثقة</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-rose-600 to-red-500 text-white">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#de191e] to-red-600 text-white">
                     <Clapperboard size={18} />
                   </div>
                 </div>
@@ -4815,23 +4815,23 @@ const DEFAULT_ORCHESTRATION = {
                               dark ? "border-black bg-[#151515]" : "border-white bg-slate-100"
                             )}>
                               {story.sourceType === "instagram" ? (
-                                <Instagram size={18} className="text-pink-500" />
+                                <Instagram size={18} className="text-[#de191e]" />
                               ) : story.sourceType === "x" ? (
                                 <span className="font-black text-sm">𝕏</span>
                               ) : story.sourceType === "youtube" ? (
-                                <span className="text-xs font-black text-red-500">▶</span>
+                                <span className="text-xs font-black text-[#de191e]">▶</span>
                               ) : story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
                               ) : story.sourceType === "article" ? (
-                                <Newspaper size={18} className="text-rose-400" />
+                                <Newspaper size={18} className="text-[#de191e]" />
                               ) : story.sourceType === "podcast" ? (
-                                <Mic size={18} className="text-indigo-400" />
+                                <Mic size={18} className="text-[#f8ca14]" />
                               ) : story.sourceType === "showcase" ? (
-                                <Video size={18} className="text-sky-400" />
+                                <Video size={18} className="text-[#08467d] dark:text-[#f8ca14]" />
                               ) : story.sourceType === "journal" ? (
-                                <BookOpen size={18} className="text-amber-400" />
+                                <BookOpen size={18} className="text-[#f8ca14]" />
                               ) : story.sourceType === "album" ? (
-                                <Camera size={18} className="text-emerald-400" />
+                                <Camera size={18} className="text-[#367453]" />
                               ) : (
                                 <span className="text-[10px] font-black">العقيق</span>
                               )}
@@ -4861,21 +4861,21 @@ const DEFAULT_ORCHESTRATION = {
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-current/10 flex items-center justify-center">
                               {story.sourceType === "instagram" ? (
-                                <Instagram size={16} className="text-pink-500" />
+                                <Instagram size={16} className="text-[#de191e]" />
                               ) : story.sourceType === "x" ? (
                                 <span className="font-black text-xs">𝕏</span>
                               ) : story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
                               ) : story.sourceType === "article" ? (
-                                <Newspaper size={16} className="text-rose-400" />
+                                <Newspaper size={16} className="text-[#de191e]" />
                               ) : story.sourceType === "podcast" ? (
-                                <Mic size={16} className="text-indigo-400" />
+                                <Mic size={16} className="text-[#f8ca14]" />
                               ) : story.sourceType === "showcase" ? (
-                                <Video size={16} className="text-sky-400" />
+                                <Video size={16} className="text-[#08467d] dark:text-[#f8ca14]" />
                               ) : story.sourceType === "journal" ? (
-                                <BookOpen size={16} className="text-amber-400" />
+                                <BookOpen size={16} className="text-[#f8ca14]" />
                               ) : story.sourceType === "album" ? (
-                                <Camera size={16} className="text-emerald-400" />
+                                <Camera size={16} className="text-[#367453]" />
                               ) : (
                                 <span className="text-[9px] font-black">قصة</span>
                               )}
@@ -4930,7 +4930,7 @@ const DEFAULT_ORCHESTRATION = {
                               <div className="flex items-center gap-2 min-w-0">
                                 <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10 flex items-center justify-center opacity-60">
                                   {story.sourceType === "instagram" ? (
-                                    <Instagram size={14} className="text-pink-500" />
+                                    <Instagram size={14} className="text-[#de191e]" />
                                   ) : story.sourceType === "x" ? (
                                     <span className="font-black text-[11px]">𝕏</span>
                                   ) : story.imageUrl ? (
@@ -5035,7 +5035,7 @@ const DEFAULT_ORCHESTRATION = {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <Clapperboard size={18} className="text-rose-400" />
+                      <Clapperboard size={18} className="text-[#de191e]" />
                       <span className="text-xs font-black">إدارة الأخبار والعروض</span>
                     </div>
                     <ArrowUpLeft size={14} className="text-slate-400" />
@@ -5356,7 +5356,7 @@ const DEFAULT_ORCHESTRATION = {
                                 ? "bg-[#f8ca14]/20 text-[#f8ca14]"
                                 : item.type === "album"
                                 ? "bg-emerald-500/20 text-emerald-400"
-                                : "bg-rose-500/20 text-rose-400"
+                                : "bg-[#de191e]/20 text-[#de191e]"
                             )}
                           >
                             {item.typeLabel}
@@ -5600,7 +5600,7 @@ const DEFAULT_ORCHESTRATION = {
                 <div
                   className={"rounded-2xl p-4 text-xs font-black flex items-center justify-between gap-3 shadow-md transition " + (
                     broadcastType === "urgent"
-                      ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white"
+                      ? "bg-gradient-to-r from-[#de191e] via-[#b91519] to-[#8a0f13] text-white"
                       : broadcastType === "celebration"
                       ? "bg-gradient-to-r from-[#d4af37] via-[#f8ca14] to-[#c59b27] text-black"
                       : "bg-gradient-to-r from-[#08467d] via-[#0b5c9e] to-[#08467d] text-white"
@@ -6475,7 +6475,7 @@ const DEFAULT_ORCHESTRATION = {
                           setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
                           toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
                         }}
-                        className="grid h-9 w-9 place-items-center rounded-xl text-rose-400 hover:bg-rose-500/10 transition"
+                        className="grid h-9 w-9 place-items-center rounded-xl text-[#de191e] hover:bg-[#de191e]/10 transition"
                         title="حذف"
                       >
                         <Trash2 size={16} />
@@ -7866,7 +7866,7 @@ const DEFAULT_ORCHESTRATION = {
         <DialogContent className={`max-w-2xl rounded-3xl ${dark ? "bg-[#0d0f15] border-white/10 text-white" : "bg-white border-black/10 text-slate-900"}`} dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2.5 text-base font-black">
-              <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black grid place-items-center shadow-md">
+              <div className="h-9 w-9 rounded-2xl bg-[#08467d] text-white grid place-items-center shadow-md">
                 <FolderSync size={18} />
               </div>
               <div>
@@ -8049,7 +8049,7 @@ const DEFAULT_ORCHESTRATION = {
                 setIsImportAudioFolderOpen(false);
                 toast.success(`تم استيراد ${toAdd.length} نشيد بنجاح! اضغط 'حفظ ونشر التعديلات' بالأعلى لتثبيتها في الموقع.`);
               }}
-              className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 px-5 py-2 text-xs font-black text-black hover:from-emerald-400 hover:to-teal-300 transition shadow-md disabled:opacity-50"
+              className="rounded-xl bg-[#08467d] px-5 py-2 text-xs font-black text-white hover:bg-[#063560] transition shadow-md disabled:opacity-50"
             >
               استيراد الأناشيد المحددة ({Object.values(selectedTrackIds).filter(Boolean).length})
             </button>
@@ -8195,15 +8195,15 @@ const DEFAULT_ORCHESTRATION = {
                       {item.imageUrl ? (
                         <img src={directDriveImage(item.imageUrl) || item.imageUrl} alt="" className="h-full w-full object-cover" />
                       ) : item.type === "article" ? (
-                        <Newspaper size={24} className="text-rose-400" />
+                        <Newspaper size={24} className="text-[#de191e]" />
                       ) : item.type === "podcast" ? (
-                        <Mic size={24} className="text-indigo-400" />
+                        <Mic size={24} className="text-[#f8ca14]" />
                       ) : item.type === "showcase" ? (
-                        <Video size={24} className="text-sky-400" />
+                        <Video size={24} className="text-[#08467d] dark:text-[#f8ca14]" />
                       ) : item.type === "journal" ? (
-                        <BookOpen size={24} className="text-amber-400" />
+                        <BookOpen size={24} className="text-[#f8ca14]" />
                       ) : item.type === "album" ? (
-                        <Camera size={24} className="text-emerald-400" />
+                        <Camera size={24} className="text-[#367453]" />
                       ) : (
                         <span className="text-xs font-black">العقيق</span>
                       )}
@@ -8213,11 +8213,11 @@ const DEFAULT_ORCHESTRATION = {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className={`rounded-md px-2 py-0.5 text-[10px] font-black ${
-                          item.type === "article" ? "bg-rose-500/15 text-rose-400 border border-rose-500/30"
-                          : item.type === "podcast" ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
-                          : item.type === "showcase" ? "bg-sky-500/15 text-sky-400 border border-sky-500/30"
-                          : item.type === "journal" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                          : item.type === "album" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                          item.type === "article" ? "bg-[#de191e]/15 text-[#de191e] border border-[#de191e]/30"
+                          : item.type === "podcast" ? "bg-[#08467d]/30 text-[#f8ca14] border border-[#f8ca14]/30"
+                          : item.type === "showcase" ? "bg-[#08467d]/15 text-[#08467d] dark:text-[#f8ca14] border border-[#08467d]/30"
+                          : item.type === "journal" ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30"
+                          : item.type === "album" ? "bg-[#367453]/15 text-[#367453] border border-[#367453]/30"
                           : "bg-slate-500/15 text-slate-300 border border-slate-500/30"
                         }`}>
                           {item.typeLabel}

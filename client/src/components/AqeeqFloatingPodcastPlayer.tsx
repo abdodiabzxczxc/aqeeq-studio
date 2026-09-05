@@ -1126,12 +1126,12 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 ? "bg-gradient-to-tr from-[#002617] via-[#003822] to-[#005A36] border-[#f8ca14]/80 shadow-[0_12px_36px_rgba(0,90,54,0.6)] ring-2 ring-[#5aba1c]/50 backdrop-blur-2xl"
                 : isVideo
                 ? isDark
-                  ? "bg-gradient-to-tr from-[#0b1022] via-[#0e1635] to-[#122046] border-cyan-400/60 shadow-[0_12px_36px_rgba(6,182,212,0.45)] ring-2 ring-cyan-400/30"
-                  : "bg-gradient-to-tr from-[#ecfeff] via-[#f8fafc] to-[#ffffff] border-cyan-400 shadow-[0_10px_30px_rgba(6,182,212,0.25)] ring-2 ring-cyan-400/40"
+                  ? "bg-gradient-to-tr from-[#0b1022] via-[#0e1635] to-[#122046] border-[#08467d]/70 shadow-[0_12px_36px_rgba(8,70,125,0.45)] ring-2 ring-[#08467d]/40"
+                  : "bg-gradient-to-tr from-[#ecfeff] via-[#f8fafc] to-[#ffffff] border-[#08467d]/40 shadow-[0_10px_30px_rgba(8,70,125,0.2)] ring-2 ring-[#08467d]/30"
                 : isPodcast
                   ? isDark
-                    ? "bg-gradient-to-tr from-[#0b0d1a] via-[#11142b] to-[#181d3d] border-indigo-400/60 shadow-[0_12px_36px_rgba(79,70,229,0.45)] ring-2 ring-indigo-400/30"
-                    : "bg-gradient-to-tr from-[#eef2ff] via-[#f8fafc] to-[#ffffff] border-indigo-300 shadow-[0_10px_30px_rgba(99,102,241,0.25)] ring-2 ring-indigo-400/40"
+                    ? "bg-gradient-to-tr from-[#0b0d1a] via-[#11142b] to-[#181d3d] border-[#f8ca14]/60 shadow-[0_12px_36px_rgba(248,202,20,0.35)] ring-2 ring-[#f8ca14]/30"
+                    : "bg-gradient-to-tr from-[#eef2ff] via-[#f8fafc] to-[#ffffff] border-[#f8ca14]/50 shadow-[0_10px_30px_rgba(248,202,20,0.15)] ring-2 ring-[#f8ca14]/30"
                   : isDark
                     ? "bg-[#0a0c13] border-amber-400/50 shadow-[0_12px_36px_rgba(0,0,0,0.7)] ring-2 ring-amber-400/20 backdrop-blur-2xl"
                     : "bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#ffffff] border-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.14)] ring-2 ring-amber-400/35 backdrop-blur-2xl"
@@ -1140,9 +1140,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 ? isNationalDay
                   ? "shadow-[#5aba1c]/40 ring-[#f8ca14]/70"
                   : isVideo
-                  ? "shadow-cyan-500/40 ring-cyan-400/60"
+                  ? "shadow-[#08467d]/40 ring-[#08467d]/60"
                   : isPodcast
-                    ? "shadow-indigo-500/40 ring-indigo-400/60"
+                    ? "shadow-[#f8ca14]/40 ring-[#f8ca14]/60"
                     : isDark
                       ? "shadow-amber-400/25 ring-amber-400/40"
                       : "shadow-amber-400/35 ring-amber-400/60"
@@ -1158,21 +1158,21 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   isNationalDay
                     ? "border-[#5aba1c]/30"
                     : isVideo
-                    ? isDark ? "border-cyan-400/20" : "border-cyan-200"
+                    ? isDark ? "border-[#08467d]/40" : "border-[#08467d]/20"
                     : isDark ? "border-white/10" : "border-slate-300/80"
                 }`} />
                 <div className={`pointer-events-none absolute inset-2 rounded-full border ${
                   isNationalDay
                     ? "border-[#f8ca14]/20"
                     : isVideo
-                    ? isDark ? "border-cyan-400/10" : "border-cyan-100"
+                    ? isDark ? "border-[#08467d]/20" : "border-[#08467d]/10"
                     : isDark ? "border-white/5" : "border-slate-300/40"
                 }`} />
                 <div className={`pointer-events-none absolute inset-3 rounded-full border ${
                   isNationalDay
                     ? "border-[#5aba1c]/30"
                     : isVideo
-                    ? isDark ? "border-cyan-400/20" : "border-cyan-200"
+                    ? isDark ? "border-[#08467d]/40" : "border-[#08467d]/20"
                     : isDark ? "border-white/10" : "border-slate-300/80"
                 }`} />
 
@@ -1182,7 +1182,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     isNationalDay
                       ? "bg-gradient-to-tr from-[#005A36] via-[#5aba1c] to-[#f8ca14]"
                       : isVideo
-                      ? "bg-gradient-to-tr from-cyan-500 to-indigo-600"
+                      ? "bg-gradient-to-tr from-[#08467d] to-[#042442]"
                       : "bg-gradient-to-tr from-[#f8ca14] to-amber-600"
                   } ${
                     isPlaying ? "animate-[spin_4s_linear_infinite]" : ""
@@ -1201,7 +1201,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   {/* Center Spindle Hole */}
                   <div className={`absolute h-2 w-2 rounded-full shadow-inner border ${
                     isVideo
-                      ? "bg-cyan-950 border-cyan-400"
+                      ? "bg-[#06182e] border-[#08467d]"
                       : isDark ? "bg-[#0a0c13] border-amber-300" : "bg-slate-100 border-slate-400"
                   }`} />
                 </div>
@@ -1210,13 +1210,13 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 {isPlaying && (
                   <>
                     <span className={`absolute -inset-1 rounded-full blur-sm animate-pulse pointer-events-none ${
-                      isVideo ? "bg-cyan-400/30" : "bg-amber-400/30"
+                      isVideo ? "bg-[#08467d]/30" : "bg-[#f8ca14]/30"
                     }`} />
                     <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 ${isDark ? "border-[#0a0c13]" : "border-white"} animate-ping ${
-                      isVideo ? "bg-cyan-400" : "bg-emerald-400"
+                      isVideo ? "bg-[#de191e]" : "bg-[#367453]"
                     }`} />
                     <span className={`absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 ${isDark ? "border-[#0a0c13]" : "border-white"} ${
-                      isVideo ? "bg-cyan-400" : "bg-emerald-400"
+                      isVideo ? "bg-[#de191e]" : "bg-[#367453]"
                     }`} />
                   </>
                 )}
@@ -1225,11 +1225,11 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               <>
                 {/* Podcast Studio Broadcasting Aesthetics (كبسولة استوديو البودكاست مع ميكروفون وبث مباشر) */}
                 <div className={`pointer-events-none absolute inset-1.5 rounded-full border ${
-                  isDark ? "border-indigo-400/20" : "border-indigo-200"
+                  isDark ? "border-[#f8ca14]/25" : "border-[#08467d]/20"
                 }`} />
 
                 {/* Center Studio Mic & Artwork (Does NOT spin!) */}
-                <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg overflow-hidden border border-white/20">
+                <div className="relative grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-slate-950 shadow-lg overflow-hidden border border-white/20">
                   {activeItem?.coverUrl && !isDefaultOrLogoImage(activeItem.coverUrl) ? (
                     <img
                       src={directDriveImage(activeItem.coverUrl) || activeItem.coverUrl}
@@ -1246,7 +1246,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   {isPlaying && (
                     <div className="absolute inset-0 bg-black/40 flex items-end justify-center gap-0.5 pb-1">
                       <span className="w-1 h-3 bg-white rounded-full animate-bounce" />
-                      <span className="w-1 h-4 bg-indigo-300 rounded-full animate-bounce delay-75" />
+                      <span className="w-1 h-4 bg-[#f8ca14] rounded-full animate-bounce delay-75" />
                       <span className="w-1 h-2 bg-white rounded-full animate-bounce delay-150" />
                     </div>
                   )}
@@ -1255,16 +1255,16 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 {/* Podcast Broadcasting Red LIVE Indicator */}
                 {isPlaying ? (
                   <>
-                    <span className="absolute -inset-1 rounded-full bg-indigo-500/25 blur-sm animate-pulse pointer-events-none" />
-                    <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-rose-500 border-2 border-white animate-ping" />
-                    <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-rose-500 border-2 border-white" />
+                    <span className="absolute -inset-1 rounded-full bg-[#f8ca14]/25 blur-sm animate-pulse pointer-events-none" />
+                    <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#de191e] border-2 border-white animate-ping" />
+                    <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#de191e] border-2 border-white" />
                     {/* Live On-Air Pill */}
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-rose-600 text-[7px] font-black text-white tracking-wider shadow-md uppercase">
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-[#de191e] text-[7px] font-black text-white tracking-wider shadow-md uppercase">
                       LIVE
                     </span>
                   </>
                 ) : (
-                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-indigo-400 border-2 border-white" />
+                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-[#f8ca14] border-2 border-white" />
                 )}
               </>
             )}
@@ -1276,8 +1276,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2.5 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
                 isPodcast
                   ? isDark
-                    ? "border-indigo-400/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-indigo-400/30"
-                    : "border-indigo-200/90 bg-white/95 backdrop-blur-2xl text-slate-900 ring-1 ring-indigo-400/30 shadow-[0_15px_45px_rgba(99,102,241,0.14)]"
+                    ? "border-[#f8ca14]/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-[#f8ca14]/30"
+                    : "border-slate-200 bg-white/95 backdrop-blur-2xl text-slate-900 ring-1 ring-[#08467d]/20 shadow-xl"
                   : isDark
                     ? "border-amber-400/40 bg-[#090b10]/95 backdrop-blur-2xl text-white ring-1 ring-amber-400/20"
                     : "border-slate-200/90 bg-white/95 backdrop-blur-2xl text-slate-900 ring-1 ring-amber-400/30 shadow-[0_15px_45px_rgba(0,0,0,0.12)]"
@@ -1294,14 +1294,14 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 border shrink-0 ${
                   playlistDrawerOpen
                     ? isPodcast
-                      ? "bg-indigo-500 text-white border-indigo-400 font-bold shadow-sm"
+                      ? "bg-[#f8ca14] text-black border-[#f8ca14] font-bold shadow-sm"
                       : "bg-amber-400 text-slate-950 border-amber-400 font-bold shadow-sm"
                     : isDark
                       ? isPodcast
-                        ? "text-indigo-300 hover:text-white hover:bg-indigo-600/30 border-indigo-400/30"
+                        ? "text-[#f8ca14] hover:text-white hover:bg-[#f8ca14]/20 border-[#f8ca14]/30"
                         : "text-amber-300 hover:text-black hover:bg-amber-400 border-amber-400/30"
                       : isPodcast
-                        ? "text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 border-indigo-200"
+                        ? "text-[#08467d] hover:text-black hover:bg-[#08467d]/10 border-[#08467d]/20"
                         : "text-slate-700 hover:text-slate-950 hover:bg-slate-100 border-slate-300"
                 }`}
                 title="فتح مكتبة الأغاني والبودكاست"
@@ -1326,9 +1326,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     title={volume === 0 || isMuted ? "إلغاء الكتم" : "كتم الصوت"}
                   >
                     {volume === 0 || isMuted ? (
-                      <VolumeX size={14} className="text-rose-500" />
+                      <VolumeX size={14} className="text-[#de191e]" />
                     ) : (
-                      <Volume2 size={14} className={isVideo ? (isDark ? "text-cyan-300" : "text-cyan-600") : isPodcast ? (isDark ? "text-indigo-300" : "text-indigo-600") : (isDark ? "text-amber-300" : "text-amber-600")} />
+                      <Volume2 size={14} className={isVideo ? (isDark ? "text-[#f8ca14]" : "text-[#08467d]") : isPodcast ? (isDark ? "text-[#f8ca14]" : "text-[#08467d]") : (isDark ? "text-amber-300" : "text-amber-600")} />
                     )}
                   </button>
                   <div dir="ltr" className="flex items-center">
@@ -1343,9 +1343,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         changeVolume(val);
                       }}
                       style={{
-                        background: `linear-gradient(to right, ${isVideo ? "#06b6d4" : isPodcast ? "#6366f1" : "#f8ca14"} 0%, ${isVideo ? "#06b6d4" : isPodcast ? "#6366f1" : "#f8ca14"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} 100%)`,
+                        background: `linear-gradient(to right, ${isVideo ? "#08467d" : isPodcast ? "#f8ca14" : "#f8ca14"} 0%, ${isVideo ? "#08467d" : isPodcast ? "#f8ca14" : "#f8ca14"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} ${volumePercent}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.12)"} 100%)`,
                       }}
-                      className={`h-1.5 w-14 sm:w-16 cursor-pointer appearance-none rounded-full ${isVideo ? "accent-cyan-500" : isPodcast ? "accent-indigo-500" : "accent-[#f8ca14]"}`}
+                      className={`h-1.5 w-14 sm:w-16 cursor-pointer appearance-none rounded-full ${isVideo ? "accent-[#08467d]" : isPodcast ? "accent-[#f8ca14]" : "accent-[#f8ca14]"}`}
                       title={`مستوى الصوت: ${volumePercent}% (شمال واطي / يمين عالي)`}
                     />
                   </div>
@@ -1366,7 +1366,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         playNextVideo();
                       }}
                       className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="الفيديو التالي 🎬"
                     >
@@ -1381,7 +1381,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         skipTime(15);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="تقديم 15 ثانية ⏩"
                     >
@@ -1396,7 +1396,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         togglePlay();
                       }}
-                      className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white hover:from-cyan-400 hover:to-indigo-500 transition shadow-md active:scale-95 mx-0.5 font-black"
+                      className="grid h-8 w-8 place-items-center rounded-full bg-[#08467d] text-white hover:bg-[#063560] transition shadow-md active:scale-95 mx-0.5 font-black"
                       title={isPlaying ? "إيقاف مؤقت للفيديو" : "تشغيل الفيديو"}
                     >
                       {isPlaying ? <Pause size={14} /> : <Play size={14} className="mr-0.5 fill-current" />}
@@ -1410,7 +1410,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         skipTime(-15);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="تأخير 15 ثانية ⏪"
                     >
@@ -1426,7 +1426,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         playPrevVideo();
                       }}
                       className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-cyan-300 hover:text-white hover:bg-white/10" : "text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="الفيديو السابق 🎬"
                     >
@@ -1443,7 +1443,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         skipTime(15);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-indigo-300 hover:text-white hover:bg-white/10" : "text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
                       title="تقديم 15 ثانية ⏩"
                     >
@@ -1459,7 +1459,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         if (!activeItem) playSong(0);
                         else togglePlay();
                       }}
-                      className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-400 hover:to-purple-500 transition shadow-md active:scale-95 mx-0.5 font-black"
+                      className="grid h-8 w-8 place-items-center rounded-full bg-[#f8ca14] text-black hover:bg-[#e6b90f] transition shadow-md active:scale-95 mx-0.5 font-black"
                       title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
                     >
                       {isPlaying ? <Pause size={14} /> : <Play size={14} className="mr-0.5 fill-current" />}
@@ -1473,7 +1473,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         skipTime(-15);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
-                        isDark ? "text-indigo-300 hover:text-white hover:bg-white/10" : "text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50"
+                        isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
                       title="تأخير 15 ثانية ⏪"
                     >
@@ -1540,7 +1540,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
               >
                 <div className={`h-7 w-7 overflow-hidden shrink-0 border ${
                   isPodcast
-                    ? isDark ? "border-indigo-400/60 bg-[#12152b] rounded-lg" : "border-indigo-300 bg-indigo-50 rounded-lg"
+                    ? isDark ? "border-[#f8ca14]/40 bg-[#121008] rounded-lg" : "border-slate-200 bg-white rounded-lg"
                     : isDark ? "border-amber-400/40 bg-black rounded-full" : "border-slate-300 bg-slate-100 rounded-full"
                 }`}>
                   <img
@@ -1558,18 +1558,18 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 <div className="text-right truncate">
                   <span className={`block text-[11px] font-black leading-tight truncate ${
                     isVideo
-                      ? isDark ? "text-cyan-300" : "text-cyan-900"
+                      ? isDark ? "text-[#f8ca14]" : "text-[#08467d]"
                       : isPodcast
-                        ? isDark ? "text-indigo-300" : "text-indigo-900"
+                        ? isDark ? "text-[#f8ca14]" : "text-[#08467d]"
                         : isDark ? "text-amber-300" : "text-slate-900"
                   }`}>
                     {activeItem ? activeItem.title : "راديو العقيق 🎵"}
                   </span>
                   <span className={`block text-[9px] font-mono leading-tight ${
                     isVideo
-                      ? isDark ? "text-cyan-300/80" : "text-cyan-700"
+                      ? isDark ? "text-slate-400" : "text-slate-600"
                       : isPodcast
-                        ? isDark ? "text-indigo-300/80" : "text-indigo-600"
+                        ? isDark ? "text-slate-400" : "text-slate-600"
                         : isDark ? "text-slate-400" : "text-slate-500"
                   }`}>
                     {isVideo ? "🎬 " : isPodcast ? "🎙️ " : ""}{formatTime(progress)} / {formatTime(duration)}
@@ -1606,13 +1606,13 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   <div className={`relative w-full h-[2.5px] group-hover/bar:h-[4px] transition-all duration-150 overflow-visible ${
                     isDark ? "bg-white/15" : "bg-slate-200"
                   }`}>
-                    {/* Filled Active Line (Cyan for Videos, Indigo for Podcasts, Golden for Songs) */}
+                    {/* Filled Active Line (Navy for Videos, Gold for Podcasts, Golden for Songs) */}
                     <div
                       className={`h-full transition-all duration-75 ${
                         isVideo
-                          ? "bg-gradient-to-r from-cyan-500 via-indigo-500 to-cyan-400"
+                          ? "bg-gradient-to-r from-[#08467d] via-[#0b5fa8] to-[#08467d]"
                           : isPodcast
-                            ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-400"
+                            ? "bg-gradient-to-r from-amber-400 to-[#f8ca14]"
                             : "bg-gradient-to-r from-amber-400 to-yellow-300"
                       }`}
                       style={{ width: `${progressPercent}%` }}
@@ -1621,9 +1621,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     <div
                       className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-3 w-3 rounded-full border-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-30 ${
                         isVideo
-                          ? "bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.9)]"
+                          ? "bg-[#08467d] dark:bg-[#f8ca14] shadow-[0_0_10px_rgba(8,70,125,0.9)]"
                           : isPodcast
-                            ? "bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.9)]"
+                            ? "bg-[#f8ca14] shadow-[0_0_10px_rgba(248,202,20,0.9)]"
                             : "bg-amber-400 shadow-[0_0_10px_rgba(248,202,20,0.9)]"
                       } ${isDark ? "border-[#090b10]" : "border-white"}`}
                       style={{ left: `${progressPercent}%` }}
@@ -1685,8 +1685,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                   }}
                   className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-xl transition border ${
                     isDark
-                      ? "text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 border-rose-500/20"
-                      : "text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200"
+                      ? "text-[#de191e] hover:text-white hover:bg-[#de191e]/20 border-[#de191e]/30"
+                      : "text-[#de191e] hover:text-[#de191e] hover:bg-[#de191e]/10 border-[#de191e]/20"
                   }`}
                   title="إطفاء الصوت بالكامل"
                 >
@@ -1869,10 +1869,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       onClick={() => playPodcast(pod)}
                       className={`group flex items-center justify-between p-2 rounded-2xl cursor-pointer transition duration-200 border ${
                         isCurrent
-                          ? "bg-indigo-500/15 border-indigo-400/50 shadow-sm"
+                          ? "bg-[#f8ca14]/15 border-[#f8ca14]/50 shadow-sm"
                           : isDark
                             ? "bg-white/[0.03] hover:bg-white/[0.08] border-white/5 hover:border-white/10"
-                            : "bg-slate-50/80 hover:bg-indigo-50/60 border-slate-200/70 hover:border-indigo-300"
+                            : "bg-slate-50/80 hover:bg-[#08467d]/10 border-slate-200/70 hover:border-[#08467d]/30"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -1893,17 +1893,17 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                             <div className="absolute inset-0 bg-black/60 grid place-items-center">
                               {isPlaying ? (
                                 <div className="flex items-end gap-0.5 h-3.5">
-                                  <span className={`w-0.5 h-full rounded-full animate-pulse ${isDark ? "bg-indigo-400" : "bg-indigo-600"}`} />
-                                  <span className={`w-0.5 h-2/3 rounded-full animate-pulse delay-75 ${isDark ? "bg-indigo-400" : "bg-indigo-600"}`} />
-                                  <span className={`w-0.5 h-4/5 rounded-full animate-pulse delay-150 ${isDark ? "bg-indigo-400" : "bg-indigo-600"}`} />
+                                  <span className={`w-0.5 h-full rounded-full animate-pulse ${isDark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
+                                  <span className={`w-0.5 h-2/3 rounded-full animate-pulse delay-75 ${isDark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
+                                  <span className={`w-0.5 h-4/5 rounded-full animate-pulse delay-150 ${isDark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
                                 </div>
                               ) : (
-                                <Pause size={14} className={`fill-current ${isDark ? "text-indigo-300" : "text-indigo-800"}`} />
+                                <Pause size={14} className={`fill-current ${isDark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
                               )}
                             </div>
                           ) : (
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center text-white">
-                              <Play size={14} className="fill-current text-indigo-300 mr-0.5" />
+                              <Play size={14} className="fill-current text-[#f8ca14] mr-0.5" />
                             </div>
                           )}
                         </div>
@@ -1912,8 +1912,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         <div className="min-w-0 text-right">
                           <p className={`text-xs font-black truncate leading-snug ${
                             isCurrent
-                              ? isDark ? "text-indigo-300" : "text-indigo-800"
-                              : isDark ? "text-white group-hover:text-indigo-200" : "text-slate-900 group-hover:text-indigo-700"
+                              ? isDark ? "text-[#f8ca14]" : "text-[#08467d]"
+                              : isDark ? "text-white group-hover:text-[#f8ca14]" : "text-slate-900 group-hover:text-[#08467d]"
                           }`}>
                             {pod.title}
                           </p>
@@ -1926,7 +1926,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       {/* Badge / Category */}
                       <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg shrink-0 border ${
                         isCurrent
-                          ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/30"
+                          ? "bg-[#f8ca14]/20 text-[#f8ca14] border-[#f8ca14]/30"
                           : "bg-white/5 text-slate-400 border-white/5"
                       }`}>
                         {pod.category || "بودكاست"}

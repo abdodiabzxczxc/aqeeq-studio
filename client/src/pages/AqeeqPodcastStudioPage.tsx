@@ -241,13 +241,13 @@ export default function AqeeqPodcastStudioPage() {
       }`}>
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-8">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-purple-500 to-[#08467d] text-white font-black shadow-lg">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-white font-black shadow-lg">
               <Radio size={20} />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-black">استوديو إنتاج وإدارة أثير العقيق 🎙️</h1>
-                <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2.5 py-0.5 text-[10px] font-black text-purple-300">
+                <span className="rounded-full bg-[#f8ca14]/20 border border-[#f8ca14]/40 px-2.5 py-0.5 text-[10px] font-black text-[#f8ca14]">
                   ATHEER PRO
                 </span>
               </div>
@@ -264,7 +264,7 @@ export default function AqeeqPodcastStudioPage() {
               onClick={() => setMainStudioTab("podcasts")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
                 mainStudioTab === "podcasts"
-                  ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
+                  ? "bg-[#08467d] text-white shadow-md shadow-[#08467d]/30"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -300,7 +300,7 @@ export default function AqeeqPodcastStudioPage() {
             {mainStudioTab === "podcasts" ? (
               <button
                 onClick={() => setIsCreateOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-purple-600/30 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#08467d] hover:bg-[#063560] px-4 py-2 text-xs font-black text-white shadow-lg shadow-[#08467d]/30 transition"
               >
                 <Plus size={16} />
                 <span>إضافة حلقة جديدة 🎙️</span>
@@ -349,7 +349,7 @@ export default function AqeeqPodcastStudioPage() {
             }`}>
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black flex items-center gap-2">
-                  <Headphones size={16} className="text-purple-400" />
+                  <Headphones size={16} className="text-[#f8ca14]" />
                   <span>دليل الحلقات ({filteredPodcasts.length})</span>
                 </h3>
                 <span className="text-xs text-slate-400 font-bold">
@@ -366,7 +366,7 @@ export default function AqeeqPodcastStudioPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="بحث في الحلقات والضيوف..."
                   className={`w-full rounded-xl border pr-9 pl-3 py-2 text-xs font-bold outline-none transition ${
-                    dark ? "border-white/10 bg-black text-white focus:border-purple-400" : "border-black/10 bg-slate-50 text-black focus:border-purple-600"
+                    dark ? "border-white/10 bg-black text-white focus:border-[#f8ca14]" : "border-black/10 bg-slate-50 text-black focus:border-[#08467d]"
                   }`}
                 />
               </div>
@@ -378,14 +378,14 @@ export default function AqeeqPodcastStudioPage() {
                 <button
                   type="button"
                   onClick={() => setFilterType("all")}
-                  className={`rounded-lg py-1.5 text-center transition ${filterType === "all" ? "bg-purple-600 text-white shadow-sm" : "text-slate-400"}`}
+                  className={`rounded-lg py-1.5 text-center transition ${filterType === "all" ? "bg-[#08467d] text-white shadow-sm" : "text-slate-400"}`}
                 >
                   الكل
                 </button>
                 <button
                   type="button"
                   onClick={() => setFilterType("audio")}
-                  className={`rounded-lg py-1.5 text-center transition flex items-center justify-center gap-1 ${filterType === "audio" ? "bg-purple-600 text-white shadow-sm" : "text-slate-400"}`}
+                  className={`rounded-lg py-1.5 text-center transition flex items-center justify-center gap-1 ${filterType === "audio" ? "bg-[#08467d] text-white shadow-sm" : "text-slate-400"}`}
                 >
                   <Headphones size={12} />
                   <span>صوت</span>
@@ -393,7 +393,7 @@ export default function AqeeqPodcastStudioPage() {
                 <button
                   type="button"
                   onClick={() => setFilterType("video")}
-                  className={`rounded-lg py-1.5 text-center transition flex items-center justify-center gap-1 ${filterType === "video" ? "bg-purple-600 text-white shadow-sm" : "text-slate-400"}`}
+                  className={`rounded-lg py-1.5 text-center transition flex items-center justify-center gap-1 ${filterType === "video" ? "bg-[#08467d] text-white shadow-sm" : "text-slate-400"}`}
                 >
                   <Video size={12} />
                   <span>فيديو</span>
@@ -416,8 +416,8 @@ export default function AqeeqPodcastStudioPage() {
                         className={`group relative flex items-start gap-3 rounded-2xl border p-3 cursor-pointer transition ${
                           isSelected
                             ? dark
-                              ? "border-purple-500 bg-purple-950/20 shadow-md shadow-purple-500/10 ring-1 ring-purple-500/30"
-                              : "border-purple-600 bg-purple-50 shadow-md"
+                              ? "border-[#f8ca14] bg-[#08467d]/20 shadow-md shadow-[#08467d]/10 ring-1 ring-[#f8ca14]/40"
+                              : "border-[#08467d] bg-[#08467d]/10 shadow-md"
                             : dark
                             ? "border-white/5 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
                             : "border-black/5 bg-slate-50 hover:border-black/20 hover:bg-white"
@@ -427,7 +427,7 @@ export default function AqeeqPodcastStudioPage() {
                           {cover ? (
                             <img src={cover} alt="" className="h-full w-full object-cover" />
                           ) : (
-                            <div className="grid h-full place-items-center text-purple-400 font-black text-xs">
+                            <div className="grid h-full place-items-center text-[#f8ca14] font-black text-xs">
                               {p.mediaType === "video" ? <Video size={18} /> : <Mic size={18} />}
                             </div>
                           )}
@@ -448,7 +448,7 @@ export default function AqeeqPodcastStudioPage() {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1">
-                            <span className="text-[10px] font-black text-purple-400">{p.category}</span>
+                            <span className="text-[10px] font-black text-[#f8ca14]">{p.category}</span>
                             <span className="text-[9px] text-slate-500 font-mono flex items-center gap-0.5">
                               <Clock size={10} />
                               {p.duration || "10:00"}
@@ -476,8 +476,8 @@ export default function AqeeqPodcastStudioPage() {
                   <div className="flex items-center gap-2">
                     <span className={`rounded-lg px-2.5 py-1 text-[11px] font-black border ${
                       selectedPodcast.mediaType === "video"
-                        ? "border-blue-400/40 bg-blue-500/10 text-blue-300"
-                        : "border-purple-400/40 bg-purple-500/10 text-purple-300"
+                        ? "border-[#08467d]/40 bg-[#08467d]/15 text-[#08467d] dark:text-[#f8ca14]"
+                        : "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
                     }`}>
                       {selectedPodcast.mediaType === "video" ? "📹 حلقة فيديو" : "🎧 حلقة صوتية"}
                     </span>
@@ -508,7 +508,7 @@ export default function AqeeqPodcastStudioPage() {
                           deleteMutation.mutate({ id: selectedPodcast.id });
                         }
                       }}
-                      className="grid h-9 w-9 place-items-center rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 transition"
+                      className="grid h-9 w-9 place-items-center rounded-xl border border-[#de191e]/30 bg-[#de191e]/10 hover:bg-[#de191e] hover:text-white text-[#de191e] transition"
                       title="حذف الحلقة"
                     >
                       <Trash2 size={15} />
@@ -624,7 +624,7 @@ export default function AqeeqPodcastStudioPage() {
                         {editCoverUrl ? (
                           <img src={directDriveImage(editCoverUrl) || editCoverUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
-                          <div className="grid h-full place-items-center text-xs text-purple-400 font-bold">بدون غلاف</div>
+                          <div className="grid h-full place-items-center text-xs text-[#f8ca14] font-bold">بدون غلاف</div>
                         )}
                       </div>
 
@@ -643,7 +643,7 @@ export default function AqeeqPodcastStudioPage() {
                               setAiImagePrompt(editTitle ? `غلاف إذاعي وبودكاست لحلقة بعنوان: ${editTitle}` : "غلاف احترافي لاستوديو وبودكاست مدارس العقيق");
                               setIsAiImageOpen(true);
                             }}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0b5c9e] hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-[#08467d]/20"
                           >
                             <Palette size={14} />
                             <span>استوديو وتصميم الأغلفة الإذاعية 🎙️</span>
@@ -664,7 +664,7 @@ export default function AqeeqPodcastStudioPage() {
                             <button
                               type="button"
                               onClick={() => setEditCoverUrl(null)}
-                              className="text-[11px] text-rose-400 hover:underline"
+                              className="text-[11px] text-[#de191e] hover:underline"
                             >
                               إزالة الغلاف
                             </button>
@@ -695,7 +695,7 @@ export default function AqeeqPodcastStudioPage() {
                         })
                       }
                       disabled={updateMutation.isPending}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 text-xs font-black transition shadow-lg shadow-purple-600/30"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#08467d] hover:bg-[#063560] text-white px-6 py-3 text-xs font-black transition shadow-lg shadow-[#08467d]/30"
                     >
                       <Check size={16} />
                       <span>{updateMutation.isPending ? "جاري حفظ التعديلات..." : "حفظ التعديلات في الحلقة"}</span>
@@ -834,7 +834,7 @@ export default function AqeeqPodcastStudioPage() {
                             setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
                             toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
                           }}
-                          className="grid h-9 w-9 place-items-center rounded-xl text-rose-400 hover:bg-rose-500/10 transition"
+                          className="grid h-9 w-9 place-items-center rounded-xl text-[#de191e] hover:bg-[#de191e]/10 transition"
                           title="حذف"
                         >
                           <Trash2 size={16} />
@@ -987,13 +987,13 @@ export default function AqeeqPodcastStudioPage() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent
           className={`max-w-2xl rounded-[2.5rem] border p-6 sm:p-8 text-right shadow-2xl ${
-            dark ? "border-purple-400/40 bg-[#0a0a0a] text-white" : "border-purple-600/30 bg-white text-slate-900"
+            dark ? "border-[#f8ca14]/40 bg-[#0a0a0a] text-white" : "border-[#08467d]/30 bg-white text-slate-900"
           }`}
           dir="rtl"
         >
           <DialogHeader className="text-right border-b border-current/10 pb-4">
             <DialogTitle className="text-lg font-black flex items-center gap-2">
-              <Mic size={18} className="text-purple-400" />
+              <Mic size={18} className="text-[#f8ca14]" />
               <span>إضافة حلقة إذاعة وبودكاست جديدة</span>
             </DialogTitle>
           </DialogHeader>
@@ -1129,7 +1129,7 @@ export default function AqeeqPodcastStudioPage() {
                     setAiImagePrompt(newTitle ? `غلاف إذاعي وبودكاست لحلقة بعنوان: ${newTitle}` : "غلاف احترافي لبودكاست مدرسي بمدارس العقيق");
                     setIsAiImageOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-purple-500/20"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0b5c9e] hover:opacity-90 text-white px-3 py-1.5 text-xs font-black transition shadow-md shadow-[#08467d]/20"
                 >
                   <Palette size={14} />
                   <span>استوديو وتصميم الأغلفة الإذاعية 🎙️</span>
@@ -1173,7 +1173,7 @@ export default function AqeeqPodcastStudioPage() {
                   });
                 }}
                 disabled={createMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black px-6 py-2.5 text-xs transition shadow-lg shadow-purple-600/30"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#08467d] hover:bg-[#063560] text-white font-black px-6 py-2.5 text-xs transition shadow-lg shadow-[#08467d]/30"
               >
                 <Check size={16} />
                 <span>{createMutation.isPending ? "جاري النشر..." : "نشر الحلقة فوراً"}</span>

@@ -22,5 +22,5 @@ export default function InvitationPngPreview({ input, alt = "معاينة الد
     return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [signature]);
 
-  return <div className={`relative overflow-hidden bg-[#0b1018] ${className}`}>{url ? <img src={url} alt={alt} className="block h-full w-full object-contain" /> : <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-400"><Loader2 size={22} className="animate-spin text-amber-300" />جارٍ بناء المعاينة النهائية…</div>}{failed ? <div className="absolute inset-0 flex items-center justify-center bg-[#0b1018]/90 px-6 text-center text-xs text-rose-200">تعذر إعداد المعاينة، لكن يمكنك إعادة المحاولة بعد لحظة.</div> : null}{children}</div>;
+  return <div className={`relative overflow-hidden bg-[#0b1018] ${className}`}>{url ? <img src={url} alt={alt} className="block h-full w-full object-contain" /> : <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-400"><Loader2 size={22} className="animate-spin text-amber-300" />جارٍ بناء المعاينة النهائية…</div>}{failed ? <div className="absolute inset-0 flex items-center justify-center bg-[#0b1018]/90 px-6 text-center text-xs text-[#de191e]">تعذر إعداد المعاينة، لكن يمكنك إعادة المحاولة بعد لحظة.</div> : null}{children}</div>;
 }

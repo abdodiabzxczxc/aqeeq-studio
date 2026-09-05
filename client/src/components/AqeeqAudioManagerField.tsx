@@ -237,7 +237,7 @@ export function AqeeqAudioManagerField({
             <button
               type="button"
               onClick={clearAudio}
-              className="grid h-7 w-7 place-items-center rounded-lg border border-rose-300/30 text-rose-300 transition hover:bg-rose-500/20"
+              className="grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/30 text-[#de191e] transition hover:bg-[#de191e]/20"
               title="إلغاء المقطع الصوتي"
             >
               <Trash2 size={13} />
@@ -373,7 +373,7 @@ export function AqeeqAudioManagerField({
                           handleDeleteUploadedFile(item.id, item.fileName, item.url);
                         }}
                         disabled={deleteMutation.isPending}
-                        className="grid h-6 w-6 place-items-center rounded-lg border border-transparent text-slate-500 transition hover:border-rose-400/40 hover:bg-rose-500/20 hover:text-rose-300"
+                        className="grid h-6 w-6 place-items-center rounded-lg border border-transparent text-slate-500 transition hover:border-[#de191e]/40 hover:bg-[#de191e]/20 hover:text-[#de191e]"
                         title="حذف هذا الملف نهائياً من السحابة"
                       >
                         <Trash2 size={12} />

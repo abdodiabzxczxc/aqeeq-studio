@@ -94,14 +94,14 @@ export function AqeeqPodcastPlayer({
         onClick={toggleNarration}
         className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-xl border px-2 sm:px-3 text-xs font-black transition active:scale-95 shadow-sm touch-manipulation ${
           isPlaying
-            ? "border-purple-400 bg-purple-500/20 text-purple-200 ring-2 ring-purple-400/40 animate-pulse"
+            ? "border-[#f8ca14] bg-[#f8ca14]/20 text-[#f8ca14] ring-2 ring-[#f8ca14]/40 animate-pulse"
             : dark
-              ? "border-purple-400/30 bg-purple-500/10 text-purple-300 hover:border-purple-400/60 hover:bg-purple-500/20"
-              : "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100"
+              ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:border-[#f8ca14]/70 hover:bg-[#f8ca14]/20"
+              : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
         }`}
         title="استمع إلى البودكاست والتعليق الصوتي الذكي للعدد"
       >
-        <Mic size={14} className={isPlaying ? "text-purple-300" : "text-purple-400"} />
+        <Mic size={14} className={isPlaying ? "text-[#f8ca14]" : (dark ? "text-[#f8ca14]" : "text-[#08467d]")} />
         <span className="hidden sm:inline">
           {isPlaying ? "إيقاف البودكاست" : "بودكاست العدد 🎙️"}
         </span>
@@ -110,16 +110,16 @@ export function AqeeqPodcastPlayer({
 
       {/* Floating Animated Active Voice Indicator */}
       {isPlaying ? (
-        <div className="fixed bottom-20 left-4 z-50 flex items-center gap-3 rounded-2xl border border-purple-400/40 bg-[#120f24]/95 p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom duration-300">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-purple-500/20 text-purple-300">
+        <div className="fixed bottom-20 left-4 z-50 flex items-center gap-3 rounded-2xl border border-[#f8ca14]/40 bg-[#06182e]/95 p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom duration-300">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#f8ca14]/20 text-[#f8ca14]">
             <Mic size={18} className="animate-pulse" />
           </div>
           <div className="min-w-0 pr-1">
-            <div className="flex items-center gap-1 text-[11px] font-black text-purple-200">
-              <Sparkles size={12} className="text-amber-300" />
+            <div className="flex items-center gap-1 text-[11px] font-black text-[#f8ca14]">
+              <Sparkles size={12} className="text-[#f8ca14]" />
               <span>القارئ الصوتي الذكي يعمل الآن</span>
             </div>
-            <p className="truncate text-[10px] text-purple-300/80 max-w-[200px]">
+            <p className="truncate text-[10px] text-slate-300 max-w-[200px]">
               {title}
             </p>
           </div>

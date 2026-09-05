@@ -237,15 +237,15 @@ export function AlaqeeqStudioSiteFooter() {
                   <span>اعتماد Cognia</span>
                 </div>
 
-                {/* 2. Sky Blue Pill on the left (under الأهلية والدولية) - fills the rest to reach 'ة' */}
+                {/* 2. SAT & IELTS Pill on the left (under الأهلية والدولية) */}
                 <div
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
                     dark
-                      ? "border-sky-500/80 bg-sky-950/20 text-sky-400 shadow-sky-500/5"
-                      : "border-sky-600/40 bg-sky-50 text-sky-800"
+                      ? "border-[#08467d]/60 bg-[#08467d]/20 text-[#f8ca14] shadow-[#08467d]/10"
+                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
                   }`}
                 >
-                  <GraduationCap size={13} className="text-sky-400 shrink-0" />
+                  <GraduationCap size={13} className={dark ? "text-[#f8ca14] shrink-0" : "text-[#08467d] shrink-0"} />
                   <span>مركز اختبارات SAT & IELTS</span>
                 </div>
               </div>
@@ -295,8 +295,8 @@ export function AlaqeeqStudioSiteFooter() {
                 rel="noreferrer"
                 className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-pink-500 hover:text-pink-400"
-                    : "border-black/10 bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
+                    : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
                 }`}
                 title="Instagram"
               >
@@ -311,8 +311,8 @@ export function AlaqeeqStudioSiteFooter() {
                 rel="noreferrer"
                 className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-yellow-400 hover:text-yellow-400"
-                    : "border-black/10 bg-white text-slate-700 hover:border-yellow-500 hover:text-yellow-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
+                    : "border-black/10 bg-white text-slate-700 hover:border-[#f8ca14] hover:text-amber-600 shadow-sm"
                 }`}
                 title="Snapchat"
               >
@@ -327,8 +327,8 @@ export function AlaqeeqStudioSiteFooter() {
                 rel="noreferrer"
                 className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-blue-500 hover:text-blue-400"
-                    : "border-black/10 bg-white text-slate-700 hover:border-blue-500 hover:text-blue-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#08467d] hover:text-[#f8ca14]"
+                    : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
                 }`}
                 title="Facebook"
               >
@@ -343,8 +343,8 @@ export function AlaqeeqStudioSiteFooter() {
                 rel="noreferrer"
                 className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-red-500 hover:text-red-400"
-                    : "border-black/10 bg-white text-slate-700 hover:border-red-500 hover:text-red-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
+                    : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
                 }`}
                 title="YouTube"
               >
@@ -359,8 +359,8 @@ export function AlaqeeqStudioSiteFooter() {
                 rel="noreferrer"
                 className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-sky-400 hover:text-sky-400"
-                    : "border-black/10 bg-white text-slate-700 hover:border-sky-500 hover:text-sky-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#08467d] hover:text-[#f8ca14]"
+                    : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
                 }`}
                 title="قناة Telegram الرسمية"
               >

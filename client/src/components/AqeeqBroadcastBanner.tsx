@@ -39,7 +39,7 @@ export function AqeeqBroadcastBanner() {
       dir="rtl"
       className={"relative z-50 w-full px-4 py-2.5 transition-all duration-300 text-xs sm:text-sm font-bold shadow-md " + (
         isUrgent
-          ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white"
+          ? "bg-gradient-to-r from-[#de191e] via-[#b91519] to-[#8a0f13] text-white"
           : isCelebration
           ? "bg-gradient-to-r from-[#d4af37] via-[#f8ca14] to-[#c59b27] text-black"
           : "bg-gradient-to-r from-[#08467d] via-[#0b5c9e] to-[#08467d] text-white"

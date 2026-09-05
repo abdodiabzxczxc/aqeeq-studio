@@ -186,7 +186,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     />
                   ) : (
-                    <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 text-slate-400">
+                    <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-slate-900 via-[#08467d]/40 to-slate-900 text-slate-400">
                       {item.category === "journal" ? <BookOpen size={52} /> : <ImageIcon size={52} />}
                     </div>
                   )}

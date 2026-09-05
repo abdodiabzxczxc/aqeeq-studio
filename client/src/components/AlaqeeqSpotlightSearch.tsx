@@ -356,7 +356,7 @@ export function AlaqeeqSpotlightSearch({
                             ? dark ? "bg-[#f8ca14]/20 text-[#f8ca14]" : "bg-[#08467d]/15 text-[#08467d]"
                             : item.type === "album"
                             ? dark ? "bg-[#367453]/25 text-emerald-400" : "bg-[#367453]/15 text-[#367453]"
-                            : dark ? "bg-[#de191e]/25 text-rose-400" : "bg-[#de191e]/15 text-[#de191e]"
+                            : dark ? "bg-[#de191e]/25 text-[#de191e]" : "bg-[#de191e]/15 text-[#de191e]"
                         )}>
                           {item.typeLabel}
                         </span>

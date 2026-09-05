@@ -143,7 +143,7 @@ export default function JournalPdfImporter({ onImported }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={Boolean(status)}
-          className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-sky-300/35 bg-sky-300/[.08] p-2.5 text-center text-xs font-bold text-sky-100 transition hover:bg-sky-300/[.15] disabled:opacity-55"
+          className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-[#08467d]/40 bg-[#08467d]/10 p-2.5 text-center text-xs font-bold text-[#f8ca14] transition hover:bg-[#08467d]/20 disabled:opacity-55"
         >
           {status && !showDriveInput ? <Loader2 size={16} className="animate-spin" /> : <FileUp size={16} />}
           <span>رفع PDF من جهازك</span>
@@ -190,8 +190,8 @@ export default function JournalPdfImporter({ onImported }: Props) {
       ) : null}
 
       {status ? (
-        <div className="rounded-xl border border-sky-300/25 bg-sky-950/40 p-3">
-          <div className="mb-1.5 flex justify-between text-[10px] font-bold text-sky-200">
+        <div className="rounded-xl border border-[#08467d]/30 bg-[#08467d]/10 p-3">
+          <div className="mb-1.5 flex justify-between text-[10px] font-bold text-amber-200">
             <span>{status}</span>
             <span>{percent}%</span>
           </div>

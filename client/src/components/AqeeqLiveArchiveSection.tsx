@@ -88,10 +88,10 @@ export function AqeeqLiveArchiveSection({
       kicker: "PHOTO ARCHIVE",
       title: "ألبوم فعالية موثق",
       value: totalAlbums,
-      icon: <Camera size={22} className="text-sky-400" />,
+      icon: <Camera size={22} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
       tag: "معرض فوتوغرافي",
-      tagColor: "bg-sky-500/15 text-sky-400 border-sky-500/30",
-      glowColor: "rgba(14, 165, 233, 0.25)",
+      tagColor: dark ? "bg-[#08467d]/30 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/30",
+      glowColor: "rgba(8, 70, 125, 0.25)",
       href: "/albums",
     },
     {
@@ -99,10 +99,10 @@ export function AqeeqLiveArchiveSection({
       kicker: "PRESERVED PAGES",
       title: "صفحة صحفية محفوظة",
       value: totalPages,
-      icon: <FileText size={22} className="text-purple-400" />,
+      icon: <FileText size={22} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
       tag: "أرشيف توثيقي",
-      tagColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-      glowColor: "rgba(168, 85, 247, 0.25)",
+      tagColor: dark ? "bg-[#08467d]/30 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/30",
+      glowColor: "rgba(8, 70, 125, 0.25)",
       href: "/journal",
     },
     {
@@ -110,9 +110,9 @@ export function AqeeqLiveArchiveSection({
       kicker: "VERIFIED MEDIA",
       title: "صورة وفيديو معتمد",
       value: totalMedia,
-      icon: <Database size={22} className="text-[#f8ca14]" />,
+      icon: <Database size={22} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
       tag: "خزينة وسائط",
-      tagColor: "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30",
+      tagColor: dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-amber-100 text-amber-900 border-amber-300",
       glowColor: "rgba(248, 202, 20, 0.25)",
       href: "/albums",
     },
@@ -141,9 +141,11 @@ export function AqeeqLiveArchiveSection({
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-[120px]" />
 
         {/* Top Header Row */}
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-white/10">
+        <div className={`relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b ${dark ? "border-white/10" : "border-slate-200"}`}>
           <div className="max-w-2xl text-right">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-4 text-[10px] font-black tracking-widest uppercase bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]">
+            <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-4 text-[10px] font-black tracking-widest uppercase ${
+              dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+            }`}>
               <Sparkles size={13} />
               <span>THE OPEN DIGITAL CORE · الذاكرة الرقمية الحية</span>
             </div>
@@ -237,7 +239,9 @@ export function AqeeqLiveArchiveSection({
               </div>
 
               {/* Hover Indicator */}
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-black text-[#f8ca14] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className={`mt-4 pt-3 border-t flex items-center justify-between text-[11px] font-black opacity-0 group-hover:opacity-100 transition-opacity ${
+                dark ? "border-white/10 text-[#f8ca14]" : "border-slate-200 text-[#08467d]"
+              }`}>
                 <span>استكشاف الأرشيف</span>
                 <ArrowUpLeft size={13} className="transition-transform group-hover:-translate-x-1" />
               </div>
@@ -246,15 +250,19 @@ export function AqeeqLiveArchiveSection({
         </div>
 
         {/* Bottom Trust Seal */}
-        <div className="relative z-10 mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <div className={`relative z-10 mt-10 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs ${
+          dark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-600"
+        }`}>
           <div className="flex items-center gap-2">
-            <ShieldCheck size={16} className="text-emerald-400" />
+            <ShieldCheck size={16} className="text-emerald-500" />
             <span>جميع البيانات مستخرجة مباشرة من قواعد بيانات استوديو مدارس العقيق وموثقة رقمياً.</span>
           </div>
           <button
             type="button"
             onClick={() => navigate("/journal")}
-            className="font-bold text-[#f8ca14] hover:underline flex items-center gap-1"
+            className={`font-bold hover:underline flex items-center gap-1 ${
+              dark ? "text-[#f8ca14]" : "text-[#08467d]"
+            }`}
           >
             <span>زيارة المستودع الرقمي الكامل</span>
             <ArrowUpLeft size={13} />

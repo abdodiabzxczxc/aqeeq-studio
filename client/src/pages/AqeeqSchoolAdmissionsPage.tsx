@@ -870,7 +870,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                     </div>
                     <div className={`p-2.5 rounded-xl border text-center ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
                       <span className="block text-[10px] text-slate-500 font-bold">قسط تابي/تمارا (4 دفعات):</span>
-                      <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">
+                      <span className="text-sm font-black text-[#08467d] dark:text-[#f8ca14]">
                         {tabbyFourInstallments.toLocaleString()} ر.س
                       </span>
                     </div>

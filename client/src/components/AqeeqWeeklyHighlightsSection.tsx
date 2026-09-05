@@ -129,7 +129,7 @@ export function AqeeqWeeklyHighlightsSection({
               }`}
             >
               {/* Top Deck Tab (Visible even when stacked) */}
-              <div className="flex items-center justify-between border-b pb-4 mb-6 border-white/10">
+              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-slate-200"}`}>
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
                     dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d]"
@@ -178,7 +178,9 @@ export function AqeeqWeeklyHighlightsSection({
                   </div>
                 </div>
 
-                <div className="order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border border-white/10 shadow-lg">
+                <div className={`order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border shadow-lg ${
+                  dark ? "border-white/10" : "border-slate-200"
+                }`}>
                   <VisualImage
                     id="studio-bento-card1-image"
                     label="صورة الحدث التعليمي الأبرز"
@@ -207,7 +209,7 @@ export function AqeeqWeeklyHighlightsSection({
               }`}
             >
               {/* Top Deck Tab */}
-              <div className="flex items-center justify-between border-b pb-4 mb-6 border-white/10">
+              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-amber-200"}`}>
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
                     dark ? "bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40" : "bg-amber-100 text-amber-900 border border-amber-300"
@@ -253,7 +255,9 @@ export function AqeeqWeeklyHighlightsSection({
                   </div>
                 </div>
 
-                <div className="order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border border-white/10 shadow-lg">
+                <div className={`order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border shadow-lg ${
+                  dark ? "border-white/10" : "border-amber-200"
+                }`}>
                   <img
                     src={medalThumb}
                     alt="وسام التميز"
@@ -275,15 +279,15 @@ export function AqeeqWeeklyHighlightsSection({
                 isNationalDay
                   ? dark ? "snd-bento-card-dark" : "snd-bento-card-light"
                   : dark
-                  ? "border-rose-500/35 bg-[#17070b]/95 hover:border-rose-500/60"
-                  : "border-rose-200 bg-rose-50/95 hover:border-rose-300 shadow-xl"
+                  ? "border-[#de191e]/35 bg-[#120406]/95 hover:border-[#de191e]/60"
+                  : "border-[#de191e]/20 bg-white hover:border-[#de191e]/40 shadow-xl"
               }`}
             >
               {/* Top Deck Tab */}
-              <div className="flex items-center justify-between border-b pb-4 mb-6 border-white/10">
+              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-[#de191e]/15"}`}>
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
-                    dark ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-rose-100 text-rose-700 border border-rose-200"
+                    dark ? "bg-[#de191e]/20 text-[#de191e] border border-[#de191e]/40" : "bg-[#de191e]/10 text-[#de191e] border border-[#de191e]/20"
                   }`}>
                     <Flame size={13} />
                     03 / نبض المجتمع والتشجيع
@@ -298,11 +302,11 @@ export function AqeeqWeeklyHighlightsSection({
                 <div className="order-2 lg:order-1 text-right">
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`grid h-10 w-10 place-items-center rounded-xl ${
-                      dark ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-rose-100 text-rose-600"
+                      dark ? "bg-[#de191e]/20 text-[#de191e] border border-[#de191e]/40" : "bg-[#de191e]/10 text-[#de191e]"
                     }`}>
                       <Flame size={20} />
                     </div>
-                    <span className={`text-xs font-black ${dark ? "text-rose-400" : "text-rose-600"}`}>
+                    <span className={`text-xs font-black ${dark ? "text-[#de191e]" : "text-[#de191e]"}`}>
                       نبض وتفاعل أولياء الأمور والطلاب
                     </span>
                   </div>
@@ -310,7 +314,7 @@ export function AqeeqWeeklyHighlightsSection({
                     <h3 className={`text-4xl sm:text-6xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
                       +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
                     </h3>
-                    <span className="text-sm font-bold text-slate-400">قلب تشجيع هذا الأسبوع ❤️</span>
+                    <span className={`text-sm font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>قلب تشجيع هذا الأسبوع ❤️</span>
                   </div>
                   <p className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
                     كل إعجاب وتشجيع هنا ينعكس فخراً وإلهاماً في نفوس أبنائنا وبناتنا في رحلتهم نحو القمة.
@@ -321,27 +325,29 @@ export function AqeeqWeeklyHighlightsSection({
                       onClick={toggleLike}
                       className={`inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl text-xs font-black transition active:scale-95 ${
                         hasLiked
-                          ? "bg-rose-600 text-white shadow-xl shadow-rose-600/30 ring-4 ring-rose-500/20"
+                          ? "bg-[#de191e] text-white shadow-xl shadow-[#de191e]/30 ring-4 ring-[#de191e]/20"
                           : dark
-                          ? "bg-white/10 text-white hover:bg-rose-500/25 border border-white/15"
-                          : "bg-white text-slate-900 hover:bg-rose-100 border border-slate-200 shadow-md"
+                          ? "bg-white/10 text-white hover:bg-[#de191e]/25 border border-white/15"
+                          : "bg-white text-slate-900 hover:bg-[#de191e]/10 border border-slate-200 shadow-md"
                       }`}
                     >
-                      <Heart size={18} className={hasLiked ? "fill-current text-white animate-bounce" : "text-rose-500"} />
+                      <Heart size={18} className={hasLiked ? "fill-current text-white animate-bounce" : "text-[#de191e]"} />
                       <span>{hasLiked ? "تم تسجيل تشجيعك! شكراً لك ❤️" : "أرسل تشجيعك للطلاب الآن"}</span>
                     </button>
                     <span className="text-xs text-slate-500 font-medium">تفاعل فوري</span>
                   </div>
                 </div>
 
-                <div className="order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border border-white/10 shadow-lg">
+                <div className={`order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border shadow-lg ${
+                  dark ? "border-white/10" : "border-[#de191e]/20"
+                }`}>
                   <img
                     src="/covers/student-excellence-about.jpg"
                     alt="نبض المجتمع"
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-4 right-4 rounded-full border border-rose-500/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-rose-300">
+                  <span className="absolute bottom-4 right-4 rounded-full border border-[#de191e]/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-[#de191e]">
                     🤝 معاً نصنع قادة الغد
                   </span>
                 </div>

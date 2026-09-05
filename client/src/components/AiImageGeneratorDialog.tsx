@@ -159,9 +159,9 @@ const MEDINA_ATMOSPHERES: Record<"dawn" | "noon" | "sunset" | "night", MedinaAtm
     icon: Sunset,
     bgGradient: "from-[#3b0d19] via-[#21060f] to-[#0d0105]",
     accentColor: "#f8ca14",
-    badgeStyle: "bg-rose-500/20 text-rose-300 border-rose-400/40",
+    badgeStyle: "bg-[#de191e]/20 text-red-200 border-[#de191e]/40",
     textColor: "text-white",
-    subtextColor: "text-rose-200/80",
+    subtextColor: "text-red-100/80",
     pattern: "radial-gradient(circle at 30% 80%, rgba(248, 202, 20, 0.2) 0%, transparent 55%)",
     archGlow: "rgba(248, 202, 20, 0.35)"
   },
@@ -830,7 +830,7 @@ export default function AiImageGeneratorDialog({
                   {isPodcast ? "استوديو أغلفة البودكاست والإذاعة المدرسية 🎙️" : "استوديو الأغلفة التحريرية والصحفية 📰"}
                 </span>
                 <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black border flex items-center gap-1 ${
-                  isPodcast ? "bg-purple-500/20 text-purple-300 border-purple-400/40" : "bg-[#f8ca14]/20 text-[#f8ca14] border-[#f8ca14]/40"
+                  isPodcast ? "bg-[#08467d]/40 text-[#f8ca14] border-[#f8ca14]/40" : "bg-[#f8ca14]/20 text-[#f8ca14] border-[#f8ca14]/40"
                 }`}>
                   <Clock size={11} /> {isPodcast ? "هوية الاستوديو الصوتي والأسطوانة الذهبية" : "المخطوطة الملكية • سلسلة إثراء المعرفة"}
                 </span>
@@ -897,7 +897,7 @@ export default function AiImageGeneratorDialog({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="mr-2 grid h-8 w-8 place-items-center rounded-xl bg-white/10 hover:bg-rose-500 hover:text-white text-slate-400 transition"
+              className="mr-2 grid h-8 w-8 place-items-center rounded-xl bg-white/10 hover:bg-[#de191e] hover:text-white text-slate-400 transition"
               title="إغلاق الاستوديو"
             >
               <X size={16} />
@@ -976,7 +976,7 @@ export default function AiImageGeneratorDialog({
                         <button
                           type="button"
                           onClick={() => setCustomBgImage(null)}
-                          className="text-[10px] font-black text-rose-300 hover:text-rose-200 underline"
+                          className="text-[10px] font-black text-red-300 hover:text-red-200 underline"
                         >
                           استعادة المشاهد
                         </button>
@@ -1143,8 +1143,8 @@ export default function AiImageGeneratorDialog({
 
                   {/* Differentiated Specific Inputs */}
                   {isPodcast ? (
-                    <div className="space-y-1 bg-purple-500/10 p-2.5 rounded-xl border border-purple-500/20">
-                      <Label className="text-xs font-black text-purple-300">مدة الحلقة أو التسجيل الصوتي:</Label>
+                    <div className="space-y-1 bg-[#08467d]/20 p-2.5 rounded-xl border border-[#f8ca14]/30">
+                      <Label className="text-xs font-black text-[#f8ca14]">مدة الحلقة أو التسجيل الصوتي:</Label>
                       <Input
                         value={podcastDuration}
                         onChange={(e) => setPodcastDuration(e.target.value)}
@@ -1470,7 +1470,7 @@ export default function AiImageGeneratorDialog({
                         </div>
 
                         <div className="flex items-center gap-1.5">
-                          <span className="px-3 py-1 rounded-full border text-[11px] font-black bg-purple-500/20 text-purple-300 border-purple-400/40 shadow-sm flex items-center gap-1">
+                          <span className="px-3 py-1 rounded-full border text-[11px] font-black bg-[#08467d]/40 text-[#f8ca14] border-[#f8ca14]/40 shadow-sm flex items-center gap-1">
                             <Headphones size={12} /> {category || "بودكاست العقيق"}
                           </span>
                         </div>

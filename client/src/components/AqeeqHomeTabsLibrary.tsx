@@ -66,11 +66,11 @@ export function AqeeqHomeTabsLibrary({
   const { data: showcase } = trpc.aqeeqShowcases.publicShowcase.useQuery({ slug: "news-offers" });
 
   const tabs = [
-    { id: "podcasts", label: "البودكاست", icon: <Mic size={16} />, count: podcasts.length, color: "from-indigo-500 to-purple-600" },
-    { id: "articles", label: "المقالات", icon: <Newspaper size={16} />, count: articles.length, color: "from-rose-500 to-pink-600" },
-    { id: "albums", label: "الألبومات", icon: <ImageIcon size={16} />, count: albums.length, color: "from-emerald-500 to-teal-600" },
-    { id: "journal", label: "المجلة", icon: <BookOpen size={16} />, count: issues.length, color: "from-amber-500 to-yellow-600" },
-    { id: "showcase", label: "العروض", icon: <Clapperboard size={16} />, count: showcase?.posts?.length || 0, color: "from-cyan-500 to-blue-600" },
+    { id: "podcasts", label: "البودكاست", icon: <Mic size={16} />, count: podcasts.length, color: "from-[#08467d] to-[#0a589e]" },
+    { id: "articles", label: "المقالات", icon: <Newspaper size={16} />, count: articles.length, color: "from-[#de191e] to-red-700" },
+    { id: "albums", label: "الألبومات", icon: <ImageIcon size={16} />, count: albums.length, color: "from-emerald-600 to-[#367453]" },
+    { id: "journal", label: "المجلة", icon: <BookOpen size={16} />, count: issues.length, color: "from-amber-400 to-[#f8ca14]" },
+    { id: "showcase", label: "العروض", icon: <Clapperboard size={16} />, count: showcase?.posts?.length || 0, color: "from-[#08467d] to-[#0d5ca3]" },
   ] as const;
 
   // Build unified items for current tab
@@ -82,9 +82,9 @@ export function AqeeqHomeTabsLibrary({
           subtitle: "حوارات ملهمة، تجارب طلابية، وإذاعات مدرسية حصرية مسجلة بأعلى جودة.",
           viewAllText: "استمع لجميع الحلقات",
           viewAllHref: "/podcast",
-          themeColor: "#6366f1",
+          themeColor: "#f8ca14",
           heroBadge: "🎙️ أحدث الحلقات الصوتية",
-          icon: <Mic size={20} className="text-indigo-400" />,
+          icon: <Mic size={20} className="text-[#f8ca14]" />,
           items: podcasts.slice(0, 4).map((p): UnifiedLibraryCardItem => ({
             id: p.id,
             title: p.title,
@@ -101,9 +101,9 @@ export function AqeeqHomeTabsLibrary({
           subtitle: "رؤى فكرية وقراءات عميقة بقلم قادة المدارس ومعلميها المتميزين.",
           viewAllText: "تصفح مكتبة المقالات",
           viewAllHref: "/articles",
-          themeColor: "#f43f5e",
+          themeColor: "#de191e",
           heroBadge: "📰 مقال الأسبوع المميز",
-          icon: <Newspaper size={20} className="text-rose-400" />,
+          icon: <Newspaper size={20} className="text-[#de191e]" />,
           items: articles.slice(0, 4).map((a): UnifiedLibraryCardItem => ({
             id: a.id,
             title: a.title,
@@ -120,9 +120,9 @@ export function AqeeqHomeTabsLibrary({
           subtitle: "توثيق فوتوغرافي شامل لكل احتفالية وبطولة ومناسبة على مدار العام.",
           viewAllText: "استكشف كافة الألبومات",
           viewAllHref: "/albums",
-          themeColor: "#10b981",
+          themeColor: "#367453",
           heroBadge: "📸 تغطية مصورة كبرى",
-          icon: <ImageIcon size={20} className="text-emerald-400" />,
+          icon: <ImageIcon size={20} className="text-[#367453]" />,
           items: albums.slice(0, 4).map((al): UnifiedLibraryCardItem => ({
             id: al.id,
             title: al.title,
@@ -139,9 +139,9 @@ export function AqeeqHomeTabsLibrary({
           subtitle: "إصدارات دورية فاخرة تُنشر رقمياً مع خاصية تقليب الصفحات ثلاثية الأبعاد.",
           viewAllText: "أرشيف الأعداد الكامل",
           viewAllHref: "/journal",
-          themeColor: "#f59e0b",
+          themeColor: "#f8ca14",
           heroBadge: "📖 العدد الرسمي المتصدر",
-          icon: <BookOpen size={20} className="text-amber-400" />,
+          icon: <BookOpen size={20} className="text-[#f8ca14]" />,
           items: issues.slice(0, 4).map((i): UnifiedLibraryCardItem => ({
             id: i.id,
             title: i.title,
@@ -159,9 +159,9 @@ export function AqeeqHomeTabsLibrary({
           subtitle: "فيديوهات حية ورسائل بصرية سريعة تنبض بأحدث لحظات المدارس اليومية.",
           viewAllText: "مشاهدة شاشة العروض",
           viewAllHref: "/offers",
-          themeColor: "#06b6d4",
+          themeColor: "#08467d",
           heroBadge: "🎬 تغطية فيديو مباشرة",
-          icon: <Clapperboard size={20} className="text-cyan-400" />,
+          icon: <Clapperboard size={20} className="text-[#08467d]" />,
           items: posts.slice(0, 4).map((post): UnifiedLibraryCardItem => ({
             id: post.id,
             title: post.title || post.caption || "عرض وتغطية مباشرة",
@@ -298,7 +298,7 @@ export function AqeeqHomeTabsLibrary({
                         layoutId="libraryActivePill"
                         transition={{ type: "spring", stiffness: 350, damping: 30 }}
                         className={`absolute inset-0 rounded-full shadow-lg ${
-                          dark ? "bg-gradient-to-r from-[#f8ca14] to-yellow-600 !text-black" : "bg-gradient-to-r from-[#08467d] to-sky-700"
+                          dark ? "bg-gradient-to-r from-[#f8ca14] to-yellow-600 !text-black" : "bg-gradient-to-r from-[#08467d] to-[#0a589e]"
                         }`}
                       />
                     )}
@@ -382,18 +382,18 @@ export function AqeeqHomeTabsLibrary({
                     {/* Audio Spectrum Visualizer (When Podcast Tab) */}
                     {activeTab === "podcasts" && (
                       <div className="absolute top-20 right-6 sm:right-10 z-20 hidden sm:flex items-center gap-1 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
-                        <Volume2 size={14} className="text-indigo-400" />
+                        <Volume2 size={14} className="text-[#f8ca14]" />
                         <div className="flex items-center gap-0.5 h-3">
                           {[6, 12, 8, 14, 5, 10, 13, 7].map((h, i) => (
                             <motion.span
                               key={i}
                               animate={{ height: [4, h, 3] }}
                               transition={{ duration: 0.7 + i * 0.1, repeat: Infinity, ease: "easeInOut" }}
-                              className="w-1 bg-indigo-400 rounded-full inline-block"
+                              className="w-1 bg-[#f8ca14] rounded-full inline-block"
                             />
                           ))}
                         </div>
-                        <span className="text-[10px] font-black text-indigo-300 mr-1">صوت فائق النقاوة</span>
+                        <span className="text-[10px] font-black text-[#f8ca14] mr-1">صوت فائق النقاوة</span>
                       </div>
                     )}
 

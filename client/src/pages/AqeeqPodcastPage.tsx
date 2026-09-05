@@ -678,8 +678,8 @@ export default function AqeeqPodcastPage() {
                   onClick={() => navigate("/atheer/manage")}
                   className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
                     dark
-                      ? "border-purple-400/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
-                      : "border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                      : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d] hover:bg-[#08467d]/10"
                   }`}
                 >
                   <Sparkles size={14} />
@@ -798,14 +798,14 @@ export default function AqeeqPodcastPage() {
           >
             {/* Ambient Backlight */}
             <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
-            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-[#367453]/15 blur-3xl" />
 
             {/* Pavilion Header */}
             <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
               dark ? "border-emerald-500/20" : "border-emerald-200"
             }`}>
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 via-emerald-400 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/30">
+                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 via-emerald-400 to-[#367453] text-slate-950 shadow-md shadow-emerald-500/30">
                   <Radio size={20} />
                 </div>
                 <div>
@@ -917,7 +917,7 @@ export default function AqeeqPodcastPage() {
                       playPodcast(audioPodcasts[0]);
                     }
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-3.5 py-1.5 text-xs font-black shadow-md shadow-emerald-500/20 transition active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-[#367453] hover:from-emerald-400 hover:to-[#367453] text-slate-950 px-3.5 py-1.5 text-xs font-black shadow-md shadow-emerald-500/20 transition active:scale-95"
                 >
                   <Disc size={14} className="animate-[spin_3s_linear_infinite]" />
                   <span>تشغيل الكل</span>
@@ -960,7 +960,7 @@ export default function AqeeqPodcastPage() {
                           playPodcast(audioPodcasts[0]);
                         }
                       }}
-                      className={`relative cursor-pointer h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
+                      className={`relative cursor-pointer h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-emerald-500 via-[#367453] to-emerald-600 shadow-xl overflow-hidden grid place-items-center ${
                         isCurrentPlaying(currentActiveAudio?.id) ? "animate-[spin_4s_linear_infinite]" : "hover:scale-105 transition duration-300"
                       }`}
                     >
@@ -1007,7 +1007,7 @@ export default function AqeeqPodcastPage() {
                     <div className="relative h-2 flex items-center cursor-pointer group/bar">
                       <div className={`h-1.5 w-full rounded-full overflow-hidden ${dark ? "bg-white/15" : "bg-slate-200"}`}>
                         <div
-                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75"
+                          className="h-full bg-gradient-to-r from-emerald-500 to-[#367453] rounded-full transition-all duration-75"
                           style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                         />
                       </div>
@@ -1029,10 +1029,10 @@ export default function AqeeqPodcastPage() {
                           type="button"
                           onClick={(e) => handleLikePodcast(currentActiveAudio, e)}
                           className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
-                            dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                            dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-white hover:bg-[#de191e]/10 text-[#de191e]"
                           }`}
                         >
-                          <Heart size={10} className="fill-rose-500/20" />
+                          <Heart size={10} className="fill-[#de191e]/20" />
                           <span>{currentActiveAudio.likesCount || 0}</span>
                         </button>
                       )}
@@ -1070,7 +1070,7 @@ export default function AqeeqPodcastPage() {
                             playPodcast(audioPodcasts[0]);
                           }
                         }}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-md shadow-emerald-500/30 transition active:scale-95"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-emerald-500 to-[#367453] hover:from-emerald-400 hover:to-[#367453] text-slate-950 shadow-md shadow-emerald-500/30 transition active:scale-95"
                         title={isCurrentPlaying(currentActiveAudio?.id) ? "إيقاف مؤقت" : "استماع"}
                       >
                         {isCurrentPlaying(currentActiveAudio?.id) ? <Pause size={15} /> : <Play size={15} className="fill-current mr-0.5" />}
@@ -1095,7 +1095,7 @@ export default function AqeeqPodcastPage() {
                         className="text-slate-400 hover:text-emerald-500 transition p-0.5"
                         title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
                       >
-                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-rose-400" /> : <Volume2 size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />}
+                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-[#de191e]" /> : <Volume2 size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />}
                       </button>
                       <input
                         type="range"
@@ -1276,7 +1276,7 @@ export default function AqeeqPodcastPage() {
                               type="button"
                               onClick={(e) => handleLikePodcast(podcast, e)}
                               className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
-                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
+                                dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-slate-50 text-[#de191e]"
                               }`}
                             >
                               <Heart size={9} className="fill-current" />
@@ -1309,33 +1309,33 @@ export default function AqeeqPodcastPage() {
             id="videos-pavilion"
             className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border p-4 sm:p-6 pb-4 sm:pb-5 transition ${
               dark
-                ? "border-indigo-500/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(99,102,241,0.1)]"
-                : "border-indigo-200/80 bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 shadow-lg"
+                ? "border-[#08467d]/40 bg-gradient-to-b from-[#100d28] via-[#090b14] to-[#04060c] shadow-[0_20px_60px_rgba(99,102,241,0.1)]"
+                : "border-[#08467d]/20 bg-white shadow-xl"
             }`}
           >
             {/* Ambient Backlight */}
-            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
-            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[#08467d]/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-[#f8ca14]/15 blur-3xl" />
 
             {/* Pavilion Header */}
             <div className={`relative flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4 ${
-              dark ? "border-indigo-500/20" : "border-indigo-200"
+              dark ? "border-[#08467d]/20" : "border-slate-200"
             }`}>
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-500 text-white shadow-md shadow-indigo-600/30">
+                <div className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-[#08467d] text-white shadow-md shadow-[#08467d]/30">
                   <Video size={20} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${
                       dark
-                        ? "bg-indigo-500/20 border-indigo-400/40 text-indigo-300"
-                        : "bg-indigo-100 border-indigo-300 text-indigo-800"
+                        ? "bg-[#f8ca14]/15 border-[#f8ca14]/40 text-[#f8ca14]"
+                        : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
                     }`}>
                       CINEMA 4K · {videoPodcasts.length} حلقات
                     </span>
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
-                      dark ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20" : "bg-indigo-100/60 text-indigo-900 border-indigo-200"
+                      dark ? "bg-[#08467d]/10 text-[#f8ca14] border-[#08467d]/20" : "bg-[#08467d]/10/60 text-[#08467d] border-slate-200"
                     }`}>
                       فريق التقديم والإعلام 🎬
                     </span>
@@ -1356,7 +1356,7 @@ export default function AqeeqPodcastPage() {
                     onClick={() => setVideosViewMode("carousel")}
                     className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
                       videosViewMode === "carousel"
-                        ? "bg-indigo-600 text-white shadow-sm"
+                        ? "bg-[#08467d] text-[#f8ca14] shadow-sm"
                         : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
                     }`}
                   >
@@ -1368,7 +1368,7 @@ export default function AqeeqPodcastPage() {
                     onClick={() => setVideosViewMode("list")}
                     className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
                       videosViewMode === "list"
-                        ? "bg-indigo-600 text-white shadow-sm"
+                        ? "bg-[#08467d] text-[#f8ca14] shadow-sm"
                         : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
                     }`}
                   >
@@ -1384,7 +1384,7 @@ export default function AqeeqPodcastPage() {
                       type="button"
                       onClick={() => scrollHorizontal(videosScrollRef, "right")}
                       className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-[#08467d]" : "border-slate-200 bg-white text-slate-800 hover:bg-[#08467d] hover:text-white shadow-sm"
                       }`}
                       title="السابق"
                     >
@@ -1394,7 +1394,7 @@ export default function AqeeqPodcastPage() {
                       type="button"
                       onClick={() => scrollHorizontal(videosScrollRef, "left")}
                       className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-[#08467d]" : "border-slate-200 bg-white text-slate-800 hover:bg-[#08467d] hover:text-white shadow-sm"
                       }`}
                       title="التالي"
                     >
@@ -1407,7 +1407,7 @@ export default function AqeeqPodcastPage() {
                       type="button"
                       onClick={() => scrollVertical(videosListScrollRef, "up")}
                       className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-[#08467d]" : "border-slate-200 bg-white text-slate-800 hover:bg-[#08467d] hover:text-white shadow-sm"
                       }`}
                       title="تمرير لأعلى"
                     >
@@ -1417,7 +1417,7 @@ export default function AqeeqPodcastPage() {
                       type="button"
                       onClick={() => scrollVertical(videosListScrollRef, "down")}
                       className={`grid h-8 w-8 place-items-center rounded-xl border transition active:scale-95 ${
-                        dark ? "border-white/10 bg-white/5 text-white hover:bg-indigo-600" : "border-slate-200 bg-white text-slate-800 hover:bg-indigo-600 hover:text-white shadow-sm"
+                        dark ? "border-white/10 bg-white/5 text-white hover:bg-[#08467d]" : "border-slate-200 bg-white text-slate-800 hover:bg-[#08467d] hover:text-white shadow-sm"
                       }`}
                       title="تمرير لأسفل"
                     >
@@ -1434,7 +1434,7 @@ export default function AqeeqPodcastPage() {
                       setInlinePlayingVideoId(videoPodcasts[0].id);
                     }
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-3.5 py-1.5 text-xs font-black shadow-md shadow-indigo-600/20 transition active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#08467d] hover:bg-[#063560] text-white px-3.5 py-1.5 text-xs font-black shadow-md shadow-[#08467d]/20 transition active:scale-95"
                 >
                   <Play size={14} className="fill-current mr-0.5" />
                   <span>مشاهدة أحدث حلقة</span>
@@ -1447,10 +1447,10 @@ export default function AqeeqPodcastPage() {
               
               {/* Master 4K Video Screen Centerpiece */}
               <div className={`lg:col-span-5 flex flex-col justify-between text-center p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-xl min-h-[340px] lg:h-[405px] ${
-                dark ? "border-indigo-500/30 bg-black/60 text-white" : "border-indigo-200 bg-white/95 text-slate-900"
+                dark ? "border-[#08467d]/30 bg-black/60 text-white" : "border-slate-200 bg-white/95 text-slate-900"
               }`}>
                 <div className={`flex items-center justify-between border-b pb-2 ${dark ? "border-white/10" : "border-slate-200"}`}>
-                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                  <span className={`text-[10px] font-black flex items-center gap-1.5 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     <Sparkles size={12} />
                     <span>شاشة العرض المركزية 4K</span>
                   </span>
@@ -1462,7 +1462,7 @@ export default function AqeeqPodcastPage() {
                 {/* 16:9 Cinema Box */}
                 <div
                   ref={pavilionVideoContainerRef}
-                  className="group/pavilion relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto"
+                  className="group/pavilion relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(99,102,241,0.2)] my-auto"
                 >
                   {inlinePlayingVideoId === currentActiveVideo?.id && currentActiveVideo ? (
                     isEmbeddableVideo(currentActiveVideo.mediaUrl) ? (
@@ -1518,18 +1518,18 @@ export default function AqeeqPodcastPage() {
                           className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
                         />
                       ) : (
-                        <div className="grid h-full place-items-center bg-indigo-950/40">
-                          <Video size={40} className="text-indigo-400" />
+                        <div className="grid h-full place-items-center bg-[#06182e]">
+                          <Video size={40} className="text-[#f8ca14]" />
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
                       
-                      <div className="absolute top-2.5 right-2.5 rounded-md bg-indigo-600/90 backdrop-blur-md px-2 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-1">
+                      <div className="absolute top-2.5 right-2.5 rounded-md bg-[#08467d]/90 backdrop-blur-md px-2 py-0.5 text-[9px] font-black text-white shadow-sm flex items-center gap-1">
                         <Video size={10} /> مرئي 4K
                       </div>
 
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] group-hover/screen:scale-115 transition duration-300">
+                        <div className="grid h-12 w-12 place-items-center rounded-full bg-[#08467d] text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] group-hover/screen:scale-115 transition duration-300">
                           <Play size={20} className="fill-current mr-0.5" />
                         </div>
                       </div>
@@ -1542,7 +1542,7 @@ export default function AqeeqPodcastPage() {
                   <h3 className={`text-sm sm:text-base font-black line-clamp-1 ${dark ? "text-white" : "text-slate-950"}`}>
                     {currentActiveVideo ? currentActiveVideo.title : "حلقة مميزة تحت الضوء"}
                   </h3>
-                  <p className={`text-[11px] font-bold ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                  <p className={`text-[11px] font-bold ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     تقديم وإعداد: {currentActiveVideo?.hostName || "فريق التقديم والإعلام المدرسي"}
                   </p>
                 </div>
@@ -1560,10 +1560,10 @@ export default function AqeeqPodcastPage() {
                         type="button"
                         onClick={(e) => handleLikePodcast(currentActiveVideo, e)}
                         className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
-                          dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                          dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-white hover:bg-[#de191e]/10 text-[#de191e]"
                         }`}
                       >
-                        <Heart size={10} className="fill-rose-500/20" />
+                        <Heart size={10} className="fill-[#de191e]/20" />
                         <span>{currentActiveVideo.likesCount || 0}</span>
                       </button>
                     )}
@@ -1581,7 +1581,7 @@ export default function AqeeqPodcastPage() {
                       <button
                         type="button"
                         onClick={togglePavilionFullscreen}
-                        className="rounded-lg border border-indigo-400/40 bg-indigo-500/20 hover:bg-indigo-500 text-white px-2 py-0.5 text-[10px] font-black transition flex items-center gap-1"
+                        className="rounded-lg border border-[#f8ca14]/40 bg-[#f8ca14]/20 hover:bg-[#08467d] text-white px-2 py-0.5 text-[10px] font-black transition flex items-center gap-1"
                         title={isPavilionFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
                       >
                         {isPavilionFullscreen ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
@@ -1609,10 +1609,10 @@ export default function AqeeqPodcastPage() {
                           key={video.id}
                           className={`group relative flex flex-col justify-between shrink-0 snap-start rounded-2xl border p-3.5 transition duration-300 hover:-translate-y-0.5 ${
                             isThisActive
-                              ? "border-indigo-400 bg-indigo-500/15 ring-2 ring-indigo-400/40 shadow-[0_8px_20px_rgba(99,102,241,0.18)]"
+                              ? "border-[#f8ca14] bg-[#08467d]/20 ring-2 ring-[#f8ca14]/40 shadow-[0_8px_20px_rgba(99,102,241,0.18)]"
                               : dark
-                              ? "border-white/10 bg-black/40 hover:border-indigo-400/50 hover:bg-black/60 shadow-sm"
-                              : "border-slate-200/90 bg-white hover:border-indigo-400 hover:shadow-md shadow-sm"
+                              ? "border-white/10 bg-black/40 hover:border-[#f8ca14]/50 hover:bg-black/60 shadow-sm"
+                              : "border-slate-200/90 bg-white hover:border-[#f8ca14] hover:shadow-md shadow-sm"
                           }`}
                         >
                           <div className="flex items-start gap-3 text-right">
@@ -1627,12 +1627,12 @@ export default function AqeeqPodcastPage() {
                               {video.coverUrl ? (
                                 <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
-                                <div className="grid h-full place-items-center bg-indigo-950/40">
-                                  <Video size={16} className="text-indigo-400" />
+                                <div className="grid h-full place-items-center bg-[#06182e]">
+                                  <Video size={16} className="text-[#f8ca14]" />
                                 </div>
                               )}
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <div className="grid h-5 w-5 place-items-center rounded-full bg-indigo-600 text-white shadow-sm">
+                                <div className="grid h-5 w-5 place-items-center rounded-full bg-[#08467d] text-[#f8ca14] shadow-sm">
                                   <Play size={9} className="fill-current mr-0.5" />
                                 </div>
                               </div>
@@ -1640,7 +1640,7 @@ export default function AqeeqPodcastPage() {
 
                             <div className="text-right min-w-0 flex-1">
                               <div className="flex items-center justify-between">
-                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-indigo-400" : "text-indigo-700"}`}>
+                                <span className={`text-[9px] font-mono font-black uppercase ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                                   حلقة #{String(idx + 1).padStart(2, "0")}
                                 </span>
                                 <span className="text-[9px] font-mono text-slate-400">{video.duration || "12:00"}</span>
@@ -1649,7 +1649,7 @@ export default function AqeeqPodcastPage() {
                               <h4
                                 onClick={() => handlePlayVideoInline(video.id)}
                                 className={`mt-0.5 text-xs sm:text-sm font-black cursor-pointer truncate transition ${
-                                  dark ? "text-white hover:text-indigo-300" : "text-slate-900 hover:text-indigo-600"
+                                  dark ? "text-white hover:text-[#f8ca14]" : "text-slate-900 hover:text-[#08467d]"
                                 }`}
                               >
                                 {video.title}
@@ -1657,7 +1657,7 @@ export default function AqeeqPodcastPage() {
 
                               {/* Presenter Name */}
                               <p className="text-[10px] text-slate-500 font-bold truncate flex items-center gap-1 mt-0.5">
-                                <User size={10} className={dark ? "text-indigo-400" : "text-indigo-600"} />
+                                <User size={10} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
                                 <span>تقديم: {video.hostName || "فريق الإعلام والتقديم"}</span>
                               </p>
                             </div>
@@ -1672,14 +1672,14 @@ export default function AqeeqPodcastPage() {
 
                           {/* Action Bar */}
                           <div className={`mt-2.5 flex items-center justify-between border-t pt-2 ${dark ? "border-white/10" : "border-slate-100"}`}>
-                            <span className={`text-[9px] font-black ${dark ? "text-indigo-400" : "text-indigo-700"}`}>مرئي 4K</span>
+                            <span className={`text-[9px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>مرئي 4K</span>
 
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={(e) => handleShare(video, e)}
                                 className={`grid h-6 w-6 place-items-center rounded-lg border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-indigo-400" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-400 hover:text-[#f8ca14]" : "border-slate-200 bg-white hover:bg-slate-100 text-slate-600"
                                 }`}
                                 title="مشاركة"
                               >
@@ -1691,8 +1691,8 @@ export default function AqeeqPodcastPage() {
                                 onClick={() => handlePlayVideoInline(video.id)}
                                 className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black transition shadow-sm ${
                                   isThisPlaying
-                                    ? "bg-indigo-600 text-white font-black shadow-indigo-600/25"
-                                    : dark ? "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white" : "bg-indigo-100 text-indigo-900 hover:bg-indigo-600 hover:text-white"
+                                    ? "bg-[#08467d] text-white font-black shadow-[#08467d]/25"
+                                    : dark ? "bg-[#08467d]/20 text-[#f8ca14] hover:bg-[#08467d] hover:text-white" : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
                                 }`}
                               >
                                 <Play size={10} className="mr-0.5 fill-current" />
@@ -1721,14 +1721,14 @@ export default function AqeeqPodcastPage() {
                           onClick={() => handlePlayVideoInline(video.id)}
                           className={`group flex items-center justify-between gap-3 rounded-xl border p-2.5 cursor-pointer transition snap-start ${
                             isThisActive
-                              ? "border-indigo-400 bg-indigo-500/15 shadow-sm"
+                              ? "border-[#f8ca14] bg-[#08467d]/20 shadow-sm"
                               : dark
-                              ? "border-white/5 bg-white/[0.02] hover:border-indigo-400/40 hover:bg-white/[0.06]"
-                              : "border-slate-200/80 bg-white hover:border-indigo-300 hover:bg-indigo-50/50 shadow-sm"
+                              ? "border-white/5 bg-white/[0.02] hover:border-[#f8ca14]/40 hover:bg-white/[0.06]"
+                              : "border-slate-200/80 bg-white hover:border-slate-200 hover:bg-[#08467d]/5 shadow-sm"
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                            <span className="w-6 text-center font-mono text-[11px] font-black text-indigo-400">
+                            <span className="w-6 text-center font-mono text-[11px] font-black text-[#f8ca14]">
                               #{String(idx + 1).padStart(2, "0")}
                             </span>
 
@@ -1736,8 +1736,8 @@ export default function AqeeqPodcastPage() {
                               {video.coverUrl ? (
                                 <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
-                                <div className="grid h-full place-items-center bg-indigo-950">
-                                  <Video size={13} className="text-indigo-400" />
+                                <div className="grid h-full place-items-center bg-[#06182e]">
+                                  <Video size={13} className="text-[#f8ca14]" />
                                 </div>
                               )}
                             </div>
@@ -1745,8 +1745,8 @@ export default function AqeeqPodcastPage() {
                             <div className="min-w-0 flex-1">
                               <h4 className={`text-xs sm:text-sm font-black truncate transition ${
                                 isThisActive
-                                  ? "text-indigo-400"
-                                  : dark ? "text-white group-hover:text-indigo-300" : "text-slate-900 group-hover:text-indigo-700"
+                                  ? "text-[#f8ca14]"
+                                  : dark ? "text-white group-hover:text-[#f8ca14]" : "text-slate-900 group-hover:text-[#08467d]"
                               }`}>
                                 {video.title}
                               </h4>
@@ -1761,7 +1761,7 @@ export default function AqeeqPodcastPage() {
                               type="button"
                               onClick={(e) => handleLikePodcast(video, e)}
                               className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
-                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
+                                dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-slate-50 text-[#de191e]"
                               }`}
                             >
                               <Heart size={9} className="fill-current" />
@@ -1770,8 +1770,8 @@ export default function AqeeqPodcastPage() {
 
                             <div className={`grid h-7 w-7 place-items-center rounded-lg transition ${
                               isThisActive
-                                ? "bg-indigo-600 text-white font-black"
-                                : "bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white"
+                                ? "bg-[#08467d] text-white font-black"
+                                : "bg-[#08467d]/20 text-[#f8ca14] group-hover:bg-[#08467d] group-hover:text-white"
                             }`}>
                               <Play size={11} className="fill-current mr-0.5" />
                             </div>
@@ -2031,14 +2031,14 @@ export default function AqeeqPodcastPage() {
                         onClick={(e) => handleLikeSong(activeItem || songs[0], e)}
                         className={`flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[10px] font-bold transition ${
                           likedSongIds.includes(String((activeItem || songs[0])?.id || "song-0"))
-                            ? "border-rose-500/40 bg-rose-500/20 text-rose-400"
-                            : dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                            ? "border-[#de191e]/40 bg-[#de191e]/20 text-[#de191e]"
+                            : dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-white hover:bg-[#de191e]/10 text-[#de191e]"
                         }`}
                         title="إعجاب بالنشيد"
                       >
                         <Heart
                           size={11}
-                          className={likedSongIds.includes(String((activeItem || songs[0])?.id || "song-0")) ? "fill-rose-500 text-rose-500" : "fill-rose-500/20"}
+                          className={likedSongIds.includes(String((activeItem || songs[0])?.id || "song-0")) ? "fill-[#de191e] text-[#de191e]" : "fill-[#de191e]/20"}
                         />
                         <span>{songLikes[String((activeItem || songs[0])?.id || "song-0")] || 142}</span>
                       </button>
@@ -2112,7 +2112,7 @@ export default function AqeeqPodcastPage() {
                         className="text-slate-400 hover:text-amber-500 transition p-0.5"
                         title={isMuted || volume === 0 ? "إلغاء الكتم" : "كتم الصوت"}
                       >
-                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-rose-400" /> : <Volume2 size={13} className={dark ? "text-amber-400" : "text-amber-600"} />}
+                        {isMuted || volume === 0 ? <VolumeX size={13} className="text-[#de191e]" /> : <Volume2 size={13} className={dark ? "text-amber-400" : "text-amber-600"} />}
                       </button>
                       <input
                         type="range"
@@ -2221,14 +2221,14 @@ export default function AqeeqPodcastPage() {
                                 onClick={(e) => handleLikeSong(song, e)}
                                 className={`flex items-center gap-0.5 rounded-lg border px-2 py-0.5 text-[9px] font-bold transition ${
                                   likedSongIds.includes(String(song.id || `song-${idx}`))
-                                    ? "border-rose-500/40 bg-rose-500/20 text-rose-400"
-                                    : dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-white hover:bg-rose-50 text-rose-500"
+                                    ? "border-[#de191e]/40 bg-[#de191e]/20 text-[#de191e]"
+                                    : dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-white hover:bg-[#de191e]/10 text-[#de191e]"
                                 }`}
                                 title="إعجاب بالنشيد"
                               >
                                 <Heart
                                   size={10}
-                                  className={likedSongIds.includes(String(song.id || `song-${idx}`)) ? "fill-rose-500 text-rose-500" : "fill-rose-500/20"}
+                                  className={likedSongIds.includes(String(song.id || `song-${idx}`)) ? "fill-[#de191e] text-[#de191e]" : "fill-[#de191e]/20"}
                                 />
                                 <span>{songLikes[String(song.id || `song-${idx}`)] || 98}</span>
                               </button>
@@ -2330,7 +2330,7 @@ export default function AqeeqPodcastPage() {
                               type="button"
                               onClick={(e) => handleLikeSong(song, e)}
                               className={`flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[9px] font-bold transition ${
-                                dark ? "border-white/10 hover:bg-rose-500/10 text-rose-400" : "border-slate-200 bg-slate-50 text-rose-500"
+                                dark ? "border-white/10 hover:bg-[#de191e]/10 text-[#de191e]" : "border-slate-200 bg-slate-50 text-[#de191e]"
                               }`}
                             >
                               <Heart size={9} className="fill-current" />
@@ -2363,7 +2363,7 @@ export default function AqeeqPodcastPage() {
       {watchingVideoPodcast && (
         <Dialog open={Boolean(watchingVideoPodcast)} onOpenChange={() => setWatchingVideoPodcast(null)}>
           <DialogContent
-            className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-indigo-500/40 bg-[#070a14]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(99,102,241,0.15)] backdrop-blur-3xl flex flex-col"
+            className="w-[calc(100vw-0.5rem)] sm:w-[min(95vw,calc((88vh-80px)*16/9),1200px)] sm:max-w-none !max-w-none max-h-[96vh] sm:max-h-[92vh] overflow-hidden rounded-[1.4rem] sm:rounded-[2.4rem] border-2 border-[#08467d]/40 bg-[#070a14]/98 p-0 text-right text-white shadow-[0_32px_120px_rgba(0,0,0,0.95),0_0_80px_rgba(99,102,241,0.15)] backdrop-blur-3xl flex flex-col"
             dir="rtl"
           >
             <div ref={watchingVideoModalRef} className="flex flex-col h-full w-full bg-black">
@@ -2411,7 +2411,7 @@ export default function AqeeqPodcastPage() {
               <div className="flex items-center justify-between gap-3 border-t border-white/10 bg-gradient-to-r from-[#090d1c] via-[#0e1428] to-[#090d1c] px-3.5 sm:px-6 py-2.5 sm:py-3.5 shrink-0">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-indigo-600 text-white px-2 py-0.5 text-[10px] font-black shrink-0">{watchingVideoPodcast.category}</span>
+                    <span className="rounded-md bg-[#08467d] text-white px-2 py-0.5 text-[10px] font-black shrink-0">{watchingVideoPodcast.category}</span>
                     <h3 className="text-xs sm:text-sm font-black text-white truncate">{watchingVideoPodcast.title}</h3>
                   </div>
                   {watchingVideoPodcast.description && (
@@ -2424,7 +2424,7 @@ export default function AqeeqPodcastPage() {
                   <button
                     type="button"
                     onClick={toggleWatchingModalFullscreen}
-                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400/20 hover:text-indigo-200 active:scale-95"
+                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-200 transition hover:border-[#f8ca14] hover:bg-[#f8ca14]/15 hover:text-[#f8ca14] active:scale-95"
                     title={isWatchingModalFullscreen ? "تصغير الشاشة" : "ملء الشاشة بالكامل (Fullscreen)"}
                   >
                     {isWatchingModalFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
@@ -2438,7 +2438,7 @@ export default function AqeeqPodcastPage() {
                       }
                       setWatchingVideoPodcast(null);
                     }}
-                    className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-indigo-400 hover:bg-indigo-400 hover:text-white active:scale-95"
+                    className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl border border-white/20 text-slate-200 transition hover:border-[#f8ca14] hover:bg-[#f8ca14]/20 hover:text-[#f8ca14] active:scale-95"
                     aria-label="إغلاق"
                   >
                     <X size={16} />

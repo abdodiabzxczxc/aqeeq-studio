@@ -98,14 +98,14 @@ export function AqeeqStaffWalkieCapsule() {
           onClick={() => setIsOpen(true)}
           className="group relative flex items-center gap-3 rounded-full border border-red-500/40 bg-gradient-to-r from-[#170c10] via-[#221016] to-[#12080c] p-2.5 sm:px-4 sm:py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-red-500 hover:shadow-red-500/20"
         >
-          <div className="relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-red-600 to-rose-400 text-white font-black shadow-lg">
+          <div className="relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-tr from-[#de191e] to-red-600 text-white font-black shadow-lg">
             <Radio size={20} className="animate-pulse" />
             <span className="absolute -top-0.5 -left-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-slate-950" />
           </div>
 
           <div className="hidden sm:block text-right">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-rose-300">اللاسلكي الإداري</span>
+              <span className="text-xs font-black text-red-200">اللاسلكي الإداري</span>
               <span className="rounded bg-red-500/30 px-1.5 py-0.2 text-[9px] text-red-200 font-mono">PTT</span>
             </div>
             <p className="text-[10px] text-slate-400 font-bold">نداء الكادر المباشر 📟</p>

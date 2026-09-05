@@ -199,11 +199,11 @@ export function AqeeqNewsMarquee({
   if (rawItems.length === 0) return null;
 
   const iconMap = {
-    article: <Newspaper size={13} className={dark ? "text-rose-400" : "text-rose-600"} />,
-    video: <Video size={13} className={dark ? "text-sky-400" : "text-sky-600"} />,
-    podcast: <Mic size={13} className={dark ? "text-indigo-400" : "text-indigo-600"} />,
-    album: <ImageIcon size={13} className={dark ? "text-emerald-400" : "text-emerald-600"} />,
-    journal: <BookOpen size={13} className={dark ? "text-amber-400" : "text-amber-600"} />,
+    article: <Newspaper size={13} className={dark ? "text-[#de191e]" : "text-[#de191e]"} />,
+    video: <Video size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
+    podcast: <Mic size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
+    album: <ImageIcon size={13} className={dark ? "text-emerald-300" : "text-[#367453]"} />,
+    journal: <BookOpen size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />,
   };
 
   const renderBatch = (items: MarqueeItem[], keyPrefix: string, isFirst = false) => (
@@ -231,14 +231,14 @@ export function AqeeqNewsMarquee({
             <span
               className={`text-[9.5px] sm:text-[10.5px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
                 item.icon === "article"
-                  ? dark ? "bg-rose-500/15 text-rose-300 border-rose-500/30" : "bg-rose-50 text-rose-700 border-rose-200"
+                  ? dark ? "bg-[#de191e]/15 text-[#de191e] border-[#de191e]/30" : "bg-[#de191e]/10 text-[#de191e] border-[#de191e]/20"
                   : item.icon === "video"
-                  ? dark ? "bg-sky-500/15 text-sky-300 border-sky-500/30" : "bg-sky-50 text-sky-700 border-sky-200"
+                  ? dark ? "bg-[#08467d]/30 text-[#f8ca14] border-[#08467d]/50" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/20"
                   : item.icon === "podcast"
-                  ? dark ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                  ? dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#f8ca14]/10 text-[#08467d] border-[#f8ca14]/40"
                   : item.icon === "album"
-                  ? dark ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : dark ? "bg-amber-500/15 text-amber-300 border-amber-500/30" : "bg-amber-50 text-amber-800 border-amber-200"
+                  ? dark ? "bg-[#367453]/20 text-emerald-300 border-[#367453]/40" : "bg-[#367453]/10 text-[#367453] border-[#367453]/20"
+                  : dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#f8ca14]/10 text-[#08467d] border-[#f8ca14]/40"
               }`}
             >
               {item.label}

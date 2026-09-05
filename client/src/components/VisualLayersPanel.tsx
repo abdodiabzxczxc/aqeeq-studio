@@ -174,7 +174,7 @@ export default function VisualLayersPanel({ open, onClose, onOpenTrash }: { open
                         type="button"
                         onClick={() => patchLayer(layer, { isLocked: !(override?.isLocked ?? false) })}
                         className={`grid h-7 w-7 place-items-center rounded-lg transition ${
-                          override?.isLocked ? "bg-rose-500/20 text-rose-300" : "text-slate-400 hover:bg-white/[0.08] hover:text-white"
+                          override?.isLocked ? "bg-[#de191e]/20 text-[#de191e]" : "text-slate-400 hover:bg-white/[0.08] hover:text-white"
                         }`}
                         title={override?.isLocked ? "إلغاء القفل" : "قفل"}
                       >
@@ -208,7 +208,7 @@ export default function VisualLayersPanel({ open, onClose, onOpenTrash }: { open
                         type="button"
                         onClick={() => deleteLayer(layer.id, layer.label)}
                         disabled={Boolean(override?.isLocked)}
-                        className="grid h-7 w-7 place-items-center rounded-lg text-rose-400 transition hover:bg-rose-500/20 hover:text-rose-200 disabled:opacity-30"
+                        className="grid h-7 w-7 place-items-center rounded-lg text-[#de191e] transition hover:bg-[#de191e]/20 hover:text-[#de191e] disabled:opacity-30"
                         title="حذف"
                       >
                         <Trash2 size={12} />

@@ -204,7 +204,7 @@ function QrModal({
             <Printer size={15} />
             طباعة البطاقة
           </button>
-          <button onClick={() => window.open(`/guest/${encodeURIComponent(attendee.qrCode)}`, "_blank", "noopener,noreferrer")} className="col-span-2 rounded-xl border border-cyan-400/35 bg-cyan-400/10 py-2.5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-400/15">فتح بطاقة الضيف الحيّة</button>
+          <button onClick={() => window.open(`/guest/${encodeURIComponent(attendee.qrCode)}`, "_blank", "noopener,noreferrer")} className="col-span-2 rounded-xl border border-[#f8ca14]/35 bg-[#f8ca14]/10 py-2.5 text-sm font-bold text-[#f8ca14] transition hover:bg-[#f8ca14]/20">فتح بطاقة الضيف الحيّة</button>
         </div>
       </motion.div>
     </div>
@@ -303,12 +303,12 @@ function AttendeeModal({
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">الاسم الكامل *</label>
               <input className={inputClass} style={inputStyle} value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))} placeholder="أدخل الاسم الكامل" />
-              {errors.fullName && <p className="text-xs text-rose-400 mt-1">{errors.fullName}</p>}
+              {errors.fullName && <p className="text-xs text-[#de191e] mt-1">{errors.fullName}</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">رقم الهوية *</label>
               <input className={inputClass} style={inputStyle} value={form.idNumber} onChange={e => setForm(f => ({ ...f, idNumber: e.target.value }))} placeholder="رقم الهوية" />
-              {errors.idNumber && <p className="text-xs text-rose-400 mt-1">{errors.idNumber}</p>}
+              {errors.idNumber && <p className="text-xs text-[#de191e] mt-1">{errors.idNumber}</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">رقم المقعد</label>
@@ -360,7 +360,7 @@ function DeleteConfirm({ name, onConfirm, onCancel, loading }: { name: string; o
         style={{ background: "oklch(13% 0.015 250)", border: "1px solid oklch(55% 0.22 25 / 0.3)" }}
       >
         <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "oklch(55% 0.22 25 / 0.1)" }}>
-          <Trash2 size={22} className="text-rose-400" />
+          <Trash2 size={22} className="text-[#de191e]" />
         </div>
         <h3 className="font-bold text-amber-100 mb-2">تأكيد الحذف</h3>
         <p className="text-sm text-slate-400 mb-6">هل أنت متأكد من حذف <span className="text-amber-200 font-semibold">{name}</span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
@@ -767,7 +767,7 @@ export default function AttendeesPage({ ceremonyId, invitationTool, onStatsChang
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border text-slate-300 hover:bg-slate-800 transition-all disabled:opacity-50"
             style={{ borderColor: "oklch(28% 0.025 250)" }}
           >
-            {bulkInvitationLoading ? <Loader2 size={14} className="animate-spin text-sky-300" /> : <FileText size={14} className="text-sky-300" />}
+            {bulkInvitationLoading ? <Loader2 size={14} className="animate-spin text-[#f8ca14]" /> : <FileText size={14} className="text-[#f8ca14]" />}
             دعوات ZIP ({selectedIds.size})
           </button>
           <button
@@ -881,7 +881,7 @@ export default function AttendeesPage({ ceremonyId, invitationTool, onStatsChang
                         <button
                           onClick={() => setDeleteTarget(attendee)}
                           title="حذف الضيف"
-                          className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all"
+                          className="p-2 rounded-lg bg-[#de191e]/10 text-[#de191e] hover:bg-[#de191e]/20 transition-all"
                         >
                           <Trash2 size={15} />
                         </button>

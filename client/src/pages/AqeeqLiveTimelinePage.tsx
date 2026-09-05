@@ -118,9 +118,9 @@ export default function AqeeqLiveTimelinePage({ slug }: { slug?: string }) {
             <button
               type="button"
               onClick={() => triggerReaction("hearts", "❤️")}
-              className="flex items-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-500/15 px-4 py-2 text-xs font-black text-rose-300 hover:scale-105 transition shadow-lg"
+              className="flex items-center gap-2 rounded-2xl border border-[#de191e]/40 bg-[#de191e]/15 px-4 py-2 text-xs font-black text-[#de191e] hover:scale-105 transition shadow-lg"
             >
-              <Heart size={16} className="fill-rose-500" />
+              <Heart size={16} className="fill-[#de191e] text-[#de191e]" />
               <span>تبريكات وفخر ({event?.totalReactions?.hearts || 0})</span>
             </button>
 
@@ -227,9 +227,9 @@ export default function AqeeqLiveTimelinePage({ slug }: { slug?: string }) {
                     <button
                       type="button"
                       onClick={() => triggerReaction("hearts", "❤️", m.id)}
-                      className="inline-flex items-center gap-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 text-xs font-bold text-rose-300 transition"
+                      className="inline-flex items-center gap-1 rounded-xl bg-[#de191e]/15 hover:bg-[#de191e]/25 px-2.5 py-1 text-xs font-bold text-[#de191e] transition"
                     >
-                      <Heart size={13} className="fill-rose-500" />
+                      <Heart size={13} className="fill-[#de191e] text-[#de191e]" />
                       <span>{m.reactions?.hearts || 0}</span>
                     </button>
                     <button

@@ -24,7 +24,7 @@ export default function SchoolNewsMonthlyPage({ monthKey }: { monthKey: string; 
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen transition-colors ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#f5f1e7] text-slate-800"}`}>
+      <main dir="rtl" className={`min-h-screen transition-colors ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#f8fafc] text-slate-900"}`}>
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
         <div className="mx-auto max-w-[1500px] px-4 py-8 animate-pulse">
           <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
@@ -35,11 +35,11 @@ export default function SchoolNewsMonthlyPage({ monthKey }: { monthKey: string; 
   }
 
   return (
-    <main dir="rtl" className={`min-h-screen transition-colors ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#f5f1e7] text-slate-800"}`}>
+    <main dir="rtl" className={`min-h-screen transition-colors ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#f8fafc] text-slate-900"}`}>
       <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={data?.issues[0]?.headerLogoUrl} />
       <div className="mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6">
         {/* Unconditional Breadcrumb Navigation */}
-        <nav className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
+        <nav className={`mb-4 flex items-center justify-between gap-2 text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
           <div className="flex items-center gap-2">
             <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
             <span className="opacity-40">›</span>

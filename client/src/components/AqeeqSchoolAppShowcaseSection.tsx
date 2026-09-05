@@ -216,7 +216,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                   <span>النداء الآلي الذكي</span>
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
                 </p>
-                <p className="text-[10px] text-slate-400">ولي أمر الطالب فهد وصل للبوابة 1</p>
+                <p className={`text-[10px] ${dark ? "text-slate-400" : "text-slate-600"}`}>ولي أمر الطالب فهد وصل للبوابة 1</p>
               </div>
             </motion.div>
 
@@ -236,8 +236,8 @@ export default function AqeeqSchoolAppShowcaseSection({
                 🌟
               </div>
               <div className="text-right">
-                <p className="text-[11px] font-black text-amber-400">وسام التفوق والشهادات</p>
-                <p className="text-[10px] text-slate-400">تم رصد درجات الشهر بنجاح</p>
+                <p className={`text-[11px] font-black ${dark ? "text-amber-400" : "text-amber-800"}`}>وسام التفوق والشهادات</p>
+                <p className={`text-[10px] ${dark ? "text-slate-400" : "text-slate-600"}`}>تم رصد درجات الشهر بنجاح</p>
               </div>
             </motion.div>
 
@@ -361,7 +361,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                   dark ? "text-white" : "text-[#0a192f]"
                 }`}
               >
-                <Sparkles size={16} className="text-[#f8ca14]" />
+                <Sparkles size={16} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
                 <span>أبرز خدمات ومميزات التطبيق</span>
               </h3>
 
@@ -387,7 +387,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                         >
                           {f.title}
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        <p className={`text-[11px] mt-0.5 leading-relaxed ${dark ? "text-slate-400" : "text-slate-600"}`}>
                           {f.desc}
                         </p>
                       </div>
@@ -421,7 +421,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                       </div>
                     )}
                   </div>
-                  <span className="mt-2 text-[10px] font-black text-slate-500 flex items-center gap-1">
+                  <span className={`mt-2 text-[10px] font-black flex items-center gap-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>
                     <QrIcon size={12} className="text-[#015a37]" />
                     <span>امسح بكاميرا الجوال</span>
                   </span>
@@ -436,7 +436,7 @@ export default function AqeeqSchoolAppShowcaseSection({
                   >
                     حمل التطبيق الآن مجاناً 📲
                   </span>
-                  <p className="text-[11px] text-slate-500 leading-snug">
+                  <p className={`text-[11px] leading-snug ${dark ? "text-slate-400" : "text-slate-600"}`}>
                     متوفر لجميع أجهزة آبل بنظام iOS وأجهزة أندرويد:
                   </p>
 

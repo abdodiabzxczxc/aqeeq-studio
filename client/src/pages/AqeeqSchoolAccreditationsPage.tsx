@@ -311,8 +311,8 @@ export default function AqeeqSchoolAccreditationsPage() {
                     }}
                     className={`absolute bottom-[10%] right-[1%] top-[12%] w-[47%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition duration-300 ${
                       dark
-                        ? "border-cyan-500/35 bg-[#071118]/95 shadow-black/90 ring-1 ring-cyan-500/20"
-                        : "border-cyan-700/25 bg-white shadow-cyan-950/15"
+                        ? "border-[#08467d]/40 bg-[#06182e]/95 shadow-black/90 ring-1 ring-[#08467d]/30"
+                        : "border-[#08467d]/20 bg-white shadow-lg"
                     }`}
                   >
                     <div className="relative overflow-hidden rounded-[1.4rem] sm:rounded-[1.8rem] h-full w-full">
@@ -324,12 +324,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                         className="h-full w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
-                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-cyan-400/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-cyan-300 shadow-md">
-                        <Award size={12} className="text-cyan-300" />
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-[#f8ca14] shadow-md">
+                        <Award size={12} className="text-[#f8ca14]" />
                         <span>خامس العالم 🌐</span>
                       </div>
                       <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right">
-                        <span className="text-[9px] font-black text-cyan-300 block">WRO INTERNATIONAL</span>
+                        <span className="text-[9px] font-black text-[#f8ca14] block">WRO INTERNATIONAL</span>
                         <h4 className="text-xs sm:text-sm font-black drop-shadow truncate">أولمبياد الروبوت الدولي</h4>
                       </div>
                     </div>
@@ -912,7 +912,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                     >
                       <div>
                         <div className="flex items-center justify-between mb-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-xl bg-rose-500/15 px-3 py-1 text-xs font-black text-rose-400 border border-rose-500/30">
+                          <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#de191e]/10 px-3 py-1 text-xs font-black text-[#de191e] border border-[#de191e]/20">
                             ACT Official Test Venue
                           </span>
                           <span className="text-xs font-bold text-slate-400">American ACT Center</span>
@@ -945,10 +945,10 @@ export default function AqeeqSchoolAccreditationsPage() {
 
                         <div className="space-y-2 text-xs font-bold mb-6 text-right">
                           <div className="flex items-center gap-2">
-                            <CheckCircle2 size={15} className="text-rose-500" /> بيئة اختبارات دولية بمواصفات قياسية
+                            <CheckCircle2 size={15} className="text-[#de191e]" /> بيئة اختبارات دولية بمواصفات قياسية
                           </div>
                           <div className="flex items-center gap-2">
-                            <CheckCircle2 size={15} className="text-rose-500" /> مشرفون ومراقبون معتمدون دولياً
+                            <CheckCircle2 size={15} className="text-[#de191e]" /> مشرفون ومراقبون معتمدون دولياً
                           </div>
                         </div>
                       </div>
@@ -957,7 +957,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                         href="https://global.act.org/"
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white px-5 py-3 text-xs font-black transition shadow"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#de191e] hover:bg-[#c41419] text-white px-5 py-3 text-xs font-black transition shadow"
                       >
                         <span>التسجيل في اختبار ACT الدولي</span>
                         <ExternalLink size={13} />
@@ -1049,7 +1049,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                     {/* Championship 2: World Robot Olympiad */}
                     <div
                       className={`rounded-3xl border p-5 shadow-lg relative overflow-hidden transition hover:shadow-xl ${
-                        dark ? "border-cyan-500/30 bg-[#080d14]" : "border-cyan-700/20 bg-[#f7fbff]"
+                        dark ? "border-[#08467d]/40 bg-[#06182e]" : "border-[#08467d]/20 bg-white"
                       }`}
                     >
                       <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
@@ -1059,17 +1059,17 @@ export default function AqeeqSchoolAccreditationsPage() {
                           className="h-full w-full object-cover transition duration-700 hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-cyan-400/40 px-3 py-1 text-xs font-black text-cyan-300 shadow-md">
-                          <Award size={12} className="text-cyan-300" />
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-[#f8ca14]/40 px-3 py-1 text-xs font-black text-[#f8ca14] shadow-md">
+                          <Award size={12} className="text-[#f8ca14]" />
                           <span>خامس العالم 🏆</span>
                         </div>
                         <div className="absolute bottom-3 right-3 left-3 text-white text-right">
-                          <span className="text-[10px] font-black text-cyan-300">WRO INTERNATIONAL</span>
+                          <span className="text-[10px] font-black text-[#f8ca14]">WRO INTERNATIONAL</span>
                           <h4 className="text-sm font-black drop-shadow">أولمبياد الروبوت العالمي (WRO)</h4>
                         </div>
                       </div>
 
-                      <h4 className={`text-base font-black mb-2 text-right ${dark ? "text-cyan-300" : "text-cyan-800"}`}>
+                      <h4 className={`text-base font-black mb-2 text-right ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                         المركز الخامس عالمياً في أولمبياد الروبوت العالمي (WRO)
                       </h4>
                       <p
@@ -1082,10 +1082,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                       </p>
 
                       <div className="flex flex-wrap gap-2 text-[11px] font-black text-right">
-                        <span className="rounded-xl px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                        <span className="rounded-xl px-2.5 py-1 bg-[#08467d]/10 border border-[#08467d]/20 text-[#08467d] dark:bg-[#f8ca14]/10 dark:border-[#f8ca14]/30 dark:text-[#f8ca14]">
                           المركز الخامس عالمياً 🌐
                         </span>
-                        <span className="rounded-xl px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                        <span className="rounded-xl px-2.5 py-1 bg-[#08467d]/10 border border-[#08467d]/20 text-[#08467d] dark:bg-[#f8ca14]/10 dark:border-[#f8ca14]/30 dark:text-[#f8ca14]">
                           منافسة أكثر من 80 دولة
                         </span>
                       </div>
@@ -1237,7 +1237,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   badge: "مسار الرواد",
                   desc: "سيرة ذاتية متكاملة وساعات AP معتمدة تؤهل لمنحة خادم الحرمين الشريفين.",
                   icon: Compass,
-                  accent: "text-cyan-400 border-cyan-500/40 bg-cyan-950/40",
+                  accent: "text-[#08467d] border-[#08467d]/40 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/30",
                   offset: staggerCol1,
                 },
                 {

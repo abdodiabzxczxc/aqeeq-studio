@@ -8,8 +8,8 @@ type MaisonMode = "premiere" | "honor" | "portrait";
 const phaseCopy = {
   sealed: { label: "الختم المغلق", action: "اقتربت لحظة الكشف", tone: "text-slate-300" },
   reveal: { label: "الإصدار متاح الآن", action: "ادخل تجربة العقيق", tone: "text-amber-200" },
-  live: { label: "ليلة العقيق بدأت", action: "عيش اللحظة الآن", tone: "text-sky-200" },
-  archive: { label: "حُفظت داخل السجل", action: "اكتشف البورتريه", tone: "text-violet-200" },
+  live: { label: "ليلة العقيق بدأت", action: "عيش اللحظة الآن", tone: "text-[#f8ca14]" },
+  archive: { label: "حُفظت داخل السجل", action: "اكتشف البورتريه", tone: "text-amber-200" },
 };
 
 function safeList(value?: string | null) {
@@ -54,7 +54,7 @@ function Premiere({ event, maison, brand, navigate, route }: { event: any; maiso
     <div className="order-1 lg:order-2"><VisualEditable id="maison-premiere-kicker" tag="text" label="شارة العرض الأول" as="div" defaultText={sealed ? "ختم محفوظ حتى لحظة الإعلان" : maison.sealLabel} className="text-xs font-black" style={{ color: brand }} />
       <VisualEditable id="maison-premiere-title" tag="text" label="عنوان بوابة العرض الأول" as="h1" defaultText={sealed ? "هذه الليلة لم تُكشف بعد." : maison.premiereTitle} className="mt-5 max-w-3xl text-5xl font-black leading-[1.18] text-amber-50 md:text-7xl" />
       <VisualEditable id="maison-premiere-phrase" tag="text" label="عبارة بوابة العرض الأول" as="p" defaultText={sealed ? maison.launchNote || "بقيت لحظة واحدة." : maison.premierePhrase || "تفاصيل صُنعت لتبقى في الذاكرة."} className="mt-6 max-w-xl text-lg leading-9 text-slate-400" />
-      <div className="mt-9 flex flex-wrap gap-3">{sealed ? <button onClick={() => navigate(route)} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.035] px-5 py-3.5 text-sm font-black text-slate-200 transition hover:border-amber-300/35"><LockKeyhole size={17} style={{ color: brand }} />احتفظ بالموعد</button> : <button onClick={() => navigate(`/event/${event.id}/honor`)} className="inline-flex items-center gap-3 rounded-2xl px-6 py-4 text-sm font-black text-[#241100] shadow-lg transition hover:scale-[1.015]" style={{ background: `linear-gradient(135deg, ${brand}, #f6d87a)` }}><Sparkles size={17} />ادخل صالة الشرف</button>}<a href={`/event/${event.id}/stage`} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-5 py-3.5 text-sm font-black text-slate-300 transition hover:border-sky-300/35 hover:text-sky-100"><Play size={16} />شاشة المسرح</a></div>
+      <div className="mt-9 flex flex-wrap gap-3">{sealed ? <button onClick={() => navigate(route)} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.035] px-5 py-3.5 text-sm font-black text-slate-200 transition hover:border-amber-300/35"><LockKeyhole size={17} style={{ color: brand }} />احتفظ بالموعد</button> : <button onClick={() => navigate(`/event/${event.id}/honor`)} className="inline-flex items-center gap-3 rounded-2xl px-6 py-4 text-sm font-black text-[#241100] shadow-lg transition hover:scale-[1.015]" style={{ background: `linear-gradient(135deg, ${brand}, #f6d87a)` }}><Sparkles size={17} />ادخل صالة الشرف</button>}<a href={`/event/${event.id}/stage`} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-5 py-3.5 text-sm font-black text-slate-300 transition hover:border-[#f8ca14]/40 hover:text-amber-200"><Play size={16} />شاشة المسرح</a></div>
     </div>
   </section>;
 }

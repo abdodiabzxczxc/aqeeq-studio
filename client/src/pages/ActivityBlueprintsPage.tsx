@@ -24,5 +24,154 @@ const BLUEPRINTS: Blueprint[] = [
   { id: "memory", number: 15, title: "استوديو الذكرى", tagline: "كل نشاط يترك صفحة رسمية", world: "golden-stage", icon: GraduationCap, color: "#eab308", story: "نغلق الستارة، لكن تبقى القصة في ذاكرة العقيق.", scenes: ["اختيار اللحظات", "صفحة الختام", "أرشفة الأثر"] },
 ];
 
-export default function ActivityBlueprintsPage() { const { user, isAuthenticated, loading } = useAuth(); const [, navigate] = useLocation(); const hasAccess = isAuthenticated && user?.role === "admin"; const { data: events = [], isLoading } = trpc.ceremonies.list.useQuery(undefined, { enabled: hasAccess, refetchOnWindowFocus: false }); const utils = trpc.useUtils(); const [selectedEvent, setSelectedEvent] = useState<number | null>(null); const [selectedBlueprint, setSelectedBlueprint] = useState<string | null>(null); const activeEvent = useMemo(() => events.find((event) => event.id === selectedEvent) || events[0], [events, selectedEvent]); const activeBlueprint = useMemo(() => BLUEPRINTS.find((item) => item.id === selectedBlueprint) || null, [selectedBlueprint]); const update = trpc.ceremonies.update.useMutation({ onSuccess: () => { toast.success("تم تطبيق تجربة النشاط على الفعالية"); void utils.ceremonies.list.invalidate(); }, onError: (error) => toast.error(error.message || "تعذر تطبيق التجربة") }); if (loading || isLoading) return <div className="flex min-h-screen items-center justify-center bg-[#080a10]"><Loader2 className="animate-spin text-amber-300" /></div>; if (!hasAccess) { navigate("/"); return null; } const apply = () => { if (!activeEvent || !activeBlueprint) return; update.mutate({ id: activeEvent.id, experienceWorld: activeBlueprint.world, storyLine: activeBlueprint.story, stageScenes: JSON.stringify(activeBlueprint.scenes) }); };
-  return <main dir="rtl" className="min-h-screen bg-[#080a10] text-slate-100"><header className="sticky top-0 z-30 border-b border-white/[.08] bg-[#080a10]/90 backdrop-blur-xl"><div className="container flex h-16 items-center justify-between"><button onClick={() => navigate("/live")} className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-amber-200"><ArrowRight size={16} />استوديو Alaqeeq Live</button><div className="text-sm font-black text-amber-50">خزانة التجارب المدرسية</div></div></header><div className="container py-8 md:py-10"><section className="rounded-[2rem] border border-amber-300/20 bg-[#111521] p-6 md:p-9"><div className="max-w-3xl"><div className="text-[11px] font-black text-amber-300">15 تجربة قابلة للتطبيق</div><h1 className="mt-2 text-4xl font-black leading-tight text-amber-50 md:text-6xl">اختر فكرة.<br />وحولها إلى عالم فعلي.</h1><p className="mt-5 text-sm leading-8 text-slate-300">هذه ليست قائمة اقتراحات؛ كل بطاقة تطبق عالم الفعالية، قصتها، ومشاهد شاشتها مباشرة على الفعالية التي تختارها.</p></div><div className="mt-7 grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]"><select value={activeEvent?.id || ""} onChange={(event) => setSelectedEvent(Number(event.target.value))} className="rounded-xl border border-slate-700 bg-black/20 px-3 py-3 text-sm font-bold text-slate-100 outline-none focus:border-amber-300"><option value="" disabled>اختر فعالية لتطبيق التجربة</option>{events.map((event) => <option key={event.id} value={event.id}>{event.title}</option>)}</select><button onClick={apply} disabled={!activeEvent || !activeBlueprint || update.isPending} className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-black text-amber-950 disabled:opacity-40">{update.isPending ? "جارٍ التطبيق…" : "تطبيق على الفعالية"}</button></div></section><section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{BLUEPRINTS.map((blueprint) => { const Icon = blueprint.icon; const active = activeBlueprint?.id === blueprint.id; return <button key={blueprint.id} onClick={() => setSelectedBlueprint(blueprint.id)} className={`group rounded-3xl border p-5 text-right transition hover:-translate-y-1 ${active ? "border-amber-300/70 bg-amber-300/[.08]" : "border-white/[.08] bg-[#111521] hover:border-white/20"}`}><div className="flex items-start justify-between"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black/20 text-sm font-black" style={{ color: blueprint.color }}>{String(blueprint.number).padStart(2, "0")}</div><Icon size={20} style={{ color: blueprint.color }} /></div><h2 className="mt-6 text-lg font-black text-amber-50">{blueprint.title}</h2><p className="mt-1 text-xs text-slate-500">{blueprint.tagline}</p><div className="mt-5 border-t border-white/[.07] pt-3 text-[10px] font-bold" style={{ color: blueprint.color }}>تطبيق العالم والمشاهد <span className="mr-1">←</span></div></button>; })}</section>{activeBlueprint ? <section className="mt-7 rounded-3xl border border-amber-300/20 bg-[#111521] p-6"><div className="flex items-start gap-4"><div className="rounded-2xl bg-amber-300/10 p-3 text-amber-200"><Medal size={22} /></div><div><div className="text-[11px] font-black text-amber-300">معاينة التجربة المختارة</div><h2 className="mt-1 text-2xl font-black text-amber-50">{activeBlueprint.title}</h2><p className="mt-3 max-w-3xl text-sm leading-8 text-slate-300">{activeBlueprint.story}</p><div className="mt-5 flex flex-wrap gap-2">{activeBlueprint.scenes.map((scene, index) => <span key={scene} className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-[11px] font-bold text-slate-300">{index + 1}. {scene}</span>)}</div></div></div></section> : null}</div></main>; }
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+
+export default function ActivityBlueprintsPage() {
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
+  const { user, isAuthenticated, loading } = useAuth();
+  const [, navigate] = useLocation();
+  const hasAccess = isAuthenticated && user?.role === "admin";
+  const { data: events = [], isLoading } = trpc.ceremonies.list.useQuery(undefined, { enabled: hasAccess, refetchOnWindowFocus: false });
+  const utils = trpc.useUtils();
+  const [selectedEvent, setSelectedEvent] = useState<number | null>(null);
+  const [selectedBlueprint, setSelectedBlueprint] = useState<string | null>(null);
+  const activeEvent = useMemo(() => events.find((event) => event.id === selectedEvent) || events[0], [events, selectedEvent]);
+  const activeBlueprint = useMemo(() => BLUEPRINTS.find((item) => item.id === selectedBlueprint) || null, [selectedBlueprint]);
+  const update = trpc.ceremonies.update.useMutation({
+    onSuccess: () => { toast.success("تم تطبيق تجربة النشاط على الفعالية"); void utils.ceremonies.list.invalidate(); },
+    onError: (error) => toast.error(error.message || "تعذر تطبيق التجربة")
+  });
+
+  if (loading || isLoading) {
+    return (
+      <div className={`flex min-h-screen items-center justify-center ${dark ? "bg-[#080a10]" : "bg-[#f8fafc]"}`}>
+        <Loader2 className={`animate-spin ${dark ? "text-amber-300" : "text-[#08467d]"}`} size={28} />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    navigate("/");
+    return null;
+  }
+
+  const apply = () => {
+    if (!activeEvent || !activeBlueprint) return;
+    update.mutate({
+      id: activeEvent.id,
+      experienceWorld: activeBlueprint.world,
+      storyLine: activeBlueprint.story,
+      stageScenes: JSON.stringify(activeBlueprint.scenes)
+    });
+  };
+
+  return (
+    <main dir="rtl" className={`min-h-screen transition-colors ${dark ? "bg-[#080a10] text-slate-100" : "bg-[#f8fafc] text-slate-900"}`}>
+      <header className={`sticky top-0 z-30 border-b backdrop-blur-xl ${dark ? "border-white/[.08] bg-[#080a10]/90" : "border-slate-200 bg-white/90 shadow-sm"}`}>
+        <div className="container flex h-16 items-center justify-between">
+          <button onClick={() => navigate("/live")} className={`inline-flex items-center gap-2 text-xs font-bold transition ${dark ? "text-slate-400 hover:text-amber-200" : "text-slate-600 hover:text-[#08467d]"}`}>
+            <ArrowRight size={16} />
+            استوديو Alaqeeq Live
+          </button>
+          <div className={`text-sm font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>خزانة التجارب المدرسية</div>
+        </div>
+      </header>
+
+      <div className="container py-8 md:py-10">
+        <section className={`rounded-[2rem] border p-6 md:p-9 shadow-xl ${dark ? "border-amber-300/20 bg-[#111521]" : "border-slate-200 bg-white"}`}>
+          <div className="max-w-3xl">
+            <div className={`text-[11px] font-black ${dark ? "text-amber-300" : "text-[#08467d]"}`}>15 تجربة قابلة للتطبيق</div>
+            <h1 className={`mt-2 text-4xl font-black leading-tight md:text-6xl ${dark ? "text-amber-50" : "text-slate-900"}`}>
+              اختر فكرة.<br />وحولها إلى عالم فعلي.
+            </h1>
+            <p className={`mt-5 text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+              هذه ليست قائمة اقتراحات؛ كل بطاقة تطبق عالم الفعالية، قصتها، ومشاهد شاشتها مباشرة على الفعالية التي تختارها.
+            </p>
+          </div>
+
+          <div className="mt-7 grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
+            <select
+              value={activeEvent?.id || ""}
+              onChange={(event) => setSelectedEvent(Number(event.target.value))}
+              className={`rounded-xl border px-3 py-3 text-sm font-bold outline-none ${
+                dark ? "border-slate-700 bg-black/20 text-slate-100 focus:border-amber-300" : "border-slate-300 bg-slate-50 text-slate-800 focus:border-[#08467d]"
+              }`}
+            >
+              <option value="" disabled>اختر فعالية لتطبيق التجربة</option>
+              {events.map((event) => (
+                <option key={event.id} value={event.id}>{event.title}</option>
+              ))}
+            </select>
+            <button
+              onClick={apply}
+              disabled={!activeEvent || !activeBlueprint || update.isPending}
+              className={`rounded-xl px-4 py-3 text-sm font-black disabled:opacity-40 shadow-md ${
+                dark ? "bg-amber-300 text-amber-950 hover:bg-amber-400" : "bg-[#08467d] text-white hover:bg-[#063560]"
+              }`}
+            >
+              {update.isPending ? "جارٍ التطبيق…" : "تطبيق على الفعالية"}
+            </button>
+          </div>
+        </section>
+
+        <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {BLUEPRINTS.map((blueprint) => {
+            const Icon = blueprint.icon;
+            const active = activeBlueprint?.id === blueprint.id;
+            return (
+              <button
+                key={blueprint.id}
+                onClick={() => setSelectedBlueprint(blueprint.id)}
+                className={`group rounded-3xl border p-5 text-right transition hover:-translate-y-1 shadow-sm ${
+                  active
+                    ? dark ? "border-amber-300/70 bg-amber-300/[.08]" : "border-[#08467d] bg-[#08467d]/10 ring-2 ring-[#08467d]/20"
+                    : dark ? "border-white/[.08] bg-[#111521] hover:border-white/20" : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-black ${dark ? "bg-black/20" : "bg-slate-100"}`} style={{ color: blueprint.color }}>
+                    {String(blueprint.number).padStart(2, "0")}
+                  </div>
+                  <Icon size={20} style={{ color: blueprint.color }} />
+                </div>
+                <h2 className={`mt-6 text-lg font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{blueprint.title}</h2>
+                <p className="mt-1 text-xs text-slate-500">{blueprint.tagline}</p>
+                <div className={`mt-5 border-t pt-3 text-[10px] font-bold ${dark ? "border-white/[.07]" : "border-slate-200"}`} style={{ color: blueprint.color }}>
+                  تطبيق العالم والمشاهد <span className="mr-1">←</span>
+                </div>
+              </button>
+            );
+          })}
+        </section>
+
+        {activeBlueprint ? (
+          <section className={`mt-7 rounded-3xl border p-6 shadow-lg ${dark ? "border-amber-300/20 bg-[#111521]" : "border-slate-200 bg-white"}`}>
+            <div className="flex items-start gap-4">
+              <div className={`rounded-2xl p-3 ${dark ? "bg-amber-300/10 text-amber-200" : "bg-amber-100 text-amber-800"}`}>
+                <Medal size={22} />
+              </div>
+              <div>
+                <div className={`text-[11px] font-black ${dark ? "text-amber-300" : "text-[#08467d]"}`}>معاينة التجربة المختارة</div>
+                <h2 className={`mt-1 text-2xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{activeBlueprint.title}</h2>
+                <p className={`mt-3 max-w-3xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>{activeBlueprint.story}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {activeBlueprint.scenes.map((scene, index) => (
+                    <span
+                      key={scene}
+                      className={`rounded-full border px-3 py-1.5 text-[11px] font-bold ${
+                        dark ? "border-white/10 bg-black/20 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-700"
+                      }`}
+                    >
+                      {index + 1}. {scene}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </main>
+  );
+}

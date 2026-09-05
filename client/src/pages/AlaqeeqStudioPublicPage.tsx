@@ -921,15 +921,15 @@ export default function AlaqeeqStudioPublicPage() {
                       ) : story.imageUrl ? (
                         <img src={story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
                       ) : story.sourceType === "article" ? (
-                        <div className="grid h-full w-full place-items-center bg-rose-500/20 text-rose-400">
+                        <div className="grid h-full w-full place-items-center bg-[#de191e]/20 text-[#de191e]">
                           <Newspaper size={22} />
                         </div>
                       ) : story.sourceType === "podcast" ? (
-                        <div className="grid h-full w-full place-items-center bg-indigo-500/20 text-indigo-400">
+                        <div className="grid h-full w-full place-items-center bg-[#f8ca14]/20 text-[#f8ca14]">
                           <Mic size={22} />
                         </div>
                       ) : story.sourceType === "showcase" ? (
-                        <div className="grid h-full w-full place-items-center bg-sky-500/20 text-sky-400">
+                        <div className="grid h-full w-full place-items-center bg-[#08467d]/25 text-[#f8ca14]">
                           <Video size={22} />
                         </div>
                       ) : story.sourceType === "journal" ? (
@@ -1561,7 +1561,7 @@ export default function AlaqeeqStudioPublicPage() {
                 }`}
                 title={isEditorActive ? "انقر لتعديل صورة مجتمع العقيق والكلمة مباشرة" : undefined}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#f8ca14]/15 text-[#f8ca14]">
                   <Users size={16} />
                 </span>
                 <span>{communityItem.triggerText}</span>
@@ -1960,15 +1960,15 @@ export default function AlaqeeqStudioPublicPage() {
                   ) : storiesList[activeStoryIndex].imageUrl ? (
                     <img src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
                   ) : storiesList[activeStoryIndex].sourceType === "article" ? (
-                    <Newspaper size={16} className="text-rose-400" />
+                    <Newspaper size={16} className="text-[#de191e]" />
                   ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
-                    <Mic size={16} className="text-indigo-400" />
+                    <Mic size={16} className="text-[#f8ca14]" />
                   ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
-                    <Video size={16} className="text-sky-400" />
+                    <Video size={16} className="text-[#08467d]" />
                   ) : storiesList[activeStoryIndex].sourceType === "journal" ? (
-                    <BookOpen size={16} className="text-amber-400" />
+                    <BookOpen size={16} className="text-[#f8ca14]" />
                   ) : storiesList[activeStoryIndex].sourceType === "album" ? (
-                    <Camera size={16} className="text-emerald-400" />
+                    <Camera size={16} className="text-[#367453]" />
                   ) : (
                     <span className="text-[10px] font-black">العقيق</span>
                   )}
@@ -2025,26 +2025,26 @@ export default function AlaqeeqStudioPublicPage() {
                 />
               ) : storiesList[activeStoryIndex].sourceType === "article" ? (
                 <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#de191e]/20 border border-[#de191e]/30 flex items-center justify-center text-[#de191e] shadow-[0_0_30px_rgba(222,25,30,0.3)]">
                     <Newspaper size={40} />
                   </div>
-                  <span className="inline-block rounded-full bg-rose-500/20 px-3 py-1 text-xs font-black text-rose-300">مقال أدبي جديد</span>
+                  <span className="inline-block rounded-full bg-[#de191e]/20 px-3 py-1 text-xs font-black text-[#de191e]">مقال أدبي جديد</span>
                   <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
                 </div>
               ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
                 <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.3)] animate-pulse">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#f8ca14]/20 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-[0_0_30px_rgba(248,202,20,0.3)] animate-pulse">
                     <Mic size={40} />
                   </div>
-                  <span className="inline-block rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black text-indigo-300">أثير العقيق 🎙️</span>
+                  <span className="inline-block rounded-full bg-[#f8ca14]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">أثير العقيق 🎙️</span>
                   <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
                 </div>
               ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
                 <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
+                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#08467d]/20 border border-[#08467d]/30 flex items-center justify-center text-[#08467d] shadow-[0_0_30px_rgba(8,70,125,0.3)]">
                     <Video size={40} />
                   </div>
-                  <span className="inline-block rounded-full bg-sky-500/20 px-3 py-1 text-xs font-black text-sky-300">عرض مرئي وتغطية</span>
+                  <span className="inline-block rounded-full bg-[#08467d]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">عرض مرئي وتغطية</span>
                   <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
                 </div>
               ) : (

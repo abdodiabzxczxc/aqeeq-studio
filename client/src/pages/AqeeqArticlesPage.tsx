@@ -244,8 +244,8 @@ function ArticleCard({
                 <Eye size={12} />
                 <span>{article.viewCount || 0}</span>
               </span>
-              <span className="flex items-center gap-1 text-rose-400">
-                <Heart size={12} className="fill-rose-500/20" />
+              <span className="flex items-center gap-1 text-[#de191e]">
+                <Heart size={12} className="fill-[#de191e]/20" />
                 <span>{article.likesCount || 0}</span>
               </span>
               {readingTime && (
@@ -629,8 +629,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                   onClick={() => navigate("/articles/manage")}
                   className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-black transition ${
                     dark
-                      ? "border-purple-400/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
-                      : "border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                      : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d] hover:bg-[#08467d]/10"
                   }`}
                 >
                   <Sparkles size={15} />
@@ -1001,9 +1001,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                     type="button"
                     onClick={() => likeMutation.mutate({ id: readingArticle.id })}
                     disabled={likeMutation.isPending}
-                    className="inline-flex items-center gap-2 rounded-xl bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/40 font-black text-xs h-10 px-4 transition"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#de191e]/20 hover:bg-[#de191e] text-[#de191e] hover:text-white border border-[#de191e]/40 font-black text-xs h-10 px-4 transition"
                   >
-                    <Heart size={16} className="fill-rose-500" />
+                    <Heart size={16} className="fill-[#de191e]" />
                     <span>أعجبني ({readingArticle.likesCount})</span>
                   </button>
 

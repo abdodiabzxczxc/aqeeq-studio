@@ -209,7 +209,7 @@ export function AqeeqInteractiveFxModal({
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, imageUrl: "" })}
-                  className="px-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                  className="px-2.5 rounded-xl border border-[#de191e]/30 bg-[#de191e]/10 text-[#de191e] hover:bg-[#de191e]/20 transition"
                   title="مسح الصورة"
                 >
                   <Trash2 size={14} />

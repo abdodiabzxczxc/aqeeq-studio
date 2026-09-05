@@ -179,6 +179,7 @@ function App() {
 }
 
 import { useSiteTheme } from "./lib/useSiteTheme";
+import { useAqeeqStudioTheme } from "./lib/aqeeqStudioTheme";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
 import { AqeeqMagneticCursor } from "./components/AqeeqMagneticCursor";
 
@@ -187,11 +188,13 @@ function StudioAppShell() {
   const brand = snapshot?.settings;
   const { activeItem } = usePodcastPlayer();
   const { isNationalDay } = useSiteTheme();
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
 
   const brandStyle = {
-    "--aq-gold": isNationalDay ? "#f8ca14" : (brand?.brand_primary || "#e5b84f"),
-    "--aq-ink": brand?.brand_surface || "#000000",
-    "--aq-brand-secondary": isNationalDay ? "#003822" : (brand?.brand_secondary || "#18293a"),
+    "--aq-gold": isNationalDay ? "#f8ca14" : (dark ? (brand?.brand_primary || "#e5b84f") : "#08467d"),
+    "--aq-ink": dark ? (brand?.brand_surface || "#000000") : "#ffffff",
+    "--aq-brand-secondary": isNationalDay ? "#003822" : (dark ? (brand?.brand_secondary || "#18293a") : "#f1f5f9"),
     "--aq-blue": isNationalDay ? "#005A36" : (brand?.brand_primary || "#08467d"),
     fontFamily: brand?.brand_font ? `'${brand.brand_font}', Tajawal, sans-serif` : undefined,
   } as React.CSSProperties;

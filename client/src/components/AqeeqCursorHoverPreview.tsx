@@ -154,7 +154,7 @@ export function AqeeqCursorHoverPreview() {
               preview.onEdit ? "cursor-pointer" : ""
             } ${
               isFrozen
-                ? "ring-2 ring-cyan-400/90 shadow-[0_0_35px_rgba(6,182,212,0.45)]"
+                ? "ring-2 ring-[#f8ca14] shadow-[0_0_35px_rgba(248,202,20,0.45)]"
                 : preview.onEdit
                 ? "ring-2 ring-[#f8ca14]/80 shadow-[0_0_25px_rgba(248,202,20,0.3)]"
                 : ""
@@ -191,8 +191,8 @@ export function AqeeqCursorHoverPreview() {
                   onClick={handleToggleFreeze}
                   className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-black shadow-md backdrop-blur-md transition cursor-pointer ${
                     isFrozen
-                      ? "bg-cyan-500 text-white hover:bg-cyan-400"
-                      : "bg-black/75 text-cyan-300 border border-cyan-400/40 hover:bg-black"
+                      ? "bg-[#08467d] text-white hover:bg-[#063560]"
+                      : "bg-black/75 text-[#f8ca14] border border-[#f8ca14]/40 hover:bg-black"
                   }`}
                   title={isFrozen ? "إلغاء التثبيت" : "تثبيت البطاقة على الشاشة"}
                 >
@@ -223,7 +223,7 @@ export function AqeeqCursorHoverPreview() {
                 type="button"
                 data-no-visual-edit="true"
                 onClick={handleClose}
-                className="rounded-lg bg-black/80 hover:bg-rose-600 text-white p-1 shadow-md transition cursor-pointer"
+                className="rounded-lg bg-black/80 hover:bg-[#de191e] text-white p-1 shadow-md transition cursor-pointer"
                 title="إغلاق المعاينة"
               >
                 <X size={12} />

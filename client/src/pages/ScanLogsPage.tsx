@@ -13,7 +13,7 @@ export default function ScanLogsPage({ ceremonyId }: { ceremonyId?: number }) {
     if (r === "success") return <CheckCircle2 size={14} className="text-emerald-400" />;
     if (r === "duplicate") return <AlertTriangle size={14} className="text-amber-400" />;
     if (r === "not_found") return <HelpCircle size={14} className="text-slate-400" />;
-    return <XCircle size={14} className="text-rose-400" />;
+    return <XCircle size={14} className="text-[#de191e]" />;
   };
 
   const resultBadge = (r: string) => {

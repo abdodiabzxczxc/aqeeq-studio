@@ -167,13 +167,13 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
           ? dark
             ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
             : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
-          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f5f1e7] text-slate-800"
+          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f8fafc] text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} />
 
       <div className={standalone ? "mx-auto max-w-[1500px] px-3 py-3 md:px-6 md:py-6" : "container py-6"}>
-        <nav className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
+        <nav className={`mb-4 flex items-center justify-between gap-2 text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
           <div className="flex items-center gap-2">
             <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
             <span className="opacity-40">›</span>
@@ -186,7 +186,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
             className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
               isNationalDay
                 ? dark ? "text-emerald-300 hover:text-[#f8ca14]" : "text-[#005A36] hover:text-[#003822]"
-                : "text-slate-400 hover:text-amber-300"
+                : dark ? "text-slate-400 hover:text-amber-300" : "text-[#08467d] hover:text-[#063560]"
             }`}
           >
             <span>← عودة للأعداد</span>
@@ -200,7 +200,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
               ? dark
                 ? "border-[#5aba1c]/40 bg-[#002617]/90 shadow-[0_15px_40px_rgba(0,50,25,0.4)] backdrop-blur-md"
                 : "border-emerald-600/20 bg-white/95 shadow-md shadow-emerald-950/5 backdrop-blur-md text-slate-900"
-              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-900/10 bg-white shadow-sm"
+              : dark ? "border-white/[.1] bg-[#10141f]" : "border-slate-200 bg-white shadow-sm"
           }`}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -211,7 +211,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
                 label="شارة قارئ المجلة"
                 defaultText={`${isPreview ? "معاينة قبل النشر · " : ""}${issue.seasonLabel} · ${issue.issueDate}`}
                 as="div"
-                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : "text-amber-300")}
+                className={"text-[10px] font-black tracking-[.1em] " + (isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-amber-300" : "text-[#08467d] font-black"))}
               />
 
 

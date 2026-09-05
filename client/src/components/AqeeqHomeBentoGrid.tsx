@@ -421,8 +421,8 @@ export function AqeeqHomeBentoGrid({
                       onClick={() => playEpisode(latestPodcast)}
                       className={`h-[200px] sm:h-[240px] md:h-auto md:min-h-[275px] relative overflow-hidden rounded-[2.2rem] cursor-pointer group shadow-xl border transition-all duration-500 z-10 ${
                         dark
-                          ? "bg-gradient-to-br from-[#120a1c] to-[#08040d] border-indigo-500/30 hover:border-indigo-400/60 shadow-indigo-950/30"
-                          : "bg-indigo-50/90 border-indigo-300 hover:border-indigo-400 shadow-lg"
+                          ? "bg-gradient-to-br from-[#06182e] to-[#030d19] border-[#08467d]/40 hover:border-[#f8ca14]/60 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                          : "bg-white border-[#08467d]/20 hover:border-[#08467d]/40 shadow-xl"
                       }`}
                     >
                       <VisualImage
@@ -435,7 +435,7 @@ export function AqeeqHomeBentoGrid({
                       <div className={`absolute inset-0 z-10 ${
                         dark
                           ? "bg-gradient-to-t from-black/95 via-black/40 to-transparent"
-                          : "bg-gradient-to-t from-indigo-50 via-indigo-50/75 to-transparent"
+                          : "bg-gradient-to-t from-white via-white/80 to-transparent"
                       }`} />
 
                       <div className={`absolute inset-0 p-6 flex flex-col justify-between z-20 ${
@@ -443,12 +443,12 @@ export function AqeeqHomeBentoGrid({
                       }`}>
                         <div className="flex items-center justify-between">
                           <div className={`flex items-center gap-1.5 font-bold text-xs px-3.5 py-1 rounded-full border ${
-                            dark ? "text-indigo-300 bg-indigo-500/20 border-indigo-500/30" : "text-indigo-800 bg-indigo-100 border-indigo-200"
+                            dark ? "text-[#f8ca14] bg-[#f8ca14]/15 border-[#f8ca14]/30" : "text-[#08467d] bg-[#08467d]/10 border-[#08467d]/20"
                           }`}>
                             <Mic size={14} />
                             <VisualEditable id="studio-highlights-podcast-tag" tag="text" label="وسم بودكاست البينتو" defaultText="صوت العقيق" as="span" />
                           </div>
-                          {isPodcastHovered && <Volume2 size={16} className={dark ? "text-indigo-400 animate-pulse" : "text-indigo-600 animate-pulse"} />}
+                          {isPodcastHovered && <Volume2 size={16} className={dark ? "text-[#f8ca14] animate-pulse" : "text-[#08467d] animate-pulse"} />}
                         </div>
 
                         <div>
@@ -467,7 +467,7 @@ export function AqeeqHomeBentoGrid({
                             className={`font-black px-4 py-2 rounded-xl flex items-center gap-1.5 text-xs hover:scale-105 transition-transform w-fit shadow-md active:scale-95 ${
                               dark
                                 ? "bg-[#f8ca14] text-black hover:bg-[#e6b90f]"
-                                : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/20"
+                                : "bg-[#08467d] text-white hover:bg-[#063560] shadow-md shadow-[#08467d]/20"
                             }`}
                           >
                             <Play size={12} className={dark ? "fill-black" : "fill-white"} />
@@ -504,8 +504,8 @@ export function AqeeqHomeBentoGrid({
                       onClick={() => navigate(`/articles/${latestArticle.slug}`)}
                       className={`h-[200px] sm:h-[240px] md:h-auto md:min-h-[275px] relative overflow-hidden rounded-[2.2rem] cursor-pointer group shadow-xl border transition-all duration-500 ${
                         dark
-                          ? "bg-gradient-to-br from-[#1c0a0e] to-[#0a0305] border-rose-500/30 hover:border-rose-400/60 shadow-rose-950/30"
-                          : "bg-rose-50/90 border-rose-300 hover:border-rose-400 shadow-lg"
+                          ? "bg-gradient-to-br from-[#1c0408] to-[#0a0204] border-[#de191e]/35 hover:border-[#de191e]/60 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                          : "bg-white border-[#de191e]/20 hover:border-[#de191e]/40 shadow-xl"
                       }`}
                     >
                       <VisualImage
@@ -518,7 +518,7 @@ export function AqeeqHomeBentoGrid({
                       <div className={`absolute inset-0 z-10 ${
                         dark
                           ? "bg-gradient-to-t from-black/95 via-black/40 to-transparent"
-                          : "bg-gradient-to-t from-rose-50 via-rose-50/75 to-transparent"
+                          : "bg-gradient-to-t from-white via-white/80 to-transparent"
                       }`} />
 
                       <div className={`absolute inset-0 p-6 flex flex-col justify-between z-20 ${
@@ -526,12 +526,12 @@ export function AqeeqHomeBentoGrid({
                       }`}>
                         <div className="flex items-center justify-between">
                           <div className={`flex items-center gap-1.5 font-bold text-xs px-3 py-1 rounded-full border ${
-                            dark ? "bg-rose-500/20 text-rose-300 border-rose-500/30" : "bg-rose-100 text-rose-800 border-rose-300"
+                            dark ? "bg-[#de191e]/20 text-[#de191e] border-[#de191e]/30" : "bg-[#de191e]/10 text-[#de191e] border-[#de191e]/20"
                           }`}>
                             <Newspaper size={14} />
                             <VisualEditable id="studio-highlights-article-tag" tag="text" label="وسم مقال البينتو" defaultText="مقال وتحليل" as="span" />
                           </div>
-                          <span className={`text-[10px] font-mono font-bold ${dark ? "text-rose-400" : "text-rose-700"}`}>قراءة سريعة ⏱️</span>
+                          <span className={`text-[10px] font-mono font-bold ${dark ? "text-[#de191e]" : "text-[#de191e]"}`}>قراءة سريعة ⏱️</span>
                         </div>
 
                         <div>
@@ -544,7 +544,7 @@ export function AqeeqHomeBentoGrid({
                             className={`text-sm sm:text-base font-black leading-snug line-clamp-3 font-cairo mb-2 ${dark ? "text-white" : "text-slate-900"}`}
                           />
                           <span className={`inline-flex items-center gap-1.5 text-xs font-black group-hover:underline ${
-                            dark ? "text-rose-400" : "text-rose-700"
+                            dark ? "text-[#de191e]" : "text-[#de191e]"
                           }`}>
                             <span>قراءة المقال الآن</span>
                             <ArrowUpLeft size={14} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
