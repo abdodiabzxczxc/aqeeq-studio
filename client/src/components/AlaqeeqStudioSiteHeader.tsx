@@ -6,7 +6,6 @@ import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon } from "@/components/VisualEditor";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
-import { MobileStickyActionBar } from "@/components/MobileStickyActionBar";
 import {
   Search,
   LayoutDashboard,
@@ -1042,8 +1041,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
       <AqeeqCreatorStudioModal open={creatorModalOpen} onOpenChange={setCreatorModalOpen} />
 
-      {/* Global Mobile Sticky Action Bar */}
-      <MobileStickyActionBar />
     </div>
   );
 }
