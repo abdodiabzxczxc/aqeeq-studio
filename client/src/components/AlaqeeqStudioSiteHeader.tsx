@@ -43,6 +43,8 @@ import {
   Menu,
   X,
   Shield,
+  LogIn,
+  ChevronLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -682,8 +684,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
               </button>
 
-              {/* ⚙️ قائمة المشرف والمحرر البصري والداش بورد (خاصة بالمشرف المسجل فقط) */}
-              {isAdmin && (
+              {/* ⚙️ قائمة المشرف للمسؤولين / 🔑 زر تسجيل الدخول للعامة */}
+              {isAdmin ? (
                 <div ref={optionsRef} className="relative shrink-0">
                   <button
                     type="button"
@@ -799,11 +801,28 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         } rounded-xl text-right transition`}
                       >
                         <LogOut size={15} className="shrink-0" />
-                        <span>{isAuthenticated ? "تسجيل الخروج" : "تسجيل الدخول كمسؤول"}</span>
+                        <span>تسجيل الخروج</span>
                       </button>
                     </div>
                   )}
                 </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className={`flex items-center gap-1.5 shrink-0 ${
+                    isScrolled ? "h-8 sm:h-8.5 px-2.5 sm:px-3 text-xs" : "h-9 sm:h-10 px-2.5 sm:px-3.5 text-xs"
+                  } font-black rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-200 hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14]"
+                      : "border-black/10 bg-white text-slate-700 hover:bg-[#08467d] hover:text-white hover:border-[#08467d] shadow-xs"
+                  }`}
+                  aria-label="تسجيل الدخول"
+                  title="تسجيل الدخول كمسؤول"
+                >
+                  <LogIn size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
+                  <span className="hidden sm:inline">تسجيل الدخول</span>
+                </button>
               )}
 
               {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Fluid entry on desktop without snap, always visible on mobile */}
@@ -1156,8 +1175,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     <ExternalLink size={12} className="opacity-60" />
                   </a>
 
-                  {/* 5. 👑 خامساً: أجنحة المشرف وإدارة المحتوى والمحرر البصري (Admin Suite - مخصص للمشرفين فقط) */}
-                  {isAdmin && (
+                  {/* 5. 👑 خامساً: أجنحة المشرف أو 🔑 تسجيل الدخول للمشرفين */}
+                  {isAdmin ? (
                     <div className={`p-3 rounded-2xl border space-y-2 ${
                       dark ? "bg-[#f8ca14]/[0.06] border-[#f8ca14]/30" : "bg-amber-50/80 border-amber-300/60 shadow-xs"
                     }`}>
@@ -1234,6 +1253,30 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         )}
                       </div>
                     </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/login");
+                      }}
+                      className={`w-full flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition cursor-pointer ${
+                        dark
+                          ? "bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                          : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800 shadow-xs"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className={`w-8 h-8 rounded-xl ${dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"} flex items-center justify-center`}>
+                          <LogIn size={15} />
+                        </span>
+                        <span className="flex flex-col text-right">
+                          <span className="font-black text-xs">تسجيل الدخول كمسؤول</span>
+                          <span className="text-[10px] text-slate-400 font-normal">بوابة الوصول للوحة الإدارة والتحرير</span>
+                        </span>
+                      </span>
+                      <ChevronLeft size={16} className="text-slate-400" />
+                    </button>
                   )}
 
                   {/* 6. 📞 سادساً: قنوات التواصل المباشر وبوابة أولياء الأمور */}
@@ -1273,22 +1316,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       <a href="mailto:info@alaqeeqholding.com" className="hover:underline">info@alaqeeqholding.com</a>
                     </div>
                   </div>
-
-                  {/* رابط هادئ لدخول المشرفين والموظفين للعامة */}
-                  {!isAdmin && (
-                    <div className="pt-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          navigate("/login");
-                        }}
-                        className="text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium transition cursor-pointer"
-                      >
-                        دخول المشرفين والموظفين
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </>
