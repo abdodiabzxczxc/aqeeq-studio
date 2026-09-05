@@ -214,16 +214,18 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const ctaButtonText = editor?.getOverride?.("header-cta-button")?.contentText || "سجّل الآن ✦";
 
   return (
-    <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
+    <div dir="rtl" className="w-full bg-transparent">
       {/* ── Fixed Master Header Deck (Always follows user down on all pages) ── */}
-      <div className="fixed top-0 inset-x-0 z-[130] w-full transition-all duration-300 ease-out">
+      <div className={`fixed top-0 inset-x-0 z-[130] w-full transition-all duration-300 ease-out bg-transparent ${
+        isScrolled ? "pointer-events-none" : "pointer-events-auto"
+      }`}>
         {/* 1. Top Executive Utility Bar */}
-        <div className={`hidden sm:block relative z-[140] border-b text-[11px] font-bold transition-all duration-300 overflow-hidden ${
+        <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 overflow-hidden ${
           isScrolled
-            ? "max-h-0 py-0 opacity-0 border-transparent pointer-events-none"
-            : "max-h-12 py-1.5 opacity-100"
-        } ${
-          dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
+            ? "max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
+            : `border-b max-h-12 py-1.5 opacity-100 ${
+                dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
+              }`
         }`}>
         <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
           <div className="flex items-center gap-4">
@@ -390,10 +392,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       </div>
 
       {/* 2. Main Executive Header — Collapses into Twin Corner Floating Islands on Scroll */}
-      <header className={`aq-studio-share-header w-full transition-all duration-300 ease-out ${
+      <header className={`w-full transition-all duration-300 ease-out ${
         isScrolled
-          ? "bg-transparent border-transparent pointer-events-none shadow-none"
-          : `border-b backdrop-blur-2xl ${
+          ? "is-scrolled !bg-transparent !border-transparent !border-0 !shadow-none pointer-events-none"
+          : `aq-studio-share-header border-b backdrop-blur-2xl ${
               isNationalDay
                 ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
