@@ -75,12 +75,35 @@ function AlbumReaderRoute({ params }: { params: { slug: string } }) {
   return <AqeeqAlbumReaderPage slug={params.slug} />;
 }
 
-function Router() {
+function ScrollToTopOnNavigation() {
+  const [location] = useLocation();
 
+  useEffect(() => {
+    // 1. Instant scroll reset to top
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // 2. Secondary frame check to ensure any dynamic layout reflows stay at the top
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [location]);
+
+  return null;
+}
+
+function Router() {
   const [location] = useLocation();
   return (
-    <RouteMotion routeKey={location}>
-    <Switch>
+    <>
+      <ScrollToTopOnNavigation />
+      <RouteMotion routeKey={location}>
+      <Switch>
       <Route path="/" component={AlaqeeqStudioPage} />
       <Route path="/studio" component={AlaqeeqStudioPage} />
       <Route path="/about" component={AqeeqSchoolAboutPage} />
@@ -122,6 +145,7 @@ function Router() {
       <Route component={NotFound} />
     </Switch>
     </RouteMotion>
+    </>
   );
 }
 

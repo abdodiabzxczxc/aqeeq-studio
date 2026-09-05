@@ -278,12 +278,22 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     dragStartY.current = null;
   };
 
-  // Keep thumbnail strip synchronized with current image position
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [slug]);
+
+  // Keep thumbnail strip synchronized horizontally with current image position
+  // IMPORTANT: Only scrolls the horizontal ribbon container internally, NEVER touching window vertical scroll!
   useEffect(() => {
     if (mode === "spread") {
       const activeThumb = document.getElementById(`aq-album-thumb-${index}`);
-      if (activeThumb) {
-        activeThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      const ribbon = document.getElementById("aq-album-thumbnails-ribbon");
+      if (activeThumb && ribbon) {
+        const offsetLeft = activeThumb.offsetLeft - ribbon.offsetLeft;
+        ribbon.scrollTo({
+          left: Math.max(0, offsetLeft - (ribbon.clientWidth - activeThumb.clientWidth) / 2),
+          behavior: "smooth",
+        });
       }
     }
   }, [index, mode]);
@@ -836,6 +846,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
             {/* Seamless Thumbnails Ribbon with LTR Movement Synchronization */}
             {album.media.length > 1 ? (
               <div
+                id="aq-album-thumbnails-ribbon"
                 dir="ltr"
                 className={`mx-auto flex max-w-5xl gap-2 overflow-x-auto rounded-2xl border p-2.5 scrollbar-none ${
                   dark ? "border-white/10 bg-black/30" : "border-slate-900/10 bg-white/70 shadow-sm"
