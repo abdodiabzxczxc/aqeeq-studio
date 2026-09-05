@@ -180,7 +180,12 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 40);
+          const currentY = window.scrollY;
+          setIsScrolled((prev) => {
+            if (!prev && currentY > 55) return true;
+            if (prev && currentY < 20) return false;
+            return prev;
+          });
           ticking = false;
         });
         ticking = true;
@@ -406,66 +411,80 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             ? "px-3 sm:px-6 pt-2.5 sm:pt-3.5 pointer-events-none"
             : "px-3.5 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
-          {/* Logo with clean branding — On scroll: Twin Floating Right Island */}
-          <div className={`transition-all duration-300 ${
-            isScrolled
-              ? "pointer-events-auto rounded-full border shadow-lg backdrop-blur-2xl px-3 sm:px-4 py-1.5 flex items-center bg-white/94 dark:bg-[#060a10]/92 border-black/10 dark:border-white/15 shadow-[0_8px_24px_rgba(8,70,125,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]"
-              : "flex items-center gap-2.5 sm:gap-3 shrink-0"
-          }`}>
-            <button
-              onClick={() => go("/")}
-              aria-label={`العودة إلى ${title}`}
-              data-visual-id="header-logo-container"
-              data-visual-tag="button"
-              data-visual-label="حاوية الشعار"
-              className={`flex items-center transition-all duration-300 hover:opacity-90 ${
-                isScrolled
-                  ? "h-[28px] sm:h-[34px] max-w-[120px] sm:max-w-[170px]"
-                  : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
-              }`}
-            >
-              <img
-                src={
-                  isNationalDay
-                    ? dark
-                      ? "/alaqeeq-logo-national-dark.png"
-                      : "/alaqeeq-logo-national-light.png"
-                    : activeLogo
-                }
-                alt="شعار مدارس العقيق الأهلية والدولية"
-                data-visual-id="header-logo"
-                data-visual-tag="image"
-                data-visual-label="شعار مدارس العقيق"
-                className={`max-h-full max-w-full object-contain transition duration-200 ${
-                  dark
-                    ? "brightness-0 invert opacity-95"
-                    : isNationalDay
-                    ? "drop-shadow-[0_1px_3px_rgba(8,70,125,0.18)]"
-                    : ""
-                }`}
+          {/* Logo with clean branding — On scroll: Twin Floating Right Island with Smoked Crystal & Ambient Aura */}
+          <div className="relative shrink-0">
+            {isScrolled && (
+              <span
+                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#f8ca14]/25 via-amber-500/10 to-transparent blur-xl -z-10 animate-in fade-in duration-500"
+                aria-hidden="true"
               />
-            </button>
-
-            {isNationalDay && !isScrolled && (
+            )}
+            <div className={`transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+              isScrolled
+                ? "pointer-events-auto rounded-full border shadow-xl backdrop-blur-2xl px-3 sm:px-4 py-1.5 flex items-center bg-white/80 dark:bg-[#060a12]/80 border-black/[0.08] dark:border-white/[0.14] shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_10px_25px_-5px_rgba(8,70,125,0.12)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.7)]"
+                : "flex items-center gap-2.5 sm:gap-3 shrink-0"
+            }`}>
               <button
-                type="button"
-                onClick={() => triggerNationalCelebration()}
-                title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
-                className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
-                  dark
-                    ? "bg-gradient-to-r from-[#08467d]/30 to-[#042442]/20 border-[#f8ca14]/40 text-[#f8ca14]"
-                    : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                onClick={() => go("/")}
+                aria-label={`العودة إلى ${title}`}
+                data-visual-id="header-logo-container"
+                data-visual-tag="button"
+                data-visual-label="حاوية الشعار"
+                className={`flex items-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:opacity-90 ${
+                  isScrolled
+                    ? "h-[28px] sm:h-[34px] max-w-[120px] sm:max-w-[170px]"
+                    : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
                 }`}
               >
-                <span>🇸🇦</span>
-                <span className={`font-bold ${dark ? "text-white" : "text-[#08467d]"}`}>عزّنا بطبعنا</span>
+                <img
+                  src={
+                    isNationalDay
+                      ? dark
+                        ? "/alaqeeq-logo-national-dark.png"
+                        : "/alaqeeq-logo-national-light.png"
+                      : activeLogo
+                  }
+                  alt="شعار مدارس العقيق الأهلية والدولية"
+                  data-visual-id="header-logo"
+                  data-visual-tag="image"
+                  data-visual-label="شعار مدارس العقيق"
+                  className={`max-h-full max-w-full object-contain transition duration-200 ${
+                    dark
+                      ? "brightness-0 invert opacity-95"
+                      : isNationalDay
+                      ? "drop-shadow-[0_1px_3px_rgba(8,70,125,0.18)]"
+                      : ""
+                  }`}
+                />
               </button>
-            )}
+
+              {isNationalDay && !isScrolled && (
+                <button
+                  type="button"
+                  onClick={() => triggerNationalCelebration()}
+                  title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
+                  className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
+                    dark
+                      ? "bg-gradient-to-r from-[#08467d]/30 to-[#042442]/20 border-[#f8ca14]/40 text-[#f8ca14]"
+                      : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
+                  }`}
+                >
+                  <span>🇸🇦</span>
+                  <span className={`font-bold ${dark ? "text-white" : "text-[#08467d]"}`}>عزّنا بطبعنا</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Center 9 Core Navigation Links (Desktop) — Hidden on scroll */}
-          {!isScrolled && (
-            <nav dir="rtl" className="hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] animate-in fade-in duration-200">
+          {/* Center 9 Core Navigation Links (Desktop) — Liquid exit/enter animation on scroll */}
+          <nav
+            dir="rtl"
+            className={`hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-all duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+              isScrolled
+                ? "opacity-0 -translate-y-3 pointer-events-none scale-95 max-h-0 overflow-hidden"
+                : "opacity-100 translate-y-0 pointer-events-auto scale-100 max-h-16"
+            }`}
+          >
               {/* 1. الرئيسية */}
               <button
                 onClick={() => go("/")}
@@ -571,20 +590,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 {navOffersText}
               </button>
             </nav>
-          )}
-
-
 
           {/* Left Action Buttons & Primary CTA */}
-          {/* Left Action Buttons — On scroll: Twin Floating Left Island (Theme + 3 Lines Menu) */}
-          <div
-            dir="ltr"
-            className={`transition-all duration-300 ${
-              isScrolled
-                ? "pointer-events-auto rounded-full border shadow-lg backdrop-blur-2xl px-2 sm:px-2.5 py-1.5 flex items-center gap-1.5 sm:gap-2 bg-white/94 dark:bg-[#060a10]/92 border-black/10 dark:border-white/15 shadow-[0_8px_24px_rgba(8,70,125,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] shrink-0"
-                : "flex items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto"
-            }`}
-          >
+          {/* Left Action Buttons — On scroll: Twin Floating Left Island with Smoked Crystal & Ambient Aura */}
+          <div className="relative shrink-0">
+            {isScrolled && (
+              <span
+                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-l from-[#08467d]/30 via-blue-600/15 to-transparent blur-xl -z-10 animate-in fade-in duration-500"
+                aria-hidden="true"
+              />
+            )}
+            <div
+              dir="ltr"
+              className={`transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+                isScrolled
+                  ? "pointer-events-auto rounded-full border shadow-xl backdrop-blur-2xl px-2 sm:px-2.5 py-1.5 flex items-center gap-1.5 sm:gap-2 bg-white/80 dark:bg-[#060a12]/80 border-black/[0.08] dark:border-white/[0.14] shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_10px_25px_-5px_rgba(8,70,125,0.12)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.7)] shrink-0"
+                  : "flex items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto"
+              }`}
+            >
             {/* Primary Executive CTA Button — Hidden on scroll */}
             {!isScrolled && (
               <Button
@@ -758,30 +781,37 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </button>
           </div>
         </div>
+        </div>
       </header>
       </div>
 
       {/* Static Spacer in DOM so page content starts cleanly below fixed header */}
       <div className="h-[66px] sm:h-[108px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
 
-      {/* Full-Screen Immersive Menu Canvas (Mobile & Desktop) */}
+      {/* Floating Dynamic Glass Card Popover (Replacing full screen) */}
       {mobileMenuOpen && (
         <div
           dir="rtl"
-          className={`fixed inset-0 z-[150] animate-in fade-in duration-200 backdrop-blur-3xl overflow-hidden flex flex-col ${
-            dark
-              ? "bg-[#060a10]/98 text-white"
-              : "bg-white/98 text-slate-900"
-          }`}
+          className="fixed inset-0 z-[150] flex items-start justify-start p-3 sm:p-5 sm:pt-4 pointer-events-auto"
         >
-          {/* Header Bar inside Drawer to guarantee seamless header integration without overlap */}
-          <div className="flex items-center justify-between px-3.5 sm:px-6 h-[66px] sm:h-[78px] border-b border-black/[0.08] dark:border-white/10 shrink-0">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => { setMobileMenuOpen(false); navigate("/"); }}
-                className="flex h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px] items-center"
-              >
+          {/* Backdrop Dimming Layer — Clicking outside closes the card */}
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/45 backdrop-blur-sm animate-in fade-in duration-300 -z-10"
+            aria-label="إغلاق القائمة"
+          />
+
+          {/* Floating Luxury Glass Popover Card — Anchored to Top-Left */}
+          <div
+            className={`relative w-full max-w-[430px] max-h-[88vh] flex flex-col rounded-3xl border shadow-2xl backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 fade-in slide-in-from-top-4 duration-300 ease-out ${
+              dark
+                ? "bg-[#070c14]/95 text-white border-white/15 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.12)]"
+                : "bg-white/95 text-slate-900 border-black/10 shadow-[0_25px_60px_-15px_rgba(8,70,125,0.18),inset_0_1px_1px_rgba(255,255,255,0.9)]"
+            }`}
+          >
+            {/* Popover Header with Brand Pill & Close Button */}
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-black/[0.06] dark:border-white/10 shrink-0 bg-black/[0.02] dark:bg-white/[0.02]">
+              <div className="flex items-center gap-2.5">
                 <img
                   src={
                     isNationalDay
@@ -791,27 +821,24 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       : activeLogo
                   }
                   alt="شعار مدارس العقيق"
-                  className={`max-h-full max-w-full object-contain ${
-                    dark ? "brightness-0 invert opacity-95" : ""
-                  }`}
+                  className={`h-7 sm:h-8 w-auto object-contain ${dark ? "brightness-0 invert opacity-95" : ""}`}
                 />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2">
+                <span className="text-xs font-black tracking-tight text-slate-800 dark:text-slate-200">
+                  دليل صفحات العقيق
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="grid h-10 w-10 place-items-center rounded-xl border border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e] active:scale-90 transition cursor-pointer"
+                className="grid h-8 w-8 place-items-center rounded-xl border border-[#de191e]/40 bg-[#de191e]/10 text-[#de191e] hover:bg-[#de191e]/20 active:scale-90 transition cursor-pointer"
                 aria-label="إغلاق القائمة"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
-          </div>
 
-          {/* Inner Scroll Container with Safe Bottom Space */}
-          <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pt-3 pb-36 max-w-lg mx-auto w-full space-y-4 scrollbar-hide">
+            {/* Inner Scroll Container */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-5 py-3.5 space-y-4 pb-8 scrollbar-hide">
 
                 {/* 1. Account / Admin Bar */}
                 <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
@@ -1101,7 +1128,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
       {/* Universal Spotlight Search Dialog */}
       <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
