@@ -93,7 +93,7 @@ export function AqeeqLuxuryPageShell({
       </div>
 
       {/* ── رأس الصفحة (Header) ── */}
-      {header && <div className="relative z-40">{header}</div>}
+      {header && <div className="sticky top-0 z-40 w-full">{header}</div>}
 
       {/* ── محتوى الصفحة (مع أو بدون ستارة الهيرو) ── */}
       {useCurtain && hero ? (
