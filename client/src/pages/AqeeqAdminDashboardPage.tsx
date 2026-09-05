@@ -311,7 +311,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "🏠",
     autoTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
     autoDesc: "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع.",
-    autoImage: "/og-preview.png",
+    autoImage: "/covers/cover-about.jpg",
   },
   {
     path: "/admissions",
@@ -320,7 +320,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "🎓",
     autoTitle: "القبول والتسجيل للعام الدراسي الجديد 🎓 | مدارس العقيق",
     autoDesc: "سجل مقعد ابنك الآن في مدارس العقيق الأهلية والدولية - فصول مجهزة، برامج وطنية ودولية، وحاسبة رسوم وخصومات حية.",
-    autoImage: "/og-preview.png",
+    autoImage: "/covers/student-lab-admissions.jpg",
   },
   {
     path: "/journal",
@@ -329,7 +329,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "📖",
     autoTitle: "مجلة العقيق المدرسية 📖 | صدى الإبداع والريادة",
     autoDesc: "تصفح أحدث أعداد مجلة العقيق الدورية بتجربة قراءة تفاعلية ثلاثية الأبعاد وتقليب حقيقي للصفحات.",
-    autoImage: "/themes/saudi-national-day/opt/cover_album_national.webp",
+    autoImage: "/uploads/site-media/1/1788029592790-9f51a02b-drive-1B3LhIXBI_l4gw0RQgAI92qeuufkowJWJ-p01_f952eff9.jpg",
   },
   {
     path: "/albums",
@@ -338,7 +338,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "📸",
     autoTitle: "معارض وألبومات العقيق 📸 | ذكريات وإنجازات مصورة",
     autoDesc: "شاهد أحدث التغطيات المصورة والمعارض التفاعلية لفعاليات وإنجازات طلاب ومعلمي مدارس العقيق.",
-    autoImage: "/themes/saudi-national-day/opt/cover_album_national.webp",
+    autoImage: "/covers/first-lego-champions.png",
   },
   {
     path: "/articles",
@@ -347,7 +347,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "✍️",
     autoTitle: "أقلام العقيق والمقالات ✍️ | إبداع الطلاب والمعلمين",
     autoDesc: "منصة المقالات التعليمية والمعرفية والمشاركات الأدبية والعلمية لأسرة مدارس العقيق.",
-    autoImage: "/covers/cover-about.jpg",
+    autoImage: "/articles/ai-in-education-comprehensive-research.jpg",
   },
   {
     path: "/atheer",
@@ -356,7 +356,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "🎙️",
     autoTitle: "أثير وبودكاست العقيق 🎙️ | صوت المعرفة والإلهام",
     autoDesc: "استمع لحلقات بودكاست العقيق وأناشيد المدارس الرسمية وحوارات ملهمة مع المتميزين والمبدعين.",
-    autoImage: "/og-preview.png",
+    autoImage: "/articles/morning-radio-student-personality-development.jpg",
   },
   {
     path: "/accreditations",
@@ -374,7 +374,7 @@ const SOCIAL_SHARE_PAGES: Array<{
     icon: "🏛️",
     autoTitle: "عن مدارس العقيق 🏛️ | مسيرة ريادة منذ عام 1994",
     autoDesc: "تعرف على تاريخ مجمعات العقيق التعليمية بالمدينة المنورة، رؤيتنا، رسالتنا، ومرافقنا المتطورة.",
-    autoImage: "/covers/cover-about.jpg",
+    autoImage: "/covers/student-excellence-about.jpg",
   },
 ];
 
@@ -530,11 +530,27 @@ export default function AqeeqAdminDashboardPage() {
       ? orchestrationForm.marketingPixels.ogDescription.trim()
       : currentSharePageConfig.autoDesc);
 
+  const { data: allVisualOverrides } = trpc.visualEditor.listAll.useQuery();
+
+  const dynamicPageVisualImage = useMemo(() => {
+    if (!allVisualOverrides || !Array.isArray(allVisualOverrides)) return null;
+    const match = allVisualOverrides.find(
+      (o: any) => o.pagePath === selectedSharePage && o.mediaUrl && typeof o.mediaUrl === "string" && o.mediaUrl.trim() && !o.isHidden
+    );
+    return match ? (match as any).mediaUrl.trim() : null;
+  }, [allVisualOverrides, selectedSharePage]);
+
+  const autoDynamicImage = dynamicPageVisualImage || (
+    selectedSharePage === "/journal" && (masterContent as any[]).find((c) => c.type === "journal" && c.coverUrl)?.coverUrl ? (masterContent as any[]).find((c) => c.type === "journal" && c.coverUrl).coverUrl :
+    selectedSharePage === "/albums" && (masterContent as any[]).find((c) => c.type === "album" && c.coverUrl)?.coverUrl ? (masterContent as any[]).find((c) => c.type === "album" && c.coverUrl).coverUrl :
+    selectedSharePage === "/articles" && (masterContent as any[]).find((c) => c.type === "article" && c.coverUrl)?.coverUrl ? (masterContent as any[]).find((c) => c.type === "article" && c.coverUrl).coverUrl :
+    selectedSharePage === "/atheer" && (masterContent as any[]).find((c) => c.type === "podcast" && c.coverUrl)?.coverUrl ? (masterContent as any[]).find((c) => c.type === "podcast" && c.coverUrl).coverUrl :
+    currentSharePageConfig.autoImage
+  );
+
   const effectiveImage = isCustomMode && activePageOverride.imageUrl?.trim()
     ? activePageOverride.imageUrl.trim()
-    : (selectedSharePage === "/" && orchestrationForm.marketingPixels?.ogImageUrl?.trim()
-      ? orchestrationForm.marketingPixels.ogImageUrl.trim()
-      : currentSharePageConfig.autoImage);
+    : autoDynamicImage;
 
   const updateActiveOverride = (updates: Partial<{ mode: "auto" | "custom"; title: string; description: string; imageUrl: string }>) => {
     const nextOverrides = {
@@ -565,42 +581,6 @@ export default function AqeeqAdminDashboardPage() {
       imageUrl: "",
     });
     toast.success(`🔄 تم تفعيل الوضع التلقائي الذكي لصفحة (${currentSharePageConfig.name})!`);
-  };
-
-  const applyShareTemplate = (tpl: "admissions" | "national" | "cognia" | "royal") => {
-    if (tpl === "admissions") {
-      updateActiveOverride({
-        mode: "custom",
-        title: "فتح باب القبول والتسجيل للعام الدراسي الجديد 🎓 | احجز مقعد ابنك في مدارس العقيق",
-        description: "بيئة تعليمية بمعايير عالمية، برامج وطنية ودولية معتمدة، وأقساط ميسرة مع خصومات للأشقاء. التقديم متاح الآن عبر موقعنا الإلكتروني.",
-        imageUrl: "/og-preview.png",
-      });
-      toast.success("✅ تم تطبيق قالب القبول والتسجيل!");
-    } else if (tpl === "national") {
-      updateActiveOverride({
-        mode: "custom",
-        title: "نحلم ونحقق 🇸🇦 | احتفالات مدارس العقيق باليوم الوطني السعودي 94",
-        description: "شاركونا مشاعر الفخر والاعتزاز بمسيرة وطننا العظيم مع فعاليات وإبداعات طلبة مدارس العقيق الأهلية والدولية بالمدينة المنورة.",
-        imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp",
-      });
-      toast.success("✅ تم تطبيق قالب اليوم الوطني 94!");
-    } else if (tpl === "cognia") {
-      updateActiveOverride({
-        mode: "custom",
-        title: "تعليم بمعايير الجودة العالمية 🏅 | مدارس العقيق معتمدة من Cognia الأمريكية",
-        description: "سجل حافل من الاعتمادات الدولية وجوائز التميز المؤسسي، لنصنع جيلاً ملهماً يقود المستقبل بالمعرفة والريادة.",
-        imageUrl: "/covers/cover-accreditations.jpg",
-      });
-      toast.success("✅ تم تطبيق قالب الاعتمادات وجودة Cognia!");
-    } else if (tpl === "royal") {
-      updateActiveOverride({
-        mode: "custom",
-        title: "مدارس العقيق الأهلية والدولية بالمدينة المنورة | صناعة المستقبل منذ عام 1994",
-        description: "صرح تعليمي رائد يجمع بين أصالة القيم وحداثة العلوم ورعاية الموهبة والإبداع لكافة المراحل بنين وبنات.",
-        imageUrl: "/alaqeeq-logo.png",
-      });
-      toast.success("✅ تم تطبيق القالب المؤسسي الملكي!");
-    }
   };
 
   const copyCacheBusterLink = () => {
@@ -3736,51 +3716,6 @@ export default function AqeeqAdminDashboardPage() {
                     <div className="lg:col-span-7 space-y-5">
                       {isCustomMode ? (
                         <div className="space-y-4">
-                          {/* 1-Click Templates */}
-                          <div className="space-y-1.5">
-                            <span className="text-[11px] font-black text-slate-400 block">
-                              قوالب جاهزة بضغطة زر (Brand Templates):
-                            </span>
-                            <div className="flex flex-wrap gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => applyShareTemplate("admissions")}
-                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-emerald-400" : "border-black/10 hover:bg-black/5 text-emerald-700"
-                                }`}
-                              >
-                                🎓 قالب القبول والتسجيل
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => applyShareTemplate("national")}
-                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-amber-400" : "border-black/10 hover:bg-black/5 text-amber-700"
-                                }`}
-                              >
-                                🇸🇦 قالب اليوم الوطني 94
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => applyShareTemplate("cognia")}
-                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-blue-400" : "border-black/10 hover:bg-black/5 text-blue-700"
-                                }`}
-                              >
-                                🏆 اعتماد كوجنيا وجودة التعليم
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => applyShareTemplate("royal")}
-                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-700"
-                                }`}
-                              >
-                                🦅 القالب المؤسسي الملكي
-                              </button>
-                            </div>
-                          </div>
-
                           {/* Image Field & Upload */}
                           <div className="space-y-1.5">
                             <label className="block text-xs font-black">
@@ -3791,7 +3726,7 @@ export default function AqeeqAdminDashboardPage() {
                                 type="text"
                                 value={activePageOverride.imageUrl || ""}
                                 onChange={(e) => updateActiveOverride({ imageUrl: e.target.value })}
-                                placeholder="/og-preview.png أو رابط صورة مباشرة"
+                                placeholder="/covers/cover-about.jpg أو رابط صورة مباشرة"
                                 className={`flex-1 rounded-xl border p-2.5 text-xs font-mono outline-none ${
                                   dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
                                 }`}
@@ -3851,15 +3786,33 @@ export default function AqeeqAdminDashboardPage() {
 
                             {/* Quick Image Suggestions */}
                             <div className="flex flex-wrap gap-1.5 text-[10px] font-bold pt-1">
-                              <span className="text-slate-400 py-0.5">اقتراحات سريعة:</span>
+                              <span className="text-slate-400 py-0.5">اقتراحات سريعة من المدارس:</span>
                               <button
                                 type="button"
-                                onClick={() => updateActiveOverride({ imageUrl: "/og-preview.png" })}
+                                onClick={() => updateActiveOverride({ imageUrl: "/covers/cover-about.jpg" })}
                                 className={`px-2 py-0.5 rounded-lg border transition ${
                                   dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
                                 }`}
                               >
-                                🖼️ الصورة الرسمية
+                                🏛️ صرح المدارس
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/covers/student-lab-admissions.jpg" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🔬 معامل الطلاب وSTEM
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/covers/cover-accreditations.jpg" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🏅 اعتماد Cognia
                               </button>
                               <button
                                 type="button"
@@ -3869,24 +3822,6 @@ export default function AqeeqAdminDashboardPage() {
                                 }`}
                               >
                                 🦅 شعار المدارس
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => updateActiveOverride({ imageUrl: "/covers/cover-accreditations.jpg" })}
-                                className={`px-2 py-0.5 rounded-lg border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
-                                }`}
-                              >
-                                🏅 غلاف الاعتمادات
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => updateActiveOverride({ imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp" })}
-                                className={`px-2 py-0.5 rounded-lg border transition ${
-                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
-                                }`}
-                              >
-                                🇸🇦 اليوم الوطني
                               </button>
                             </div>
                           </div>

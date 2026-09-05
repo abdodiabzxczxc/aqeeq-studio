@@ -442,7 +442,7 @@ export async function resolveSocialPreviewForPath(
       description:
         "سجل الآن في مدارس العقيق الأهلية والدولية بالمدينة المنورة للعام الدراسي الجديد. اكتشف المراحل والمسارات التعليمية وحاسبة الأقساط والخصومات الحصرية.",
       imageUrl: resolveSocialImageUrl(
-        visualOverride || "/covers/cover-admissions.jpg",
+        visualOverride || "/covers/student-lab-admissions.jpg",
         origin
       ),
       canonicalUrl: new URL("/admissions", origin).toString(),
@@ -505,6 +505,7 @@ export async function resolveSocialPreviewForPath(
   // 16. Default / Homepage -> Dynamically reads from Site Orchestration & Marketing Pixels in DB
   try {
     const config = await getSiteOrchestration();
+    const visualOverride = await getVisualImageOverride("/");
     const title =
       config?.marketingPixels?.ogTitle?.trim() ||
       "مدارس العقيق الأهلية والدولية بالمدينة المنورة";
@@ -513,7 +514,8 @@ export async function resolveSocialPreviewForPath(
       "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع";
     const rawImage =
       config?.marketingPixels?.ogImageUrl?.trim() ||
-      "/api/og-image.png";
+      visualOverride ||
+      "/covers/cover-about.jpg";
 
     return {
       title,
@@ -527,7 +529,7 @@ export async function resolveSocialPreviewForPath(
       title: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
       description:
         "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع",
-      imageUrl: resolveSocialImageUrl("/api/og-image.png", origin),
+      imageUrl: resolveSocialImageUrl("/covers/cover-about.jpg", origin),
       canonicalUrl: new URL(cleanPath, origin).toString(),
       ogType: "website",
     };
