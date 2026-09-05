@@ -810,18 +810,15 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
-                  className={`flex items-center gap-1.5 shrink-0 ${
-                    isScrolled ? "h-8 sm:h-8.5 px-2.5 sm:px-3 text-xs" : "h-9 sm:h-10 px-2.5 sm:px-3.5 text-xs"
-                  } font-black rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                  className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                     dark
-                      ? "border-white/10 bg-white/5 text-slate-200 hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14]"
-                      : "border-black/10 bg-white text-slate-700 hover:bg-[#08467d] hover:text-white hover:border-[#08467d] shadow-xs"
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14]"
+                      : "border-black/10 bg-black/5 text-slate-700 hover:bg-[#08467d] hover:text-white hover:border-[#08467d]"
                   }`}
                   aria-label="تسجيل الدخول"
                   title="تسجيل الدخول كمسؤول"
                 >
-                  <LogIn size={15} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                  <span className="hidden sm:inline">تسجيل الدخول</span>
+                  <LogIn size={16} />
                 </button>
               )}
 
