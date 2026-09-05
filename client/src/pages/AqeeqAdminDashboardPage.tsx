@@ -3,40 +3,23 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
-function directDriveImage(url: string | null | undefined) {
-  if (!url) return null;
-  const match = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/);
-  return match ? `/api/drive-proxy/${match[1]}` : url;
-}
 import { AqeeqUniversalMediaPickerModal, MediaPickerItem } from "@/components/AqeeqUniversalMediaPickerModal";
 import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   LayoutDashboard,
-  Palette,
-  Sliders,
-  Users,
+  GraduationCap,
   Layers,
   Megaphone,
-  Share2,
-  BookOpen,
-  Camera,
-  Clapperboard,
-  Image as ImageIcon,
-  Instagram,
-  Facebook,
-  MapPin,
+  Shield,
+  Palette,
+  Users,
   Eye,
   Plus,
-  Key,
   Trash2,
-  Shield,
-  ShieldCheck,
-  Radio,
   ExternalLink,
   Sparkles,
-  AlertTriangle,
   CheckCircle2,
   Copy,
   Download,
@@ -50,33 +33,25 @@ import {
   Moon,
   Clock,
   Wand2,
-  Music,
   Headphones,
-  Play,
-  Pause,
-  ListMusic,
-  FolderSync,
+  BookOpen,
+  Camera,
+  Clapperboard,
   Newspaper,
   Mic,
-  Video,
-  GraduationCap,
-  PhoneCall,
-  MessageCircle,
   FileSpreadsheet,
-  UserCheck,
   Building2,
-  Smartphone,
   Rocket,
-  Compass,
   TrendingUp,
   Database,
-  Upload,
-  Pin,
+  Share2,
+  MessageCircle,
+  FolderSync,
+  Instagram,
 } from "lucide-react";
 
-import { VisualOverridesDashboardManager } from "@/components/VisualOverridesDashboardManager";
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
-import { type InteractiveHoverItem, DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
+import { DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
 
 import {
   Dialog,
@@ -87,125 +62,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-function SnapchatIcon({ size = 14, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M12.166 2C8.36 2 6.27 4.29 6.27 7.07c0 1.25.46 2.37 1.05 3.19.14.19.17.43.07.64-.19.4-.64.81-1.39 1.01-.35.09-.59.4-.57.76.03.48.42.79.88.79.13 0 .27-.02.4-.08.57-.23 1.1-.3 1.54-.15.25.09.4.3.4.57 0 .8-.56 2.37-2.3 3.03-.43.16-.69.61-.59 1.06.1.44.53.75.98.71 1.45-.13 2.76.62 3.65 1.55.3.31.72.48 1.15.48h.04c.43 0 .85-.17 1.15-.48.89-.93 2.2-1.68 3.65-1.55.45.04.88-.27.98-.71.1-.45-.16-.9-.59-1.06-1.74-.66-2.3-2.23-2.3-3.03 0-.27.15-.48.4-.57.44-.15.97-.08 1.54.15.13.06.27.08.4.08.46 0 .85-.31.88-.79.02-.36-.22-.67-.57-.76-.75-.2-1.2-.61-1.39-1.01-.1-.21-.07-.45.07-.64.59-.82 1.05-1.94 1.05-3.19C17.73 4.29 15.64 2 12.166 2z" />
-    </svg>
-  );
+function directDriveImage(url: string | null | undefined) {
+  if (!url) return null;
+  const match = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/);
+  return match ? `/api/drive-proxy/${match[1]}` : url;
 }
 
-type TabKey = "radar" | "admissions" | "orchestration" | "content" | "audio_media" | "campaigns" | "users" | "articles" | "podcast" | "music" | "broadcast" | "whatsapp";
-
-export default function AqeeqAdminDashboardPage() {
-  const [, navigate] = useLocation();
-  const { user, isAuthenticated, loading, login, logout } = useAuth();
-  const { theme, toggleTheme } = useAqeeqStudioTheme();
-  const dark = theme === "dark";
-  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
-  const [activeTab, setActiveTab] = useState<TabKey>("radar");
-  const [admissionsSubTab, setAdmissionsSubTab] = useState<"inbox" | "fees" | "settings">("inbox");
-  const [orchestrationSubTab, setOrchestrationSubTab] = useState<"hero" | "header_nav" | "visual_overrides" | "interactive_fx" | "marketing" | "backup" | "app" | "campuses" | "sections">("hero");
-  const [contentSubTab, setContentSubTab] = useState<"master" | "articles">("master");
-  const [audioSubTab, setAudioSubTab] = useState<"podcast" | "music">("podcast");
-  const [commsSubTab, setCommsSubTab] = useState<"broadcast" | "whatsapp">("broadcast");
-  const [isYearbookOpen, setIsYearbookOpen] = useState(false);
-  const [isDeploying, setIsDeploying] = useState(false);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
-  const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
-  const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
-  const utils = trpc.useUtils();
-
-  // Keyboard shortcut listener for Ctrl+K / Cmd+K
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const deployMutation = trpc.deploy.syncToLive.useMutation({
-    onSuccess: () => {
-      setIsDeploying(false);
-      toast.success("🚀 تم نشر وتحديث الموقع المباشر بنجاح!");
-    },
-    onError: (err) => {
-      setIsDeploying(false);
-      toast.error(err.message || "فشل نشر التعديلات");
-    },
-  });
-
-
-  // Admin Overview Queries
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = trpc.executiveAdmin.getOverviewStats.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-    refetchInterval: 15000,
-  });
-
-  const { data: usersList = [], refetch: refetchUsers } = trpc.executiveAdmin.getUsers.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-
-  const { data: masterContent = [], isLoading: contentLoading, refetch: refetchContent } = trpc.executiveAdmin.getMasterContent.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-
-  // Site Orchestration State & Queries
-  const { data: orchestrationData, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-
-  const { data: issuesList = [] } = trpc.schoolNews.publicList.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-
-  const { data: albumsList = [] } = trpc.aqeeqAlbums.publicList.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-
-  const { data: showcaseData } = trpc.aqeeqShowcases.publicShowcase.useQuery(
-    { slug: "news-offers" },
-    { enabled: Boolean(isAuthenticated && user?.role === "admin") }
-  );
-
-  const { data: admissionsList = [], refetch: refetchAdmissions } = trpc.admissions.list.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-    refetchInterval: 15000,
-  });
-
-  const updateAdmissionStatusMutation = trpc.admissions.updateStatus.useMutation({
-    onSuccess: () => {
-      toast.success("تم تحديث حالة طلب القبول بنجاح");
-      refetchAdmissions();
-    },
-    onError: (err) => {
-      toast.error(err.message || "فشل تحديث حالة الطلب");
-    },
-  });
-
-  const deleteAdmissionMutation = trpc.admissions.delete.useMutation({
-    onSuccess: () => {
-      toast.success("تم حذف الطلب بنجاح");
-      refetchAdmissions();
-    },
-    onError: (err) => {
-      toast.error(err.message || "فشل حذف الطلب");
-    },
-  });
-
+export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system";
+export type AdmissionsSubTab = "inbox" | "fees" | "settings";
+export type ContentSubTab = "master" | "articles";
+export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
+export type SystemSubTab = "theme" | "users" | "campuses" | "marketing" | "backup";
 
 const DEFAULT_ORCHESTRATION = {
   nav: {
@@ -414,36 +281,95 @@ const DEFAULT_ORCHESTRATION = {
   },
 };
 
-  // Universal Media Picker State
-  const [mediaPickerConfig, setMediaPickerConfig] = useState<{
-    open: boolean;
-    title: string;
-    currentUrl?: string | null;
-    onSelect: (item: MediaPickerItem) => void;
-  }>({
-    open: false,
-    title: "",
-    onSelect: () => {},
+export default function AqeeqAdminDashboardPage() {
+  const [, navigate] = useLocation();
+  const { user, isAuthenticated, loading, login, logout } = useAuth();
+  const { theme, toggleTheme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+  // 🏛️ The 5 Pillars Master State
+  const [activeTab, setActiveTab] = useState<TabKey>("radar");
+  const [admissionsSubTab, setAdmissionsSubTab] = useState<AdmissionsSubTab>("inbox");
+  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("master");
+  const [campaignsSubTab, setCampaignsSubTab] = useState<CampaignsSubTab>("broadcast");
+  const [systemSubTab, setSystemSubTab] = useState<SystemSubTab>("theme");
+
+  // Auxiliary UI States
+  const [isYearbookOpen, setIsYearbookOpen] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
+  const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
+  const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+
+  const utils = trpc.useUtils();
+
+  // Keyboard shortcut listener for Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Deploy to live mutation
+  const deployMutation = trpc.deploy.syncToLive.useMutation({
+    onSuccess: () => {
+      setIsDeploying(false);
+      toast.success("🚀 تم نشر وتحديث الموقع المباشر بنجاح على سيرفرات ريندر!");
+    },
+    onError: (err) => {
+      setIsDeploying(false);
+      toast.error(err.message || "فشل نشر التعديلات");
+    },
   });
 
-  const openMediaPicker = (title: string, currentUrl: string | null | undefined, onSelect: (item: MediaPickerItem) => void) => {
-    setMediaPickerConfig({
-      open: true,
-      title,
-      currentUrl,
-      onSelect,
-    });
-  };
+  // Admin Overview Queries
+  const { data: stats, refetch: refetchStats } = trpc.executiveAdmin.getOverviewStats.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+    refetchInterval: 20000,
+  });
 
-  const handleLivePreview = async () => {
-    try {
-      await setOrchestrationMutation.mutateAsync(orchestrationForm);
-      window.open("/", "_blank");
-    } catch {
-      window.open("/", "_blank");
-    }
-  };
+  const { data: usersList = [], refetch: refetchUsers } = trpc.executiveAdmin.getUsers.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
 
+  const { data: masterContent = [] } = trpc.executiveAdmin.getMasterContent.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
+
+  const { data: orchestrationData, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+  });
+
+  const { data: admissionsList = [], refetch: refetchAdmissions } = trpc.admissions.list.useQuery(undefined, {
+    enabled: Boolean(isAuthenticated && user?.role === "admin"),
+    refetchInterval: 15000,
+  });
+
+  const updateAdmissionStatusMutation = trpc.admissions.updateStatus.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث حالة طلب القبول بنجاح");
+      refetchAdmissions();
+    },
+    onError: (err) => toast.error(err.message || "فشل تحديث حالة الطلب"),
+  });
+
+  const deleteAdmissionMutation = trpc.admissions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("تم حذف الطلب بنجاح");
+      refetchAdmissions();
+    },
+    onError: (err) => toast.error(err.message || "فشل حذف الطلب"),
+  });
+
+  // Form Orchestration state
   const [orchestrationForm, setOrchestrationForm] = useState<any>(DEFAULT_ORCHESTRATION);
 
   useEffect(() => {
@@ -472,87 +398,25 @@ const DEFAULT_ORCHESTRATION = {
 
   const setOrchestrationMutation = trpc.executiveAdmin.setSiteOrchestration.useMutation({
     onSuccess: () => {
-      toast.success("تم حفظ ونشر جميع تعديلات الواجهة والسكاشن بنجاح! 🚀");
+      toast.success("تم حفظ وتحديث الإعدادات بنجاح! 🚀");
       void refetchOrchestration();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر حفظ التعديلات");
-    },
+    onError: (err) => toast.error(err.message || "تعذر حفظ التعديلات"),
   });
 
-  // Interactive FX Handlers
-  const currentHoverItems: InteractiveHoverItem[] = (
-    orchestrationForm.interactiveFx?.wellingtonHoverItems || DEFAULT_WELLINGTON_HOVER_ITEMS
-  );
+  // Media Picker state
+  const [mediaPickerConfig, setMediaPickerConfig] = useState<{
+    open: boolean;
+    title: string;
+    currentUrl?: string | null;
+    onSelect: (item: MediaPickerItem) => void;
+  }>({
+    open: false,
+    title: "",
+    onSelect: () => {},
+  });
 
-  const handleUpdateHoverItem = (index: number, field: keyof InteractiveHoverItem, value: any) => {
-    const updated = [...currentHoverItems];
-    updated[index] = { ...updated[index], [field]: value };
-    setOrchestrationForm((prev: any) => ({
-      ...prev,
-      interactiveFx: {
-        ...(prev.interactiveFx || {}),
-        wellingtonHoverItems: updated,
-      },
-    }));
-  };
-
-  const handleAddHoverItem = () => {
-    const newItem: InteractiveHoverItem = {
-      id: "hover-" + Date.now(),
-      triggerText: "عنصر تفاعلي جديد",
-      title: "عنوان البطاقة التفاعلية",
-      badge: "شارة العقيق",
-      imageUrl: "/articles/is-quality-important-school-accreditation.jpg",
-      targetUrl: "/accreditations",
-    };
-    setOrchestrationForm((prev: any) => ({
-      ...prev,
-      interactiveFx: {
-        ...(prev.interactiveFx || {}),
-        wellingtonHoverItems: [...currentHoverItems, newItem],
-      },
-    }));
-    toast.success("تمت إضافة عنصر تفاعلي جديد! يمكنك تعديل تفاصيله وحفظه.");
-  };
-
-  const handleDeleteHoverItem = (index: number) => {
-    if (currentHoverItems.length <= 1) {
-      toast.error("يجب الإبقاء على عنصر تفاعلي واحد على الأقل.");
-      return;
-    }
-    const updated = currentHoverItems.filter((_, i) => i !== index);
-    setOrchestrationForm((prev: any) => ({
-      ...prev,
-      interactiveFx: {
-        ...(prev.interactiveFx || {}),
-        wellingtonHoverItems: updated,
-      },
-    }));
-    toast.success("تم حذف العنصر التفاعلي.");
-  };
-
-  const handleFileUploadForHoverItem = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      toast.error("الحد الأقصى لحجم الصورة هو 8 ميجابايت");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        handleUpdateHoverItem(index, "imageUrl", reader.result);
-        toast.success("✅ تم اختيار الصورة من جهازك بنجاح!");
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Hero Covers Sub-tab State
-  const [heroActiveCoverTab, setHeroActiveCoverTab] = useState<"home" | "journal" | "albums" | "showcase" | "articles" | "podcasts">("home");
-
-  // School Songs State
+  // School Songs state
   const [newSongTitle, setNewSongTitle] = useState("");
   const [newSongArtist, setNewSongArtist] = useState("");
   const [newSongUrl, setNewSongUrl] = useState("");
@@ -566,20 +430,18 @@ const DEFAULT_ORCHESTRATION = {
 
   const scanDriveAudioFolderMutation = trpc.admin.scanGoogleDriveAudioFolder.useMutation();
 
-  // User Management State
+  // User Management state
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserOpenId, setNewUserOpenId] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState<"admin" | "coordinator" | "receptionist" | "auditor">("admin");
-
   const [resetPassUserId, setResetPassUserId] = useState<number | null>(null);
   const [newPasswordValue, setNewPasswordValue] = useState("");
-
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
 
-  // Broadcast Banner State
+  // Broadcast Banner state
   const [editingBroadcastId, setEditingBroadcastId] = useState<string | null>(null);
   const [broadcastEnabled, setBroadcastEnabled] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState("");
@@ -591,7 +453,6 @@ const DEFAULT_ORCHESTRATION = {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
   });
 
-  // Sync broadcast state from server once loaded
   const [broadcastInitialized, setBroadcastInitialized] = useState(false);
   if (stats?.broadcast && !broadcastInitialized) {
     const b = stats.broadcast as any;
@@ -604,14 +465,14 @@ const DEFAULT_ORCHESTRATION = {
     setBroadcastInitialized(true);
   }
 
-  // WhatsApp Campaign State
+  // WhatsApp Campaign state
   const [selectedCampaignItem, setSelectedCampaignItem] = useState<string>("");
 
   // Content Grid Search & Filters
   const [contentSearch, setContentSearch] = useState("");
   const [contentTypeFilter, setContentTypeFilter] = useState<"all" | "journal" | "album" | "post">("all");
 
-  // Mutations
+  // User Mutations
   const createUserMutation = trpc.executiveAdmin.createUser.useMutation({
     onSuccess: () => {
       toast.success("تم إنشاء حساب المشرف بنجاح!");
@@ -623,9 +484,7 @@ const DEFAULT_ORCHESTRATION = {
       void refetchUsers();
       void refetchStats();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر إنشاء الحساب");
-    },
+    onError: (err) => toast.error(err.message || "تعذر إنشاء الحساب"),
   });
 
   const resetPasswordMutation = trpc.executiveAdmin.resetPassword.useMutation({
@@ -634,9 +493,7 @@ const DEFAULT_ORCHESTRATION = {
       setResetPassUserId(null);
       setNewPasswordValue("");
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر تغيير كلمة المرور");
-    },
+    onError: (err) => toast.error(err.message || "تعذر تغيير كلمة المرور"),
   });
 
   const deleteUserMutation = trpc.executiveAdmin.deleteUser.useMutation({
@@ -646,9 +503,7 @@ const DEFAULT_ORCHESTRATION = {
       void refetchUsers();
       void refetchStats();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر حذف المستخدم");
-    },
+    onError: (err) => toast.error(err.message || "تعذر حذف المستخدم"),
   });
 
   const updateRoleMutation = trpc.executiveAdmin.updateRole.useMutation({
@@ -656,11 +511,10 @@ const DEFAULT_ORCHESTRATION = {
       toast.success("تم تحديث صلاحية المستخدم!");
       void refetchUsers();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر تحديث الصلاحية");
-    },
+    onError: (err) => toast.error(err.message || "تعذر تحديث الصلاحية"),
   });
 
+  // Broadcast Mutations
   const setBroadcastMutation = trpc.executiveAdmin.setBroadcast.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ ونشر التنبيه العاجل بنجاح!");
@@ -668,9 +522,7 @@ const DEFAULT_ORCHESTRATION = {
       void refetchStats();
       void utils.executiveAdmin.getBroadcast.invalidate();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر حفظ إعدادات التنبيه");
-    },
+    onError: (err) => toast.error(err.message || "تعذر حفظ إعدادات التنبيه"),
   });
 
   const deleteBroadcastMutation = trpc.executiveAdmin.deleteBroadcast.useMutation({
@@ -680,23 +532,10 @@ const DEFAULT_ORCHESTRATION = {
       void refetchStats();
       void utils.executiveAdmin.getBroadcast.invalidate();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر حذف التنبيه");
-    },
+    onError: (err) => toast.error(err.message || "تعذر حذف التنبيه"),
   });
 
-  const toggleBroadcastMutation = trpc.executiveAdmin.toggleBroadcast.useMutation({
-    onSuccess: () => {
-      toast.success("تم تحديث حالة التنبيه!");
-      void refetchBroadcastList();
-      void refetchStats();
-      void utils.executiveAdmin.getBroadcast.invalidate();
-    },
-    onError: (err) => {
-      toast.error(err.message || "تعذر تعديل حالة التنبيه");
-    },
-  });
-
+  // Stories Mutations
   const hideStoryMutation = trpc.executiveAdmin.hideStory.useMutation({
     onSuccess: (_, variables) => {
       toast.success("تم استبعاد القصة من شريط 24H بنجاح", {
@@ -737,27 +576,23 @@ const DEFAULT_ORCHESTRATION = {
     onError: (err) => toast.error(err.message || "تعذر تعديل حالة القصة"),
   });
 
-  const { data: availableStories = [], isLoading: isLoadingStories, refetch: refetchAvailableStories } = trpc.executiveAdmin.getAllAvailableStories.useQuery(undefined, {
+  const { data: availableStories = [] } = trpc.executiveAdmin.getAllAvailableStories.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
   });
 
   const [isStoryPickerOpen, setIsStoryPickerOpen] = useState(false);
-  const [storyPickerCategory, setStoryPickerCategory] = useState<string>("all");
   const [storyPickerSearch, setStoryPickerSearch] = useState<string>("");
-  const [storyPickerStatusFilter, setStoryPickerStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [storyDurationHours, setStoryDurationHours] = useState<number>(24); // default 24h
+  const [storyDurationHours, setStoryDurationHours] = useState<number>(24);
 
   // Global Theme Engine State & Mutation
   const setActiveThemeMutation = trpc.executiveAdmin.setActiveTheme.useMutation({
     onSuccess: (data) => {
       const isNd = data.themeMode?.activeTheme === "saudi-national-day";
-      toast.success(isNd ? "تم تفعيل سيم اليوم الوطني السعودي بنجاح على كامل الموقع! 🇸🇦✨" : "تمت العودة إلى السيم الأصلي للعقيق 💎");
+      toast.success(isNd ? "تم تفعيل ثيم اليوم الوطني السعودي بنجاح على كامل الموقع! 🇸🇦✨" : "تمت العودة إلى الثيم الأصلي للعقيق 💎");
       void utils.executiveAdmin.getSiteOrchestration.invalidate();
       void refetchOrchestration();
     },
-    onError: (err) => {
-      toast.error(err.message || "تعذر تحديث سيم الموقع");
-    },
+    onError: (err) => toast.error(err.message || "تعذر تحديث ثيم الموقع"),
   });
 
   const [themeForm, setThemeForm] = useState<{
@@ -828,40 +663,6 @@ const DEFAULT_ORCHESTRATION = {
     onError: () => toast.error("تعذر التدقيق اللغوي بالذكاء الاصطناعي"),
   });
 
-  // Podcasts Queries & Mutations
-  const { data: allAdminPodcasts = [], refetch: refetchAdminPodcasts } = trpc.podcasts.list.useQuery(undefined, {
-    enabled: Boolean(isAuthenticated && user?.role === "admin"),
-  });
-  const [isAddPodcastOpen, setIsAddPodcastOpen] = useState(false);
-  const [newPodcastTitle, setNewPodcastTitle] = useState("");
-  const [newPodcastDesc, setNewPodcastDesc] = useState("");
-  const [newPodcastUrl, setNewPodcastUrl] = useState("");
-  const [newPodcastType, setNewPodcastType] = useState<"audio" | "video">("audio");
-  const [newPodcastSource, setNewPodcastSource] = useState<"drive" | "youtube" | "direct">("direct");
-  const [newPodcastCategory, setNewPodcastCategory] = useState<any>("بودكاست قيادات");
-  const [newPodcastHost, setNewPodcastHost] = useState("");
-  const [newPodcastDuration, setNewPodcastDuration] = useState("10:00");
-
-  const createPodcastMutation = trpc.podcasts.create.useMutation({
-    onSuccess: () => {
-      toast.success("تم نشر حلقة البودكاست بنجاح!");
-      setIsAddPodcastOpen(false);
-      setNewPodcastTitle("");
-      setNewPodcastDesc("");
-      setNewPodcastUrl("");
-      void refetchAdminPodcasts();
-    },
-    onError: (err) => toast.error(err.message || "تعذر إضافة الحلقة"),
-  });
-
-  const deletePodcastMutation = trpc.podcasts.delete.useMutation({
-    onSuccess: () => {
-      toast.success("تم حذف الحلقة بنجاح!");
-      void refetchAdminPodcasts();
-    },
-    onError: (err) => toast.error(err.message || "تعذر حذف الحلقة"),
-  });
-
   // Filtered Master Content
   const filteredContent = useMemo(() => {
     return masterContent.filter((item) => {
@@ -874,12 +675,11 @@ const DEFAULT_ORCHESTRATION = {
     });
   }, [masterContent, contentTypeFilter, contentSearch]);
 
-  // Selected WhatsApp item details
+  // WhatsApp Campaign details
   const campaignItemData = useMemo(() => {
     return masterContent.find((item) => item.id === selectedCampaignItem);
   }, [masterContent, selectedCampaignItem]);
 
-  // Formatted WhatsApp message
   const generatedWhatsAppMessage = useMemo(() => {
     if (!campaignItemData) return "";
     const fullUrl = window.location.origin + campaignItemData.viewUrl;
@@ -900,7 +700,55 @@ const DEFAULT_ORCHESTRATION = {
       .join("\n");
   }, [campaignItemData]);
 
-  // While auth state is initializing, show a clean loading indicator
+  // Intelligent navigation router for shortcuts & command palette
+  const handleNavigateTab = (tab: any, subTab?: string) => {
+    if (tab === "radar") {
+      setActiveTab("radar");
+    } else if (tab === "admissions") {
+      setActiveTab("admissions");
+      if (subTab === "inbox" || subTab === "fees" || subTab === "settings") {
+        setAdmissionsSubTab(subTab);
+      }
+    } else if (tab === "content" || tab === "articles") {
+      setActiveTab("content");
+      if (tab === "articles" || subTab === "articles") {
+        setContentSubTab("articles");
+      } else {
+        setContentSubTab("master");
+      }
+    } else if (tab === "campaigns" || tab === "broadcast" || tab === "whatsapp" || tab === "music" || tab === "podcast") {
+      setActiveTab("campaigns");
+      if (tab === "whatsapp" || subTab === "whatsapp") {
+        setCampaignsSubTab("whatsapp");
+      } else if (tab === "music" || tab === "podcast" || subTab === "radio") {
+        setCampaignsSubTab("radio");
+      } else {
+        setCampaignsSubTab("broadcast");
+      }
+    } else if (tab === "system" || tab === "users" || tab === "orchestration") {
+      setActiveTab("system");
+      if (tab === "users" || subTab === "users") {
+        setSystemSubTab("users");
+      } else if (subTab === "campuses" || subTab === "header_nav") {
+        setSystemSubTab("campuses");
+      } else if (subTab === "marketing") {
+        setSystemSubTab("marketing");
+      } else if (subTab === "backup") {
+        setSystemSubTab("backup");
+      } else {
+        setSystemSubTab("theme");
+      }
+    }
+  };
+
+  // Pending counts
+  const pendingLeadsCount = admissionsList.filter(
+    (a: any) => a.status === "new" || a.status === "pending"
+  ).length;
+
+  const pendingArticlesCount = allAdminArticles.filter((a) => a.status === "pending").length;
+
+  // Auth Loading Screen
   if (loading) {
     return (
       <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center p-6 text-center bg-slate-950 text-white font-[Tajawal,sans-serif]">
@@ -910,7 +758,7 @@ const DEFAULT_ORCHESTRATION = {
     );
   }
 
-  // If not admin, provide direct 1-click login and manual login options
+  // Auth Gate
   if (!isAuthenticated || user?.role !== "admin") {
     return (
       <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center p-6 text-center bg-slate-950 text-white font-[Tajawal,sans-serif]">
@@ -948,20 +796,20 @@ const DEFAULT_ORCHESTRATION = {
   return (
     <div
       dir="rtl"
-      className={"min-h-screen w-full max-w-full overflow-x-hidden transition-colors duration-300 font-[Tajawal,sans-serif] " + (
+      className={"min-h-screen w-full max-w-full overflow-x-hidden transition-colors duration-300 font-[Tajawal,sans-serif] pb-24 lg:pb-12 " + (
         dark ? "bg-[#080808] text-white" : "bg-[#f4f6f9] text-slate-900"
       )}
     >
-      {/* Top Executive Header */}
+      {/* ==================== TOP EXECUTIVE HEADER ==================== */}
       <header
         className={"sticky top-0 z-40 border-b backdrop-blur-xl transition " + (
           dark ? "border-white/[0.08] bg-black/85" : "border-black/[0.08] bg-white/90"
         )}
       >
-        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 sm:px-8">
-          {/* Logo & Title */}
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-4 sm:px-8">
+          {/* Logo & Platform Name */}
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate("/")} className="h-11 w-auto">
+            <button onClick={() => navigate("/")} className="h-11 w-auto cursor-pointer" title="العودة للصفحة الرئيسية">
               <img
                 src="/alaqeeq-logo.png"
                 alt="العقيق"
@@ -973,17 +821,17 @@ const DEFAULT_ORCHESTRATION = {
                 <span className="grid h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
                 <h1 className="text-base font-black">غرفة قيادة مدارس العقيق</h1>
               </div>
-              <p className="text-[11px] font-bold text-slate-400">Executive Admin Command Center</p>
+              <p className="text-[11px] font-bold text-slate-400">Executive Command Center · قمرة القيادة 2.0</p>
             </div>
           </div>
 
-          {/* Quick Actions & Profile */}
-          <div className="flex items-center gap-2.5">
+          {/* Quick Actions & Profiles */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Quick Command Palette (Ctrl+K) */}
             <button
               type="button"
               onClick={() => setIsCommandPaletteOpen(true)}
-              className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition " + (
+              className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition cursor-pointer " + (
                 dark
                   ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                   : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
@@ -997,48 +845,44 @@ const DEFAULT_ORCHESTRATION = {
               </kbd>
             </button>
 
-            {/* View Live Site Button */}
+            {/* Direct CTA to Live Visual Editor */}
             <button
               onClick={() => navigate("/")}
-              className={"inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-black transition " + (
+              className="hidden md:inline-flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3.5 py-2 text-xs font-black text-amber-400 hover:bg-amber-400 hover:text-black transition shadow-sm cursor-pointer"
+              title="فتح المحرر البصري التفاعلي على الموقع"
+            >
+              <Palette size={14} />
+              <span>المحرر البصري 🎨</span>
+            </button>
+
+            {/* View Live Site */}
+            <button
+              onClick={() => window.open("/", "_blank")}
+              className={"inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition cursor-pointer " + (
                 dark
                   ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                   : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
               )}
+              title="معاينة الموقع كزائر"
             >
-              <span>الموقع المباشر</span>
-              <ArrowUpLeft size={14} />
+              <span>الموقع</span>
+              <ExternalLink size={13} />
             </button>
 
             {/* Theme Switcher */}
             <button
               onClick={toggleTheme}
-              className={"grid h-10 w-10 place-items-center rounded-xl border transition " + (
+              className={"grid h-10 w-10 place-items-center rounded-xl border transition cursor-pointer " + (
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
               )}
-              title="تبديل المظهر"
+              title="تبديل المظهر (نهاري / ليلي)"
             >
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
 
-            {/* User Profile Pill */}
-            <div
-              className={"hidden md:flex items-center gap-2.5 rounded-xl border px-3 py-1.5 " + (
-                dark ? "border-white/10 bg-white/5" : "border-black/10 bg-white shadow-sm"
-              )}
-            >
-              <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-xs">
-                {user?.name?.[0] || "A"}
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-black">{user?.name || "المشرف العام"}</p>
-                <span className="text-[10px] font-bold text-emerald-400">مشرف معتمد</span>
-              </div>
-            </div>
-
-            {/* Deploy to Live Button — خاص باللوكال هوست فقط لنشر التعديلات لريندر */}
+            {/* Deploy to Live Button (for localhost sync) */}
             {isLocalhost && (
               <button
                 onClick={() => {
@@ -1047,7 +891,7 @@ const DEFAULT_ORCHESTRATION = {
                   deployMutation.mutate();
                 }}
                 disabled={isDeploying}
-                className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 ${
+                className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 cursor-pointer ${
                   isDeploying
                     ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
                     : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
@@ -1055,14 +899,14 @@ const DEFAULT_ORCHESTRATION = {
                 title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
               >
                 <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
-                <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للموقع المباشر 🚀"}</span>
+                <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للإنتاج 🚀"}</span>
               </button>
             )}
 
             {/* Logout */}
             <button
               onClick={() => void logout()}
-              className="grid h-10 w-10 place-items-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
               title="تسجيل الخروج"
             >
               <LogOut size={16} />
@@ -1070,3802 +914,217 @@ const DEFAULT_ORCHESTRATION = {
           </div>
         </div>
 
-        {/* Executive Navigation Tabs */}
-        <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-3 sm:px-8 overflow-x-auto scrollbar-hide pb-2 pt-1">
+        {/* 🏛️ The 5 Pillars Executive Tabs */}
+        <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-4 sm:px-8 overflow-x-auto scrollbar-hide pb-2 pt-1">
           {[
-            { key: "radar", label: "مركز القيادة والرادار", icon: LayoutDashboard },
             {
-              key: "admissions",
-              label: "شؤون القبول والرسوم 🎓",
-              icon: GraduationCap,
-              badge: admissionsList.filter((a: any) => a.status === "new" || a.status === "pending").length || undefined,
-              alert: admissionsList.some((a: any) => a.status === "new" || a.status === "pending"),
+              key: "radar" as TabKey,
+              label: "مركز القيادة والرادار",
+              icon: LayoutDashboard,
+              badge: undefined,
+              alert: false,
             },
-            { key: "orchestration", label: "تخصيص الموقع والمجمعات 🎨", icon: Palette, alert: false },
-            { key: "content", label: "المحتوى والمقالات 📚", icon: BookOpen, badge: allAdminArticles.filter((a) => a.status === "pending").length || undefined },
-            { key: "audio_media", label: "الاستوديو الصوتي والراديو 🎙️", icon: Radio, badge: allAdminPodcasts.length },
-            { key: "campaigns", label: "التنبيهات والتواصل والواتساب 📢", icon: Megaphone, alert: broadcastEnabled },
-            { key: "users", label: "المشرفين والصلاحيات 👥", icon: Users, badge: usersList.length },
+            {
+              key: "admissions" as TabKey,
+              label: "شؤون القبول والرسوم CRM",
+              icon: GraduationCap,
+              badge: pendingLeadsCount || undefined,
+              alert: pendingLeadsCount > 0,
+            },
+            {
+              key: "content" as TabKey,
+              label: "الجدول الموحد للمحتوى",
+              icon: Layers,
+              badge: pendingArticlesCount || undefined,
+              alert: pendingArticlesCount > 0,
+            },
+            {
+              key: "campaigns" as TabKey,
+              label: "التنبيهات والتواصل المباشر",
+              icon: Megaphone,
+              badge: broadcastEnabled ? "بث نشط" : undefined,
+              alert: broadcastEnabled,
+            },
+            {
+              key: "system" as TabKey,
+              label: "إدارة النظام والهوية والأمان",
+              icon: Shield,
+              badge: orchestrationData?.themeMode?.activeTheme === "saudi-national-day" ? "اليوم الوطني 🇸🇦" : undefined,
+              alert: false,
+            },
           ].map((tab) => {
-
             const Icon = tab.icon;
-            const active =
-              activeTab === tab.key ||
-              (tab.key === "content" && activeTab === "articles") ||
-              (tab.key === "audio_media" && (activeTab === "podcast" || activeTab === "music")) ||
-              (tab.key === "campaigns" && (activeTab === "broadcast" || activeTab === "whatsapp"));
+            const active = activeTab === tab.key;
 
             return (
               <button
                 key={tab.key}
-                onClick={() => {
-                  if (tab.key === "content") {
-                    setActiveTab(contentSubTab === "articles" ? "articles" : "content");
-                  } else if (tab.key === "audio_media") {
-                    setActiveTab(audioSubTab === "music" ? "music" : "podcast");
-                  } else if (tab.key === "campaigns") {
-                    setActiveTab(commsSubTab === "whatsapp" ? "whatsapp" : "broadcast");
-                  } else {
-                    setActiveTab(tab.key as TabKey);
-                  }
-                }}
-                className={"inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition shrink-0 " + (
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`relative inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-black transition whitespace-nowrap shrink-0 cursor-pointer ${
                   active
                     ? dark
-                      ? "bg-[#f8ca14] text-black shadow-lg shadow-[#f8ca14]/20"
+                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-lg shadow-[#f8ca14]/20"
                       : "bg-[#08467d] text-white shadow-lg shadow-[#08467d]/20"
                     : dark
-                    ? "bg-white/5 text-slate-300 hover:bg-white/10"
-                    : "bg-white text-slate-600 hover:bg-slate-100 border border-black/5"
-                )}
+                    ? "bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/5"
+                    : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-black/5 shadow-sm"
+                }`}
               >
-                <Icon size={15} />
+                <Icon size={16} />
                 <span>{tab.label}</span>
-                {tab.badge !== undefined ? (
+
+                {tab.badge && (
                   <span
-                    className={"rounded-md px-1.5 py-0.5 text-[10px] font-black " + (
-                      tab.key === "admissions"
-                        ? "bg-[#de191e] text-white animate-pulse shadow-sm shadow-[#de191e]/50"
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
+                      tab.alert
+                        ? "bg-red-500 text-white animate-pulse"
                         : active
-                        ? dark ? "bg-black/20 text-black" : "bg-white/20 text-white"
-                        : dark ? "bg-white/10 text-slate-300" : "bg-slate-200 text-slate-700"
-                    )}
+                        ? "bg-black/20 text-current"
+                        : "bg-amber-400/20 text-amber-400 border border-amber-400/30"
+                    }`}
                   >
                     {tab.badge}
                   </span>
-                ) : null}
-                {tab.alert ? (
-                  <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
-                ) : null}
+                )}
               </button>
             );
           })}
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="mx-auto max-w-[1440px] p-3 sm:p-8 w-full overflow-x-hidden">
-        {/* ==================== TAB: ORCHESTRATION & CMS ==================== */}
-        {activeTab === "orchestration" && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
-              <div>
-                <h2 className="text-xl font-black">منظومة التحكم الشاملة في الواجهة والسكاشن</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  تحكم كامل في كفرات الهيرو، سيكشن الإنجازات، أسماء الصفحات، نصوص السكاشن، وكلمة المشرف
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={handleLivePreview}
-                  className={"inline-flex items-center gap-1.5 rounded-2xl border px-4 py-2.5 text-xs font-black transition " + (
-                    dark
-                      ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
-                      : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
-                  )}
-                >
-                  <ExternalLink size={14} />
-                  <span>معاينة حية للموقع (مع الحفظ)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrchestrationMutation.mutate(orchestrationForm);
-                  }}
-                  disabled={setOrchestrationMutation.isPending}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-6 py-2.5 text-xs font-black text-black transition hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20"
-                >
-                  <CheckCircle2 size={16} />
-                  <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر جميع التعديلات"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("hero")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "hero"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Palette size={15} />
-                <span>أغلفة الهيرو ومناسبات الموقع 🎨</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("header_nav")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "header_nav"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Compass size={15} />
-                <span>استوديو الهيدر وشريط الطوارئ 🧭</span>
-                {orchestrationForm.emergencyBanner?.enabled && (
-                  <span className="h-2 w-2 rounded-full bg-[#de191e] animate-ping" />
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("visual_overrides")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "visual_overrides"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Sparkles size={15} />
-                <span>التعديلات المرئية (Overrides Hub) ⚡</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("interactive_fx")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "interactive_fx"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Pin size={15} />
-                <span>عناصر الماوس والسكرول (Interactive FX) 🎯</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("marketing")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "marketing"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <TrendingUp size={15} />
-                <span>أكواد البكسل وSEO 📈</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("backup")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "backup"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Database size={15} />
-                <span>النسخ الاحتياطي 🛡️</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("app")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "app"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Smartphone size={15} />
-                <span>تطبيق مدارس العقيق الذكي 📱</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("campuses")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "campuses"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Building2 size={15} />
-                <span>مجمعاتنا وهوية المدارس 🏛️</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOrchestrationSubTab("sections")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition shrink-0 ${
-                  orchestrationSubTab === "sections"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <SlidersHorizontal size={15} />
-                <span>باقي السكاشن والمحتوى ⚙️</span>
-              </button>
-            </div>
-
-            {/* Subtab 1: HERO COVERS & THEMES */}
-            {orchestrationSubTab === "hero" && (
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-
-              {/* 🌟 0. GLOBAL OCCASION THEME ENGINE (سيمات ومناسبات الموقع) */}
-              <div
-                className={`lg:col-span-2 rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden transition-all duration-500 ${
-                  themeForm.activeTheme === "saudi-national-day"
-                    ? dark
-                      ? "border-emerald-500/40 bg-gradient-to-br from-[#001f13] via-[#05150f] to-[#0a100d] text-white shadow-emerald-950/40"
-                      : "border-emerald-400 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/40 text-slate-900 shadow-emerald-100"
-                    : dark
-                    ? "border-white/10 bg-[#101010] text-white"
-                    : "border-black/5 bg-white text-slate-900 shadow-slate-200/50"
-                }`}
-              >
-                {/* Header of Theme Studio */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
-                  <div className="flex items-center gap-3.5">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-[#5aba1c] text-white shadow-lg shadow-emerald-600/30 text-xl">
-                      🇸🇦
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-black">منظومة السيمات والهوية الوطنية والمناسبات</h3>
-                        {themeForm.activeTheme === "saudi-national-day" ? (
-                          <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-0.5 text-[11px] font-black text-emerald-400 animate-pulse">
-                            ● نشط ومطبق الآن
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-slate-500/15 border border-slate-500/30 px-3 py-0.5 text-[11px] font-black text-slate-400">
-                            السيم الافتراضي
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs font-bold text-slate-400 mt-0.5">
-                        تبديل هوية الموقع بالكامل بنقرة واحدة (ألوان، زخارف الهوية الوطنية، وشريط التهنئة) مع بقاء كل المحتوى والمقالات كما هي 100%.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Save Theme Button */}
-                  <Button
-                    type="button"
-                    disabled={setActiveThemeMutation.isPending}
-                    onClick={() => {
-                      setActiveThemeMutation.mutate(themeForm);
-                    }}
-                    className={`text-xs font-black rounded-2xl px-6 py-2.5 transition shadow-lg gap-2 ${
-                      themeForm.activeTheme === "saudi-national-day"
-                        ? "bg-gradient-to-r from-[#005A36] via-[#367453] to-[#2d5e43] hover:from-[#00482b] hover:to-[#254f38] text-white shadow-[#367453]/30"
-                        : "bg-white/10 hover:bg-white/20 text-white"
-                    }`}
-                  >
-                    <Sparkles size={16} />
-                    <span>{setActiveThemeMutation.isPending ? "جاري التطبيق..." : "حفظ وتطبيق السيم فوراً"}</span>
-                  </Button>
-                </div>
-
-                {/* Theme Selection Cards (Default vs Saudi National Day) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Theme Option 1: Classic Default Theme */}
-                  <div
-                    onClick={() => setThemeForm((prev) => ({ ...prev, activeTheme: "default" }))}
-                    className={`group relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${
-                      themeForm.activeTheme === "default"
-                        ? "border-[#f8ca14] bg-[#f8ca14]/5 ring-2 ring-[#f8ca14]/30 shadow-lg shadow-[#f8ca14]/10"
-                        : dark
-                        ? "border-white/10 bg-black/30 hover:border-white/20"
-                        : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] text-white font-black text-sm">
-                          💎
-                        </div>
-                        <div>
-                          <h4 className="font-black text-sm">السيم الأصلي للعقيق (الكلاسيكي الملكي)</h4>
-                          <p className="text-[11px] text-slate-400">الهوية الرسمية الكلاسيكية باللون الكحلي والذهبي والزمردي</p>
-                        </div>
-                      </div>
-                      <div className={`h-5 w-5 rounded-full border-2 grid place-items-center ${
-                        themeForm.activeTheme === "default"
-                          ? "border-[#f8ca14] bg-[#f8ca14] text-black text-[10px] font-black"
-                          : "border-slate-400"
-                      }`}>
-                        {themeForm.activeTheme === "default" && "✓"}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-2 pt-3 border-t border-current/10 text-[11px] text-slate-400">
-                      <span className="h-3 w-3 rounded-full bg-[#08467d]" />
-                      <span className="h-3 w-3 rounded-full bg-[#367453]" />
-                      <span className="h-3 w-3 rounded-full bg-[#f8ca14]" />
-                      <span className="mr-2 font-mono text-[10px]">الهوية القياسية المستقرة</span>
-                    </div>
-                  </div>
-
-                  {/* Theme Option 2: Saudi National Day Theme */}
-                  <div
-                    onClick={() => setThemeForm((prev) => ({ ...prev, activeTheme: "saudi-national-day" }))}
-                    className={`group relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${
-                      themeForm.activeTheme === "saudi-national-day"
-                        ? "border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/40 shadow-xl shadow-emerald-600/20"
-                        : dark
-                        ? "border-white/10 bg-black/30 hover:border-emerald-500/30"
-                        : "border-slate-200 bg-slate-50/60 hover:border-emerald-300"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#005A36] to-[#5aba1c] text-white text-lg shadow-md">
-                          🇸🇦
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h4 className="font-black text-sm">سيم اليوم الوطني السعودي</h4>
-                            <span className="rounded-full bg-emerald-500/20 px-2 py-0.2 text-[10px] font-black text-emerald-400">
-                              أطباعنا سعودية
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-400">هوية اليوم الوطني الرسمية بألوان القيم الستة والخلفيات الرسمية</p>
-                        </div>
-                      </div>
-                      <div className={`h-5 w-5 rounded-full border-2 grid place-items-center ${
-                        themeForm.activeTheme === "saudi-national-day"
-                          ? "border-emerald-500 bg-emerald-500 text-white text-[10px] font-black"
-                          : "border-slate-400"
-                      }`}>
-                        {themeForm.activeTheme === "saudi-national-day" && "✓"}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-1.5 pt-3 border-t border-current/10 text-[11px] text-slate-400 flex-wrap">
-                      <span className="h-3 w-3 rounded-full bg-[#005A36]" title="الأخضر الملكي" />
-                      <span className="h-3 w-3 rounded-full bg-[#6565e0]" title="الرؤية" />
-                      <span className="h-3 w-3 rounded-full bg-[#0050af]" title="العزم" />
-                      <span className="h-3 w-3 rounded-full bg-[#5aba1c]" title="الشجاعة" />
-                      <span className="h-3 w-3 rounded-full bg-[#971a4d]" title="الكرم" />
-                      <span className="h-3 w-3 rounded-full bg-[#607c4f]" title="الأصالة" />
-                      <span className="h-3 w-3 rounded-full bg-[#7c5d21]" title="العطاء" />
-                      <span className="mr-2 font-mono text-[10px] text-emerald-400 font-bold">هوية الـ 6 قيم الوطنية</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Detailed Controls when Saudi National Day is selected */}
-                {themeForm.activeTheme === "saudi-national-day" && (
-                  <div className="mt-4 pt-5 border-t border-current/10 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      
-                      {/* 1. Template Variant Selection */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-black flex items-center gap-1.5">
-                          <span>🎨 قالب الزخرفة والخلفية الوطنية:</span>
-                        </label>
-                        <select
-                          value={themeForm.templateVariant}
-                          onChange={(e) => setThemeForm((prev) => ({ ...prev, templateVariant: e.target.value as any }))}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-black cursor-pointer ${
-                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
-                          }`}
-                        >
-                          <option value="general">🏛️ القالب العام الرسمي (General Template)</option>
-                          <option value="generosity">☕ الكرم والجود - الدلة والفنجان (Generosity)</option>
-                          <option value="authenticity">🐪 الأصالة والموروث (Authenticity)</option>
-                          <option value="vision">🔭 الرؤية والمستقبل (Vision)</option>
-                          <option value="giving">🤲 العطاء الاستثنائي (Giving)</option>
-                        </select>
-                        <p className="text-[10px] text-slate-400">يتغير نمط الخلفية والزخرفة في الهيرو والسكاشن تلقائياً</p>
-                      </div>
-
-                      {/* 2. Duration / Expiry selector */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-black flex items-center gap-1.5">
-                          <span>⏱ مدة تفعيل السيم:</span>
-                        </label>
-                        <select
-                          value={themeForm.durationHours === null ? "permanent" : String(themeForm.durationHours)}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setThemeForm((prev) => ({
-                              ...prev,
-                              durationHours: val === "permanent" ? null : Number(val),
-                            }));
-                          }}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-black cursor-pointer ${
-                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
-                          }`}
-                        >
-                          <option value="permanent">♾️ دائم حتى أقوم بإيقافه يدوياً</option>
-                          <option value="24">⏱ ٢٤ ساعة (يوم واحد)</option>
-                          <option value="48">⏱ ٤٨ ساعة (يومان)</option>
-                          <option value="168">⏱ أسبوع كامل (7 أيام)</option>
-                          <option value="720">⏱ شهر كامل (30 يوماً)</option>
-                        </select>
-                        <p className="text-[10px] text-slate-400">يعود الموقع تلقائياً للسيم الأصلي فور انتهاء المدة المحددة</p>
-                      </div>
-
-                      {/* 3. Custom Badge / Slogan Text */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-black flex items-center gap-1.5">
-                          <span>✍️ نص شارة المناسبة:</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={themeForm.customBadgeText}
-                          onChange={(e) => setThemeForm((prev) => ({ ...prev, customBadgeText: e.target.value }))}
-                          placeholder="نحلم ونحقق 🇸🇦"
-                          className={`w-full rounded-xl border p-2.5 text-xs font-black ${
-                            dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
-                          }`}
-                        />
-                        <p className="text-[10px] text-slate-400">تظهر في الهيدر والـ Ribbon أعلى الموقع</p>
-                      </div>
-
-                    </div>
-
-                    {/* Ribbon & Opacity Toggles */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-current/10">
-                      <label className="flex items-center gap-2 cursor-pointer text-xs font-black">
-                        <input
-                          type="checkbox"
-                          checked={themeForm.showCelebrationRibbon}
-                          onChange={(e) => setThemeForm((prev) => ({ ...prev, showCelebrationRibbon: e.target.checked }))}
-                          className="h-4 w-4 rounded border-slate-400 text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <span>إظهار شريط التهنئة الوطني أعلى كل الصفحات (Celebration Ribbon)</span>
-                      </label>
-
-                      <div className="flex items-center gap-3 text-xs font-black">
-                        <span className="text-slate-400">شفافية الزخرفة:</span>
-                        <input
-                          type="range"
-                          min="20"
-                          max="100"
-                          step="5"
-                          value={themeForm.backgroundPatternOpacity}
-                          onChange={(e) => setThemeForm((prev) => ({ ...prev, backgroundPatternOpacity: Number(e.target.value) }))}
-                          className="w-28 accent-emerald-500 cursor-pointer"
-                        />
-                        <span className="font-mono text-emerald-400">{themeForm.backgroundPatternOpacity}%</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 1. HERO COVERS STUDIO (الرئيسية والصفحات الفرعية) */}
-              <div
-                className={"rounded-3xl border p-4 sm:p-7 space-y-6 shadow-md overflow-hidden " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 border-current/10">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-white shrink-0">
-                      <BookOpen size={18} />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-black">أغلفة وكفرات الواجهة الرئيسية (Hero Covers)</h3>
-                      <p className="text-xs font-bold text-slate-400">التحكم في كفرات الهيرو بالرئيسية وصفحات (المجلة، الألبومات، الأخبار)</p>
-                    </div>
-                  </div>
-
-                  {/* Sub-tab Navigation Pills */}
-                  <div className={"flex items-center gap-1 rounded-xl border p-1 text-[11px] font-black overflow-x-auto scrollbar-hide max-w-full " + (
-                    dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-100"
-                  )}>
-                    {[
-                      { key: "home", label: "🏠 الرئيسية (3D)" },
-                      { key: "journal", label: "📖 المجلة" },
-                      { key: "albums", label: "📸 الألبومات" },
-                      { key: "showcase", label: "🎬 الأخبار" },
-                      { key: "articles", label: "✍️ المقالات" },
-                      { key: "podcasts", label: "🎙️ البودكاست" },
-                    ].map((st) => (
-                      <button
-                        key={st.key}
-                        type="button"
-                        onClick={() => setHeroActiveCoverTab(st.key as typeof heroActiveCoverTab)}
-                        className={"rounded-lg px-2.5 py-1 transition shrink-0 whitespace-nowrap " + (
-                          heroActiveCoverTab === st.key
-                            ? dark
-                              ? "bg-[#f8ca14] text-black shadow-sm"
-                              : "bg-[#08467d] text-white shadow-sm"
-                            : "text-slate-400 hover:text-white"
-                        )}
-                      >
-                        {st.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Resolvers for live previews */}
-                {(() => {
-                  const resolvedJournalCover = (issuesList.find((i) => i.id === orchestrationForm.heroCovers.customJournalIssueId) || issuesList[0])?.coverUrl;
-                  const resolvedJournalSecondCover = (issuesList.find((i) => i.id === orchestrationForm.heroCovers.journalSecondaryIssueId) || issuesList[1] || issuesList[0])?.coverUrl;
-                  const resolvedJournalIssue = issuesList.find((i) => i.id === orchestrationForm.heroCovers.customJournalIssueId) || issuesList[0];
-                  const resolvedJournalSecondIssue = issuesList.find((i) => i.id === orchestrationForm.heroCovers.journalSecondaryIssueId) || issuesList[1] || issuesList[0];
-
-                  const resolvedAlb = albumsList.find((a) => a.id === orchestrationForm.heroCovers.customAlbumId) || albumsList[0];
-                  const resolvedAlbumCover = directDriveImage(resolvedAlb?.coverUrl) || resolvedAlb?.coverUrl;
-                  const resolvedAlbSecond = albumsList.find((a) => a.id === orchestrationForm.heroCovers.albumsSecondaryAlbumId) || albumsList[1] || albumsList[0];
-                  const resolvedAlbumSecondCover = directDriveImage(resolvedAlbSecond?.coverUrl) || resolvedAlbSecond?.coverUrl;
-
-                  const resolvedPost = showcaseData?.posts?.find((p) => p.id === orchestrationForm.heroCovers.customShowcasePostId) || showcaseData?.posts?.[0];
-                  const resolvedShowcaseCover = directDriveImage(resolvedPost?.thumbnailUrl) || resolvedPost?.thumbnailUrl || resolvedPost?.mediaUrl;
-                  const resolvedPostSecond = showcaseData?.posts?.find((p) => p.id === orchestrationForm.heroCovers.showcaseSecondaryPostId) || showcaseData?.posts?.[1] || showcaseData?.posts?.[0];
-                  const resolvedShowcaseSecondCover = directDriveImage(resolvedPostSecond?.thumbnailUrl) || resolvedPostSecond?.thumbnailUrl || resolvedPostSecond?.mediaUrl;
-
-                  const resolvedArt = allAdminArticles.find((a: any) => a.id === orchestrationForm.heroCovers.customArticleId) || allAdminArticles[0];
-                  const resolvedArticleCover = directDriveImage(resolvedArt?.coverUrl) || resolvedArt?.coverUrl;
-                  const resolvedArtSecond = allAdminArticles.find((a: any) => a.id === orchestrationForm.heroCovers.articlesSecondaryArticleId) || allAdminArticles[1] || allAdminArticles[0];
-                  const resolvedArticleSecondCover = directDriveImage(resolvedArtSecond?.coverUrl) || resolvedArtSecond?.coverUrl;
-
-                  const resolvedPod = allAdminPodcasts.find((p: any) => p.id === orchestrationForm.heroCovers.customPodcastId) || allAdminPodcasts[0];
-                  const resolvedPodcastCover = directDriveImage(resolvedPod?.coverUrl) || resolvedPod?.coverUrl;
-                  const resolvedPodSecond = allAdminPodcasts.find((p: any) => p.id === orchestrationForm.heroCovers.podcastsSecondaryPodcastId) || allAdminPodcasts[1] || allAdminPodcasts[0];
-                  const resolvedPodcastSecondCover = directDriveImage(resolvedPodSecond?.coverUrl) || resolvedPodSecond?.coverUrl;
-
-                  return (
-                    <div className="space-y-6">
-                      {/* SUBTAB 1: HOMEPAGE 3D HERO */}
-                      {heroActiveCoverTab === "home" && (
-                        <div className="space-y-5">
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60 shadow-inner" : "border-black/5 bg-slate-900 text-white shadow-xl"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Sparkles size={14} className="text-[#f8ca14]" />
-                                <span className="text-xs font-black text-white">المعاينة الحية المتداخلة ثلاثية الأبعاد (Homepage 3D Stage)</span>
-                              </div>
-                              <span className="text-[10px] text-slate-400 font-bold">انقر على أي غلاف لتغييره</span>
-                            </div>
-
-                            {/* Overlapping Hero Canvas (طابق الأصل للصفحة الرئيسية) */}
-                            <div className="relative mx-auto h-[190px] sm:h-[230px] w-full max-w-[440px]">
-                              {/* 1. Showcase Cover (Right / Background Card) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف الأخبار والعروض", resolvedShowcaseCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, showcaseMode: "custom", customShowcasePostId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-[12%] right-[2%] top-[14%] w-[45%] cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-[#111] opacity-75 transition duration-300 hover:scale-105 hover:opacity-100 hover:z-30 hover:border-blue-400 shadow-xl"
-                                title="انقر لاختيار وتغيير غلاف الأخبار والعروض"
-                              >
-                                {resolvedShowcaseCover ? (
-                                  <img src={resolvedShowcaseCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-400 font-bold">الأخبار والعروض</div>
-                                )}
-                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-1.5 text-center">
-                                  <span className="text-[9px] font-black text-blue-300">الأخبار والعروض</span>
-                                </div>
-                              </div>
-
-                              {/* 2. Albums Cover (Middle Card) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف ألبوم العقيق", resolvedAlbumCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, albumsMode: "custom", customAlbumId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-[8%] left-[28%] top-[8%] z-10 w-[51%] cursor-pointer overflow-hidden rounded-2xl border border-white/20 bg-[#151515] opacity-90 transition duration-300 hover:scale-105 hover:opacity-100 hover:z-30 hover:border-emerald-400 shadow-2xl"
-                                title="انقر لاختيار وتغيير غلاف ألبوم الفعاليات"
-                              >
-                                {resolvedAlbumCover ? (
-                                  <img src={resolvedAlbumCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-400 font-bold">ألبوم الفعاليات</div>
-                                )}
-                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-1.5 text-center">
-                                  <span className="text-[9px] font-black text-emerald-300">ألبوم الفعاليات</span>
-                                </div>
-                              </div>
-
-                              {/* 3. Journal Cover (Front / Left Card in RTL with Golden Highlight) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف مجلة العقيق", resolvedJournalCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, journalMode: "custom", customJournalIssueId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-[2%] left-[2%] top-[4%] z-20 w-[47%] cursor-pointer overflow-hidden rounded-2xl border-2 border-[#f8ca14] bg-[#111] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.9)] transition duration-300 hover:scale-105 hover:z-30"
-                                title="انقر لاختيار وتغيير غلاف مجلة العقيق"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedJournalCover ? (
-                                    <img src={resolvedJournalCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-[#f8ca14] font-bold">مجلة العقيق</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-1.5 text-center">
-                                    <span className="text-[9px] font-black text-[#f8ca14]">مجلة العقيق</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <p className="mt-2 text-center text-[10px] text-slate-400 font-bold">
-                              💡 يمكنك النقر على أي كارت بالمسرح لتغييره فوراً أو استخدام التبويبات بالأعلى للتحكم المفصل في كل صفحة
-                            </p>
-                          </div>
-
-                          {/* Quick Summary Row */}
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div
-                              onClick={() => setHeroActiveCoverTab("journal")}
-                              className={"cursor-pointer rounded-2xl border p-3 transition hover:border-[#f8ca14]/60 " + (dark ? "border-white/10 bg-white/5" : "border-black/5 bg-slate-50")}
-                            >
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className="h-2 w-2 rounded-full bg-[#f8ca14]" />
-                                <span className="text-xs font-black">غلاف المجلة</span>
-                              </div>
-                              <p className="text-[11px] font-bold text-slate-400 truncate">{resolvedJournalIssue?.title || "تلقائي"}</p>
-                            </div>
-
-                            <div
-                              onClick={() => setHeroActiveCoverTab("albums")}
-                              className={"cursor-pointer rounded-2xl border p-3 transition hover:border-emerald-400 " + (dark ? "border-white/10 bg-white/5" : "border-black/5 bg-slate-50")}
-                            >
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                                <span className="text-xs font-black">غلاف الألبومات</span>
-                              </div>
-                              <p className="text-[11px] font-bold text-slate-400 truncate">{resolvedAlb?.title || "تلقائي"}</p>
-                            </div>
-
-                            <div
-                              onClick={() => setHeroActiveCoverTab("showcase")}
-                              className={"cursor-pointer rounded-2xl border p-3 transition hover:border-blue-400 " + (dark ? "border-white/10 bg-white/5" : "border-black/5 bg-slate-50")}
-                            >
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className="h-2 w-2 rounded-full bg-blue-400" />
-                                <span className="text-xs font-black">غلاف الأخبار</span>
-                              </div>
-                              <p className="text-[11px] font-bold text-slate-400 truncate">{resolvedPost?.title || "تلقائي"}</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* SUBTAB 2: JOURNAL PAGE COVER */}
-                      {heroActiveCoverTab === "journal" && (
-                        <div className="space-y-4">
-                          {/* Live 2-card Preview of /journal */}
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-[#f8ca14]">معاينة هيرو صفحة مجلة العقيق (/journal)</span>
-                              <a href="/journal" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#f8ca14] hover:underline">
-                                <span>معاينة الصفحة الحية</span>
-                                <ArrowUpLeft size={13} />
-                              </a>
-                            </div>
-
-                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
-                              {/* Secondary Tilted Card (Back) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار الغلاف الثانوي للمجلة (العدد السابق)", resolvedJournalSecondCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, journalSecondaryIssueId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
-                                style={{ transform: "rotate(-7deg)" }}
-                                title="انقر لتغيير الغلاف الثانوي (العدد السابق)"
-                              >
-                                {resolvedJournalSecondCover ? (
-                                  <img src={resolvedJournalSecondCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">العدد السابق</div>
-                                )}
-                              </div>
-
-                              {/* Primary Card (Front) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف مجلة العقيق الرئيسي", resolvedJournalCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, journalMode: "custom", customJournalIssueId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-[#f8ca14]/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
-                                style={{ transform: "rotate(3deg)" }}
-                                title="انقر لتغيير الغلاف الرئيسي للمجلة"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedJournalCover ? (
-                                    <img src={resolvedJournalCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-[#f8ca14] font-bold">العدد الحالي</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-[10px] font-black text-white truncate">{resolvedJournalIssue?.title || "العدد الحالي"}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Controls */}
-                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف المجلة</label>
-                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalMode: "auto" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.journalMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  تلقائي (الأحدث)
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalMode: "custom" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.journalMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  غلاف مخصص
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Primary and Secondary cover selectors */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الأساسي (العدد المميز)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedJournalCover ? <img src={resolvedJournalCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار غلاف مجلة العقيق الرئيسي", resolvedJournalCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, journalMode: "custom", customJournalIssueId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-[#f8ca14]/30 bg-[#f8ca14]/10 px-3 py-2 text-xs font-black text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition text-right"
-                                  >
-                                    {resolvedJournalIssue?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الثانوي (العدد السابق للخلفية)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedJournalSecondCover ? <img src={resolvedJournalSecondCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار الغلاف الثانوي للمجلة", resolvedJournalSecondCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, journalSecondaryIssueId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
-                                  >
-                                    {resolvedJournalSecondIssue?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Text customization */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.journalCustomTag || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalCustomTag: e.target.value } })}
-                                  placeholder="موسم العقيق · النشرة الدورية"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.journalCustomTitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalCustomTitle: e.target.value } })}
-                                  placeholder="خبر يُقلب إلى ذكرى."
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة المجلة</label>
-                              <textarea
-                                rows={2}
-                                value={orchestrationForm.heroCovers.journalCustomDesc || ""}
-                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, journalCustomDesc: e.target.value } })}
-                                placeholder="رفوف رقمية تجمع أعداد مجلة ونشرات مدارس العقيق الأهلية..."
-                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* SUBTAB 3: ALBUMS PAGE COVER */}
-                      {heroActiveCoverTab === "albums" && (
-                        <div className="space-y-4">
-                          {/* Live 2-card Preview of /albums */}
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-emerald-400">معاينة هيرو صفحة ألبوم العقيق (/albums)</span>
-                              <a href="/albums" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:underline">
-                                <span>معاينة الصفحة الحية</span>
-                                <ArrowUpLeft size={13} />
-                              </a>
-                            </div>
-
-                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
-                              {/* Secondary Tilted Card (Back) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار الغلاف الثانوي للألبومات (الألبوم السابق)", resolvedAlbumSecondCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, albumsSecondaryAlbumId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
-                                style={{ transform: "rotate(-7deg)" }}
-                                title="انقر لتغيير الغلاف الثانوي (الألبوم السابق)"
-                              >
-                                {resolvedAlbumSecondCover ? (
-                                  <img src={resolvedAlbumSecondCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">الألبوم السابق</div>
-                                )}
-                              </div>
-
-                              {/* Primary Card (Front) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف ألبوم العقيق الرئيسي", resolvedAlbumCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, albumsMode: "custom", customAlbumId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-emerald-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
-                                style={{ transform: "rotate(3deg)" }}
-                                title="انقر لتغيير الغلاف الرئيسي للألبوم"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedAlbumCover ? (
-                                    <img src={resolvedAlbumCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-emerald-400 font-bold">الألبوم الحالي</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-[10px] font-black text-white truncate">{resolvedAlb?.title || "الألبوم الحالي"}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Controls */}
-                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف الألبومات</label>
-                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, albumsMode: "auto" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.albumsMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  تلقائي (الأحدث)
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, albumsMode: "custom" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.albumsMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  غلاف مخصص
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Primary and Secondary cover selectors */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الأساسي (الألبوم المميز)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedAlbumCover ? <img src={resolvedAlbumCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار غلاف ألبوم العقيق الرئيسي", resolvedAlbumCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, albumsMode: "custom", customAlbumId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs font-black text-emerald-400 hover:bg-emerald-400 hover:text-black transition text-right"
-                                  >
-                                    {resolvedAlb?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الثانوي (الألبوم السابق للخلفية)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedAlbumSecondCover ? <img src={resolvedAlbumSecondCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار الغلاف الثانوي للألبومات", resolvedAlbumSecondCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, albumsSecondaryAlbumId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
-                                  >
-                                    {resolvedAlbSecond?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Text customization */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.albumsCustomTag || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, albumsCustomTag: e.target.value } })}
-                                  placeholder="موسم العقيق · أرشيف الفعاليات"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.albumsCustomTitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, albumsCustomTitle: e.target.value } })}
-                                  placeholder="كل فعالية تحفظ لحظتها."
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة الألبومات</label>
-                              <textarea
-                                rows={2}
-                                value={orchestrationForm.heroCovers.albumsCustomDesc || ""}
-                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, albumsCustomDesc: e.target.value } })}
-                                placeholder="رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق..."
-                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* SUBTAB 4: SHOWCASE & NEWS PAGE COVER */}
-                      {heroActiveCoverTab === "showcase" && (
-                        <div className="space-y-4">
-                          {/* Live 2-card Preview of /offers */}
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-blue-400">معاينة هيرو صفحة الأخبار والعروض (/offers)</span>
-                              <a href="/offers" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-400 hover:underline">
-                                <span>معاينة الصفحة الحية</span>
-                                <ArrowUpLeft size={13} />
-                              </a>
-                            </div>
-
-                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
-                              {/* Secondary Tilted Card (Back) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار الغلاف الثانوي للأخبار (المنشور السابق)", resolvedShowcaseSecondCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, showcaseSecondaryPostId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
-                                style={{ transform: "rotate(-7deg)" }}
-                                title="انقر لتغيير الغلاف الثانوي (المنشور السابق)"
-                              >
-                                {resolvedShowcaseSecondCover ? (
-                                  <img src={resolvedShowcaseSecondCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">المنشور السابق</div>
-                                )}
-                              </div>
-
-                              {/* Primary Card (Front) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار غلاف الأخبار والعروض الرئيسي", resolvedShowcaseCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, showcaseMode: "custom", customShowcasePostId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-blue-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
-                                style={{ transform: "rotate(3deg)" }}
-                                title="انقر لتغيير الغلاف الرئيسي للأخبار"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedShowcaseCover ? (
-                                    <img src={resolvedShowcaseCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-blue-400 font-bold">الخبر الحالي</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-[10px] font-black text-white truncate">{resolvedPost?.title || "أحدث خبر ومنشور"}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Controls */}
-                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف الأخبار والعروض</label>
-                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseMode: "auto" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.showcaseMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  تلقائي (الأحدث)
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseMode: "custom" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.showcaseMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  غلاف مخصص
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Primary and Secondary cover selectors */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الأساسي (الخبر / المنشور المميز)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedShowcaseCover ? <img src={resolvedShowcaseCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار غلاف الأخبار والعروض الرئيسي", resolvedShowcaseCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, showcaseMode: "custom", customShowcasePostId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-blue-400/30 bg-blue-400/10 px-3 py-2 text-xs font-black text-blue-400 hover:bg-blue-400 hover:text-black transition text-right"
-                                  >
-                                    {resolvedPost?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الغلاف الثانوي (المنشور السابق للخلفية)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedShowcaseSecondCover ? <img src={resolvedShowcaseSecondCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار الغلاف الثانوي للأخبار", resolvedShowcaseSecondCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, showcaseSecondaryPostId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
-                                  >
-                                    {resolvedPostSecond?.title || "اختر من الوسائط..."}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Text customization */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.showcaseCustomTag || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseCustomTag: e.target.value } })}
-                                  placeholder="العقيق · الأخبار والعروض"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">العنوان الأول</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.showcaseCustomTitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseCustomTitle: e.target.value } })}
-                                  placeholder="الأخبار والعروض"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">السطر الذهبي المميز</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.showcaseCustomSubtitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseCustomSubtitle: e.target.value } })}
-                                  placeholder="كل جديد، أولًا بأول."
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة الأخبار والعروض</label>
-                              <textarea
-                                rows={2}
-                                value={orchestrationForm.heroCovers.showcaseCustomDesc || ""}
-                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, showcaseCustomDesc: e.target.value } })}
-                                placeholder="رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق وعروضها..."
-                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {/* SUBTAB 5: ARTICLES PAGE COVER */}
-                      {heroActiveCoverTab === "articles" && (
-                        <div className="space-y-4">
-                          {/* Live 2-card Preview of /articles */}
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-amber-400">معاينة هيرو صفحة المقالات والأقلام (/articles)</span>
-                              <a href="/articles" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:underline">
-                                <span>معاينة الصفحة الحية</span>
-                                <ArrowUpLeft size={13} />
-                              </a>
-                            </div>
-
-                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
-                              {/* Secondary Tilted Card (Back) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار المقال الثانوي للهيرو (الخلفية)", resolvedArticleSecondCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, articlesSecondaryArticleId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
-                                style={{ transform: "rotate(-7deg)" }}
-                                title="انقر لتغيير المقال الثانوي"
-                              >
-                                {resolvedArticleSecondCover ? (
-                                  <img src={resolvedArticleSecondCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">المقال السابق</div>
-                                )}
-                              </div>
-
-                              {/* Primary Card (Front) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار مقال الهيرو الرئيسي", resolvedArticleCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom", customArticleId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
-                                style={{ transform: "rotate(3deg)" }}
-                                title="انقر لتغيير المقال المميز الرئيسي"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedArticleCover ? (
-                                    <img src={resolvedArticleCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-amber-400 font-bold">المقال المميز</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-[10px] font-black text-white truncate">{resolvedArt?.title || "أحدث مقال أدبي"}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Controls */}
-                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف مقالات العقيق</label>
-                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "auto" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.articlesMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  تلقائي (الأحدث)
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.articlesMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  مخصص
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Pickers */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-amber-400">المقال الرئيسي (الغلاف الأول)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedArticleCover ? <img src={resolvedArticleCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار مقال الهيرو الرئيسي", resolvedArticleCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, articlesMode: "custom", customArticleId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-400 hover:bg-amber-400 hover:text-black transition text-right"
-                                  >
-                                    {resolvedArt?.title || "اختر من المقالات..."}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">المقال الثانوي (الخلفية المائلة)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedArticleSecondCover ? <img src={resolvedArticleSecondCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار المقال الثانوي", resolvedArticleSecondCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, articlesSecondaryArticleId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
-                                  >
-                                    {resolvedArtSecond?.title || "اختر من المقالات..."}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Text customization */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.articlesCustomTag || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomTag: e.target.value } })}
-                                  placeholder="موسم العقيق · مقالات وأقلام"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.articlesCustomTitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomTitle: e.target.value } })}
-                                  placeholder="أقلام تفيض فكراً وإبداعاً."
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة المقالات</label>
-                              <textarea
-                                rows={2}
-                                value={orchestrationForm.heroCovers.articlesCustomDesc || ""}
-                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, articlesCustomDesc: e.target.value } })}
-                                placeholder="رفوف ثقافية ومساحة أدبية تفاعلية نبرز فيها كتابات طلاب مدارس العقيق..."
-                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* SUBTAB 6: PODCAST & BROADCAST PAGE COVER */}
-                      {heroActiveCoverTab === "podcasts" && (
-                        <div className="space-y-4">
-                          {/* Live 2-card Preview of /podcast */}
-                          <div className={"relative overflow-hidden rounded-2xl border p-4 sm:p-5 " + (
-                            dark ? "border-white/10 bg-black/60" : "border-black/5 bg-slate-900 text-white"
-                          )}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-black text-[#f8ca14]">معاينة هيرو صفحة أثير العقيق (/atheer)</span>
-                              <a href="/podcast" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#f8ca14] hover:underline">
-                                <span>معاينة الصفحة الحية</span>
-                                <ArrowUpLeft size={13} />
-                              </a>
-                            </div>
-
-                            <div className="relative mx-auto h-[180px] w-full max-w-[360px]">
-                              {/* Secondary Tilted Card (Back) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار الحلقة الثانوية للهيرو (الخلفية)", resolvedPodcastSecondCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, podcastsSecondaryPodcastId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute left-[6%] top-[8%] h-[80%] w-[58%] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#111] opacity-60 transition duration-300 hover:scale-105 hover:opacity-100 shadow-xl"
-                                style={{ transform: "rotate(-7deg)" }}
-                                title="انقر لتغيير الحلقة الثانوية"
-                              >
-                                {resolvedPodcastSecondCover ? (
-                                  <img src={resolvedPodcastSecondCover} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                  <div className="grid h-full place-items-center text-[10px] text-slate-500 font-bold">الحلقة السابقة</div>
-                                )}
-                              </div>
-
-                              {/* Primary Card (Front) */}
-                              <div
-                                onClick={() => {
-                                  openMediaPicker("اختيار حلقة البودكاست الرئيسية", resolvedPodcastCover, (item) => {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom", customPodcastId: item.rawId },
-                                    });
-                                  });
-                                }}
-                                className="group absolute bottom-1 right-[6%] h-[88%] w-[68%] cursor-pointer overflow-hidden rounded-2xl border-2 border-[#f8ca14] bg-[#111] p-1.5 shadow-2xl transition duration-300 hover:scale-105"
-                                style={{ transform: "rotate(3deg)" }}
-                                title="انقر لتغيير حلقة البودكاست المميزة"
-                              >
-                                <div className="relative h-full w-full overflow-hidden rounded-xl">
-                                  {resolvedPodcastCover ? (
-                                    <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <div className="grid h-full place-items-center text-[10px] text-[#f8ca14] font-bold">الحلقة المميزة</div>
-                                  )}
-                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-[10px] font-black text-white truncate">{resolvedPod?.title || "أحدث حلقة بودكاست"}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Controls */}
-                          <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-black text-slate-300">نمط اختيار غلاف البودكاست والإذاعة</label>
-                              <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "auto" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.podcastsMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  تلقائي (الأحدث)
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom" } })}
-                                  className={"rounded px-2.5 py-1 transition " + (orchestrationForm.heroCovers.podcastsMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                                >
-                                  مخصص
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Pickers */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-[#f8ca14]">الحلقة الرئيسية (الغلاف الأول)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedPodcastCover ? <img src={resolvedPodcastCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار حلقة البودكاست الرئيسية", resolvedPodcastCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, podcastsMode: "custom", customPodcastId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-[#f8ca14]/30 bg-[#f8ca14]/10 px-3 py-2 text-xs font-black text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition text-right"
-                                  >
-                                    {resolvedPod?.title || "اختر من الحلقات..."}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="rounded-xl border border-current/10 p-3 space-y-2">
-                                <label className="block text-[11px] font-black text-slate-400">الحلقة الثانوية (الخلفية المائلة)</label>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10">
-                                    {resolvedPodcastSecondCover ? <img src={resolvedPodcastSecondCover} alt="" className="h-full w-full object-cover" /> : null}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      openMediaPicker("اختيار الحلقة الثانوية", resolvedPodcastSecondCover, (item) => {
-                                        setOrchestrationForm({
-                                          ...orchestrationForm,
-                                          heroCovers: { ...orchestrationForm.heroCovers, podcastsSecondaryPodcastId: item.rawId },
-                                        });
-                                      });
-                                    }}
-                                    className="flex-1 truncate rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300 hover:bg-white/10 transition text-right"
-                                  >
-                                    {resolvedPodSecond?.title || "اختر من الحلقات..."}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Text customization */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الهيرو (Tag)</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.podcastsCustomTag || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomTag: e.target.value } })}
-                                  placeholder="أثير العقيق الرقمي · إذاعة وبودكاست"
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الهيرو الرئيسي</label>
-                                <input
-                                  type="text"
-                                  value={orchestrationForm.heroCovers.podcastsCustomTitle || ""}
-                                  onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomTitle: e.target.value } })}
-                                  placeholder="صوت ينبض بالحياة والإبداع."
-                                  className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الهيرو لصفحة البودكاست</label>
-                              <textarea
-                                rows={2}
-                                value={orchestrationForm.heroCovers.podcastsCustomDesc || ""}
-                                onChange={(e) => setOrchestrationForm({ ...orchestrationForm, heroCovers: { ...orchestrationForm.heroCovers, podcastsCustomDesc: e.target.value } })}
-                                placeholder="استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية..."
-                                className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-              </div>
-            )}
-
-            {/* Subtab 2: SMART APP SHOWCASE */}
-            {orchestrationSubTab === "app" && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
-                  <div>
-                    <h3 className="text-lg font-black flex items-center gap-2">
-                      <Smartphone size={20} className="text-[#f8ca14]" />
-                      <span>إدارة سيكشن تطبيق مدارس العقيق الذكي بالصفحة الرئيسية</span>
-                    </h3>
-                    <p className="text-xs font-bold text-slate-400 mt-1">
-                      التحكم في فيديو الشرح الإرشادي المدمج، رمز QR للتحميل السريع، وروابط المتاجر، مع إمكانية إظهار أو إخفاء السيكشن بالكامل.
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setOrchestrationMutation.mutate({
-                        appShowcase: orchestrationForm.appShowcase,
-                      });
-                    }}
-                    disabled={setOrchestrationMutation.isPending}
-                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ إعدادات التطبيق"}</span>
-                  </Button>
-                </div>
-
-                <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                  {/* Enable Switch */}
-                  <div className="flex items-center justify-between border-b pb-4 border-current/10">
-                    <div>
-                      <h4 className="text-sm font-black">إظهار سيكشن التطبيق في الصفحة الرئيسية</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">يظهر مباشرة أسفل مكتبة التابات بالصفحة الرئيسية لتعريف الزوار بمزايا التطبيق وطريقة الدفع</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const current = orchestrationForm.appShowcase?.enabled ?? true;
-                        setOrchestrationForm({
-                          ...orchestrationForm,
-                          appShowcase: {
-                            ...orchestrationForm.appShowcase,
-                            enabled: !current,
-                          },
-                        });
-                      }}
-                      className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                        (orchestrationForm.appShowcase?.enabled ?? true) ? "bg-emerald-500" : "bg-slate-700"
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transform transition ease-in-out duration-200 ${
-                          (orchestrationForm.appShowcase?.enabled ?? true) ? "translate-x-0" : "-translate-x-5"
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* YouTube Video ID & Preview */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div className="lg:col-span-6 space-y-4">
-                      <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1.5">
-                          معرف فيديو الشرح على YouTube (Video ID)
-                        </label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.appShowcase?.youtubeVideoId ?? "_h3K-q8cDUc"}
-                          onChange={(e) => {
-                            let val = e.target.value.trim();
-                            const match = val.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                            if (match) val = match[1];
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              appShowcase: {
-                                ...orchestrationForm.appShowcase,
-                                youtubeVideoId: val,
-                              },
-                            });
-                          }}
-                          placeholder="_h3K-q8cDUc أو رابط يوتيوب كامل"
-                          className={`w-full rounded-xl border p-3 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                        <p className="text-[10px] font-bold text-slate-400 mt-1">
-                          يمكنك وضع رمز الفيديو فقط مثل <code className="text-[#f8ca14]">_h3K-q8cDUc</code> أو الرابط الكامل وسيتم استخراجه تلقائياً.
-                        </p>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1.5">
-                          رابط صفحة التحميل المباشرة لرمز الـ QR
-                        </label>
-                        <input
-                          type="url"
-                          value={orchestrationForm.appShowcase?.qrCodeUrl ?? "https://qr-codes.io/LQMip0"}
-                          onChange={(e) => {
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              appShowcase: {
-                                ...orchestrationForm.appShowcase,
-                                qrCodeUrl: e.target.value.trim(),
-                              },
-                            });
-                          }}
-                          placeholder="https://qr-codes.io/LQMip0"
-                          className={`w-full rounded-xl border p-3 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                        <p className="text-[10px] font-bold text-slate-400 mt-1">
-                          هذا الرابط يتم توليد كود الـ QR منه لحظياً في الموقع ليقوم ولي الأمر بمسحه من كاميرا جواله.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رابط متجر App Store (iOS)</label>
-                          <input
-                            type="url"
-                            value={orchestrationForm.appShowcase?.appStoreUrl ?? "https://apps.apple.com"}
-                            onChange={(e) => {
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                appShowcase: {
-                                  ...orchestrationForm.appShowcase,
-                                  appStoreUrl: e.target.value.trim(),
-                                },
-                              });
-                            }}
-                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                            }`}
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رابط متجر Google Play</label>
-                          <input
-                            type="url"
-                            value={orchestrationForm.appShowcase?.googlePlayUrl ?? "https://play.google.com"}
-                            onChange={(e) => {
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                appShowcase: {
-                                  ...orchestrationForm.appShowcase,
-                                  googlePlayUrl: e.target.value.trim(),
-                                },
-                              });
-                            }}
-                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Preview Player */}
-                    <div className="lg:col-span-6 space-y-3">
-                      <span className="text-xs font-black text-[#f8ca14] block">معاينة فيديو الشرح الحالي:</span>
-                      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-current/10 bg-black shadow-xl">
-                        <iframe
-                          src={`https://www.youtube-nocookie.com/embed/${orchestrationForm.appShowcase?.youtubeVideoId || "_h3K-q8cDUc"}?rel=0`}
-                          title="معاينة فيديو تطبيق المدارس"
-                          className="h-full w-full border-0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Subtab 3: CAMPUSES & CONTACTS */}
-            {orchestrationSubTab === "campuses" && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
-                  <div>
-                    <h3 className="text-lg font-black flex items-center gap-2">
-                      <Building2 size={20} className="text-[#f8ca14]" />
-                      <span>إدارة مجمعات مدارس العقيق وبيانات التواصل المعتمدة</span>
-                    </h3>
-                    <p className="text-xs font-bold text-slate-400 mt-1">
-                      تعديل هواتف الاستقبال لمجمعي البنين والبنات، العناوين الرسمية، وروابط خرائط Google Maps المعروضة في صفحة /about والموقع.
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setOrchestrationMutation.mutate({
-                        schoolCampuses: orchestrationForm.schoolCampuses,
-                      });
-                    }}
-                    disabled={setOrchestrationMutation.isPending}
-                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ بيانات المجمعات"}</span>
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Boys Campus Card */}
-                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-emerald-500/20 bg-[#0c141a]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
-                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-                        <Building2 size={20} />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black">مجمع البنين — طيبة الطيبة</h4>
-                        <p className="text-[11px] text-slate-400">أهلي ودولي (المرحلة الابتدائية والمتوسطة والثانوية)</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">هاتف الاستقبال والتسجيل (مجمع البنين)</label>
-                      <input
-                        type="tel"
-                        value={orchestrationForm.schoolCampuses?.boysPhone ?? "0148131652"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              boysPhone: e.target.value.trim(),
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">العنوان والوصف الجغرافي</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.schoolCampuses?.boysAddress ?? "مجمع الرانوناء — ممشى الهجرة (خلف نايس برايس) بالمدينة المنورة"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              boysAddress: e.target.value,
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">رابط الموقع على Google Maps</label>
-                      <input
-                        type="url"
-                        value={orchestrationForm.schoolCampuses?.boysMapUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              boysMapUrl: e.target.value.trim(),
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Girls Campus Card */}
-                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-[#08467d]/40 bg-[#08467d]/10" : "border-[#08467d]/20 bg-white shadow-sm"}`}>
-                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#08467d]/20 text-[#08467d] dark:text-[#f8ca14]">
-                        <Building2 size={20} />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black">مجمع البنات ورياض الأطفال — طيبة الطيبة</h4>
-                        <p className="text-[11px] text-slate-400">أهلي ودولي (روضة وحضانة وابتدائي ومتوسط وثانوي)</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">هاتف الاستقبال والتسجيل (مجمع البنات)</label>
-                      <input
-                        type="tel"
-                        value={orchestrationForm.schoolCampuses?.girlsPhone ?? "0148644466"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              girlsPhone: e.target.value.trim(),
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">العنوان والوصف الجغرافي</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.schoolCampuses?.girlsAddress ?? "مجمع الرانوناء — ممشى الهجرة (خلف نايس برايس) بالمدينة المنورة"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              girlsAddress: e.target.value,
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-black text-slate-300 block mb-1">رابط الموقع على Google Maps</label>
-                      <input
-                        type="url"
-                        value={orchestrationForm.schoolCampuses?.girlsMapUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
-                        onChange={(e) => {
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            schoolCampuses: {
-                              ...orchestrationForm.schoolCampuses,
-                              girlsMapUrl: e.target.value.trim(),
-                            },
-                          });
-                        }}
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Subtab 4: SECTIONS, BENTO, SOCIAL, FOOTER */}
-            {orchestrationSubTab === "sections" && (
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-
-              {/* 2. WEEKLY BENTO HIGHLIGHTS */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center justify-between border-b pb-4 border-current/10">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#de191e] to-[#f8ca14] text-white">
-                      <Flame size={18} />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-black">سيكشن إنجازات وبينتو الأسبوع</h3>
-                      <p className="text-xs font-bold text-slate-400">الكارت المميز، وسام التميز، وعداد الإعجابات</p>
-                    </div>
-                  </div>
-
-                  <label className="relative inline-flex cursor-pointer items-center">
-                    <input
-                      type="checkbox"
-                      checked={orchestrationForm.weeklyBento.enabled}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, enabled: e.target.checked } })}
-                      className="peer sr-only"
-                    />
-                    <div className="peer h-6 w-11 rounded-full bg-slate-700 after:absolute after:top-[2px] after:right-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[] peer-checked:bg-emerald-500 peer-checked:after:-translate-x-5" />
-                  </label>
-                </div>
-
-                {/* Featured Story Picker */}
-                <div className="space-y-2.5 rounded-2xl border border-current/10 p-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-black text-slate-300">الخبر / الفعالية المعروضة بالكارت الكبير</label>
-                    <div className="flex items-center gap-1 rounded-lg border border-current/10 p-0.5 text-[10px] font-black">
-                      <button
-                        type="button"
-                        onClick={() => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, featuredMode: "auto" } })}
-                        className={"rounded px-2 py-0.5 transition " + (orchestrationForm.weeklyBento.featuredMode === "auto" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                      >
-                        تلقائي
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, featuredMode: "custom" } })}
-                        className={"rounded px-2 py-0.5 transition " + (orchestrationForm.weeklyBento.featuredMode === "custom" ? "bg-[#f8ca14] text-black" : "text-slate-400")}
-                      >
-                        مخصص
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-1">
-                    {(() => {
-                      const selectedPost = showcaseData?.posts?.find((p) => p.id === orchestrationForm.weeklyBento.customPostId) || showcaseData?.posts?.[0];
-                      const cover = directDriveImage(selectedPost?.thumbnailUrl) || selectedPost?.thumbnailUrl || selectedPost?.mediaUrl;
-                      return (
-                        <>
-                          <div className="h-16 w-20 shrink-0 overflow-hidden rounded-xl border border-current/10 bg-black/40">
-                            {cover ? <img src={cover} alt="تغطية الفعالية" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-[10px]">لا يوجد</div>}
-                          </div>
-                          <div className="flex-1 space-y-1.5">
-                            <p className="text-xs font-black truncate">{selectedPost?.title || "أحدث خبر في البينتو"}</p>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                openMediaPicker("اختيار خبر أو فعالية لسيكشن الإنجازات", cover, (item) => {
-                                  setOrchestrationForm({
-                                    ...orchestrationForm,
-                                    weeklyBento: {
-                                      ...orchestrationForm.weeklyBento,
-                                      featuredMode: "custom",
-                                      customPostId: item.rawId,
-                                      customTitle: orchestrationForm.weeklyBento.customTitle || item.title,
-                                    },
-                                  });
-                                });
-                              }}
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-[#f8ca14]/30 bg-[#f8ca14]/10 px-3 py-1 text-[11px] font-black text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition"
-                            >
-                              <ImageIcon size={12} />
-                              <span>تصفح واختيار من الوسائط</span>
-                            </button>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان الكارت المخصص</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.weeklyBento.customTitle || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, customTitle: e.target.value } })}
-                        placeholder="انطلاق فعاليات الأسبوع العلمي..."
-                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 mb-1">شارة الكارت (Tag)</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.weeklyBento.customTag || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, customTag: e.target.value } })}
-                        placeholder="تغطية الأسبوع الكبرى..."
-                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">وصف الكارت المخصص</label>
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.weeklyBento.customDescription || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, customDescription: e.target.value } })}
-                      placeholder="تغطية شاملة للفعاليات وورش العمل..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-
-                {/* Academic Badge Customization */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">عنوان وسام التميز</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.weeklyBento.academicBadgeTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, academicBadgeTitle: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رقم أو تسمية الأسبوع</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.weeklyBento.academicBadgeWeek || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, academicBadgeWeek: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-
-                {/* Badge Subtitle & Hearts */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">وصف إنجاز الوسام</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.weeklyBento.academicBadgeDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, academicBadgeDesc: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">عداد القلوب</label>
-                    <input
-                      type="number"
-                      value={orchestrationForm.weeklyBento.heartsCount ?? 142}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, weeklyBento: { ...orchestrationForm.weeklyBento, heartsCount: Number(e.target.value) || 0 } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. NAVIGATION & PAGE NAMES */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center gap-3 border-b pb-4 border-current/10">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#0b5c9e] text-white">
-                    <Layers size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black">أسماء الصفحات وروابط الهيدر</h3>
-                    <p className="text-xs font-bold text-slate-400">تعديل مسميات الروابط والأقسام في شريط الموقع</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">اسم رابط الرئيسية</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.nav.homeLabel || "الرئيسية"}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, nav: { ...orchestrationForm.nav, homeLabel: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">اسم رابط المجلة</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.nav.journalLabel || "مجلة العقيق"}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, nav: { ...orchestrationForm.nav, journalLabel: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">اسم رابط الألبوم</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.nav.albumsLabel || "ألبوم العقيق"}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, nav: { ...orchestrationForm.nav, albumsLabel: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">اسم رابط الأخبار والعروض</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.nav.showcaseLabel || "الأخبار والعروض"}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, nav: { ...orchestrationForm.nav, showcaseLabel: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. EDITORIAL VOICE */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center justify-between border-b pb-4 border-current/10">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#f8ca14] text-white">
-                      <Radio size={18} />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-black">كلمة وصوت المشرف العام</h3>
-                      <p className="text-xs font-bold text-slate-400">الرسالة التوجيهية والملف الصوتي بالصفحة الرئيسية</p>
-                    </div>
-                  </div>
-
-                  <label className="relative inline-flex cursor-pointer items-center">
-                    <input
-                      type="checkbox"
-                      checked={orchestrationForm.editorialVoice.enabled}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, editorialVoice: { ...orchestrationForm.editorialVoice, enabled: e.target.checked } })}
-                      className="peer sr-only"
-                    />
-                    <div className="peer h-6 w-11 rounded-full bg-slate-700 after:absolute after:top-[2px] after:right-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[] peer-checked:bg-emerald-500 peer-checked:after:-translate-x-5" />
-                  </label>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 mb-1">نص الكلمة التوجيهية</label>
-                  <textarea
-                    rows={3}
-                    value={orchestrationForm.editorialVoice.quoteText || ""}
-                    onChange={(e) => setOrchestrationForm({ ...orchestrationForm, editorialVoice: { ...orchestrationForm.editorialVoice, quoteText: e.target.value } })}
-                    className={"w-full rounded-xl border p-3 text-xs font-bold outline-none leading-relaxed " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">اسم القائل</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.editorialVoice.authorName || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, editorialVoice: { ...orchestrationForm.editorialVoice, authorName: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">المسمى الوظيفي</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.editorialVoice.authorTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, editorialVoice: { ...orchestrationForm.editorialVoice, authorTitle: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 mb-1">رابط الملف الصوتي للكلمة (Audio URL)</label>
-                  <input
-                    type="url"
-                    value={orchestrationForm.editorialVoice.audioUrl || ""}
-                    onChange={(e) => setOrchestrationForm({ ...orchestrationForm, editorialVoice: { ...orchestrationForm.editorialVoice, audioUrl: e.target.value || null } })}
-                    placeholder="https://.../speech.mp3"
-                    className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                  />
-                </div>
-              </div>
-
-              {/* 4.5. SCHOOL ANTHEMS & SPOTIFY AUDIO PLAYLIST */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-current/10">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-black font-black">
-                      <Headphones size={18} />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-black">مكتبة أغاني وأناشيد العقيق (Spotify Audio)</h3>
-                      <p className="text-xs font-bold text-slate-400">إدارة الأغاني والأناشيد والموسيقى للمشغل الصوتي الموحد</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDriveAudioFolderUrl("");
-                        setScannedAudioTracks([]);
-                        setSelectedTrackIds({});
-                        setIsImportAudioFolderOpen(true);
-                      }}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#08467d] text-white font-black text-xs hover:bg-[#063560] transition shadow-md shrink-0"
-                      title="استيراد مجلد أغانٍ كامل من Google Drive"
-                    >
-                      <FolderSync size={15} />
-                      <span>استيراد فولدر من Drive</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNewSongTitle("");
-                        setNewSongArtist("");
-                        setNewSongUrl("");
-                        setNewSongCategory("النشيد المدرسي");
-                        setNewSongCover("");
-                        setIsAddSongOpen(true);
-                      }}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 text-black font-black text-xs hover:bg-amber-300 transition shrink-0"
-                    >
-                      <Plus size={15} />
-                      <span>إضافة نشيد منفرد</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* List of Current Songs */}
-                <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
-                  {(orchestrationForm.schoolSongs || []).map((song: any, idx: number) => (
-                    <div
-                      key={song.id || idx}
-                      className={`flex items-center justify-between p-3 rounded-2xl border transition ${
-                        dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="relative h-11 w-11 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-sm">
-                          <img
-                            src={
-                              (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
-                                ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
-                                : (directDriveImage(song.coverUrl) || song.coverUrl)
-                            }
-                            alt=""
-                            className="h-full w-full object-cover"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
-                            }}
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-black truncate">{song.title}</p>
-                          <p className="text-[11px] text-slate-400 truncate">{song.artist || "مدارس العقيق"} · {song.category || "نشيد"}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
-                            setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
-                            toast.info("تم حذف الأغنية من القائمة مؤقتاً، اضغط حفظ التعديلات لتأكيد الحفظ.");
-                          }}
-                          className="p-1.5 rounded-lg text-[#de191e] hover:bg-[#de191e]/10 transition"
-                          title="حذف الأغنية"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {(!orchestrationForm.schoolSongs || orchestrationForm.schoolSongs.length === 0) && (
-                    <p className="text-center py-6 text-xs text-slate-400 font-bold">لا توجد أغاني مضافة حالياً. أضف أول نشيد الآن!</p>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  💡 <strong>ملاحظة:</strong> المشغل الذكي في الموقع يقوم تلقائياً بتشغيل الأغاني والانتقال بينها، وإذا قام الزائر بتشغيل بودكاست، يتم إيقاف الأغنية مؤقتاً، وبعد انتهاء البودكاست يُسأل الزائر فوراً إن كان يود العودة للأغنية أو البودكاست التالي.
-                </p>
-              </div>
-
-              {/* 5. SECTIONS VISIBILITY & TITLES */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md lg:col-span-2 " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center gap-3 border-b pb-4 border-current/10">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#08467d] text-white">
-                    <Sliders size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black">عناوين ووصف ومفاتيح ظهور السكاشن</h3>
-                    <p className="text-xs font-bold text-slate-400">إظهار أو إخفاء أي قسم وتعديل عنوانه ووصفه</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* 1. News Marquee */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">شريط الأخبار المتحرك</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.marqueeEnabled !== false}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, marqueeEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.marqueeBadge || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, marqueeBadge: e.target.value } })}
-                      placeholder="شارة شريط الأخبار (مثل: آخر الأخبار)..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <p className="text-[11px] text-slate-400">شريط متحرك يعرض أحدث العناوين من المقالات والبودكاست والألبومات والمجلات تلقائياً.</p>
-                  </div>
-
-                  {/* 2. School Highlights Bento */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">قسم جديد مدارس العقيق (Bento Grid)</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.studioHighlightsEnabled !== false}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.studioHighlightsTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsTitle: e.target.value } })}
-                      placeholder="عنوان جديد المدارس..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.sections.studioHighlightsDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, studioHighlightsDesc: e.target.value } })}
-                      placeholder="وصف جديد المدارس..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-
-                  {/* 3. Explore Library Tabs */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4 md:col-span-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن استكشف المكتبة (Tabs Library)</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.libraryEnabled !== false}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        value={orchestrationForm.sections.libraryTitle || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryTitle: e.target.value } })}
-                        placeholder="عنوان استكشف المكتبة..."
-                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                      />
-                      <input
-                        type="text"
-                        value={orchestrationForm.sections.libraryDesc || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, libraryDesc: e.target.value } })}
-                        placeholder="وصف استكشف المكتبة..."
-                        className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Journal Section */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن مجلة العقيق</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.pathwaysEnabled}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, pathwaysEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.journalSectionTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, journalSectionTitle: e.target.value } })}
-                      placeholder="عنوان السيكشن..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.sections.journalSectionDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, journalSectionDesc: e.target.value } })}
-                      placeholder="وصف السيكشن..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-
-                  {/* Albums Section */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن ألبوم الفعاليات</span>
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.albumsSectionTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, albumsSectionTitle: e.target.value } })}
-                      placeholder="عنوان السيكشن..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.sections.albumsSectionDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, albumsSectionDesc: e.target.value } })}
-                      placeholder="وصف السيكشن..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-
-                  {/* Memory Wall Section */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن حائط الذكريات</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.memoryWallEnabled}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, memoryWallEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.memoryWallTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, memoryWallTitle: e.target.value } })}
-                      placeholder="عنوان حائط الذكريات..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.sections.memoryWallDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, memoryWallDesc: e.target.value } })}
-                      placeholder="وصف حائط الذكريات..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-
-                  {/* Archive Section */}
-                  <div className="space-y-2 rounded-2xl border border-current/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">سيكشن إحصائيات الأرشيف</span>
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.sections.archiveStatsEnabled}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, archiveStatsEnabled: e.target.checked } })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={orchestrationForm.sections.archiveTitle || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, archiveTitle: e.target.value } })}
-                      placeholder="عنوان الأرشيف..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                    <textarea
-                      rows={2}
-                      value={orchestrationForm.sections.archiveDesc || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, sections: { ...orchestrationForm.sections, archiveDesc: e.target.value } })}
-                      placeholder="وصف الأرشيف..."
-                      className={"w-full rounded-xl border p-2 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 6. SOCIAL & FOOTER */}
-              <div
-                className={"rounded-3xl border p-6 sm:p-7 space-y-6 shadow-md lg:col-span-2 " + (
-                  dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center gap-3 border-b pb-4 border-current/10">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-emerald-600 text-black font-black">
-                    @
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black">قنوات التواصل والواتساب وحقوق الفوتر</h3>
-                    <p className="text-xs font-bold text-slate-400">تحديث الروابط الرسمية ونصوص الحقوق أسفل الموقع</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط منصة 𝕏</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.xUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, xUrl: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط Instagram</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.instagramUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, instagramUrl: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط سناب شات (Snapchat)</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.snapchatUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, snapchatUrl: e.target.value } })}
-                      placeholder="https://snapchat.com/add/..."
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط فيسبوك (Facebook)</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.facebookUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, facebookUrl: e.target.value } })}
-                      placeholder="https://facebook.com/..."
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط YouTube</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.youtubeUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, youtubeUrl: e.target.value } })}
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رابط قناة تيليجرام (Telegram)</label>
-                    <input
-                      type="url"
-                      value={orchestrationForm.social.telegramUrl || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, telegramUrl: e.target.value } })}
-                      placeholder="https://t.me/alaqeeqschools"
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 mb-1">رقم واتساب المدارس</label>
-                    <input
-                      type="text"
-                      value={orchestrationForm.social.whatsappNumber || ""}
-                      onChange={(e) => setOrchestrationForm({ ...orchestrationForm, social: { ...orchestrationForm.social, whatsappNumber: e.target.value } })}
-                      placeholder="966500000000"
-                      className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 mb-1">نص حقوق الملكية بالفوتر</label>
-                  <input
-                    type="text"
-                    value={orchestrationForm.footer.copyrightText || ""}
-                    onChange={(e) => setOrchestrationForm({ ...orchestrationForm, footer: { ...orchestrationForm.footer, copyrightText: e.target.value } })}
-                    className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                  />
-                </div>
-
-                {/* Location Settings */}
-                <div className="space-y-3 rounded-2xl border border-current/10 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-                      <span className="text-xs font-black">وسم ورابط موقع المدارس (Google Maps)</span>
-                    </div>
-                    <label className="relative inline-flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={orchestrationForm.location?.enabled !== false}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, location: { ...orchestrationForm.location, enabled: e.target.checked } })}
-                        className="peer sr-only"
-                      />
-                      <div className="peer h-5 w-9 rounded-full bg-slate-700 after:absolute after:top-[2px] after:right-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[] peer-checked:bg-emerald-500 peer-checked:after:-translate-x-4" />
-                    </label>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 mb-1">نص الموقع بالفوتر</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.location?.text || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, location: { ...orchestrationForm.location, text: e.target.value } })}
-                        placeholder="المدينة المنورة · المملكة العربية السعودية"
-                        className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 mb-1">رابط خرائط Google Maps</label>
-                      <input
-                        type="url"
-                        value={orchestrationForm.location?.mapUrl || ""}
-                        onChange={(e) => setOrchestrationForm({ ...orchestrationForm, location: { ...orchestrationForm.location, mapUrl: e.target.value } })}
-                        placeholder="https://maps.google.com/?q=..."
-                        className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50")}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            )}
-
-            {/* ==================== SUBTAB: HEADER & NAVIGATION & EMERGENCY ==================== */}
-            {orchestrationSubTab === "header_nav" && (
-              <div className="space-y-8 animate-in fade-in duration-300">
-                {/* 1. Emergency Alert Bar Section */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden ${
-                  orchestrationForm.emergencyBanner?.enabled
-                    ? orchestrationForm.emergencyBanner?.type === "urgent"
-                      ? dark ? "border-[#de191e]/40 bg-gradient-to-br from-[#de191e]/20 to-[#121212]" : "border-[#de191e]/30 bg-red-50/50"
-                      : orchestrationForm.emergencyBanner?.type === "celebration"
-                      ? dark ? "border-amber-500/40 bg-gradient-to-br from-amber-950/40 to-[#121212]" : "border-amber-300 bg-amber-50/50"
-                      : dark ? "border-[#08467d]/40 bg-gradient-to-br from-[#08467d]/30 to-[#121212]" : "border-[#08467d]/30 bg-blue-50/50"
-                    : dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-current/10 pb-5">
-                    <div>
-                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-[#de191e]/10 text-[#de191e] mb-2 border border-[#de191e]/20">
-                        <Megaphone size={14} />
-                        <span>شريط الإعلانات والطوارئ الفوري في قمة الموقع</span>
-                      </div>
-                      <h3 className="text-xl font-black">شريط التنبيهات العاجل والإعلانات المدرسية</h3>
-                      <p className="text-xs text-slate-400 mt-1 font-bold">
-                        يظهر في أعلى الهيدر مباشرة لجميع الزوار مع خلفية مميزة وأزرار توجيه فورية.
-                      </p>
-                    </div>
-
-                    <label className="relative inline-flex cursor-pointer items-center shrink-0">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(orchestrationForm.emergencyBanner?.enabled)}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            emergencyBanner: {
-                              ...orchestrationForm.emergencyBanner,
-                              enabled: e.target.checked,
-                            },
-                          })
-                        }
-                        className="peer sr-only"
-                      />
-                      <div className="peer h-7 w-12 rounded-full bg-slate-700 after:absolute after:top-[3px] after:right-[3px] after:h-5.5 after:w-5.5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#de191e] peer-checked:after:-translate-x-5" />
-                    </label>
-                  </div>
-
-                  {orchestrationForm.emergencyBanner?.enabled && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                      <div className="md:col-span-3">
-                        <label className="block text-xs font-black mb-1.5">نوع ومظهر التنبيه:</label>
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            { id: "urgent", label: "🚨 عاجل أحمر (تعليق دراسة / طوارئ)" },
-                            { id: "celebration", label: "✨ مناسبة وتكريم ذهبي" },
-                            { id: "notice", label: "📢 إعلان رسمي أزرق (تسجيل / فعاليات)" },
-                          ].map((t) => (
-                            <button
-                              key={t.id}
-                              type="button"
-                              onClick={() =>
-                                setOrchestrationForm({
-                                  ...orchestrationForm,
-                                  emergencyBanner: {
-                                    ...orchestrationForm.emergencyBanner,
-                                    type: t.id,
-                                  },
-                                })
-                              }
-                              className={`px-4 py-2 rounded-xl text-xs font-black transition border ${
-                                orchestrationForm.emergencyBanner?.type === t.id
-                                  ? "bg-white text-black border-white shadow"
-                                  : dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/10 bg-slate-100 text-slate-700"
-                              }`}
-                            >
-                              {t.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-xs font-black mb-1">نص التنبيه:</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.emergencyBanner?.text || ""}
-                          onChange={(e) =>
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              emergencyBanner: {
-                                ...orchestrationForm.emergencyBanner,
-                                text: e.target.value,
-                              },
-                            })
-                          }
-                          placeholder="مثال: إعلان عاجل: تعليق الدراسة الحضورية غداً وتحويلها عن بُعد عبر منصة مدرستي"
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                          }`}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-black mb-1">رابط التوجيه (اختياري):</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.emergencyBanner?.linkUrl || ""}
-                          onChange={(e) =>
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              emergencyBanner: {
-                                ...orchestrationForm.emergencyBanner,
-                                linkUrl: e.target.value,
-                              },
-                            })
-                          }
-                          placeholder="/news أو رابط خارجي"
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. Main Navigation Links (The 9 Links) */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
-                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="border-b border-current/10 pb-4">
-                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-amber-400/10 text-amber-500 mb-2 border border-amber-400/20">
-                      <Compass size={14} />
-                      <span>قوائم التنقل الرئيسية الـ 9</span>
-                    </div>
-                    <h3 className="text-xl font-black">إدارة روابط قائمة الهيدر</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                      يمكنك تعديل اسم كل صفحة في القائمة الرئيسية أو إخفاء أي صفحة مؤقتاً بنقرة زر واحدة.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      { key: "homeLabel", defaultVal: "الرئيسية", path: "/", id: "nav-home" },
-                      { key: "aboutLabel", defaultVal: "مدارسنا", path: "/about", id: "nav-about" },
-                      { key: "accreditationsLabel", defaultVal: "الاعتمادات", path: "/accreditations", id: "nav-accreditations" },
-                      { key: "admissionsLabel", defaultVal: "القبول والتسجيل", path: "/admissions", id: "nav-admissions" },
-                      { key: "journalLabel", defaultVal: "صحيفة ومجلة العقيق", path: "/journal", id: "nav-journal" },
-                      { key: "albumsLabel", defaultVal: "ألبوم العقيق", path: "/albums", id: "nav-albums" },
-                      { key: "podcastLabel", defaultVal: "أثير وبودكاست العقيق", path: "/podcast", id: "nav-podcast" },
-                      { key: "articlesLabel", defaultVal: "المقالات والأخبار", path: "/articles", id: "nav-articles" },
-                      { key: "offersLabel", defaultVal: "العروض والخصومات", path: "/offers", id: "nav-offers" },
-                    ].map((item, idx) => {
-                      const isHidden = (orchestrationForm.nav?.hiddenNavKeys || []).includes(item.id);
-                      return (
-                        <div
-                          key={item.key}
-                          className={`rounded-2xl border p-4 transition ${
-                            isHidden
-                              ? "opacity-50 border-dashed"
-                              : dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50/80"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-black text-amber-500 font-mono">#{idx + 1} {item.path}</span>
-                            <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-400">
-                              <input
-                                type="checkbox"
-                                checked={!isHidden}
-                                onChange={(e) => {
-                                  const currentHidden = orchestrationForm.nav?.hiddenNavKeys || [];
-                                  const updatedHidden = e.target.checked
-                                    ? currentHidden.filter((k: string) => k !== item.id)
-                                    : [...currentHidden, item.id];
-                                  setOrchestrationForm({
-                                    ...orchestrationForm,
-                                    nav: {
-                                      ...orchestrationForm.nav,
-                                      hiddenNavKeys: updatedHidden,
-                                    },
-                                  });
-                                }}
-                                className="rounded"
-                              />
-                              <span>ظاهر</span>
-                            </label>
-                          </div>
-                          <label className="block text-[11px] font-black text-slate-400 mb-1">اسم الرابط بالقائمة:</label>
-                          <input
-                            type="text"
-                            value={orchestrationForm.nav?.[item.key] || item.defaultVal}
-                            onChange={(e) =>
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                nav: {
-                                  ...orchestrationForm.nav,
-                                  [item.key]: e.target.value,
-                                },
-                              })
-                            }
-                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
-                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                            }`}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 3. Top Bar Contact Info & Logo */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
-                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="border-b border-current/10 pb-4">
-                    <h3 className="text-xl font-black">شعار الموقع وبيانات الشريط العلوي (Top Bar)</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                      أرقام التواصل والبريد وروابط البوابات السريعة التي تظهر في أعلى الهيدر.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">شعار المدارس (Logo URL):</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.nav?.logoUrl || "/alaqeeq-logo.png"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, logoUrl: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">هاتف الاتصال الرئيسي:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.nav?.phone || "0148131652"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, phone: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">واتساب المدارس:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.nav?.whatsapp || "966500000000"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, whatsapp: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">البريد الإلكتروني:</label>
-                      <input
-                        type="email"
-                        value={orchestrationForm.nav?.email || "info@alaqeeq.edu.sa"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, email: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">رابط بوابات الدخول (Portals):</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.nav?.portalsUrl || "https://alaqeeq.edu.sa/portals"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, portalsUrl: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-slate-400 mb-1">نص زر الإجراء بالهيدر (CTA):</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.nav?.ctaButtonText || "القبول والتسجيل 🎓"}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            nav: { ...orchestrationForm.nav, ctaButtonText: e.target.value },
-                          })
-                        }
-                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ==================== SUBTAB: VISUAL OVERRIDES HUB ==================== */}
-            {orchestrationSubTab === "visual_overrides" && (
-              <div className="animate-in fade-in duration-300">
-                <VisualOverridesDashboardManager onNavigateToPage={(p) => navigate(p)} />
-              </div>
-            )}
-
-            {/* ==================== SUBTAB: INTERACTIVE FX STUDIO ==================== */}
-            {orchestrationSubTab === "interactive_fx" && (
-              <div className="space-y-8 animate-in fade-in duration-300">
-                {/* 1. Header Banner */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-4 shadow-xl ${
-                  dark ? "border-white/10 bg-[#0c1017]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-black text-amber-400">
-                        <Sparkles size={13} />
-                        <span>استوديو عناصر الماوس والسكرول التفاعلية · INTERACTIVE FX</span>
-                      </div>
-                      <h2 className="text-xl sm:text-2xl font-black">
-                        التحكم في تلميحات الماوس (Hover Cards) ومؤثرات السكرول
-                      </h2>
-                      <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
-                        عدّل الصور والنصوص والروابط التي تظهر عند تمرير مؤشر الفأرة على عناصر الموقع (مثل اعتمادات كوجنيا، آيلتس، وسات). يمكنك رفع الصور مباشرة من حاسوبك أو اختيارها من مكتبة الوسائط، مع دعم ميزة التجميد (Freeze FX) أثناء تصفح الموقع.
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={handleAddHoverItem}
-                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 text-xs font-black shadow-md transition cursor-pointer"
-                      >
-                        <Plus size={15} />
-                        <span>إضافة بطاقة جديدة</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
-                        disabled={setOrchestrationMutation.isPending}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black px-5 py-2.5 text-xs font-black shadow-md transition cursor-pointer disabled:opacity-50"
-                      >
-                        <CheckCircle2 size={15} />
-                        <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ عناصر التفاعل ✨"}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Quick Tip Box */}
-                  <div className={`flex items-start gap-3 rounded-2xl p-4 text-xs font-bold ${
-                    dark ? "bg-[#08467d]/20 border border-[#08467d]/40 text-[#f8ca14]" : "bg-blue-50 border border-[#08467d]/20 text-[#08467d]"
-                  }`}>
-                    <Pin size={16} className="shrink-0 mt-0.5 text-[#f8ca14]" />
-                    <p className="leading-relaxed">
-                      💡 <strong>طريقة التعديل من واجهة الموقع:</strong> عند تفعيل المحرر المرئي في الصفحة الرئيسية، ستظهر لك أيقونة قلم ✏️ بجوار كل كلمة تفاعلية لتعديلها فوراً، كما يمكنك تحريك الماوس فوق البطاقة والنقر على زر <strong>«تثبيت ❄️»</strong> لتجميدها والتعديل المباشر عليها!
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2. Interactive Hover Items Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {currentHoverItems.map((item, index) => (
-                    <div
-                      key={item.id || index}
-                      className={`rounded-3xl border p-5 sm:p-6 space-y-5 shadow-lg relative transition-all ${
-                        dark ? "border-white/10 bg-[#0c1017] hover:border-amber-400/30" : "border-black/5 bg-white hover:border-amber-500/40"
-                      }`}
-                    >
-                      {/* Top Bar with Number & Delete */}
-                      <div className="flex items-center justify-between pb-3 border-b border-current/10">
-                        <div className="flex items-center gap-2">
-                          <span className="grid h-6 w-6 place-items-center rounded-lg bg-amber-400/20 text-amber-400 text-xs font-black">
-                            {index + 1}
-                          </span>
-                          <span className="text-xs font-black">عنصر تفاعلي #{index + 1}</span>
-                        </div>
-
-                        {currentHoverItems.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteHoverItem(index)}
-                            className="text-slate-400 hover:text-[#de191e] p-1 rounded-lg hover:bg-[#de191e]/10 transition cursor-pointer"
-                            title="حذف هذا العنصر التفاعلي"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Live Preview Card */}
-                      <div>
-                        <label className="block text-[11px] font-black text-slate-400 mb-1.5">
-                          معاينة حية لشكل البطاقة عند الوقوف بالماوس:
-                        </label>
-                        <div className="relative h-44 w-full overflow-hidden rounded-2xl border border-white/15 bg-black shadow-inner">
-                          {item.imageUrl ? (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title || "Preview"}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="h-full w-full flex flex-col items-center justify-center text-slate-400 text-xs gap-1 bg-gradient-to-br from-black to-slate-900">
-                              <ImageIcon size={28} className="opacity-30" />
-                              <span>لا توجد صورة محددة</span>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                          {item.badge && (
-                            <div className="absolute top-2.5 right-2.5 rounded-full bg-black/75 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md">
-                              {item.badge}
-                            </div>
-                          )}
-                          {item.title && (
-                            <div className="absolute bottom-2.5 inset-x-3">
-                              <p className="text-right text-xs font-black text-white line-clamp-2 leading-snug">
-                                {item.title}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Image Control Bar (Upload + Library + URL) */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <label className="text-[11px] font-black text-slate-400">
-                            صورة البطاقة التفاعلية 🖼️:
-                          </label>
-                          <div className="flex items-center gap-2">
-                            {/* Hidden native input for this item */}
-                            <input
-                              type="file"
-                              id={`hover-file-${index}`}
-                              className="hidden"
-                              accept="image/*"
-                              onChange={(e) => handleFileUploadForHoverItem(index, e)}
-                            />
-                            <label
-                              htmlFor={`hover-file-${index}`}
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-400/30 bg-blue-500/10 px-2.5 py-1 text-[11px] font-black text-blue-400 hover:bg-blue-500/20 transition cursor-pointer"
-                            >
-                              <Upload size={13} />
-                              <span>رفع من جهازك 📤</span>
-                            </label>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                openMediaPicker("اختيار صورة التلميح التفاعلي", item.imageUrl, (media) => {
-                                  if (media?.url) {
-                                    handleUpdateHoverItem(index, "imageUrl", media.url);
-                                  }
-                                })
-                              }
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-black text-amber-400 hover:bg-amber-500/20 transition cursor-pointer"
-                            >
-                              <ImageIcon size={13} />
-                              <span>المكتبة 🖼️</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <input
-                          type="text"
-                          value={item.imageUrl}
-                          onChange={(e) => handleUpdateHoverItem(index, "imageUrl", e.target.value)}
-                          placeholder="https://... أو /articles/image.jpg"
-                          className={`w-full rounded-xl border p-2.5 text-xs font-mono font-bold outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white focus:border-amber-400" : "border-black/10 bg-white focus:border-amber-500"
-                          }`}
-                        />
-                      </div>
-
-                      {/* Trigger Text */}
-                      <div>
-                        <label className="block text-[11px] font-black text-slate-400 mb-1">
-                          الكلمة / النص المعروض في الصفحة:
-                        </label>
-                        <input
-                          type="text"
-                          value={item.triggerText}
-                          onChange={(e) => handleUpdateHoverItem(index, "triggerText", e.target.value)}
-                          placeholder="مثال: معتمدة من كوجنيا الأمريكية (Cognia)"
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white focus:border-amber-400" : "border-black/10 bg-white focus:border-amber-500"
-                          }`}
-                        />
-                      </div>
-
-                      {/* Title & Badge Row */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-[11px] font-black text-slate-400 mb-1">
-                            عنوان البطاقة المنبثقة:
-                          </label>
-                          <input
-                            type="text"
-                            value={item.title}
-                            onChange={(e) => handleUpdateHoverItem(index, "title", e.target.value)}
-                            placeholder="مثال: اعتماد كوجنيا الأمريكي..."
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-black text-slate-400 mb-1">
-                            الشارة العلوية (Badge):
-                          </label>
-                          <input
-                            type="text"
-                            value={item.badge}
-                            onChange={(e) => handleUpdateHoverItem(index, "badge", e.target.value)}
-                            placeholder="مثال: Cognia USA Accredited"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                            }`}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Target Link */}
-                      <div>
-                        <label className="block text-[11px] font-black text-slate-400 mb-1">
-                          الرابط المستهدف عند النقر:
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={item.targetUrl || ""}
-                            onChange={(e) => handleUpdateHoverItem(index, "targetUrl", e.target.value)}
-                            placeholder="/accreditations أو /about"
-                            className={`flex-1 rounded-xl border p-2.5 text-xs font-mono font-bold outline-none ${
-                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                            }`}
-                          />
-                          {item.targetUrl && (
-                            <a
-                              href={item.targetUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="p-2.5 rounded-xl border border-current/10 hover:bg-white/5 transition"
-                              title="فتح الرابط"
-                            >
-                              <ExternalLink size={14} />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 3. Bottom Save Bar */}
-                <div className={`rounded-3xl border p-6 flex items-center justify-between shadow-xl ${
-                  dark ? "border-white/10 bg-[#0c1017]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="text-xs text-slate-400 font-bold">
-                    💡 التعديلات المحفوظة هنا تُطبَّق فوراً على جميع زوار الموقع.
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
-                    disabled={setOrchestrationMutation.isPending}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black px-6 py-3 text-xs font-black shadow-lg shadow-[#f8ca14]/20 transition cursor-pointer disabled:opacity-50"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر جميع عناصر التفاعل 🚀"}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* ==================== SUBTAB: MARKETING & PIXELS & SEO ==================== */}
-            {orchestrationSubTab === "marketing" && (
-              <div className="space-y-8 animate-in fade-in duration-300">
-                {/* Pixels Section */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
-                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="border-b border-current/10 pb-4">
-                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-[#08467d]/20 text-[#f8ca14] mb-2 border border-[#f8ca14]/30">
-                      <TrendingUp size={14} />
-                      <span>تتبع الحملات الإعلانية ومعدلات التحويل</span>
-                    </div>
-                    <h3 className="text-xl font-black">أكواد وبكسل منصات التسويق (Tracking Pixels)</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                      ضع معرفات البكسل الخاصة بحملاتك الإعلانية؛ ليتم تفعيلها تلقائياً لتتبع الزيارات ونماذج القبول والتسجيل.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-black text-amber-400 mb-1">Snapchat Pixel ID 👻:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.marketingPixels?.snapchatPixelId || ""}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            marketingPixels: {
-                              ...orchestrationForm.marketingPixels,
-                              snapchatPixelId: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-[#08467d] dark:text-blue-300 mb-1">Meta / Facebook Pixel ID 🔵:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.marketingPixels?.metaPixelId || ""}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            marketingPixels: {
-                              ...orchestrationForm.marketingPixels,
-                              metaPixelId: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="123456789012345"
-                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-[#de191e] mb-1">TikTok Pixel ID 🎵:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.marketingPixels?.tiktokPixelId || ""}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            marketingPixels: {
-                              ...orchestrationForm.marketingPixels,
-                              tiktokPixelId: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="CXXXXXXXXXXXXXXXXX"
-                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-emerald-400 mb-1">Google Analytics ID (GA4) 📊:</label>
-                      <input
-                        type="text"
-                        value={orchestrationForm.marketingPixels?.googleAnalyticsId || ""}
-                        onChange={(e) =>
-                          setOrchestrationForm({
-                            ...orchestrationForm,
-                            marketingPixels: {
-                              ...orchestrationForm.marketingPixels,
-                              googleAnalyticsId: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="G-XXXXXXXXXX"
-                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* OpenGraph & Social Preview Section */}
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
-                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="border-b border-current/10 pb-4">
-                    <h3 className="text-xl font-black">معاينة الروابط في واتساب وشبكات التواصل (Social Share Card)</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                      العنوان، الوصف، وصورة الغلاف التي تظهر تلقائياً عندما يقوم أولياء الأمور أو الطلاب بنشر رابط الموقع.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-black mb-1">عنوان المشاركة (OG Title):</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.marketingPixels?.ogTitle || "مدارس العقيق الأهلية والدولية بالمدينة المنورة"}
-                          onChange={(e) =>
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              marketingPixels: {
-                                ...orchestrationForm.marketingPixels,
-                                ogTitle: e.target.value,
-                              },
-                            })
-                          }
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                          }`}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-black mb-1">وصف المشاركة (OG Description):</label>
-                        <textarea
-                          rows={3}
-                          value={orchestrationForm.marketingPixels?.ogDescription || "الريادة في التعليم وصناعة المستقبل منذ عام 1994"}
-                          onChange={(e) =>
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              marketingPixels: {
-                                ...orchestrationForm.marketingPixels,
-                                ogDescription: e.target.value,
-                              },
-                            })
-                          }
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                          }`}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-black mb-1">صورة الغلاف والمعاينة (OG Image):</label>
-                        <div className="flex gap-2 mb-2">
-                          <input
-                            type="text"
-                            value={orchestrationForm.marketingPixels?.ogImageUrl || "/og-preview.png"}
-                            onChange={(e) =>
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                marketingPixels: {
-                                  ...orchestrationForm.marketingPixels,
-                                  ogImageUrl: e.target.value,
-                                },
-                              })
-                            }
-                            placeholder="/og-preview.png أو رابط صورة"
-                            className={`flex-1 rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                            }`}
-                          />
-                          <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black cursor-pointer bg-amber-500 hover:bg-amber-600 text-black transition shrink-0">
-                            <Upload size={14} />
-                            <span>رفع من الجهاز</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                if (file.size > 8 * 1024 * 1024) {
-                                  toast.error("الحد الأقصى لحجم الصورة هو 8 ميجابايت");
-                                  return;
-                                }
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                  if (typeof reader.result === "string") {
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      marketingPixels: {
-                                        ...orchestrationForm.marketingPixels,
-                                        ogImageUrl: reader.result,
-                                      },
-                                    });
-                                    toast.success("✅ تم اختيار صورة المعاينة بنجاح!");
-                                  }
-                                };
-                                reader.readAsDataURL(file);
-                              }}
-                            />
-                          </label>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 text-[10px] font-bold">
-                          <span className="text-slate-400 py-0.5">اقتراحات سريعة:</span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                marketingPixels: {
-                                  ...orchestrationForm.marketingPixels,
-                                  ogImageUrl: "/og-preview.png",
-                                },
-                              })
-                            }
-                            className={`px-2 py-0.5 rounded-lg border transition ${
-                              dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
-                            }`}
-                          >
-                            🖼️ الصورة الرسمية المخصصة
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setOrchestrationForm({
-                                ...orchestrationForm,
-                                marketingPixels: {
-                                  ...orchestrationForm.marketingPixels,
-                                  ogImageUrl: "/alaqeeq-logo.png",
-                                },
-                              })
-                            }
-                            className={`px-2 py-0.5 rounded-lg border transition ${
-                              dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
-                            }`}
-                          >
-                            🦅 شعار المدارس
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Live Preview Card */}
-                    <div>
-                      <span className="block text-[11px] font-black text-slate-400 mb-2">معاينة شكل البطاقة في واتساب وتويتر:</span>
-                      <div className={`rounded-2xl border overflow-hidden shadow-lg ${
-                        dark ? "border-white/10 bg-[#090b0e]" : "border-black/10 bg-slate-50"
-                      }`}>
-                        <div className="h-36 bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] flex items-center justify-center p-4 relative overflow-hidden">
-                          {orchestrationForm.marketingPixels?.ogImageUrl ? (
-                            <img
-                              src={orchestrationForm.marketingPixels.ogImageUrl}
-                              alt="معاينة"
-                              className="max-h-24 max-w-full object-contain drop-shadow"
-                            />
-                          ) : (
-                            <span className="font-black text-white text-lg">مدارس العقيق</span>
-                          )}
-                        </div>
-                        <div className="p-4 space-y-1 text-right">
-                          <span className="text-[10px] text-amber-500 font-mono block">alaqeeq.edu.sa</span>
-                          <h4 className="text-xs font-black line-clamp-1">
-                            {orchestrationForm.marketingPixels?.ogTitle || "مدارس العقيق الأهلية والدولية"}
-                          </h4>
-                          <p className="text-[11px] text-slate-400 line-clamp-2">
-                            {orchestrationForm.marketingPixels?.ogDescription || "الريادة في التعليم وصناعة المستقبل منذ عام 1994"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ==================== SUBTAB: SYSTEM BACKUP & RESTORE ==================== */}
-            {orchestrationSubTab === "backup" && (
-              <div className="space-y-8 animate-in fade-in duration-300">
-                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${
-                  dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"
-                }`}>
-                  <div className="border-b border-current/10 pb-4">
-                    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-emerald-500/10 text-emerald-400 mb-2 border border-emerald-500/20">
-                      <Database size={14} />
-                      <span>حماية وأمان المنظومة الشامل</span>
-                    </div>
-                    <h3 className="text-xl font-black">النسخ الاحتياطي واستعادة الموقع (System Backup & Restore)</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                      يمكنك تنزيل لقطة كاملة (Full Snapshot) تحتوي على كل إعدادات الواجهة، المقالات، الألبومات، التعديلات المرئية، ورسوم القبول في ملف JSON مشفر للرجوع إليها في أي وقت.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Backup Download */}
-                    <div className={`rounded-2xl border p-6 space-y-4 ${
-                      dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/10 text-amber-500 font-black">
-                          <Download size={22} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-black">تنزيل نسخة احتياطية كاملة</h4>
-                          <p className="text-[11px] text-slate-400">تصدير snapshot لكامل بيانات الموقع بضغطة زر</p>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          try {
-                            const fullSnapshot = {
-                              timestamp: new Date().toISOString(),
-                              orchestration: orchestrationForm,
-                              exportedBy: user?.name || "admin",
-                            };
-                            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullSnapshot, null, 2));
-                            const downloadAnchor = document.createElement("a");
-                            downloadAnchor.setAttribute("href", dataStr);
-                            downloadAnchor.setAttribute("download", `alaqeeq-system-snapshot-${new Date().toISOString().slice(0, 10)}.json`);
-                            document.body.appendChild(downloadAnchor);
-                            downloadAnchor.click();
-                            downloadAnchor.remove();
-                            toast.success("✅ تم تصدير النسخة الاحتياطية بنجاح!");
-                          } catch {
-                            toast.error("فشل تصدير النسخة الاحتياطية");
-                          }
-                        }}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 py-3 text-xs font-black text-black hover:bg-yellow-400 transition shadow-lg shadow-amber-400/20"
-                      >
-                        <Download size={16} />
-                        <span>تحميل ملف النسخة الاحتياطية (JSON) 💾</span>
-                      </button>
-                    </div>
-
-                    {/* Backup Restore */}
-                    <div className={`rounded-2xl border p-6 space-y-4 ${
-                      dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d]/15 text-[#08467d] dark:text-[#f8ca14] font-black">
-                          <Upload size={22} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-black">استعادة نسخة احتياطية سابقة</h4>
-                          <p className="text-[11px] text-slate-400">استرجاع الإعدادات والتعديلات من ملف تم تنزيله سابقاً</p>
-                        </div>
-                      </div>
-
-                      <label className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border py-3 text-xs font-black cursor-pointer transition ${
-                        dark
-                          ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
-                          : "border-black/10 bg-white text-slate-700 hover:bg-slate-100 shadow-sm"
-                      }`}>
-                        <Upload size={16} />
-                        <span>رفع ملف استعادة النسخة 📥</span>
-                        <input
-                          type="file"
-                          accept=".json"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = async (event) => {
-                              try {
-                                const parsed = JSON.parse(event.target?.result as string);
-                                if (parsed.orchestration) {
-                                  setOrchestrationForm(parsed.orchestration);
-                                  await setOrchestrationMutation.mutateAsync(parsed.orchestration);
-                                  toast.success("🚀 تمت استعادة النسخة الاحتياطية وحفظها بنجاح!");
-                                } else {
-                                  toast.error("الملف لا يحتوي على بنية نسخة احتياطية صالحة");
-                                }
-                              } catch {
-                                toast.error("تعذر قراءة أو استعادة الملف");
-                              }
-                            };
-                            reader.readAsText(file);
-                            e.target.value = "";
-                          }}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Bottom Save Bar */}
-            <div className="border-t pt-6 border-current/10 flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setOrchestrationMutation.mutate(orchestrationForm);
-                }}
-                disabled={setOrchestrationMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-8 py-3 text-sm font-black text-black transition hover:bg-yellow-400 shadow-xl shadow-[#f8ca14]/20"
-              >
-                <CheckCircle2 size={18} />
-                <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر جميع التعديلات فوراً"}</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 1: RADAR & STATS ==================== */}
+      {/* ==================== MAIN DASHBOARD BODY ==================== */}
+      <main className="mx-auto max-w-[1440px] px-4 sm:px-8 py-6 sm:py-8">
+
+        {/* ============================================================== */}
+        {/* 🌟 PILLAR 1: COMMAND RADAR & REAL-TIME INTELLIGENCE             */}
+        {/* ============================================================== */}
         {activeTab === "radar" && (
           <div className="space-y-8 animate-in fade-in duration-300">
             {/* AI Yearbook Super Feature Banner */}
-            <div className={`relative overflow-hidden rounded-3xl p-8 sm:p-10 shadow-2xl ${
-              dark 
-                ? "bg-gradient-to-r from-[#111] via-[#1a1508] to-[#111] border border-[#e5b84f]/20" 
-                : "bg-gradient-to-r from-slate-50 via-amber-50 to-slate-50 border border-[#e5b84f]/30"
+            <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 shadow-2xl border ${
+              dark
+                ? "bg-gradient-to-r from-[#111] via-[#1a1508] to-[#111] border-[#e5b84f]/20"
+                : "bg-gradient-to-r from-slate-50 via-amber-50 to-slate-50 border-[#e5b84f]/30"
             }`}>
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-right max-w-2xl">
-                  <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold bg-[#e5b84f]/10 text-[#e5b84f] mb-4">
+                  <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-[#e5b84f]/15 text-[#e5b84f] mb-3 border border-[#e5b84f]/30">
                     <Sparkles size={14} />
-                    <span>ميزة تجريبية خارقة (Beta)</span>
+                    <span>ميزة الذكاء الاصطناعي الفائقة 🎓</span>
                   </div>
-                  <h3 className="text-3xl sm:text-4xl font-black font-['Tajawal'] mb-3">
-                    السجل السنوي المخصص بالذكاء الاصطناعي 🎓
+                  <h3 className="text-2xl sm:text-3xl font-black mb-2">
+                    منشئ السجل السنوي وكتاب التخرج بالذكاء الاصطناعي
                   </h3>
-                  <p className={`text-sm sm:text-base font-bold leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                    أول نظام في الشرق الأوسط يقوم بتوليد "مجلة تخرج" أو "سجل سنوي" فردي وحصري لكل طالب بناءً على بصمته الرقمية، إنجازاته، وصوره من نظام التعرف على الوجوه.
+                  <p className={`text-xs sm:text-sm font-bold leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                    توليد كتاب تخرج وسجل سنوي تفاعلي حصري لكل طالب بناءً على بصمته الرقمية، إنجازاته، ومشاركاته في المعارض والفعاليات.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsYearbookOpen(true)}
-                  className="shrink-0 flex items-center justify-center gap-2 h-14 px-8 rounded-2xl bg-gradient-to-l from-[#e5b84f] to-[#c59c3a] text-black font-black text-lg shadow-[0_0_40px_rgba(229,184,79,0.4)] hover:scale-105 hover:shadow-[0_0_60px_rgba(229,184,79,0.6)] transition-all"
+                  className="shrink-0 flex items-center justify-center gap-2 h-12 px-6 rounded-2xl bg-gradient-to-l from-[#e5b84f] to-[#c59c3a] text-black font-black text-sm shadow-[0_0_30px_rgba(229,184,79,0.35)] hover:scale-105 transition-all cursor-pointer"
                 >
-                  <Wand2 size={24} />
-                  <span>توليد السجلات الذكية</span>
+                  <Wand2 size={18} />
+                  <span>فتح استوديو السجلات الذكية</span>
                 </button>
               </div>
             </div>
 
-            {/* Top KPI Cards */}
+            {/* 4 Executive Real-time KPI Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {/* 1. Views */}
+              {/* 1. Admissions Priority KPI (The #1 Metric for School Leadership) */}
               <div
-                className={"relative overflow-hidden rounded-3xl border p-6 shadow-md " + (
+                onClick={() => setActiveTab("admissions")}
+                className={`relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-md cursor-pointer transition-all hover:scale-[1.02] ${
+                  pendingLeadsCount > 0
+                    ? "border-amber-500/40 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent"
+                    : dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-slate-200/50"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-400">طلبات القبول والتسجيل 🎓</span>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-black font-black shadow-md">
+                    <GraduationCap size={20} />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <p className="text-3xl sm:text-4xl font-black">{pendingLeadsCount}</p>
+                  <span className="text-xs font-bold text-slate-400">طلب بانتظار المراجعة</span>
+                </div>
+                <div className="mt-3 flex items-center justify-between text-[11px] font-bold">
+                  <span className="text-slate-400">إجمالي الطلبات: {admissionsList.length}</span>
+                  <span className="text-amber-400 flex items-center gap-1">
+                    <span>فتح الصندوق</span>
+                    <ArrowUpLeft size={12} />
+                  </span>
+                </div>
+              </div>
+
+              {/* 2. Total Views & Engagement */}
+              <div
+                className={"relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-md " + (
                   dark ? "border-white/10 bg-gradient-to-br from-[#121212] to-[#0a0a0a]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-400">إجمالي المشاهدات والتفاعل</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] text-white">
+                  <span className="text-xs font-black text-slate-400">إجمالي المشاهدات والتفاعل 👁️</span>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] text-white shadow-md">
                     <Eye size={18} />
                   </div>
                 </div>
                 <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalViews?.toLocaleString() || 0}</p>
-                <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-emerald-500">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <div className="mt-3 flex items-center gap-2 text-[11px] font-bold text-emerald-500">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>تحديث لحظي مستمر</span>
                 </div>
               </div>
 
-              {/* 2. Magazines */}
+              {/* 3. Published Master Content */}
               <div
-                className={"relative overflow-hidden rounded-3xl border p-6 shadow-md " + (
+                onClick={() => setActiveTab("content")}
+                className={"relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-md cursor-pointer transition-all hover:scale-[1.02] " + (
                   dark ? "border-white/10 bg-gradient-to-br from-[#121212] to-[#0a0a0a]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-400">أعداد مجلة العقيق</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#f8ca14] to-[#e5b204] text-black">
+                  <span className="text-xs font-black text-slate-400">المحتوى والأرشيف المفتوح 📚</span>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md">
                     <BookOpen size={18} />
                   </div>
                 </div>
-                <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalIssues || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">عدد مجلة منشور بالأرشيف</p>
+                <p className="mt-4 text-3xl sm:text-4xl font-black">
+                  {(stats?.totalIssues || 0) + (stats?.totalAlbums || 0) + (stats?.totalMediaFiles || 0)}
+                </p>
+                <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-slate-400">
+                  <span>{stats?.totalIssues || 0} مجلة · {stats?.totalAlbums || 0} ألبوم · {stats?.totalMediaFiles || 0} ميديا</span>
+                  <ArrowUpLeft size={12} className="text-emerald-400" />
+                </div>
               </div>
 
-              {/* 3. Albums */}
+              {/* 4. Active Admins & Team */}
               <div
-                className={"relative overflow-hidden rounded-3xl border p-6 shadow-md " + (
+                onClick={() => { setActiveTab("system"); setSystemSubTab("users"); }}
+                className={"relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-md cursor-pointer transition-all hover:scale-[1.02] " + (
                   dark ? "border-white/10 bg-gradient-to-br from-[#121212] to-[#0a0a0a]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-400">ألبومات الفعاليات</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#367453] text-white">
-                    <Camera size={18} />
+                  <span className="text-xs font-black text-slate-400">فريق المشرفين والصلاحيات 👥</span>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-md">
+                    <Users size={18} />
                   </div>
                 </div>
-                <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalAlbums || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">ألبوم فعالية ومناسبة</p>
-              </div>
-
-              {/* 4. Media Files */}
-              <div
-                className={"relative overflow-hidden rounded-3xl border p-6 shadow-md " + (
-                  dark ? "border-white/10 bg-gradient-to-br from-[#121212] to-[#0a0a0a]" : "border-black/5 bg-white shadow-slate-200/50"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-slate-400">الأخبار والوسائط الموثقة</span>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-[#de191e] to-red-600 text-white">
-                    <Clapperboard size={18} />
-                  </div>
+                <p className="mt-4 text-3xl sm:text-4xl font-black">{usersList.length}</p>
+                <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-slate-400">
+                  <span>مدراء الأقسام والمعلمين</span>
+                  <ArrowUpLeft size={12} className="text-purple-400" />
                 </div>
-                <p className="mt-4 text-3xl sm:text-4xl font-black">{stats?.totalMediaFiles || 0}</p>
-                <p className="mt-2 text-[11px] font-bold text-slate-400">صورة وفيديو ومنشور</p>
               </div>
             </div>
 
-            {/* Middle Section: 24H Stories Radar + Quick Creator Hub */}
+            {/* Middle Section: 24H Stories Hub + Executive Quick Launchpad */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* 24H Stories Radar Widget */}
+              {/* 24H Stories Radar Widget (2 Cols) */}
               <div
                 className={"rounded-3xl border p-6 lg:col-span-2 shadow-md space-y-5 " + (
                   dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
@@ -4877,8 +1136,8 @@ const DEFAULT_ORCHESTRATION = {
                       <Flame size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-black">رادار واستوريهات اليوم (Stories Hub)</h3>
-                      <p className="text-xs font-bold text-slate-400">القصص التفاعلية في قمة الموقع لجميع المحتويات (مقالات، مرئيات، بودكاست، ألبومات، مجلات، سوشيال)</p>
+                      <h3 className="text-base font-black">رادار وقصص اليوم (24H Stories Hub)</h3>
+                      <p className="text-xs font-bold text-slate-400">القصص التفاعلية الحية المعروضة في شريط قمة الموقع</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -4894,7 +1153,7 @@ const DEFAULT_ORCHESTRATION = {
                     <Button
                       type="button"
                       onClick={() => setIsStoryPickerOpen(true)}
-                      className="gap-2 bg-gradient-to-r from-[#08467d] via-[#367453] to-[#f8ca14] text-white hover:opacity-95 text-xs font-black rounded-xl shadow-md"
+                      className="gap-2 bg-gradient-to-r from-[#08467d] via-[#367453] to-[#f8ca14] text-white hover:opacity-95 text-xs font-black rounded-xl shadow-md cursor-pointer"
                     >
                       <Sparkles size={14} className="text-[#f8ca14]" />
                       <span>اختيار وتفعيل استوريهات</span>
@@ -4905,7 +1164,7 @@ const DEFAULT_ORCHESTRATION = {
                 {stats?.activeStories && stats.activeStories.length > 0 ? (
                   <div className="space-y-4">
                     {/* Visual Stories Row Preview */}
-                    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none border-b pb-4 border-current/10">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-3 scrollbar-none border-b border-current/10">
                       {stats.activeStories.slice(0, 12).map((story: any) => (
                         <div key={story.id} className="flex flex-col items-center gap-1 shrink-0 text-center">
                           <div className={"relative p-[2px] rounded-full " + (
@@ -4920,39 +1179,31 @@ const DEFAULT_ORCHESTRATION = {
                                 <Instagram size={18} className="text-[#de191e]" />
                               ) : story.sourceType === "x" ? (
                                 <span className="font-black text-sm">𝕏</span>
-                              ) : story.sourceType === "youtube" ? (
-                                <span className="text-xs font-black text-[#de191e]">▶</span>
                               ) : story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
                               ) : story.sourceType === "article" ? (
                                 <Newspaper size={18} className="text-[#de191e]" />
                               ) : story.sourceType === "podcast" ? (
                                 <Mic size={18} className="text-[#f8ca14]" />
-                              ) : story.sourceType === "showcase" ? (
-                                <Video size={18} className="text-[#08467d] dark:text-[#f8ca14]" />
                               ) : story.sourceType === "journal" ? (
                                 <BookOpen size={18} className="text-[#f8ca14]" />
-                              ) : story.sourceType === "album" ? (
-                                <Camera size={18} className="text-[#367453]" />
                               ) : (
-                                <span className="text-[10px] font-black">العقيق</span>
+                                <Camera size={18} className="text-[#367453]" />
                               )}
                             </div>
-                            {story.isPinned ? (
+                            {story.isPinned && (
                               <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f8ca14] text-[9px] font-black text-black shadow-md">
                                 ★
                               </span>
-                            ) : (
-                              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-[#367453] border-2 border-black" />
                             )}
                           </div>
-                          <span className="text-[10px] font-bold text-slate-400 max-w-[60px] truncate">{story.title}</span>
+                          <span className="text-[10px] font-bold text-slate-400 max-w-[65px] truncate">{story.title}</span>
                         </div>
                       ))}
                     </div>
 
                     {/* Active Stories List */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
                       {stats.activeStories.map((story: any) => (
                         <div
                           key={story.id}
@@ -4961,187 +1212,144 @@ const DEFAULT_ORCHESTRATION = {
                           )}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-current/10 flex items-center justify-center">
-                              {story.sourceType === "instagram" ? (
-                                <Instagram size={16} className="text-[#de191e]" />
-                              ) : story.sourceType === "x" ? (
-                                <span className="font-black text-xs">𝕏</span>
-                              ) : story.imageUrl ? (
+                            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-current/10 flex items-center justify-center">
+                              {story.imageUrl ? (
                                 <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
-                              ) : story.sourceType === "article" ? (
-                                <Newspaper size={16} className="text-[#de191e]" />
-                              ) : story.sourceType === "podcast" ? (
-                                <Mic size={16} className="text-[#f8ca14]" />
-                              ) : story.sourceType === "showcase" ? (
-                                <Video size={16} className="text-[#08467d] dark:text-[#f8ca14]" />
-                              ) : story.sourceType === "journal" ? (
-                                <BookOpen size={16} className="text-[#f8ca14]" />
-                              ) : story.sourceType === "album" ? (
-                                <Camera size={16} className="text-[#367453]" />
                               ) : (
-                                <span className="text-[9px] font-black">قصة</span>
+                                <Sparkles size={14} className="text-amber-400" />
                               )}
                             </div>
                             <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <p className="font-black truncate">{story.title}</p>
-                                {story.isPinned && (
-                                  <span className="rounded bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/30 px-1 py-0.2 text-[8px] font-black">مثبتة</span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
-                                <span className="rounded bg-current/10 px-1.5 py-0.5 font-bold text-slate-300">{story.category}</span>
-                                <span>{story.timeAgo}</span>
-                              </div>
+                              <p className="font-black truncate">{story.title}</p>
+                              <span className="text-[10px] text-slate-400">{story.category} · {story.timeAgo}</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => hideStoryMutation.mutate({ storyId: story.id })}
-                              disabled={hideStoryMutation.isPending}
-                              className="rounded-lg p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
-                              title="استبعاد من الاستوريهات"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => hideStoryMutation.mutate({ storyId: story.id })}
+                            className="rounded-lg p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                            title="استبعاد من شريط 24H"
+                          >
+                            <Trash2 size={13} />
+                          </button>
                         </div>
                       ))}
                     </div>
 
-                    {/* Hidden / Excluded Stories Section */}
+                    {/* Hidden Stories Recovery */}
                     {stats?.hiddenStories && stats.hiddenStories.length > 0 && (
-                      <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-red-400" />
-                            <h4 className="text-xs font-black text-red-300">القصص المستبعدة مؤقتاً من شريط 24H ({stats.hiddenStories.length})</h4>
-                          </div>
-                          <span className="text-[10px] text-slate-400">مخفية عن الزوار · يمكنك استعادتها بأي وقت</span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {stats.hiddenStories.map((story: any) => (
-                            <div
-                              key={story.id}
-                              className={"flex items-center justify-between gap-2.5 rounded-xl border p-2.5 text-xs " + (
-                                dark ? "border-white/10 bg-black/40" : "border-black/5 bg-white"
-                              )}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-black/40 border border-current/10 flex items-center justify-center opacity-60">
-                                  {story.sourceType === "instagram" ? (
-                                    <Instagram size={14} className="text-[#de191e]" />
-                                  ) : story.sourceType === "x" ? (
-                                    <span className="font-black text-[11px]">𝕏</span>
-                                  ) : story.imageUrl ? (
-                                    <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
-                                  ) : (
-                                    <span className="text-[8px] font-black">قصة</span>
-                                  )}
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-black truncate text-slate-400 line-through text-[11px]">{story.title}</p>
-                                  <span className="text-[9px] text-slate-500">{story.category}</span>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => unhideStoryMutation.mutate({ storyId: story.id })}
-                                disabled={unhideStoryMutation.isPending}
-                                className="inline-flex items-center gap-1 shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-black text-emerald-400 hover:bg-emerald-500/20 transition"
-                                title="استعادة القصة للظهور في الصفحة الرئيسية"
-                              >
-                                <RefreshCw size={11} />
-                                <span>استعادة</span>
-                              </button>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-300">
+                          يوجد {stats.hiddenStories.length} قصص مستبعدة مؤقتاً
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            stats.hiddenStories.forEach((s: any) => unhideStoryMutation.mutate({ storyId: s.id }));
+                          }}
+                          className="text-xs font-black text-amber-400 hover:underline cursor-pointer"
+                        >
+                          استعادة الكل
+                        </button>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-current/10 p-6 text-center">
-                    <p className="text-sm font-bold text-slate-400">
-                      بمجرد نشر أي خبر أو عدد مجلة أو ألبوم جديد اليوم، سيظهر كـ Story في قمة الصفحة الرئيسية تلقائياً.
-                    </p>
-                    <div className="mt-4 flex flex-wrap justify-center gap-3">
-                      <button
-                        onClick={() => navigate("/offers/manage")}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#08467d] px-4 py-2 text-xs font-black text-white transition hover:bg-[#0b5c9e]"
-                      >
-                        <span>نشر خبر أو فيديو الآن</span>
-                        <Plus size={14} />
-                      </button>
-                      <button
-                        onClick={() => navigate("/albums/manage")}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-600"
-                      >
-                        <span>إضافة ألبوم فعالية</span>
-                        <Camera size={14} />
-                      </button>
-                    </div>
+                  <div className="rounded-2xl border border-dashed border-current/10 p-8 text-center space-y-3">
+                    <p className="text-xs font-bold text-slate-400">لا توجد استوريهات نشطة في الصفحة الرئيسية حالياً.</p>
+                    <Button
+                      onClick={() => setIsStoryPickerOpen(true)}
+                      className="bg-amber-400 hover:bg-amber-500 text-black font-black text-xs rounded-xl"
+                    >
+                      <Plus size={14} className="ml-1" />
+                      <span>اختيار قصص وتثبيتها الآن</span>
+                    </Button>
                   </div>
                 )}
               </div>
 
-              {/* Quick Launchpad Hub */}
+              {/* Quick Operations Launchpad (1 Col) */}
               <div
-                className={"rounded-3xl border p-6 shadow-md " + (
+                className={"rounded-3xl border p-6 shadow-md flex flex-col justify-between space-y-4 " + (
                   dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#f8ca14] text-white">
-                    <Sparkles size={18} />
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#08467d] to-[#f8ca14] text-white shadow-md">
+                      <Sparkles size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black">منصة الإجراءات السريعة</h3>
+                      <p className="text-xs font-bold text-slate-400">الوصول المباشر لأدوات المنظومة</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-black">إدارة المحتوى والإصدارات</h3>
-                    <p className="text-xs font-bold text-slate-400">إدارة الأقسام والوسائط المدرسية</p>
+
+                  {/* PROMINENT VISUAL EDITOR CTA */}
+                  <div className="p-4 rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/10 via-amber-400/5 to-transparent space-y-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Palette size={16} className="text-amber-400" />
+                      <h4 className="text-xs font-black text-amber-400">المحرر البصري التفاعلي المباشر</h4>
+                    </div>
+                    <p className="text-[11px] font-bold text-slate-300 leading-relaxed">
+                      عدّل النصوص والصور والفيديوهات والألوان مباشرة على صفحات الموقع بالمعاينة الحية بدون نماذج عمياء!
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/")}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs shadow-md transition active:scale-95 cursor-pointer"
+                    >
+                      <Palette size={15} />
+                      <span>🎨 فتح المحرر البصري الآن</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setActiveTab("admissions")}
+                      className={"flex w-full items-center justify-between rounded-xl border p-3 text-xs font-black transition cursor-pointer " + (
+                        dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <GraduationCap size={16} className="text-amber-400" />
+                        <span>صندوق طلبات القبول والرسوم</span>
+                      </div>
+                      <ArrowUpLeft size={14} className="text-slate-400" />
+                    </button>
+
+                    <button
+                      onClick={() => { setActiveTab("campaigns"); setCampaignsSubTab("whatsapp"); }}
+                      className={"flex w-full items-center justify-between rounded-xl border p-3 text-xs font-black transition cursor-pointer " + (
+                        dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Share2 size={16} className="text-emerald-400" />
+                        <span>منشئ حملات واتساب لأولياء الأمور</span>
+                      </div>
+                      <ArrowUpLeft size={14} className="text-slate-400" />
+                    </button>
+
+                    <button
+                      onClick={() => { setActiveTab("campaigns"); setCampaignsSubTab("broadcast"); }}
+                      className={"flex w-full items-center justify-between rounded-xl border p-3 text-xs font-black transition cursor-pointer " + (
+                        dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Megaphone size={16} className="text-red-400" />
+                        <span>شريط التنبيهات العاجلة والاحتفالية</span>
+                      </div>
+                      <ArrowUpLeft size={14} className="text-slate-400" />
+                    </button>
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-2.5">
-                  <button
-                    onClick={() => navigate("/journal/manage")}
-                    className={"flex w-full items-center justify-between rounded-2xl border p-3.5 transition " + (
-                      dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <BookOpen size={18} className="text-[#f8ca14]" />
-                      <span className="text-xs font-black">إدارة المجلات الدورية</span>
-                    </div>
-                    <ArrowUpLeft size={14} className="text-slate-400" />
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/albums/manage")}
-                    className={"flex w-full items-center justify-between rounded-2xl border p-3.5 transition " + (
-                      dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Camera size={18} className="text-emerald-400" />
-                      <span className="text-xs font-black">إدارة ألبومات الفعاليات</span>
-                    </div>
-                    <ArrowUpLeft size={14} className="text-slate-400" />
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/offers/manage")}
-                    className={"flex w-full items-center justify-between rounded-2xl border p-3.5 transition " + (
-                      dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Clapperboard size={18} className="text-[#de191e]" />
-                      <span className="text-xs font-black">إدارة الأخبار والعروض</span>
-                    </div>
-                    <ArrowUpLeft size={14} className="text-slate-400" />
-                  </button>
+                <div className="pt-2 border-t border-current/10">
+                  <span className="text-[10px] text-slate-400 font-bold block text-center">
+                    مدارس العقيق الأهلية والدولية · غرفة القيادة الموحدة
+                  </span>
                 </div>
               </div>
             </div>
@@ -5159,7 +1367,7 @@ const DEFAULT_ORCHESTRATION = {
                 </div>
                 <button
                   onClick={() => void refetchStats()}
-                  className="text-xs font-bold text-slate-400 hover:text-current flex items-center gap-1"
+                  className="text-xs font-bold text-slate-400 hover:text-current flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw size={12} /> تحديث
                 </button>
@@ -5179,1581 +1387,40 @@ const DEFAULT_ORCHESTRATION = {
                         <span className="text-slate-400">نفذ إجراء:</span>
                         <code className="rounded bg-black/20 px-1.5 py-0.5 text-[11px] font-mono">{log.action}</code>
                       </div>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] text-slate-400 font-mono">
                         {log.createdAt ? new Date(log.createdAt).toLocaleTimeString("ar-SA") : ""}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="py-6 text-center text-xs text-slate-400 font-bold">لا توجد عمليات مسجلة حديثاً</p>
+                  <p className="py-4 text-center text-xs text-slate-400 font-bold">لا توجد عمليات مسجلة حديثاً</p>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* ==================== TAB 2: ADMIN USERS ==================== */}
-        {activeTab === "users" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Header Actions */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-black">إدارة المشرفين وفريق العمل</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  إضافة مشرفين جدد بالبريد وكلمة المرور وتعيين الصلاحيات الخاصة بكل عضو
-                </p>
-              </div>
-
-              <button
-                onClick={() => setIsAddUserOpen(true)}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-5 py-2.5 text-xs font-black text-black transition hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20"
-              >
-                <Plus size={16} />
-                <span>إضافة مشرف جديد</span>
-              </button>
-            </div>
-
-            {/* Users Table */}
-            <div
-              className={"overflow-hidden rounded-3xl border shadow-md " + (
-                dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-              )}
-            >
-              <div className="overflow-x-auto">
-                <table className="w-full text-right text-xs">
-                  <thead className={"border-b text-[11px] font-black uppercase text-slate-400 " + (
-                    dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
-                  )}>
-                    <tr>
-                      <th className="p-4 sm:px-6">المشرف</th>
-                      <th className="p-4">اسم الدخول (Username)</th>
-                      <th className="p-4">الصلاحية (Role)</th>
-                      <th className="p-4">آخر تسجيل دخول</th>
-                      <th className="p-4 sm:px-6 text-center">الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-current/5">
-                    {usersList.map((usr) => (
-                      <tr key={usr.id} className="hover:bg-white/[0.02] transition">
-                        {/* Name & Email */}
-                        <td className="p-4 sm:px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-tr from-[#08467d] to-[#f8ca14] text-white font-black text-sm">
-                              {usr.name?.[0] || "U"}
-                            </div>
-                            <div>
-                              <p className="font-black text-sm">{usr.name || "مستخدم"}</p>
-                              <p className="text-[11px] text-slate-400 font-mono">{usr.email || "بدون بريد"}</p>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* OpenId */}
-                        <td className="p-4 font-mono font-bold text-slate-300">
-                          {usr.openId}
-                        </td>
-
-                        {/* Role */}
-                        <td className="p-4">
-                          <span
-                            className={"inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-black " + (
-                              usr.role === "admin"
-                                ? "bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/30"
-                                : usr.role === "coordinator"
-                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                            )}
-                          >
-                            <ShieldCheck size={12} />
-                            {usr.role === "admin"
-                              ? "مشرف عام"
-                              : usr.role === "coordinator"
-                              ? "منسق إعلامي"
-                              : usr.role === "receptionist"
-                              ? "مسؤول حضور"
-                              : usr.role}
-                          </span>
-                        </td>
-
-                        {/* Last Sign In */}
-                        <td className="p-4 text-slate-400 text-[11px] font-bold">
-                          {usr.lastSignedIn ? new Date(usr.lastSignedIn).toLocaleDateString("ar-SA") : "لم يسجل بعد"}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="p-4 sm:px-6">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => {
-                                setResetPassUserId(usr.id);
-                                setNewPasswordValue("");
-                              }}
-                              className={"grid h-8 w-8 place-items-center rounded-lg border transition " + (
-                                dark
-                                  ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black"
-                                  : "border-black/10 bg-slate-100 text-slate-700 hover:bg-[#08467d] hover:text-white"
-                              )}
-                              title="تغيير كلمة المرور"
-                            >
-                              <Key size={14} />
-                            </button>
-
-                            <button
-                              onClick={() => setDeleteUserId(usr.id)}
-                              className="grid h-8 w-8 place-items-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition"
-                              title="حذف المشرف"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 3: MASTER CONTENT GRID ==================== */}
-        {activeTab === "content" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("content"); setContentSubTab("master"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  contentSubTab === "master"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Layers size={15} />
-                <span>الجدول الموحد للمحتوى 📑</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{masterContent.length}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("articles"); setContentSubTab("articles"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  contentSubTab === "articles"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <BookOpen size={15} />
-                <span>مراجعة مقالات الطلاب والمعلمين ✍️</span>
-                {allAdminArticles.filter((a) => a.status === "pending").length > 0 && (
-                  <span className="rounded-full bg-amber-500 text-black text-[10px] font-black px-2 py-0.5">
-                    {allAdminArticles.filter((a) => a.status === "pending").length} معلق
-                  </span>
-                )}
-              </button>
-            </div>
-
-            {/* Search & Filter Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-black">الجدول الموحد لإدارة كل المحتوى</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  عرض وتعديل والوصول السريع لجميع المجلات والألبومات والأخبار في شاشة واحدة
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div
-                  className={"flex items-center gap-2 rounded-xl border px-3 py-1.5 " + (
-                    dark ? "border-white/10 bg-black/40" : "border-black/10 bg-white shadow-sm"
-                  )}
-                >
-                  <Search size={14} className="text-slate-400" />
-                  <input
-                    type="text"
-                    value={contentSearch}
-                    onChange={(e) => setContentSearch(e.target.value)}
-                    placeholder="بحث في العناوين..."
-                    className="bg-transparent text-xs outline-none w-36 sm:w-48 font-bold"
-                  />
-                </div>
-
-                <div className="flex items-center gap-1 rounded-xl border border-current/10 p-1">
-                  {[
-                    { id: "all", label: "الكل" },
-                    { id: "journal", label: "المجلات" },
-                    { id: "album", label: "الألبومات" },
-                    { id: "post", label: "الأخبار" },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setContentTypeFilter(tab.id as any)}
-                      className={"rounded-lg px-2.5 py-1 text-[11px] font-black transition " + (
-                        contentTypeFilter === tab.id
-                          ? dark
-                            ? "bg-[#f8ca14] text-black"
-                            : "bg-[#08467d] text-white"
-                          : "text-slate-400 hover:text-current"
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Master Content Table */}
-            <div
-              className={"overflow-hidden rounded-3xl border shadow-md " + (
-                dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-              )}
-            >
-              <div className="overflow-x-auto">
-                <table className="w-full text-right text-xs">
-                  <thead className={"border-b text-[11px] font-black uppercase text-slate-400 " + (
-                    dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
-                  )}>
-                    <tr>
-                      <th className="p-4 sm:px-6">المحتوى والغلاف</th>
-                      <th className="p-4">النوع</th>
-                      <th className="p-4">التاريخ / الموسم</th>
-                      <th className="p-4">الحجم / الملفات</th>
-                      <th className="p-4">المشاهدات</th>
-                      <th className="p-4 sm:px-6 text-center">الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-current/5">
-                    {filteredContent.map((item) => (
-                      <tr key={item.id} className="hover:bg-white/[0.02] transition">
-                        {/* Cover + Title */}
-                        <td className="p-4 sm:px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-current/10 bg-black">
-                              {item.coverUrl ? (
-                                <img
-                                  src={directDriveImage(item.coverUrl) || item.coverUrl}
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <div className="grid h-full w-full place-items-center text-slate-500">
-                                  {item.type === "journal" ? <BookOpen size={16} /> : item.type === "album" ? <Camera size={16} /> : <Clapperboard size={16} />}
-                                </div>
-                              )}
-                            </div>
-                            <div className="min-w-0 max-w-xs">
-                              <p className="font-black text-sm truncate">{item.title}</p>
-                              <span className="text-[10px] text-slate-400 font-mono">ID: {item.id}</span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* Type Badge */}
-                        <td className="p-4">
-                          <span
-                            className={"inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-black " + (
-                              item.type === "journal"
-                                ? "bg-[#f8ca14]/20 text-[#f8ca14]"
-                                : item.type === "album"
-                                ? "bg-emerald-500/20 text-emerald-400"
-                                : "bg-[#de191e]/20 text-[#de191e]"
-                            )}
-                          >
-                            {item.typeLabel}
-                          </span>
-                        </td>
-
-                        {/* Date */}
-                        <td className="p-4 text-slate-300 font-bold">{item.date || "—"}</td>
-
-                        {/* Count */}
-                        <td className="p-4 text-slate-300 font-bold">
-                          {item.count ? item.count + (item.type === "journal" ? " صفحة" : " ملف") : "—"}
-                        </td>
-
-                        {/* Views */}
-                        <td className="p-4 font-mono font-bold text-[#f8ca14]">
-                          {item.viewsCount?.toLocaleString() || 0}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="p-4 sm:px-6">
-                          <div className="flex items-center justify-center gap-2">
-                            <a
-                              href={item.viewUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className={"grid h-8 w-8 place-items-center rounded-lg border transition " + (
-                                dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
-                              )}
-                              title="معاينة في الموقع"
-                            >
-                              <ExternalLink size={13} />
-                            </a>
-
-                            <button
-                              onClick={() => navigate(item.editUrl)}
-                              className={"inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-black transition " + (
-                                dark
-                                  ? "bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                                  : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
-                              )}
-                            >
-                              <span>إدارة المحتوى</span>
-                              <ArrowUpLeft size={13} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 4: FLASH BROADCAST ==================== */}
-        {activeTab === "broadcast" && (
-          <div className="max-w-4xl space-y-8 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("broadcast"); setCommsSubTab("broadcast"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  commsSubTab === "broadcast"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Megaphone size={15} />
-                <span>شريط التنبيهات العاجل 📣</span>
-                {broadcastEnabled && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("whatsapp"); setCommsSubTab("whatsapp"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  commsSubTab === "whatsapp"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Share2 size={15} />
-                <span>حملات ورسائل الواتساب وQR 💬</span>
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-black">شريط التنبيهات والأخبار العاجلة الفوري</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  بث شريط إعلاني فوري يظهر في قمة الموقع لجميع أولياء الأمور والطلاب والزوار مع سجل إدارة كامل
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-xs font-black text-amber-300">
-                  إجمالي التنبيهات: {broadcastList.length}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingBroadcastId(null);
-                    setBroadcastEnabled(true);
-                    setBroadcastMessage("");
-                    setBroadcastType("urgent");
-                    setBroadcastLink("");
-                    setBroadcastLinkText("");
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-3.5 py-1.5 text-xs font-black text-slate-950 hover:bg-amber-300 transition shadow"
-                >
-                  <Plus size={14} />
-                  <span>تنبيه جديد</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Broadcast Form Card */}
-            <div
-              className={"rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md transition " + (
-                dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-              )}
-            >
-              <div className="flex items-center justify-between border-b pb-4 border-current/10">
-                <div className="flex items-center gap-2">
-                  <Megaphone className="text-amber-400" size={20} />
-                  <h4 className="text-sm font-black">
-                    {editingBroadcastId ? "تعديل التنبيه المحدد" : "إنشاء تنبيه عاجل جديد"}
-                  </h4>
-                </div>
-                {editingBroadcastId && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingBroadcastId(null);
-                      setBroadcastMessage("");
-                      setBroadcastLink("");
-                      setBroadcastLinkText("");
-                    }}
-                    className="text-xs font-bold text-slate-400 hover:text-white underline"
-                  >
-                    إلغاء التعديل والبدء بجديد
-                  </button>
-                )}
-              </div>
-
-              {/* Toggle Enable */}
-              <div className="flex items-center justify-between border-b pb-6 border-current/10">
-                <div>
-                  <h4 className="text-sm font-black">تفعيل هذا التنبيه وعرضه على الموقع</h4>
-                  <p className="text-xs font-bold text-slate-400">عند تفعيله، سيظهر فوراً في قمة صفحات الموقع لجميع الزوار</p>
-                </div>
-
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    checked={broadcastEnabled}
-                    onChange={(e) => setBroadcastEnabled(e.target.checked)}
-                    className="peer sr-only"
-                  />
-                  <div className="peer h-7 w-12 rounded-full bg-slate-700 after:absolute after:top-[2px] after:right-[2px] after:h-6 after:w-6 after:rounded-full after:bg-white after:transition-all after:content-[] peer-checked:bg-emerald-500 peer-checked:after:-translate-x-5" />
-                </label>
-              </div>
-
-              {/* Broadcast Type */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 mb-2">نوع ومظهر التنبيه</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {[
-                    { id: "urgent", label: "🚨 تنبيه عاجل (أحمر ناري)", desc: "للإجازات والتعليمات الطارئة" },
-                    { id: "celebration", label: "🏆 إعلان تهنئة (ذهبي)", desc: "للجوائز وتكريم المتفوقين" },
-                    { id: "info", label: "📢 إشعار إداري (كحلي)", desc: "للتذكير بالمواعيد والفعاليات" },
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setBroadcastType(t.id as any)}
-                      className={"rounded-2xl border p-4 text-right transition " + (
-                        broadcastType === t.id
-                          ? dark
-                            ? "border-[#f8ca14] bg-[#f8ca14]/10 text-white shadow-md shadow-[#f8ca14]/10"
-                            : "border-[#08467d] bg-[#08467d]/10 text-[#08467d] shadow-md"
-                          : "border-current/10 opacity-70 hover:opacity-100"
-                      )}
-                    >
-                      <p className="text-xs font-black">{t.label}</p>
-                      <p className="mt-1 text-[10px] text-slate-400 font-bold">{t.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Message Input */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 mb-2">نص التنبيه أو الإعلان</label>
-                <textarea
-                  value={broadcastMessage}
-                  onChange={(e) => setBroadcastMessage(e.target.value)}
-                  rows={2}
-                  placeholder="مثال: عاجل: تعليق الدراسة الحضورية غداً وتحويلها عن بُعد عبر منصة مدرستي..."
-                  className={"w-full rounded-2xl border p-4 text-sm font-bold outline-none transition " + (
-                    dark
-                      ? "border-white/10 bg-black/40 focus:border-[#f8ca14]"
-                      : "border-black/10 bg-slate-50 focus:border-[#08467d]"
-                  )}
-                />
-              </div>
-
-              {/* Optional Link & Button Text */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-black text-slate-400 mb-2">رابط الزر (اختياري)</label>
-                  <input
-                    type="url"
-                    value={broadcastLink}
-                    onChange={(e) => setBroadcastLink(e.target.value)}
-                    placeholder="https://..."
-                    className={"w-full rounded-xl border p-3 text-xs font-bold outline-none font-mono " + (
-                      dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50"
-                    )}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-slate-400 mb-2">نص الزر (اختياري)</label>
-                  <input
-                    type="text"
-                    value={broadcastLinkText}
-                    onChange={(e) => setBroadcastLinkText(e.target.value)}
-                    placeholder="مثال: عرض التفاصيل"
-                    className={"w-full rounded-xl border p-3 text-xs font-bold outline-none " + (
-                      dark ? "border-white/10 bg-black/40" : "border-black/10 bg-slate-50"
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Live Preview Box */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 mb-2">معاينة حية لشكل الشريط في الموقع</label>
-                <div
-                  className={"rounded-2xl p-4 text-xs font-black flex items-center justify-between gap-3 shadow-md transition " + (
-                    broadcastType === "urgent"
-                      ? "bg-gradient-to-r from-[#de191e] via-[#b91519] to-[#8a0f13] text-white"
-                      : broadcastType === "celebration"
-                      ? "bg-gradient-to-r from-[#d4af37] via-[#f8ca14] to-[#c59b27] text-black"
-                      : "bg-gradient-to-r from-[#08467d] via-[#0b5c9e] to-[#08467d] text-white"
-                  )}
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="rounded bg-black/20 px-2 py-0.5 text-[10px]">
-                      {broadcastType === "urgent" ? "تنبيه عاجل" : broadcastType === "celebration" ? "إعلان تهنئة" : "إشعار هام"}
-                    </span>
-                    <span className="truncate">{broadcastMessage || "نص التنبيه سيظهر هنا..."}</span>
-                  </div>
-                  {broadcastLinkText ? (
-                    <span className="shrink-0 rounded bg-white/20 px-2.5 py-1 text-[10px]">
-                      {broadcastLinkText}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <div className="pt-4 border-t border-current/10 flex justify-end gap-3">
-                {editingBroadcastId && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingBroadcastId(null);
-                      setBroadcastMessage("");
-                      setBroadcastLink("");
-                      setBroadcastLinkText("");
-                    }}
-                    className="rounded-2xl border border-white/10 px-5 py-3 text-xs font-black text-slate-300 hover:bg-white/5 transition"
-                  >
-                    إلغاء
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!broadcastMessage.trim()) {
-                      toast.error("يرجى كتابة نص التنبيه أولاً");
-                      return;
-                    }
-                    setBroadcastMutation.mutate({
-                      id: editingBroadcastId || undefined,
-                      enabled: broadcastEnabled,
-                      message: broadcastMessage.trim(),
-                      type: broadcastType,
-                      link: broadcastLink.trim() || undefined,
-                      linkText: broadcastLinkText.trim() || undefined,
-                    });
-                  }}
-                  disabled={setBroadcastMutation.isPending}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#f8ca14] px-6 py-3 text-xs font-black text-black transition hover:bg-yellow-400 shadow-lg shadow-[#f8ca14]/20"
-                >
-                  <CheckCircle2 size={16} />
-                  <span>{setBroadcastMutation.isPending ? "جاري الحفظ..." : editingBroadcastId ? "حفظ وتحديث التنبيه" : "حفظ ونشر التنبيه"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Broadcasts History List */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
-                  <Clock size={16} className="text-amber-400" />
-                  <span>سجل وقائمة التنبيهات المحفوظة ({broadcastList.length})</span>
-                </h3>
-              </div>
-
-              {broadcastList.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-white/10 p-8 text-center text-slate-400 text-xs font-bold">
-                  لا توجد تنبيهات محفوظة حتى الآن. أنشئ أول تنبيه أعلاه!
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {broadcastList.map((item) => {
-                    const isItemUrgent = item.type === "urgent";
-                    const isItemCelebration = item.type === "celebration";
-                    return (
-                      <div
-                        key={item.id}
-                        className={`rounded-2xl border p-4 sm:p-5 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                          item.enabled
-                            ? "border-emerald-500/50 bg-emerald-950/10 shadow-lg shadow-emerald-500/5"
-                            : dark
-                            ? "border-white/10 bg-[#12141a]"
-                            : "border-black/10 bg-slate-50"
-                        }`}
-                      >
-                        <div className="space-y-2 min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span
-                              className={`rounded-lg px-2 py-0.5 text-[10px] font-black ${
-                                isItemUrgent
-                                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                                  : isItemCelebration
-                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                                  : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                              }`}
-                            >
-                              {isItemUrgent ? "🚨 عاجل" : isItemCelebration ? "🏆 تهنئة" : "📢 إداري"}
-                            </span>
-
-                            {item.enabled ? (
-                              <span className="rounded-lg bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                معروض الآن على الموقع
-                              </span>
-                            ) : (
-                              <span className="rounded-lg bg-slate-700/30 px-2 py-0.5 text-[10px] font-bold text-slate-400">
-                                متوقف
-                              </span>
-                            )}
-
-                            <span className="text-[10px] text-slate-500 font-mono">
-                              {new Date(item.createdAt).toLocaleDateString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-
-                          <p className="text-sm font-black text-slate-200 leading-6">{item.message}</p>
-
-                          {item.link && (
-                            <p className="text-xs text-amber-300/80 font-bold flex items-center gap-1">
-                              <ArrowUpLeft size={12} />
-                              <span>الرابط: {item.linkText || item.link}</span>
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                          {/* Toggle Active Button */}
-                          <button
-                            type="button"
-                            onClick={() => toggleBroadcastMutation.mutate({ id: item.id, enabled: !item.enabled })}
-                            className={`rounded-xl px-3 py-1.5 text-xs font-black transition border ${
-                              item.enabled
-                                ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
-                                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            }`}
-                            title={item.enabled ? "إيقاف العرض" : "تفعيل وعرض على الموقع"}
-                          >
-                            {item.enabled ? "إيقاف" : "تفعيل الآن"}
-                          </button>
-
-                          {/* Edit Button */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingBroadcastId(item.id);
-                              setBroadcastEnabled(item.enabled);
-                              setBroadcastMessage(item.message);
-                              setBroadcastType(item.type);
-                              setBroadcastLink(item.link || "");
-                              setBroadcastLinkText(item.linkText || "");
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
-                            className="grid h-8 w-8 place-items-center rounded-xl border border-white/15 bg-black/40 text-slate-300 hover:text-amber-300 hover:border-amber-400 transition"
-                            title="تعديل هذا التنبيه"
-                          >
-                            <SlidersHorizontal size={14} />
-                          </button>
-
-                          {/* Delete Button */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm("هل أنت متأكد من رغبتك في حذف هذا التنبيه نهائياً من السجل؟")) {
-                                deleteBroadcastMutation.mutate({ id: item.id });
-                              }
-                            }}
-                            className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
-                            title="حذف التنبيه"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 6: ARTICLES MODERATION ==================== */}
-        {activeTab === "articles" && (
-          <div className="max-w-5xl space-y-8 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("content"); setContentSubTab("master"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  contentSubTab === "master"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Layers size={15} />
-                <span>الجدول الموحد للمحتوى 📑</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{masterContent.length}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("articles"); setContentSubTab("articles"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  contentSubTab === "articles"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <BookOpen size={15} />
-                <span>مراجعة مقالات الطلاب والمعلمين ✍️</span>
-                {allAdminArticles.filter((a) => a.status === "pending").length > 0 && (
-                  <span className="rounded-full bg-amber-500 text-black text-[10px] font-black px-2 py-0.5">
-                    {allAdminArticles.filter((a) => a.status === "pending").length} معلق
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-black">غرفة مراجعة واعتماد مقالات العقيق ✍️</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  مراجعة مقالات الطلاب والمعلمين وتدقيقها بالذكاء الاصطناعي وقبول نشرها فوراً
-                </p>
-              </div>
-
-              {/* Status Filters */}
-              <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-black/40 p-1">
-                {(["all", "pending", "published", "rejected"] as const).map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    onClick={() => setArticleFilterStatus(st)}
-                    className={`rounded-xl px-3 py-1.5 text-xs font-black transition ${
-                      articleFilterStatus === st
-                        ? "bg-amber-400 text-slate-950 shadow"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    {st === "all"
-                      ? `الكل (${allAdminArticles.length})`
-                      : st === "pending"
-                      ? `بانتظار المراجعة (${allAdminArticles.filter((a) => a.status === "pending").length}) ⏳`
-                      : st === "published"
-                      ? `المنشورة (${allAdminArticles.filter((a) => a.status === "published").length}) ✅`
-                      : `المرفوضة (${allAdminArticles.filter((a) => a.status === "rejected").length})`}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Articles List */}
-            {allAdminArticles
-              .filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus))
-              .length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center text-slate-400 text-xs font-bold">
-                لا توجد مقالات في هذه القائمة حالياً.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {allAdminArticles
-                  .filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus))
-                  .map((art) => (
-                    <div
-                      key={art.id}
-                      className={`rounded-3xl border p-5 sm:p-6 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                        art.status === "pending"
-                          ? "border-amber-400/40 bg-amber-400/[0.03] shadow-lg shadow-amber-400/5"
-                          : art.status === "published"
-                          ? dark
-                            ? "border-white/10 bg-[#10131d]"
-                            : "border-black/10 bg-white"
-                          : "border-red-500/20 bg-red-950/10 opacity-70"
-                      }`}
-                    >
-                      <div className="space-y-2 min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black ${
-                              art.status === "pending"
-                                ? "bg-amber-400/20 text-amber-300 border border-amber-400/30 animate-pulse"
-                                : art.status === "published"
-                                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                : "bg-red-500/20 text-red-300 border border-red-500/30"
-                            }`}
-                          >
-                            {art.status === "pending"
-                              ? "⏳ بانتظار المراجعة والاعتماد"
-                              : art.status === "published"
-                              ? "✅ منشور على المنصة"
-                              : "❌ مرفوض"}
-                          </span>
-
-                          <span className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-black text-amber-200">
-                            {art.category}
-                          </span>
-
-                          <span className="text-[10px] text-slate-500 font-mono">
-                            {new Date(art.createdAt).toLocaleDateString("ar-SA")}
-                          </span>
-                        </div>
-
-                        <h3 className="text-base font-black text-white">{art.title}</h3>
-                        <p className="text-xs text-slate-300 line-clamp-2 leading-5 font-bold">
-                          {art.excerpt || art.content.slice(0, 150)}
-                        </p>
-
-                        <div className="flex items-center gap-3 text-xs text-slate-400 font-bold pt-1">
-                          <span>الكاتب: <b className="text-slate-200">{art.authorName}</b> ({art.authorRole})</span>
-                          <span>·</span>
-                          <span>👁️ {art.viewCount} قراءة</span>
-                          <span>·</span>
-                          <span>❤️ {art.likesCount} إعجاب</span>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                        <Button
-                          type="button"
-                          onClick={() => setSelectedArticleForEdit(art)}
-                          className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-9 px-4 rounded-xl shadow"
-                        >
-                          <BookOpen size={14} className="ml-1.5" />
-                          <span>مراجعة وتعديل المقال</span>
-                        </Button>
-
-                        {art.status === "pending" && (
-                          <Button
-                            type="button"
-                            onClick={() => moderateArticleMutation.mutate({ id: art.id, status: "published" })}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs h-9 px-3.5 rounded-xl shadow"
-                          >
-                            <CheckCircle2 size={14} className="ml-1" />
-                            <span>قبول ونشر</span>
-                          </Button>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟")) {
-                              deleteArticleMutation.mutate({ id: art.id });
-                            }
-                          }}
-                          className="grid h-9 w-9 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
-                          title="حذف المقال"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {/* Article Edit & AI Polish Modal */}
-            {selectedArticleForEdit && (
-              <Dialog open={Boolean(selectedArticleForEdit)} onOpenChange={() => setSelectedArticleForEdit(null)}>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-amber-400/40 bg-[#090d16] p-6 sm:p-8 text-right text-white shadow-2xl" dir="rtl">
-                  <DialogHeader className="text-right border-b border-white/10 pb-4">
-                    <DialogTitle className="text-lg font-black text-white flex items-center justify-between">
-                      <span>مراجعة وتدقيق المقال: «{selectedArticleForEdit.title}»</span>
-                      <Button
-                        type="button"
-                        disabled={aiPolishArticleMutation.isPending}
-                        onClick={() =>
-                          aiPolishArticleMutation.mutate({
-                            title: selectedArticleForEdit.title,
-                            content: selectedArticleForEdit.content,
-                          })
-                        }
-                        className="bg-gradient-to-r from-amber-500 to-yellow-300 hover:from-amber-400 hover:to-yellow-200 text-slate-950 font-black text-xs h-9 px-3.5 rounded-xl shadow-lg flex items-center gap-1.5"
-                      >
-                        <Sparkles size={14} className={aiPolishArticleMutation.isPending ? "animate-spin" : ""} />
-                        <span>{aiPolishArticleMutation.isPending ? "جاري التدقيق..." : "تدقيق لغوي بالذكاء الاصطناعي ✨"}</span>
-                      </Button>
-                    </DialogTitle>
-                  </DialogHeader>
-
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">عنوان المقال</label>
-                      <input
-                        type="text"
-                        value={selectedArticleForEdit.title}
-                        onChange={(e) =>
-                          setSelectedArticleForEdit((prev: any) => ({ ...prev, title: e.target.value }))
-                        }
-                        className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">الموجز (Excerpt)</label>
-                      <input
-                        type="text"
-                        value={selectedArticleForEdit.excerpt || ""}
-                        onChange={(e) =>
-                          setSelectedArticleForEdit((prev: any) => ({ ...prev, excerpt: e.target.value }))
-                        }
-                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-bold outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">محتوى المقال الكامل</label>
-                      <textarea
-                        rows={8}
-                        value={selectedArticleForEdit.content}
-                        onChange={(e) =>
-                          setSelectedArticleForEdit((prev: any) => ({ ...prev, content: e.target.value }))
-                        }
-                        className="w-full rounded-2xl border border-white/15 bg-black/50 p-4 text-xs font-bold leading-6 outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            moderateArticleMutation.mutate({
-                              id: selectedArticleForEdit.id,
-                              status: "published",
-                              updates: {
-                                title: selectedArticleForEdit.title,
-                                content: selectedArticleForEdit.content,
-                                excerpt: selectedArticleForEdit.excerpt,
-                              },
-                            })
-                          }
-                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs h-10 px-5 rounded-xl shadow"
-                        >
-                          <CheckCircle2 size={15} className="ml-1" />
-                          <span>اعتماد ونشر المقال ✅</span>
-                        </Button>
-
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            moderateArticleMutation.mutate({
-                              id: selectedArticleForEdit.id,
-                              status: "rejected",
-                            })
-                          }
-                          variant="destructive"
-                          className="font-black text-xs h-10 px-4 rounded-xl"
-                        >
-                          رفض المقال ❌
-                        </Button>
-                      </div>
-
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setSelectedArticleForEdit(null)}
-                        className="text-xs text-slate-400"
-                      >
-                        إغلاق
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        )}
-
-        {/* ==================== TAB 7: PODCAST & BROADCAST MANAGEMENT ==================== */}
-        {activeTab === "podcast" && (
-          <div className="max-w-5xl space-y-8 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("podcast"); setAudioSubTab("podcast"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  audioSubTab === "podcast"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Radio size={15} />
-                <span>أثير العقيق (البودكاست) 🎙️</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{allAdminPodcasts.length}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("music"); setAudioSubTab("music"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  audioSubTab === "music"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Headphones size={15} />
-                <span>أغاني وراديو العقيق والسمفونية 🎵</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{(orchestrationForm.schoolSongs || []).length}</span>
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-black">إدارة إذاعة وبودكاست العقيق 🎙️</h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  إضافة وإدارة التسجيلات الإذاعية وحلقات البودكاست المرئية والصوتية
-                </p>
-              </div>
-
-              <Button
-                type="button"
-                onClick={() => setIsAddPodcastOpen(true)}
-                className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-10 px-5 rounded-2xl shadow-lg flex items-center gap-2"
-              >
-                <Plus size={16} />
-                <span>+ إضافة حلقة جديدة</span>
-              </Button>
-            </div>
-
-            {/* Podcasts Grid */}
-            {allAdminPodcasts.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center text-slate-400 text-xs font-bold">
-                لا توجد حلقات بودكاست مسجلة حالياً.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {allAdminPodcasts.map((pod) => (
-                  <div
-                    key={pod.id}
-                    className="rounded-3xl border border-white/10 bg-[#0f121e] p-5 shadow-xl flex flex-col justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[10px] font-black text-amber-300">
-                          {pod.category}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
-                          {pod.mediaType === "video" ? "📹 فيديو" : "🎧 صوت"} · {pod.duration}
-                        </span>
-                      </div>
-
-                      <h3 className="text-base font-black text-white">{pod.title}</h3>
-                      <p className="text-xs text-slate-400 line-clamp-2 mt-1 font-bold">{pod.description}</p>
-                    </div>
-
-                    <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                      <span className="text-xs text-slate-400 font-bold">المقدم: {pod.hostName || "مدارس العقيق"}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm("هل أنت متأكد من رغبتك في حذف هذه الحلقة؟")) {
-                            deletePodcastMutation.mutate({ id: pod.id });
-                          }
-                        }}
-                        className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Add Podcast Modal */}
-            <Dialog open={isAddPodcastOpen} onOpenChange={setIsAddPodcastOpen}>
-              <DialogContent className="max-w-lg rounded-3xl border border-amber-400/30 bg-[#0a0d16] p-6 text-right text-white shadow-2xl" dir="rtl">
-                <DialogHeader className="text-right border-b border-white/10 pb-3">
-                  <DialogTitle className="text-base font-black text-amber-300 flex items-center gap-2">
-                    <Radio size={18} />
-                    <span>إضافة حلقة جديدة إلى إذاعة وبودكاست العقيق 🎙️</span>
-                  </DialogTitle>
-                </DialogHeader>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!newPodcastTitle.trim() || !newPodcastUrl.trim()) return;
-                    createPodcastMutation.mutate({
-                      title: newPodcastTitle.trim(),
-                      description: newPodcastDesc.trim(),
-                      mediaType: newPodcastType,
-                      sourceType: newPodcastSource,
-                      mediaUrl: newPodcastUrl.trim(),
-                      category: newPodcastCategory,
-                      hostName: newPodcastHost.trim() || undefined,
-                      duration: newPodcastDuration.trim() || "10:00",
-                    });
-                  }}
-                  className="mt-4 space-y-4"
-                >
-                  <div>
-                    <label className="block text-xs font-black text-amber-200 mb-1">عنوان الحلقة *</label>
-                    <input
-                      type="text"
-                      required
-                      value={newPodcastTitle}
-                      onChange={(e) => setNewPodcastTitle(e.target.value)}
-                      placeholder="مثال: الإذاعة الصباحية - إشراقة أمل"
-                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">نوع المحتوى</label>
-                      <select
-                        value={newPodcastType}
-                        onChange={(e) => setNewPodcastType(e.target.value as any)}
-                        className="w-full rounded-xl border border-white/15 bg-[#141824] p-3 text-xs font-bold outline-none text-slate-200"
-                      >
-                        <option value="audio">🎧 صوتي (Audio)</option>
-                        <option value="video">📹 مرئي (Video)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">التصنيف</label>
-                      <select
-                        value={newPodcastCategory}
-                        onChange={(e) => setNewPodcastCategory(e.target.value as any)}
-                        className="w-full rounded-xl border border-white/15 bg-[#141824] p-3 text-xs font-bold outline-none text-slate-200"
-                      >
-                        <option value="إذاعة الصباح">🎙️ إذاعة الصباح</option>
-                        <option value="بودكاست قيادات">👑 بودكاست قيادات</option>
-                        <option value="تغطيات صوتية">📹 تغطيات مرئية وصوتية</option>
-                        <option value="حوارات الطلاب">🎤 حوارات الطلاب</option>
-                        <option value="نشرات إخبارية">📢 نشرات إخبارية</option>
-                      </select>
-                    </div>
-                  </div>
-
-
-                  {/* Source Type Selector */}
-                  <div>
-                    <label className="block text-xs font-black text-amber-200 mb-1">نوع المصدر</label>
-                    <div className="flex gap-2">
-                      {(["drive", "direct", "youtube"] as const).map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setNewPodcastSource(s)}
-                          className={`flex-1 rounded-xl py-2.5 text-xs font-black transition ${
-                            newPodcastSource === s
-                              ? "bg-amber-400 text-black shadow-md"
-                              : "bg-white/5 text-slate-400 hover:bg-white/10"
-                          }`}
-                        >
-                          {s === "drive" ? "☁️ Google Drive" : s === "direct" ? "🔗 رابط مباشر" : "▶️ يوتيوب"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* URL / File ID field — smart by source */}
-                  <div>
-                    <label className="block text-xs font-black text-amber-200 mb-1">
-                      {newPodcastSource === "drive"
-                        ? "رابط Google Drive أو File ID المباشر *"
-                        : newPodcastSource === "youtube"
-                        ? "رابط يوتيوب *"
-                        : "رابط الملف الصوتي المباشر *"}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newPodcastUrl}
-                      onChange={(e) => setNewPodcastUrl(e.target.value)}
-                      placeholder={
-                        newPodcastSource === "drive"
-                          ? "https://drive.google.com/file/d/1ABC.../view  أو  1ABC..."
-                          : newPodcastSource === "youtube"
-                          ? "https://youtube.com/watch?v=..."
-                          : "https://.../podcast.mp3"
-                      }
-                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-mono outline-none focus:border-amber-400"
-                    />
-                    {/* Drive: show extracted File ID preview */}
-                    {newPodcastSource === "drive" && newPodcastType === "audio" && newPodcastUrl.trim() && (() => {
-                      const m =
-                        newPodcastUrl.match(/\/d\/([\w-]+)/) ||
-                        newPodcastUrl.match(/[?&]id=([\w-]+)/) ||
-                        (newPodcastUrl.match(/^[\w-]{25,}$/) ? [null, newPodcastUrl] : null);
-                      const fid = m?.[1];
-                      return fid ? (
-                        <div className="mt-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-mono flex items-center gap-2">
-                          <span className="text-emerald-400 text-base">✅</span>
-                          <div>
-                            <span className="text-emerald-200 font-black text-xs">Drive File ID: </span>
-                            <span className="opacity-80">{fid}</span>
-                            <div className="text-emerald-400/70 mt-0.5">سيُشغَّل عبر البروكسي السريع تلقائياً 🚀</div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="mt-2 p-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-[11px]">
-                          ⚠️ تعذّر استخراج File ID — تأكد من نسخ رابط الملف أو ID المباشر من Google Drive
-                        </div>
-                      );
-                    })()}
-                  </div>
-
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">المقدم / الضيف</label>
-                      <input
-                        type="text"
-                        value={newPodcastHost}
-                        onChange={(e) => setNewPodcastHost(e.target.value)}
-                        placeholder="مثال: نادي الإذاعة المدرسية"
-                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-bold outline-none focus:border-amber-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-black text-amber-200 mb-1">المدة التقريبية</label>
-                      <input
-                        type="text"
-                        value={newPodcastDuration}
-                        onChange={(e) => setNewPodcastDuration(e.target.value)}
-                        placeholder="12:30"
-                        className="w-full rounded-xl border border-white/15 bg-black/50 p-2.5 text-xs font-mono outline-none focus:border-amber-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black text-amber-200 mb-1">وصف الحلقة</label>
-                    <textarea
-                      rows={3}
-                      value={newPodcastDesc}
-                      onChange={(e) => setNewPodcastDesc(e.target.value)}
-                      placeholder="نبذة عن موضوع الحلقة..."
-                      className="w-full rounded-xl border border-white/15 bg-black/50 p-3 text-xs font-bold outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
-                    <Button type="button" variant="ghost" onClick={() => setIsAddPodcastOpen(false)} className="text-xs text-slate-400">
-                      إلغاء
-                    </Button>
-                    <Button type="submit" disabled={createPodcastMutation.isPending} className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-5 h-10 shadow-lg">
-                      {createPodcastMutation.isPending ? "جاري الحفظ..." : "نشر الحلقة 🎙️"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
-
-        {/* ==================== TAB: MUSIC & ANTHEMS ==================== */}
-        {activeTab === "music" && (
-          <div className="space-y-6">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("podcast"); setAudioSubTab("podcast"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  audioSubTab === "podcast"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Radio size={15} />
-                <span>أثير العقيق (البودكاست) 🎙️</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{allAdminPodcasts.length}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("music"); setAudioSubTab("music"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  audioSubTab === "music"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Headphones size={15} />
-                <span>أغاني وراديو العقيق والسمفونية 🎵</span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{(orchestrationForm.schoolSongs || []).length}</span>
-              </button>
-            </div>
-
-            <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white"}`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 border-current/10">
-                <div className="flex items-center gap-4">
-                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-black font-black shadow-lg shadow-amber-400/20">
-                    <Headphones size={26} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-black font-cairo">أغاني وراديو العقيق 🎵 (Spotify Engine)</h2>
-                    <p className="text-xs sm:text-sm font-bold text-slate-400">إدارة الأناشيد والأغاني المدرسية التي تعمل في المشغل الصوتي الموحد</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNewSongTitle("");
-                      setNewSongArtist("");
-                      setNewSongUrl("");
-                      setNewSongCategory("النشيد المدرسي");
-                      setNewSongCover("");
-                      setIsAddSongOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#f8ca14] text-black font-black text-xs hover:bg-yellow-400 transition shadow-lg shadow-[#f8ca14]/20 active:scale-95"
-                  >
-                    <Plus size={16} />
-                    <span>إضافة أغنية / نشيد جديد</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
-                    disabled={setOrchestrationMutation.isPending}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر التعديلات"}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Songs List */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(orchestrationForm.schoolSongs || []).map((song: any, idx: number) => (
-                  <div
-                    key={song.id || idx}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition ${
-                      dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-md">
-                        <img
-                          src={
-                            (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
-                              ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
-                              : (directDriveImage(song.coverUrl) || song.coverUrl)
-                          }
-                          alt=""
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
-                          }}
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-1">
-                          {song.category || "نشيد مدرسي"}
-                        </span>
-                        <h4 className="text-sm font-black truncate">{song.title}</h4>
-                        <p className="text-xs text-slate-400 truncate">{song.artist || "مدارس العقيق"}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
-                          setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
-                          toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
-                        }}
-                        className="grid h-9 w-9 place-items-center rounded-xl text-[#de191e] hover:bg-[#de191e]/10 transition"
-                        title="حذف"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                {(!orchestrationForm.schoolSongs || orchestrationForm.schoolSongs.length === 0) && (
-                  <div className="col-span-full text-center py-12 text-slate-400 font-bold text-sm">
-                    لا توجد أناشيد أو أغاني مضافة حالياً. اضغط زر "إضافة أغنية / نشيد جديد" للبدء.
-                  </div>
-                )}
-              </div>
-
-              {/* Instructions Callout */}
-              <div className={`p-5 rounded-2xl border ${dark ? "border-amber-400/20 bg-amber-400/5 text-amber-200" : "border-amber-300 bg-amber-50 text-amber-900"}`}>
-                <h4 className="text-xs font-black mb-1 flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-amber-400" />
-                  <span>كيف يعمل نظام مشغل سبوتيفاي الذكي في الموقع؟</span>
-                </h4>
-                <p className="text-[11px] leading-relaxed opacity-90">
-                  المشغل العائم متاح للزوار في أسفل الشاشة ومن الهيدر العلوي عبر أيقونة السماعة 🎧. يستمع الزائر لأناشيد المدارس، وإذا ضغط على أي حلقة بودكاست، يُبدل المشغل تلقائياً إلى البودكاست، وعند انتهاء الحلقة يخير الزائر تلقائياً بالعودة للنشيد أو الانتقال للبودكاست التالي!
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB 5: WHATSAPP CAMPAIGN ==================== */}
-        {activeTab === "whatsapp" && (
-          <div className="max-w-3xl space-y-6 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => { setActiveTab("broadcast"); setCommsSubTab("broadcast"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  commsSubTab === "broadcast"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Megaphone size={15} />
-                <span>شريط التنبيهات العاجل 📣</span>
-                {broadcastEnabled && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab("whatsapp"); setCommsSubTab("whatsapp"); }}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
-                  commsSubTab === "whatsapp"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
-                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
-                }`}
-              >
-                <Share2 size={15} />
-                <span>حملات ورسائل الواتساب وQR 💬</span>
-              </button>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-black">مُولّد حملات ورسائل الواتساب وQR</h2>
-              <p className="text-xs font-bold text-slate-400 mt-1">
-                تجهيز رسائل إعلامية منسقة بضغطة زر لنشرها في قروبات أولياء الأمور والطلاب والمعلمين
-              </p>
-            </div>
-
-            <div
-              className={"rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md " + (
-                dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-              )}
-            >
-              {/* Select Item */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 mb-2">اختر المجلة أو الألبوم المراد تجهيز حملته</label>
-                <select
-                  value={selectedCampaignItem}
-                  onChange={(e) => setSelectedCampaignItem(e.target.value)}
-                  className={"w-full rounded-2xl border p-4 text-xs font-black outline-none " + (
-                    dark ? "border-white/10 bg-black/50 text-white" : "border-black/10 bg-slate-50 text-slate-900"
-                  )}
-                >
-                  <option value="">-- اختر من المحتوى المنشور --</option>
-                  {masterContent.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      [{item.typeLabel}] {item.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {campaignItemData ? (
-                <div className="space-y-6">
-                  {/* Generated Message Preview */}
-                  <div>
-                    <label className="block text-xs font-black text-slate-400 mb-2">الرسالة المنسقة المجهزة للواتساب</label>
-                    <div
-                      className={"relative rounded-2xl border p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap " + (
-                        dark ? "border-white/10 bg-black/60 text-slate-200" : "border-black/10 bg-slate-50 text-slate-800"
-                      )}
-                    >
-                      {generatedWhatsAppMessage}
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(generatedWhatsAppMessage);
-                          toast.success("تم نسخ نص الرسالة للحافظة بنجاح!");
-                        }}
-                        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-500 shadow-md"
-                      >
-                        <Copy size={14} />
-                        <span>نسخ الرسالة بالكامل للواتساب</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* QR Code generator */}
-                  <div className="border-t pt-6 border-current/10">
-                    <h4 className="text-sm font-black mb-3">رمز QR المباشر للمحتوى</h4>
-                    <div className="flex flex-col sm:flex-row items-center gap-5">
-                      <div className="h-36 w-36 rounded-2xl bg-white p-2.5 shadow-lg flex items-center justify-center">
-                        <img
-                          src={"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(window.location.origin + campaignItemData.viewUrl)}
-                          alt="QR Code"
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <div className="space-y-2 text-center sm:text-right">
-                        <p className="text-xs font-bold text-slate-400">
-                          رمز استجابة سريع عالي الدقة، جاهز للطباعة أو الإرفاق مع النشرات المدرسية لفتح المحتوى مباشرة من كاميرا الجوال.
-                        </p>
-                        <a
-                          href={"https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=" + encodeURIComponent(window.location.origin + campaignItemData.viewUrl)}
-                          target="_blank"
-                          rel="noreferrer"
-                          download="aqeeq-qr-code.png"
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-current/20 px-3.5 py-2 text-xs font-black transition hover:bg-white/10"
-                        >
-                          <Download size={14} />
-                          <span>تحميل صورة QR بدقة عالية</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-8 text-center text-xs text-slate-400 font-bold">
-                  اختر أحد أعداد المجلات أو ألبومات الفعاليات بالأعلى لتوليد رسالة الواتساب ورمز QR فوراً.
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ==================== TAB: ADMISSIONS & TUITION ==================== */}
+        {/* ============================================================== */}
+        {/* 🎓 PILLAR 2: ADMISSIONS & TUITION FEES CRM                      */}
+        {/* ============================================================== */}
         {activeTab === "admissions" && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Subtabs Bar */}
-            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-none">
+            {/* Pillar Subtabs Navigation */}
+            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
               <button
                 type="button"
                 onClick={() => setAdmissionsSubTab("inbox")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   admissionsSubTab === "inbox"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#015a37] text-white shadow-md"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
                 }`}
               >
                 <GraduationCap size={15} />
-                <span>صندوق الطلبات الواردة 📥</span>
-                {admissionsList.filter((a: any) => a.status === "new").length > 0 && (
-                  <span className="rounded-full bg-red-500 text-white text-[10px] font-black px-2 py-0.5">
-                    {admissionsList.filter((a: any) => a.status === "new").length}
+                <span>صندوق طلبات التسجيل الواردة 📥</span>
+                {pendingLeadsCount > 0 && (
+                  <span className="rounded-full bg-red-500 text-white text-[10px] font-black px-2 py-0.2 animate-pulse">
+                    {pendingLeadsCount} جديد
                   </span>
                 )}
               </button>
@@ -6761,580 +1428,300 @@ const DEFAULT_ORCHESTRATION = {
               <button
                 type="button"
                 onClick={() => setAdmissionsSubTab("fees")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   admissionsSubTab === "fees"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#015a37] text-white shadow-md"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
                 }`}
               >
                 <FileSpreadsheet size={15} />
-                <span>إدارة جدول الرسوم وحاسبة الأقساط 💰</span>
+                <span>جدول الرسوم الدراسية وحاسبة الأقساط 💰</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setAdmissionsSubTab("settings")}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   admissionsSubTab === "settings"
-                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#015a37] text-white shadow-md"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
                 }`}
               >
                 <SlidersHorizontal size={15} />
-                <span>ضوابط وحالة التقديم ⚙️</span>
+                <span>ضوابط وإغلاق التسجيل ⚙️</span>
               </button>
             </div>
 
+            {/* SUBTAB 1: INBOX & LEADS CRM */}
             {admissionsSubTab === "inbox" && (
               <div className="space-y-6">
-                {/* Header & Actions */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
+                {/* Header Actions & Filter Controls */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-black flex items-center gap-2">
-                      <GraduationCap size={22} className="text-[#f8ca14]" />
-                      <span>صندوق طلبات القبول والتسجيل الإلكتروني</span>
-                    </h2>
-                <p className="text-xs font-bold text-slate-400 mt-1">
-                  إدارة طلبات أولياء الأمور وحجز المقاعد، وتحديث الحالات، والتواصل المباشر عبر الواتساب والهاتف
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    const csvRows = [
-                      ["المعرف", "اسم الطالب", "اسم ولي الأمر", "رقم الجوال", "البريد", "المرحلة", "المسار", "الفرع", "الحالة", "تاريخ التقديم"],
-                      ...admissionsList.map((a: any) => [
-                        a.id,
-                        `"${a.studentName}"`,
-                        `"${a.guardianName}"`,
-                        `"${a.phone}"`,
-                        `"${a.email || ''}"`,
-                        `"${a.gradeLevel}"`,
-                        `"${a.track}"`,
-                        `"${a.gender}"`,
-                        `"${a.status}"`,
-                        `"${new Date(a.createdAt).toLocaleString('ar-SA')}"`,
-                      ]),
-                    ];
-                    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.map((e) => e.join(",")).join("\n");
-                    const encodedUri = encodeURI(csvContent);
-                    const link = document.createElement("a");
-                    link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", `aqeeq-admissions-${new Date().toISOString().slice(0, 10)}.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    toast.success("تم تصدير ملف الطلبات بنجاح!");
-                  }}
-                  className="rounded-xl text-xs font-bold gap-1.5"
-                >
-                  <FileSpreadsheet size={15} />
-                  <span>تصدير Excel (CSV)</span>
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => refetchAdmissions()}
-                  className="rounded-xl text-xs font-bold gap-1.5"
-                >
-                  <RefreshCw size={14} />
-                  <span>تحديث</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Metrics Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className={`p-5 rounded-2xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                <span className="text-xs font-bold text-slate-400">إجمالي طلبات التسجيل</span>
-                <p className="text-2xl font-black mt-2">{admissionsList.length}</p>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${dark ? "border-amber-500/20 bg-amber-500/5" : "border-amber-200 bg-amber-50/50"}`}>
-                <span className="text-xs font-black text-amber-600 dark:text-amber-400">طلبات جديدة (بانتظار التواصل)</span>
-                <p className="text-2xl font-black mt-2 text-amber-600 dark:text-amber-400">
-                  {admissionsList.filter((a: any) => a.status === "new").length}
-                </p>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${dark ? "border-blue-500/20 bg-blue-500/5" : "border-blue-200 bg-blue-50/50"}`}>
-                <span className="text-xs font-black text-blue-600 dark:text-blue-400">تم التواصل معهم</span>
-                <p className="text-2xl font-black mt-2 text-blue-600 dark:text-blue-400">
-                  {admissionsList.filter((a: any) => a.status === "contacted").length}
-                </p>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${dark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-200 bg-emerald-50/50"}`}>
-                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">تم اعتماد القبول ✅</span>
-                <p className="text-2xl font-black mt-2 text-emerald-600 dark:text-emerald-400">
-                  {admissionsList.filter((a: any) => a.status === "admitted").length}
-                </p>
-              </div>
-            </div>
-
-            {/* Filter & Search Bar */}
-            <div className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-4 ${
-              dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"
-            }`}>
-              <div className="flex items-center gap-2 overflow-x-auto">
-                {[
-                  { key: "all", label: "كافة الطلبات" },
-                  { key: "new", label: "جديد 🟡" },
-                  { key: "contacted", label: "تم التواصل 📞" },
-                  { key: "admitted", label: "تم القبول ✅" },
-                  { key: "rejected", label: "مرفوض ❌" },
-                ].map((tab) => (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => setAdmissionsFilter(tab.key)}
-                    className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition shrink-0 ${
-                      admissionsFilter === tab.key
-                        ? dark ? "bg-[#f8ca14] text-black" : "bg-[#015a37] text-white"
-                        : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative min-w-[240px] flex-1 sm:flex-none">
-                <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="بحث باسم الطالب أو الجوال..."
-                  value={admissionsSearch}
-                  onChange={(e) => setAdmissionsSearch(e.target.value)}
-                  className={`w-full rounded-xl border py-2 pr-9 pl-3 text-xs outline-none ${
-                    dark ? "border-white/10 bg-black/50 text-white" : "border-black/10 bg-slate-50 text-slate-900"
-                  }`}
-                />
-              </div>
-            </div>
-
-            {/* Leads Table */}
-            {(() => {
-              const filtered = admissionsList.filter((item: any) => {
-                const matchesFilter = admissionsFilter === "all" || item.status === admissionsFilter;
-                const matchesSearch =
-                  !admissionsSearch ||
-                  item.studentName?.toLowerCase().includes(admissionsSearch.toLowerCase()) ||
-                  item.guardianName?.toLowerCase().includes(admissionsSearch.toLowerCase()) ||
-                  item.phone?.includes(admissionsSearch);
-                return matchesFilter && matchesSearch;
-              });
-
-              if (filtered.length === 0) {
-                return (
-                  <div className={`text-center py-16 rounded-3xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white"}`}>
-                    <GraduationCap size={40} className="mx-auto text-slate-400 mb-3 opacity-50" />
-                    <h4 className="font-black text-sm">لا توجد طلبات قبول تطابق هذا البحث</h4>
-                    <p className="text-xs text-slate-500 mt-1">الطلبات الجديدة التي يقدمها أولياء الأمور ستظهر هنا فوراً</p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="space-y-3">
-                  {/* Floating Bulk Action Bar */}
-                  {selectedLeadIds.length > 0 && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-black animate-in fade-in slide-in-from-top-2">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[11px]">
-                          {selectedLeadIds.length} محدد
-                        </span>
-                        <span>إجراءات سريعة على الطلبات المختارة:</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Button
-                          size="sm"
-                          type="button"
-                          onClick={async () => {
-                            for (const id of selectedLeadIds) {
-                              await updateAdmissionStatusMutation.mutateAsync({ id, status: "contacted" });
-                            }
-                            toast.success(`تم تحديث ${selectedLeadIds.length} طلبات إلى: تم التواصل`);
-                            setSelectedLeadIds([]);
-                          }}
-                          className="rounded-xl h-8 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-black gap-1"
-                        >
-                          <span>تم التواصل 📞</span>
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          type="button"
-                          onClick={async () => {
-                            for (const id of selectedLeadIds) {
-                              await updateAdmissionStatusMutation.mutateAsync({ id, status: "admitted" });
-                            }
-                            toast.success(`تم اعتماد قبول ${selectedLeadIds.length} طلبات بنجاح 🎓`);
-                            setSelectedLeadIds([]);
-                          }}
-                          className="rounded-xl h-8 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
-                        >
-                          <span>اعتماد القبول 🎓</span>
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            const targetList = admissionsList.filter((a: any) => selectedLeadIds.includes(a.id));
-                            const csvRows = [
-                              ["المعرف", "اسم الطالب", "اسم ولي الأمر", "رقم الجوال", "البريد", "المرحلة", "المسار", "الفرع", "الحالة", "تاريخ التقديم"],
-                              ...targetList.map((a: any) => [
-                                a.id,
-                                `"${a.studentName}"`,
-                                `"${a.guardianName}"`,
-                                `"${a.phone}"`,
-                                `"${a.email || ''}"`,
-                                `"${a.gradeLevel}"`,
-                                `"${a.track}"`,
-                                `"${a.gender}"`,
-                                `"${a.status}"`,
-                                `"${new Date(a.createdAt).toLocaleString('ar-SA')}"`,
-                              ]),
-                            ];
-                            const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.map((e) => e.join(",")).join("\n");
-                            const encodedUri = encodeURI(csvContent);
-                            const link = document.createElement("a");
-                            link.setAttribute("href", encodedUri);
-                            link.setAttribute("download", `aqeeq-admissions-selected-${new Date().toISOString().slice(0, 10)}.csv`);
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            toast.success(`تم تصدير ${targetList.length} طلب محدد بنجاح!`);
-                          }}
-                          className="rounded-xl h-8 text-[11px] font-bold gap-1"
-                        >
-                          <span>تصدير المحددين CSV 📑</span>
-                        </Button>
-
-                        <button
-                          type="button"
-                          onClick={() => setSelectedLeadIds([])}
-                          className="text-slate-400 hover:text-red-400 text-xs font-bold px-2 py-1"
-                        >
-                          إلغاء التحديد ✕
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Mobile Cards View (block md:hidden) */}
-                  <div className="block md:hidden space-y-3">
-                    {filtered.map((lead: any) => {
-                      const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
-                      const waMessage = encodeURIComponent(
-                        `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
-                      );
-                      const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
-
-                      return (
-                        <div
-                          key={`mob-${lead.id}`}
-                          className={`rounded-2xl border p-4 space-y-3 transition ${
-                            dark ? "border-white/10 bg-[#121212]" : "border-slate-200/90 bg-white shadow-sm"
-                          }`}
-                        >
-                          {/* Top Row: Checkbox + Student Name + Track */}
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-start gap-2.5">
-                              <input
-                                type="checkbox"
-                                checked={selectedLeadIds.includes(lead.id)}
-                                onChange={() => {
-                                  setSelectedLeadIds((prev) =>
-                                    prev.includes(lead.id) ? prev.filter((id) => id !== lead.id) : [...prev, lead.id]
-                                  );
-                                }}
-                                className="rounded accent-emerald-600 h-4 w-4 mt-0.5 cursor-pointer"
-                              />
-                              <div>
-                                <h4 className="font-black text-sm">{lead.studentName}</h4>
-                                <p className="text-[11px] text-slate-500 mt-0.5">
-                                  {lead.gradeLevel === "kindergarten"
-                                    ? "رياض الأطفال (KG)"
-                                    : lead.gradeLevel === "primary"
-                                    ? "المرحلة الابتدائية"
-                                    : lead.gradeLevel === "middle"
-                                    ? "المرحلة المتوسطة"
-                                    : "المرحلة الثانوية"}
-                                  {" · "}
-                                  {lead.gender === "girls" ? "مجمع البنات" : "مجمع البنين"}
-                                </p>
-                              </div>
-                            </div>
-
-                            <span className="inline-block rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400 shrink-0">
-                              {lead.track === "international" ? "🌐 دولي" : "🇸🇦 أهلي"}
-                            </span>
-                          </div>
-
-                          {/* Middle Row: Guardian & Submission Date */}
-                          <div className="flex items-center justify-between text-xs border-t border-b py-2 border-current/5">
-                            <div>
-                              <span className="text-slate-400 text-[10px] block">ولي الأمر:</span>
-                              <span className="font-bold">{lead.guardianName}</span>
-                            </div>
-                            <div className="text-left font-mono text-[10px] text-slate-400">
-                              {new Date(lead.createdAt).toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
-                            </div>
-                          </div>
-
-                          {/* Notes if present */}
-                          {lead.notes && (
-                            <p className="text-[11px] text-slate-500 bg-current/5 p-2 rounded-xl">
-                              💬 {lead.notes}
-                            </p>
-                          )}
-
-                          {/* Actions: Direct Contact & Status Dropdown & Delete */}
-                          <div className="flex items-center justify-between gap-2 pt-1">
-                            <div className="flex items-center gap-1.5">
-                              <a
-                                href={`tel:${lead.phone}`}
-                                className="flex items-center gap-1 h-8 px-2.5 rounded-xl bg-blue-500/10 text-blue-500 text-xs font-bold hover:bg-blue-500 hover:text-white transition"
-                              >
-                                <PhoneCall size={12} />
-                                <span>اتصال</span>
-                              </a>
-                              <a
-                                href={waUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center gap-1 h-8 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-600 text-xs font-black hover:bg-emerald-600 hover:text-white transition"
-                              >
-                                <MessageCircle size={12} />
-                                <span>واتساب</span>
-                              </a>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                              <select
-                                value={lead.status}
-                                onChange={(e) =>
-                                  updateAdmissionStatusMutation.mutate({
-                                    id: lead.id,
-                                    status: e.target.value as any,
-                                  })
-                                }
-                                className={`rounded-xl border px-2 py-1 text-[11px] font-black outline-none ${
-                                  lead.status === "new"
-                                    ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
-                                    : lead.status === "contacted"
-                                    ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
-                                    : lead.status === "admitted"
-                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
-                                    : "border-red-500/30 bg-red-500/10 text-red-500"
-                                }`}
-                              >
-                                <option value="new">جديد 🟡</option>
-                                <option value="contacted">تم التواصل 📞</option>
-                                <option value="admitted">تم القبول ✅</option>
-                                <option value="rejected">مرفوض ❌</option>
-                              </select>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (window.confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) {
-                                    deleteAdmissionMutation.mutate({ id: lead.id });
-                                  }
-                                }}
-                                className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition shrink-0"
-                                title="حذف الطلب"
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    <h2 className="text-xl font-black">صندوق طلبات التسجيل والقبول الإلكتروني</h2>
+                    <p className="text-xs font-bold text-slate-400 mt-1">
+                      متابعة أولياء الأمور، تغيير حالات الطلبات، والتواصل السريع عبر واتساب بنقرة واحدة
+                    </p>
                   </div>
 
-                  {/* Desktop Table View (hidden md:block) */}
-                  <div className={`hidden md:block rounded-3xl border overflow-hidden shadow-lg ${
-                    dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"
-                  }`}>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-right border-collapse text-xs">
-                        <thead>
-                          <tr className={`border-b font-black ${
-                            dark ? "border-white/10 bg-white/5 text-slate-300" : "border-black/5 bg-slate-50 text-slate-700"
-                          }`}>
-                            <th className="p-4 w-10 text-center">
-                              <input
-                                type="checkbox"
-                                checked={selectedLeadIds.length === filtered.length && filtered.length > 0}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setSelectedLeadIds(filtered.map((l: any) => l.id));
-                                  } else {
-                                    setSelectedLeadIds([]);
-                                  }
-                                }}
-                                className="rounded accent-emerald-600 h-4 w-4 cursor-pointer"
-                              />
-                            </th>
-                            <th className="p-4">تاريخ التقديم</th>
-                            <th className="p-4">اسم الطالب</th>
-                            <th className="p-4">المرحلة والمسار</th>
-                            <th className="p-4">ولي الأمر والجوال</th>
-                            <th className="p-4 text-center">التواصل المباشر</th>
-                            <th className="p-4">حالة الطلب</th>
-                            <th className="p-4">ملاحظات</th>
-                            <th className="p-4 text-center">إجراءات</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-current/5">
-                          {filtered.map((lead: any) => {
-                            const phoneClean = lead.phone ? lead.phone.replace(/[^0-9]/g, "").replace(/^0/, "966") : "";
-                            const waMessage = encodeURIComponent(
-                              `السلام عليكم ورحمة الله وبركاته، معكم إدارة القبول والتسجيل بمدارس العقيق الأهلية والدولية بالمدينة المنورة بخصوص طلب تسجيل الطالب (${lead.studentName}). نرحب بكم ويسعدنا خدمتكم وتأكيد موعد المقابلة.`
-                            );
-                            const waUrl = `https://wa.me/${phoneClean}?text=${waMessage}`;
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* CSV Export Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (admissionsList.length === 0) {
+                          toast.error("لا توجد بيانات للتصدير");
+                          return;
+                        }
+                        const headers = ["رقم الطلب", "اسم الطالب", "ولي الأمر", "رقم الجوال", "البريد", "المرحلة", "المسار", "الجنس", "الحالة", "تاريخ الطلب"];
+                        const rows = admissionsList.map((a: any) => [
+                          a.id,
+                          `"${a.studentName}"`,
+                          `"${a.guardianName}"`,
+                          `"${a.phone}"`,
+                          `"${a.email || ''}"`,
+                          `"${a.gradeLevel}"`,
+                          `"${a.track}"`,
+                          `"${a.gender}"`,
+                          `"${a.status}"`,
+                          `"${new Date(a.createdAt).toLocaleDateString('ar-SA')}"`,
+                        ]);
+                        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+                        const encodedUri = encodeURI(csvContent);
+                        const link = document.createElement("a");
+                        link.setAttribute("href", encodedUri);
+                        link.setAttribute("download", `aqeeq-admissions-${new Date().toISOString().slice(0, 10)}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        toast.success("تم تصدير ملف الإكسل (CSV) بنجاح!");
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-current/15 px-3.5 py-2 text-xs font-black transition hover:bg-white/10 cursor-pointer"
+                    >
+                      <Download size={14} />
+                      <span>تصدير Excel / CSV</span>
+                    </button>
 
-                            return (
-                              <tr key={lead.id} className="hover:bg-current/5 transition">
-                                <td className="p-4 w-10 text-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedLeadIds.includes(lead.id)}
-                                    onChange={() => {
-                                      setSelectedLeadIds((prev) =>
-                                        prev.includes(lead.id)
-                                          ? prev.filter((id) => id !== lead.id)
-                                          : [...prev, lead.id]
-                                      );
-                                    }}
-                                    className="rounded accent-emerald-600 h-4 w-4 cursor-pointer"
-                                  />
-                                </td>
-                                <td className="p-4 text-slate-400 font-mono whitespace-nowrap">
-                                {new Date(lead.createdAt).toLocaleDateString("ar-SA", {
-                                  month: "short",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </td>
-
-                              <td className="p-4 font-black text-sm">
-                                {lead.studentName}
-                              </td>
-
-                              <td className="p-4 space-y-1">
-                                <span className="inline-block rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
-                                  {lead.track === "international" ? "🌐 مسار دولي" : "🇸🇦 مسار أهلي"}
-                                </span>
-                                <div className="text-[11px] text-slate-500">
-                                  {lead.gradeLevel === "kindergarten"
-                                    ? "رياض الأطفال (KG)"
-                                    : lead.gradeLevel === "primary"
-                                    ? "المرحلة الابتدائية"
-                                    : lead.gradeLevel === "middle"
-                                    ? "المرحلة المتوسطة"
-                                    : "المرحلة الثانوية"}
-                                  {" · "}
-                                  {lead.gender === "girls" ? "مجمع البنات" : "مجمع البنين"}
-                                </div>
-                              </td>
-
-                              <td className="p-4">
-                                <div className="font-bold">{lead.guardianName}</div>
-                                <div className="text-slate-400 font-mono text-[11px]" dir="ltr">{lead.phone}</div>
-                              </td>
-
-                              <td className="p-4 text-center">
-                                <div className="inline-flex items-center gap-2">
-                                  <a
-                                    href={`tel:${lead.phone}`}
-                                    className="grid h-8 w-8 place-items-center rounded-xl bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition"
-                                    title="اتصال هاتفي"
-                                  >
-                                    <PhoneCall size={14} />
-                                  </a>
-
-                                  <a
-                                    href={waUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 hover:bg-emerald-600 hover:text-white transition"
-                                    title="محادثة واتساب مباشرة"
-                                  >
-                                    <MessageCircle size={14} />
-                                  </a>
-                                </div>
-                              </td>
-
-                              <td className="p-4">
-                                <select
-                                  value={lead.status}
-                                  onChange={(e) =>
-                                    updateAdmissionStatusMutation.mutate({
-                                      id: lead.id,
-                                      status: e.target.value as any,
-                                    })
-                                  }
-                                  className={`rounded-lg border px-2.5 py-1 text-[11px] font-black outline-none ${
-                                    lead.status === "new"
-                                      ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
-                                      : lead.status === "contacted"
-                                      ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
-                                      : lead.status === "admitted"
-                                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
-                                      : "border-red-500/30 bg-red-500/10 text-red-500"
-                                  }`}
-                                >
-                                  <option value="new">جديد 🟡</option>
-                                  <option value="contacted">تم التواصل 📞</option>
-                                  <option value="admitted">تم القبول ✅</option>
-                                  <option value="rejected">مرفوض ❌</option>
-                                </select>
-                              </td>
-
-                              <td className="p-4 text-slate-400 text-[11px] max-w-xs truncate">
-                                {lead.notes || "—"}
-                              </td>
-
-                              <td className="p-4 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (window.confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟")) {
-                                      deleteAdmissionMutation.mutate({ id: lead.id });
-                                    }
-                                  }}
-                                  className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition"
-                                  title="حذف الطلب"
-                                >
-                                  <Trash2 size={13} />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                    {/* Bulk Delete Selected */}
+                    {selectedLeadIds.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setBulkDeleteConfirmOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-black text-white hover:bg-red-700 transition cursor-pointer"
+                      >
+                        <Trash2 size={14} />
+                        <span>حذف المحدد ({selectedLeadIds.length})</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
-            );
-            })()}
+
+                {/* Filter Pills & Search Input */}
+                <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl border border-current/10">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {[
+                      { id: "all", label: `الكل (${admissionsList.length})` },
+                      { id: "new", label: `جديد (${admissionsList.filter((a: any) => a.status === "new").length}) 🟢` },
+                      { id: "pending", label: `قيد المراجعة (${admissionsList.filter((a: any) => a.status === "pending").length}) 🟡` },
+                      { id: "contacted", label: `تم التواصل (${admissionsList.filter((a: any) => a.status === "contacted").length}) 📞` },
+                      { id: "admitted", label: `تم القبول (${admissionsList.filter((a: any) => a.status === "admitted").length}) ✅` },
+                      { id: "rejected", label: `مرفوض (${admissionsList.filter((a: any) => a.status === "rejected").length}) ❌` },
+                    ].map((pill) => (
+                      <button
+                        key={pill.id}
+                        type="button"
+                        onClick={() => setAdmissionsFilter(pill.id)}
+                        className={`rounded-xl px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+                          admissionsFilter === pill.id
+                            ? "bg-amber-400 text-black shadow"
+                            : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                        }`}
+                      >
+                        {pill.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative w-full sm:w-64">
+                    <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="بحث بالاسم أو الجوال أو المرحلة..."
+                      value={admissionsSearch}
+                      onChange={(e) => setAdmissionsSearch(e.target.value)}
+                      className={`w-full rounded-xl border py-2 pr-9 pl-3 text-xs font-bold outline-none ${
+                        dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white text-slate-900"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Leads Table */}
+                {(() => {
+                  const filteredLeads = admissionsList.filter((lead: any) => {
+                    if (admissionsFilter !== "all" && lead.status !== admissionsFilter) return false;
+                    if (admissionsSearch) {
+                      const q = admissionsSearch.toLowerCase();
+                      return (
+                        lead.studentName?.toLowerCase().includes(q) ||
+                        lead.guardianName?.toLowerCase().includes(q) ||
+                        lead.phone?.includes(q) ||
+                        lead.gradeLevel?.toLowerCase().includes(q)
+                      );
+                    }
+                    return true;
+                  });
+
+                  if (filteredLeads.length === 0) {
+                    return (
+                      <div className="rounded-3xl border border-dashed border-current/10 p-12 text-center text-slate-400 text-xs font-bold">
+                        لا توجد طلبات قبول مطابقة لمعايير البحث الحالية.
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className={`overflow-hidden rounded-3xl border shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"}`}>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-right text-xs">
+                          <thead className={`border-b text-[11px] font-black uppercase text-slate-400 ${
+                            dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                          }`}>
+                            <tr>
+                              <th className="p-4 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedLeadIds.length === filteredLeads.length && filteredLeads.length > 0}
+                                  onChange={(e) => {
+                                    if (e.target.checked) setSelectedLeadIds(filteredLeads.map((l: any) => l.id));
+                                    else setSelectedLeadIds([]);
+                                  }}
+                                  className="rounded"
+                                />
+                              </th>
+                              <th className="p-4">الطالب والمرحلة</th>
+                              <th className="p-4">ولي الأمر والجوال</th>
+                              <th className="p-4">المسار والجنس</th>
+                              <th className="p-4">تاريخ الطلب</th>
+                              <th className="p-4">الحالة والمتابعة</th>
+                              <th className="p-4 text-center">التواصل والإجراء</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-current/5">
+                            {filteredLeads.map((lead: any) => {
+                              const cleanPhone = lead.phone?.replace(/[^0-9]/g, "") || "";
+                              const whatsappPhone = cleanPhone.startsWith("0") ? "966" + cleanPhone.slice(1) : cleanPhone;
+                              const waMessage = `السلام عليكم ورحمة الله وبركاته، ولي أمر الطالب/ة *${lead.studentName}* المحترم.. نرحب بكم من مدارس العقيق الأهلية والدولية بشأن طلب التسجيل رقم #${lead.id} للمرحلة (${lead.gradeLevel}). يسعدنا استكمال إجراءات القبول معكم.`;
+
+                              return (
+                                <tr key={lead.id} className="hover:bg-white/[0.02] transition">
+                                  <td className="p-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedLeadIds.includes(lead.id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) setSelectedLeadIds([...selectedLeadIds, lead.id]);
+                                        else setSelectedLeadIds(selectedLeadIds.filter((id) => id !== lead.id));
+                                      }}
+                                      className="rounded"
+                                    />
+                                  </td>
+
+                                  <td className="p-4">
+                                    <div>
+                                      <p className="font-black text-sm text-amber-300">{lead.studentName}</p>
+                                      <span className="text-[11px] text-slate-400 font-bold">{lead.gradeLevel}</span>
+                                    </div>
+                                  </td>
+
+                                  <td className="p-4">
+                                    <div>
+                                      <p className="font-bold">{lead.guardianName}</p>
+                                      <span className="text-[11px] text-slate-400 font-mono" dir="ltr">{lead.phone}</span>
+                                    </div>
+                                  </td>
+
+                                  <td className="p-4">
+                                    <span className="inline-block rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold">
+                                      {lead.track} · {lead.gender === "boy" ? "بنين" : "بنات"}
+                                    </span>
+                                  </td>
+
+                                  <td className="p-4 text-slate-400 font-mono text-[11px]">
+                                    {new Date(lead.createdAt).toLocaleDateString("ar-SA")}
+                                  </td>
+
+                                  <td className="p-4">
+                                    <select
+                                      value={lead.status || "new"}
+                                      onChange={(e) => {
+                                        updateAdmissionStatusMutation.mutate({
+                                          id: lead.id,
+                                          status: e.target.value as any,
+                                        });
+                                      }}
+                                      className={`rounded-xl border px-3 py-1.5 text-xs font-black outline-none cursor-pointer ${
+                                        lead.status === "new"
+                                          ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
+                                          : lead.status === "admitted"
+                                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                                          : lead.status === "contacted"
+                                          ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
+                                          : lead.status === "rejected"
+                                          ? "border-red-500/40 bg-red-500/10 text-red-400"
+                                          : "border-current/20 bg-transparent text-slate-300"
+                                      }`}
+                                    >
+                                      <option value="new">جديد 🟢</option>
+                                      <option value="pending">قيد المراجعة 🟡</option>
+                                      <option value="contacted">تم التواصل 📞</option>
+                                      <option value="admitted">تم القبول ✅</option>
+                                      <option value="rejected">مرفوض ❌</option>
+                                    </select>
+                                  </td>
+
+                                  <td className="p-4 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                      {/* One-click WhatsApp Contact Button */}
+                                      <a
+                                        href={`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(waMessage)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] px-2.5 py-1.5 transition shadow"
+                                        title="مراسلة عبر واتساب مباشرة"
+                                      >
+                                        <MessageCircle size={13} />
+                                        <span>مراسلة</span>
+                                      </a>
+
+                                      {/* Delete single lead */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          if (confirm(`هل أنت متأكد من حذف طلب الطالب ${lead.studentName}؟`)) {
+                                            deleteAdmissionMutation.mutate({ id: lead.id });
+                                          }
+                                        }}
+                                        className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                                        title="حذف الطلب"
+                                      >
+                                        <Trash2 size={13} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
-            {/* SUBTAB: TUITION FEES & DISCOUNTS */}
+            {/* SUBTAB 2: TUITION FEES & DISCOUNTS */}
             {admissionsSubTab === "fees" && (
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
@@ -7344,7 +1731,7 @@ const DEFAULT_ORCHESTRATION = {
                       <span>إدارة جدول الرسوم الدراسية وحاسبة الأقساط</span>
                     </h3>
                     <p className="text-xs font-bold text-slate-400 mt-1">
-                      تعديل الرسوم السنوية لكل مرحلة دراسية، ونسب خصومات الإخوة والسداد المبكر، وتنعكس مباشرة على الموقع وحاسبة تابي وتمارا.
+                      تعديل الرسوم السنوية لكل مرحلة دراسية، ونسب خصومات الإخوة والسداد المبكر، وتنعكس مباشرة على حاسبة الموقع.
                     </p>
                   </div>
 
@@ -7356,7 +1743,7 @@ const DEFAULT_ORCHESTRATION = {
                       });
                     }}
                     disabled={setOrchestrationMutation.isPending}
-                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2"
+                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2 cursor-pointer"
                   >
                     <CheckCircle2 size={16} />
                     <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ جدول الرسوم والخصومات"}</span>
@@ -7456,66 +1843,62 @@ const DEFAULT_ORCHESTRATION = {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-current/5">
-                        {(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!).map((feeItem: any, idx: number) => {
-                          return (
-                            <tr key={idx} className={dark ? "hover:bg-white/5" : "hover:bg-slate-50"}>
-                              <td className="p-4 font-black text-sm">
-                                {feeItem.gradeLevel}
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    value={feeItem.nationalAnnual}
-                                    onChange={(e) => {
-                                      const val = Number(e.target.value);
-                                      const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
-                                      updatedList[idx] = { ...updatedList[idx], nationalAnnual: val };
-                                      setOrchestrationForm({
-                                        ...orchestrationForm,
-                                        admissionsSettings: {
-                                          ...orchestrationForm.admissionsSettings,
-                                          tuitionFees: updatedList,
-                                        },
-                                      });
-                                    }}
-                                    className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
-                                      dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
-                                    }`}
-                                  />
-                                  <span className="text-[11px] text-slate-400 font-bold">ريال</span>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    value={feeItem.internationalAnnual}
-                                    onChange={(e) => {
-                                      const val = Number(e.target.value);
-                                      const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
-                                      updatedList[idx] = { ...updatedList[idx], internationalAnnual: val };
-                                      setOrchestrationForm({
-                                        ...orchestrationForm,
-                                        admissionsSettings: {
-                                          ...orchestrationForm.admissionsSettings,
-                                          tuitionFees: updatedList,
-                                        },
-                                      });
-                                    }}
-                                    className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
-                                      dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
-                                    }`}
-                                  />
-                                  <span className="text-[11px] text-slate-400 font-bold">ريال</span>
-                                </div>
-                              </td>
-                              <td className="p-4 text-center font-bold text-emerald-400">
-                                {Math.round(feeItem.nationalAnnual / 3).toLocaleString()} ريال
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!).map((feeItem: any, idx: number) => (
+                          <tr key={idx} className={dark ? "hover:bg-white/5" : "hover:bg-slate-50"}>
+                            <td className="p-4 font-black text-sm">{feeItem.gradeLevel}</td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="number"
+                                  value={feeItem.nationalAnnual}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
+                                    updatedList[idx] = { ...updatedList[idx], nationalAnnual: val };
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      admissionsSettings: {
+                                        ...orchestrationForm.admissionsSettings,
+                                        tuitionFees: updatedList,
+                                      },
+                                    });
+                                  }}
+                                  className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
+                                    dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                                  }`}
+                                />
+                                <span className="text-[11px] text-slate-400 font-bold">ريال</span>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="number"
+                                  value={feeItem.internationalAnnual}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
+                                    updatedList[idx] = { ...updatedList[idx], internationalAnnual: val };
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      admissionsSettings: {
+                                        ...orchestrationForm.admissionsSettings,
+                                        tuitionFees: updatedList,
+                                      },
+                                    });
+                                  }}
+                                  className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
+                                    dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                                  }`}
+                                />
+                                <span className="text-[11px] text-slate-400 font-bold">ريال</span>
+                              </div>
+                            </td>
+                            <td className="p-4 text-center font-bold text-emerald-400 font-mono">
+                              {Math.round(feeItem.nationalAnnual / 3).toLocaleString()} ريال
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -7523,7 +1906,7 @@ const DEFAULT_ORCHESTRATION = {
               </div>
             )}
 
-            {/* SUBTAB: REGISTRATION STATUS & SETTINGS */}
+            {/* SUBTAB 3: REGISTRATION STATUS & SWITCHES */}
             {admissionsSubTab === "settings" && (
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
@@ -7545,7 +1928,7 @@ const DEFAULT_ORCHESTRATION = {
                       });
                     }}
                     disabled={setOrchestrationMutation.isPending}
-                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2"
+                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2 cursor-pointer"
                   >
                     <CheckCircle2 size={16} />
                     <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ضوابط التسجيل"}</span>
@@ -7575,7 +1958,7 @@ const DEFAULT_ORCHESTRATION = {
                       }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transform transition ease-in-out duration-200 ${
+                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition ease-in-out duration-200 ${
                           (orchestrationForm.admissionsSettings?.isOpen ?? true) ? "translate-x-0" : "-translate-x-5"
                         }`}
                       />
@@ -7608,10 +1991,1484 @@ const DEFAULT_ORCHESTRATION = {
             )}
           </div>
         )}
+
+        {/* ============================================================== */}
+        {/* 📚 PILLAR 3: MASTER CONTENT MATRIX & ARTICLES MODERATION        */}
+        {/* ============================================================== */}
+        {activeTab === "content" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Dedicated Studio Launchers Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="p-3.5 rounded-2xl border border-amber-400/30 bg-amber-400/5 hover:bg-amber-400/15 text-right transition group cursor-pointer"
+              >
+                <Palette size={20} className="text-amber-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">المحرر البصري</h4>
+                <p className="text-[10px] text-slate-400">تعديل حي على الموقع</p>
+              </button>
+
+              <button
+                onClick={() => navigate("/journal/manage")}
+                className="p-3.5 rounded-2xl border border-current/10 bg-white/[0.02] hover:bg-white/[0.06] text-right transition group cursor-pointer"
+              >
+                <BookOpen size={20} className="text-yellow-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">استوديو المجلات</h4>
+                <p className="text-[10px] text-slate-400">الأعداد الدورية 3D</p>
+              </button>
+
+              <button
+                onClick={() => navigate("/albums/manage")}
+                className="p-3.5 rounded-2xl border border-current/10 bg-white/[0.02] hover:bg-white/[0.06] text-right transition group cursor-pointer"
+              >
+                <Camera size={20} className="text-emerald-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">استوديو الألبومات</h4>
+                <p className="text-[10px] text-slate-400">توثيق الفعاليات</p>
+              </button>
+
+              <button
+                onClick={() => navigate("/offers/manage")}
+                className="p-3.5 rounded-2xl border border-current/10 bg-white/[0.02] hover:bg-white/[0.06] text-right transition group cursor-pointer"
+              >
+                <Clapperboard size={20} className="text-red-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">الأخبار والعروض</h4>
+                <p className="text-[10px] text-slate-400">فيديوهات ومنشورات</p>
+              </button>
+
+              <button
+                onClick={() => navigate("/articles/manage")}
+                className="p-3.5 rounded-2xl border border-current/10 bg-white/[0.02] hover:bg-white/[0.06] text-right transition group cursor-pointer"
+              >
+                <Newspaper size={20} className="text-blue-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">استوديو المقالات</h4>
+                <p className="text-[10px] text-slate-400">كتابة مقال جديد</p>
+              </button>
+
+              <button
+                onClick={() => navigate("/podcast/manage")}
+                className="p-3.5 rounded-2xl border border-current/10 bg-white/[0.02] hover:bg-white/[0.06] text-right transition group cursor-pointer"
+              >
+                <Mic size={20} className="text-purple-400 mb-2 group-hover:scale-110 transition" />
+                <h4 className="text-xs font-black">استوديو البودكاست</h4>
+                <p className="text-[10px] text-slate-400">أثير العقيق الصوتي</p>
+              </button>
+            </div>
+
+            {/* Subtabs Bar */}
+            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => setContentSubTab("master")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "master"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Layers size={15} />
+                <span>الجدول الموحد الشامل للمحتوى 📑</span>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{masterContent.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setContentSubTab("articles")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "articles"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <BookOpen size={15} />
+                <span>مراجعة واعتماد مقالات الطلاب والمعلمين ✍️</span>
+                {pendingArticlesCount > 0 && (
+                  <span className="rounded-full bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 animate-pulse">
+                    {pendingArticlesCount} معلق
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* SUBTAB 1: UNIFIED MASTER CONTENT TABLE */}
+            {contentSubTab === "master" && (
+              <div className="space-y-6">
+                {/* Search & Type Filters */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-black">الجدول الموحد لإدارة جميع إصدارات العقيق</h2>
+                    <p className="text-xs font-bold text-slate-400 mt-1">
+                      استعراض وتعديل ومعاينة المجلات والألبومات والتغطيات في شاشة مركزية واحدة
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 ${
+                      dark ? "border-white/10 bg-black/40" : "border-black/10 bg-white shadow-sm"
+                    }`}>
+                      <Search size={14} className="text-slate-400" />
+                      <input
+                        type="text"
+                        value={contentSearch}
+                        onChange={(e) => setContentSearch(e.target.value)}
+                        placeholder="بحث في العناوين..."
+                        className="bg-transparent text-xs outline-none w-36 sm:w-48 font-bold"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1 rounded-xl border border-current/10 p-1">
+                      {[
+                        { id: "all", label: "الكل" },
+                        { id: "journal", label: "المجلات" },
+                        { id: "album", label: "الألبومات" },
+                        { id: "post", label: "الأخبار" },
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setContentTypeFilter(tab.id as any)}
+                          className={`rounded-lg px-2.5 py-1 text-[11px] font-black transition cursor-pointer ${
+                            contentTypeFilter === tab.id
+                              ? dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+                              : "text-slate-400 hover:text-current"
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Master Table */}
+                <div className={`overflow-hidden rounded-3xl border shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"}`}>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right text-xs">
+                      <thead className={`border-b text-[11px] font-black uppercase text-slate-400 ${
+                        dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                      }`}>
+                        <tr>
+                          <th className="p-4 sm:px-6">المحتوى والغلاف</th>
+                          <th className="p-4">النوع</th>
+                          <th className="p-4">التاريخ / الموسم</th>
+                          <th className="p-4">الحجم / الصفحات</th>
+                          <th className="p-4">المشاهدات</th>
+                          <th className="p-4 sm:px-6 text-center">الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-current/5">
+                        {filteredContent.map((item) => (
+                          <tr key={item.id} className="hover:bg-white/[0.02] transition">
+                            <td className="p-4 sm:px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-current/10 bg-black">
+                                  {item.coverUrl ? (
+                                    <img
+                                      src={directDriveImage(item.coverUrl) || item.coverUrl}
+                                      alt=""
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="grid h-full w-full place-items-center text-slate-500">
+                                      {item.type === "journal" ? <BookOpen size={16} /> : item.type === "album" ? <Camera size={16} /> : <Clapperboard size={16} />}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 max-w-xs">
+                                  <p className="font-black text-sm truncate">{item.title}</p>
+                                  <span className="text-[10px] text-slate-400 font-mono">ID: {item.id}</span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-black ${
+                                item.type === "journal"
+                                  ? "bg-[#f8ca14]/20 text-[#f8ca14]"
+                                  : item.type === "album"
+                                  ? "bg-emerald-500/20 text-emerald-400"
+                                  : "bg-[#de191e]/20 text-[#de191e]"
+                              }`}>
+                                {item.typeLabel}
+                              </span>
+                            </td>
+
+                            <td className="p-4 text-slate-300 font-bold">{item.date || "—"}</td>
+                            <td className="p-4 text-slate-300 font-bold">
+                              {item.count ? item.count + (item.type === "journal" ? " صفحة" : " ملف") : "—"}
+                            </td>
+                            <td className="p-4 font-mono font-bold text-[#f8ca14]">
+                              {item.viewsCount?.toLocaleString() || 0}
+                            </td>
+
+                            <td className="p-4 sm:px-6">
+                              <div className="flex items-center justify-center gap-2">
+                                <a
+                                  href={item.viewUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className={`grid h-8 w-8 place-items-center rounded-lg border transition ${
+                                    dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                  }`}
+                                  title="معاينة في الموقع"
+                                >
+                                  <ExternalLink size={13} />
+                                </a>
+
+                                <button
+                                  onClick={() => navigate(item.editUrl)}
+                                  className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+                                    dark
+                                      ? "bg-[#f8ca14]/15 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                                      : "bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                                  }`}
+                                >
+                                  <span>تعديل في الاستوديو</span>
+                                  <ArrowUpLeft size={13} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 2: ARTICLES REVIEW & AI MODERATION */}
+            {contentSubTab === "articles" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-black">غرفة مراجعة واعتماد مقالات العقيق ✍️</h2>
+                    <p className="text-xs font-bold text-slate-400 mt-1">
+                      مراجعة مقالات الطلاب والمعلمين وتدقيقها بالذكاء الاصطناعي وقبول نشرها فوراً
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-black/40 p-1">
+                    {(["all", "pending", "published", "rejected"] as const).map((st) => (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setArticleFilterStatus(st)}
+                        className={`rounded-xl px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+                          articleFilterStatus === st
+                            ? "bg-amber-400 text-slate-950 shadow"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {st === "all"
+                          ? `الكل (${allAdminArticles.length})`
+                          : st === "pending"
+                          ? `بانتظار المراجعة (${pendingArticlesCount}) ⏳`
+                          : st === "published"
+                          ? `المنشورة (${allAdminArticles.filter((a) => a.status === "published").length}) ✅`
+                          : `المرفوضة (${allAdminArticles.filter((a) => a.status === "rejected").length})`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Articles Cards Grid */}
+                {allAdminArticles.filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus)).length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center text-slate-400 text-xs font-bold">
+                    لا توجد مقالات في هذه القائمة حالياً.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4">
+                    {allAdminArticles
+                      .filter((a) => (articleFilterStatus === "all" ? true : a.status === articleFilterStatus))
+                      .map((art) => (
+                        <div
+                          key={art.id}
+                          className={`rounded-3xl border p-5 sm:p-6 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                            art.status === "pending"
+                              ? "border-amber-400/40 bg-amber-400/[0.03] shadow-lg shadow-amber-400/5"
+                              : art.status === "published"
+                              ? dark ? "border-white/10 bg-[#10131d]" : "border-black/10 bg-white"
+                              : "border-red-500/20 bg-red-950/10 opacity-70"
+                          }`}
+                        >
+                          <div className="space-y-2 min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`rounded-lg px-2.5 py-0.5 text-[10px] font-black ${
+                                art.status === "pending"
+                                  ? "bg-amber-400/20 text-amber-300 border border-amber-400/30 animate-pulse"
+                                  : art.status === "published"
+                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-red-500/20 text-red-300 border border-red-500/30"
+                              }`}>
+                                {art.status === "pending"
+                                  ? "⏳ بانتظار المراجعة والاعتماد"
+                                  : art.status === "published"
+                                  ? "✅ منشور على المنصة"
+                                  : "❌ مرفوض"}
+                              </span>
+
+                              <span className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-black text-amber-200">
+                                {art.category}
+                              </span>
+
+                              <span className="text-[10px] text-slate-500 font-mono">
+                                {new Date(art.createdAt).toLocaleDateString("ar-SA")}
+                              </span>
+                            </div>
+
+                            <h3 className="text-base font-black text-white">{art.title}</h3>
+                            <p className="text-xs text-slate-300 line-clamp-2 leading-5 font-bold">
+                              {art.excerpt || art.content.slice(0, 150)}
+                            </p>
+
+                            <div className="flex items-center gap-3 text-xs text-slate-400 font-bold pt-1">
+                              <span>الكاتب: <b className="text-slate-200">{art.authorName}</b> ({art.authorRole})</span>
+                              <span>·</span>
+                              <span>👁️ {art.viewCount} قراءة</span>
+                              <span>·</span>
+                              <span>❤️ {art.likesCount} إعجاب</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                            <Button
+                              type="button"
+                              onClick={() => setSelectedArticleForEdit(art)}
+                              className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs h-9 px-4 rounded-xl shadow cursor-pointer"
+                            >
+                              <BookOpen size={14} className="ml-1.5" />
+                              <span>مراجعة وتعديل المقال</span>
+                            </Button>
+
+                            {art.status === "pending" && (
+                              <Button
+                                type="button"
+                                onClick={() => moderateArticleMutation.mutate({ id: art.id, status: "published" })}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs h-9 px-3.5 rounded-xl shadow cursor-pointer"
+                              >
+                                <CheckCircle2 size={14} className="ml-1" />
+                                <span>قبول ونشر</span>
+                              </Button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟")) {
+                                  deleteArticleMutation.mutate({ id: art.id });
+                                }
+                              }}
+                              className="grid h-9 w-9 place-items-center rounded-xl border border-red-500/20 bg-red-950/20 text-red-400 hover:bg-red-900/40 transition cursor-pointer"
+                              title="حذف المقال"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* 📢 PILLAR 4: COMMS, BROADCASTS & CAMPAIGNS                     */}
+        {/* ============================================================== */}
+        {activeTab === "campaigns" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Subtabs Bar */}
+            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => setCampaignsSubTab("broadcast")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  campaignsSubTab === "broadcast"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Megaphone size={15} />
+                <span>شريط التنبيهات العاجل والاحتفالي للموقع 📣</span>
+                {broadcastEnabled && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCampaignsSubTab("whatsapp")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  campaignsSubTab === "whatsapp"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Share2 size={15} />
+                <span>حملات ورسائل الواتساب وQR 💬</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCampaignsSubTab("radio")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  campaignsSubTab === "radio"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Headphones size={15} />
+                <span>أغاني وراديو العقيق والنشيد المدرسي 🎵</span>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{(orchestrationForm.schoolSongs || []).length}</span>
+              </button>
+            </div>
+
+            {/* SUBTAB 1: EMERGENCY & CELEBRATION BROADCAST BANNER */}
+            {campaignsSubTab === "broadcast" && (
+              <div className="max-w-4xl space-y-6">
+                <div>
+                  <h2 className="text-xl font-black">إدارة شريط التنبيهات والأخبار العاجلة للموقع</h2>
+                  <p className="text-xs font-bold text-slate-400 mt-1">
+                    شريط بارز يظهر في أعلى صفحات الموقع لتنبيه أولياء الأمور والطلاب بالأمور الطارئة أو الاحتفالية
+                  </p>
+                </div>
+
+                {/* Broadcast Live Preview */}
+                <div className="space-y-2">
+                  <span className="text-xs font-black text-slate-400 block">معاينة شكل التنبيه في قمة الموقع:</span>
+                  <div className={`p-4 rounded-2xl flex items-center justify-between gap-4 text-xs font-black transition ${
+                    broadcastType === "urgent"
+                      ? "bg-red-600 text-white shadow-lg shadow-red-500/20"
+                      : broadcastType === "celebration"
+                      ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-lg shadow-amber-500/20"
+                      : "bg-[#08467d] text-white shadow-lg shadow-[#08467d]/20"
+                  }`}>
+                    <div className="flex items-center gap-2.5">
+                      <Megaphone size={16} />
+                      <span>{broadcastMessage || "نص التنبيه العاجل يظهر هنا..."}</span>
+                    </div>
+                    {broadcastLink && (
+                      <span className="underline text-[11px] shrink-0">
+                        {broadcastLinkText || "اضغط للتفاصيل"} ←
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Edit Form */}
+                <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-sm"}`}>
+                  <div className="flex items-center justify-between border-b pb-4 border-current/10">
+                    <div>
+                      <h4 className="text-sm font-black">حالة تفعيل شريط التنبيه</h4>
+                      <p className="text-xs text-slate-400">تشغيل أو إيقاف ظهور الشريط في الموقع فوراً</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setBroadcastEnabled(!broadcastEnabled)}
+                      className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                        broadcastEnabled ? "bg-emerald-500" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition ease-in-out duration-200 ${
+                          broadcastEnabled ? "translate-x-0" : "-translate-x-5"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-2">نوع وطابع التنبيه</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { id: "urgent", label: "🚨 عاجل وهام (أحمر)", desc: "تعليق دراسة، طوارئ" },
+                          { id: "celebration", label: "🎉 مناسبة واحتفال (ذهبي)", desc: "يوم وطني، إنجاز" },
+                          { id: "info", label: "ℹ️ تنويه عام (كحلي)", desc: "إعلان، موعد تسجيل" },
+                        ].map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setBroadcastType(t.id as any)}
+                            className={`p-3 rounded-2xl border text-right transition cursor-pointer ${
+                              broadcastType === t.id
+                                ? "border-amber-400 bg-amber-400/10 text-amber-300 shadow"
+                                : dark ? "border-white/10 bg-white/5 text-slate-400" : "border-black/10 bg-slate-50 text-slate-600"
+                            }`}
+                          >
+                            <span className="text-xs font-black block">{t.label}</span>
+                            <span className="text-[10px] opacity-75">{t.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">نص رسالة التنبيه</label>
+                      <textarea
+                        rows={2}
+                        value={broadcastMessage}
+                        onChange={(e) => setBroadcastMessage(e.target.value)}
+                        placeholder="مثال: تعليق الدراسة الحضورية غداً وتحويلها عن بُعد عبر منصة مدرستي حرصاً على سلامة أبنائنا..."
+                        className={`w-full rounded-xl border p-3 text-xs font-bold outline-none leading-relaxed ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-black text-slate-300 block mb-1">رابط التفاصيل (اختياري)</label>
+                        <input
+                          type="url"
+                          value={broadcastLink}
+                          onChange={(e) => setBroadcastLink(e.target.value)}
+                          placeholder="https://... أو /news-offers"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-black text-slate-300 block mb-1">نص زر الرابط</label>
+                        <input
+                          type="text"
+                          value={broadcastLinkText}
+                          onChange={(e) => setBroadcastLinkText(e.target.value)}
+                          placeholder="اضغط للتفاصيل"
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setBroadcastMutation.mutate({
+                            id: editingBroadcastId || undefined,
+                            enabled: broadcastEnabled,
+                            message: broadcastMessage,
+                            type: broadcastType,
+                            link: broadcastLink,
+                            linkText: broadcastLinkText,
+                          });
+                        }}
+                        disabled={setBroadcastMutation.isPending}
+                        className="rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-6 py-2.5 shadow-lg shadow-amber-400/20 cursor-pointer"
+                      >
+                        <CheckCircle2 size={16} className="ml-1" />
+                        <span>{setBroadcastMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر التنبيه فوراً"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Saved Broadcasts List */}
+                {broadcastList.length > 0 && (
+                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-sm"}`}>
+                    <h4 className="text-xs font-black text-slate-400">سجل التنبيهات المحفوظة</h4>
+                    <div className="space-y-2">
+                      {broadcastList.map((b: any) => (
+                        <div key={b.id} className="flex items-center justify-between p-3 rounded-2xl border border-current/10 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${b.enabled ? "bg-emerald-500" : "bg-slate-500"}`} />
+                            <span className="font-bold">{b.message}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingBroadcastId(b.id);
+                                setBroadcastEnabled(b.enabled);
+                                setBroadcastMessage(b.message);
+                                setBroadcastType(b.type);
+                                setBroadcastLink(b.link || "");
+                                setBroadcastLinkText(b.linkText || "");
+                                toast.info("تم تحميل بيانات التنبيه للنموذج بالأعلى للتعديل");
+                              }}
+                              className="text-amber-400 text-xs font-bold hover:underline cursor-pointer"
+                            >
+                              تعديل
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteBroadcastMutation.mutate({ id: b.id })}
+                              className="text-red-400 text-xs font-bold hover:underline cursor-pointer"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SUBTAB 2: WHATSAPP CAMPAIGNS GENERATOR */}
+            {campaignsSubTab === "whatsapp" && (
+              <div className="max-w-3xl space-y-6">
+                <div>
+                  <h2 className="text-xl font-black">مُولّد حملات ورسائل الواتساب وQR</h2>
+                  <p className="text-xs font-bold text-slate-400 mt-1">
+                    تجهيز رسائل إعلامية منسقة بضغطة زر لنشرها في قروبات أولياء الأمور والطلاب والمعلمين
+                  </p>
+                </div>
+
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"}`}>
+                  <div>
+                    <label className="block text-xs font-black text-slate-400 mb-2">اختر المحتوى المراد تجهيز حملته</label>
+                    <select
+                      value={selectedCampaignItem}
+                      onChange={(e) => setSelectedCampaignItem(e.target.value)}
+                      className={`w-full rounded-2xl border p-4 text-xs font-black outline-none cursor-pointer ${
+                        dark ? "border-white/10 bg-black/50 text-white" : "border-black/10 bg-slate-50 text-slate-900"
+                      }`}
+                    >
+                      <option value="">-- اختر من المحتوى المنشور --</option>
+                      {masterContent.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          [{item.typeLabel}] {item.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {campaignItemData ? (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 mb-2">الرسالة المنسقة المجهزة للواتساب</label>
+                        <div className={`relative rounded-2xl border p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap ${
+                          dark ? "border-white/10 bg-black/60 text-slate-200" : "border-black/10 bg-slate-50 text-slate-800"
+                        }`}>
+                          {generatedWhatsAppMessage}
+
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(generatedWhatsAppMessage);
+                                toast.success("تم نسخ نص الرسالة للحافظة بنجاح!");
+                              }}
+                              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-xs font-black text-white transition shadow-md cursor-pointer"
+                            >
+                              <Copy size={14} />
+                              <span>نسخ الرسالة</span>
+                            </button>
+
+                            <a
+                              href={`https://wa.me/?text=${encodeURIComponent(generatedWhatsAppMessage)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20b558] px-4 py-2 text-xs font-black text-white transition shadow-md"
+                            >
+                              <MessageCircle size={14} />
+                              <span>فتح في واتساب ويب مباشرة</span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* QR Code Generator */}
+                      <div className="border-t pt-6 border-current/10">
+                        <h4 className="text-sm font-black mb-3">رمز QR المباشر للمحتوى</h4>
+                        <div className="flex flex-col sm:flex-row items-center gap-5">
+                          <div className="h-36 w-36 rounded-2xl bg-white p-2.5 shadow-lg flex items-center justify-center">
+                            <img
+                              src={"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(window.location.origin + campaignItemData.viewUrl)}
+                              alt="QR Code"
+                              className="h-full w-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-2 text-center sm:text-right">
+                            <p className="text-xs font-bold text-slate-400">
+                              رمز استجابة سريع عالي الدقة، جاهز للطباعة أو الإرفاق مع النشرات المدرسية لفتح المحتوى مباشرة من كاميرا الجوال.
+                            </p>
+                            <a
+                              href={"https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=" + encodeURIComponent(window.location.origin + campaignItemData.viewUrl)}
+                              target="_blank"
+                              rel="noreferrer"
+                              download="aqeeq-qr-code.png"
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-current/20 px-3.5 py-2 text-xs font-black transition hover:bg-white/10"
+                            >
+                              <Download size={14} />
+                              <span>تحميل صورة QR بدقة عالية</span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-xs text-slate-400 font-bold">
+                      اختر أحد أعداد المجلات أو ألبومات الفعاليات بالأعلى لتوليد رسالة الواتساب ورمز QR فوراً.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 3: SCHOOL SONGS & SPOTIFY ENGINE */}
+            {campaignsSubTab === "radio" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white"}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 border-current/10">
+                    <div className="flex items-center gap-4">
+                      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-amber-600 text-black font-black shadow-lg shadow-amber-400/20">
+                        <Headphones size={26} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-black font-cairo">أغاني وراديو العقيق 🎵 (Spotify Engine)</h2>
+                        <p className="text-xs sm:text-sm font-bold text-slate-400">إدارة الأناشيد والأغاني المدرسية التي تعمل في المشغل الصوتي الموحد</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewSongTitle("");
+                          setNewSongArtist("");
+                          setNewSongUrl("");
+                          setNewSongCategory("النشيد المدرسي");
+                          setNewSongCover("");
+                          setIsAddSongOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#f8ca14] text-black font-black text-xs hover:bg-yellow-400 transition shadow-lg shadow-[#f8ca14]/20 active:scale-95 cursor-pointer"
+                      >
+                        <Plus size={15} />
+                        <span>إضافة نشيد يدوي</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsImportAudioFolderOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-current/20 bg-white/5 hover:bg-white/10 text-xs font-black transition cursor-pointer"
+                      >
+                        <FolderSync size={15} />
+                        <span>استيراد مجلد من Drive 📁</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                        disabled={setOrchestrationMutation.isPending}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50 cursor-pointer"
+                      >
+                        <CheckCircle2 size={16} />
+                        <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ ونشر التعديلات"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Songs List */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(orchestrationForm.schoolSongs || []).map((song: any, idx: number) => (
+                      <div
+                        key={song.id || idx}
+                        className={`flex items-center justify-between p-4 rounded-2xl border transition ${
+                          dark ? "border-white/10 bg-black/40 hover:border-white/20" : "border-black/5 bg-slate-50 hover:border-black/15"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black shadow-md">
+                            <img
+                              src={
+                                (!song.coverUrl || song.coverUrl.includes("logo") || song.coverUrl.includes("og-"))
+                                  ? (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")
+                                  : (directDriveImage(song.coverUrl) || song.coverUrl)
+                              }
+                              alt=""
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
+                              }}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-1">
+                              {song.category || "نشيد مدرسي"}
+                            </span>
+                            <h4 className="text-sm font-black truncate">{song.title}</h4>
+                            <p className="text-xs text-slate-400 truncate">{song.artist || "مدارس العقيق"}</p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = (orchestrationForm.schoolSongs || []).filter((_: any, i: number) => i !== idx);
+                            setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                            toast.info("تم حذف النشيد. اضغط 'حفظ ونشر التعديلات' لتثبيت التغيير.");
+                          }}
+                          className="grid h-9 w-9 place-items-center rounded-xl text-[#de191e] hover:bg-[#de191e]/10 transition cursor-pointer"
+                          title="حذف النشيد"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* ⚙️ PILLAR 5: SYSTEM CORE, SECURITY & NATIONAL THEME             */}
+        {/* ============================================================== */}
+        {activeTab === "system" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Subtabs Bar */}
+            <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("theme")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "theme"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Palette size={15} />
+                <span>محرك الهوية والمناسبات الوطنية (اليوم الوطني 94) 🇸🇦</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("users")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "users"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Users size={15} />
+                <span>المشرفين والصلاحيات 👥</span>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{usersList.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("campuses")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "campuses"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Building2 size={15} />
+                <span>مجمعات المدارس والتواصل 📍</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("marketing")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "marketing"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <TrendingUp size={15} />
+                <span>بكسلات التتبع وسيو المنصة 📊</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("backup")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "backup"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Database size={15} />
+                <span>المزامنة السحابية والنسخ الاحتياطي 💾</span>
+              </button>
+            </div>
+
+            {/* SUBTAB 1: NATIONAL OCCASIONS THEME ENGINE */}
+            {systemSubTab === "theme" && (
+              <div className="max-w-4xl space-y-6">
+                <div>
+                  <h2 className="text-xl font-black">محرك سيمات وهوية المناسبات الوطنية (Theme Engine)</h2>
+                  <p className="text-xs font-bold text-slate-400 mt-1">
+                    تحويل هوية وألوان وزخارف الموقع بالكامل إلى سيم اليوم الوطني السعودي 94 بضغطة زر واحدة
+                  </p>
+                </div>
+
+                <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-sm"}`}>
+                  <div className="flex items-center justify-between border-b pb-4 border-current/10">
+                    <div>
+                      <h4 className="text-sm font-black">تفعيل سيم اليوم الوطني السعودي 94 🇸🇦</h4>
+                      <p className="text-xs text-slate-400">تطبيق الألوان الخضراء الملكية، الزخارف النجدية والحجازية، وشارة نحلم ونحقق</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newTheme = themeForm.activeTheme === "saudi-national-day" ? "default" : "saudi-national-day";
+                        setThemeForm({ ...themeForm, activeTheme: newTheme });
+                      }}
+                      className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                        themeForm.activeTheme === "saudi-national-day" ? "bg-emerald-600" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition ease-in-out duration-200 ${
+                          themeForm.activeTheme === "saudi-national-day" ? "translate-x-0" : "-translate-x-5"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-black text-slate-300 block mb-1">نص الشارة الاحتفالية</label>
+                        <input
+                          type="text"
+                          value={themeForm.customBadgeText}
+                          onChange={(e) => setThemeForm({ ...themeForm, customBadgeText: e.target.value })}
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-black text-slate-300 block mb-1">نمط وهوية الاحتفال (Variant)</label>
+                        <select
+                          value={themeForm.templateVariant}
+                          onChange={(e) => setThemeForm({ ...themeForm, templateVariant: e.target.value as any })}
+                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none cursor-pointer ${
+                            dark ? "border-white/10 bg-black/50 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        >
+                          <option value="general">العام — نحلم ونحقق 94</option>
+                          <option value="generosity">كرم العقيق وجود المدينة</option>
+                          <option value="authenticity">أصالة وتاريخ طيبة الطيبة</option>
+                          <option value="vision">رؤية المملكة الطموحة 2030</option>
+                          <option value="giving">عطاء ونماء المستقبل</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-current/10 pt-4">
+                      <div>
+                        <h4 className="text-xs font-black">إظهار الشريط الاحتفالي والزخارف العليا</h4>
+                        <p className="text-[11px] text-slate-400">شريط رفيع متحرك بنقوش السيفين والنخلة في أعلى الهيدر</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={themeForm.showCelebrationRibbon}
+                        onChange={(e) => setThemeForm({ ...themeForm, showCelebrationRibbon: e.target.checked })}
+                        className="rounded cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setActiveThemeMutation.mutate(themeForm);
+                        }}
+                        disabled={setActiveThemeMutation.isPending}
+                        className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-6 py-2.5 shadow-lg shadow-emerald-600/20 cursor-pointer"
+                      >
+                        <CheckCircle2 size={16} className="ml-1" />
+                        <span>{setActiveThemeMutation.isPending ? "جاري الحفظ..." : "حفظ وتفعيل ثيم المناسبة"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 2: ADMIN USERS & ACCESS CONTROL */}
+            {systemSubTab === "users" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-black">إدارة المشرفين والصلاحيات والأمان</h2>
+                    <p className="text-xs font-bold text-slate-400 mt-1">
+                      إضافة أعضاء جدد لفريق العمل، تعيين الصلاحيات، وإعادة تعيين كلمات المرور
+                    </p>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => setIsAddUserOpen(true)}
+                    className="rounded-2xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs px-5 py-2.5 shadow-lg shadow-amber-400/20 cursor-pointer gap-2"
+                  >
+                    <Plus size={16} />
+                    <span>إضافة مشرف جديد</span>
+                  </Button>
+                </div>
+
+                <div className={`overflow-hidden rounded-3xl border shadow-md ${dark ? "border-white/10 bg-[#101010]" : "border-black/5 bg-white shadow-slate-200/50"}`}>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right text-xs">
+                      <thead className={`border-b text-[11px] font-black uppercase text-slate-400 ${
+                        dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                      }`}>
+                        <tr>
+                          <th className="p-4 sm:px-6">المشرف والبريد</th>
+                          <th className="p-4">اسم المستخدم</th>
+                          <th className="p-4">مستوى الصلاحية</th>
+                          <th className="p-4">تاريخ الإنشاء</th>
+                          <th className="p-4 sm:px-6 text-center">الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-current/5">
+                        {usersList.map((u: any) => (
+                          <tr key={u.id} className="hover:bg-white/[0.02] transition">
+                            <td className="p-4 sm:px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-tr from-amber-400 to-amber-600 text-black font-black text-xs">
+                                  {u.name?.[0] || "U"}
+                                </div>
+                                <div>
+                                  <p className="font-black text-sm">{u.name}</p>
+                                  <span className="text-[11px] text-slate-400">{u.email || "بدون بريد"}</span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="p-4 font-mono font-bold text-slate-300">{u.openId || u.id}</td>
+
+                            <td className="p-4">
+                              <select
+                                value={u.role || "admin"}
+                                onChange={(e) => updateRoleMutation.mutate({ userId: u.id, role: e.target.value as any })}
+                                className="rounded-xl border border-current/20 bg-transparent px-3 py-1 text-xs font-black outline-none cursor-pointer"
+                              >
+                                <option value="admin">مدير عام (Admin)</option>
+                                <option value="coordinator">منسق محتوى (Coordinator)</option>
+                                <option value="receptionist">مسؤول قبول (Receptionist)</option>
+                                <option value="auditor">مدقق لغوي (Auditor)</option>
+                              </select>
+                            </td>
+
+                            <td className="p-4 text-slate-400 font-mono text-[11px]">
+                              {u.createdAt ? new Date(u.createdAt).toLocaleDateString("ar-SA") : "—"}
+                            </td>
+
+                            <td className="p-4 sm:px-6 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setResetPassUserId(u.id);
+                                    setNewPasswordValue("");
+                                  }}
+                                  className="rounded-xl border border-current/15 px-3 py-1.5 text-[11px] font-bold hover:bg-white/10 transition cursor-pointer"
+                                >
+                                  كلمة المرور
+                                </button>
+
+                                {u.id !== user?.id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteUserId(u.id)}
+                                    className="grid h-8 w-8 place-items-center rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                                    title="حذف المشرف"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 3: CAMPUSES & DIRECTORY */}
+            {systemSubTab === "campuses" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
+                  <div>
+                    <h3 className="text-lg font-black flex items-center gap-2">
+                      <Building2 size={20} className="text-[#f8ca14]" />
+                      <span>إدارة مجمعات مدارس العقيق وبيانات التواصل المعتمدة</span>
+                    </h3>
+                    <p className="text-xs font-bold text-slate-400 mt-1">
+                      تعديل هواتف الاستقبال لمجمعي البنين والبنات، العناوين الرسمية، وروابط خرائط Google Maps
+                    </p>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setOrchestrationMutation.mutate({
+                        schoolCampuses: orchestrationForm.schoolCampuses,
+                        nav: orchestrationForm.nav,
+                      });
+                    }}
+                    disabled={setOrchestrationMutation.isPending}
+                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2 cursor-pointer"
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ بيانات المجمعات والتواصل"}</span>
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Boys Campus Card */}
+                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-emerald-500/20 bg-[#0c141a]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
+                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
+                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
+                        <Building2 size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black">مجمع البنين — طيبة الطيبة</h4>
+                        <p className="text-[11px] text-slate-400">أهلي ودولي (ابتدائي ومتوسط وثانوي)</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">هاتف الاستقبال والتسجيل (مجمع البنين)</label>
+                      <input
+                        type="tel"
+                        value={orchestrationForm.schoolCampuses?.boysPhone ?? "0148131652"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, boysPhone: e.target.value.trim() },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">العنوان والوصف الجغرافي</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.schoolCampuses?.boysAddress ?? "مجمع الرانوناء — ممشى الهجرة بالمدينة المنورة"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, boysAddress: e.target.value },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">رابط خرائط Google Maps</label>
+                      <input
+                        type="url"
+                        value={orchestrationForm.schoolCampuses?.boysMapUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, boysMapUrl: e.target.value.trim() },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Girls Campus Card */}
+                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-[#08467d]/40 bg-[#08467d]/10" : "border-[#08467d]/20 bg-white shadow-sm"}`}>
+                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
+                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#08467d]/20 text-[#08467d] dark:text-[#f8ca14]">
+                        <Building2 size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black">مجمع البنات ورياض الأطفال — طيبة الطيبة</h4>
+                        <p className="text-[11px] text-slate-400">أهلي ودولي (روضة وحضانة وابتدائي ومتوسط وثانوي)</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">هاتف الاستقبال والتسجيل (مجمع البنات)</label>
+                      <input
+                        type="tel"
+                        value={orchestrationForm.schoolCampuses?.girlsPhone ?? "0148644466"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, girlsPhone: e.target.value.trim() },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">العنوان والوصف الجغرافي</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.schoolCampuses?.girlsAddress ?? "مجمع الرانوناء — ممشى الهجرة بالمدينة المنورة"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, girlsAddress: e.target.value },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black text-slate-300 block mb-1">رابط خرائط Google Maps</label>
+                      <input
+                        type="url"
+                        value={orchestrationForm.schoolCampuses?.girlsMapUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          schoolCampuses: { ...orchestrationForm.schoolCampuses, girlsMapUrl: e.target.value.trim() },
+                        })}
+                        className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
+                          dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 4: MARKETING PIXELS & SEO */}
+            {systemSubTab === "marketing" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"}`}>
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
+                    <div>
+                      <h3 className="text-xl font-black">أكواد وبكسل منصات التسويق (Tracking Pixels)</h3>
+                      <p className="text-xs text-slate-400 mt-1 font-bold">
+                        تتبع الحملات الإعلانية ومعدلات تحويل نماذج القبول والتسجيل
+                      </p>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setOrchestrationMutation.mutate({
+                          marketingPixels: orchestrationForm.marketingPixels,
+                        });
+                      }}
+                      disabled={setOrchestrationMutation.isPending}
+                      className="rounded-2xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-amber-400/20 gap-2 cursor-pointer"
+                    >
+                      <CheckCircle2 size={16} />
+                      <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ إعدادات التسويق"}</span>
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-amber-400 mb-1">Snapchat Pixel ID 👻:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.snapchatPixelId || ""}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          marketingPixels: { ...orchestrationForm.marketingPixels, snapchatPixelId: e.target.value },
+                        })}
+                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-blue-400 mb-1">Meta / Facebook Pixel ID 🔵:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.metaPixelId || ""}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          marketingPixels: { ...orchestrationForm.marketingPixels, metaPixelId: e.target.value },
+                        })}
+                        placeholder="123456789012345"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-red-400 mb-1">TikTok Pixel ID 🎵:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.tiktokPixelId || ""}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          marketingPixels: { ...orchestrationForm.marketingPixels, tiktokPixelId: e.target.value },
+                        })}
+                        placeholder="CXXXXXXXXXXXXXXXXX"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-emerald-400 mb-1">Google Analytics ID (GA4) 📊:</label>
+                      <input
+                        type="text"
+                        value={orchestrationForm.marketingPixels?.googleAnalyticsId || ""}
+                        onChange={(e) => setOrchestrationForm({
+                          ...orchestrationForm,
+                          marketingPixels: { ...orchestrationForm.marketingPixels, googleAnalyticsId: e.target.value },
+                        })}
+                        placeholder="G-XXXXXXXXXX"
+                        className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                          dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUBTAB 5: CLOUD DEPLOY, BACKUP & HEALTH */}
+            {systemSubTab === "backup" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 shadow-xl ${dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"}`}>
+                  <div className="border-b border-current/10 pb-4">
+                    <h3 className="text-xl font-black">المزامنة السحابية والنسخ الاحتياطي (Cloud Sync & Backup)</h3>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">
+                      نشر الموقع للإنتاج على ريندر وتصدير نسخة احتياطية مشفرة لكامل البيانات
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {/* Live Sync to Render */}
+                    <div className={`rounded-2xl border p-6 space-y-4 ${dark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-700/15 bg-white shadow-sm"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400 font-black">
+                          <Rocket size={24} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black">مزامنة ونشر الموقع المباشر</h4>
+                          <p className="text-[11px] text-slate-400">إرسال كافة التعديلات لسيرفرات Render الحية</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isDeploying) return;
+                          setIsDeploying(true);
+                          deployMutation.mutate();
+                        }}
+                        disabled={isDeploying}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 py-3 text-xs font-black text-white transition shadow-lg shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                      >
+                        <Rocket size={16} className={isDeploying ? "animate-spin" : ""} />
+                        <span>{isDeploying ? "جارِ المزامنة والنشر..." : "نشر التعديلات للإنتاج الآن 🚀"}</span>
+                      </button>
+                    </div>
+
+                    {/* Full JSON Snapshot Download */}
+                    <div className={`rounded-2xl border p-6 space-y-4 ${dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/10 text-amber-500 font-black">
+                          <Download size={22} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black">تنزيل نسخة احتياطية كاملة</h4>
+                          <p className="text-[11px] text-slate-400">تصدير snapshot لكافة إعدادات الموقع JSON</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            const fullSnapshot = {
+                              timestamp: new Date().toISOString(),
+                              orchestration: orchestrationForm,
+                              exportedBy: user?.name || "admin",
+                            };
+                            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullSnapshot, null, 2));
+                            const downloadAnchor = document.createElement("a");
+                            downloadAnchor.setAttribute("href", dataStr);
+                            downloadAnchor.setAttribute("download", `alaqeeq-system-snapshot-${new Date().toISOString().slice(0, 10)}.json`);
+                            document.body.appendChild(downloadAnchor);
+                            downloadAnchor.click();
+                            downloadAnchor.remove();
+                            toast.success("✅ تم تصدير النسخة الاحتياطية بنجاح!");
+                          } catch {
+                            toast.error("فشل تصدير النسخة الاحتياطية");
+                          }
+                        }}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 py-3 text-xs font-black text-black hover:bg-yellow-400 transition shadow-lg shadow-amber-400/20 cursor-pointer"
+                      >
+                        <Download size={16} />
+                        <span>تحميل ملف النسخة الاحتياطية (JSON) 💾</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
+      {/* ============================================================== */}
+      {/* 📱 MOBILE BOTTOM EXECUTIVE NAVIGATION BAR (lg:hidden)           */}
+      {/* ============================================================== */}
+      <nav
+        aria-label="التنقل السريع للوحة التحكم"
+        className={`fixed bottom-0 left-0 right-0 z-50 block lg:hidden border-t backdrop-blur-2xl transition-colors ${
+          dark ? "bg-black/95 border-white/10" : "bg-white/95 border-black/10 shadow-2xl"
+        }`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <div className="flex items-center justify-around px-2 py-2">
+          {[
+            { key: "radar" as TabKey, label: "الرادار", icon: LayoutDashboard },
+            { key: "admissions" as TabKey, label: "القبول", icon: GraduationCap, badge: pendingLeadsCount || undefined },
+            { key: "content" as TabKey, label: "المحتوى", icon: Layers, badge: pendingArticlesCount || undefined },
+            { key: "campaigns" as TabKey, label: "التواصل", icon: Megaphone },
+            { key: "system" as TabKey, label: "النظام", icon: Shield },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`relative flex flex-col items-center gap-1 px-3 py-1.5 rounded-2xl text-[10px] font-black transition cursor-pointer ${
+                  active
+                    ? "text-amber-400 bg-amber-400/10"
+                    : dark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                }`}
+              >
+                <Icon size={18} />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="absolute top-1 right-2 flex h-2 w-2 rounded-full bg-red-500 animate-ping" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
-      {/* ==================== MODAL: ADD ADMIN USER ==================== */}
+      {/* ============================================================== */}
+      {/* 🧩 PRESERVED MODALS & DIALOGS                                   */}
+      {/* ============================================================== */}
+
+      {/* MODAL 1: ADD ADMIN USER */}
       <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
         <DialogContent
           dir="rtl"
@@ -7628,104 +3485,109 @@ const DEFAULT_ORCHESTRATION = {
 
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-xs font-black text-slate-400 mb-1.5">الاسم الكامل *</label>
+              <label className="text-xs font-black text-slate-400 block mb-1">الاسم الكامل *</label>
               <input
                 type="text"
                 value={newUserName}
                 onChange={(e) => setNewUserName(e.target.value)}
-                placeholder="مثال: أ. أحمد الغامدي"
-                className={"w-full rounded-xl border p-3 text-xs font-bold outline-none " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                placeholder="مثال: أ. محمد الحربي"
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-400 mb-1.5">البريد الإلكتروني *</label>
-              <input
-                type="email"
-                value={newUserEmail}
-                onChange={(e) => setNewUserEmail(e.target.value)}
-                placeholder="ahmed@alaqeeq.edu.sa"
-                className={"w-full rounded-xl border p-3 text-xs font-bold outline-none font-mono " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-black text-slate-400 mb-1.5">اسم المستخدم (Username) *</label>
+              <label className="text-xs font-black text-slate-400 block mb-1">اسم المستخدم للدخول (Username) *</label>
               <input
                 type="text"
                 value={newUserOpenId}
-                onChange={(e) => setNewUserOpenId(e.target.value)}
-                placeholder="ahmed_ghamdi"
-                className={"w-full rounded-xl border p-3 text-xs font-bold outline-none font-mono " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                onChange={(e) => setNewUserOpenId(e.target.value.trim().toLowerCase())}
+                placeholder="مثال: m.alharbi"
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold font-mono outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-400 mb-1.5">كلمة المرور * (6 أحرف على الأقل)</label>
+              <label className="text-xs font-black text-slate-400 block mb-1">البريد الإلكتروني (اختياري)</label>
+              <input
+                type="email"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value.trim())}
+                placeholder="admin@alaqeeq.edu.sa"
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black text-slate-400 block mb-1">كلمة المرور *</label>
               <input
                 type="password"
                 value={newUserPassword}
                 onChange={(e) => setNewUserPassword(e.target.value)}
                 placeholder="••••••••"
-                className={"w-full rounded-xl border p-3 text-xs font-bold outline-none " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-400 mb-1.5">مستوى الصلاحية (Role) *</label>
+              <label className="text-xs font-black text-slate-400 block mb-1">مستوى الصلاحية *</label>
               <select
                 value={newUserRole}
                 onChange={(e) => setNewUserRole(e.target.value as any)}
-                className={"w-full rounded-xl border p-3 text-xs font-black outline-none " + (
-                  dark ? "border-white/10 bg-black/50 text-white" : "border-black/10 bg-slate-50 text-slate-900"
-                )}
+                className={`w-full rounded-xl border p-2.5 text-xs font-black outline-none cursor-pointer ${
+                  dark ? "border-white/10 bg-black/50 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               >
-                <option value="admin">مشرف عام (كامل الصلاحيات والإعدادات)</option>
-                <option value="coordinator">منسق إعلامي (إدارة المجلات والألبومات والأخبار)</option>
-                <option value="receptionist">مسؤول حضور (مسح الـ QR للفعاليات)</option>
+                <option value="admin">مدير عام — تحكم كامل (Admin)</option>
+                <option value="coordinator">منسق محتوى — إضافة وتحرير (Coordinator)</option>
+                <option value="receptionist">مسؤول قبول — متابعة طلبات التسجيل (Receptionist)</option>
+                <option value="auditor">مدقق لغوي — مراجعة واعتماد المقالات (Auditor)</option>
               </select>
             </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              onClick={() => setIsAddUserOpen(false)}
-              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400 hover:bg-white/5 transition"
-            >
-              إلغاء
-            </button>
-            <button
+            <Button
+              type="button"
               onClick={() => {
-                if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
-                  toast.error("يرجى تعبئة جميع الحقول المطلوبة");
+                if (!newUserName.trim() || !newUserOpenId.trim() || !newUserPassword.trim()) {
+                  toast.error("يرجى ملء جميع الحقول المطلوبة");
                   return;
                 }
+                const emailToUse = newUserEmail.trim() || `${newUserOpenId.trim()}@alaqeeq.edu.sa`;
                 createUserMutation.mutate({
                   name: newUserName.trim(),
-                  email: newUserEmail.trim(),
-                  openId: newUserOpenId.trim() || undefined,
-                  password: newUserPassword.trim(),
+                  openId: newUserOpenId.trim(),
+                  email: emailToUse,
+                  password: newUserPassword,
                   role: newUserRole,
                 });
               }}
               disabled={createUserMutation.isPending}
-              className="rounded-xl bg-[#f8ca14] px-5 py-2 text-xs font-black text-black hover:bg-yellow-400 transition shadow-md"
+              className="rounded-2xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs px-5 py-2.5"
             >
-              {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المشرف"}
-            </button>
+              {createUserMutation.isPending ? "جاري الإنشاء..." : "حفظ وإنشاء الحساب"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddUserOpen(false)}
+              className="rounded-2xl text-xs font-bold"
+            >
+              إلغاء
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ==================== MODAL: RESET PASSWORD ==================== */}
+      {/* MODAL 2: RESET PASSWORD */}
       <Dialog open={resetPassUserId !== null} onOpenChange={(open) => !open && setResetPassUserId(null)}>
         <DialogContent
           dir="rtl"
@@ -7736,49 +3598,51 @@ const DEFAULT_ORCHESTRATION = {
           <DialogHeader>
             <DialogTitle className="text-lg font-black">تعيين كلمة مرور جديدة</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
-              أدخل كلمة المرور الجديدة لهذا الحساب (6 أحرف على الأقل)
+              قم بكتابة كلمة المرور الجديدة للمشرف
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
+            <label className="text-xs font-black text-slate-400 block mb-1">كلمة المرور الجديدة</label>
             <input
               type="password"
               value={newPasswordValue}
               onChange={(e) => setNewPasswordValue(e.target.value)}
-              placeholder="كلمة المرور الجديدة..."
-              className={"w-full rounded-xl border p-3 text-xs font-bold outline-none " + (
-                dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-              )}
+              placeholder="••••••••"
+              className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+              }`}
             />
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              onClick={() => setResetPassUserId(null)}
-              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400"
-            >
-              إلغاء
-            </button>
-            <button
+            <Button
+              type="button"
               onClick={() => {
-                if (!newPasswordValue || newPasswordValue.length < 6) {
-                  toast.error("كلمة المرور يجب ألا تقل عن 6 أحرف");
-                  return;
-                }
-                if (resetPassUserId) {
-                  resetPasswordMutation.mutate({ userId: resetPassUserId, newPassword: newPasswordValue });
-                }
+                if (!newPasswordValue.trim() || !resetPassUserId) return;
+                resetPasswordMutation.mutate({
+                  userId: resetPassUserId,
+                  newPassword: newPasswordValue.trim(),
+                });
               }}
               disabled={resetPasswordMutation.isPending}
-              className="rounded-xl bg-[#f8ca14] px-5 py-2 text-xs font-black text-black hover:bg-yellow-400 transition"
+              className="rounded-2xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs px-5 py-2.5"
             >
-              {resetPasswordMutation.isPending ? "جاري التحديث..." : "حفظ كلمة المرور"}
-            </button>
+              {resetPasswordMutation.isPending ? "جاري الحفظ..." : "حفظ كلمة المرور"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setResetPassUserId(null)}
+              className="rounded-2xl text-xs font-bold"
+            >
+              إلغاء
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ==================== MODAL: DELETE CONFIRM ==================== */}
+      {/* MODAL 3: DELETE USER CONFIRMATION */}
       <Dialog open={deleteUserId !== null} onOpenChange={(open) => !open && setDeleteUserId(null)}>
         <DialogContent
           dir="rtl"
@@ -7789,33 +3653,74 @@ const DEFAULT_ORCHESTRATION = {
           <DialogHeader>
             <DialogTitle className="text-lg font-black text-red-400">تأكيد حذف المشرف</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
-              هل أنت متأكد من رغبتك في حذف هذا الحساب؟ لن يتمكن من تسجيل الدخول للمنصة مجدداً.
+              هل أنت متأكد من رغبتك في حذف هذا الحساب نهائياً؟ لن يتمكن من تسجيل الدخول مرة أخرى.
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-4">
-            <button
-              onClick={() => setDeleteUserId(null)}
-              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400"
-            >
-              إلغاء
-            </button>
-            <button
+            <Button
+              type="button"
               onClick={() => {
-                if (deleteUserId) {
-                  deleteUserMutation.mutate({ userId: deleteUserId });
-                }
+                if (deleteUserId) deleteUserMutation.mutate({ userId: deleteUserId });
               }}
               disabled={deleteUserMutation.isPending}
-              className="rounded-xl bg-red-600 px-5 py-2 text-xs font-black text-white hover:bg-red-500 transition"
+              className="rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs px-5 py-2.5"
             >
-              {deleteUserMutation.isPending ? "جاري الحذف..." : "تأكيد الحذف"}
-            </button>
+              {deleteUserMutation.isPending ? "جاري الحذف..." : "نعم، احذف المشرف"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteUserId(null)}
+              className="rounded-2xl text-xs font-bold"
+            >
+              إلغاء
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ==================== MODAL: ADD SCHOOL SONG ==================== */}
+      {/* MODAL 4: BULK DELETE LEADS CONFIRMATION */}
+      <Dialog open={bulkDeleteConfirmOpen} onOpenChange={setBulkDeleteConfirmOpen}>
+        <DialogContent
+          dir="rtl"
+          className={"sm:max-w-[400px] rounded-3xl " + (
+            dark ? "bg-[#121212] text-white border-white/15" : "bg-white text-slate-900 border-black/10"
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black text-red-400">⚠️ تأكيد الحذف الجماعي للطلبات</DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              هل أنت متأكد من رغبتك في حذف {selectedLeadIds.length} طلب قبول محدد نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                selectedLeadIds.forEach((id) => deleteAdmissionMutation.mutate({ id }));
+                setSelectedLeadIds([]);
+                setBulkDeleteConfirmOpen(false);
+                toast.success("تم إرسال أوامر الحذف بنجاح");
+              }}
+              className="rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs px-5 py-2.5"
+            >
+              نعم، احذف {selectedLeadIds.length} طلب
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setBulkDeleteConfirmOpen(false)}
+              className="rounded-2xl text-xs font-bold"
+            >
+              إلغاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL 5: ADD SCHOOL SONG */}
       <Dialog open={isAddSongOpen} onOpenChange={setIsAddSongOpen}>
         <DialogContent
           dir="rtl"
@@ -7825,145 +3730,110 @@ const DEFAULT_ORCHESTRATION = {
         >
           <DialogHeader>
             <DialogTitle className="text-lg font-black flex items-center gap-2">
-              <Headphones size={20} className="text-amber-400" />
-              <span>إضافة أغنية أو نشيد جديد</span>
+              <Headphones size={20} className="text-[#f8ca14]" />
+              <span>إضافة نشيد / أغنية مدرسية جديدة</span>
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
-              أدخل بيانات الملف الصوتي ليظهر في قائمة مشغل العقيق الصوتي الموحد.
+              أضف رابط ملف MP3 وعنوان النشيد ليعمل في المشغل الصوتي الموحد للزوار
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 py-3">
+          <div className="space-y-4 py-4">
             <div>
-              <label className="block text-[11px] font-black text-slate-400 mb-1">اسم الأغنية / النشيد *</label>
+              <label className="text-xs font-black text-slate-300 block mb-1">عنوان النشيد / المعزوفة *</label>
               <input
                 type="text"
                 value={newSongTitle}
                 onChange={(e) => setNewSongTitle(e.target.value)}
-                placeholder="مثال: نشيد مدارس العقيق الرسمي"
-                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                placeholder="مثال: نشيد صُنّاع المجد"
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 mb-1">المؤدي / المنشد / الكورال</label>
+              <label className="text-xs font-black text-slate-300 block mb-1">المؤدي / الكورال</label>
               <input
                 type="text"
                 value={newSongArtist}
                 onChange={(e) => setNewSongArtist(e.target.value)}
-                placeholder="مثال: كورال طلاب مدارس العقيق"
-                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                placeholder="كورال طلاب العقيق"
+                className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 mb-1">رابط الملف الصوتي (Audio URL / Drive) *</label>
+              <label className="text-xs font-black text-slate-300 block mb-1">رابط ملف الصوت (MP3) أو Google Drive *</label>
               <input
-                type="text"
+                type="url"
                 value={newSongUrl}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setNewSongUrl(val);
-                  if (val.includes("/folders/")) {
-                    setDriveAudioFolderUrl(val);
-                  }
-                }}
-                placeholder="رابط ملف Drive المباشر أو https://.../song.mp3"
-                className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono " + (
-                  dark ? "border-white/10 bg-black/50" : "border-black/10 bg-slate-50"
-                )}
+                onChange={(e) => setNewSongUrl(e.target.value.trim())}
+                placeholder="https://.../audio.mp3"
+                className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                  dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
               />
-              {newSongUrl.includes("/folders/") && (
-                <div className="mt-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
-                  <span>💡 هذا الرابط يشير لمجلد Google Drive كامل!</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDriveAudioFolderUrl(newSongUrl);
-                      setIsAddSongOpen(false);
-                      setIsImportAudioFolderOpen(true);
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-black text-[11px] hover:bg-emerald-400 transition"
-                  >
-                    استيراد المجلد كاملاً
-                  </button>
-                </div>
-              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 mb-1">التصنيف</label>
-                <select
-                  value={newSongCategory}
-                  onChange={(e) => setNewSongCategory(e.target.value)}
-                  className={"w-full rounded-xl border p-2.5 text-xs font-bold outline-none " + (
-                    dark ? "border-white/10 bg-[#1a1a1a] text-white" : "border-black/10 bg-slate-50 text-black"
-                  )}
-                >
-                  <option value="النشيد المدرسي">النشيد المدرسي</option>
-                  <option value="احتفالي">احتفالي</option>
-                  <option value="أغنية وطنية">أغنية وطنية</option>
-                  <option value="حفل تخرج">حفل تخرج</option>
-                  <option value="بيانو وهدوء">بيانو وهدوء</option>
-                </select>
-              </div>
-
-            {/* Pure Audio Mode Banner (No images needed) */}
-            <div className={`p-3 rounded-2xl border text-xs flex items-center gap-2.5 ${
-              dark ? "bg-amber-400/5 border-amber-400/20 text-amber-300/90" : "bg-amber-50/80 border-amber-200 text-amber-900"
-            }`}>
-              <Music size={16} className="shrink-0 text-amber-500" />
-              <span>يتم عرض النشيد تلقائياً بهوية النوتة الموسيقية المينيمال الموحدة المتكيفة بين الوضع الفاتح والداكن دون الحاجة لرفع صور.</span>
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1">التصنيف</label>
+              <select
+                value={newSongCategory}
+                onChange={(e) => setNewSongCategory(e.target.value)}
+                className={`w-full rounded-xl border p-2.5 text-xs font-black outline-none cursor-pointer ${
+                  dark ? "border-white/10 bg-black/50 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                }`}
+              >
+                <option value="النشيد المدرسي">النشيد المدرسي</option>
+                <option value="احتفالي">احتفالي</option>
+                <option value="بيانو وهدوء">بيانو وهدوء</option>
+                <option value="أجواء ملكية">أجواء ملكية</option>
+                <option value="تخرج وفخر">تخرج وفخر</option>
+              </select>
             </div>
           </div>
-          </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-2">
-            <button
-              onClick={() => setIsAddSongOpen(false)}
-              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400"
-            >
-              إلغاء
-            </button>
-            <button
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
               onClick={() => {
-                if (!newSongTitle.trim()) {
-                  toast.error("يرجى إدخال اسم الأغنية أو النشيد");
-                  return;
-                }
-                if (!newSongUrl.trim()) {
-                  toast.error("يرجى إدخال رابط الملف الصوتي");
+                if (!newSongTitle.trim() || !newSongUrl.trim()) {
+                  toast.error("يرجى إدخال عنوان النشيد ورابط الملف الصوتي");
                   return;
                 }
                 const newSong = {
-                  id: `song-${Date.now()}`,
+                  id: "song-" + Date.now(),
                   title: newSongTitle.trim(),
                   artist: newSongArtist.trim() || "مدارس العقيق",
-                  mediaUrl: newSongUrl.trim(),
                   category: newSongCategory,
-                  coverUrl: "",
+                  mediaUrl: newSongUrl.trim(),
+                  coverUrl: newSongCover.trim() || "",
                 };
                 const updatedList = [...(orchestrationForm.schoolSongs || []), newSong];
                 setOrchestrationForm({ ...orchestrationForm, schoolSongs: updatedList });
                 setIsAddSongOpen(false);
-                toast.success("تمت إضافة النشيد بنجاح! اضغط 'حفظ ونشر التعديلات' لنشره على الموقع.");
+                toast.success("تمت إضافة النشيد! اضغط 'حفظ ونشر التعديلات' لتثبيته.");
               }}
-              className="rounded-xl bg-amber-400 px-5 py-2 text-xs font-black text-black hover:bg-amber-300 transition"
+              className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-5 py-2.5 cursor-pointer"
             >
-              إضافة للقائمة
-            </button>
+              إضافة النشيد
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddSongOpen(false)}
+              className="rounded-2xl text-xs font-bold cursor-pointer"
+            >
+              إلغاء
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ========================================================================= */}
-      {/* GOOGLE DRIVE AUDIO FOLDER BATCH IMPORT MODAL */}
-      {/* ========================================================================= */}
+      {/* MODAL 6: IMPORT GOOGLE DRIVE AUDIO FOLDER */}
       <Dialog open={isImportAudioFolderOpen} onOpenChange={setIsImportAudioFolderOpen}>
         <DialogContent className={`max-w-2xl rounded-3xl ${dark ? "bg-[#0d0f15] border-white/10 text-white" : "bg-white border-black/10 text-slate-900"}`} dir="rtl">
           <DialogHeader>
@@ -7973,13 +3843,12 @@ const DEFAULT_ORCHESTRATION = {
               </div>
               <div>
                 <span>استيراد مكتبة صوتية كاملة من Google Drive</span>
-                <p className="text-xs font-bold text-slate-400 mt-0.5">يدعم جميع صيغ الصوت: MP3, WAV, M4A, FLAC, OGG, AAC, OPUS, WMA, WEBA...</p>
+                <p className="text-xs font-bold text-slate-400 mt-0.5">يدعم جميع صيغ الصوت: MP3, WAV, M4A, FLAC, OGG, AAC...</p>
               </div>
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 pt-2">
-            {/* Input URL & Scan Button */}
             <div>
               <label className="block text-xs font-black text-slate-400 mb-1.5">رابط مجلد Google Drive (يجب أن يكون «أي شخص لديه الرابط - مشاهد»)</label>
               <div className="flex gap-2">
@@ -7987,7 +3856,7 @@ const DEFAULT_ORCHESTRATION = {
                   type="url"
                   value={driveAudioFolderUrl}
                   onChange={(e) => setDriveAudioFolderUrl(e.target.value)}
-                  placeholder="https://drive.google.com/drive/folders/1aBcDeFgHiJkLmNoPqRsTuVwXyZ..."
+                  placeholder="https://drive.google.com/drive/folders/..."
                   className={`flex-1 rounded-2xl border px-3.5 py-2.5 text-xs font-mono font-bold outline-none transition ${
                     dark ? "border-white/10 bg-black/50 focus:border-emerald-400/50" : "border-black/10 bg-slate-50 focus:border-emerald-500"
                   }`}
@@ -8007,10 +3876,10 @@ const DEFAULT_ORCHESTRATION = {
                       setSelectedTrackIds(initialSelected);
                       toast.success(`تم بنجاح العثور على ${res.count} ملف صوتي في المجلد!`);
                     } catch (err: any) {
-                      toast.error(err.message || "تعذر قراءة المجلد. تأكد من صحة الرابط وأن الصلاحية عامة.");
+                      toast.error(err.message || "تعذر قراءة المجلد. تأكد من صحة الرابط.");
                     }
                   }}
-                  className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition flex items-center gap-1.5 shrink-0 shadow-md disabled:opacity-50"
+                  className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition flex items-center gap-1.5 shrink-0 shadow-md disabled:opacity-50 cursor-pointer"
                 >
                   {scanDriveAudioFolderMutation.isPending ? (
                     <>
@@ -8025,9 +3894,6 @@ const DEFAULT_ORCHESTRATION = {
                   )}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
-                💡 <strong>نصيحة:</strong> قم بوضع ملفات الأناشيد في مجلد في درايف، واجعل المشاركة «Anyone with the link can view». سيقوم النظام تلقائياً بتنظيف الأسماء، وتحديد الصيغة، وتعيين أغلفة أنيقة جاهزة للعزف.
-              </p>
             </div>
 
             {/* Scanned Audio List Preview */}
@@ -8046,7 +3912,7 @@ const DEFAULT_ORCHESTRATION = {
                         scannedAudioTracks.forEach((t: any) => { all[t.driveFileId] = true; });
                         setSelectedTrackIds(all);
                       }}
-                      className="text-[11px] text-slate-400 hover:text-white"
+                      className="text-[11px] text-slate-400 hover:text-white cursor-pointer"
                     >
                       تحديد الكل
                     </button>
@@ -8054,14 +3920,14 @@ const DEFAULT_ORCHESTRATION = {
                     <button
                       type="button"
                       onClick={() => setSelectedTrackIds({})}
-                      className="text-[11px] text-slate-400 hover:text-white"
+                      className="text-[11px] text-slate-400 hover:text-white cursor-pointer"
                     >
                       إلغاء التحديد
                     </button>
                   </div>
                 </div>
 
-                <div className="max-h-[260px] overflow-y-auto space-y-1.5 pr-1">
+                <div className="max-h-[240px] overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
                   {scannedAudioTracks.map((track: any) => {
                     const isChecked = !!selectedTrackIds[track.driveFileId];
                     return (
@@ -8086,30 +3952,15 @@ const DEFAULT_ORCHESTRATION = {
                             onChange={() => {}}
                             className="rounded accent-emerald-500 h-4 w-4"
                           />
-                          <div className="h-9 w-9 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black">
-                            <img
-                              src={track.coverUrl || (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")}
-                              alt=""
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg";
-                              }}
-                            />
-                          </div>
                           <div className="min-w-0">
                             <p className="text-xs font-black truncate">{track.title}</p>
                             <p className="text-[10px] text-slate-400 truncate">{track.artist} · {track.fileName}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                            {track.extension}
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-slate-400">
-                            {track.category}
-                          </span>
-                        </div>
+                        <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                          {track.extension}
+                        </span>
                       </div>
                     );
                   })}
@@ -8119,321 +3970,298 @@ const DEFAULT_ORCHESTRATION = {
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-white/10">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setIsImportAudioFolderOpen(false)}
-              className="rounded-xl border border-current/15 px-4 py-2 text-xs font-black text-slate-400 hover:text-white"
+              className="rounded-xl text-xs font-bold"
             >
-              إغلاق
-            </button>
-            <button
+              إلغاء
+            </Button>
+            <Button
               type="button"
-              disabled={scannedAudioTracks.length === 0 || Object.values(selectedTrackIds).filter(Boolean).length === 0}
+              disabled={Object.values(selectedTrackIds).filter(Boolean).length === 0}
               onClick={() => {
-                const toAdd = scannedAudioTracks
-                  .filter((t: any) => selectedTrackIds[t.driveFileId])
-                  .map((t: any, idx: number) => ({
-                    id: `song-drive-${t.driveFileId}-${Date.now()}-${idx}`,
-                    title: t.title,
-                    artist: t.artist,
-                    mediaUrl: t.mediaUrl,
-                    category: t.category,
-                    coverUrl: t.coverUrl,
-                  }));
-
-                if (toAdd.length === 0) {
-                  toast.error("يرجى اختيار نشيد واحد على الأقل للاستيراد");
-                  return;
-                }
-
-                const updated = [...(orchestrationForm.schoolSongs || []), ...toAdd];
-                setOrchestrationForm({ ...orchestrationForm, schoolSongs: updated });
+                const selected = scannedAudioTracks.filter((t) => selectedTrackIds[t.driveFileId]);
+                const newSongs = selected.map((t) => ({
+                  id: "drive-" + t.driveFileId,
+                  title: t.title,
+                  artist: t.artist || "مدارس العقيق",
+                  category: t.category || "نشيد مدرسي",
+                  mediaUrl: `/api/drive-proxy/${t.driveFileId}`,
+                  coverUrl: t.coverUrl || "",
+                }));
+                const updatedList = [...(orchestrationForm.schoolSongs || []), ...newSongs];
+                setOrchestrationForm({ ...orchestrationForm, schoolSongs: updatedList });
                 setIsImportAudioFolderOpen(false);
-                toast.success(`تم استيراد ${toAdd.length} نشيد بنجاح! اضغط 'حفظ ونشر التعديلات' بالأعلى لتثبيتها في الموقع.`);
+                toast.success(`تم بنجاح إضافة ${newSongs.length} نشيد! اضغط حفظ التعديلات.`);
               }}
-              className="rounded-xl bg-[#08467d] px-5 py-2 text-xs font-black text-white hover:bg-[#063560] transition shadow-md disabled:opacity-50"
+              className="rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs px-5"
             >
               استيراد الأناشيد المحددة ({Object.values(selectedTrackIds).filter(Boolean).length})
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Universal Media & Cover Picker Modal */}
+
+      {/* MODAL 7: 24H STORY PICKER */}
+      <Dialog open={isStoryPickerOpen} onOpenChange={setIsStoryPickerOpen}>
+        <DialogContent className={`max-w-4xl max-h-[90vh] flex flex-col p-6 overflow-hidden rounded-3xl ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`} dir="rtl">
+          <DialogHeader className="space-y-1 text-right border-b pb-4 border-current/10">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-lg font-black flex items-center gap-2">
+                <Sparkles size={20} className="text-[#f8ca14]" />
+                <span>إدارة وتفعيل قصص العقيق (Stories Hub)</span>
+              </DialogTitle>
+              <span className="text-xs text-slate-400 font-bold">
+                المتاح: {availableStories.length} قصة
+              </span>
+            </div>
+            <DialogDescription className="text-xs text-slate-400">
+              اختر أي محتوى من المقالات، المجلات، الألبومات، أو الأخبار لتثبيته في شريط الاستوريهات في قمة الموقع.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Story Duration Selector */}
+          <div className="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-current/10">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-slate-300">مدة بقاء القصة نشطة:</span>
+              <select
+                value={storyDurationHours}
+                onChange={(e) => setStoryDurationHours(Number(e.target.value))}
+                className="rounded-xl border border-current/20 bg-transparent px-3 py-1 text-xs font-black outline-none cursor-pointer"
+              >
+                <option value={24}>٢٤ ساعة (يوم واحد)</option>
+                <option value={48}>٤٨ ساعة (يومان)</option>
+                <option value={72}>٧٢ ساعة (٣ أيام)</option>
+                <option value={168}>أسبوع كامل (٧ أيام)</option>
+              </select>
+            </div>
+
+            <div className="relative w-48 sm:w-64">
+              <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="بحث في القصص..."
+                value={storyPickerSearch}
+                onChange={(e) => setStoryPickerSearch(e.target.value)}
+                className={`w-full rounded-xl border py-1.5 pr-8 pl-3 text-xs font-bold outline-none ${
+                  dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-slate-50 text-slate-900"
+                }`}
+              />
+            </div>
+          </div>
+
+          {/* Stories Grid */}
+          <div className="flex-1 overflow-y-auto py-4 space-y-3 scrollbar-thin">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {availableStories
+                .filter((s: any) => {
+                  if (storyPickerSearch) {
+                    return s.title?.toLowerCase().includes(storyPickerSearch.toLowerCase());
+                  }
+                  return true;
+                })
+                .map((story: any) => {
+                  const isStoryActive = story.isActive;
+
+                  return (
+                    <div
+                      key={story.id}
+                      className={`flex items-center justify-between gap-3 p-3 rounded-2xl border transition ${
+                        isStoryActive
+                          ? "border-emerald-500/40 bg-emerald-500/5"
+                          : dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-current/10 flex items-center justify-center">
+                          {story.imageUrl ? (
+                            <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <Sparkles size={16} className="text-amber-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-black text-xs truncate">{story.title}</p>
+                          <span className="text-[10px] text-slate-400 font-bold">{story.category}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toggleStoryMutation.mutate({
+                            storyId: story.id,
+                            active: !isStoryActive,
+                            durationHours: storyDurationHours,
+                          });
+                        }}
+                        disabled={toggleStoryMutation.isPending}
+                        className={`rounded-xl px-3 py-1.5 text-[10px] font-black transition cursor-pointer shrink-0 ${
+                          isStoryActive
+                            ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
+                            : "bg-emerald-500 text-white hover:bg-emerald-600 shadow"
+                        }`}
+                      >
+                        {isStoryActive ? "إيقاف" : "تفعيل 🟢"}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3 border-t border-current/10 flex items-center justify-between">
+            <span className="text-xs text-slate-400 font-bold">
+              يتم تحديث شريط الاستوريهات لحظياً في الصفحة الرئيسية
+            </span>
+            <Button
+              type="button"
+              onClick={() => setIsStoryPickerOpen(false)}
+              className="rounded-xl text-xs font-bold cursor-pointer"
+            >
+              إغلاق
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL 8: ARTICLE REVIEW & AI POLISH */}
+      {selectedArticleForEdit && (
+        <Dialog open={Boolean(selectedArticleForEdit)} onOpenChange={() => setSelectedArticleForEdit(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-amber-400/40 bg-[#090d16] p-6 sm:p-8 text-right text-white shadow-2xl" dir="rtl">
+            <DialogHeader className="text-right border-b border-white/10 pb-4">
+              <DialogTitle className="text-lg font-black text-white flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <BookOpen size={20} className="text-amber-400" />
+                  <span>مراجعة وتدقيق المقال بالذكاء الاصطناعي</span>
+                </span>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    aiPolishArticleMutation.mutate({
+                      title: selectedArticleForEdit.title,
+                      content: selectedArticleForEdit.content,
+                    });
+                  }}
+                  disabled={aiPolishArticleMutation.isPending}
+                  className="gap-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-xs rounded-xl shadow-lg cursor-pointer"
+                >
+                  <Sparkles size={14} className={aiPolishArticleMutation.isPending ? "animate-spin" : ""} />
+                  <span>{aiPolishArticleMutation.isPending ? "جارِ التدقيق..." : "تدقيق بالذكاء الاصطناعي ✨"}</span>
+                </Button>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-400">
+                الكاتب: {selectedArticleForEdit.authorName} ({selectedArticleForEdit.authorRole}) · التصنيف: {selectedArticleForEdit.category}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div>
+                <label className="text-xs font-black text-amber-300 block mb-1">عنوان المقال</label>
+                <input
+                  type="text"
+                  value={selectedArticleForEdit.title}
+                  onChange={(e) => setSelectedArticleForEdit({ ...selectedArticleForEdit, title: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm font-black text-white outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-black text-slate-300 block mb-1">المقتطف التعريفي</label>
+                <textarea
+                  rows={2}
+                  value={selectedArticleForEdit.excerpt || ""}
+                  onChange={(e) => setSelectedArticleForEdit({ ...selectedArticleForEdit, excerpt: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs font-bold text-slate-200 outline-none leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-black text-slate-300 block mb-1">نص المقال الكامل</label>
+                <textarea
+                  rows={10}
+                  value={selectedArticleForEdit.content}
+                  onChange={(e) => setSelectedArticleForEdit({ ...selectedArticleForEdit, content: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-xs font-bold text-slate-200 outline-none leading-relaxed font-sans"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t border-white/10">
+              <div className="flex flex-wrap items-center justify-between w-full gap-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      moderateArticleMutation.mutate({
+                        id: selectedArticleForEdit.id,
+                        status: "published",
+                        updates: {
+                          title: selectedArticleForEdit.title,
+                          content: selectedArticleForEdit.content,
+                          excerpt: selectedArticleForEdit.excerpt,
+                        },
+                      });
+                    }}
+                    disabled={moderateArticleMutation.isPending}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow cursor-pointer"
+                  >
+                    <CheckCircle2 size={14} className="ml-1" />
+                    <span>قبول واعتماد النشر فوراً ✅</span>
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      moderateArticleMutation.mutate({
+                        id: selectedArticleForEdit.id,
+                        status: "rejected",
+                      });
+                    }}
+                    disabled={moderateArticleMutation.isPending}
+                    className="bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl shadow cursor-pointer"
+                  >
+                    رفض المقال ❌
+                  </Button>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSelectedArticleForEdit(null)}
+                  className="text-xs font-bold rounded-xl cursor-pointer"
+                >
+                  إغلاق
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* MODAL 9: UNIVERSAL MEDIA PICKER */}
       <AqeeqUniversalMediaPickerModal
         open={mediaPickerConfig.open}
         onOpenChange={(open) => setMediaPickerConfig((prev) => ({ ...prev, open }))}
         title={mediaPickerConfig.title}
         currentSelectedUrl={mediaPickerConfig.currentUrl}
         onSelect={mediaPickerConfig.onSelect}
-        dark={dark}
       />
 
-      {/* Story Picker & Orchestration Modal */}
-      <Dialog open={isStoryPickerOpen} onOpenChange={setIsStoryPickerOpen}>
-        <DialogContent className={`max-w-4xl max-h-[90vh] flex flex-col p-6 overflow-hidden rounded-3xl ${dark ? "bg-[#0c0c0c] border-white/10 text-white" : "bg-white border-black/10 text-black"}`}>
-          <DialogHeader className="space-y-1 text-right">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#de191e] text-white shadow-lg">
-                  <Flame size={20} />
-                </div>
-                <div>
-                  <DialogTitle className="text-lg font-black">
-                    مركز اختيار وتفعيل استوريهات الموقع (Stories Hub)
-                  </DialogTitle>
-                  <DialogDescription className="text-xs text-slate-400">
-                    فعّل أو أوقف أي محتوى من مقالات، مرئيات، بودكاست، ألبومات، ومجلات ليظهر في شريط الاستوري لزوار الموقع
-                  </DialogDescription>
-                </div>
-              </div>
-            </div>
-          </DialogHeader>
+      {/* MODAL 10: AI YEARBOOK GENERATOR */}
+      <AqeeqAiYearbookGenerator
+        open={isYearbookOpen}
+        onOpenChange={setIsYearbookOpen}
+      />
 
-          {/* Controls: Search + Categories */}
-          <div className="space-y-3 pt-2">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={storyPickerSearch}
-                  onChange={(e) => setStoryPickerSearch(e.target.value)}
-                  placeholder="ابحث عن مقال، عرض مرئي، بودكاست، ألبوم، أو مجلة..."
-                  className={`w-full rounded-xl py-2 pr-9 pl-4 text-xs font-bold transition border focus:outline-none ${
-                    dark ? "bg-white/5 border-white/10 text-white focus:border-[#f8ca14]" : "bg-slate-50 border-black/10 text-black focus:border-[#08467d]"
-                  }`}
-                />
-              </div>
-
-              {/* Status Filter Toggle */}
-              <div className={`flex rounded-xl p-1 border text-xs font-bold ${dark ? "bg-white/5 border-white/10" : "bg-slate-100 border-black/5"}`}>
-                <button
-                  type="button"
-                  onClick={() => setStoryPickerStatusFilter("all")}
-                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "all" ? (dark ? "bg-white/20 text-white font-black" : "bg-white text-black font-black shadow-sm") : "text-slate-400"}`}
-                >
-                  الكل
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStoryPickerStatusFilter("active")}
-                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "active" ? "bg-emerald-500 text-white font-black shadow-sm" : "text-slate-400"}`}
-                >
-                  المفعلة 🟢
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStoryPickerStatusFilter("inactive")}
-                  className={`px-3 py-1 rounded-lg transition ${storyPickerStatusFilter === "inactive" ? (dark ? "bg-white/20 text-white font-black" : "bg-white text-black font-black shadow-sm") : "text-slate-400"}`}
-                >
-                  غير المفعلة ⚪
-                </button>
-              </div>
-            </div>
-
-            {/* Category Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-              {[
-                { id: "all", label: "🌟 الكل", count: availableStories.length },
-                { id: "article", label: "✍️ المقالات", count: availableStories.filter((s: any) => s.type === "article").length },
-                { id: "showcase", label: "🎬 المرئيات", count: availableStories.filter((s: any) => s.type === "showcase").length },
-                { id: "podcast", label: "🎙️ أثير العقيق", count: availableStories.filter((s: any) => s.type === "podcast").length },
-                { id: "album", label: "📸 الألبومات", count: availableStories.filter((s: any) => s.type === "album").length },
-                { id: "journal", label: "📖 المجلات", count: availableStories.filter((s: any) => s.type === "journal").length },
-                { id: "post", label: "📱 السوشيال", count: availableStories.filter((s: any) => s.type === "post").length },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setStoryPickerCategory(tab.id)}
-                  className={`shrink-0 rounded-xl px-3 py-1.5 font-bold transition flex items-center gap-1.5 ${
-                    storyPickerCategory === tab.id
-                      ? (dark ? "bg-gradient-to-r from-[#f8ca14] to-[#de191e] text-black font-black shadow-sm" : "bg-[#08467d] text-white font-black shadow-sm")
-                      : (dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200")
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  <span className="text-[10px] opacity-75">({tab.count})</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Items List */}
-          <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2.5 max-h-[50vh]">
-            {isLoadingStories ? (
-              <div className="py-12 text-center text-slate-400">
-                <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[#f8ca14]" />
-                <p className="text-xs font-bold">جاري تحميل عناصر الموقع...</p>
-              </div>
-            ) : (() => {
-              const filtered = availableStories.filter((item: any) => {
-                const matchCat = storyPickerCategory === "all" || item.type === storyPickerCategory;
-                const matchSearch = !storyPickerSearch.trim() || item.title.toLowerCase().includes(storyPickerSearch.toLowerCase()) || item.category.toLowerCase().includes(storyPickerSearch.toLowerCase());
-                const matchStatus = storyPickerStatusFilter === "all" || (storyPickerStatusFilter === "active" && item.isActive) || (storyPickerStatusFilter === "inactive" && !item.isActive);
-                return matchCat && matchSearch && matchStatus;
-              });
-
-              if (filtered.length === 0) {
-                return (
-                  <div className="py-12 text-center text-slate-400">
-                    <p className="text-sm font-bold">لا توجد عناصر مطابقة للبحث الحالي</p>
-                  </div>
-                );
-              }
-
-              return filtered.map((item: any) => (
-                <div
-                  key={item.id}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-3.5 transition ${
-                    item.isActive
-                      ? (dark ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]" : "border-emerald-500/40 bg-emerald-50/50 shadow-sm")
-                      : (dark ? "border-white/10 bg-white/5 opacity-80 hover:opacity-100" : "border-black/5 bg-slate-50")
-                  }`}
-                >
-                  {/* Left (Thumbnail + Info) */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-current/10 bg-black/40 flex items-center justify-center">
-                      {item.imageUrl ? (
-                        <img src={directDriveImage(item.imageUrl) || item.imageUrl} alt="" className="h-full w-full object-cover" />
-                      ) : item.type === "article" ? (
-                        <Newspaper size={24} className="text-[#de191e]" />
-                      ) : item.type === "podcast" ? (
-                        <Mic size={24} className="text-[#f8ca14]" />
-                      ) : item.type === "showcase" ? (
-                        <Video size={24} className="text-[#08467d] dark:text-[#f8ca14]" />
-                      ) : item.type === "journal" ? (
-                        <BookOpen size={24} className="text-[#f8ca14]" />
-                      ) : item.type === "album" ? (
-                        <Camera size={24} className="text-[#367453]" />
-                      ) : (
-                        <span className="text-xs font-black">العقيق</span>
-                      )}
-                      <span className={`absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border-2 ${dark ? "border-black" : "border-white"} ${item.isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`rounded-md px-2 py-0.5 text-[10px] font-black ${
-                          item.type === "article" ? "bg-[#de191e]/15 text-[#de191e] border border-[#de191e]/30"
-                          : item.type === "podcast" ? "bg-[#08467d]/30 text-[#f8ca14] border border-[#f8ca14]/30"
-                          : item.type === "showcase" ? "bg-[#08467d]/15 text-[#08467d] dark:text-[#f8ca14] border border-[#08467d]/30"
-                          : item.type === "journal" ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30"
-                          : item.type === "album" ? "bg-[#367453]/15 text-[#367453] border border-[#367453]/30"
-                          : "bg-slate-500/15 text-slate-300 border border-slate-500/30"
-                        }`}>
-                          {item.typeLabel}
-                        </span>
-                        {item.isPinned && (
-                          <span className="rounded-md bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40 px-1.5 py-0.5 text-[9px] font-black">
-                            ★ مثبتة يدوياً
-                          </span>
-                        )}
-                        {item.isPinned && (item as any).remainingHours != null && (
-                          <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-black border ${(item as any).remainingHours < 6 ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"}`}>
-                            {`⏱ متبقي ${Math.round((item as any).remainingHours)}س`}
-                          </span>
-                        )}
-                        <span className="text-[10px] text-slate-400">
-                          {item.createdAt ? new Date(item.createdAt).toLocaleDateString("ar-SA") : ""}
-                        </span>
-                      </div>
-                      <h4 className="mt-1 font-black text-xs sm:text-sm truncate">{item.title}</h4>
-                    </div>
-                  </div>
-
-                  {/* Right (Actions: Preview + Duration + Toggle) */}
-                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0 flex-wrap justify-end">
-                    <a
-                      href={item.targetUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`p-2 rounded-xl border transition ${
-                        dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-slate-200 text-slate-600"
-                      }`}
-                      title="معاينة الصفحة"
-                    >
-                      <ExternalLink size={14} />
-                    </a>
-
-                    {!item.isActive && (
-                      <select
-                        value={storyDurationHours}
-                        onChange={(e) => setStoryDurationHours(Number(e.target.value))}
-                        className={`text-[10px] font-black rounded-xl px-2 py-1.5 border cursor-pointer ${
-                          dark ? "bg-white/5 border-white/10 text-slate-200" : "bg-black/5 border-black/10 text-slate-700"
-                        }`}
-                        title="مدة الاستوري"
-                      >
-                        <option value={24}>⏱ 24 ساعة</option>
-                        <option value={48}>⏱ 48 ساعة</option>
-                        <option value={72}>⏱ 72 ساعة</option>
-                        <option value={168}>⏱ أسبوع</option>
-                      </select>
-                    )}
-
-                    <Button
-                      type="button"
-                      disabled={toggleStoryMutation.isPending}
-                      onClick={() => toggleStoryMutation.mutate({ storyId: item.id, active: !item.isActive, durationHours: item.isActive ? 24 : storyDurationHours })}
-                      className={`text-xs font-black rounded-xl px-4 py-2 transition shadow-md gap-1.5 ${
-                        item.isActive
-                          ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
-                          : "bg-gradient-to-r from-[#08467d] via-[#367453] to-[#f8ca14] text-white hover:opacity-95"
-                      }`}
-                    >
-                      {item.isActive ? (
-                        <>
-                          <Trash2 size={13} />
-                          <span>إيقاف من الاستوريهات</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={13} className="text-[#f8ca14]" />
-                          <span>تفعيل كاستوري نشطة 🟢</span>
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ));
-            })()}
-          </div>
-
-          <DialogFooter className="pt-3 border-t border-current/10 flex items-center justify-between sm:justify-between">
-            <div className="text-xs font-bold text-slate-400">
-              {availableStories.filter((s: any) => s.isActive).length} قصة مفعلة الآن ستظهر لزوار الموقع
-            </div>
-            <Button
-              type="button"
-              onClick={() => setIsStoryPickerOpen(false)}
-              className="bg-white/10 hover:bg-white/20 text-white text-xs font-black rounded-xl px-5"
-            >
-              تم وإغلاق
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AqeeqAiYearbookGenerator open={isYearbookOpen} onOpenChange={setIsYearbookOpen} />
-
-      {/* Quick Command Palette (Ctrl+K) */}
+      {/* MODAL 11: COMMAND PALETTE (CTRL+K) */}
       <AqeeqAdminCommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
-        onSelectTab={(tab, subTab) => {
-          setActiveTab(tab);
-          if (subTab) {
-            if (tab === "admissions") setAdmissionsSubTab(subTab as any);
-            if (tab === "orchestration") setOrchestrationSubTab(subTab as any);
-            if (tab === "broadcast") setCommsSubTab(subTab as any);
-          }
-        }}
-        onTriggerDeploy={() => {
-          if (isDeploying) return;
-          setIsDeploying(true);
-          deployMutation.mutate();
-        }}
+        onSelectTab={handleNavigateTab}
+        onTriggerDeploy={() => deployMutation.mutate()}
         admissionsList={admissionsList}
       />
     </div>
