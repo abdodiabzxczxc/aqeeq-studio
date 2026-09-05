@@ -5,10 +5,9 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSchoolNewsIssueBySlug, getSiteOrchestration } from "../db";
+import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSiteOrchestration } from "../db";
 import { streamAqeeqAlbumMedia, streamAqeeqAlbumVideo, streamAqeeqAlbumZip, streamAqeeqDriveVideo } from "../aqeeqAlbumDownloads";
-import { createAlbumSocialPreviewHtml, createSiteSocialPreviewHtml } from "../albumSocialPreview";
-import { createJournalSocialPreviewHtml, isJournalSocialCrawler } from "../journalSocialPreview";
+import { serveDynamicSocialPreview } from "../dynamicSocialPreview";
 
 async function serveOgImage(req: express.Request, res: express.Response, next: express.NextFunction) {
   try {
@@ -40,44 +39,7 @@ async function serveOgImage(req: express.Request, res: express.Response, next: e
   }
 }
 
-async function serveUniversalSiteSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {
-  if (!isJournalSocialCrawler(req.get("user-agent") || "")) return next();
-  try {
-    const config = await getSiteOrchestration();
-    const protocol = String(req.get("x-forwarded-proto") || req.protocol).split(",")[0]?.trim() || "https";
-    const origin = `${protocol}://${req.get("host")}`;
-    res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(createSiteSocialPreviewHtml(origin, req.originalUrl || "/", config?.marketingPixels));
-  } catch (error) {
-    next(error);
-  }
-}
 
-async function serveJournalSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {
-  if (!isJournalSocialCrawler(req.get("user-agent") || "")) return next();
-
-  try {
-    const issue = await getSchoolNewsIssueBySlug(req.params.slug);
-    if (!issue) return next();
-    const protocol = String(req.get("x-forwarded-proto") || req.protocol).split(",")[0]?.trim() || "https";
-    const origin = `${protocol}://${req.get("host")}`;
-    res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(createJournalSocialPreviewHtml(issue, origin));
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function serveAlbumSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {
-  if (!isJournalSocialCrawler(req.get("user-agent") || "")) return next();
-  try {
-    const album = await getAqeeqAlbumBySlug(req.params.slug);
-    if (!album) return next();
-    const protocol = String(req.get("x-forwarded-proto") || req.protocol).split(",")[0]?.trim() || "https";
-    const origin = `${protocol}://${req.get("host")}`;
-    res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(createAlbumSocialPreviewHtml(album, origin));
-  } catch (error) {
-    next(error);
-  }
-}
 
 async function serveAqeeqAlbumZip(req: express.Request, res: express.Response, next: express.NextFunction) {
   try {
@@ -142,9 +104,7 @@ export async function setupVite(app: Express, server: Server) {
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
   app.use(vite.middlewares);
   app.get("/api/og-image.png", serveOgImage);
-  app.get("/journal/issue/:slug", serveJournalSocialPreview);
-  app.get("/albums/:slug", serveAlbumSocialPreview);
-  app.get("*", serveUniversalSiteSocialPreview);
+  app.use(serveDynamicSocialPreview);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -187,9 +147,7 @@ export function serveStatic(app: Express) {
   app.get("/api/albums/:slug/media/:mediaId/stream", serveAqeeqAlbumVideo);
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
   app.get("/api/og-image.png", serveOgImage);
-  app.get("/journal/issue/:slug", serveJournalSocialPreview);
-  app.get("/albums/:slug", serveAlbumSocialPreview);
-  app.get("*", serveUniversalSiteSocialPreview);
+  app.use(serveDynamicSocialPreview);
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist (with no-cache so Chrome always loads fresh bundle)
