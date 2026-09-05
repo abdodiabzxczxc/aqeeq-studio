@@ -781,35 +781,41 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 )}
               </div>
 
-              {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Always visible and active on all screens */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSearchOpen(false);
-                  setOptionsOpen(false);
-                  setMobileMenuOpen((open) => !open);
-                }}
-                className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
-                  mobileMenuOpen
-                    ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
-                    : dark
-                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]"
-                    : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]"
-                }`}
-                aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-                title="القائمة الشاملة"
-              >
-                {mobileMenuOpen ? (
-                  <X size={18} />
-                ) : (
-                  <div className="flex flex-col justify-center items-center gap-[3.5px] w-4">
-                    <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
-                    <span className="h-[2px] w-2.5 rounded-full bg-current transition-all duration-300 group-hover:w-4" />
-                    <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
-                  </div>
-                )}
-              </button>
+              {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Fluid entry on desktop without snap, always visible on mobile */}
+              <div className={`transition-[max-width,opacity,transform] duration-300 ease-out overflow-hidden ${
+                isScrolled
+                  ? "max-w-[48px] opacity-100 scale-100 pointer-events-auto"
+                  : "max-w-[48px] opacity-100 scale-100 lg:max-w-0 lg:opacity-0 lg:scale-90 lg:pointer-events-none"
+              }`}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSearchOpen(false);
+                    setOptionsOpen(false);
+                    setMobileMenuOpen((open) => !open);
+                  }}
+                  className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
+                    mobileMenuOpen
+                      ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
+                      : dark
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]"
+                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]"
+                  }`}
+                  aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+                  title="القائمة الشاملة"
+                >
+                  {mobileMenuOpen ? (
+                    <X size={18} />
+                  ) : (
+                    <div className="flex flex-col justify-center items-center gap-[3.5px] w-4">
+                      <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                      <span className="h-[2px] w-2.5 rounded-full bg-current transition-all duration-300 group-hover:w-4" />
+                      <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                    </div>
+                  )}
+                </button>
+              </div>
             </div>
 
           {/* ── Complete Bento Cockpit Popover ── */}
