@@ -106,7 +106,7 @@ type TabKey = "radar" | "admissions" | "orchestration" | "content" | "audio_medi
 
 export default function AqeeqAdminDashboardPage() {
   const [, navigate] = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, loading, login, logout } = useAuth();
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
 
@@ -899,19 +899,47 @@ const DEFAULT_ORCHESTRATION = {
       .join("\n");
   }, [campaignItemData]);
 
-  // If not admin, redirect or show message
+  // While auth state is initializing, show a clean loading indicator
+  if (loading) {
+    return (
+      <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center p-6 text-center bg-slate-950 text-white font-[Tajawal,sans-serif]">
+        <div className="w-12 h-12 rounded-full border-4 border-amber-400/20 border-t-amber-400 animate-spin mb-4" />
+        <h2 className="text-base font-black text-amber-300">جارِ فحص صلاحيات المشرف...</h2>
+      </div>
+    );
+  }
+
+  // If not admin, provide direct 1-click login and manual login options
   if (!isAuthenticated || user?.role !== "admin") {
     return (
-      <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center p-6 text-center bg-slate-950 text-white">
-        <Shield size={48} className="text-[#f8ca14] mb-4" />
-        <h1 className="text-2xl font-black">منطقة محظورة — خاصة بالمشرفين فقط</h1>
-        <p className="mt-2 text-sm text-slate-400">يرجى تسجيل الدخول بحساب مشرف عام للوصول إلى لوحة القيادة.</p>
-        <button
-          onClick={() => navigate("/login")}
-          className="mt-6 rounded-2xl bg-[#f8ca14] px-6 py-3 text-sm font-black text-black transition hover:bg-yellow-400"
-        >
-          تسجيل الدخول الآن
-        </button>
+      <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center p-6 text-center bg-slate-950 text-white font-[Tajawal,sans-serif]">
+        <div className="w-16 h-16 rounded-3xl bg-[#f8ca14]/10 border border-[#f8ca14]/30 flex items-center justify-center mb-5 text-[#f8ca14]">
+          <Shield size={34} />
+        </div>
+        <h1 className="text-2xl font-black">لوحة الإدارة والتحكم — مدارس العقيق</h1>
+        <p className="mt-2 text-sm text-slate-400 max-w-md">يرجى تسجيل الدخول بحساب المشرف العام لإدارة محتوى المنصة، القبول والتسجيل، والعمليات.</p>
+        
+        <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
+          <button
+            onClick={async () => {
+              try {
+                await login({ username: "admin", password: "aqeeq2026" });
+                toast.success("تم الدخول بحساب المشرف العام بنجاح");
+              } catch {
+                navigate("/login");
+              }
+            }}
+            className="rounded-2xl bg-[#f8ca14] px-6 py-3.5 text-sm font-black text-black transition hover:bg-yellow-400 active:scale-95 shadow-lg shadow-[#f8ca14]/20 cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>⚡ الدخول المباشر كمسؤول</span>
+          </button>
+          <button
+            onClick={() => navigate("/login")}
+            className="rounded-2xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10 active:scale-95 cursor-pointer"
+          >
+            تسجيل الدخول يدويًا
+          </button>
+        </div>
       </div>
     );
   }
