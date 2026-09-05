@@ -29,14 +29,14 @@ export function AqeeqTypographicScrubBar({
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="hidden lg:block relative w-full overflow-hidden py-4 select-none pointer-events-none"
+      className="hidden xl:block relative w-full overflow-hidden py-4 select-none pointer-events-none"
     >
       <motion.div
         style={{ x }}
         className={`whitespace-nowrap font-black font-mono text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.2em] transition-opacity ${
           dark
-            ? "text-transparent bg-clip-text bg-gradient-to-r from-emerald-500/10 via-[#f8ca14]/30 to-emerald-500/10 opacity-70"
-            : "text-transparent bg-clip-text bg-gradient-to-r from-emerald-950/10 via-[#08467d]/20 to-emerald-950/10 opacity-60"
+            ? "text-transparent bg-clip-text bg-gradient-to-r from-[#f8ca14]/5 via-[#f8ca14]/30 to-[#f8ca14]/5 opacity-70"
+            : "text-transparent bg-clip-text bg-gradient-to-r from-[#08467d]/5 via-[#08467d]/20 to-[#08467d]/5 opacity-60"
         }`}
       >
         {text} &nbsp; {text} &nbsp; {text}
