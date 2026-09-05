@@ -215,10 +215,16 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
   return (
     <div dir="rtl" className={`aq-studio-share ${dark ? "aq-studio-share--dark" : "aq-studio-share--light"}`}>
-      {/* 1. Top Executive Utility Bar */}
-      <div className={`hidden sm:block relative z-[140] border-b text-[11px] font-bold py-1.5 transition-colors ${
-        dark ? "border-white/5 bg-[#0c1218]/90 text-slate-400" : "border-black/5 bg-slate-50/90 text-slate-600"
-      }`}>
+      {/* ── Fixed Master Header Deck (Always follows user down on all pages) ── */}
+      <div className="fixed top-0 inset-x-0 z-[130] w-full transition-all duration-300 ease-out">
+        {/* 1. Top Executive Utility Bar */}
+        <div className={`hidden sm:block relative z-[140] border-b text-[11px] font-bold transition-all duration-300 overflow-hidden ${
+          isScrolled
+            ? "max-h-0 py-0 opacity-0 border-transparent pointer-events-none"
+            : "max-h-12 py-1.5 opacity-100"
+        } ${
+          dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
+        }`}>
         <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
           <div className="flex items-center gap-4">
             <span
@@ -384,7 +390,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       </div>
 
       {/* 2. Main Executive Header — Collapses to Wellington-Style Compact Luxury on Scroll */}
-      <header className={`aq-studio-share-header sticky top-0 z-[130] border-b backdrop-blur-2xl transition-all duration-300 ease-out ${
+      <header className={`aq-studio-share-header w-full border-b backdrop-blur-2xl transition-all duration-300 ease-out ${
         isScrolled
           ? dark
             ? "border-white/[0.08] bg-[#060a10]/95 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
@@ -738,6 +744,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           </div>
         </div>
       </header>
+      </div>
+
+      {/* Static Spacer in DOM so page content starts cleanly below fixed header */}
+      <div className="h-[66px] sm:h-[108px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
 
       {/* Full-Screen Immersive Menu Canvas (Mobile & Desktop) */}
       {mobileMenuOpen && (
