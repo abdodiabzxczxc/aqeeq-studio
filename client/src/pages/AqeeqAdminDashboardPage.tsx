@@ -48,6 +48,14 @@ import {
   MessageCircle,
   FolderSync,
   Instagram,
+  Upload,
+  QrCode,
+  Globe,
+  Radio,
+  Check,
+  Link2,
+  Smartphone,
+  Laptop,
 } from "lucide-react";
 
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
@@ -115,6 +123,12 @@ const DEFAULT_ORCHESTRATION = {
     ogTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
     ogDescription: "الريادة في التعليم وصناعة المستقبل منذ عام 1994",
     ogImageUrl: "/alaqeeq-logo.png",
+    pageShareOverrides: {} as Record<string, {
+      mode: "auto" | "custom";
+      title?: string;
+      description?: string;
+      imageUrl?: string;
+    }>,
   },
   heroCovers: {
     journalMode: "auto",
@@ -281,6 +295,89 @@ const DEFAULT_ORCHESTRATION = {
   },
 };
 
+const SOCIAL_SHARE_PAGES: Array<{
+  path: string;
+  name: string;
+  badge: string;
+  icon: string;
+  autoTitle: string;
+  autoDesc: string;
+  autoImage: string;
+}> = [
+  {
+    path: "/",
+    name: "الرئيسية",
+    badge: "البوابة الرسمية",
+    icon: "🏠",
+    autoTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
+    autoDesc: "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع.",
+    autoImage: "/og-preview.png",
+  },
+  {
+    path: "/admissions",
+    name: "القبول والرسوم",
+    badge: "بوابة التقديم",
+    icon: "🎓",
+    autoTitle: "القبول والتسجيل للعام الدراسي الجديد 🎓 | مدارس العقيق",
+    autoDesc: "سجل مقعد ابنك الآن في مدارس العقيق الأهلية والدولية - فصول مجهزة، برامج وطنية ودولية، وحاسبة رسوم وخصومات حية.",
+    autoImage: "/og-preview.png",
+  },
+  {
+    path: "/journal",
+    name: "المجلة الرقمية",
+    badge: "الأعداد الدورية",
+    icon: "📖",
+    autoTitle: "مجلة العقيق المدرسية 📖 | صدى الإبداع والريادة",
+    autoDesc: "تصفح أحدث أعداد مجلة العقيق الدورية بتجربة قراءة تفاعلية ثلاثية الأبعاد وتقليب حقيقي للصفحات.",
+    autoImage: "/themes/saudi-national-day/opt/cover_album_national.webp",
+  },
+  {
+    path: "/albums",
+    name: "ألبومات الفعاليات",
+    badge: "معارض مصورة",
+    icon: "📸",
+    autoTitle: "معارض وألبومات العقيق 📸 | ذكريات وإنجازات مصورة",
+    autoDesc: "شاهد أحدث التغطيات المصورة والمعارض التفاعلية لفعاليات وإنجازات طلاب ومعلمي مدارس العقيق.",
+    autoImage: "/themes/saudi-national-day/opt/cover_album_national.webp",
+  },
+  {
+    path: "/articles",
+    name: "المقالات والأخبار",
+    badge: "المدونة والإنتاج",
+    icon: "✍️",
+    autoTitle: "أقلام العقيق والمقالات ✍️ | إبداع الطلاب والمعلمين",
+    autoDesc: "منصة المقالات التعليمية والمعرفية والمشاركات الأدبية والعلمية لأسرة مدارس العقيق.",
+    autoImage: "/covers/cover-about.jpg",
+  },
+  {
+    path: "/atheer",
+    name: "إذاعة وبودكاست أثير",
+    badge: "صوت العقيق",
+    icon: "🎙️",
+    autoTitle: "أثير وبودكاست العقيق 🎙️ | صوت المعرفة والإلهام",
+    autoDesc: "استمع لحلقات بودكاست العقيق وأناشيد المدارس الرسمية وحوارات ملهمة مع المتميزين والمبدعين.",
+    autoImage: "/og-preview.png",
+  },
+  {
+    path: "/accreditations",
+    name: "الاعتمادات والجودة",
+    badge: "Cognia والجوائز",
+    icon: "🏅",
+    autoTitle: "الاعتمادات والجودة والجوائز 🏅 | مدارس العقيق الأهلية والدولية",
+    autoDesc: "سجل حافل من الاعتمادات الوطنية والدولية وجوائز التميز المؤسسي والأكاديمي واعتماد Cognia الأمريكي.",
+    autoImage: "/covers/cover-accreditations.jpg",
+  },
+  {
+    path: "/about",
+    name: "عن المدارس والمسيرة",
+    badge: "منذ 1994",
+    icon: "🏛️",
+    autoTitle: "عن مدارس العقيق 🏛️ | مسيرة ريادة منذ عام 1994",
+    autoDesc: "تعرف على تاريخ مجمعات العقيق التعليمية بالمدينة المنورة، رؤيتنا، رسالتنا، ومرافقنا المتطورة.",
+    autoImage: "/covers/cover-about.jpg",
+  },
+];
+
 export default function AqeeqAdminDashboardPage() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated, loading, login, logout } = useAuth();
@@ -395,6 +492,137 @@ export default function AqeeqAdminDashboardPage() {
       });
     }
   }, [orchestrationData]);
+
+  // 🌐 Universal Social Share Hub State (Dual Engine: Auto vs Custom)
+  const [selectedSharePage, setSelectedSharePage] = useState<string>("/");
+  const [previewPlatform, setPreviewPlatform] = useState<"whatsapp" | "x" | "facebook">("whatsapp");
+  const [utmSource, setUtmSource] = useState<string>("whatsapp");
+  const [utmCampaign, setUtmCampaign] = useState<string>("admissions-2026");
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+
+  const currentSharePageConfig = useMemo(() => {
+    return SOCIAL_SHARE_PAGES.find((p) => p.path === selectedSharePage) || SOCIAL_SHARE_PAGES[0];
+  }, [selectedSharePage]);
+
+  const pageOverridesMap = (orchestrationForm.marketingPixels?.pageShareOverrides || {}) as Record<
+    string,
+    { mode: "auto" | "custom"; title?: string; description?: string; imageUrl?: string }
+  >;
+
+  const activePageOverride = pageOverridesMap[selectedSharePage] || {
+    mode: "auto" as const,
+    title: "",
+    description: "",
+    imageUrl: "",
+  };
+
+  const isCustomMode = activePageOverride.mode === "custom";
+
+  const effectiveTitle = isCustomMode && activePageOverride.title?.trim()
+    ? activePageOverride.title.trim()
+    : (selectedSharePage === "/" && orchestrationForm.marketingPixels?.ogTitle?.trim()
+      ? orchestrationForm.marketingPixels.ogTitle.trim()
+      : currentSharePageConfig.autoTitle);
+
+  const effectiveDesc = isCustomMode && activePageOverride.description?.trim()
+    ? activePageOverride.description.trim()
+    : (selectedSharePage === "/" && orchestrationForm.marketingPixels?.ogDescription?.trim()
+      ? orchestrationForm.marketingPixels.ogDescription.trim()
+      : currentSharePageConfig.autoDesc);
+
+  const effectiveImage = isCustomMode && activePageOverride.imageUrl?.trim()
+    ? activePageOverride.imageUrl.trim()
+    : (selectedSharePage === "/" && orchestrationForm.marketingPixels?.ogImageUrl?.trim()
+      ? orchestrationForm.marketingPixels.ogImageUrl.trim()
+      : currentSharePageConfig.autoImage);
+
+  const updateActiveOverride = (updates: Partial<{ mode: "auto" | "custom"; title: string; description: string; imageUrl: string }>) => {
+    const nextOverrides = {
+      ...pageOverridesMap,
+      [selectedSharePage]: {
+        ...activePageOverride,
+        ...updates,
+      },
+    };
+    const nextMarketingPixels = {
+      ...orchestrationForm.marketingPixels,
+      pageShareOverrides: nextOverrides,
+      ...(selectedSharePage === "/" && updates.title !== undefined ? { ogTitle: updates.title } : {}),
+      ...(selectedSharePage === "/" && updates.description !== undefined ? { ogDescription: updates.description } : {}),
+      ...(selectedSharePage === "/" && updates.imageUrl !== undefined ? { ogImageUrl: updates.imageUrl } : {}),
+    };
+    setOrchestrationForm({
+      ...orchestrationForm,
+      marketingPixels: nextMarketingPixels,
+    });
+  };
+
+  const resetToAutoMode = () => {
+    updateActiveOverride({
+      mode: "auto",
+      title: "",
+      description: "",
+      imageUrl: "",
+    });
+    toast.success(`🔄 تم تفعيل الوضع التلقائي الذكي لصفحة (${currentSharePageConfig.name})!`);
+  };
+
+  const applyShareTemplate = (tpl: "admissions" | "national" | "cognia" | "royal") => {
+    if (tpl === "admissions") {
+      updateActiveOverride({
+        mode: "custom",
+        title: "فتح باب القبول والتسجيل للعام الدراسي الجديد 🎓 | احجز مقعد ابنك في مدارس العقيق",
+        description: "بيئة تعليمية بمعايير عالمية، برامج وطنية ودولية معتمدة، وأقساط ميسرة مع خصومات للأشقاء. التقديم متاح الآن عبر موقعنا الإلكتروني.",
+        imageUrl: "/og-preview.png",
+      });
+      toast.success("✅ تم تطبيق قالب القبول والتسجيل!");
+    } else if (tpl === "national") {
+      updateActiveOverride({
+        mode: "custom",
+        title: "نحلم ونحقق 🇸🇦 | احتفالات مدارس العقيق باليوم الوطني السعودي 94",
+        description: "شاركونا مشاعر الفخر والاعتزاز بمسيرة وطننا العظيم مع فعاليات وإبداعات طلبة مدارس العقيق الأهلية والدولية بالمدينة المنورة.",
+        imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp",
+      });
+      toast.success("✅ تم تطبيق قالب اليوم الوطني 94!");
+    } else if (tpl === "cognia") {
+      updateActiveOverride({
+        mode: "custom",
+        title: "تعليم بمعايير الجودة العالمية 🏅 | مدارس العقيق معتمدة من Cognia الأمريكية",
+        description: "سجل حافل من الاعتمادات الدولية وجوائز التميز المؤسسي، لنصنع جيلاً ملهماً يقود المستقبل بالمعرفة والريادة.",
+        imageUrl: "/covers/cover-accreditations.jpg",
+      });
+      toast.success("✅ تم تطبيق قالب الاعتمادات وجودة Cognia!");
+    } else if (tpl === "royal") {
+      updateActiveOverride({
+        mode: "custom",
+        title: "مدارس العقيق الأهلية والدولية بالمدينة المنورة | صناعة المستقبل منذ عام 1994",
+        description: "صرح تعليمي رائد يجمع بين أصالة القيم وحداثة العلوم ورعاية الموهبة والإبداع لكافة المراحل بنين وبنات.",
+        imageUrl: "/alaqeeq-logo.png",
+      });
+      toast.success("✅ تم تطبيق القالب المؤسسي الملكي!");
+    }
+  };
+
+  const copyCacheBusterLink = () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://alaqeeq.edu.sa";
+    const cacheBusterUrl = `${origin}${selectedSharePage === "/" ? "" : selectedSharePage}?v=${Date.now()}`;
+    navigator.clipboard.writeText(cacheBusterUrl);
+    toast.success("⚡ تم نسخ رابط كاسر كاش واتساب وتويتر! استخدمه لتحديث الصورة فوراً.");
+  };
+
+  const shareDirectToWhatsApp = () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://alaqeeq.edu.sa";
+    const targetUrl = `${origin}${selectedSharePage === "/" ? "" : selectedSharePage}?v=${Date.now()}`;
+    const text = `${effectiveTitle}\n\n${effectiveDesc}\n\n🔗 ${targetUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const campaignGeneratedUrl = useMemo(() => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://alaqeeq.edu.sa";
+    const base = `${origin}${selectedSharePage === "/" ? "" : selectedSharePage}`;
+    const cleanCamp = (utmCampaign || "promo").trim().toLowerCase().replace(/\s+/g, "-");
+    return `${base}?utm_source=${utmSource}&utm_campaign=${cleanCamp}&v=${Date.now()}`;
+  }, [selectedSharePage, utmSource, utmCampaign]);
 
   const setOrchestrationMutation = trpc.executiveAdmin.setSiteOrchestration.useMutation({
     onSuccess: () => {
@@ -3333,6 +3561,761 @@ export default function AqeeqAdminDashboardPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* UNIVERSAL SOCIAL SHARE & OPENGRAPH HUB (Dual Engine: Auto vs Custom) */}
+                <div className={`rounded-3xl border p-6 sm:p-8 space-y-8 shadow-xl ${dark ? "border-white/10 bg-[#12141a]" : "border-black/5 bg-white"}`}>
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 border-current/10">
+                    <div className="space-y-1">
+                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black bg-amber-400/10 text-amber-500 border border-amber-400/20">
+                        <Share2 size={13} />
+                        <span>محرك المشاركة الاجتماعية الذكي (Social Virality Hub)</span>
+                      </div>
+                      <h3 className="text-xl font-black">بطاقات المشاركة لشبكات التواصل وواتساب (OpenGraph & Meta)</h3>
+                      <p className="text-xs text-slate-400 font-bold max-w-2xl">
+                        تحكم في شكل العنوان، الوصف، والصورة عند إرسال روابط الموقع عبر واتساب، تويتر، وفيسبوك. يدعم المحرك المزدوج (التحديث التلقائي الذكي أو التخصيص اليدوي) لكل صفحة بشكل مستقل.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        onClick={copyCacheBusterLink}
+                        variant="outline"
+                        className={`rounded-2xl text-xs font-black px-4 py-2 gap-1.5 cursor-pointer ${
+                          dark ? "border-white/10 hover:bg-white/5 text-amber-400" : "border-black/10 hover:bg-black/5 text-amber-600"
+                        }`}
+                        title="ينشئ رابط فوري بكود تحديث لحظي لإجبار واتساب وتويتر على تحديث الصورة فوراً"
+                      >
+                        <RefreshCw size={14} className="text-amber-400 animate-spin-slow" />
+                        <span>⚡ نسخ رابط كاسر الكاش</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={shareDirectToWhatsApp}
+                        className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-2 gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20"
+                      >
+                        <MessageCircle size={14} />
+                        <span>تجربة في واتساب</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setOrchestrationMutation.mutate({
+                            marketingPixels: orchestrationForm.marketingPixels,
+                          });
+                        }}
+                        disabled={setOrchestrationMutation.isPending}
+                        className="rounded-2xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs px-5 py-2 shadow-lg shadow-amber-400/20 gap-1.5 cursor-pointer"
+                      >
+                        <CheckCircle2 size={15} />
+                        <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ بطاقات المشاركة"}</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* 1. Page Selector Pills */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black flex items-center gap-1.5">
+                        <Globe size={14} className="text-amber-400" />
+                        <span>اختر الصفحة المراد ضبط بطاقة مشاركتها:</span>
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-bold">
+                        {isCustomMode ? (
+                          <span className="text-amber-400 font-black">🟡 وضع مخصص لهذه الصفحة</span>
+                        ) : (
+                          <span className="text-emerald-400 font-black">🟢 وضع تلقائي ذكي متجدد</span>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                      {SOCIAL_SHARE_PAGES.map((pg) => {
+                        const isSelected = selectedSharePage === pg.path;
+                        const hasCustom = pageOverridesMap[pg.path]?.mode === "custom";
+                        return (
+                          <button
+                            key={pg.path}
+                            type="button"
+                            onClick={() => setSelectedSharePage(pg.path)}
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black transition shrink-0 cursor-pointer border ${
+                              isSelected
+                                ? "bg-amber-400 text-black border-amber-400 shadow-md shadow-amber-400/20"
+                                : dark
+                                ? "border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/10"
+                                : "border-black/10 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                            }`}
+                          >
+                            <span>{pg.icon}</span>
+                            <span>{pg.name}</span>
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                hasCustom ? "bg-amber-500" : "bg-emerald-500"
+                              }`}
+                              title={hasCustom ? "مخصص" : "تلقائي"}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. Dual Engine Switcher: Auto-Pilot vs Custom Override */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={resetToAutoMode}
+                      className={`p-4 rounded-2xl border text-right transition cursor-pointer relative overflow-hidden ${
+                        !isCustomMode
+                          ? dark
+                            ? "border-emerald-500/40 bg-emerald-500/10 ring-2 ring-emerald-500/30"
+                            : "border-emerald-600/40 bg-emerald-50 ring-2 ring-emerald-600/20"
+                          : dark
+                          ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                          : "border-black/10 bg-slate-50 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 font-black text-sm text-emerald-500">
+                          <RefreshCw size={16} />
+                          <span>الوضع التلقائي الذكي (Auto-Pilot)</span>
+                        </div>
+                        {!isCustomMode && (
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500 text-white">
+                            الوضع النشط ✓
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                        يقرأ النظام تلقائياً أحدث غلاف وعنوان وتفاصيل من قاعدة البيانات عند إرسال الرابط، ويتجدد تلقائياً مع كل محتوى جديد دون الحاجة لتدخلك.
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateActiveOverride({
+                          mode: "custom",
+                          title: activePageOverride.title || effectiveTitle,
+                          description: activePageOverride.description || effectiveDesc,
+                          imageUrl: activePageOverride.imageUrl || effectiveImage,
+                        });
+                      }}
+                      className={`p-4 rounded-2xl border text-right transition cursor-pointer relative overflow-hidden ${
+                        isCustomMode
+                          ? dark
+                            ? "border-amber-500/40 bg-amber-500/10 ring-2 ring-amber-500/30"
+                            : "border-amber-500/40 bg-amber-50 ring-2 ring-amber-500/20"
+                          : dark
+                          ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                          : "border-black/10 bg-slate-50 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 font-black text-sm text-amber-500">
+                          <Wand2 size={16} />
+                          <span>الوضع المخصص اليدوي (Custom Override)</span>
+                        </div>
+                        {isCustomMode && (
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400 text-black">
+                            الوضع النشط ✓
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                        يتيح لك كتابة عنوان تسويقي مخصص، رفع صورة غلاف من جهازك، وصياغة وصف مخصص للحملات والإعلانات الخاصة ومواسم التسجيل.
+                      </p>
+                    </button>
+                  </div>
+
+                  {/* 3. Custom Mode Form Controls OR Auto Mode Banner */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Left/Main Column: Form or Auto Info */}
+                    <div className="lg:col-span-7 space-y-5">
+                      {isCustomMode ? (
+                        <div className="space-y-4">
+                          {/* 1-Click Templates */}
+                          <div className="space-y-1.5">
+                            <span className="text-[11px] font-black text-slate-400 block">
+                              قوالب جاهزة بضغطة زر (Brand Templates):
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => applyShareTemplate("admissions")}
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-emerald-400" : "border-black/10 hover:bg-black/5 text-emerald-700"
+                                }`}
+                              >
+                                🎓 قالب القبول والتسجيل
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyShareTemplate("national")}
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-amber-400" : "border-black/10 hover:bg-black/5 text-amber-700"
+                                }`}
+                              >
+                                🇸🇦 قالب اليوم الوطني 94
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyShareTemplate("cognia")}
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-blue-400" : "border-black/10 hover:bg-black/5 text-blue-700"
+                                }`}
+                              >
+                                🏆 اعتماد كوجنيا وجودة التعليم
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyShareTemplate("royal")}
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-xl border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-700"
+                                }`}
+                              >
+                                🦅 القالب المؤسسي الملكي
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Image Field & Upload */}
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-black">
+                              صورة الغلاف والمعاينة (OG Image):
+                            </label>
+                            <div className="flex flex-wrap sm:flex-nowrap gap-2">
+                              <input
+                                type="text"
+                                value={activePageOverride.imageUrl || ""}
+                                onChange={(e) => updateActiveOverride({ imageUrl: e.target.value })}
+                                placeholder="/og-preview.png أو رابط صورة مباشرة"
+                                className={`flex-1 rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                                  dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                                }`}
+                              />
+
+                              <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black cursor-pointer bg-amber-400 hover:bg-yellow-400 text-black transition shrink-0">
+                                <Upload size={14} />
+                                <span>رفع من الجهاز</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    if (file.size > 8 * 1024 * 1024) {
+                                      toast.error("الحد الأقصى لحجم الصورة هو 8 ميجابايت");
+                                      return;
+                                    }
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                      if (typeof reader.result === "string") {
+                                        updateActiveOverride({
+                                          mode: "custom",
+                                          imageUrl: reader.result,
+                                        });
+                                        toast.success("✅ تم رفع وتعيين صورة المعاينة بنجاح!");
+                                      }
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                              </label>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMediaPickerConfig({
+                                    open: true,
+                                    title: "اختر صورة الغلاف من مكتبة وسائط العقيق",
+                                    currentUrl: effectiveImage,
+                                    onSelect: (item) => {
+                                      updateActiveOverride({
+                                        mode: "custom",
+                                        imageUrl: item.url,
+                                      });
+                                    },
+                                  });
+                                }}
+                                className={`px-3 py-2 rounded-xl text-xs font-bold border transition shrink-0 ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-700"
+                                }`}
+                              >
+                                🖼️ المكتبة
+                              </button>
+                            </div>
+
+                            {/* Quick Image Suggestions */}
+                            <div className="flex flex-wrap gap-1.5 text-[10px] font-bold pt-1">
+                              <span className="text-slate-400 py-0.5">اقتراحات سريعة:</span>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/og-preview.png" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🖼️ الصورة الرسمية
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/alaqeeq-logo.png" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🦅 شعار المدارس
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/covers/cover-accreditations.jpg" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🏅 غلاف الاعتمادات
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => updateActiveOverride({ imageUrl: "/themes/saudi-national-day/opt/cover_album_national.webp" })}
+                                className={`px-2 py-0.5 rounded-lg border transition ${
+                                  dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                                }`}
+                              >
+                                🇸🇦 اليوم الوطني
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Title */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <label className="block text-xs font-black">
+                                عنوان الرابط والمشاركة (OG Title):
+                              </label>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {(activePageOverride.title || "").length} حرف
+                              </span>
+                            </div>
+                            <input
+                              type="text"
+                              value={activePageOverride.title || ""}
+                              onChange={(e) => updateActiveOverride({ title: e.target.value })}
+                              placeholder={currentSharePageConfig.autoTitle}
+                              className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                                dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                              }`}
+                            />
+                          </div>
+
+                          {/* Description */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <label className="block text-xs font-black">
+                                الوصف التسويقي للرابط (OG Description):
+                              </label>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {(activePageOverride.description || "").length} حرف
+                              </span>
+                            </div>
+                            <textarea
+                              rows={3}
+                              value={activePageOverride.description || ""}
+                              onChange={(e) => updateActiveOverride({ description: e.target.value })}
+                              placeholder={currentSharePageConfig.autoDesc}
+                              className={`w-full rounded-xl border p-2.5 text-xs font-medium outline-none resize-none ${
+                                dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                              }`}
+                            />
+                          </div>
+
+                          <div className="pt-2 flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={resetToAutoMode}
+                              className="text-xs text-amber-500 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                            >
+                              <RefreshCw size={12} />
+                              <span>استعادة الوضع التلقائي الذكي لهذه الصفحة</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Auto Mode Detailed Preview */
+                        <div className={`p-6 rounded-2xl border space-y-4 ${
+                          dark ? "border-emerald-500/20 bg-emerald-500/5" : "border-emerald-600/20 bg-emerald-50/50"
+                        }`}>
+                          <div className="flex items-center gap-2 text-emerald-500 font-black text-sm">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                            <span>المحرك يعمل في وضع التحديث التلقائي الذكي (Auto-Pilot)</span>
+                          </div>
+                          <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                            تقوم خوارزميات المنصة بالاتصال المباشر بقاعدة البيانات عند إرسال رابط <span className="font-mono text-amber-400">{selectedSharePage}</span> عبر واتساب أو منصات التواصل، واستخراج أحدث عنوان وغلاف ووصف تم نشره.
+                          </p>
+
+                          <div className={`p-4 rounded-xl border space-y-2 text-xs ${
+                            dark ? "border-white/10 bg-black/30" : "border-black/10 bg-white"
+                          }`}>
+                            <div className="text-slate-400 text-[11px] font-bold">البيانات الحية المعتمدة حالياً:</div>
+                            <div className="font-bold text-sm line-clamp-1">📌 {effectiveTitle}</div>
+                            <div className="text-[11px] text-slate-400 line-clamp-2">📝 {effectiveDesc}</div>
+                          </div>
+
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              updateActiveOverride({
+                                mode: "custom",
+                                title: effectiveTitle,
+                                description: effectiveDesc,
+                                imageUrl: effectiveImage,
+                              });
+                            }}
+                            className="w-full rounded-xl bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs py-2.5 gap-2 cursor-pointer shadow-md"
+                          >
+                            <Wand2 size={14} />
+                            <span>تخصيص بيانات هذا الرابط يدوياً (التحويل للوضع المخصص)</span>
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Campaign UTM Generator & QR Code Studio */}
+                      <div className={`p-5 rounded-2xl border space-y-3 ${
+                        dark ? "border-white/10 bg-white/[0.02]" : "border-black/5 bg-slate-50"
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black flex items-center gap-1.5">
+                            <Megaphone size={14} className="text-amber-400" />
+                            <span>صانع روابط الحملات التسويقية ورموز QR (UTM Builder):</span>
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-bold">تتبع دقيق في رادار الزيارات</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-400 mb-1">المنصة الناشرة:</label>
+                            <select
+                              value={utmSource}
+                              onChange={(e) => setUtmSource(e.target.value)}
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                                dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                              }`}
+                            >
+                              <option value="whatsapp">واتساب (WhatsApp)</option>
+                              <option value="snapchat">سناب شات (Snapchat)</option>
+                              <option value="x">منصة إكس / تويتر (X)</option>
+                              <option value="instagram">إنستغرام (Instagram)</option>
+                              <option value="sms">رسائل SMS المباشرة</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-400 mb-1">رمز الحملة الإعلانية:</label>
+                            <input
+                              type="text"
+                              value={utmCampaign}
+                              onChange={(e) => setUtmCampaign(e.target.value)}
+                              placeholder="admissions-2026"
+                              className={`w-full rounded-xl border p-2 text-xs font-mono outline-none ${
+                                dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-[11px] font-mono overflow-hidden ${
+                          dark ? "border-white/10 bg-black/60 text-slate-300" : "border-black/10 bg-white text-slate-700"
+                        }`}>
+                          <span className="truncate" dir="ltr">{campaignGeneratedUrl}</span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(campaignGeneratedUrl);
+                                toast.success("📋 تم نسخ رابط الحملة المتتبع!");
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-amber-400 text-black font-black text-xs hover:bg-yellow-400 transition"
+                            >
+                              نسخ
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsQrModalOpen(true)}
+                              className={`p-1.5 rounded-lg border transition ${
+                                dark ? "border-white/10 hover:bg-white/10" : "border-black/10 hover:bg-black/5"
+                              }`}
+                              title="عرض رمز QR"
+                            >
+                              <QrCode size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Multi-Platform Live Realistic Preview */}
+                    <div className="lg:col-span-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black flex items-center gap-1.5">
+                          <Eye size={14} className="text-amber-400" />
+                          <span>معاينة الرابط الحية (Live Preview):</span>
+                        </span>
+
+                        {/* Platform Switcher */}
+                        <div className={`flex items-center p-0.5 rounded-xl border text-[11px] font-bold ${
+                          dark ? "border-white/10 bg-white/[0.04]" : "border-black/10 bg-slate-100"
+                        }`}>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewPlatform("whatsapp")}
+                            className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                              previewPlatform === "whatsapp"
+                                ? "bg-emerald-600 text-white shadow-sm"
+                                : "text-slate-400 hover:text-current"
+                            }`}
+                          >
+                            واتساب
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewPlatform("x")}
+                            className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                              previewPlatform === "x"
+                                ? dark
+                                  ? "bg-white text-black shadow-sm"
+                                  : "bg-black text-white shadow-sm"
+                                : "text-slate-400 hover:text-current"
+                            }`}
+                          >
+                            إكس / تويتر
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewPlatform("facebook")}
+                            className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                              previewPlatform === "facebook"
+                                ? "bg-blue-600 text-white shadow-sm"
+                                : "text-slate-400 hover:text-current"
+                            }`}
+                          >
+                            فيسبوك
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* WhatsApp Simulation */}
+                      {previewPlatform === "whatsapp" && (
+                        <div className={`p-4 rounded-3xl border shadow-2xl relative ${
+                          dark ? "border-white/10 bg-[#0b141a]" : "border-emerald-900/10 bg-[#e5ddd5]"
+                        }`}>
+                          <div className="text-[10px] text-center text-slate-400 mb-3 font-mono">
+                            فقاعة محادثة واتساب الرسمية
+                          </div>
+
+                          <div className={`rounded-2xl border overflow-hidden max-w-sm mx-auto shadow-md ${
+                            dark ? "border-white/10 bg-[#1f2c34] text-white" : "border-emerald-800/10 bg-white text-slate-900"
+                          }`}>
+                            <div className="h-44 bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] flex items-center justify-center relative overflow-hidden">
+                              {effectiveImage ? (
+                                <img
+                                  src={effectiveImage}
+                                  alt="معاينة الغلاف"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = "/alaqeeq-logo.png";
+                                  }}
+                                />
+                              ) : (
+                                <span className="font-black text-white text-lg">مدارس العقيق</span>
+                              )}
+                              <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] font-mono text-white">
+                                alaqeeq.edu.sa
+                              </span>
+                            </div>
+
+                            <div className="p-3.5 space-y-1.5 text-right">
+                              <span className="text-[10px] text-emerald-500 font-mono font-bold block">
+                                alaqeeq.edu.sa{selectedSharePage === "/" ? "" : selectedSharePage}
+                              </span>
+                              <h4 className="text-xs font-black line-clamp-2 leading-snug">
+                                {effectiveTitle}
+                              </h4>
+                              <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                {effectiveDesc}
+                              </p>
+                              <div className="flex justify-end pt-1">
+                                <span className="text-[9px] text-slate-400 font-mono">12:30 م ✓✓</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* X / Twitter Simulation */}
+                      {previewPlatform === "x" && (
+                        <div className={`p-4 rounded-3xl border shadow-2xl relative ${
+                          dark ? "border-white/10 bg-[#000]" : "border-black/10 bg-slate-900 text-white"
+                        }`}>
+                          <div className="text-[10px] text-center text-slate-400 mb-3 font-mono">
+                            بطاقة تويتر السينمائية العريضة (Summary Large Image)
+                          </div>
+
+                          <div className="rounded-2xl border border-white/20 overflow-hidden bg-black text-white max-w-sm mx-auto shadow-md">
+                            <div className="h-44 bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] flex items-center justify-center relative overflow-hidden">
+                              {effectiveImage ? (
+                                <img
+                                  src={effectiveImage}
+                                  alt="معاينة الغلاف"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = "/alaqeeq-logo.png";
+                                  }}
+                                />
+                              ) : (
+                                <span className="font-black text-white text-lg">مدارس العقيق</span>
+                              )}
+                              <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono text-white">
+                                alaqeeq.edu.sa
+                              </span>
+                            </div>
+
+                            <div className="p-3 space-y-1 text-right">
+                              <span className="text-[10px] text-slate-400 font-mono block">
+                                From alaqeeq.edu.sa
+                              </span>
+                              <h4 className="text-xs font-black line-clamp-1">
+                                {effectiveTitle}
+                              </h4>
+                              <p className="text-[11px] text-slate-400 line-clamp-2">
+                                {effectiveDesc}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Facebook Simulation */}
+                      {previewPlatform === "facebook" && (
+                        <div className={`p-4 rounded-3xl border shadow-2xl relative ${
+                          dark ? "border-white/10 bg-[#18191a]" : "border-black/10 bg-[#f0f2f5]"
+                        }`}>
+                          <div className="text-[10px] text-center text-slate-400 mb-3 font-mono">
+                            بطاقة مشاركة فيسبوك ولينكد إن الرسمية
+                          </div>
+
+                          <div className={`rounded-2xl border overflow-hidden max-w-sm mx-auto shadow-md ${
+                            dark ? "border-white/10 bg-[#242526] text-white" : "border-black/10 bg-white text-slate-900"
+                          }`}>
+                            <div className="h-44 bg-gradient-to-tr from-[#08467d] to-[#0e6cbd] flex items-center justify-center relative overflow-hidden">
+                              {effectiveImage ? (
+                                <img
+                                  src={effectiveImage}
+                                  alt="معاينة الغلاف"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = "/alaqeeq-logo.png";
+                                  }}
+                                />
+                              ) : (
+                                <span className="font-black text-white text-lg">مدارس العقيق</span>
+                              )}
+                            </div>
+
+                            <div className="p-3 space-y-1 text-right">
+                              <span className="text-[9px] uppercase tracking-wider text-slate-400 font-mono block">
+                                ALAQEEQ.EDU.SA
+                              </span>
+                              <h4 className="text-xs font-black line-clamp-1">
+                                {effectiveTitle}
+                              </h4>
+                              <p className="text-[11px] text-slate-400 line-clamp-2">
+                                {effectiveDesc}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* External Debugger Links */}
+                      <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-[10px] text-slate-400">
+                        <span>أدوات فحص الكاش الرسمية للمطورين:</span>
+                        <a
+                          href={`https://developers.facebook.com/tools/debug/?q=${encodeURIComponent("https://alaqeeq.edu.sa" + selectedSharePage)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-amber-500 hover:underline inline-flex items-center gap-0.5"
+                        >
+                          <span>Facebook Debugger</span>
+                          <ExternalLink size={10} />
+                        </a>
+                        <span>·</span>
+                        <a
+                          href="https://cards-dev.twitter.com/validator"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-amber-500 hover:underline inline-flex items-center gap-0.5"
+                        >
+                          <span>Twitter Validator</span>
+                          <ExternalLink size={10} />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* QR Code Dialog */}
+                <Dialog open={isQrModalOpen} onOpenChange={setIsQrModalOpen}>
+                  <DialogContent className={`max-w-md text-right ${dark ? "bg-[#11141c] text-white border-white/10" : "bg-white text-slate-900 border-black/10"}`}>
+                    <DialogHeader>
+                      <DialogTitle className="text-right text-base font-black flex items-center gap-2">
+                        <QrCode size={18} className="text-amber-400" />
+                        <span>رمز الاستجابة السريعة (QR Code) للحملة</span>
+                      </DialogTitle>
+                      <DialogDescription className="text-right text-xs text-slate-400">
+                        امسح الكود بكاميرا الجوال للانتقال المباشر للرابط المتتبع
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex flex-col items-center justify-center p-4 space-y-4">
+                      <div className="bg-white p-4 rounded-2xl shadow-xl border border-black/10">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(campaignGeneratedUrl)}`}
+                          alt="QR Code"
+                          className="w-48 h-48"
+                        />
+                      </div>
+                      <p className="text-[11px] font-mono text-slate-400 text-center break-all max-w-sm px-2">
+                        {campaignGeneratedUrl}
+                      </p>
+                    </div>
+
+                    <DialogFooter className="flex-row-reverse gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(campaignGeneratedUrl);
+                          toast.success("📋 تم نسخ الرابط!");
+                        }}
+                        className="bg-amber-400 hover:bg-yellow-400 text-black font-black text-xs gap-1.5"
+                      >
+                        <Copy size={14} />
+                        <span>نسخ الرابط</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsQrModalOpen(false)}
+                        className="text-xs font-bold"
+                      >
+                        إغلاق
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             )}
 

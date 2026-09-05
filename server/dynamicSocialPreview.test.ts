@@ -122,5 +122,40 @@ describe("Dynamic Social Preview Engine", () => {
       expect(preview.title).toBeTruthy();
       expect(preview.canonicalUrl).toBe("https://aqeeq-studio.onrender.com/");
     });
+
+    it("respects custom page override when mode is custom and reverts when auto", async () => {
+      const { setSiteOrchestration } = await import("./db");
+      await setSiteOrchestration({
+        marketingPixels: {
+          pageShareOverrides: {
+            "/admissions": {
+              mode: "custom",
+              title: "حملة التسجيل المبكر 2026",
+              description: "خصم حصري 20% للتسجيل المبكر",
+              imageUrl: "/covers/early-bird.jpg",
+            },
+          },
+        },
+      });
+
+      const customPreview = await resolveSocialPreviewForPath("/admissions", origin);
+      expect(customPreview.title).toBe("حملة التسجيل المبكر 2026");
+      expect(customPreview.description).toBe("خصم حصري 20% للتسجيل المبكر");
+      expect(customPreview.imageUrl).toBe("https://aqeeq-studio.onrender.com/covers/early-bird.jpg");
+
+      // Reset back to auto mode
+      await setSiteOrchestration({
+        marketingPixels: {
+          pageShareOverrides: {
+            "/admissions": {
+              mode: "auto",
+            },
+          },
+        },
+      });
+
+      const autoPreview = await resolveSocialPreviewForPath("/admissions", origin);
+      expect(autoPreview.title).toContain("القبول والتسجيل");
+    });
   });
 });

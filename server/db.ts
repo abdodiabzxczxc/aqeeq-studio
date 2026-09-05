@@ -715,6 +715,12 @@ export type SiteOrchestrationConfig = {
     ogTitle?: string;
     ogDescription?: string;
     ogImageUrl?: string;
+    pageShareOverrides?: Record<string, {
+      mode: "auto" | "custom";
+      title?: string;
+      description?: string;
+      imageUrl?: string;
+    }>;
   };
   interactiveFx?: {
     wellingtonHoverItems?: Array<{
@@ -767,6 +773,7 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     ogTitle: "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
     ogDescription: "الريادة في التعليم وصناعة المستقبل منذ عام 1994",
     ogImageUrl: "/alaqeeq-logo.png",
+    pageShareOverrides: {},
   },
   interactiveFx: {
     wellingtonHoverItems: [

@@ -124,6 +124,28 @@ export async function resolveSocialPreviewForPath(
 ): Promise<SocialPreviewData> {
   const cleanPath = pathname.split("?")[0].replace(/\/+$/, "") || "/";
 
+  // 0. Check Custom Page Share Overrides from Site Orchestration (Dual Engine: Auto vs Custom)
+  try {
+    const config = await getSiteOrchestration();
+    const pageOverrides = config?.marketingPixels?.pageShareOverrides;
+    const currentOverride = pageOverrides?.[cleanPath];
+    if (
+      currentOverride &&
+      currentOverride.mode === "custom" &&
+      (currentOverride.title || currentOverride.imageUrl || currentOverride.description)
+    ) {
+      return {
+        title: currentOverride.title?.trim() || "مدارس العقيق الأهلية والدولية بالمدينة المنورة",
+        description:
+          currentOverride.description?.trim() ||
+          "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع",
+        imageUrl: resolveSocialImageUrl(currentOverride.imageUrl || "/api/og-image.png", origin),
+        canonicalUrl: new URL(cleanPath, origin).toString(),
+        ogType: "website",
+      };
+    }
+  } catch {}
+
   // 1. Single Album (/albums/:slug)
   const albumMatch = cleanPath.match(/^\/albums\/([^/]+)$/);
   if (albumMatch && albumMatch[1] !== "manage") {
