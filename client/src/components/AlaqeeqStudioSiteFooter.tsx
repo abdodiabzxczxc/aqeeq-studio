@@ -65,18 +65,18 @@ export function AlaqeeqStudioSiteFooter() {
           : "border-black/[0.06] bg-[#fafafa] text-slate-900"
       }`}
     >
-      <div className="mx-auto max-w-[1360px] px-5 pt-8 pb-8 md:px-8">
-        {/* 1. Pre-Footer Call-to-Excellence Card (الشكل القديم الملموم ذو الارتفاع الصغير الأنيق + نفس التأثيرات الفخمة) */}
+      <div className="mx-auto max-w-[1360px] px-5 pt-8 pb-28 md:pb-10 md:px-8">
+        {/* 1. Pre-Footer Call-to-Excellence Card */}
         <div
           className={`mb-8 rounded-2xl sm:rounded-[1.8rem] border p-5 sm:p-6 md:p-7 relative overflow-hidden backdrop-blur-2xl transition-all duration-300 shadow-xl ${
             dark
               ? "border-[#f8ca14]/20 bg-gradient-to-br from-[#0a1218] via-[#05090e] to-[#02140c] shadow-[0_15px_40px_rgba(0,0,0,0.5)]"
-              : "border-emerald-700/15 bg-gradient-to-br from-white via-emerald-50/40 to-amber-50/30 shadow-[0_10px_30px_rgba(1,90,55,0.05)]"
+              : "border-[#08467d]/15 bg-gradient-to-br from-white via-slate-50 to-amber-50/25 shadow-[0_10px_30px_rgba(8,70,125,0.05)]"
           }`}
         >
           {/* Subtle Ambient Glow */}
           <div className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-[#f8ca14]/10 blur-3xl animate-pulse" />
-          <div className="pointer-events-none absolute -right-12 -bottom-12 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -right-12 -bottom-12 h-48 w-48 rounded-full bg-[#08467d]/10 blur-3xl animate-pulse" />
 
           {/* Rotating Golden Compass Seal in Background */}
           <div className="pointer-events-none absolute -bottom-10 left-1/4 w-44 h-44 opacity-[0.04] select-none animate-[spin_60s_linear_infinite]">
@@ -91,14 +91,14 @@ export function AlaqeeqStudioSiteFooter() {
             <div className="max-w-2xl text-right">
               <div className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-0.5 text-[10px] font-black mb-2 shadow-sm ${
                 dark
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                  : "border-emerald-600/30 bg-emerald-50 text-emerald-800"
+                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                  : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
               }`}>
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dark ? "bg-emerald-400" : "bg-emerald-600"}`} />
-                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dark ? "bg-emerald-500" : "bg-emerald-600"}`} />
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
+                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
                 </span>
-                <Sparkles size={11} className={dark ? "text-[#f8ca14]" : "text-amber-600"} />
+                <Sparkles size={11} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
                 <VisualEditable
                   id="studio-prefooter-kicker"
                   tag="text"
@@ -129,13 +129,11 @@ export function AlaqeeqStudioSiteFooter() {
 
             {/* Clean Horizontal Button Strip on Left Side */}
             <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto shrink-0">
-              {/* Primary Button with Liquid Shimmer Beam */}
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
                 className="relative overflow-hidden flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-l from-[#f8ca14] to-yellow-500 hover:from-yellow-400 hover:to-yellow-500 text-black font-black text-xs shadow-lg shadow-amber-500/15 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
               >
-                {/* Diagonal Light Shimmer */}
                 <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
                 <VisualEditable
                   id="studio-prefooter-cta-text"
@@ -147,22 +145,17 @@ export function AlaqeeqStudioSiteFooter() {
                 <ArrowUpLeft size={15} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </button>
 
-              {/* WhatsApp Live Advisor */}
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
                 className={`flex-1 sm:flex-initial px-4 py-3 rounded-xl border text-xs font-black transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 ${
                   dark
-                    ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
-                    : "border-emerald-600/30 bg-white text-emerald-700 hover:bg-emerald-50 shadow-sm"
+                    ? "border-white/15 bg-white/5 text-[#f8ca14] hover:bg-white/10"
+                    : "border-[#08467d]/20 bg-white text-[#08467d] hover:bg-slate-50 shadow-sm"
                 }`}
               >
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-                </span>
-                <MessageCircle size={15} className="text-emerald-500" />
+                <MessageCircle size={15} className="text-[#25D366]" />
                 <VisualEditable
                   id="studio-prefooter-advisor-text"
                   tag="text"
@@ -172,7 +165,6 @@ export function AlaqeeqStudioSiteFooter() {
                 />
               </a>
 
-              {/* Approved Fees Button */}
               <button
                 type="button"
                 onClick={() => navigate("/admissions#fees-table-section")}
@@ -194,212 +186,210 @@ export function AlaqeeqStudioSiteFooter() {
           </div>
         </div>
 
-        {/* 2. Main Minimal Studio Bar: Brand + Badges under title (from 'م' to 'ة') + Location + Socials */}
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row py-4">
-          {/* Brand Logo & Name with Badges */}
-          <div className="flex items-center gap-4 sm:gap-5">
-            <img
-              src={activeLogo}
-              alt="مدارس العقيق"
-              className={`h-12 sm:h-14 w-auto object-contain transition shrink-0 ${
-                dark ? "brightness-0 invert opacity-95" : "opacity-90"
-              }`}
-            />
-
-            {/* Container fits title exactly, scaled down as a single unit */}
-            <div
-              className="w-fit inline-flex flex-col items-stretch origin-right shrink-0"
-              style={{ zoom: 0.78 }}
-            >
-              <h3
-                className={`text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap leading-none ${
-                  dark
-                    ? "text-white"
-                    : isNationalDay
-                    ? "text-[#015a37]"
-                    : "text-slate-900"
+        {/* 2. Main Minimal Luxury Emblem Footer Bar */}
+        <div className="py-6 border-b border-black/[0.06] dark:border-white/[0.08]">
+          <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between md:items-center">
+            
+            {/* Brand Logo & Title with Badges */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-right">
+              <img
+                src={activeLogo}
+                alt="مدارس العقيق"
+                className={`h-12 sm:h-14 w-auto object-contain transition shrink-0 ${
+                  dark ? "brightness-0 invert opacity-95" : "opacity-95"
                 }`}
-              >
-                مدارس العقيق الأهلية والدولية
-              </h3>
-
-              {/* The 2 capsule pills spanning from 'م' in مدارس to 'ة' in الدولية without empty void */}
-              <div className="mt-2.5 flex items-center justify-between gap-2 w-full">
-                {/* 1. Golden Pill on the right (under مدارس العقيق) - sized to fit without empty void */}
-                <div
-                  className={`shrink-0 flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
-                    dark
-                      ? "border-amber-500/80 bg-amber-950/20 text-amber-400 shadow-amber-500/5"
-                      : "border-amber-600/40 bg-amber-50 text-amber-800"
+              />
+              <div className="flex flex-col items-center sm:items-start">
+                <h3
+                  className={`text-base sm:text-lg font-black tracking-tight ${
+                    dark ? "text-white" : "text-slate-900"
                   }`}
                 >
-                  <Award size={13} className="text-amber-400 shrink-0" />
-                  <span>اعتماد Cognia</span>
-                </div>
-
-                {/* 2. SAT & IELTS Pill on the left (under الأهلية والدولية) */}
-                <div
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1 rounded-full border text-[11px] sm:text-xs font-bold whitespace-nowrap transition shadow-sm ${
-                    dark
-                      ? "border-[#08467d]/60 bg-[#08467d]/20 text-[#f8ca14] shadow-[#08467d]/10"
-                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
-                  }`}
-                >
-                  <GraduationCap size={13} className={dark ? "text-[#f8ca14] shrink-0" : "text-[#08467d] shrink-0"} />
-                  <span>مركز اختبارات SAT & IELTS</span>
+                  مدارس العقيق الأهلية والدولية
+                </h3>
+                <div className="mt-1.5 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                  <div
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm ${
+                      dark
+                        ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                        : "border-amber-500/40 bg-amber-50 text-[#855e09]"
+                    }`}
+                  >
+                    <Award size={11} className="text-[#f8ca14] shrink-0" />
+                    <span>اعتماد Cognia</span>
+                  </div>
+                  <div
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm ${
+                      dark
+                        ? "border-[#08467d]/60 bg-[#08467d]/20 text-slate-200"
+                        : "border-[#08467d]/25 bg-[#08467d]/5 text-[#08467d]"
+                    }`}
+                  >
+                    <GraduationCap size={11} className="text-[#08467d] dark:text-[#f8ca14] shrink-0" />
+                    <span>مركز اختبارات SAT & IELTS</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Location Tag */}
-          {orchestration?.location?.enabled !== false && (
-            <a
-              href={orchestration?.location?.mapUrl || "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
-              target="_blank"
-              rel="noreferrer"
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition hover:scale-105 ${
-                dark
-                  ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
-                  : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
-              }`}
-              title="موقع مدارس العقيق على خرائط Google"
-            >
-              <MapPin size={13} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />
-              <span>{orchestration?.location?.text || "المدينة المنورة · المملكة العربية السعودية"}</span>
-            </a>
-          )}
-
-          {/* Social Media & WhatsApp Contact */}
-          <div className="flex items-center gap-2.5">
-            {orchestration?.social?.xUrl && (
-              <a
-                href={orchestration.social.xUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-sm font-black transition hover:scale-110 ${
+            {/* Quick Links Capsule Navigation */}
+            <div className="flex items-center justify-center gap-2 flex-wrap text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => navigate("/admissions")}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
+                    : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
-                title="منصة 𝕏"
               >
-                <span>𝕏</span>
-              </a>
-            )}
-
-            {orchestration?.social?.instagramUrl && (
-              <a
-                href={orchestration.social.instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
+                القبول والتسجيل ✦
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/accreditations")}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
+                    : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
-                title="Instagram"
               >
-                <Instagram size={16} />
-              </a>
-            )}
-
-            {orchestration?.social?.snapchatUrl && (
-              <a
-                href={orchestration.social.snapchatUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
+                الاعتمادات
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/about")}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
                   dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#f8ca14] hover:text-amber-600 shadow-sm"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
+                    : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
-                title="Snapchat"
               >
-                <SnapchatIcon size={16} />
-              </a>
-            )}
+                المجمعات 🏫
+              </button>
+            </div>
 
-            {orchestration?.social?.facebookUrl && (
-              <a
-                href={orchestration.social.facebookUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
-                  dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#08467d] hover:text-[#f8ca14]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
-                }`}
-                title="Facebook"
-              >
-                <Facebook size={16} />
-              </a>
-            )}
+            {/* Clean Uniform Social Media Circles (Including WhatsApp) */}
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {orchestration?.social?.xUrl && (
+                <a
+                  href={orchestration.social.xUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs font-black transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
+                      : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
+                  }`}
+                  title="منصة 𝕏"
+                >
+                  <span>𝕏</span>
+                </a>
+              )}
 
-            {orchestration?.social?.youtubeUrl && (
-              <a
-                href={orchestration.social.youtubeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
-                  dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
-                }`}
-                title="YouTube"
-              >
-                <Youtube size={16} />
-              </a>
-            )}
+              {orchestration?.social?.instagramUrl && (
+                <a
+                  href={orchestration.social.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
+                      : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
+                  }`}
+                  title="Instagram"
+                >
+                  <Instagram size={15} />
+                </a>
+              )}
 
-            {((orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools") && (
-              <a
-                href={(orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools"}
-                target="_blank"
-                rel="noreferrer"
-                className={`grid h-10 w-10 min-h-[40px] min-w-[40px] place-items-center rounded-full border text-xs transition hover:scale-110 ${
-                  dark
-                    ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#08467d] hover:text-[#f8ca14]"
-                    : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
-                }`}
-                title="قناة Telegram الرسمية"
-              >
-                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
-                </svg>
-              </a>
-            )}
+              {orchestration?.social?.snapchatUrl && (
+                <a
+                  href={orchestration.social.snapchatUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
+                      : "border-black/10 bg-white text-slate-700 hover:border-[#f8ca14] hover:text-amber-600 shadow-sm"
+                  }`}
+                  title="Snapchat"
+                >
+                  <SnapchatIcon size={15} />
+                </a>
+              )}
 
-            {orchestration?.social?.whatsappNumber && (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-black transition hover:scale-105 min-h-[40px] ${
-                  dark
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                    : "border-emerald-500/20 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-sm"
-                }`}
-                title="تواصل معنا عبر واتساب"
-              >
-                <MessageCircle size={15} />
-                <span>تواصل عبر واتساب</span>
-              </a>
-            )}
+              {orchestration?.social?.youtubeUrl && (
+                <a
+                  href={orchestration.social.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#de191e] hover:text-[#de191e]"
+                      : "border-black/10 bg-white text-slate-700 hover:border-[#de191e] hover:text-[#de191e] shadow-sm"
+                  }`}
+                  title="YouTube"
+                >
+                  <Youtube size={15} />
+                </a>
+              )}
+
+              {((orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools") && (
+                <a
+                  href={(orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#08467d] hover:text-[#f8ca14]"
+                      : "border-black/10 bg-white text-slate-700 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
+                  }`}
+                  title="Telegram"
+                >
+                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
+                  </svg>
+                </a>
+              )}
+
+              {orchestration?.social?.whatsappNumber && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-emerald-500/40 bg-emerald-950/30 text-[#25D366] hover:bg-emerald-900/50"
+                      : "border-[#25D366]/40 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 shadow-sm"
+                  }`}
+                  title="واتساب مدارس العقيق"
+                >
+                  <MessageCircle size={15} />
+                </a>
+              )}
+            </div>
+
           </div>
         </div>
 
-        {/* 3. Minimal Copyright Line & Back to Top */}
+        {/* 3. Minimal Copyright Line & Back to Top (with Safe Clearance from Floating Widgets) */}
         <div
-          className={`mt-6 border-t pt-4 flex items-center justify-between gap-4 text-[11px] font-bold ${
-            dark ? "border-white/[0.06] text-slate-500" : "border-black/[0.06] text-slate-600"
+          className={`mt-4 pt-3 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 text-center sm:text-right text-[11px] font-bold ${
+            dark ? "text-slate-500" : "text-slate-600"
           }`}
         >
-          <p>{orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}</p>
+          <div className="flex items-center gap-2">
+            <p>{orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}</p>
+            {orchestration?.location?.enabled !== false && (
+              <span className="hidden sm:inline text-slate-400">· {orchestration?.location?.text || "المدينة المنورة"}</span>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={scrollToTop}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-black transition hover:scale-105 ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-black transition hover:scale-105 active:scale-95 ${
               dark
                 ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
                 : "border-black/10 bg-white text-slate-600 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
