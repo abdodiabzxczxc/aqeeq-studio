@@ -389,21 +389,27 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         </div>
       </div>
 
-      {/* 2. Main Executive Header — Collapses to Wellington-Style Compact Luxury on Scroll */}
-      <header className={`aq-studio-share-header w-full border-b backdrop-blur-2xl transition-all duration-300 ease-out ${
+      {/* 2. Main Executive Header — Collapses into Twin Corner Floating Islands on Scroll */}
+      <header className={`aq-studio-share-header w-full transition-all duration-300 ease-out ${
         isScrolled
-          ? dark
-            ? "border-white/[0.08] bg-[#060a10]/95 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
-            : "border-black/[0.06] bg-white/95 shadow-[0_4px_20px_rgba(8,70,125,0.06)]"
-          : isNationalDay
-          ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
-          : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
+          ? "bg-transparent border-transparent pointer-events-none shadow-none"
+          : `border-b backdrop-blur-2xl ${
+              isNationalDay
+                ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
+                : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
+            }`
       }`}>
-        <div className={`relative mx-auto max-w-[1380px] px-3.5 sm:px-6 md:px-8 flex items-center justify-between transition-all duration-300 ease-out ${
-          isScrolled ? "h-[50px] sm:h-[54px]" : "h-[66px] sm:h-[78px]"
+        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between transition-all duration-300 ease-out ${
+          isScrolled
+            ? "px-3 sm:px-6 pt-2.5 sm:pt-3.5 pointer-events-none"
+            : "px-3.5 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
-          {/* Logo with clean branding — Pinned on the far right */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          {/* Logo with clean branding — On scroll: Twin Floating Right Island */}
+          <div className={`transition-all duration-300 ${
+            isScrolled
+              ? "pointer-events-auto rounded-full border shadow-lg backdrop-blur-2xl px-3 sm:px-4 py-1.5 flex items-center bg-white/94 dark:bg-[#060a10]/92 border-black/10 dark:border-white/15 shadow-[0_8px_24px_rgba(8,70,125,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]"
+              : "flex items-center gap-2.5 sm:gap-3 shrink-0"
+          }`}>
             <button
               onClick={() => go("/")}
               aria-label={`العودة إلى ${title}`}
@@ -412,7 +418,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-label="حاوية الشعار"
               className={`flex items-center transition-all duration-300 hover:opacity-90 ${
                 isScrolled
-                  ? "h-[32px] sm:h-[38px] max-w-[130px] sm:max-w-[180px]"
+                  ? "h-[28px] sm:h-[34px] max-w-[120px] sm:max-w-[170px]"
                   : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
               }`}
             >
@@ -568,8 +574,15 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
 
           {/* Left Action Buttons & Primary CTA */}
-          {/* Left Action Buttons — On scroll: Compresses to Theme Toggle + 3 Lines Menu */}
-          <div dir="ltr" className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Left Action Buttons — On scroll: Twin Floating Left Island (Theme + 3 Lines Menu) */}
+          <div
+            dir="ltr"
+            className={`transition-all duration-300 ${
+              isScrolled
+                ? "pointer-events-auto rounded-full border shadow-lg backdrop-blur-2xl px-2 sm:px-2.5 py-1.5 flex items-center gap-1.5 sm:gap-2 bg-white/94 dark:bg-[#060a10]/92 border-black/10 dark:border-white/15 shadow-[0_8px_24px_rgba(8,70,125,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] shrink-0"
+                : "flex items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto"
+            }`}
+          >
             {/* Primary Executive CTA Button — Hidden on scroll */}
             {!isScrolled && (
               <Button
