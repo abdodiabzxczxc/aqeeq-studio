@@ -408,23 +408,17 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
             }`
       }`}>
-        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between transition-all duration-300 ease-out ${
+        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between transition-[height,padding] duration-300 ease-out ${
           isScrolled
-            ? "px-3 sm:px-6 pt-2.5 sm:pt-3.5 pointer-events-none"
+            ? "px-3 sm:px-6 h-[54px] sm:h-[62px] pointer-events-none"
             : "px-3.5 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
-          {/* Logo with clean branding — On scroll: Twin Floating Right Island with Smoked Crystal & Ambient Aura */}
+          {/* Logo with clean branding — Permanently rounded pill island, zero circle morphing */}
           <div className="relative shrink-0">
-            {isScrolled && (
-              <span
-                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#f8ca14]/25 via-amber-500/10 to-transparent blur-xl -z-10 animate-in fade-in duration-500"
-                aria-hidden="true"
-              />
-            )}
-            <div className={`transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+            <div className={`rounded-full flex items-center transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${
               isScrolled
-                ? "pointer-events-auto rounded-full border shadow-xl backdrop-blur-2xl backdrop-saturate-[180%] px-3 sm:px-4 py-1.5 flex items-center bg-white/45 dark:bg-[#060a12]/55 border-black/10 dark:border-white/20 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_10px_30px_-5px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.18),0_12px_30px_-5px_rgba(0,0,0,0.7)]"
-                : "flex items-center gap-2.5 sm:gap-3 shrink-0"
+                ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-3 sm:px-4 py-1.5 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
+                : "border border-transparent bg-transparent px-1 sm:px-2 py-1"
             }`}>
               <button
                 onClick={() => go("/")}
@@ -432,10 +426,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-id="header-logo-container"
                 data-visual-tag="button"
                 data-visual-label="حاوية الشعار"
-                className={`flex items-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:opacity-90 ${
+                className={`flex items-center transition-[height,max-width,transform] duration-300 ease-out hover:opacity-90 ${
                   isScrolled
-                    ? "h-[28px] sm:h-[34px] max-w-[120px] sm:max-w-[170px]"
-                    : "h-[44px] sm:h-[58px] w-auto max-w-[160px] sm:max-w-[220px]"
+                    ? "h-[30px] sm:h-[34px] max-w-[125px] sm:max-w-[170px]"
+                    : "h-[42px] sm:h-[54px] w-auto max-w-[160px] sm:max-w-[220px]"
                 }`}
               >
                 <img
@@ -460,12 +454,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 />
               </button>
 
-              {isNationalDay && !isScrolled && (
+              {isNationalDay && (
                 <button
                   type="button"
                   onClick={() => triggerNationalCelebration()}
                   title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
-                  className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
+                  className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${
+                    isScrolled ? "max-w-0 opacity-0 overflow-hidden pointer-events-none p-0 border-0" : "max-w-[120px] opacity-100 mr-2"
+                  } ${
                     dark
                       ? "bg-gradient-to-r from-[#08467d]/30 to-[#042442]/20 border-[#f8ca14]/40 text-[#f8ca14]"
                       : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
@@ -481,10 +477,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           {/* Center 9 Core Navigation Links (Desktop) — Liquid exit/enter animation on scroll */}
           <nav
             dir="rtl"
-            className={`hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-all duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+            className={`hidden lg:flex items-center gap-2.5 xl:gap-5 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-[opacity,transform,max-height] duration-300 ease-out ${
               isScrolled
-                ? "opacity-0 -translate-y-3 pointer-events-none scale-95 max-h-0 overflow-hidden"
-                : "opacity-100 translate-y-0 pointer-events-auto scale-100 max-h-16"
+                ? "opacity-0 -translate-y-2 pointer-events-none max-h-0 overflow-hidden"
+                : "opacity-100 translate-y-0 pointer-events-auto max-h-16"
             }`}
           >
               {/* 1. الرئيسية */}
@@ -519,7 +515,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-label="رابط الاعتمادات"
                 className={`aq-studio-toplink ${
                   currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
-                } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+                }`}
               >
                 {navAccreditationsText}
               </button>
@@ -532,7 +528,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-label="رابط القبول والتسجيل"
                 className={`aq-studio-toplink ${
                   currentActive === "admissions" ? "aq-studio-toplink--active" : ""
-                } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
+                }`}
               >
                 {navAdmissionsText}
               </button>
@@ -553,18 +549,18 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 onClick={() => go("/albums")}
                 data-visual-id="header-nav-albums"
                 data-visual-tag="text"
-                data-visual-label="رابط ألبومات العقيق"
+                data-visual-label="رابط الألبومات"
                 className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
               >
                 {navAlbumsText}
               </button>
 
-              {/* 7. أثير */}
+              {/* 7. أثير البودكاست */}
               <button
-                onClick={() => go("/atheer")}
+                onClick={() => go("/podcast")}
                 data-visual-id="header-nav-podcast"
                 data-visual-tag="text"
-                data-visual-label="رابط بودكاست أثير"
+                data-visual-label="رابط البودكاست"
                 className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
               >
                 {navPodcastText}
@@ -575,7 +571,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 onClick={() => go("/articles")}
                 data-visual-id="header-nav-articles"
                 data-visual-tag="text"
-                data-visual-label="رابط مقالات العقيق"
+                data-visual-label="رابط المقالات"
                 className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
               >
                 {navArticlesText}
@@ -583,205 +579,207 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
               {/* 9. الأخبار */}
               <button
-                onClick={() => go("/offers")}
+                onClick={() => go("/showcase")}
                 data-visual-id="header-nav-offers"
                 data-visual-tag="text"
-                data-visual-label="رابط الأخبار والعروض"
+                data-visual-label="رابط الأخبار"
                 className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
               >
                 {navOffersText}
               </button>
             </nav>
 
-          {/* Left Action Buttons & Primary CTA */}
-          {/* Left Action Buttons — On scroll: Twin Floating Left Island with Smoked Crystal & Ambient Aura */}
+          {/* Left Action Buttons — Permanently rounded pill island, zero circle morphing */}
           <div className="relative shrink-0">
-            {isScrolled && (
-              <span
-                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-l from-[#08467d]/30 via-blue-600/15 to-transparent blur-xl -z-10 animate-in fade-in duration-500"
-                aria-hidden="true"
-              />
-            )}
             <div
               dir="ltr"
-              className={`transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+              className={`rounded-full flex items-center shrink-0 transition-[background-color,border-color,box-shadow,padding,gap] duration-300 ease-out ${
                 isScrolled
-                  ? "pointer-events-auto rounded-full border shadow-xl backdrop-blur-2xl backdrop-saturate-[180%] px-2 sm:px-2.5 py-1.5 flex items-center gap-1.5 sm:gap-2 bg-white/45 dark:bg-[#060a12]/55 border-black/10 dark:border-white/20 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_10px_30px_-5px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.18),0_12px_30px_-5px_rgba(0,0,0,0.7)] shrink-0"
-                  : "flex items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto"
+                  ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-2 sm:px-2.5 py-1.5 gap-1.5 sm:gap-2 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
+                  : "border border-transparent bg-transparent px-1 sm:px-1.5 py-1 gap-2 sm:gap-2.5 pointer-events-auto"
               }`}
             >
-            {/* Primary Executive CTA Button — Hidden on scroll */}
-            {!isScrolled && (
-              <Button
-                onClick={() => go("/admissions#admission-form-section")}
-                data-visual-id="header-cta-button"
-                data-visual-tag="button"
-                data-visual-label="زر القبول والتسجيل (الهيدر)"
-                className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 ${
-                  dark
-                    ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                    : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
+              {/* Desktop Collapsible Extra Action Items (Glide away smoothly on scroll without layout snap) */}
+              <div
+                className={`hidden sm:flex items-center gap-2 transition-[max-width,opacity,transform] duration-300 ease-out overflow-hidden ${
+                  isScrolled
+                    ? "max-w-0 opacity-0 -translate-x-3 pointer-events-none"
+                    : "max-w-[420px] opacity-100 translate-x-0 pointer-events-auto"
                 }`}
               >
-                <span>{ctaButtonText}</span>
-              </Button>
-            )}
-
-            {/* Options Dropdown Menu OR Login Button (Desktop) — Hidden on scroll */}
-            {!isScrolled && isAuthenticated ? (
-              <div ref={optionsRef} className="hidden sm:block relative">
-                <button
-                  type="button"
-                  onClick={() => { setOptionsOpen((prev) => !prev); setPortalsOpen(false); }}
-                  className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 cursor-pointer ${
+                {/* Primary Executive CTA Button */}
+                <Button
+                  onClick={() => go("/admissions#admission-form-section")}
+                  data-visual-id="header-cta-button"
+                  data-visual-tag="button"
+                  data-visual-label="زر القبول والتسجيل (الهيدر)"
+                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 whitespace-nowrap ${
                     dark
-                      ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                      : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
+                      : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
                   }`}
-                  aria-label="قائمة الخيارات"
-                  title="قائمة الخيارات"
                 >
-                  <Settings2 size={16} />
-                </button>
+                  <span>{ctaButtonText}</span>
+                </Button>
 
-                {optionsOpen && (
-                  <div
-                    dir="rtl"
-                    className={`absolute left-0 top-full mt-2 w-56 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 p-1.5 ${
-                      dark ? "bg-[#0c0c0c]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-2xl"
-                    }`}
-                  >
-                    <div className="font-black text-xs text-center py-2 text-slate-500 dark:text-slate-400">
-                      {user?.name || "المشرف العام"}
-                    </div>
-                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-slate-200"}`} />
-
-                    {/* Admin Only Actions */}
-                    {isAdmin && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => { setOptionsOpen(false); editor.toggleEditing(); }}
-                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
-                            dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
-                          } rounded-xl mb-1 text-right transition`}
-                        >
-                          <PencilRuler size={15} className="text-[#f8ca14] shrink-0" />
-                          <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => { setOptionsOpen(false); navigate("/admin"); }}
-                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
-                            dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
-                          } rounded-xl mb-1 text-right transition`}
-                        >
-                          <LayoutDashboard size={15} className="text-blue-500 shrink-0" />
-                          <span>لوحة التحكم للإدارة</span>
-                        </button>
-                      </>
-                    )}
-
-                    <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-black/10"}`} />
-
-                    {/* Auth Logout */}
+                {/* Options Dropdown Menu OR Login Button */}
+                {isAuthenticated && (
+                  <div ref={optionsRef} className="relative shrink-0">
                     <button
                       type="button"
-                      onClick={() => { setOptionsOpen(false); handleAuth(); }}
-                      className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
-                        dark ? "hover:bg-[#de191e]/20 text-[#de191e]" : "hover:bg-[#de191e]/10 text-[#de191e]"
-                      } rounded-xl text-right transition`}
+                      onClick={() => { setOptionsOpen((prev) => !prev); setPortalsOpen(false); }}
+                      className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 cursor-pointer ${
+                        dark
+                          ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "border-black/10 bg-black/5 text-slate-700 hover:bg-black/10"
+                      }`}
+                      aria-label="قائمة الخيارات"
+                      title="قائمة الخيارات"
                     >
-                      <LogOut size={15} className="shrink-0" />
-                      <span>تسجيل الخروج</span>
+                      <Settings2 size={16} />
                     </button>
+
+                    {optionsOpen && (
+                      <div
+                        dir="rtl"
+                        className={`absolute left-0 top-full mt-2 w-56 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 p-1.5 ${
+                          dark ? "bg-[#0c0c0c]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-2xl"
+                        }`}
+                      >
+                        <div className="font-black text-xs text-center py-2 text-slate-500 dark:text-slate-400">
+                          {user?.name || "المشرف العام"}
+                        </div>
+                        <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+
+                        {isAdmin && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => { setOptionsOpen(false); editor.toggleEditing(); }}
+                              className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                                dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
+                              } rounded-xl mb-1 text-right transition`}
+                            >
+                              <PencilRuler size={15} className="text-[#f8ca14] shrink-0" />
+                              <span>{editor.isEditing ? "إنهاء التعديل البصري" : "تفعيل المحرر البصري"}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => { setOptionsOpen(false); navigate("/admin"); }}
+                              className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                                dark ? "hover:bg-white/5 text-white" : "hover:bg-slate-100 text-slate-800"
+                              } rounded-xl mb-1 text-right transition`}
+                            >
+                              <LayoutDashboard size={15} className="text-blue-500 shrink-0" />
+                              <span>لوحة التحكم للإدارة</span>
+                            </button>
+                          </>
+                        )}
+
+                        <div className={`h-px my-1 ${dark ? "bg-white/10" : "bg-black/10"}`} />
+
+                        <button
+                          type="button"
+                          onClick={() => { setOptionsOpen(false); handleAuth(); }}
+                          className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-bold text-xs ${
+                            dark ? "hover:bg-[#de191e]/20 text-[#de191e]" : "hover:bg-[#de191e]/10 text-[#de191e]"
+                          } rounded-xl text-right transition`}
+                        >
+                          <LogOut size={15} className="shrink-0" />
+                          <span>تسجيل الخروج</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
+
+                {/* Deploy to Live — للمشرف فقط */}
+                {isAdmin && isLocalhost && (
+                  <button
+                    onClick={() => {
+                      if (isDeploying) return;
+                      if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                      setIsDeploying(true);
+                      deployMutation.mutate();
+                    }}
+                    disabled={isDeploying}
+                    className={`shrink-0 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
+                      isDeploying
+                        ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] cursor-wait opacity-70"
+                        : "border-[#f8ca14]/50 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14] hover:shadow-[#f8ca14]/20"
+                    }`}
+                    title="نشر التعديلات على الموقع المباشر 🚀"
+                  >
+                    <Rocket size={16} className={isDeploying ? "animate-spin" : ""} />
+                  </button>
+                )}
+
+                {/* Spotlight Search Trigger */}
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  data-visual-id="header-icon-search"
+                  data-visual-tag="icon"
+                  data-visual-label="زر البحث الشامل"
+                  className={`shrink-0 grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
+                    dark
+                      ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                      : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                  }`}
+                  title="البحث الشامل (Ctrl+K)"
+                  aria-label="البحث الشامل"
+                >
+                  <Search size={16} />
+                </button>
               </div>
-            ) : null}
 
-            {/* Deploy to Live — للمشرف فقط — Hidden on scroll */}
-            {!isScrolled && isAdmin && isLocalhost ? (
+              {/* ☀️ / 🌙 زر الإضاءة (Theme Toggle) — Always visible, silky smooth */}
               <button
-                onClick={() => {
-                  if (isDeploying) return;
-                  if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                  setIsDeploying(true);
-                  deployMutation.mutate();
-                }}
-                disabled={isDeploying}
-                className={`hidden sm:grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 shadow-lg ${
-                  isDeploying
-                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] cursor-wait opacity-70"
-                    : "border-[#f8ca14]/50 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14] hover:shadow-[#f8ca14]/20"
-                }`}
-                title="نشر التعديلات على الموقع المباشر 🚀"
-              >
-                <Rocket size={16} className={isDeploying ? "animate-spin" : ""} />
-              </button>
-            ) : null}
-
-            {/* Spotlight Search Trigger — Hidden on scroll */}
-            {!isScrolled && (
-              <button
-                onClick={() => setSearchOpen(true)}
-                data-visual-id="header-icon-search"
-                data-visual-tag="icon"
-                data-visual-label="زر البحث الشامل"
-                className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border transition active:scale-95 ${
+                onClick={toggleTheme}
+                className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 ${
                   dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
                     : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
-                title="البحث الشامل (Ctrl+K)"
-                aria-label="البحث الشامل"
+                title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
               >
-                <Search size={16} />
+                <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
               </button>
-            )}
 
-            {/* ☀️ / 🌙 زر الإضاءة (Theme Toggle) — Always visible, compact on scroll */}
-            <button
-              onClick={toggleTheme}
-              className={`grid ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-95 ${
-                dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                  : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
-              }`}
-              title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
-            >
-              <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
-            </button>
-
-            {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Visible on ALL screens when isScrolled */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMobileMenuOpen((open) => !open);
-              }}
-              className={`group grid ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5 flex" : "h-9 w-9 sm:h-10 sm:w-10 lg:hidden"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
-                mobileMenuOpen
-                  ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
-                  : dark
-                  ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]"
-                  : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]"
-              }`}
-              aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-              title="القائمة الشاملة"
-            >
-              {mobileMenuOpen ? (
-                <X size={18} />
-              ) : (
-                <div className="flex flex-col justify-center items-center gap-[3.5px] w-4">
-                  <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
-                  <span className="h-[2px] w-2.5 rounded-full bg-current transition-all duration-300 group-hover:w-4" />
-                  <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
-                </div>
-              )}
-            </button>
-          </div>
+              {/* ☰ الثلاث شُرط (Hamburger Menu Button) — Fluid entry on desktop without snap */}
+              <div className={`transition-[max-width,opacity,transform] duration-300 ease-out overflow-hidden ${
+                isScrolled
+                  ? "max-w-[48px] opacity-100 scale-100 pointer-events-auto"
+                  : "max-w-[48px] opacity-100 scale-100 lg:max-w-0 lg:opacity-0 lg:scale-90 lg:pointer-events-none"
+              }`}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMobileMenuOpen((open) => !open);
+                  }}
+                  className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
+                    mobileMenuOpen
+                      ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
+                      : dark
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20 hover:border-[#f8ca14]"
+                      : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/15 hover:border-[#08467d]"
+                  }`}
+                  aria-label={mobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+                  title="القائمة الشاملة"
+                >
+                  {mobileMenuOpen ? (
+                    <X size={18} />
+                  ) : (
+                    <div className="flex flex-col justify-center items-center gap-[3.5px] w-4">
+                      <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                      <span className="h-[2px] w-2.5 rounded-full bg-current transition-all duration-300 group-hover:w-4" />
+                      <span className="h-[2px] w-4 rounded-full bg-current transition-all duration-300" />
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
 
           {/* ── Contextual Anchored Bento Popover (Directly Below the Button) ── */}
           {mobileMenuOpen && (
