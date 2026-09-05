@@ -104,6 +104,19 @@ describe("Dynamic Social Preview Engine", () => {
       expect(qualityPreview.title).toContain("الاعتمادات");
     });
 
+    it("resolves social preview for journal hub dynamically from published issues", async () => {
+      const preview = await resolveSocialPreviewForPath("/journal", origin);
+      expect(preview.title).toContain("مجلة العقيق");
+      expect(preview.canonicalUrl).toBe("https://aqeeq-studio.onrender.com/journal");
+      expect(preview.imageUrl).not.toContain("alaqeeq-logo.png");
+    });
+
+    it("resolves social preview for showcase hub dynamically", async () => {
+      const preview = await resolveSocialPreviewForPath("/showcase", origin);
+      expect(preview.title).toContain("الأخبار والفعاليات");
+      expect(preview.canonicalUrl).toBe("https://aqeeq-studio.onrender.com/showcase");
+    });
+
     it("resolves default homepage preview for root /", async () => {
       const preview = await resolveSocialPreviewForPath("/", origin);
       expect(preview.title).toBeTruthy();

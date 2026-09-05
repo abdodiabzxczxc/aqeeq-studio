@@ -1,13 +1,18 @@
 import type { Request, Response, NextFunction } from "express";
 import {
   getAqeeqAlbumBySlug,
+  listAqeeqAlbums,
   getSchoolNewsIssueBySlug,
+  listSchoolNewsIssues,
   getSchoolNewsMonthlyBook,
   getAqeeqShowcaseBySlug,
+  listAqeeqShowcases,
+  getCustomPageBySlug,
+  listVisualElementOverrides,
   getSiteOrchestration,
 } from "./db";
-import { getArticleBySlug } from "./articlesDb";
-import { getPodcastBySlug } from "./podcastDb";
+import { getArticleBySlug, getPublishedArticles } from "./articlesDb";
+import { getPodcastBySlug, getPodcasts } from "./podcastDb";
 
 export const isSocialCrawler = (userAgent: string): boolean => {
   if (!userAgent) return false;
@@ -36,6 +41,18 @@ export function resolveSocialImageUrl(source: string | null | undefined, origin:
     return new URL(proxied, origin).toString();
   } catch {
     return new URL("/og-preview.png", origin).toString();
+  }
+}
+
+async function getVisualImageOverride(pagePath: string): Promise<string | undefined> {
+  try {
+    const overrides = await listVisualElementOverrides(pagePath, "published");
+    const img = overrides.find(
+      (r: any) => r.mediaUrl && typeof r.mediaUrl === "string" && r.mediaUrl.trim() && !r.isHidden
+    );
+    return img ? (img as any).mediaUrl.trim() : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -132,13 +149,26 @@ export async function resolveSocialPreviewForPath(
     } catch {}
   }
 
-  // 2. Albums List (/albums)
+  // 2. Albums List (/albums) -> Dynamically fetches the latest published album from DB
   if (cleanPath === "/albums") {
+    let latestAlbumCover: string | undefined;
+    let latestAlbumTitle = "معارض وأنشطة العقيق";
+    try {
+      const albums = await listAqeeqAlbums("published");
+      if (albums.length > 0) {
+        const latest = albums[0];
+        latestAlbumCover = latest.coverUrl || undefined;
+        latestAlbumTitle = latest.title;
+      }
+    } catch {}
+
     return {
       title: "معارض وألبومات العقيق 📸 | ذكريات وإنجازات مصورة",
-      description:
-        "شاهد أحدث التغطيات المصورة والمعارض التفاعلية لفعاليات وإنجازات طلاب ومعلمي مدارس العقيق الأهلية والدولية بالمدينة المنورة.",
-      imageUrl: resolveSocialImageUrl("/og-preview.png", origin),
+      description: `شاهد أحدث التغطيات المصورة والمعارض التفاعلية لفعاليات وإنجازات طلاب ومعلمي مدارس العقيق بالمدينة المنورة (أحدث ألبوم: ${latestAlbumTitle}).`,
+      imageUrl: resolveSocialImageUrl(
+        latestAlbumCover || "/themes/saudi-national-day/opt/cover_album_national.webp",
+        origin
+      ),
       canonicalUrl: new URL("/albums", origin).toString(),
       ogType: "website",
     };
@@ -163,7 +193,7 @@ export async function resolveSocialPreviewForPath(
           title: `${issue.title.trim()} | مجلة العقيق المدرسية 📖`,
           description:
             issue.description?.trim() ||
-            `${issue.seasonLabel || "مجلة العقيق"} · تاريخ الإصدار: ${issue.issueDate} · تصفح إلكتروني تفاعلي لكافة صفحات العدد.`,
+            `${issue.seasonLabel || "مجلة العقيق"} · تاريخ الإصدار: ${issue.issueDate} · تصفح وقراءة إلكترونية تفاعلية لكافة صفحات العدد.`,
           imageUrl: resolveSocialImageUrl(coverSource, origin),
           canonicalUrl: new URL(`/journal/issue/${encodeURIComponent(issue.slug)}`, origin).toString(),
           ogType: "article",
@@ -190,13 +220,26 @@ export async function resolveSocialPreviewForPath(
     } catch {}
   }
 
-  // 5. Journal Index & Archive (/journal, /journal/archive)
+  // 5. Journal Index & Archive (/journal, /journal/archive) -> Dynamically fetches the latest published magazine issue from DB
   if (cleanPath === "/journal" || cleanPath === "/journal/archive") {
+    let latestIssueCover: string | undefined;
+    let latestIssueTitle = "إصدارات العقيق";
+    try {
+      const issues = await listSchoolNewsIssues("published");
+      if (issues.length > 0) {
+        const latest = issues[0];
+        latestIssueCover = latest.coverUrl || undefined;
+        latestIssueTitle = latest.title;
+      }
+    } catch {}
+
     return {
       title: "مجلة العقيق المدرسية 📖 | صدى الإبداع والريادة",
-      description:
-        "تصفح أحدث وأرشيف أعداد مجلة العقيق الصادرة عن مدارس العقيق الأهلية والدولية بالمدينة المنورة بتجربة تصفح تفاعلية ومميزة.",
-      imageUrl: resolveSocialImageUrl("/alaqeeq-logo.png", origin),
+      description: `تصفح أحدث وأرشيف أعداد مجلة العقيق الصادرة عن مدارس العقيق الأهلية والدولية بالمدينة المنورة بتجربة تصفح تفاعلية ومميزة (أحدث عدد: ${latestIssueTitle}).`,
+      imageUrl: resolveSocialImageUrl(
+        latestIssueCover || "/uploads/site-media/1/1788029592790-9f51a02b-drive-1B3LhIXBI_l4gw0RQgAI92qeuufkowJWJ-p01_f952eff9.jpg",
+        origin
+      ),
       canonicalUrl: new URL("/journal", origin).toString(),
       ogType: "website",
     };
@@ -227,14 +270,24 @@ export async function resolveSocialPreviewForPath(
     } catch {}
   }
 
-  // 7. Articles Index (/articles)
+  // 7. Articles Index (/articles) -> Dynamically fetches the latest published article from DB
   if (cleanPath === "/articles") {
+    let latestArticleCover: string | undefined;
+    let latestArticleTitle = "رؤى وبحوث العقيق";
+    try {
+      const articles = await getPublishedArticles();
+      if (articles.length > 0) {
+        const latest = articles[0];
+        latestArticleCover = latest.coverUrl || undefined;
+        latestArticleTitle = latest.title;
+      }
+    } catch {}
+
     return {
       title: "مقالات ورؤى العقيق التربوية ✍️ | مدارس العقيق",
-      description:
-        "مقالات وبحوث تربوية وعلمية وثقافية لنخبة من المعلمين والقيادات والطلاب بمدارس العقيق الأهلية والدولية بالمدينة المنورة.",
+      description: `مقالات وبحوث تربوية وعلمية وثقافية لنخبة من المعلمين والقيادات والطلاب بمدارس العقيق (أحدث مقال: ${latestArticleTitle}).`,
       imageUrl: resolveSocialImageUrl(
-        "/articles/is-quality-important-school-accreditation.jpg",
+        latestArticleCover || "/articles/is-quality-important-school-accreditation.jpg",
         origin
       ),
       canonicalUrl: new URL("/articles", origin).toString(),
@@ -267,13 +320,26 @@ export async function resolveSocialPreviewForPath(
     } catch {}
   }
 
-  // 9. Podcast Hub (/atheer, /podcast)
+  // 9. Podcast Hub (/atheer, /podcast) -> Dynamically fetches the latest podcast episode from DB
   if (cleanPath === "/atheer" || cleanPath === "/podcast") {
+    let latestPodcastCover: string | undefined;
+    let latestPodcastTitle = "صوت الإبداع المدرسي";
+    try {
+      const podcasts = await getPodcasts();
+      if (podcasts.length > 0) {
+        const latest = podcasts[0];
+        latestPodcastCover = latest.thumbnailUrl || latest.coverUrl || undefined;
+        latestPodcastTitle = latest.title;
+      }
+    } catch {}
+
     return {
       title: "أثير العقيق 🎙️ | البودكاست والإذاعة المدرسية",
-      description:
-        "صوت الإبداع والإلهام، حوارات ونشرات إذاعية يقدمها طلاب ومعلمو مدارس العقيق الأهلية والدولية بالمدينة المنورة.",
-      imageUrl: resolveSocialImageUrl("/alaqeeq-logo.png", origin),
+      description: `صوت الإبداع والإلهام، حوارات ونشرات إذاعية يقدمها طلاب ومعلمو مدارس العقيق (أحدث حلقة: ${latestPodcastTitle}).`,
+      imageUrl: resolveSocialImageUrl(
+        latestPodcastCover || "/covers/cover-about.jpg",
+        origin
+      ),
       canonicalUrl: new URL("/podcast", origin).toString(),
       ogType: "website",
     };
@@ -311,64 +377,110 @@ export async function resolveSocialPreviewForPath(
     } catch {}
   }
 
-  // 11. Showcase / News Hub (/showcase, /news, /offers)
+  // 11. Showcase / News Hub (/showcase, /news, /offers) -> Dynamically fetches the latest showcase from DB
   if (
     cleanPath === "/showcase" ||
     cleanPath === "/news" ||
     cleanPath === "/offers"
   ) {
+    let latestShowcaseCover: string | undefined;
+    let latestShowcaseTitle = "فعاليات وإنجازات العقيق";
+    try {
+      const showcases = await listAqeeqShowcases("published");
+      if (showcases.length > 0) {
+        const latest = showcases[0];
+        latestShowcaseCover = latest.coverUrl || undefined;
+        latestShowcaseTitle = latest.title;
+      }
+    } catch {}
+
     return {
       title: "معرض الأخبار والفعاليات 📢 | مدارس العقيق الأهلية والدولية",
-      description:
-        "متابعة حية وشاملة لكافة فعاليات وبطولات ومعارض وإنجازات مدارس العقيق الأهلية والدولية بالمدينة المنورة.",
-      imageUrl: resolveSocialImageUrl("/og-preview.png", origin),
+      description: `متابعة حية وشاملة لكافة فعاليات وبطولات ومعارض وإنجازات مدارس العقيق بالمدينة المنورة (أحدث تغطية: ${latestShowcaseTitle}).`,
+      imageUrl: resolveSocialImageUrl(
+        latestShowcaseCover || "/themes/saudi-national-day/opt/cover_showcase_national.webp",
+        origin
+      ),
       canonicalUrl: new URL("/showcase", origin).toString(),
       ogType: "website",
     };
   }
 
-  // 12. Admissions & Fees (/admissions, /admission, /fees, /prices)
+  // 12. Admissions & Fees (/admissions, /admission, /fees, /prices) -> Dynamically reads Visual Editor & Admin settings
   if (
     cleanPath === "/admissions" ||
     cleanPath === "/admission" ||
     cleanPath === "/fees" ||
     cleanPath === "/prices"
   ) {
+    const visualOverride = await getVisualImageOverride("/admissions");
+
     return {
       title: "بوابة القبول والتسجيل والرسوم الدراسية 🎓 | مدارس العقيق",
       description:
         "سجل الآن في مدارس العقيق الأهلية والدولية بالمدينة المنورة للعام الدراسي الجديد. اكتشف المراحل والمسارات التعليمية وحاسبة الأقساط والخصومات الحصرية.",
-      imageUrl: resolveSocialImageUrl("/og-preview.png", origin),
+      imageUrl: resolveSocialImageUrl(
+        visualOverride || "/covers/cover-admissions.jpg",
+        origin
+      ),
       canonicalUrl: new URL("/admissions", origin).toString(),
       ogType: "website",
     };
   }
 
-  // 13. About Us (/about)
+  // 13. About Us (/about) -> Dynamically reads Visual Editor & Admin Campus settings
   if (cleanPath === "/about") {
+    const visualOverride = await getVisualImageOverride("/about");
+
     return {
       title: "عن مدارس العقيق الأهلية والدولية 🏫 | الريادة والتميز منذ 1994",
       description:
         "تعرف على مسيرة مدارس العقيق بالمدينة المنورة، رؤيتنا التعليمية، مجمعات البنين والبنات، وكوادرنا التدريسية المؤهلة.",
-      imageUrl: resolveSocialImageUrl("/og-preview.png", origin),
+      imageUrl: resolveSocialImageUrl(
+        visualOverride || "/covers/cover-about.jpg",
+        origin
+      ),
       canonicalUrl: new URL("/about", origin).toString(),
       ogType: "website",
     };
   }
 
-  // 14. Accreditations (/accreditations, /quality)
+  // 14. Accreditations (/accreditations, /quality) -> Dynamically reads Visual Editor & Admin settings
   if (cleanPath === "/accreditations" || cleanPath === "/quality") {
+    const visualOverride = await getVisualImageOverride("/accreditations");
+
     return {
       title: "الاعتمادات والجودة والجوائز 🏅 | مدارس العقيق الأهلية والدولية",
       description:
         "سجل حافل من الاعتمادات الوطنية والدولية وجوائز التميز المؤسسي والأكاديمي لمدارس العقيق بالمدينة المنورة.",
-      imageUrl: resolveSocialImageUrl("/og-preview.png", origin),
+      imageUrl: resolveSocialImageUrl(
+        visualOverride || "/covers/cover-accreditations.jpg",
+        origin
+      ),
       canonicalUrl: new URL("/accreditations", origin).toString(),
       ogType: "website",
     };
   }
 
-  // 15. Default / Homepage (Fallback to Site Orchestration from Admin Dashboard)
+  // 15. Custom Pages (/page/:slug) -> Dynamically reads from customPages DB table
+  const customPageMatch = cleanPath.match(/^\/page\/([^/]+)$/);
+  if (customPageMatch) {
+    const slug = decodeURIComponent(customPageMatch[1]);
+    try {
+      const customPage = await getCustomPageBySlug(slug, "public");
+      if (customPage) {
+        return {
+          title: `${customPage.title.trim()} | مدارس العقيق`,
+          description: `${customPage.title} - مدارس العقيق الأهلية والدولية بالمدينة المنورة.`,
+          imageUrl: resolveSocialImageUrl("/covers/cover-about.jpg", origin),
+          canonicalUrl: new URL(`/page/${encodeURIComponent(slug)}`, origin).toString(),
+          ogType: "article",
+        };
+      }
+    } catch {}
+  }
+
+  // 16. Default / Homepage -> Dynamically reads from Site Orchestration & Marketing Pixels in DB
   try {
     const config = await getSiteOrchestration();
     const title =
@@ -377,7 +489,9 @@ export async function resolveSocialPreviewForPath(
     const description =
       config?.marketingPixels?.ogDescription?.trim() ||
       "الريادة في التعليم وصناعة المستقبل منذ عام 1994 - برامج تعليمية معتمدة ورعاية للموهبة والإبداع";
-    const rawImage = config?.marketingPixels?.ogImageUrl?.trim() || "/api/og-image.png";
+    const rawImage =
+      config?.marketingPixels?.ogImageUrl?.trim() ||
+      "/api/og-image.png";
 
     return {
       title,
