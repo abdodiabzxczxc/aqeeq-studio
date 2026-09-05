@@ -1820,20 +1820,72 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald-300"] { background-colo
 
 /* واجهة المشاركة والاستوديو: بلاك مود نقي ووايت مود نقي بألوان الهوية المعتمدة */
 .aq-studio-share { background: #000000; color: #ffffff; }
-.aq-studio-share-header { background: rgba(0,0,0,.95); border-bottom: 1px solid rgba(255,255,255,.08); }
+
+/* الوضع الداكن للهيدر */
+.aq-studio-share-header:not(.is-scrolled),
+html.dark .aq-studio-share-header:not(.is-scrolled),
+:root[data-aqeeq-theme="dark"] .aq-studio-share-header:not(.is-scrolled) {
+  background: rgba(10, 15, 24, 0.94);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* الوضع الفاتح للهيدر — يطبق على جميع الصفحات بدون استثناء */
+html.light .aq-studio-share-header:not(.is-scrolled),
+html:not(.dark) .aq-studio-share-header:not(.is-scrolled),
+:root[data-aqeeq-theme="light"] .aq-studio-share-header:not(.is-scrolled),
+.aq-studio-share--light .aq-studio-share-header:not(.is-scrolled) {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+
 .aq-studio-share-hero { background: #000000; }
 .aq-studio-share-link { color: rgba(255,255,255,.75); transition: color 160ms cubic-bezier(.23,1,.32,1); }
 .aq-studio-share-link:hover { color: #f8ca14; }
 .aq-studio-share-link--active { background: rgba(248,202,20,.12); color: #f8ca14; }
-.aq-studio-toplink { position: relative; padding: .75rem 0; font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: 0.82rem; color: rgba(255,255,255,.85); transition: color .2s ease; }
+
+/* الروابط في الوضع الداكن */
+.aq-studio-toplink {
+  position: relative;
+  padding: .75rem 0;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,.85);
+  transition: color .2s ease;
+}
 .aq-studio-toplink:hover, .aq-studio-toplink--active { color: #f8ca14; }
 .aq-studio-toplink--active::after { content: ""; position: absolute; right: 0; bottom: .18rem; left: 0; height: 2px; background: #f8ca14; }
+
+/* الروابط في الوضع الفاتح — يطبق على جميع الصفحات */
+html.light .aq-studio-toplink,
+html:not(.dark) .aq-studio-toplink,
+:root[data-aqeeq-theme="light"] .aq-studio-toplink,
+.aq-studio-share--light .aq-studio-toplink {
+  color: #334155 !important;
+}
+html.light .aq-studio-toplink:hover,
+html.light .aq-studio-toplink--active,
+html:not(.dark) .aq-studio-toplink:hover,
+html:not(.dark) .aq-studio-toplink--active,
+:root[data-aqeeq-theme="light"] .aq-studio-toplink:hover,
+:root[data-aqeeq-theme="light"] .aq-studio-toplink--active,
+.aq-studio-share--light .aq-studio-toplink:hover,
+.aq-studio-share--light .aq-studio-toplink--active {
+  color: #08467d !important;
+}
+html.light .aq-studio-toplink--active::after,
+html:not(.dark) .aq-studio-toplink--active::after,
+:root[data-aqeeq-theme="light"] .aq-studio-toplink--active::after,
+.aq-studio-share--light .aq-studio-toplink--active::after {
+  background: #08467d !important;
+}
+
 .aq-studio-mobile-link { display: block; width: 100%; border-radius: .75rem; padding: .9rem 1rem; text-align: right; font-size: .78rem; font-weight: 800; color: #ffffff; transition: background .2s ease, color .2s ease; }
 .aq-studio-mobile-link:hover, .aq-studio-mobile-link--active { background: rgba(248,202,20,.12); color: #f8ca14; }
 
-/* وايت مود نقي تماماً */
-.aq-studio-share--light { background: #f8fafc !important; color: #0f172a !important; }
-.aq-studio-share--light .aq-studio-share-header:not(.is-scrolled) { background: rgba(255,255,255,.98); border-color: rgba(0,0,0,.08); color: #0f172a; }
+/* حالة السكرول: شفافية كاملة على كل الصفحات */
 .aq-studio-share-header.is-scrolled,
 .aq-studio-share--light .aq-studio-share-header.is-scrolled,
 header.is-scrolled {
@@ -1843,15 +1895,15 @@ header.is-scrolled {
   box-shadow: none !important;
   pointer-events: none !important;
 }
+
+/* وايت مود نقي تماماً للبطاقات */
+.aq-studio-share--light { background: #f8fafc !important; color: #0f172a !important; }
 .aq-studio-share--light .aq-studio-share-hero { background: #ffffff !important; }
 .aq-studio-share--light .aq-studio-share-card { background: #ffffff !important; border-color: rgba(8,70,125,.12) !important; box-shadow: 0 0.75rem 2.5rem rgba(8,70,125,.06) !important; }
 .aq-studio-share--light .aq-studio-share-media { background: #f1f5f9 !important; border-color: rgba(0,0,0,.08) !important; }
 .aq-studio-share--light .aq-studio-share-link { color: #334155; }
 .aq-studio-share--light .aq-studio-share-link:hover { color: #08467d; }
 .aq-studio-share--light .aq-studio-share-link--active { background: rgba(8,70,125,.08); color: #08467d; }
-.aq-studio-share--light .aq-studio-toplink { color: #334155; }
-.aq-studio-share--light .aq-studio-toplink:hover, .aq-studio-share--light .aq-studio-toplink--active { color: #08467d; }
-.aq-studio-share--light .aq-studio-toplink--active::after { background: #08467d; }
 .aq-studio-share--light .aq-studio-mobile-link { color: #0f172a; }
 .aq-studio-share--light .aq-studio-mobile-link:hover, .aq-studio-share--light .aq-studio-mobile-link--active { background: rgba(8,70,125,.08); color: #08467d; }
 

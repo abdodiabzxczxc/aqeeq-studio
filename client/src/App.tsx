@@ -109,12 +109,14 @@ function Router() {
       <Route path="/albums/manage" component={AqeeqAlbumStudioPage} />
       <Route path="/albums/:slug" component={AlbumReaderRoute} />
       <Route path="/albums" component={AqeeqAlbumsPage} />
+      <Route path="/showcase/manage" component={AqeeqShowcaseStudioPage} />
+      <Route path="/showcase" component={AqeeqShowcasePage} />
       <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
       <Route path="/offers" component={AqeeqShowcasePage} />
-      <Route path="/news/manage" component={LegacyNewsManageRedirect} />
+      <Route path="/news/manage" component={AqeeqShowcaseStudioPage} />
+      <Route path="/news" component={AqeeqShowcasePage} />
       <Route path="/news/month/:monthKey" component={LegacyNewsMonthRedirect} />
       <Route path="/news/:slug" component={LegacyNewsSlugRedirect} />
-      <Route path="/news" component={LegacyNewsRedirect} />
       <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
