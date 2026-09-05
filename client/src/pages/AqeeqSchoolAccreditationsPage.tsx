@@ -73,12 +73,12 @@ export default function AqeeqSchoolAccreditationsPage() {
   const rawHeroMiddleCardY = useTransform(scrollY, [0, 450], [0, -32]);
   const rawHeroMiddleCardScale = useTransform(scrollY, [0, 450], [1, 1.08]);
 
-  const heroFrontCardX = useSpring(rawHeroFrontCardX, { stiffness: 100, damping: 20 });
-  const heroFrontCardRotate = useSpring(rawHeroFrontCardRotate, { stiffness: 100, damping: 20 });
-  const heroBackCardX = useSpring(rawHeroBackCardX, { stiffness: 100, damping: 20 });
-  const heroBackCardRotate = useSpring(rawHeroBackCardRotate, { stiffness: 100, damping: 20 });
-  const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
-  const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
+  const heroFrontCardX = rawHeroFrontCardX;
+  const heroFrontCardRotate = rawHeroFrontCardRotate;
+  const heroBackCardX = rawHeroBackCardX;
+  const heroBackCardRotate = rawHeroBackCardRotate;
+  const heroMiddleCardY = rawHeroMiddleCardY;
+  const heroMiddleCardScale = rawHeroMiddleCardScale;
 
   // 3D Mouse Perspective Tilt for Hero Cards
   const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
@@ -107,9 +107,9 @@ export default function AqeeqSchoolAccreditationsPage() {
   const rawPlaqueRotateY = useTransform(hubProgress, [0, 0.45, 0.9], [-16, 0, 10]);
   const rawPlaqueScale = useTransform(hubProgress, [0, 0.45, 0.9], [0.93, 1, 0.96]);
 
-  const plaqueRotateX = useSpring(rawPlaqueRotateX, { stiffness: 80, damping: 20 });
-  const plaqueRotateY = useSpring(rawPlaqueRotateY, { stiffness: 80, damping: 20 });
-  const plaqueScale = useSpring(rawPlaqueScale, { stiffness: 80, damping: 20 });
+  const plaqueRotateX = rawPlaqueRotateX;
+  const plaqueRotateY = rawPlaqueRotateY;
+  const plaqueScale = rawPlaqueScale;
 
   // ========================================================
   // 3. Pathway Energy Beam Scroll Progress & Milestones Parallax
@@ -120,12 +120,12 @@ export default function AqeeqSchoolAccreditationsPage() {
     offset: ["start end", "end start"],
   });
   const rawBeamHeight = useTransform(pipelineProgress, [0.1, 0.85], ["0%", "100%"]);
-  const beamHeight = useSpring(rawBeamHeight, { stiffness: 100, damping: 24 });
+  const beamHeight = rawBeamHeight;
 
   const rawStaggerCol1 = useTransform(pipelineProgress, [0, 1], [30, -30]);
   const rawStaggerCol2 = useTransform(pipelineProgress, [0, 1], [-25, 25]);
-  const staggerCol1 = useSpring(rawStaggerCol1, { stiffness: 85, damping: 20 });
-  const staggerCol2 = useSpring(rawStaggerCol2, { stiffness: 85, damping: 20 });
+  const staggerCol1 = rawStaggerCol1;
+  const staggerCol2 = rawStaggerCol2;
 
   // ========================================================
   // 4. Interactive 3D Holographic Radar Cockpit Scroll Physics
@@ -140,9 +140,9 @@ export default function AqeeqSchoolAccreditationsPage() {
   const rawRadarScale = useTransform(radarProgress, [0, 0.45, 0.9], [0.93, 1, 0.96]);
   const rawRadarRotateRing = useTransform(radarProgress, [0, 1], [0, 260]);
 
-  const radarRotateX = useSpring(rawRadarRotateX, { stiffness: 85, damping: 22 });
-  const radarScale = useSpring(rawRadarScale, { stiffness: 85, damping: 22 });
-  const radarRotateRing = useSpring(rawRadarRotateRing, { stiffness: 70, damping: 20 });
+  const radarRotateX = rawRadarRotateX;
+  const radarScale = rawRadarScale;
+  const radarRotateRing = rawRadarRotateRing;
 
   const selectScannerGrade = (grade: "primary" | "middle" | "high") => {
     setScannerGrade(grade);

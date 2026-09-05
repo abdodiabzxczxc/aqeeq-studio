@@ -27,6 +27,17 @@ button, a, input, select, textarea, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Hardware Acceleration & Zero-Stutter Offscreen Rendering ── */
+.aq-perf-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 650px;
+}
+
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
 /* ── Scrollbar Utilities ─────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;

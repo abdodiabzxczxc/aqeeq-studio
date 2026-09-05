@@ -145,11 +145,6 @@ function AqeeqCurtainHeroStage({
   const rawScale = useTransform(scrollYProgress, [0, 0.65], [1, 0.92]);
   const rawOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.35]);
   const rawY = useTransform(scrollYProgress, [0, 0.65], ["0px", "-35px"]);
-  const rawBlur = useTransform(scrollYProgress, [0, 0.65], ["blur(0px)", "blur(6px)"]);
-
-  const heroScale = useSpring(rawScale, { stiffness: 100, damping: 22, mass: 0.5 });
-  const heroOpacity = useSpring(rawOpacity, { stiffness: 100, damping: 22, mass: 0.5 });
-  const heroY = useSpring(rawY, { stiffness: 100, damping: 22, mass: 0.5 });
 
   // فحص الشاشات الكبيرة لتفعيل التثبيت السينمائي على الكمبيوتر حصرياً
   // وتوفير انسياب طبيعي بدون تداخل على الموبايل
@@ -169,10 +164,9 @@ function AqeeqCurtainHeroStage({
         <div className="relative lg:sticky lg:top-0 z-0 w-full overflow-hidden">
           <motion.div
             style={{
-              scale: isDesktop ? heroScale : 1,
-              opacity: isDesktop ? heroOpacity : 1,
-              y: isDesktop ? heroY : 0,
-              filter: isDesktop ? rawBlur : "none",
+              scale: isDesktop ? rawScale : 1,
+              opacity: isDesktop ? rawOpacity : 1,
+              y: isDesktop ? rawY : 0,
               transformOrigin: "center top",
             }}
             className="w-full will-change-transform"
