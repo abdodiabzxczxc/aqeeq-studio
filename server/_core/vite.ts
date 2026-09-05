@@ -5,16 +5,21 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSchoolNewsIssueBySlug } from "../db";
+import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSchoolNewsIssueBySlug, getSiteOrchestration } from "../db";
 import { streamAqeeqAlbumMedia, streamAqeeqAlbumVideo, streamAqeeqAlbumZip, streamAqeeqDriveVideo } from "../aqeeqAlbumDownloads";
 import { createAlbumSocialPreviewHtml, createSiteSocialPreviewHtml } from "../albumSocialPreview";
 import { createJournalSocialPreviewHtml, isJournalSocialCrawler } from "../journalSocialPreview";
 
 async function serveUniversalSiteSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (!isJournalSocialCrawler(req.get("user-agent") || "")) return next();
-  const protocol = String(req.get("x-forwarded-proto") || req.protocol).split(",")[0]?.trim() || "https";
-  const origin = `${protocol}://${req.get("host")}`;
-  res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(createSiteSocialPreviewHtml(origin, req.originalUrl || "/"));
+  try {
+    const config = await getSiteOrchestration();
+    const protocol = String(req.get("x-forwarded-proto") || req.protocol).split(",")[0]?.trim() || "https";
+    const origin = `${protocol}://${req.get("host")}`;
+    res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(createSiteSocialPreviewHtml(origin, req.originalUrl || "/", config?.marketingPixels));
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function serveJournalSocialPreview(req: express.Request, res: express.Response, next: express.NextFunction) {

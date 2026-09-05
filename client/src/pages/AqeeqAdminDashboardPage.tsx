@@ -4474,23 +4474,94 @@ const DEFAULT_ORCHESTRATION = {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-black mb-1">رابط صورة الغلاف (OG Image URL):</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.marketingPixels?.ogImageUrl || "/alaqeeq-logo.png"}
-                          onChange={(e) =>
-                            setOrchestrationForm({
-                              ...orchestrationForm,
-                              marketingPixels: {
-                                ...orchestrationForm.marketingPixels,
-                                ogImageUrl: e.target.value,
-                              },
-                            })
-                          }
-                          className={`w-full rounded-xl border p-2.5 text-xs font-mono outline-none ${
-                            dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
-                          }`}
-                        />
+                        <label className="block text-xs font-black mb-1">صورة الغلاف والمعاينة (OG Image):</label>
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={orchestrationForm.marketingPixels?.ogImageUrl || "/og-preview.png"}
+                            onChange={(e) =>
+                              setOrchestrationForm({
+                                ...orchestrationForm,
+                                marketingPixels: {
+                                  ...orchestrationForm.marketingPixels,
+                                  ogImageUrl: e.target.value,
+                                },
+                              })
+                            }
+                            placeholder="/og-preview.png أو رابط صورة"
+                            className={`flex-1 rounded-xl border p-2.5 text-xs font-mono outline-none ${
+                              dark ? "border-white/10 bg-black/40 text-white" : "border-black/10 bg-white"
+                            }`}
+                          />
+                          <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black cursor-pointer bg-amber-500 hover:bg-amber-600 text-black transition shrink-0">
+                            <Upload size={14} />
+                            <span>رفع من الجهاز</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.size > 8 * 1024 * 1024) {
+                                  toast.error("الحد الأقصى لحجم الصورة هو 8 ميجابايت");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  if (typeof reader.result === "string") {
+                                    setOrchestrationForm({
+                                      ...orchestrationForm,
+                                      marketingPixels: {
+                                        ...orchestrationForm.marketingPixels,
+                                        ogImageUrl: reader.result,
+                                      },
+                                    });
+                                    toast.success("✅ تم اختيار صورة المعاينة بنجاح!");
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }}
+                            />
+                          </label>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 text-[10px] font-bold">
+                          <span className="text-slate-400 py-0.5">اقتراحات سريعة:</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOrchestrationForm({
+                                ...orchestrationForm,
+                                marketingPixels: {
+                                  ...orchestrationForm.marketingPixels,
+                                  ogImageUrl: "/og-preview.png",
+                                },
+                              })
+                            }
+                            className={`px-2 py-0.5 rounded-lg border transition ${
+                              dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                            }`}
+                          >
+                            🖼️ الصورة الرسمية المخصصة
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOrchestrationForm({
+                                ...orchestrationForm,
+                                marketingPixels: {
+                                  ...orchestrationForm.marketingPixels,
+                                  ogImageUrl: "/alaqeeq-logo.png",
+                                },
+                              })
+                            }
+                            className={`px-2 py-0.5 rounded-lg border transition ${
+                              dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-black/10 hover:bg-black/5 text-slate-600"
+                            }`}
+                          >
+                            🦅 شعار المدارس
+                          </button>
+                        </div>
                       </div>
                     </div>
 

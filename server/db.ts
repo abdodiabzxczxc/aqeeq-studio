@@ -928,6 +928,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           appShowcase: { ...DEFAULT_SITE_ORCHESTRATION.appShowcase, ...(parsed.appShowcase || {}) },
           schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
           admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
+          marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
         };
       }
     } catch (err) {
@@ -958,6 +959,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         appShowcase: { ...DEFAULT_SITE_ORCHESTRATION.appShowcase, ...(parsed.appShowcase || {}) },
         schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
         admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
+        marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
         interactiveFx: { ...DEFAULT_SITE_ORCHESTRATION.interactiveFx, ...(parsed.interactiveFx || {}) },
       };
     }
@@ -984,6 +986,7 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     appShowcase: { ...(current.appShowcase || DEFAULT_SITE_ORCHESTRATION.appShowcase!), ...(data.appShowcase || {}) },
     schoolCampuses: { ...(current.schoolCampuses || DEFAULT_SITE_ORCHESTRATION.schoolCampuses!), ...(data.schoolCampuses || {}) },
     admissionsSettings: { ...(current.admissionsSettings || DEFAULT_SITE_ORCHESTRATION.admissionsSettings!), ...(data.admissionsSettings || {}) },
+    marketingPixels: { ...(current.marketingPixels || DEFAULT_SITE_ORCHESTRATION.marketingPixels!), ...(data.marketingPixels || {}) },
     interactiveFx: data.interactiveFx !== undefined
       ? { ...(current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx!), ...data.interactiveFx }
       : (current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx),

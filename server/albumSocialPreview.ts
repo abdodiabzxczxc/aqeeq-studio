@@ -43,11 +43,16 @@ export function createAlbumSocialPreviewHtml(album: AlbumSocialPreview, origin: 
 </html>`;
 }
 
-export function createSiteSocialPreviewHtml(origin: string, targetPath: string = "/") {
+export function createSiteSocialPreviewHtml(
+  origin: string,
+  targetPath: string = "/",
+  customConfig?: { ogTitle?: string; ogDescription?: string; ogImageUrl?: string }
+) {
   const canonicalUrl = absoluteUrl(targetPath, origin);
-  const imageUrl = absoluteUrl("/og-preview.png", origin);
-  const title = "مدارس العقيق الأهلية والدولية | استوديو العقيق الذكي";
-  const description = "البوابة الإعلامية الذكية والاستوديو الرقمي التفاعلي لمدارس العقيق الأهلية والدولية - مجلة العقيق، ألبومات التخرج والفعاليات، والبحث عن الصور بالذكاء الاصطناعي.";
+  const imageSource = customConfig?.ogImageUrl?.trim() || "/og-preview.png";
+  const imageUrl = absoluteUrl(imageSource, origin);
+  const title = customConfig?.ogTitle?.trim() || "مدارس العقيق الأهلية والدولية | المنصة الرسمية";
+  const description = customConfig?.ogDescription?.trim() || "الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - القبول والتسجيل، مجلة العقيق، ألبومات الفعاليات، وأحدث الأخبار والمقالات.";
 
   return `<!doctype html>
 <html lang="ar" dir="rtl">
