@@ -21,6 +21,7 @@ export interface ParallaxProduct {
 
 export interface HeroParallaxProps {
   products: ParallaxProduct[];
+  header?: React.ReactNode;
   headerTitle?: React.ReactNode;
   headerDescription?: React.ReactNode;
   kickerText?: string;
@@ -34,6 +35,7 @@ export interface HeroParallaxProps {
 
 export const HeroParallax = ({
   products,
+  header,
   headerTitle,
   headerDescription,
   kickerText = "ALAQEEQ ALBUMS & MEMORIES · الأرشيف المرئي",
@@ -130,17 +132,23 @@ export const HeroParallax = ({
       </div>
 
       {/* Hero Header */}
-      <HeroParallaxHeader
-        title={headerTitle}
-        description={headerDescription}
-        kickerText={kickerText}
-        onTvModeClick={onTvModeClick}
-        onWrappedClick={onWrappedClick}
-        onManageClick={onManageClick}
-        isAdmin={isAdmin}
-        albumsCount={albumsCount}
-        dark={dark}
-      />
+      {header ? (
+        <div className="relative z-20 mx-auto w-full max-w-[1380px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-10 pb-4 text-right">
+          {header}
+        </div>
+      ) : (
+        <HeroParallaxHeader
+          title={headerTitle}
+          description={headerDescription}
+          kickerText={kickerText}
+          onTvModeClick={onTvModeClick}
+          onWrappedClick={onWrappedClick}
+          onManageClick={onManageClick}
+          isAdmin={isAdmin}
+          albumsCount={albumsCount}
+          dark={dark}
+        />
+      )}
 
       {/* 3D Moving Perspective Rows */}
       <motion.div

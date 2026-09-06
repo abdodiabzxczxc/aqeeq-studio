@@ -279,24 +279,6 @@ export default function AqeeqAlbumsPage() {
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
   const visibleAlbums = useMemo(() => searchAndSortAqeeqContent(albums, searchQuery, sort), [albums, searchQuery, sort]) as PublicAlbum[];
 
-  const parallaxProducts = useMemo<ParallaxProduct[]>(() => {
-    const liveItems: ParallaxProduct[] = albums.map((album) => ({
-      title: album.title,
-      link: `/albums/${album.slug}`,
-      thumbnail: directDriveImage(album.coverUrl) || album.coverUrl || "/uploads/site-media/1/1788029592790-9f51a02b-drive-1B3LhIXBI_l4gw0RQgAI92qeuufkowJWJ-p01_f952eff9.jpg",
-      category: "ألبوم العقيق",
-      mediaCount: album.mediaCount || 12,
-      date: "موسم العقيق",
-    }));
-
-    const fallbackSlug = albums[0]?.slug ? `/albums/${albums[0].slug}` : "#albums-grid-section";
-    const mappedCurated = CURATED_PARALLAX_ITEMS.map((item, idx) => ({
-      ...item,
-      link: albums[idx % (albums.length || 1)]?.slug ? `/albums/${albums[idx % (albums.length || 1)].slug}` : fallbackSlug,
-    }));
-
-    return [...liveItems, ...mappedCurated].slice(0, 15);
-  }, [albums]);
 
   const featuredAlbum = useMemo(() => {
     if (orchestration?.heroCovers?.albumsMode === "custom" && orchestration?.heroCovers?.customAlbumId) {
@@ -317,8 +299,38 @@ export default function AqeeqAlbumsPage() {
 
   const { data: allMediaDetails, isLoading: isAllMediaLoading } = trpc.aqeeqAlbums.allPublicMedia.useQuery(
     undefined,
-    { enabled: isTvMode }
+    { refetchOnWindowFocus: false }
   );
+
+  const parallaxProducts = useMemo<ParallaxProduct[]>(() => {
+    // If we have photos from inside the albums, display them so each card is a different authentic moment!
+    if (allMediaDetails && allMediaDetails.length > 0) {
+      return allMediaDetails.map((media) => ({
+        title: media.caption || media.albumTitle || "فعالية العقيق",
+        link: `/albums/${media.albumSlug}`,
+        thumbnail: media.imageUrl || media.thumbnailUrl || "/uploads/site-media/1/1788029592790-9f51a02b-drive-1B3LhIXBI_l4gw0RQgAI92qeuufkowJWJ-p01_f952eff9.jpg",
+        category: media.albumTitle || "ألبوم العقيق",
+        date: "موسم العقيق",
+      }));
+    }
+
+    const liveItems: ParallaxProduct[] = albums.map((album) => ({
+      title: album.title,
+      link: `/albums/${album.slug}`,
+      thumbnail: directDriveImage(album.coverUrl) || album.coverUrl || "/uploads/site-media/1/1788029592790-9f51a02b-drive-1B3LhIXBI_l4gw0RQgAI92qeuufkowJWJ-p01_f952eff9.jpg",
+      category: "ألبوم العقيق",
+      mediaCount: album.mediaCount || 12,
+      date: "موسم العقيق",
+    }));
+
+    const fallbackSlug = albums[0]?.slug ? `/albums/${albums[0].slug}` : "#albums-grid-section";
+    const mappedCurated = CURATED_PARALLAX_ITEMS.map((item, idx) => ({
+      ...item,
+      link: albums[idx % (albums.length || 1)]?.slug ? `/albums/${albums[idx % (albums.length || 1)].slug}` : fallbackSlug,
+    }));
+
+    return [...liveItems, ...mappedCurated].slice(0, 15);
+  }, [albums, allMediaDetails]);
 
   if (isLoading) {
     return (
@@ -343,55 +355,252 @@ export default function AqeeqAlbumsPage() {
         <HeroParallax
           products={parallaxProducts}
           dark={dark}
-          albumsCount={albums.length}
-          onTvModeClick={() => setIsTvMode(true)}
-          onWrappedClick={() => setIsWrappedOpen(true)}
-          onManageClick={isAdmin ? () => navigate("/albums/manage") : undefined}
-          isAdmin={isAdmin}
-          kickerText={
-            isNationalDay
-              ? "🇸🇦 ألبوم العقيق · توثيق فعاليات الوطن والفخر"
-              : orchestration?.heroCovers?.albumsCustomTag || "✦ ALAQEEQ EVENT ARCHIVE · الذاكرة الحية ✦"
-          }
-          headerTitle={
-            <h1
-              className={`text-3xl sm:text-5xl md:text-7xl font-black leading-[1.12] tracking-tight ${
-                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-slate-900"
-              }`}
-            >
-              <VisualEditable
-                id="albums-hero-title"
-                tag="text"
-                label="عنوان غلاف الألبومات"
-                defaultText={orchestration?.heroCovers?.albumsCustomTitle || "ألبومات ومعارض العقيق"}
-                as="span"
-              />{" "}
-              <br />
-              <span
-                className={
-                  isNationalDay
-                    ? "bg-gradient-to-r from-emerald-400 via-[#f8ca14] to-emerald-300 bg-clip-text text-transparent"
-                    : "bg-gradient-to-r from-[#f8ca14] via-amber-400 to-[#de191e] bg-clip-text text-transparent"
-                }
-              >
-                توثيق ينبض بالحياة والإنجاز.
-              </span>
-            </h1>
-          }
-          headerDescription={
-            <VisualEditable
-              id="albums-hero-intro"
-              tag="text"
-              label="مقدمة غلاف الألبومات"
-              defaultText={
-                orchestration?.heroCovers?.albumsCustomDesc ||
-                "سجل فوتوغرافي ومرئي ثلاثي الأبعاد يروي قصص التفوق، وبطولات الروبوت والذكاء الاصطناعي، واحتفالات اليوم الوطني، ومسيرة أجيال مدارس العقيق عبر أكثر من 30 عاماً من الريادة."
-              }
-              as="p"
-              className={`mt-5 max-w-3xl text-sm sm:text-base md:text-lg leading-relaxed font-medium ${
-                dark ? "text-slate-300" : isNationalDay ? "text-emerald-950/80" : "text-slate-600"
-              }`}
-            />
+          header={
+            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 py-6 md:grid-cols-[1fr_1.1fr] md:py-10 lg:gap-16">
+              {/* Left Column: 2 tilted cards — exactly as it was */}
+              <div className="relative order-2 mx-auto h-[340px] w-full max-w-[540px] md:order-1 md:h-[450px]">
+                {secondAlbum ? (
+                  <button
+                    onClick={() => navigate(`/albums/${secondAlbum.slug}`)}
+                    className={`absolute left-[4%] top-[5%] h-[77%] w-[62%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition hover:opacity-90 ${
+                      isNationalDay
+                        ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                        : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                    }`}
+                    style={{ transform: "rotate(-7deg)" }}
+                  >
+                    <VisualImage
+                      id={`albums-hero-previous-cover-${secondAlbum.id}`}
+                      label="غلاف الألبوم السابق"
+                      src={directDriveImage(secondAlbum.coverUrl) || secondAlbum.coverUrl || ""}
+                      alt=""
+                      className="h-full w-full rounded-[1.2rem] object-cover"
+                    />
+                  </button>
+                ) : null}
+
+                {featuredAlbum ? (
+                  <button
+                    onClick={() => navigate(`/albums/${featuredAlbum.slug}`)}
+                    className={`group absolute bottom-1 right-[5%] h-[88%] w-[70%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition hover:scale-[1.02] ${
+                      isNationalDay
+                        ? dark
+                          ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                          : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                        : dark
+                        ? "border-[#f8ca14]/50 bg-[#111111]"
+                        : "border-[#08467d]/30 bg-white"
+                    }`}
+                    style={{ transform: "rotate(3deg)" }}
+                  >
+                    <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                      {featuredAlbum.coverUrl ? (
+                        <VisualImage
+                          id={`albums-hero-current-cover-${featuredAlbum.id}`}
+                          label="غلاف الألبوم الحالي"
+                          src={directDriveImage(featuredAlbum.coverUrl) || featuredAlbum.coverUrl}
+                          alt={`غلاف ${featuredAlbum.title}`}
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div
+                          className={`grid h-full place-items-center ${
+                            dark
+                              ? "bg-[#181818] text-[#f8ca14]"
+                              : isNationalDay
+                              ? "bg-emerald-50 text-[#005A36]"
+                              : "bg-slate-100 text-[#08467d]"
+                          }`}
+                        >
+                          <Camera size={42} />
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16 text-right">
+                        <span className="text-[10px] font-black text-[#f8ca14]">
+                          {featuredAlbum.mediaCount} ملف
+                        </span>
+                        <VisualEditable
+                          id="albums-hero-featured-title"
+                          tag="text"
+                          label="عنوان غلاف الألبوم الحالي"
+                          defaultText={featuredAlbum.title}
+                          as="h2"
+                          className="mt-1 text-lg font-black text-white"
+                        />
+                      </div>
+                    </div>
+                  </button>
+                ) : null}
+              </div>
+
+              {/* Right Column: Exact original text, colors, badges and buttons */}
+              <div className="order-1 md:order-2 text-right">
+                {isNationalDay ? (
+                  <div
+                    className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
+                      dark
+                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
+                        : "bg-emerald-50 border-emerald-500/30 text-[#005A36]"
+                    }`}
+                  >
+                    <span className="text-sm">🇸🇦</span>
+                    <span className="font-black">ألبوم العقيق · توثيق فعاليات الوطن</span>
+                  </div>
+                ) : (
+                  <VisualEditable
+                    id="albums-hero-kicker"
+                    tag="text"
+                    label="شارة غلاف الألبومات"
+                    defaultText={orchestration?.heroCovers?.albumsCustomTag || "موسم العقيق · أرشيف الفعاليات"}
+                    as="div"
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+                      dark
+                        ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                        : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                    }`}
+                  >
+                    <Sparkles size={14} />
+                    {orchestration?.heroCovers?.albumsCustomTag || "موسم العقيق · أرشيف الفعاليات"}
+                  </VisualEditable>
+                )}
+
+                {/* Exact Title with Original Colors (Pure solid white in dark mode, black in light mode - NO gradients!) */}
+                <VisualEditable
+                  id="albums-hero-title"
+                  tag="text"
+                  label="عنوان غلاف الألبومات"
+                  defaultText={orchestration?.heroCovers?.albumsCustomTitle || "كل فعالية تحفظ لحظتها."}
+                  as="h1"
+                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
+                    dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
+                  }`}
+                />
+
+                {/* Exact Intro with Original Colors */}
+                <VisualEditable
+                  id="albums-hero-intro"
+                  tag="text"
+                  label="مقدمة غلاف الألبومات"
+                  defaultText={
+                    orchestration?.heroCovers?.albumsCustomDesc ||
+                    "رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق، وكل ألبوم يفتح بطريقته المناسبة للذكرى."
+                  }
+                  as="p"
+                  className={`mt-5 max-w-xl text-sm leading-8 ${
+                    dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"
+                  }`}
+                />
+
+                {/* Exact Stats Badges */}
+                <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold">
+                  <span
+                    className={`rounded-full border px-3 py-2 ${
+                      isNationalDay
+                        ? dark
+                          ? "border-emerald-500/20 bg-[#001c10] text-emerald-300"
+                          : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                        : dark
+                        ? "border-white/[0.1] bg-white/[0.03] text-slate-300"
+                        : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <ImageIcon
+                      className={`ml-1 inline ${
+                        isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                      }`}
+                      size={13}
+                    />
+                    {albums.length} ألبوم منشور
+                  </span>
+                  <span
+                    className={`rounded-full border px-3 py-2 ${
+                      isNationalDay
+                        ? dark
+                          ? "border-emerald-500/20 bg-[#001c10] text-emerald-300"
+                          : "border-emerald-200 bg-emerald-50 text-emerald-800"
+                        : dark
+                        ? "border-white/[0.1] bg-white/[0.03] text-slate-300"
+                        : "border-black/[0.08] bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <Video
+                      className={`ml-1 inline ${
+                        isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                      }`}
+                      size={13}
+                    />
+                    صور وفيديوهات
+                  </span>
+                </div>
+
+                {/* Exact Buttons with Original Colors */}
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <VisualEditable
+                    id="albums-hero-action"
+                    tag="button"
+                    label="زر فتح الألبوم الحالي"
+                    defaultText="ابدأ بالألبوم الحالي"
+                    as="button"
+                    onAction={() =>
+                      navigate(`/albums/${featuredAlbum?.slug || albums[0]?.slug || ""}`)
+                    }
+                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
+                      dark
+                        ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
+                        : isNationalDay
+                        ? "!bg-[#005A36] !text-white shadow-[0_0_20px_rgba(0,90,54,0.25)] hover:bg-[#003822]"
+                        : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+                    }`}
+                  >
+                    <ArrowUpLeft size={16} />
+                    ابدأ بالألبوم الحالي
+                  </VisualEditable>
+
+                  {/* Aqeeq Wrapped Button */}
+                  <button
+                    onClick={() => setIsWrappedOpen(true)}
+                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:scale-105 ${
+                      dark
+                        ? "border-amber-400/50 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-transparent text-amber-300 hover:border-amber-400 hover:shadow-[0_0_25px_rgba(248,202,20,0.3)] ring-1 ring-amber-400/20"
+                        : "border-amber-500/40 bg-gradient-to-r from-amber-100 via-amber-50 to-white text-amber-950 hover:border-amber-500 shadow-md"
+                    }`}
+                  >
+                    <Sparkles size={16} className="animate-pulse text-amber-400" />
+                    <span>حصاد العقيق الذكي 🎬</span>
+                    <span className="rounded-md bg-amber-400 px-1.5 py-0.5 text-[9px] font-black text-slate-950">
+                      AI VIDEO
+                    </span>
+                  </button>
+
+                  {isAdmin ? (
+                    <>
+                      <button
+                        onClick={() => navigate("/albums/manage")}
+                        className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                          dark
+                            ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                            : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                        }`}
+                      >
+                        <Settings2 size={16} />
+                        إدارة ألبومات المدارس
+                      </button>
+                      <button
+                        onClick={() => setIsTvMode(true)}
+                        className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                          dark
+                            ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20"
+                            : "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 hover:bg-emerald-600/20"
+                        }`}
+                      >
+                        <MonitorPlay size={16} />
+                        تشغيل كشاشة عرض 📺
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </div>
           }
         />
       }
