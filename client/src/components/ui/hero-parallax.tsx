@@ -4,7 +4,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   MotionValue,
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
@@ -85,36 +84,34 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
-
-  const scrollEnd = rowCount === 2 ? 0.55 : 1;
-  const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
-  const rawTranslateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
-  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
+  // Direct linear transforms: 100% synchronous with user scroll (ZERO magnetic snap, ZERO lag)
+  const rawTranslateX = useTransform(scrollYProgress, [0, 0.95], [0, isDesktop ? (rowCount === 2 ? 460 : 580) : 220]);
+  const rawTranslateXReverse = useTransform(scrollYProgress, [0, 0.95], [0, isDesktop ? (rowCount === 2 ? -460 : -580) : -220]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 12 : 5, 0]);
   const rawRotateZ = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
-    [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
+    [0, 0.45],
+    [isDesktop ? (isRightToLeft ? -12 : 12) : (isRightToLeft ? -3 : 3), 0]
   );
   const rawTranslateY = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
-    [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
+    [0, 0.6],
+    [isDesktop ? -80 : -40, isDesktop ? 60 : 30]
   );
 
   // Direct linear opacity — zero flicker
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+    [0, 0.12, 0.7, 0.95],
     [0.08, 0.88, 0.88, 0]
   );
 
-  // Organic gliding inertia with ZERO bounce
-  const translateX = useSpring(rawTranslateX, smoothConfig);
-  const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
-  const rotateX = useSpring(rawRotateX, smoothConfig);
-  const rotateZ = useSpring(rawRotateZ, smoothConfig);
-  const translateY = useSpring(rawTranslateY, smoothConfig);
+  // 1:1 direct scroll binding — no springs, no magnetic pull, no post-stop drag
+  const translateX = rawTranslateX;
+  const translateXReverse = rawTranslateXReverse;
+  const rotateX = rawRotateX;
+  const rotateZ = rawRotateZ;
+  const translateY = rawTranslateY;
 
   return (
     <div
@@ -127,13 +124,13 @@ export const HeroParallax = ({
           ? rowCount === 2
             ? "104vh"
             : cardShape === "square"
-            ? "148vh"
-            : "210vh"
+            ? "125vh"
+            : "130vh"
           : rowCount === 2
           ? "94vh"
           : cardShape === "square"
-          ? "120vh"
-          : "160vh",
+          ? "110vh"
+          : "115vh",
       }}
     >
       {/* Ambient background glow & radial highlights (pure dark, no yellow) */}
