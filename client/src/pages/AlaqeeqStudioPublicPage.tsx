@@ -7,7 +7,6 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { AqeeqCurtainHeroWrapper } from "@/components/AqeeqCurtainHeroWrapper";
 import { AqeeqHorizontalScrubSection } from "@/components/AqeeqHorizontalScrubSection";
 import { AqeeqMemoryWallSection } from "@/components/AqeeqMemoryWallSection";
 import { AqeeqLiveArchiveSection } from "@/components/AqeeqLiveArchiveSection";
@@ -964,20 +963,18 @@ export default function AlaqeeqStudioPublicPage() {
         </section>
       ) : null}
 
-      {/* 2. غلاف واجهة مدارس العقيق الرئيسية مع تجربة ويلينغتون الستارية الملكية (Curtain Wipe & 3D Depth) */}
-      <AqeeqCurtainHeroWrapper
-        hero={
-          <VisualEditable
-            id="studio-hero-section"
-            tag="section"
-            label="غلاف واجهة مدارس العقيق"
-            as="section"
-            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 " + (
-              isNationalDay
-                ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
-                : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-            )}
-          >
+      {/* 2. غلاف واجهة مدارس العقيق الرئيسية */}
+      <VisualEditable
+        id="studio-hero-section"
+        tag="section"
+        label="غلاف واجهة مدارس العقيق"
+        as="section"
+        className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
+          isNationalDay
+            ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
+            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+        )}
+      >
         {/* Subtle Ambient Background Watermark */}
         {isNationalDay ? (
           <>
@@ -1352,9 +1349,6 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       </VisualEditable>
-        }
-        curtainContent={
-          <>
 
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية (محمي من تطفل المحرر المرئي مع تثبيت تلقائي) */}
@@ -1918,11 +1912,8 @@ export default function AlaqeeqStudioPublicPage() {
         totalMedia={totalFiles + totalPosts}
       />
 
-            {/* Unified Luxury Site Footer */}
+      {/* Unified Luxury Site Footer */}
       <AlaqeeqStudioSiteFooter />
-          </>
-        }
-      />
 
 
 
