@@ -4,7 +4,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   MotionValue,
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
@@ -85,44 +84,24 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const springConfig = { stiffness: 220, damping: 28, bounce: 60 };
-
   const scrollEnd = rowCount === 2 ? 0.55 : 1;
-  const translateX = useSpring(
-    useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]),
-    springConfig
+  const translateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
+  const translateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
+  const rotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+    [0.08, 0.88, 0.88, 0]
   );
-  const translateXReverse = useSpring(
-    useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]),
-    springConfig
+  const rotateZ = useTransform(
+    scrollYProgress,
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
   );
-  const rotateX = useSpring(
-    useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]),
-    springConfig
-  );
-  const opacity = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
-      [0.08, 0.88, 0.88, 0]
-    ),
-    springConfig
-  );
-  const rotateZ = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, rowCount === 2 ? 0.18 : 0.25],
-      [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
-    ),
-    springConfig
-  );
-  const translateY = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, rowCount === 2 ? 0.18 : 0.25],
-      [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
-    ),
-    springConfig
+  const translateY = useTransform(
+    scrollYProgress,
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
   );
 
   return (

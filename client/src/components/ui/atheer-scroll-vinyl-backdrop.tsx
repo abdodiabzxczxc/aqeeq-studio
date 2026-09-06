@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   type MotionValue,
 } from "framer-motion";
 import { Disc3 } from "lucide-react";
@@ -99,7 +98,7 @@ function GrandVinylRecordItem({
     return normalized * maxSlide;
   });
 
-  const slide = useSpring(rawSlide, { stiffness: 220, damping: 26, bounce: 0 });
+  const slide = rawSlide;
 
   // Authentic continuous turntable rotation
   const discRotate = useTransform(
@@ -241,24 +240,17 @@ export function AtheerScrollVinylBackdrop({
     offset: ["start start", "end start"],
   });
 
-  // Snappy responsive spring with zero bounce for immediate reaction on first scroll pixel
-  const springConfig = { stiffness: 220, damping: 28, bounce: 0 };
-
   // Ultra-subtle starting opacity at 0.08 (pure dark luxury), blooms smoothly to 0.88 on scroll
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.35], [0.08, 0.88]);
-  const opacity = useSpring(rawOpacity, springConfig);
+  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  const opacity = useTransform(scrollYProgress, [0, 0.35], [0.08, 0.88]);
 
   // Parallax horizontal glides for the two grand vinyl rows
-  const rawRow1X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 520 : 320]);
-  const rawRow2X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -520 : -320]);
-  const row1X = useSpring(rawRow1X, springConfig);
-  const row2X = useSpring(rawRow2X, springConfig);
+  const row1X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 520 : 320]);
+  const row2X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -520 : -320]);
 
   // 3D perspective tilt: tilts gracefully and levels out
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 15 : 8, 0]);
-  const rawRotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -4 : -2, 0]);
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
+  const rotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 15 : 8, 0]);
+  const rotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -4 : -2, 0]);
 
   // Guarantee at least 10 items
   const displayItems = useMemo(() => {

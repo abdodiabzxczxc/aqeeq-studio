@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
@@ -118,40 +117,33 @@ export function AdmissionsScrollCampusBackdrop({
     offset: ["start start", "end start"],
   });
 
-  // Snappy responsive spring with zero bounce for immediate reaction on first scroll pixel
-  const springConfig = { stiffness: 220, damping: 28, bounce: 0 };
-
   // Smooth entrance bloom (0.08 -> 0.88), dissolves gracefully on scroll down (0.88 -> 0)
-  const rawOpacity = useTransform(
+  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  const opacity = useTransform(
     scrollYProgress,
     [0, 0.15, 0.50, 0.88],
     [0.08, 0.88, 0.88, 0]
   );
-  const opacity = useSpring(rawOpacity, springConfig);
 
   // Parallax horizontal glides for the two grand rows in opposite directions
-  const rawRow1X = useTransform(
+  const row1X = useTransform(
     scrollYProgress,
     [0, 0.65],
     [0, isDesktop ? (isRtl ? -520 : 520) : (isRtl ? -280 : 280)]
   );
-  const rawRow2X = useTransform(
+  const row2X = useTransform(
     scrollYProgress,
     [0, 0.65],
     [0, isDesktop ? (isRtl ? 520 : -520) : (isRtl ? 280 : -280)]
   );
-  const row1X = useSpring(rawRow1X, springConfig);
-  const row2X = useSpring(rawRow2X, springConfig);
 
   // 3D perspective tilt: tilts gracefully and levels out
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 14 : 7, 0]);
-  const rawRotateZ = useTransform(
+  const rotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 14 : 7, 0]);
+  const rotateZ = useTransform(
     scrollYProgress,
     [0, 0.35],
     [isDesktop ? (isRtl ? 4 : -4) : (isRtl ? 2 : -2), 0]
   );
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
 
   const displayItems = useMemo(() => {
     const base = items && items.length > 0 ? items : DEFAULT_ADMISSIONS_ITEMS;

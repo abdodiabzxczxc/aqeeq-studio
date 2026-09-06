@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import { BookOpen, Sparkles, User, Clock, ArrowUpLeft } from "lucide-react";
 
@@ -68,35 +67,20 @@ export function ArticlesParallaxScroll({
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 200, damping: 28, bounce: 30 };
-
+  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
   // 3D Matrix Perspective Transformations
   // Starts with gentle tilt in the background, smoothly unfurling forward
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 15 : 6, 0]);
-  const rawRotateZ = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -5 : -2, 0]);
-  const rawTranslateY = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -440 : -140, isDesktop ? 220 : 60]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 15 : 6, 0]);
+  const rotateZ = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -5 : -2, 0]);
+  const translateY = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -440 : -140, isDesktop ? 220 : 60]);
   
   // Opacity: starts subtle at 0.14 (14%) for 100% header readability, blooms to 0.98 upon scrolling
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.24], [0.14, 0.98]);
-
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
-  const translateY = useSpring(rawTranslateY, springConfig);
-  const opacity = useSpring(rawOpacity, springConfig);
+  const opacity = useTransform(scrollYProgress, [0, 0.24], [0.14, 0.98]);
 
   // Column vertical parallax offsets (Opposite directions for high-speed parallax)
-  const col1Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -420 : -160]),
-    springConfig
-  );
-  const col2Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 360 : 140]),
-    springConfig
-  );
-  const col3Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -480 : -180]),
-    springConfig
-  );
+  const col1Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -420 : -160]);
+  const col2Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 360 : 140]);
+  const col3Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -480 : -180]);
 
   return (
     <div

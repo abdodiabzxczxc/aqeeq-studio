@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import { BookOpen, Sparkles } from "lucide-react";
 
@@ -46,50 +45,33 @@ export function ArticlesScrollParallaxBackdrop({
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 190, damping: 28, bounce: 35 };
-
-  // 3D Matrix Rotation & Perspective Unfurling from LEFT or RIGHT to CENTER on entrance
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
-  const rawRotateY = useTransform(
+  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  const rotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
+  const rotateY = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? -16 : 16) : (isRtl ? -7 : 7), 0]
   );
-  const rawRotateZ = useTransform(
+  const rotateZ = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? 7 : -7) : (isRtl ? 3 : -3), 0]
   );
-  const rawTranslateX = useTransform(
+  const translateX = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? 140 : -140) : (isRtl ? 50 : -50), 0]
   );
-  const rawTranslateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
+  const translateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
 
   // Ultra-subtle starting opacity at 0.08 (pure dark luxury), blooms to 0.88 on entrance, and dissolves gracefully on scroll down (0.88 -> 0)
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.25, 0.62, 0.95], [0.08, 0.88, 0.88, 0]);
-
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateY = useSpring(rawRotateY, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
-  const translateX = useSpring(rawTranslateX, springConfig);
-  const translateY = useSpring(rawTranslateY, springConfig);
-  const opacity = useSpring(rawOpacity, springConfig);
+  // Direct interpolation with NO spring to eliminate all flickering and shivering
+  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.62, 0.95], [0.08, 0.88, 0.88, 0]);
 
   // Column vertical parallax offsets (Opposite directions for true unfurling motion)
-  const col1Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]),
-    springConfig
-  );
-  const col2Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]),
-    springConfig
-  );
-  const col3Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]),
-    springConfig
-  );
+  const col1Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]);
+  const col2Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]);
+  const col3Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]);
 
   // Guarantee at least 15 items by looping
   const displayItems = useMemo(() => {
@@ -136,11 +118,22 @@ export function ArticlesScrollParallaxBackdrop({
           rotateZ,
           x: translateX,
           y: translateY,
+          transformStyle: "preserve-3d",
+          backfaceVisibility: "hidden",
+          willChange: "transform, opacity",
         }}
         className="absolute -inset-x-12 -inset-y-24 grid grid-cols-3 gap-6 sm:gap-8 px-4 opacity-70"
       >
         {/* Column 1: moves Up */}
-        <motion.div style={{ y: col1Y }} className="flex flex-col gap-6">
+        <motion.div
+          style={{
+            y: col1Y,
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            willChange: "transform",
+          }}
+          className="flex flex-col gap-6"
+        >
           {col1.map((item, idx) => (
             <div
               key={`b-col1-${item.id}-${idx}`}
@@ -175,7 +168,15 @@ export function ArticlesScrollParallaxBackdrop({
         </motion.div>
 
         {/* Column 2: moves Down */}
-        <motion.div style={{ y: col2Y }} className="flex flex-col gap-6 -mt-16">
+        <motion.div
+          style={{
+            y: col2Y,
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            willChange: "transform",
+          }}
+          className="flex flex-col gap-6 -mt-16"
+        >
           {col2.map((item, idx) => (
             <div
               key={`b-col2-${item.id}-${idx}`}
@@ -210,7 +211,15 @@ export function ArticlesScrollParallaxBackdrop({
         </motion.div>
 
         {/* Column 3: moves Up */}
-        <motion.div style={{ y: col3Y }} className="flex flex-col gap-6">
+        <motion.div
+          style={{
+            y: col3Y,
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            willChange: "transform",
+          }}
+          className="flex flex-col gap-6"
+        >
           {col3.map((item, idx) => (
             <div
               key={`b-col3-${item.id}-${idx}`}

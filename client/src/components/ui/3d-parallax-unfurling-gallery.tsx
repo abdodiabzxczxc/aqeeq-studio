@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import { Newspaper, Sparkles, BookOpen } from "lucide-react";
 
@@ -68,78 +67,57 @@ export function ParallaxUnfurlingGallery({
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 190, damping: 28, bounce: 35 };
-
-  // 3D Matrix Rotation & Perspective Unfurling
+  // 3D Matrix Rotation & Perspective Unfurling — direct 1:1 hardware-accelerated transforms
   // Supports left-to-right (default) OR right-to-left (for /about)
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
-  const rawRotateY = useTransform(
+  const rotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
+  const rotateY = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -7 : 7), 0]
   );
-  const rawRotateZ = useTransform(
+  const rotateZ = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRightToLeft ? 7 : -7) : (isRightToLeft ? 3 : -3), 0]
   );
-  const rawTranslateX = useTransform(
+  const translateX = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRightToLeft ? 140 : -140) : (isRightToLeft ? 50 : -50), 0]
   );
-  const rawTranslateY = useTransform(
+  const translateY = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? -180 : -80, isDesktop ? 140 : 60]
   );
 
   // Smooth entrance bloom (0.08 -> 0.88), and dissolves gracefully on scroll down (0.88 -> 0)
-  const rawOpacity = useTransform(
+  const opacity = useTransform(
     scrollYProgress,
     [0, 0.25, 0.62, 0.95],
     [0.08, 0.88, 0.88, 0]
   );
 
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateY = useSpring(rawRotateY, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
-  const translateX = useSpring(rawTranslateX, springConfig);
-  const translateY = useSpring(rawTranslateY, springConfig);
-  const opacity = useSpring(rawOpacity, springConfig);
-
   // Column vertical parallax offsets (Opposite directions for true unfurling motion)
-  const col1Y = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 1],
-      [isDesktop ? (isRightToLeft ? 0 : -260) : -100, isDesktop ? (isRightToLeft ? -450 : 260) : 100]
-    ),
-    springConfig
+  const col1Y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [isDesktop ? (isRightToLeft ? 0 : -260) : -100, isDesktop ? (isRightToLeft ? -450 : 260) : 100]
   );
-  const col2Y = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 1],
-      [isDesktop ? (isRightToLeft ? -280 : 100) : 40, isDesktop ? (isRightToLeft ? 300 : -420) : -160]
-    ),
-    springConfig
+  const col2Y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [isDesktop ? (isRightToLeft ? -280 : 100) : 40, isDesktop ? (isRightToLeft ? 300 : -420) : -160]
   );
-  const col3Y = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 1],
-      [isDesktop ? (isRightToLeft ? 100 : -280) : -110, isDesktop ? (isRightToLeft ? -420 : 300) : 120]
-    ),
-    springConfig
+  const col3Y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [isDesktop ? (isRightToLeft ? 100 : -280) : -110, isDesktop ? (isRightToLeft ? -420 : 300) : 120]
   );
-  const col4Y = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 1],
-      [isDesktop ? (isRightToLeft ? -260 : 0) : 0, isDesktop ? (isRightToLeft ? 260 : -450) : -180]
-    ),
-    springConfig
+  const col4Y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [isDesktop ? (isRightToLeft ? -260 : 0) : 0, isDesktop ? (isRightToLeft ? 260 : -450) : -180]
   );
 
   return (

@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import {
   Sparkles,
@@ -100,42 +99,23 @@ export function AdmissionsCampusParallax({
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 200, damping: 28, bounce: 30 };
-
   // Scroll reactions:
   // Starts subtle in deep background at 0.14 opacity
   // Zooms outward in 3D perspective and blooms to 0.98 on scroll
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.28], [0.15, 0.98]);
-  const rawTranslateY = useTransform(
+  const opacity = useTransform(scrollYProgress, [0, 0.28], [0.15, 0.98]);
+  const translateY = useTransform(
     scrollYProgress,
     [0, 0.38],
     [isDesktop ? -380 : -120, isDesktop ? 160 : 40]
   );
-  const rawScale = useTransform(scrollYProgress, [0, 0.38], [0.88, 1.05]);
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.38], [isDesktop ? 14 : 6, 0]);
-
-  const opacity = useSpring(rawOpacity, springConfig);
-  const translateY = useSpring(rawTranslateY, springConfig);
-  const scale = useSpring(rawScale, springConfig);
-  const rotateX = useSpring(rawRotateX, springConfig);
+  const scale = useTransform(scrollYProgress, [0, 0.38], [0.88, 1.05]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.38], [isDesktop ? 14 : 6, 0]);
 
   // Parallax offsets for the 4 flanking facility cards
-  const card1Offset = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -120 : -40]),
-    springConfig
-  );
-  const card2Offset = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 140 : 50]),
-    springConfig
-  );
-  const card3Offset = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -100 : -35]),
-    springConfig
-  );
-  const card4Offset = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 120 : 45]),
-    springConfig
-  );
+  const card1Offset = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -120 : -40]);
+  const card2Offset = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 140 : 50]);
+  const card3Offset = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -100 : -35]);
+  const card4Offset = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 120 : 45]);
 
   const centerItem = facilities[0] || DEFAULT_CAMPUS_FACILITIES[0];
   const item1 = facilities[1] || DEFAULT_CAMPUS_FACILITIES[1];

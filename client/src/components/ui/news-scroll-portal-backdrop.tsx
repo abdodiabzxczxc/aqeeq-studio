@@ -5,7 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from "framer-motion";
 import {
   Sparkles,
@@ -47,31 +46,17 @@ export function NewsScrollPortalBackdrop({
     offset: ["start start", "end start"],
   });
 
-  const springConfig = { stiffness: 190, damping: 26, bounce: 25 };
-
-  // Subtle resting opacity at 0.12, blooming smoothly to 0.94 with zero scroll delay
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.20], [0.12, 0.94]);
-  const opacity = useSpring(rawOpacity, springConfig);
+  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  const opacity = useTransform(scrollYProgress, [0, 0.20], [0.12, 0.94]);
 
   // 3D perspective tilt
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);
-  const rawRotateZ = useTransform(scrollYProgress, [0, 0.5], [-3, 0]);
-  const rotateX = useSpring(rawRotateX, springConfig);
-  const rotateZ = useSpring(rawRotateZ, springConfig);
+  const rotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);
+  const rotateZ = useTransform(scrollYProgress, [0, 0.5], [-3, 0]);
 
   // High-speed column vertical parallax in opposite directions (matching Articles)
-  const col1Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, -190]),
-    springConfig
-  );
-  const col2Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, 170]),
-    springConfig
-  );
-  const col3Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, -210]),
-    springConfig
-  );
+  const col1Y = useTransform(scrollYProgress, [0, 1], [0, -190]);
+  const col2Y = useTransform(scrollYProgress, [0, 1], [0, 170]);
+  const col3Y = useTransform(scrollYProgress, [0, 1], [0, -210]);
 
   // Ensure at least 15 items by looping if necessary
   const displayPosts = useMemo(() => {
