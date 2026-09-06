@@ -11,7 +11,7 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { AccreditationsScrollGlobalBackdrop } from "@/components/ui/accreditations-scroll-global-backdrop";
-import { type ParallaxProduct } from "@/components/ui/hero-parallax";
+import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
 import { useLocation } from "wouter";
 
 const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
@@ -101,20 +101,6 @@ export default function AqeeqSchoolAccreditationsPage() {
   const heroBackCardRotate = rawHeroBackCardRotate;
   const heroMiddleCardY = rawHeroMiddleCardY;
   const heroMiddleCardScale = rawHeroMiddleCardScale;
-  // 3D Mouse Perspective Tilt for Hero Cards
-  const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
-  const heroTiltX = useSpring(heroMouse.y, { stiffness: 120, damping: 18 });
-  const heroTiltY = useSpring(heroMouse.x, { stiffness: 120, damping: 18 });
-
-  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 16;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -16;
-    setHeroMouse({ x, y });
-  };
-  const handleHeroMouseLeave = () => {
-    setHeroMouse({ x: 0, y: 0 });
-  };
 
 
 
@@ -204,13 +190,15 @@ export default function AqeeqSchoolAccreditationsPage() {
       useCurtain={false}
       curtainKicker="✦ استكشف قاعة الاعتمادات ومراكز الاختبارات العالمية ✦"
       hero={
-        <div className={`relative overflow-hidden py-8 sm:py-12 md:py-16 ${dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"}`}>
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-            <div className={`absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full blur-[140px] ${dark ? "bg-[#08467d]/20" : "bg-[#08467d]/10"}`} />
-            <div className={`absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full blur-[120px] ${dark ? "bg-amber-400/[0.04]" : "bg-amber-500/[0.03]"}`} />
-          </div>
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <HeroParallax
+          products={ACCREDITATIONS_PARALLAX_PRODUCTS}
+          dark={dark}
+          direction="right-to-left"
+          cardShape="square"
+          rowCount={2}
+          header={
+            <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
                 <div
@@ -312,11 +300,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               {/* Left Column: Overlapping 3D Credential Covers with 3D Mouse Tilt & Scroll Fan-out (5 cols) */}
               <div className="lg:col-span-5 relative">
                 <motion.div
-                  onMouseMove={(e) => { if (isDesktop) handleHeroMouseMove(e); }}
-                  onMouseLeave={() => { if (isDesktop) handleHeroMouseLeave(); }}
                   style={{
-                    rotateX: isDesktop ? heroTiltX : 0,
-                    rotateY: isDesktop ? heroTiltY : 0,
                     transformStyle: isDesktop ? "preserve-3d" : "flat",
                   }}
                   className="relative mx-auto h-[320px] w-full max-w-[560px] sm:h-[400px] lg:h-[430px] perspective-1000 will-change-transform select-none"
@@ -457,7 +441,8 @@ export default function AqeeqSchoolAccreditationsPage() {
               </div>
             </div>
           </div>
-        </div>
+        }
+      />
       }
     >
       {/* Kinetic Typographic Ribbon 1 */}

@@ -17,7 +17,7 @@ import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
-import { type ParallaxProduct } from "@/components/ui/hero-parallax";
+import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
 
@@ -33,19 +33,11 @@ function directDriveImage(url: string | null) {
 function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: number; onOpen: () => void; dark: boolean }) {
   const { isNationalDay } = useSiteTheme();
   const cover = directDriveImage(album.coverUrl) || album.coverUrl;
-  const { ref, tilt, onMove, onLeave } = useMagneticTilt(8);
 
   return (
     <motion.article
       variants={fadeUpSpring}
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{
-        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
-      }}
-      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition-all duration-300 hover:-translate-y-1 md:p-6 backdrop-blur-2xl will-change-transform ${
         isNationalDay
           ? dark
             ? "snd-bento-card-dark text-white hover:border-emerald-500/50 hover:shadow-[0_25px_60px_rgba(0,90,54,0.35)]"
@@ -55,13 +47,6 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
           : "border-black/[0.06] bg-white/90 text-black shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:border-[#08467d]/40 hover:shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
       }`}
     >
-      {/* Specular glare following cursor */}
-      <div
-        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
-        }}
-      />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
         <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border text-right sm:w-[45%] transition duration-500 group-hover:scale-[1.02] ${
           isNationalDay
@@ -352,13 +337,11 @@ export default function AqeeqAlbumsPage() {
       footer={<AlaqeeqStudioSiteFooter />}
       useCurtain={false}
       hero={
-        <div className={`relative overflow-hidden py-8 sm:py-12 md:py-16 ${dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"}`}>
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-            <div className={`absolute top-0 right-1/4 h-[450px] w-[550px] rounded-full blur-[120px] ${dark ? "bg-[#08467d]/20" : "bg-[#08467d]/10"}`} />
-            <div className={`absolute bottom-0 left-1/4 h-[350px] w-[450px] rounded-full blur-[100px] ${dark ? "bg-amber-400/[0.04]" : "bg-amber-500/[0.03]"}`} />
-          </div>
-          <div className="container relative mx-auto px-4 sm:px-6 max-w-7xl z-10">
-            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 py-2 md:grid-cols-[1fr_1.1fr] md:py-6 lg:gap-16">
+        <HeroParallax
+          products={parallaxProducts}
+          dark={dark}
+          header={
+            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 py-6 md:grid-cols-[1fr_1.1fr] md:py-10 lg:gap-16">
               {/* Left Column: 2 tilted cards — exactly as it was */}
               <div className="relative order-2 mx-auto h-[340px] w-full max-w-[540px] md:order-1 md:h-[450px]">
                 {secondAlbum ? (
@@ -610,8 +593,8 @@ export default function AqeeqAlbumsPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          }
+        />
       }
     >
       <section id="albums-grid-section" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
