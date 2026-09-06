@@ -434,7 +434,14 @@ export default function AqeeqAlbumsPage() {
               </div>
 
               {/* Right Column: Exact original text, colors, badges and buttons */}
-              <div className="order-1 md:order-2 text-right">
+              <div className="order-1 md:order-2 text-right relative z-10">
+                {/* Ambient soft dark contrast scrim behind text for 100% clarity */}
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute -inset-6 -z-10 rounded-3xl blur-2xl ${
+                    dark ? "bg-gradient-to-l from-black/85 via-black/50 to-transparent opacity-95" : "bg-gradient-to-l from-white/90 via-white/60 to-transparent opacity-90"
+                  }`}
+                />
                 {isNationalDay ? (
                   <div
                     className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
