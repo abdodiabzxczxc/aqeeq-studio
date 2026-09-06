@@ -4,7 +4,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   MotionValue,
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
@@ -85,7 +84,6 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
   const scrollEnd = rowCount === 2 ? 0.55 : 1;
   const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
@@ -109,12 +107,12 @@ export const HeroParallax = ({
     [0.08, 0.88, 0.88, 0]
   );
 
-  // Organic gliding inertia with ZERO bounce
-  const translateX = useSpring(rawTranslateX, smoothConfig);
-  const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
-  const rotateX = useSpring(rawRotateX, smoothConfig);
-  const rotateZ = useSpring(rawRotateZ, smoothConfig);
-  const translateY = useSpring(rawTranslateY, smoothConfig);
+  // Direct 1:1 instantaneous response without spring inertia or magnetic post-stop drag
+  const translateX = rawTranslateX;
+  const translateXReverse = rawTranslateXReverse;
+  const rotateX = rawRotateX;
+  const rotateZ = rawRotateZ;
+  const translateY = rawTranslateY;
 
   return (
     <div
