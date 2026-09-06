@@ -108,12 +108,12 @@ export default function AqeeqSchoolAccreditationsPage() {
   // 1. 3D Overlapping Credential Covers Fan-out on Scroll
   // ========================================================
   const { scrollY } = useScroll();
-  const rawHeroFrontCardX = useTransform(scrollY, [0, 600], [0, -40]);
-  const rawHeroFrontCardRotate = useTransform(scrollY, [0, 600], [0, -6]);
-  const rawHeroBackCardX = useTransform(scrollY, [0, 600], [0, 40]);
-  const rawHeroBackCardRotate = useTransform(scrollY, [0, 600], [0, 6]);
-  const rawHeroMiddleCardY = useTransform(scrollY, [0, 600], [0, -24]);
-  const rawHeroMiddleCardScale = useTransform(scrollY, [0, 600], [1, 1.05]);
+  const rawHeroFrontCardX = useTransform(scrollY, [0, 450], [0, -50]);
+  const rawHeroFrontCardRotate = useTransform(scrollY, [0, 450], [0, -8]);
+  const rawHeroBackCardX = useTransform(scrollY, [0, 450], [0, 50]);
+  const rawHeroBackCardRotate = useTransform(scrollY, [0, 450], [0, 8]);
+  const rawHeroMiddleCardY = useTransform(scrollY, [0, 450], [0, -32]);
+  const rawHeroMiddleCardScale = useTransform(scrollY, [0, 450], [1, 1.08]);
 
   const heroFrontCardX = rawHeroFrontCardX;
   const heroFrontCardRotate = rawHeroFrontCardRotate;
@@ -332,7 +332,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       rotate: isDesktop ? heroBackCardRotate : 0,
                       zIndex: 10,
                     }}
-                    className={`absolute bottom-[10%] right-[1%] top-[12%] w-[47%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition-shadow duration-300 ${
+                    className={`absolute bottom-[10%] right-[1%] top-[12%] w-[47%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition duration-300 ${
                       dark
                         ? "border-[#08467d]/40 bg-[#06182e]/95 shadow-black/90 ring-1 ring-[#08467d]/30"
                         : "border-[#08467d]/20 bg-white shadow-lg"
@@ -432,7 +432,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       rotate: isDesktop ? heroFrontCardRotate : 0,
                       zIndex: 20,
                     }}
-                    className={`absolute bottom-[2%] left-[1%] top-[3%] w-[49%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition-shadow duration-300 ${
+                    className={`absolute bottom-[2%] left-[1%] top-[3%] w-[49%] rounded-[1.8rem] sm:rounded-[2.2rem] p-2 sm:p-3 border shadow-2xl overflow-hidden cursor-pointer transition duration-300 ${
                       dark
                         ? "border-amber-500/35 bg-[#0b1218]/95 shadow-black/90 ring-1 ring-amber-500/20"
                         : "border-amber-600/30 bg-white shadow-amber-950/15"
