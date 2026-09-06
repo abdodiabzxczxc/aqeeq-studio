@@ -33,9 +33,23 @@ button, a, input, select, textarea, [role="button"] {
   contain-intrinsic-size: 0 650px;
 }
 
-.gpu-layer {
+.gpu-layer,
+.will-change-transform {
+  -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* ── Smooth hardware rendering on low-spec displays ────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Scrollbar Utilities ─────────────────────────────────── */
@@ -680,7 +694,6 @@ body.light #root {
 
   html {
     direction: rtl;
-    scroll-behavior: smooth;
   }
 
   body {

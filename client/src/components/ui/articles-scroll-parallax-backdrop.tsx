@@ -161,6 +161,8 @@ export function ArticlesScrollParallaxBackdrop({
                   <img
                     src={item.coverUrl}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -204,6 +206,8 @@ export function ArticlesScrollParallaxBackdrop({
                   <img
                     src={item.coverUrl}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -247,6 +251,8 @@ export function ArticlesScrollParallaxBackdrop({
                   <img
                     src={item.coverUrl}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (
