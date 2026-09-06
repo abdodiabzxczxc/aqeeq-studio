@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
   type MotionValue,
 } from "framer-motion";
 import { Disc3 } from "lucide-react";
@@ -116,13 +117,6 @@ function GrandVinylRecordItem({
       ? ["rgba(255,255,255,0.12)", "rgba(248,202,20,0.85)"]
       : ["rgba(0,0,0,0.12)", "rgba(248,202,20,0.9)"]
   );
-  const sleeveBoxShadow = useTransform(
-    centerHighlight,
-    [0, 1],
-    dark
-      ? ["0 20px 45px rgba(0,0,0,0.7)", "0 25px 60px rgba(248,202,20,0.35)"]
-      : ["0 15px 35px rgba(0,0,0,0.1)", "0 25px 50px rgba(248,202,20,0.3)"]
-  );
 
   // Elevation: active center card elevates above neighbors
   const cardZIndex = useTransform(centerHighlight, [0, 0.15], [5, 30]);
@@ -186,9 +180,8 @@ function GrandVinylRecordItem({
       <motion.div
         style={{
           borderColor: sleeveBorderColor,
-          boxShadow: sleeveBoxShadow,
         }}
-        className={`relative z-10 w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] rounded-[1.8rem] sm:rounded-[2.2rem] overflow-hidden border transition-colors duration-300 ${
+        className={`relative z-10 w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] rounded-[1.8rem] sm:rounded-[2.2rem] overflow-hidden border shadow-2xl transition-colors duration-300 ${
           dark
             ? "border-white/10 bg-[#0d1218] shadow-black/80"
             : "border-black/10 bg-white shadow-slate-300"
@@ -241,16 +234,24 @@ export function AtheerScrollVinylBackdrop({
   });
 
   // Ultra-subtle starting opacity at 0.08 (pure dark luxury), blooms smoothly to 0.88 on scroll
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
   const opacity = useTransform(scrollYProgress, [0, 0.35], [0.08, 0.88]);
 
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // ZERO bounce, ZERO lag, ultra-silky glide identical to other pages
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
   // Parallax horizontal glides for the two grand vinyl rows
-  const row1X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 520 : 320]);
-  const row2X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -520 : -320]);
+  const rawRow1X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 520 : 320]);
+  const rawRow2X = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -520 : -320]);
 
   // 3D perspective tilt: tilts gracefully and levels out
-  const rotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 15 : 8, 0]);
-  const rotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -4 : -2, 0]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 15 : 8, 0]);
+  const rawRotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -4 : -2, 0]);
+
+  const row1X = useSpring(rawRow1X, smoothConfig);
+  const row2X = useSpring(rawRow2X, smoothConfig);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
 
   // Guarantee at least 10 items
   const displayItems = useMemo(() => {

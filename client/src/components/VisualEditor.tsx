@@ -709,9 +709,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     if (!currentOverride && typeof document !== "undefined") {
       const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
       if (el) {
-        if (selected.tag === "image" && el instanceof HTMLImageElement) {
-          defaultMedia = el.src || "";
-          defaultAlt = el.alt || "";
+        if (selected.tag === "image") {
+          const imgEl = el instanceof HTMLImageElement ? el : el.querySelector<HTMLImageElement>("img");
+          if (imgEl) {
+            defaultMedia = imgEl.src || "";
+            defaultAlt = imgEl.alt || "";
+          }
         } else if (selected.tag === "text") {
           defaultContent = el.textContent?.trim() || "";
           try {
@@ -1564,8 +1567,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         if (textChild) textChild.textContent = payload.contentText;
         else domNode.textContent = payload.contentText;
       }
-      if (payload.mediaUrl && domNode.tagName === "IMG") {
-        (domNode as HTMLImageElement).src = payload.mediaUrl;
+      if (payload.mediaUrl) {
+        const imgEl = domNode.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode.querySelector<HTMLImageElement>("img");
+        if (imgEl) {
+          imgEl.src = payload.mediaUrl;
+        }
       }
       if (payload.textColor) {
         domNode.style.color = payload.textColor;
@@ -1646,6 +1652,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     draftPreviewEnabled.current = true;
     stageSelectedBackground({ mediaUrl: asset.url, altText: asset.altText || draft.altText });
     setMediaLibraryOpen(false);
+    setWorkspaceMediaOpen(false);
     toast.success("تم اختيار الصورة كمعاينة مباشرة — اضغط «حفظ ونشر التعديل» لتطبيقها");
   };
 
@@ -1850,7 +1857,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     <LayerTrashPanel open={shouldShowWorkspacePanel(isEditing, previewMode, trashOpen)} onClose={() => setTrashOpen(false)} pagePath={pagePath} />
     <DesignToolsPanel open={shouldShowWorkspacePanel(isEditing && Boolean(selected), previewMode, designToolsOpen)} onClose={() => setDesignToolsOpen(false)} label={selected?.label || "الطبقة"} effects={{ filterPreset: layerBehavior.filterPreset || "original", blurAmount: layerBehavior.blurAmount || 0, shadowPreset: layerBehavior.shadowPreset || "none", blendMode: layerBehavior.blendMode || "normal", glass: layerBehavior.glass, innerShadow: layerBehavior.innerShadow, gradientBorder: layerBehavior.gradientBorder, texture: layerBehavior.texture }} onPatch={updateDesignEffects} />
     <PageMapDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, pageMapOpen)} onClose={() => setPageMapOpen(false)} currentLocation={`${window.location.pathname}${window.location.search}`} />
-    <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, workspaceMediaOpen)} onClose={() => setWorkspaceMediaOpen(false)} workspace />
+    <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, workspaceMediaOpen)} onClose={() => setWorkspaceMediaOpen(false)} workspace onSelect={selected ? selectMediaForDraft : undefined} accept={selected?.tag === "video" ? "video" : "image"} />
     <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, mediaLibraryOpen)} onClose={() => setMediaLibraryOpen(false)} accept={selected?.tag === "video" ? "video" : "image"} onSelect={selectMediaForDraft} />
     {pendingMediaAsset ? <div className="fixed inset-0 z-[430] grid place-items-center bg-black/65 p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-labelledby="replace-media-title" dir="rtl"><section className="w-full max-w-md rounded-3xl border border-amber-300/35 bg-[#111521] p-5 shadow-2xl"><div className="text-[11px] font-black tracking-[.14em] text-amber-300">استبدال الصورة</div><h2 id="replace-media-title" className="mt-2 text-lg font-black text-amber-50">تطبيق الصورة الجديدة كمعاينة؟</h2><p className="mt-2 text-sm leading-6 text-slate-300">ستُستبدل الصورة داخل القماش فورًا كمسودة محلية فقط. يمكنك استعادة الأصل أو تجاهل التعديل قبل الحفظ والنشر.</p><div className="mt-5 grid grid-cols-2 gap-2"><button onClick={() => setPendingMediaAsset(null)} className="rounded-xl border border-white/15 px-3 py-3 text-xs font-black text-slate-200 transition hover:bg-white/[0.06]">إلغاء</button><button onClick={confirmMediaReplacement} className="rounded-xl bg-amber-300 px-3 py-3 text-xs font-black text-amber-950 transition hover:bg-amber-200">تطبيق كمعاينة</button></div></section></div> : null}
     {selected && shouldShowPropertiesPanel(isEditing, true, previewMode, mobilePreview) ? (

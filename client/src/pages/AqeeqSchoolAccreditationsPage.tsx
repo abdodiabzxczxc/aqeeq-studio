@@ -102,20 +102,7 @@ export default function AqeeqSchoolAccreditationsPage() {
   const heroMiddleCardY = rawHeroMiddleCardY;
   const heroMiddleCardScale = rawHeroMiddleCardScale;
 
-  // 3D Mouse Perspective Tilt for Hero Cards
-  const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
-  const heroTiltX = useSpring(heroMouse.y, { stiffness: 120, damping: 18 });
-  const heroTiltY = useSpring(heroMouse.x, { stiffness: 120, damping: 18 });
 
-  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 16;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -16;
-    setHeroMouse({ x, y });
-  };
-  const handleHeroMouseLeave = () => {
-    setHeroMouse({ x: 0, y: 0 });
-  };
 
   // ========================================================
   // 2. Hub 3D Perspective Scrubbing for the Credential Terminal
@@ -313,11 +300,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               {/* Left Column: Overlapping 3D Credential Covers with 3D Mouse Tilt & Scroll Fan-out (5 cols) */}
               <div className="lg:col-span-5 relative">
                 <motion.div
-                  onMouseMove={(e) => { if (isDesktop) handleHeroMouseMove(e); }}
-                  onMouseLeave={() => { if (isDesktop) handleHeroMouseLeave(); }}
                   style={{
-                    rotateX: isDesktop ? heroTiltX : 0,
-                    rotateY: isDesktop ? heroTiltY : 0,
                     transformStyle: isDesktop ? "preserve-3d" : "flat",
                   }}
                   className="relative mx-auto h-[320px] w-full max-w-[560px] sm:h-[400px] lg:h-[430px] perspective-1000 will-change-transform select-none"
