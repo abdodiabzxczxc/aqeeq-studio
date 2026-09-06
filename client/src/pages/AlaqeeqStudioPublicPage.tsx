@@ -767,6 +767,16 @@ export default function AlaqeeqStudioPublicPage() {
   const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
   const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
 
+  // فيزياء تراجع الهيرو بالبعد الثالث والبارالاكس السينمائي (3D Cinematic Receding Hero & Parallax)
+  const rawHeroScale = useTransform(scrollY, [0, 500], [1, isDesktop ? 0.93 : 0.97]);
+  const rawHeroOpacity = useTransform(scrollY, [0, 500], [1, isDesktop ? 0.75 : 0.88]);
+  const rawHeroY = useTransform(scrollY, [0, 500], [0, isDesktop ? 120 : 40]);
+  const rawHeroBlur = useTransform(scrollY, [0, 500], ["blur(0px)", "blur(4px)"]);
+
+  const heroScale = useSpring(rawHeroScale, { stiffness: 100, damping: 20 });
+  const heroOpacity = useSpring(rawHeroOpacity, { stiffness: 100, damping: 20 });
+  const heroY = useSpring(rawHeroY, { stiffness: 100, damping: 20 });
+
   // فيزياء ميلان كروت الهيرو بالماوس في البعد الثالث (3D Mouse Perspective Tilt)
   const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
   const heroTiltX = useSpring(heroMouse.y, { stiffness: 120, damping: 18 });
@@ -963,18 +973,29 @@ export default function AlaqeeqStudioPublicPage() {
         </section>
       ) : null}
 
-      {/* 2. غلاف واجهة مدارس العقيق الرئيسية */}
-      <VisualEditable
-        id="studio-hero-section"
-        tag="section"
-        label="غلاف واجهة مدارس العقيق"
-        as="section"
-        className={"aq-studio-share-hero relative isolate overflow-hidden border-b transition-colors duration-500 " + (
-          isNationalDay
-            ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
-            : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-        )}
-      >
+      {/* 2. غلاف واجهة مدارس العقيق الرئيسية مع عمق البعد الثالث وانتقال الستارة الملكية */}
+      <div className="relative z-0 w-full overflow-hidden">
+        <motion.div
+          style={{
+            scale: isDesktop ? heroScale : 1,
+            opacity: isDesktop ? heroOpacity : 1,
+            y: isDesktop ? heroY : 0,
+            filter: isDesktop ? rawHeroBlur : "none",
+            transformOrigin: "center top",
+          }}
+          className="w-full will-change-transform"
+        >
+          <VisualEditable
+            id="studio-hero-section"
+            tag="section"
+            label="غلاف واجهة مدارس العقيق"
+            as="section"
+            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 " + (
+              isNationalDay
+                ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
+                : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+            )}
+          >
         {/* Subtle Ambient Background Watermark */}
         {isNationalDay ? (
           <>
@@ -1349,6 +1370,40 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       </VisualEditable>
+        </motion.div>
+      </div>
+
+      {/* 3. الستارة الملكية الصاعدة (تغطي الهيرو بسلاسة مع السكرول وبدون أي فراغ أولي) */}
+      <div
+        className={`relative z-20 w-full mt-0 rounded-t-[2.5rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4rem] transition-colors duration-500 overflow-x-clip ${
+          isNationalDay
+            ? dark
+              ? "bg-[#020b06] shadow-[0_-35px_90px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
+              : "bg-[#f8faf8] shadow-[0_-25px_70px_rgba(0,90,54,0.18)] border-t-2 border-emerald-500/30"
+            : dark
+            ? "bg-[#07090e] shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t-2 border-white/15"
+            : "bg-white shadow-[0_-25px_70px_rgba(0,0,0,0.12)] border-t-2 border-black/10"
+        }`}
+      >
+        {/* خط إضاءة نيون ملكي في أعلى الستارة */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+        />
+
+        {/* مقبض استكشاف بصري فاخر */}
+        <div className="flex flex-col items-center justify-center pt-3 pb-1.5 gap-1">
+          <div
+            className={`h-1 w-12 rounded-full transition ${
+              dark ? "bg-white/20" : "bg-black/15"
+            }`}
+          />
+          <span className={`text-[9px] font-black tracking-widest uppercase ${
+            dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
+          }`}>
+            ✦ واحة العقيق الرقمية ✦
+          </span>
+        </div>
 
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية (محمي من تطفل المحرر المرئي مع تثبيت تلقائي) */}
@@ -1914,6 +1969,7 @@ export default function AlaqeeqStudioPublicPage() {
 
       {/* Unified Luxury Site Footer */}
       <AlaqeeqStudioSiteFooter />
+      </div>
 
 
 
