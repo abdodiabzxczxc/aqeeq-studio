@@ -109,10 +109,10 @@ export function ParallaxUnfurlingGallery({
   return (
     <div
       ref={containerRef}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-16 [perspective:1200px] [transform-style:preserve-3d] ${
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-12 [perspective:1200px] [transform-style:preserve-3d] ${
         dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
       } ${className}`}
-      style={{ minHeight: isDesktop ? "190vh" : "150vh" }}
+      style={{ minHeight: isDesktop ? "124vh" : "105vh" }}
       dir="rtl"
     >
       {/* Ambient background glow and contrast vignetting */}
@@ -132,7 +132,7 @@ export function ParallaxUnfurlingGallery({
         />
         {/* Soft bottom edge gradient for seamless transition to issues archive */}
         <div
-          className={`absolute inset-x-0 bottom-0 h-40 pointer-events-none z-10 ${
+          className={`absolute inset-x-0 bottom-0 h-28 pointer-events-none z-10 ${
             dark
               ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/80 to-transparent"
               : "bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent"

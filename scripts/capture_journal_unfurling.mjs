@@ -78,6 +78,24 @@ async function run() {
   writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/scratch_journal_desktop_500.png', Buffer.from(snap.data, 'base64'));
   console.log('Saved scratch_journal_desktop_500.png');
 
+  // 2b. Desktop Light Mode Scrolled View
+  await send('Runtime.evaluate', { expression: `
+    localStorage.setItem('aqeeq-studio-theme', 'light');
+    window.location.reload();
+  ` });
+  await sleep(3000);
+  await send('Runtime.evaluate', { expression: `window.scrollTo(0, 550);` });
+  await sleep(1000);
+
+  snap = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('/Users/abelrahmankhalil/.gemini/antigravity/brain/380b8a87-73e8-4479-8f0a-5160a518b9ca/scratch_journal_desktop_light_scroll.png', Buffer.from(snap.data, 'base64'));
+  console.log('Saved scratch_journal_desktop_light_scroll.png');
+
+  // Switch back to dark for consistency
+  await send('Runtime.evaluate', { expression: `
+    localStorage.setItem('aqeeq-studio-theme', 'dark');
+  ` });
+
   // 3. Mobile View (Fresh Navigation)
   await send('Emulation.setDeviceMetricsOverride', {
     width: 390,
