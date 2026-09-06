@@ -70,11 +70,11 @@ export function AqeeqHomeBentoGrid({
   const rawJournalY = useTransform(scrollYProgress, [0, 1], [25, -25]);
   const rawPodY = useTransform(scrollYProgress, [0, 1], [50, -35]);
   const rawArtY = useTransform(scrollYProgress, [0, 1], [15, -45]);
-
-  const albumY = useSpring(rawAlbumY, { stiffness: 85, damping: 20 });
-  const journalY = useSpring(rawJournalY, { stiffness: 85, damping: 20 });
-  const podY = useSpring(rawPodY, { stiffness: 85, damping: 20 });
-  const artY = useSpring(rawArtY, { stiffness: 85, damping: 20 });
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+  const albumY = useSpring(rawAlbumY, smoothConfig);
+  const journalY = useSpring(rawJournalY, smoothConfig);
+  const podY = useSpring(rawPodY, smoothConfig);
+  const artY = useSpring(rawArtY, smoothConfig);
 
   const c1 = useMagneticTilt();
   const c2 = useMagneticTilt();

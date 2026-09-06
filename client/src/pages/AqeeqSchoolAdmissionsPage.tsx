@@ -158,7 +158,7 @@ export default function AqeeqSchoolAdmissionsPage() {
     offset: ["start end", "end start"],
   });
   const rawLaserLineWidth = useTransform(roadmapProgress, [0.15, 0.75], ["0%", "100%"]);
-  const laserLineWidth = useSpring(rawLaserLineWidth, { stiffness: 90, damping: 24 });
+  const laserLineWidth = useSpring(rawLaserLineWidth, smoothConfig);
 
   const handleSelectReelStage = (
     track: "national" | "international",

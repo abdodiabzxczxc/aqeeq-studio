@@ -37,17 +37,18 @@ export default function AqeeqSchoolAppShowcaseSection({
 
   const rawCol1Y = useTransform(scrollYProgress, [0, 1], [35, -35]);
   const rawCol2Y = useTransform(scrollYProgress, [0, 1], [65, -15]);
-  const col1Y = useSpring(rawCol1Y, { stiffness: 85, damping: 20 });
-  const col2Y = useSpring(rawCol2Y, { stiffness: 85, damping: 20 });
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+  const col1Y = useSpring(rawCol1Y, smoothConfig);
+  const col2Y = useSpring(rawCol2Y, smoothConfig);
 
   // 3D Perspective scrubbing physics for the video / app frame
   const rawRotateX = useTransform(scrollYProgress, [0, 0.45, 0.9], [14, 0, -6]);
   const rawRotateY = useTransform(scrollYProgress, [0, 0.45, 0.9], [-16, 0, 8]);
   const rawScale = useTransform(scrollYProgress, [0, 0.45, 0.9], [0.92, 1, 0.96]);
 
-  const rotateX = useSpring(rawRotateX, { stiffness: 80, damping: 20 });
-  const rotateY = useSpring(rawRotateY, { stiffness: 80, damping: 20 });
-  const scale = useSpring(rawScale, { stiffness: 80, damping: 20 });
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateY = useSpring(rawRotateY, smoothConfig);
+  const scale = useSpring(rawScale, smoothConfig);
 
   const appShowcase = orchestrationData?.appShowcase;
   const isEnabled = appShowcase?.enabled ?? true;
