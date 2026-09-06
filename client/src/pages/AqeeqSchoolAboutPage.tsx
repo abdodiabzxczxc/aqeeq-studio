@@ -8,7 +8,6 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "fra
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
-import { ScrollingAnimation } from "@/components/ui/scrolling-animation";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import {
@@ -1703,20 +1702,7 @@ export default function AqeeqSchoolAboutPage() {
       </section>
 
       {/* ========================================================
-          STAGE 5: Al-Aqeeq Orbital Human Leadership & Champions (Scrolling-Animation)
-      ======================================================== */}
-      <section id="people-leadership-stage" className="relative">
-        <ScrollingAnimation
-          kicker="✦ صُناع الأثر والتميز التربوي · 30 عاماً بطيبة الطيبة ✦"
-          title="الإنسان أولاً"
-          titleSecond="في العقيق"
-          subtitle="من الروضة حتى التخرج · نخبة من القيادات الأكاديمية والكوادر الوطنية والمعلمين يرافقون أجيال العقيق نحو صناعة المستقبل."
-          themeMode={dark ? "dark" : "light"}
-        />
-      </section>
-
-      {/* ========================================================
-          STAGE 6: Medina Interactive Map & Campus Logistics (Live Radar)
+          STAGE 5: Medina Interactive Map & Campus Logistics (Live Radar)
       ======================================================== */}
       <section id="map-contact-section" className="py-20 container mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-14">
