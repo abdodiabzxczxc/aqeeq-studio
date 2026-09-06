@@ -2603,7 +2603,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   </Tag>;
 }
 
-export function VisualImage({ id, label, src, alt, className = "", linkUrl, style }: { id: string; label: string; src: string; alt: string; className?: string; linkUrl?: string; style?: React.CSSProperties }) {
+export function VisualImage({ id, label, src, alt, className = "", linkUrl, style, priority = false, loading }: { id: string; label: string; src: string; alt: string; className?: string; linkUrl?: string; style?: React.CSSProperties; priority?: boolean; loading?: "lazy" | "eager" }) {
   const { getOverride } = useContext(VisualEditorContext);
   const override = getOverride(id);
   const cachedOverride = useMemo(() => {
@@ -2631,7 +2631,7 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   const imageTransform = !isBrandMark && activeOverride?.backgroundSize && activeOverride.backgroundSize !== 100 ? `scale(${activeOverride.backgroundSize / 100})` : undefined;
   const fillHeight = /(?:^|\s)h-full(?:\s|$)/.test(className);
   const fillWidth = /(?:^|\s)w-full(?:\s|$)/.test(className);
-  const image = <img src={resolvedSrc} alt={resolvedAlt} referrerPolicy="no-referrer" className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"}`} style={isBrandMark ? style : { ...style, objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`, transform: imageTransform, transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%` }} />;
+  const image = <img src={resolvedSrc} alt={resolvedAlt} referrerPolicy="no-referrer" loading={loading || (priority ? "eager" : "lazy")} {...(priority ? { fetchPriority: "high" } : {})} decoding="async" className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"}`} style={isBrandMark ? style : { ...style, objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`, transform: imageTransform, transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%` }} />;
   return <VisualEditable id={id} tag="image" label={label} as="div" className={visualImageWrapperClassName(className, isBrandMark)}>{resolvedLink ? <a href={resolvedLink} target={opensInNewTab ? "_blank" : undefined} rel={opensInNewTab ? "noopener noreferrer" : undefined} className={`${fillHeight ? "block h-full" : ""} ${fillWidth ? "w-full" : ""}`}>{image}</a> : image}</VisualEditable>;
 }
 

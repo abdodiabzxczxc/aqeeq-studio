@@ -188,6 +188,7 @@ export const HeroParallax = ({
               key={product.title + "-r1-" + idx}
               dark={dark}
               cardShape={cardShape}
+              priority={idx < 3}
             />
           ))}
         </div>
@@ -201,6 +202,7 @@ export const HeroParallax = ({
               key={product.title + "-r2-" + idx}
               dark={dark}
               cardShape={cardShape}
+              priority={idx < 2}
             />
           ))}
         </div>
@@ -388,11 +390,13 @@ export const ProductCard = ({
   translate,
   dark,
   cardShape = "default",
+  priority = false,
 }: {
   product: ParallaxProduct;
   translate: MotionValue<number>;
   dark?: boolean;
   cardShape?: "default" | "square";
+  priority?: boolean;
 }) => {
   return (
     <motion.div
@@ -416,7 +420,8 @@ export const ProductCard = ({
         <img
           src={product.thumbnail}
           alt={product.title}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          {...(priority ? { fetchPriority: "high" } : {})}
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover/product:scale-108"
         />
