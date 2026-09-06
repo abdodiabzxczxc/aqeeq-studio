@@ -274,31 +274,41 @@ export default function SchoolNewsPage() {
     0
   );
 
-  const { data: allMedia = [] } = trpc.aqeeqAlbums.allPublicMedia.useQuery(
+  const { data: allJournalPages = [] } = trpc.schoolNews.allPublicPages.useQuery(
     undefined,
     { refetchOnWindowFocus: false, staleTime: 60000 }
   );
 
   const unfurlingGalleryItems: UnfurlingItem[] = useMemo(() => {
-    const fromIssues: UnfurlingItem[] = issues.map((iss, idx) => ({
-      id: `issue-${iss.id}`,
-      title: iss.title,
-      image: directDriveImage(iss.coverUrl) || iss.coverUrl || "/covers/cover-about.jpg",
-      badge: `العدد ${String(idx + 1).padStart(2, "0")}`,
-      date: iss.issueDate,
-      link: `/journal/${iss.slug}`,
-    }));
+    // 1. Pages from published magazine issues
+    const fromPages: UnfurlingItem[] = allJournalPages.map((p) => {
+      const isCover = p.pageOrder === 0;
+      const cleanCaption = p.caption && !p.caption.toLowerCase().includes(".pdf") ? p.caption : null;
+      return {
+        id: `page-${p.id}`,
+        title: cleanCaption || (isCover ? `غلاف ${p.issueTitle}` : `${p.issueTitle} · صفحة ${p.pageOrder + 1}`),
+        image: directDriveImage(p.imageUrl) || p.imageUrl,
+        badge: isCover ? "غلاف العدد" : `صفحة ${p.pageOrder + 1}`,
+        date: p.issueDate,
+        link: `/journal/${p.issueSlug}`,
+      };
+    });
 
-    const fromMedia: UnfurlingItem[] = allMedia.map((m, idx) => ({
-      id: `media-${m.id}`,
-      title: m.caption || m.albumTitle || "توثيق فعاليات مدارس العقيق",
-      image: directDriveImage(m.imageUrl) || m.imageUrl || m.thumbnailUrl || "/covers/cover-about.jpg",
-      badge: m.albumTitle ? m.albumTitle.slice(0, 16) : "أرشيف العقيق",
-      date: "2025/2026",
-    }));
+    // 2. Issue covers (if not already represented)
+    const existingImages = new Set(fromPages.map((i) => i.image));
+    const fromCovers: UnfurlingItem[] = issues
+      .filter((iss) => iss.coverUrl && !existingImages.has(directDriveImage(iss.coverUrl) || iss.coverUrl))
+      .map((iss, idx) => ({
+        id: `issue-cover-${iss.id}`,
+        title: iss.title,
+        image: directDriveImage(iss.coverUrl) || iss.coverUrl!,
+        badge: `العدد ${String(idx + 1).padStart(2, "0")}`,
+        date: iss.issueDate,
+        link: `/journal/${iss.slug}`,
+      }));
 
-    return [...fromIssues, ...fromMedia];
-  }, [issues, allMedia]);
+    return [...fromPages, ...fromCovers];
+  }, [allJournalPages, issues]);
 
   if (isLoading) {
     return (

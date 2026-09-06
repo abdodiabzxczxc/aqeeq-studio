@@ -53,6 +53,7 @@ import {
   createEventTask,
   updateEventTask,
   listSchoolNewsIssues,
+  listAllSchoolNewsPages,
   getSchoolNewsIssueBySlug,
   createSchoolNewsIssue,
   updateSchoolNewsIssue,
@@ -557,6 +558,7 @@ export const appRouter = router({
 
   schoolNews: router({
     publicList: publicProcedure.query(() => listSchoolNewsIssues("published")),
+    allPublicPages: publicProcedure.query(() => listAllSchoolNewsPages("published")),
     recordView: publicProcedure.input(z.object({ id: z.number().int().positive(), viewerKey: z.string().trim().min(12).max(64) })).mutation(({ input }) => recordAqeeqContentView("journal", input.id, input.viewerKey)),
     monthlyBook: publicProcedure.input(z.object({ monthKey: z.string().regex(/^\d{4}-\d{2}$/) })).query(({ input }) => getSchoolNewsMonthlyBook(input.monthKey)),
     list: adminProcedure.query(() => listSchoolNewsIssues()),

@@ -308,6 +308,48 @@ export const localSchoolNews = {
     });
   },
 
+  listAllPages(status?: "draft" | "published"): Array<{
+    id: number;
+    issueId: number;
+    imageUrl: string;
+    caption: string | null;
+    pageOrder: number;
+    issueTitle: string;
+    issueSlug: string;
+    issueDate: string;
+  }> {
+    const db = getLocalDb();
+    let issues = [...db.issues];
+    if (status) issues = issues.filter((i) => i.status === status);
+    const result: Array<{
+      id: number;
+      issueId: number;
+      imageUrl: string;
+      caption: string | null;
+      pageOrder: number;
+      issueTitle: string;
+      issueSlug: string;
+      issueDate: string;
+    }> = [];
+    for (const issue of issues) {
+      if (issue.pages) {
+        for (const p of issue.pages) {
+          result.push({
+            id: p.id,
+            issueId: issue.id,
+            imageUrl: p.imageUrl,
+            caption: p.caption || null,
+            pageOrder: p.pageOrder,
+            issueTitle: issue.title,
+            issueSlug: issue.slug,
+            issueDate: issue.issueDate,
+          });
+        }
+      }
+    }
+    return result;
+  },
+
   getBySlug(slug: string, includeDraft = false): (LocalNewsIssue & { pages: LocalNewsPage[] }) | undefined {
     const db = getLocalDb();
     const issue = db.issues.find((i) => i.slug === slug && (includeDraft || i.status === "published"));

@@ -2141,6 +2141,29 @@ export async function listSchoolNewsIssues(status?: "draft" | "published") {
   return issues.map((issue) => ({ ...issue, pageCount: pages.filter((page) => page.issueId === issue.id).length }));
 }
 
+export async function listAllSchoolNewsPages(status?: "draft" | "published") {
+  const db = await getDb();
+  if (!db) return localSchoolNews.listAllPages(status);
+  const issues = status ? await db.select().from(schoolNewsIssues).where(eq(schoolNewsIssues.status, status)) : await db.select().from(schoolNewsIssues);
+  const issueIds = issues.map((i) => i.id);
+  if (!issueIds.length) return [];
+  const pages = await db.select().from(schoolNewsPages).where(inArray(schoolNewsPages.issueId, issueIds)).orderBy(schoolNewsPages.pageOrder);
+  const issueMap = new Map(issues.map((i) => [i.id, i]));
+  return pages.map((page) => {
+    const issue = issueMap.get(page.issueId);
+    return {
+      id: page.id,
+      issueId: page.issueId,
+      imageUrl: page.imageUrl,
+      caption: page.caption || null,
+      pageOrder: page.pageOrder,
+      issueTitle: issue?.title || "النشرة الأسبوعية",
+      issueSlug: issue?.slug || "",
+      issueDate: issue?.issueDate || "",
+    };
+  });
+}
+
 export async function getSchoolNewsIssueBySlug(slug: string, includeDraft = false) {
   const db = await getDb();
   if (!db) return localSchoolNews.getBySlug(slug, includeDraft);

@@ -68,36 +68,41 @@ export function ParallaxUnfurlingGallery({
   const springConfig = { stiffness: 190, damping: 28, bounce: 35 };
 
   // 3D Matrix Rotation & Perspective Unfurling
-  // At rest (scroll 0): angled matrix in the background. As you scroll, it unfurls smoothly.
+  // Coming from LEFT to CENTER:
+  // Positive rotateY (+16) tilts left side towards viewer
+  // Negative rotateZ (-7) angles grid counter-clockwise
+  // Negative translateX (-140) shifts matrix to the left, smoothly centering to 0 on scroll
   const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
-  const rawRotateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -15 : -6, 0]);
-  const rawRotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 7 : 3, 0]);
+  const rawRotateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 7, 0]);
+  const rawRotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -7 : -3, 0]);
+  const rawTranslateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -140 : -50, 0]);
   const rawTranslateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
 
-  // Opacity: starts subtle at 0.14 for maximum text legibility, then blooms to 0.95 upon scrolling
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.28], [0.14, 0.95]);
+  // Opacity: starts subtle at 0.18 for maximum text legibility, then blooms to 0.95 upon scrolling
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.28], [0.18, 0.95]);
 
   const rotateX = useSpring(rawRotateX, springConfig);
   const rotateY = useSpring(rawRotateY, springConfig);
   const rotateZ = useSpring(rawRotateZ, springConfig);
+  const translateX = useSpring(rawTranslateX, springConfig);
   const translateY = useSpring(rawTranslateY, springConfig);
   const opacity = useSpring(rawOpacity, springConfig);
 
   // Column vertical parallax offsets (Opposite directions for true unfurling motion)
   const col1Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -450 : -180]),
+    useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]),
     springConfig
   );
   const col2Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 300 : 120]),
-    springConfig
-  );
-  const col3Y = useSpring(
     useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]),
     springConfig
   );
+  const col3Y = useSpring(
+    useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]),
+    springConfig
+  );
   const col4Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -320 : -120, isDesktop ? 240 : 100]),
+    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -450 : -180]),
     springConfig
   );
 
@@ -135,12 +140,14 @@ export function ParallaxUnfurlingGallery({
         />
       </div>
 
-      {/* 3D Angled Unfurling Matrix Grid (Background) */}
+      {/* 3D Angled Unfurling Matrix Grid (Background) - Directed from LEFT to CENTER */}
       <motion.div
+        dir="ltr"
         style={{
           rotateX,
           rotateY,
           rotateZ,
+          translateX,
           translateY,
           opacity,
         }}
@@ -223,7 +230,7 @@ function UnfurlingCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
       {/* Card Details Pill */}
-      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-right">
+      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-right" dir="rtl">
         {item.badge && (
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-black border backdrop-blur-md mb-1 sm:mb-1.5 ${
