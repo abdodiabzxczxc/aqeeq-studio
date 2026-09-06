@@ -85,40 +85,31 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
-  // Smooth continuous parallax across full scroll [0, 1] — matching all other pages without abrupt clamping
-  const rawTranslateX = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, isDesktop ? (isRightToLeft ? -380 : 380) : (isRightToLeft ? -160 : 160)]
-  );
-  const rawTranslateXReverse = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, isDesktop ? (isRightToLeft ? 380 : -380) : (isRightToLeft ? 160 : -160)]
-  );
-  const rawRotateX = useTransform(scrollYProgress, [0, 1], [isDesktop ? 12 : 5, 0]);
+  const scrollEnd = rowCount === 2 ? 0.55 : 1;
+  const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
+  const rawTranslateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
+  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
   const rawRotateZ = useTransform(
     scrollYProgress,
-    [0, 1],
-    [isDesktop ? (isRightToLeft ? -12 : 12) : (isRightToLeft ? -3 : 3), 0]
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
   );
   const rawTranslateY = useTransform(
     scrollYProgress,
-    [0, 1],
-    [isDesktop ? (rowCount === 2 ? -120 : -220) : -80, isDesktop ? (rowCount === 2 ? 60 : 120) : 40]
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
   );
 
   // Direct linear opacity — zero flicker
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.85, 1],
-    [0.9, 1, 1, 0.4]
+    [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+    [0.08, 0.88, 0.88, 0]
   );
 
-  // Standardized smooth physics matching all other pages
+  // Organic gliding inertia with ZERO bounce
   const translateX = useSpring(rawTranslateX, smoothConfig);
   const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
   const rotateX = useSpring(rawRotateX, smoothConfig);
