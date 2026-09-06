@@ -4,7 +4,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   MotionValue,
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
@@ -85,20 +84,18 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
-
-  const scrollEnd = rowCount === 2 ? 0.55 : 1;
+  const scrollEnd = 1;
   const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
   const rawTranslateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
-  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
+  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.35 : 0.45], [isDesktop ? 14 : 6, 0]);
   const rawRotateZ = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
+    [0, rowCount === 2 ? 0.35 : 0.45],
     [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
   );
   const rawTranslateY = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
+    [0, rowCount === 2 ? 0.35 : 0.45],
     [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
   );
 
@@ -109,12 +106,12 @@ export const HeroParallax = ({
     [0.08, 0.88, 0.88, 0]
   );
 
-  // Organic gliding inertia with ZERO bounce
-  const translateX = useSpring(rawTranslateX, smoothConfig);
-  const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
-  const rotateX = useSpring(rawRotateX, smoothConfig);
-  const rotateZ = useSpring(rawRotateZ, smoothConfig);
-  const translateY = useSpring(rawTranslateY, smoothConfig);
+  // 1:1 direct scroll binding — ZERO spring rubberband stretch, ZERO sudden snap
+  const translateX = rawTranslateX;
+  const translateXReverse = rawTranslateXReverse;
+  const rotateX = rawRotateX;
+  const rotateZ = rawRotateZ;
+  const translateY = rawTranslateY;
 
   return (
     <div
@@ -413,7 +410,7 @@ export const ProductCard = ({
         cardShape === "square"
           ? "h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] md:h-[350px] md:w-[350px] aspect-square"
           : "h-[280px] sm:h-[340px] md:h-[380px] w-[290px] sm:w-[380px] md:w-[440px]"
-      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 will-change-transform cursor-pointer`}
+      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl will-change-transform cursor-pointer`}
     >
       <Link href={product.link} className="block h-full w-full">
         {/* Background Album Photo with smooth zoom on hover */}
