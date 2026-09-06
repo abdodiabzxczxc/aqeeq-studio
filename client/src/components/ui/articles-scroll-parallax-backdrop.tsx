@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 import { BookOpen, Sparkles } from "lucide-react";
 
@@ -45,33 +46,45 @@ export function ArticlesScrollParallaxBackdrop({
     offset: ["start start", "end start"],
   });
 
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
-  const rotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
-  const rotateY = useTransform(
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia across all devices
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
+  const rawRotateY = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? -16 : 16) : (isRtl ? -7 : 7), 0]
   );
-  const rotateZ = useTransform(
+  const rawRotateZ = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? 7 : -7) : (isRtl ? 3 : -3), 0]
   );
-  const translateX = useTransform(
+  const rawTranslateX = useTransform(
     scrollYProgress,
     [0, 0.45],
     [isDesktop ? (isRtl ? 140 : -140) : (isRtl ? 50 : -50), 0]
   );
-  const translateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
+  const rawTranslateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
 
-  // Ultra-subtle starting opacity at 0.08 (pure dark luxury), blooms to 0.88 on entrance, and dissolves gracefully on scroll down (0.88 -> 0)
-  // Direct interpolation with NO spring to eliminate all flickering and shivering
+  // Direct linear opacity — never flickers, pure smooth fade
   const opacity = useTransform(scrollYProgress, [0, 0.25, 0.62, 0.95], [0.08, 0.88, 0.88, 0]);
 
-  // Column vertical parallax offsets (Opposite directions for true unfurling motion)
-  const col1Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]);
-  const col2Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]);
-  const col3Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateY = useSpring(rawRotateY, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
+  const translateX = useSpring(rawTranslateX, smoothConfig);
+  const translateY = useSpring(rawTranslateY, smoothConfig);
+
+  // Column vertical parallax offsets with critically damped gliding inertia
+  const rawCol1Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]);
+  const rawCol2Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]);
+  const rawCol3Y = useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]);
+
+  const col1Y = useSpring(rawCol1Y, smoothConfig);
+  const col2Y = useSpring(rawCol2Y, smoothConfig);
+  const col3Y = useSpring(rawCol3Y, smoothConfig);
 
   // Guarantee at least 15 items by looping
   const displayItems = useMemo(() => {
@@ -137,7 +150,7 @@ export function ArticlesScrollParallaxBackdrop({
           {col1.map((item, idx) => (
             <div
               key={`b-col1-${item.id}-${idx}`}
-              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition ${
+              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition-colors duration-300 ${
                 dark
                   ? "border-white/10 bg-[#0a0f16]/90 shadow-black/80"
                   : "border-black/10 bg-white/90 shadow-slate-200"
@@ -180,7 +193,7 @@ export function ArticlesScrollParallaxBackdrop({
           {col2.map((item, idx) => (
             <div
               key={`b-col2-${item.id}-${idx}`}
-              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition ${
+              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition-colors duration-300 ${
                 dark
                   ? "border-white/10 bg-[#0a0f16]/90 shadow-black/80"
                   : "border-black/10 bg-white/90 shadow-slate-200"
@@ -223,7 +236,7 @@ export function ArticlesScrollParallaxBackdrop({
           {col3.map((item, idx) => (
             <div
               key={`b-col3-${item.id}-${idx}`}
-              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition ${
+              className={`rounded-2xl border p-2.5 overflow-hidden shadow-2xl transition-colors duration-300 ${
                 dark
                   ? "border-white/10 bg-[#0a0f16]/90 shadow-black/80"
                   : "border-black/10 bg-white/90 shadow-slate-200"

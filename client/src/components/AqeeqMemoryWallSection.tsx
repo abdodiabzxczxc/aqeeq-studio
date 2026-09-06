@@ -39,9 +39,10 @@ export function AqeeqMemoryWallSection({
   // Column 2 moves downward with an offset cadence
   const rawCol2 = useTransform(scrollYProgress, [0, 1], [85, -45]);
 
-  const col0Y = useSpring(rawCol0, { stiffness: 75, damping: 20 });
-  const col1Y = useSpring(rawCol1, { stiffness: 75, damping: 20 });
-  const col2Y = useSpring(rawCol2, { stiffness: 75, damping: 20 });
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+  const col0Y = useSpring(rawCol0, smoothConfig);
+  const col1Y = useSpring(rawCol1, smoothConfig);
+  const col2Y = useSpring(rawCol2, smoothConfig);
 
   return (
     <VisualEditable

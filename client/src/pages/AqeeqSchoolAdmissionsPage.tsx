@@ -142,10 +142,14 @@ export default function AqeeqSchoolAdmissionsPage() {
   const rawFeesScale = useTransform(feesProgress, [0, 0.45, 0.9], [0.93, 1, 0.96]);
   const rawFeesResultY = useTransform(feesProgress, [0, 1], [30, -30]);
 
-  const feesRotateX = useSpring(rawFeesRotateX, { stiffness: 85, damping: 22 });
-  const feesRotateY = useSpring(rawFeesRotateY, { stiffness: 85, damping: 22 });
-  const feesScale = useSpring(rawFeesScale, { stiffness: 85, damping: 22 });
-  const feesResultY = useSpring(rawFeesResultY, { stiffness: 85, damping: 22 });
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // ZERO bounce, ZERO lag, ultra-silky glide across all devices
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  const feesRotateX = useSpring(rawFeesRotateX, smoothConfig);
+  const feesRotateY = useSpring(rawFeesRotateY, smoothConfig);
+  const feesScale = useSpring(rawFeesScale, smoothConfig);
+  const feesResultY = useSpring(rawFeesResultY, smoothConfig);
 
   // Kinetic laser progress line for roadmap steps
   const roadmapRef = useRef<HTMLDivElement>(null);
@@ -750,7 +754,7 @@ export default function AqeeqSchoolAdmissionsPage() {
               scale: isDesktop ? feesScale : 1,
               transformStyle: isDesktop ? "preserve-3d" : "flat",
             }}
-            className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition will-change-transform ${
+            className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden transition-colors duration-300 will-change-transform ${
               dark
                 ? "border-[#f8ca14]/25 bg-gradient-to-br from-[#0c1218] via-[#091016] to-[#05080c] shadow-black/80"
                 : "border-[#08467d]/20 bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9] shadow-xl"

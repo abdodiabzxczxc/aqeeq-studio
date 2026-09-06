@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
@@ -117,8 +118,11 @@ export function AdmissionsScrollCampusBackdrop({
     offset: ["start start", "end start"],
   });
 
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
   // Smooth entrance bloom (0.08 -> 0.88), dissolves gracefully on scroll down (0.88 -> 0)
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
   const opacity = useTransform(
     scrollYProgress,
     [0, 0.15, 0.50, 0.88],
@@ -126,24 +130,28 @@ export function AdmissionsScrollCampusBackdrop({
   );
 
   // Parallax horizontal glides for the two grand rows in opposite directions
-  const row1X = useTransform(
+  const rawRow1X = useTransform(
     scrollYProgress,
     [0, 0.65],
     [0, isDesktop ? (isRtl ? -520 : 520) : (isRtl ? -280 : 280)]
   );
-  const row2X = useTransform(
+  const rawRow2X = useTransform(
     scrollYProgress,
     [0, 0.65],
     [0, isDesktop ? (isRtl ? 520 : -520) : (isRtl ? 280 : -280)]
   );
+  const row1X = useSpring(rawRow1X, smoothConfig);
+  const row2X = useSpring(rawRow2X, smoothConfig);
 
   // 3D perspective tilt: tilts gracefully and levels out
-  const rotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 14 : 7, 0]);
-  const rotateZ = useTransform(
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 14 : 7, 0]);
+  const rawRotateZ = useTransform(
     scrollYProgress,
     [0, 0.35],
     [isDesktop ? (isRtl ? 4 : -4) : (isRtl ? 2 : -2), 0]
   );
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
 
   const displayItems = useMemo(() => {
     const base = items && items.length > 0 ? items : DEFAULT_ADMISSIONS_ITEMS;

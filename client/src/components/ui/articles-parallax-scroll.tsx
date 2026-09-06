@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 import { BookOpen, Sparkles, User, Clock, ArrowUpLeft } from "lucide-react";
 
@@ -67,20 +68,30 @@ export function ArticlesParallaxScroll({
     offset: ["start start", "end start"],
   });
 
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
-  // 3D Matrix Perspective Transformations
-  // Starts with gentle tilt in the background, smoothly unfurling forward
-  const rotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 15 : 6, 0]);
-  const rotateZ = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -5 : -2, 0]);
-  const translateY = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -440 : -140, isDesktop ? 220 : 60]);
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  // 3D Matrix Perspective Transformations with critically damped inertia
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 15 : 6, 0]);
+  const rawRotateZ = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -5 : -2, 0]);
+  const rawTranslateY = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -440 : -140, isDesktop ? 220 : 60]);
   
-  // Opacity: starts subtle at 0.14 (14%) for 100% header readability, blooms to 0.98 upon scrolling
+  // Direct linear opacity — zero flicker
   const opacity = useTransform(scrollYProgress, [0, 0.24], [0.14, 0.98]);
 
-  // Column vertical parallax offsets (Opposite directions for high-speed parallax)
-  const col1Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -420 : -160]);
-  const col2Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 360 : 140]);
-  const col3Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -480 : -180]);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
+  const translateY = useSpring(rawTranslateY, smoothConfig);
+
+  // Column vertical parallax offsets with critically damped inertia
+  const rawCol1Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -420 : -160]);
+  const rawCol2Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 360 : 140]);
+  const rawCol3Y = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -480 : -180]);
+
+  const col1Y = useSpring(rawCol1Y, smoothConfig);
+  const col2Y = useSpring(rawCol2Y, smoothConfig);
+  const col3Y = useSpring(rawCol3Y, smoothConfig);
 
   return (
     <div

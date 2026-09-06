@@ -23,7 +23,8 @@ export function AqeeqTypographicScrubBar({
   const from = reverse ? "-25%" : "25%";
   const to = reverse ? "25%" : "-25%";
   const rawX = useTransform(scrollYProgress, [0, 1], [from, to]);
-  const x = useSpring(rawX, { stiffness: 85, damping: 20 });
+  // Critically damped spring physics: zero bounce, zero vibration, silky glide
+  const x = useSpring(rawX, { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 });
 
   return (
     <div
@@ -32,7 +33,12 @@ export function AqeeqTypographicScrubBar({
       className="hidden xl:block relative w-full overflow-hidden py-4 select-none pointer-events-none"
     >
       <motion.div
-        style={{ x }}
+        style={{
+          x,
+          transform: "translate3d(0, 0, 0)",
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+        }}
         className={`whitespace-nowrap font-black font-mono text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.2em] transition-opacity ${
           dark
             ? "text-transparent bg-clip-text bg-gradient-to-r from-[#f8ca14]/5 via-[#f8ca14]/30 to-[#f8ca14]/5 opacity-70"

@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 import {
   Award,
@@ -184,17 +185,26 @@ export function AccreditationsScrollGlobalBackdrop({
     offset: ["start start", "end start"],
   });
 
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  // Direct linear opacity — zero flicker
   const opacity = useTransform(scrollYProgress, [0, 0.20], [0.12, 0.94]);
 
-  // 3D perspective tilt
-  const rotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);
-  const rotateZ = useTransform(scrollYProgress, [0, 0.5], [-3, 0]);
+  // 3D perspective tilt with critically damped inertia
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);
+  const rawRotateZ = useTransform(scrollYProgress, [0, 0.5], [-3, 0]);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
 
   // High-speed column vertical parallax in opposite directions (matching Articles)
-  const col1Y = useTransform(scrollYProgress, [0, 1], [0, -190]);
-  const col2Y = useTransform(scrollYProgress, [0, 1], [0, 170]);
-  const col3Y = useTransform(scrollYProgress, [0, 1], [0, -210]);
+  const rawCol1Y = useTransform(scrollYProgress, [0, 1], [0, -190]);
+  const rawCol2Y = useTransform(scrollYProgress, [0, 1], [0, 170]);
+  const rawCol3Y = useTransform(scrollYProgress, [0, 1], [0, -210]);
+  const col1Y = useSpring(rawCol1Y, smoothConfig);
+  const col2Y = useSpring(rawCol2Y, smoothConfig);
+  const col3Y = useSpring(rawCol3Y, smoothConfig);
 
   const col1 = useMemo(() => ACCREDITATION_SHIELD_ITEMS.slice(0, 4), []);
   const col2 = useMemo(() => ACCREDITATION_SHIELD_ITEMS.slice(4, 8), []);

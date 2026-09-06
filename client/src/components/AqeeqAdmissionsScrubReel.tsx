@@ -136,7 +136,7 @@ export function AqeeqAdmissionsScrubReel({ onSelectStage }: AqeeqAdmissionsScrub
   // Smooth 120fps spring scrub mapped to track distance (Exact match with homepage)
   // In RTL Arabic, moving cards to the left means translating in positive X direction in RTL flow
   const rawX = useTransform(scrollYProgress, [0.02, 0.98], [0, maxScrollDistance]);
-  const smoothX = useSpring(rawX, { stiffness: 90, damping: 24, mass: 0.4 });
+  const smoothX = useSpring(rawX, { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 });
 
   // Progress percentage (0 to 100)
   const progressPercent = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);

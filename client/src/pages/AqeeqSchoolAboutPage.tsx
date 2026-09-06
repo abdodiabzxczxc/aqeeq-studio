@@ -222,19 +222,23 @@ export default function AqeeqSchoolAboutPage() {
   // Scroll Tracking for Smooth Parallax
   const { scrollY } = useScroll();
 
+  // Smooth critically-damped inertia physics: mass: 0.1, stiffness: 100, damping: 30
+  // ZERO bounce, ZERO lag, ultra-silky glide across all devices
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
   // Hero Card 3D Scroll Physics
   const rawHeroCardY = useTransform(scrollY, [0, 500], [0, 45]);
   const rawHeroCardRotateX = useTransform(scrollY, [0, 500], [0, 6]);
   const rawHeroCardScale = useTransform(scrollY, [0, 500], [1, 0.94]);
-  const heroCardY = useSpring(rawHeroCardY, { stiffness: 90, damping: 20 });
-  const heroCardRotateX = useSpring(rawHeroCardRotateX, { stiffness: 90, damping: 20 });
-  const heroCardScale = useSpring(rawHeroCardScale, { stiffness: 90, damping: 20 });
+  const heroCardY = useSpring(rawHeroCardY, smoothConfig);
+  const heroCardRotateX = useSpring(rawHeroCardRotateX, smoothConfig);
+  const heroCardScale = useSpring(rawHeroCardScale, smoothConfig);
 
   // Floating Satellite Badges Counter-Parallax
   const rawHeroBadge1Y = useTransform(scrollY, [0, 500], [0, -32]);
   const rawHeroBadge2Y = useTransform(scrollY, [0, 500], [0, 32]);
-  const heroBadge1Y = useSpring(rawHeroBadge1Y, { stiffness: 85, damping: 20 });
-  const heroBadge2Y = useSpring(rawHeroBadge2Y, { stiffness: 85, damping: 20 });
+  const heroBadge1Y = useSpring(rawHeroBadge1Y, smoothConfig);
+  const heroBadge2Y = useSpring(rawHeroBadge2Y, smoothConfig);
 
   // 3D Tilt for Hero Showcase Card
   const { ref: heroCardRef, tilt: heroTilt, onMove: onHeroMove, onLeave: onHeroLeave } = useMagneticTilt(6);
@@ -248,9 +252,9 @@ export default function AqeeqSchoolAboutPage() {
   const rawTimelineRotateX = useTransform(timelineProgress, [0, 0.5, 1], [10, 0, -8]);
   const rawTimelineScale = useTransform(timelineProgress, [0, 0.5, 1], [0.94, 1, 0.95]);
   const rawTimelinePhotoY = useTransform(timelineProgress, [0, 1], [25, -25]);
-  const timelineRotateX = useSpring(rawTimelineRotateX, { stiffness: 85, damping: 22 });
-  const timelineScale = useSpring(rawTimelineScale, { stiffness: 85, damping: 22 });
-  const timelinePhotoY = useSpring(rawTimelinePhotoY, { stiffness: 85, damping: 22 });
+  const timelineRotateX = useSpring(rawTimelineRotateX, smoothConfig);
+  const timelineScale = useSpring(rawTimelineScale, smoothConfig);
+  const timelinePhotoY = useSpring(rawTimelinePhotoY, smoothConfig);
 
   // Campus Facilities Section Ref & Scroll Physics
   const campusSectionRef = useRef<HTMLDivElement>(null);
@@ -260,8 +264,8 @@ export default function AqeeqSchoolAboutPage() {
   });
   const rawCampusRotateX = useTransform(campusProgress, [0, 0.5, 1], [9, 0, -7]);
   const rawCampusScale = useTransform(campusProgress, [0, 0.5, 1], [0.95, 1, 0.96]);
-  const campusRotateX = useSpring(rawCampusRotateX, { stiffness: 85, damping: 22 });
-  const campusScale = useSpring(rawCampusScale, { stiffness: 85, damping: 22 });
+  const campusRotateX = useSpring(rawCampusRotateX, smoothConfig);
+  const campusScale = useSpring(rawCampusScale, smoothConfig);
 
   // Vision Section Ref & 3D Dual Wing Pivot
   const visionSectionRef = useRef<HTMLDivElement>(null);
@@ -271,8 +275,8 @@ export default function AqeeqSchoolAboutPage() {
   });
   const rawVisionWingLeft = useTransform(visionProgress, [0, 0.5, 1], [-7, 0, 6]);
   const rawVisionWingRight = useTransform(visionProgress, [0, 0.5, 1], [7, 0, -6]);
-  const visionWingLeft = useSpring(rawVisionWingLeft, { stiffness: 85, damping: 22 });
-  const visionWingRight = useSpring(rawVisionWingRight, { stiffness: 85, damping: 22 });
+  const visionWingLeft = useSpring(rawVisionWingLeft, smoothConfig);
+  const visionWingRight = useSpring(rawVisionWingRight, smoothConfig);
 
   // Pillars Section Ref & Staggered Scroll Parallax
   const pillarsSectionRef = useRef<HTMLDivElement>(null);
@@ -284,10 +288,10 @@ export default function AqeeqSchoolAboutPage() {
   const rawPillar1Y = useTransform(pillarsProgress, [0, 1], [-18, 18]);
   const rawPillar2Y = useTransform(pillarsProgress, [0, 1], [18, -18]);
   const rawPillar3Y = useTransform(pillarsProgress, [0, 1], [-18, 18]);
-  const pillar0Y = useSpring(rawPillar0Y, { stiffness: 85, damping: 22 });
-  const pillar1Y = useSpring(rawPillar1Y, { stiffness: 85, damping: 22 });
-  const pillar2Y = useSpring(rawPillar2Y, { stiffness: 85, damping: 22 });
-  const pillar3Y = useSpring(rawPillar3Y, { stiffness: 85, damping: 22 });
+  const pillar0Y = useSpring(rawPillar0Y, smoothConfig);
+  const pillar1Y = useSpring(rawPillar1Y, smoothConfig);
+  const pillar2Y = useSpring(rawPillar2Y, smoothConfig);
+  const pillar3Y = useSpring(rawPillar3Y, smoothConfig);
   const pillarYOffsets = [pillar0Y, pillar1Y, pillar2Y, pillar3Y];
 
   // Interactive States
@@ -1169,7 +1173,7 @@ export default function AqeeqSchoolAboutPage() {
             scale: isDesktop ? timelineScale : 1,
             transformPerspective: 1200,
           }}
-          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden transition duration-500 will-change-transform ${
+          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden transition-colors duration-300 will-change-transform ${
             dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}
         >
@@ -1649,7 +1653,7 @@ export default function AqeeqSchoolAboutPage() {
                 rotateY: isDesktop ? visionWingLeft : 0,
                 transformPerspective: 1400,
               }}
-              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
+              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition-colors duration-300 hover:border-[#f8ca14]/50 ${
                 dark ? "border-white/10 bg-white/5" : "border-[#08467d]/15 bg-[#08467d]/[0.03]"
               }`}
             >
@@ -1673,7 +1677,7 @@ export default function AqeeqSchoolAboutPage() {
                 rotateY: isDesktop ? visionWingRight : 0,
                 transformPerspective: 1400,
               }}
-              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition duration-300 hover:border-[#f8ca14]/50 ${
+              className={`rounded-3xl border p-5 sm:p-8 relative overflow-hidden shadow-xl will-change-transform group transition-colors duration-300 hover:border-[#f8ca14]/50 ${
                 dark ? "border-amber-500/20 bg-white/5" : "border-[#f8ca14]/20 bg-[#f8ca14]/[0.03]"
               }`}
             >

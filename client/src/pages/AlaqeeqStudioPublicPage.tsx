@@ -760,22 +760,20 @@ export default function AlaqeeqStudioPublicPage() {
   const rawHeroMiddleCardY = useTransform(scrollY, [0, 500], [0, isDesktop ? -30 : -10]);
   const rawHeroMiddleCardScale = useTransform(scrollY, [0, 500], [1, isDesktop ? 1.06 : 1.02]);
 
-  const heroFrontCardX = useSpring(rawHeroFrontCardX, { stiffness: 100, damping: 20 });
-  const heroFrontCardRotate = useSpring(rawHeroFrontCardRotate, { stiffness: 100, damping: 20 });
-  const heroBackCardX = useSpring(rawHeroBackCardX, { stiffness: 100, damping: 20 });
-  const heroBackCardRotate = useSpring(rawHeroBackCardRotate, { stiffness: 100, damping: 20 });
-  const heroMiddleCardY = useSpring(rawHeroMiddleCardY, { stiffness: 100, damping: 20 });
-  const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, { stiffness: 100, damping: 20 });
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
-  // فيزياء تراجع الهيرو بالبعد الثالث والبارالاكس السينمائي (3D Cinematic Receding Hero & Parallax)
-  const rawHeroScale = useTransform(scrollY, [0, 500], [1, isDesktop ? 0.93 : 0.97]);
-  const rawHeroOpacity = useTransform(scrollY, [0, 500], [1, isDesktop ? 0.75 : 0.88]);
-  const rawHeroY = useTransform(scrollY, [0, 500], [0, isDesktop ? 120 : 40]);
-  const rawHeroBlur = useTransform(scrollY, [0, 500], ["blur(0px)", "blur(4px)"]);
+  const heroFrontCardX = useSpring(rawHeroFrontCardX, smoothConfig);
+  const heroFrontCardRotate = useSpring(rawHeroFrontCardRotate, smoothConfig);
+  const heroBackCardX = useSpring(rawHeroBackCardX, smoothConfig);
+  const heroBackCardRotate = useSpring(rawHeroBackCardRotate, smoothConfig);
+  const heroMiddleCardY = useSpring(rawHeroMiddleCardY, smoothConfig);
+  const heroMiddleCardScale = useSpring(rawHeroMiddleCardScale, smoothConfig);
 
-  const heroScale = useSpring(rawHeroScale, { stiffness: 100, damping: 20 });
-  const heroOpacity = useSpring(rawHeroOpacity, { stiffness: 100, damping: 20 });
-  const heroY = useSpring(rawHeroY, { stiffness: 100, damping: 20 });
+  // فيزياء تراجع الهيرو بانسيابية حريرية فائقة وبدون أي رجفة
+  const rawHeroOpacity = useTransform(scrollY, [0, 500], [1, isDesktop ? 0.8 : 0.9]);
+  const rawHeroY = useTransform(scrollY, [0, 500], [0, isDesktop ? 100 : 35]);
+  const heroOpacity = rawHeroOpacity;
+  const heroY = useSpring(rawHeroY, smoothConfig);
 
   // فيزياء ميلان كروت الهيرو بالماوس في البعد الثالث (3D Mouse Perspective Tilt)
   const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 });
@@ -977,10 +975,8 @@ export default function AlaqeeqStudioPublicPage() {
       <div className="relative z-0 w-full overflow-hidden">
         <motion.div
           style={{
-            scale: isDesktop ? heroScale : 1,
             opacity: isDesktop ? heroOpacity : 1,
             y: isDesktop ? heroY : 0,
-            filter: isDesktop ? rawHeroBlur : "none",
             transformOrigin: "center top",
           }}
           className="w-full will-change-transform"

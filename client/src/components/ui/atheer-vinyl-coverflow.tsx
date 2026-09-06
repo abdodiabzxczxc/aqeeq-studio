@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from "framer-motion";
 import {
   Play,
@@ -77,15 +78,23 @@ export function AtheerVinylCoverflow({
     offset: ["start start", "end start"],
   });
 
-  // Direct 1:1 hardware-accelerated transforms — zero trembling, zero bounce, zero latency
+  // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
+  // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  // Direct linear opacity — zero flicker
   const opacity = useTransform(scrollYProgress, [0, 0.28], [0.16, 1]);
-  const translateY = useTransform(
+  const rawTranslateY = useTransform(
     scrollYProgress,
     [0, 0.35],
     [isDesktop ? -440 : -150, isDesktop ? 140 : 40]
   );
-  const scale = useTransform(scrollYProgress, [0, 0.35], [0.9, 1]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 12 : 6, 0]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.35], [0.9, 1]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? 12 : 6, 0]);
+
+  const translateY = useSpring(rawTranslateY, smoothConfig);
+  const scale = useSpring(rawScale, smoothConfig);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
 
   const displayList = useMemo(() => {
     if (!items || items.length === 0) return [];
