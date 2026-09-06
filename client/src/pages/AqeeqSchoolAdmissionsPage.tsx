@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
@@ -19,7 +19,7 @@ import { FluidWaveCanvas } from "@/components/ui/fluid-wave-canvas";
 import { AdmissionsScrollCampusBackdrop } from "@/components/ui/admissions-scroll-campus-backdrop";
 import { ParallaxUnfurlingGallery, type UnfurlingItem } from "@/components/ui/3d-parallax-unfurling-gallery";
 
-const ADMISSIONS_UNFURLING_ITEMS: UnfurlingItem[] = [
+export const ADMISSIONS_UNFURLING_ITEMS: UnfurlingItem[] = [
   { id: "adm-1", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "بطل المملكة WRO", date: "أكاديميات المستقبل" },
   { id: "adm-2", title: "المسبح نصف الأولمبي المغطى", image: "/covers/cover-admissions.jpg", badge: "حوض FINA مدفأ", date: "صرح رياضي" },
   { id: "adm-3", title: "المسرح الملكي وقاعات المؤتمرات", image: "/covers/student-excellence-about.jpg", badge: "سعة 600 مقعد", date: "منصة التتويج" },
@@ -105,6 +105,19 @@ export default function AqeeqSchoolAdmissionsPage() {
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const admissionsHeroRef = useRef<HTMLDivElement>(null);
+
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  const dynamicAdmissionsItems = useMemo<UnfurlingItem[]>(() => {
+    const custom = (orchestration as any)?.backdrops?.admissions;
+    if (custom && Array.isArray(custom) && custom.length > 0) {
+      return custom;
+    }
+    return ADMISSIONS_UNFURLING_ITEMS;
+  }, [orchestration]);
 
   const validateStep1 = () => {
     const errors: Record<string, string> = {};
@@ -480,7 +493,7 @@ export default function AqeeqSchoolAdmissionsPage() {
         >
           {/* Scroll-driven 2-Row Photo Cards Backdrop (Atheer style without CDs) */}
           <AdmissionsScrollCampusBackdrop
-            items={ADMISSIONS_UNFURLING_ITEMS}
+            items={dynamicAdmissionsItems}
             dark={dark}
             containerRef={admissionsHeroRef}
             direction="right-to-left"

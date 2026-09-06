@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { AccreditationsScrollGlobalBackdrop } from "@/components/ui/accreditations-scroll-global-backdrop";
 import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 
-const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
+export const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
   { title: "اعتماد كوجنيا الأمريكية Cognia", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تقييم 99.2%", date: "اعتماد دولي" },
   { title: "مركز اختبارات آيلتس IDP IELTS", link: "#accreditations-hub-section", thumbnail: "/covers/cover-admissions.jpg", category: "مقر رسمي بالمدينة", date: "IDP Venue" },
   { title: "مركز اختبارات السات الرقمي SAT", link: "#accreditations-hub-section", thumbnail: "/covers/student-lab-admissions.jpg", category: "كود رسمي #68412", date: "College Board" },
@@ -65,6 +66,25 @@ export default function AqeeqSchoolAccreditationsPage() {
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const accreditationsHeroRef = useRef<HTMLDivElement>(null);
+
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  const dynamicAccreditationsParallaxProducts = useMemo<ParallaxProduct[]>(() => {
+    const custom = (orchestration as any)?.backdrops?.accreditations;
+    if (custom && Array.isArray(custom) && custom.length > 0) {
+      return custom.map((item: any) => ({
+        title: item.title,
+        link: item.link || "#accreditations-hub-section",
+        thumbnail: item.image,
+        category: item.badge || item.category,
+        date: item.date,
+      }));
+    }
+    return ACCREDITATIONS_PARALLAX_PRODUCTS;
+  }, [orchestration]);
 
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
@@ -191,7 +211,7 @@ export default function AqeeqSchoolAccreditationsPage() {
       curtainKicker="✦ استكشف قاعة الاعتمادات ومراكز الاختبارات العالمية ✦"
       hero={
         <HeroParallax
-          products={ACCREDITATIONS_PARALLAX_PRODUCTS}
+          products={dynamicAccreditationsParallaxProducts}
           dark={dark}
           direction="right-to-left"
           cardShape="square"

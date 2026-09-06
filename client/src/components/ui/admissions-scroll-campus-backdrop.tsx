@@ -25,7 +25,7 @@ interface AdmissionsScrollCampusBackdropProps {
   direction?: "left-to-right" | "right-to-left";
 }
 
-const DEFAULT_ADMISSIONS_ITEMS: AdmissionsBackdropItem[] = [
+export const DEFAULT_ADMISSIONS_ITEMS: AdmissionsBackdropItem[] = [
   { id: "adm-1", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "بطل المملكة WRO", date: "أكاديميات المستقبل" },
   { id: "adm-2", title: "المسبح نصف الأولمبي المغطى", image: "/covers/cover-admissions.jpg", badge: "حوض FINA مدفأ", date: "صرح رياضي" },
   { id: "adm-3", title: "المسرح الملكي وقاعات المؤتمرات", image: "/covers/student-excellence-about.jpg", badge: "سعة 600 مقعد", date: "منصة التتويج" },

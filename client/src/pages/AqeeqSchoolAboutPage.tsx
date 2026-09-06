@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -11,8 +11,9 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { ArticlesScrollParallaxBackdrop, type ArticleBackdropItem } from "@/components/ui/articles-scroll-parallax-backdrop";
+import { trpc } from "@/lib/trpc";
 
-const ABOUT_UNFURLING_ITEMS = [
+export const ABOUT_UNFURLING_ITEMS = [
   { id: "about-1", title: "تأسيس مدارس العقيق 1994", image: "/covers/cover-about.jpg", badge: "30+ عاماً ريادة", date: "طيبة الطيبة" },
   { id: "about-2", title: "مجمع البنين - ممشى الهجرة", image: "/covers/cover-admissions.jpg", badge: "حي الرانوناء", date: "صرح تعليمي" },
   { id: "about-3", title: "مجمع البنات والطفولة المبكرة", image: "/covers/student-excellence-about.jpg", badge: "بيئة رائدة", date: "تعليم وتمكين" },
@@ -207,6 +208,25 @@ export default function AqeeqSchoolAboutPage() {
   const dark = theme === "dark";
   const [, navigate] = useLocation();
   const aboutHeroRef = useRef<HTMLDivElement>(null);
+
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  const dynamicAboutParallaxItems = useMemo<ArticleBackdropItem[]>(() => {
+    const custom = (orchestration as any)?.backdrops?.about;
+    if (custom && Array.isArray(custom) && custom.length > 0) {
+      return custom.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        category: item.badge || item.date || "مدارس العقيق",
+        authorName: item.date || "صرح العقيق",
+        coverUrl: item.image,
+      }));
+    }
+    return ABOUT_PARALLAX_ITEMS;
+  }, [orchestration]);
 
   // فحص الشاشات الكبيرة لتفعيل فيزياء البعد الثالث على الكمبيوتر حصرياً
   // وتجنب انبعاج أو ميلان نصوص القراءة على الموبايل
@@ -834,7 +854,7 @@ export default function AqeeqSchoolAboutPage() {
         >
           {/* Scroll-driven 3D Columns Backdrop from Right to Left (Articles Style) */}
           <ArticlesScrollParallaxBackdrop
-            articles={ABOUT_PARALLAX_ITEMS}
+            articles={dynamicAboutParallaxItems}
             dark={dark}
             containerRef={aboutHeroRef}
             direction="right-to-left"

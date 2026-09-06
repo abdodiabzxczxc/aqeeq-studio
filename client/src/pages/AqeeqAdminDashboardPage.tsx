@@ -61,6 +61,7 @@ import {
 
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
 import { DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
+import { BackdropsManager } from "@/components/BackdropsManager";
 
 import {
   Dialog,
@@ -79,7 +80,7 @@ function directDriveImage(url: string | null | undefined) {
 
 export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system";
 export type AdmissionsSubTab = "inbox" | "fees" | "settings";
-export type ContentSubTab = "master" | "articles";
+export type ContentSubTab = "master" | "articles" | "backdrops";
 export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
 export type SystemSubTab = "theme" | "users" | "campuses" | "marketing" | "backup";
 
@@ -2330,6 +2331,19 @@ export default function AqeeqAdminDashboardPage() {
                   </span>
                 )}
               </button>
+
+              <button
+                type="button"
+                onClick={() => setContentSubTab("backdrops")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "backdrops"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Camera size={15} />
+                <span>صور الخلفيات المتحركة (مدارسنا · الاعتمادات · القبول) 🖼️✨</span>
+              </button>
             </div>
 
             {/* SUBTAB 1: UNIFIED MASTER CONTENT TABLE */}
@@ -2611,6 +2625,17 @@ export default function AqeeqAdminDashboardPage() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* SUBTAB 3: SCROLLING BACKDROPS MANAGER */}
+            {contentSubTab === "backdrops" && (
+              <BackdropsManager
+                orchestrationForm={orchestrationForm}
+                setOrchestrationForm={setOrchestrationForm}
+                onSave={() => setOrchestrationMutation.mutate(orchestrationForm)}
+                isSaving={setOrchestrationMutation.isPending}
+                dark={dark}
+              />
             )}
           </div>
         )}
