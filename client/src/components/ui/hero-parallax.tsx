@@ -87,29 +87,29 @@ export const HeroParallax = ({
 
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
-  const scrollEnd = rowCount === 2 ? 0.55 : 1;
+  const scrollEnd = 1;
   const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
   const rawTranslateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
-  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.65], [isDesktop ? 14 : 6, 0]);
   const rawRotateZ = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
+    [0, 0.65],
     [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
   );
   const rawTranslateY = useTransform(
     scrollYProgress,
-    [0, rowCount === 2 ? 0.18 : 0.25],
-    [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
+    [0, 0.65],
+    [isDesktop ? (rowCount === 2 ? -240 : -440) : -140, isDesktop ? (rowCount === 2 ? 80 : 180) : 50]
   );
 
-  // Direct linear opacity — zero flicker
+  // Direct linear opacity — atmospheric fade in and out as user scrolls
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+    [0, 0.15, rowCount === 2 ? 0.55 : 0.7, rowCount === 2 ? 0.85 : 0.95],
     [0.08, 0.88, 0.88, 0]
   );
 
-  // Organic gliding inertia with ZERO bounce
+  // Organic gliding inertia with ZERO bounce (The magnet that smooths out wheel ticks!)
   const translateX = useSpring(rawTranslateX, smoothConfig);
   const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
   const rotateX = useSpring(rawRotateX, smoothConfig);
@@ -150,77 +150,89 @@ export const HeroParallax = ({
         />
       </div>
 
-      {/* Hero Header */}
-      {header ? (
-        <div className="relative z-20 mx-auto w-full max-w-[1380px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-10 pb-4 text-right">
-          {header}
-        </div>
-      ) : (
-        <HeroParallaxHeader
-          title={headerTitle}
-          description={headerDescription}
-          kickerText={kickerText}
-          onTvModeClick={onTvModeClick}
-          onWrappedClick={onWrappedClick}
-          onManageClick={onManageClick}
-          isAdmin={isAdmin}
-          albumsCount={albumsCount}
-          dark={dark}
-        />
-      )}
-
-      {/* 3D Moving Perspective Rows */}
+      {/* Hero Header with smooth entrance bloom */}
       <motion.div
-        style={{
-          rotateX,
-          rotateZ,
-          translateY,
-          opacity,
-        }}
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-20 mx-auto w-full max-w-[1380px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-10 pb-4 text-right"
+      >
+        {header ? (
+          header
+        ) : (
+          <HeroParallaxHeader
+            title={headerTitle}
+            description={headerDescription}
+            kickerText={kickerText}
+            onTvModeClick={onTvModeClick}
+            onWrappedClick={onWrappedClick}
+            onManageClick={onManageClick}
+            isAdmin={isAdmin}
+            albumsCount={albumsCount}
+            dark={dark}
+          />
+        )}
+      </motion.div>
+
+      {/* 3D Moving Perspective Rows with smooth entrance bloom */}
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 will-change-transform"
       >
-        {/* Row 1: moves to the right (or left if RTL) */}
-        <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8 mb-6 sm:mb-8">
-          {firstRow.map((product, idx) => (
-            <ProductCard
-              product={product}
-              translate={isRightToLeft ? translateXReverse : translateX}
-              key={product.title + "-r1-" + idx}
-              dark={dark}
-              cardShape={cardShape}
-              priority={idx < 3}
-            />
-          ))}
-        </div>
-
-        {/* Row 2: moves to the left (or right if RTL) */}
-        <div className="flex flex-row mb-6 sm:mb-8 space-x-6 sm:space-x-8">
-          {secondRow.map((product, idx) => (
-            <ProductCard
-              product={product}
-              translate={isRightToLeft ? translateX : translateXReverse}
-              key={product.title + "-r2-" + idx}
-              dark={dark}
-              cardShape={cardShape}
-              priority={idx < 2}
-            />
-          ))}
-        </div>
-
-        {/* Row 3: moves to the right (or left if RTL) - only when rowCount is 3 */}
-        {rowCount === 3 && (
-          <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8">
-            {thirdRow.map((product, idx) => (
+        <motion.div
+          style={{
+            rotateX,
+            rotateZ,
+            translateY,
+            opacity,
+          }}
+          className="will-change-transform"
+        >
+          {/* Row 1: moves to the right (or left if RTL) */}
+          <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8 mb-6 sm:mb-8">
+            {firstRow.map((product, idx) => (
               <ProductCard
                 product={product}
                 translate={isRightToLeft ? translateXReverse : translateX}
-                key={product.title + "-r3-" + idx}
+                key={product.title + "-r1-" + idx}
                 dark={dark}
                 cardShape={cardShape}
+                priority={idx < 3}
               />
             ))}
           </div>
-        )}
+
+          {/* Row 2: moves to the left (or right if RTL) */}
+          <div className="flex flex-row mb-6 sm:mb-8 space-x-6 sm:space-x-8">
+            {secondRow.map((product, idx) => (
+              <ProductCard
+                product={product}
+                translate={isRightToLeft ? translateX : translateXReverse}
+                key={product.title + "-r2-" + idx}
+                dark={dark}
+                cardShape={cardShape}
+                priority={idx < 2}
+              />
+            ))}
+          </div>
+
+          {/* Row 3: moves to the right (or left if RTL) - only when rowCount is 3 */}
+          {rowCount === 3 && (
+            <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8">
+              {thirdRow.map((product, idx) => (
+                <ProductCard
+                  product={product}
+                  translate={isRightToLeft ? translateXReverse : translateX}
+                  key={product.title + "-r3-" + idx}
+                  dark={dark}
+                  cardShape={cardShape}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
       </motion.div>
 
       {/* Bottom fade shadow for seamless connection to next section */}
@@ -413,7 +425,7 @@ export const ProductCard = ({
         cardShape === "square"
           ? "h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] md:h-[350px] md:w-[350px] aspect-square"
           : "h-[280px] sm:h-[340px] md:h-[380px] w-[290px] sm:w-[380px] md:w-[440px]"
-      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 will-change-transform cursor-pointer`}
+      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-shadow duration-300 will-change-transform cursor-pointer`}
     >
       <Link href={product.link} className="block h-full w-full">
         {/* Background Album Photo with smooth zoom on hover */}
