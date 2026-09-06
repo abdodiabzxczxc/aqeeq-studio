@@ -4,6 +4,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
   MotionValue,
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
@@ -84,30 +85,36 @@ export const HeroParallax = ({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Direct linear transforms: 100% synchronous with user scroll (ZERO magnetic snap, ZERO lag)
-  const rawTranslateX = useTransform(scrollYProgress, [0, 0.95], [0, isDesktop ? (rowCount === 2 ? 460 : 580) : 220]);
-  const rawTranslateXReverse = useTransform(scrollYProgress, [0, 0.95], [0, isDesktop ? (rowCount === 2 ? -460 : -580) : -220]);
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 12 : 5, 0]);
+  const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
+
+  const scrollEnd = rowCount === 2 ? 0.55 : 1;
+  const rawTranslateX = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]);
+  const rawTranslateXReverse = useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]);
+  const rawRotateX = useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]);
   const rawRotateZ = useTransform(
     scrollYProgress,
-    [0, 0.45],
-    [isDesktop ? (isRightToLeft ? -12 : 12) : (isRightToLeft ? -3 : 3), 0]
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
   );
   const rawTranslateY = useTransform(
     scrollYProgress,
-    [0, 0.6],
-    [isDesktop ? -80 : -40, isDesktop ? 60 : 30]
+    [0, rowCount === 2 ? 0.18 : 0.25],
+    [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
   );
 
-  // Scroll exit fade: perfectly crisp 1.0 at rest, gracefully dissolves as user scrolls away
-  const scrollExitOpacity = useTransform(scrollYProgress, [0, 0.72, 0.95], [1, 1, 0]);
+  // Direct linear opacity — zero flicker
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+    [0.08, 0.88, 0.88, 0]
+  );
 
-  // 1:1 direct scroll binding — no springs, no magnetic pull, no post-stop drag
-  const translateX = rawTranslateX;
-  const translateXReverse = rawTranslateXReverse;
-  const rotateX = rawRotateX;
-  const rotateZ = rawRotateZ;
-  const translateY = rawTranslateY;
+  // Organic gliding inertia with ZERO bounce
+  const translateX = useSpring(rawTranslateX, smoothConfig);
+  const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
+  const translateY = useSpring(rawTranslateY, smoothConfig);
 
   return (
     <div
@@ -120,13 +127,13 @@ export const HeroParallax = ({
           ? rowCount === 2
             ? "104vh"
             : cardShape === "square"
-            ? "125vh"
-            : "130vh"
+            ? "148vh"
+            : "210vh"
           : rowCount === 2
           ? "94vh"
           : cardShape === "square"
-          ? "110vh"
-          : "115vh",
+          ? "120vh"
+          : "160vh",
       }}
     >
       {/* Ambient background glow & radial highlights (pure dark, no yellow) */}
@@ -143,44 +150,35 @@ export const HeroParallax = ({
         />
       </div>
 
-      {/* Hero Header with Apple-grade smooth entrance */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-20 mx-auto w-full max-w-[1380px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-10 pb-4 text-right"
-      >
-        {header ? header : (
-          <HeroParallaxHeader
-            title={headerTitle}
-            description={headerDescription}
-            kickerText={kickerText}
-            onTvModeClick={onTvModeClick}
-            onWrappedClick={onWrappedClick}
-            onManageClick={onManageClick}
-            isAdmin={isAdmin}
-            albumsCount={albumsCount}
-            dark={dark}
-          />
-        )}
-      </motion.div>
+      {/* Hero Header */}
+      {header ? (
+        <div className="relative z-20 mx-auto w-full max-w-[1380px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-10 pb-4 text-right">
+          {header}
+        </div>
+      ) : (
+        <HeroParallaxHeader
+          title={headerTitle}
+          description={headerDescription}
+          kickerText={kickerText}
+          onTvModeClick={onTvModeClick}
+          onWrappedClick={onWrappedClick}
+          onManageClick={onManageClick}
+          isAdmin={isAdmin}
+          albumsCount={albumsCount}
+          dark={dark}
+        />
+      )}
 
-      {/* 3D Moving Perspective Rows with cinematic entrance bloom */}
+      {/* 3D Moving Perspective Rows */}
       <motion.div
-        initial={{ opacity: 0, y: 36, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.85, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          rotateX,
+          rotateZ,
+          translateY,
+          opacity,
+        }}
         className="relative z-10 will-change-transform"
       >
-        <motion.div
-          style={{
-            rotateX,
-            rotateZ,
-            translateY,
-            opacity: scrollExitOpacity,
-          }}
-          className="will-change-transform"
-        >
         {/* Row 1: moves to the right (or left if RTL) */}
         <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8 mb-6 sm:mb-8">
           {firstRow.map((product, idx) => (
@@ -223,7 +221,6 @@ export const HeroParallax = ({
             ))}
           </div>
         )}
-        </motion.div>
       </motion.div>
 
       {/* Bottom fade shadow for seamless connection to next section */}
@@ -416,7 +413,7 @@ export const ProductCard = ({
         cardShape === "square"
           ? "h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] md:h-[350px] md:w-[350px] aspect-square"
           : "h-[280px] sm:h-[340px] md:h-[380px] w-[290px] sm:w-[380px] md:w-[440px]"
-      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-shadow duration-300 will-change-transform cursor-pointer`}
+      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 will-change-transform cursor-pointer`}
     >
       <Link href={product.link} className="block h-full w-full">
         {/* Background Album Photo with smooth zoom on hover */}
