@@ -15,6 +15,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { FluidWaveCanvas } from "@/components/ui/fluid-wave-canvas";
+import { AdmissionsScrollCampusBackdrop } from "@/components/ui/admissions-scroll-campus-backdrop";
+import { ParallaxUnfurlingGallery, type UnfurlingItem } from "@/components/ui/3d-parallax-unfurling-gallery";
+
+const ADMISSIONS_UNFURLING_ITEMS: UnfurlingItem[] = [
+  { id: "adm-1", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "بطل المملكة WRO", date: "أكاديميات المستقبل" },
+  { id: "adm-2", title: "المسبح نصف الأولمبي المغطى", image: "/covers/cover-admissions.jpg", badge: "حوض FINA مدفأ", date: "صرح رياضي" },
+  { id: "adm-3", title: "المسرح الملكي وقاعات المؤتمرات", image: "/covers/student-excellence-about.jpg", badge: "سعة 600 مقعد", date: "منصة التتويج" },
+  { id: "adm-4", title: "الفصول التفاعلية الذكية 4K", image: "/covers/cover-about.jpg", badge: "شاشات 4K معتمدة", date: "بيئة ذكية" },
+  { id: "adm-5", title: "أكاديمية فيرست ليجو للروبوت", image: "/covers/first-lego-champions.png", badge: "خامس العالم WRO", date: "بطولات دولية" },
+  { id: "adm-6", title: "مختبرات العلوم والكيمياء الحديثة", image: "/covers/student-lab-admissions.jpg", badge: "معايير السلامة", date: "اكتشاف وتطبيق" },
+  { id: "adm-7", title: "المسار الأمريكي المعتمد (Cognia)", image: "/covers/cover-about.jpg", badge: "مقر SAT & ACT", date: "المسار الدولي" },
+  { id: "adm-8", title: "مرحلة الطفولة المبكرة ورياض الأطفال", image: "/covers/student-excellence-about.jpg", badge: "تأسيس مبهج", date: "رياض الأطفال" },
+  { id: "adm-9", title: "منح التفوق وخصومات الأشقاء 15%", image: "/covers/cover-admissions.jpg", badge: "تسهيلات سداد", date: "منح ورعاية" },
+  { id: "adm-10", title: "أجيال العقيق نحو كبرى الجامعات", image: "/covers/student-lab-admissions.jpg", badge: "قبول 100%", date: "نحو المستقبل" },
+  { id: "adm-11", title: "برامج رعاية الموهبة والتفوق الأكاديمي", image: "/covers/student-excellence-about.jpg", badge: "أعلى معدلات التحصيلي", date: "صناع الريادة" },
+  { id: "adm-12", title: "الصالة المغطاة للألعاب الرياضية", image: "/covers/cover-admissions.jpg", badge: "تدريب معتمد", date: "أنشطة وبطولات" },
+  { id: "adm-13", title: "مكتبة العقيق الرقمية ومنصة البحث", image: "/covers/student-lab-admissions.jpg", badge: "شاشات بحثية", date: "حاضنة الفكر" },
+  { id: "adm-14", title: "مركز التميز واللغات العالمية", image: "/covers/cover-about.jpg", badge: "IELTS & Cambridge", date: "كفاءة لغوية" },
+  { id: "adm-15", title: "أبطال الروبوت والذكاء الاصطناعي", image: "/covers/first-lego-champions.png", badge: "تمثيل المملكة", date: "منصات الذهب" },
+  { id: "adm-16", title: "بيئة تعليمية آمنة متكاملة", image: "/covers/cover-about.jpg", badge: "حافلات ومرافق ذكية", date: "رعاية شاملة" },
+];
 import {
   GraduationCap,
   Calculator,
@@ -82,6 +104,7 @@ export default function AqeeqSchoolAdmissionsPage() {
   const [submitted, setSubmitted] = useState(false);
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const admissionsHeroRef = useRef<HTMLDivElement>(null);
 
   const validateStep1 = () => {
     const errors: Record<string, string> = {};
@@ -441,171 +464,175 @@ export default function AqeeqSchoolAdmissionsPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="القبول والتسجيل والرسوم" active="admissions" />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف حاسبة الرسوم ونموذج التسجيل ✦"
       hero={
-        /* Hero Section: Modern Executive 2-Column Showcase */
-        <section className={`relative isolate overflow-hidden border-b py-12 sm:py-20 ${
-        isNationalDay
-          ? dark ? "snd-hero-dark border-[#f8ca14]/15" : "snd-hero-light border-[#08467d]/20"
-          : dark ? "border-white/[0.08]" : "border-black/[0.08]"
-      }`}>
-        {/* Subtle Ambient Glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(8,70,125,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(248,202,20,0.12),transparent_60%)]" />
+        <section
+          ref={admissionsHeroRef}
+          style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
+          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between py-8 sm:py-12 transition-colors duration-500 ${
+            dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
+          }`}
+        >
+          {/* Scroll-driven 2-Row Photo Cards Backdrop (Atheer style without CDs) */}
+          <AdmissionsScrollCampusBackdrop
+            items={ADMISSIONS_UNFURLING_ITEMS}
+            dark={dark}
+            containerRef={admissionsHeroRef}
+            direction="right-to-left"
+          />
 
-        <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            
-            {/* Right Column: Hero Content & CTAs (7 cols) */}
-            <div className="lg:col-span-7 text-right">
-              <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 shadow-sm ${
-                isNationalDay
-                  ? dark
-                    ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                    : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d]"
-                  : dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : "border-[#08467d]/20 bg-white/95 text-[#08467d]"
-              }`}>
-                {isNationalDay ? <span>🇸🇦</span> : <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />}
-                <span>{isNationalDay ? "بوابة القبول والتسجيل للعام الجديد · عزّنا بطبعنا 🇸🇦" : "بوابة القبول والتسجيل للعام الدراسي 2026 - 2027"}</span>
-              </div>
-
-              <VisualEditable
-                id="admissions-hero-title"
-                tag="text"
-                label="عنوان هيرو القبول والتسجيل"
-                defaultText="استثمر في مستقبل أبنائك في صرح العقيق الرائد"
-                as="h1"
-                className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
-                  dark ? "text-white" : "text-[#0a192f]"
-                }`}
-              />
-
-              <VisualEditable
-                id="admissions-hero-desc"
-                tag="text"
-                label="وصف هيرو القبول والتسجيل"
-                defaultText="نفتح أبواب التميز لأبنائنا وبناتنا في المدينة المنورة. بيئة تعليمية عالمية معتمدة من كوجنيا، تجمع بين أصالة القيم وأحدث علوم العصر، مع أنظمة سداد مرنة وخدمات ذكية لأولياء الأمور."
-                as="p"
-                className={`text-base sm:text-lg font-medium leading-relaxed max-w-2xl mb-8 ${
-                  dark ? "text-slate-300" : "text-slate-700"
-                }`}
-              />
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 mb-10">
-                <Button
-                  onClick={() => scrollToSection("admission-form-section")}
-                  className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
-                    dark
-                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                      : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
-                  }`}
-                >
-                  <Send size={18} className="ml-2" />
-                  <span>قدّم طلب تسجيل إلكتروني</span>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => scrollToSection("tuition-fees-section")}
-                  className={`rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 shadow-sm ${
-                    dark
-                      ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
-                      : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
-                  <Calculator size={18} className="ml-2" />
-                  <span>جدول الرسوم الدراسية</span>
-                </Button>
-              </div>
-
-              {/* Quick Metrics Bar */}
-              <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border backdrop-blur-md shadow-sm ${
-                dark
-                  ? "border-white/10 bg-white/[0.03]"
-                  : "border-[#08467d]/15 bg-white/80"
-              }`}>
-                <div>
-                  <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>+10,000</span>
-                  <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ولي أمر يثقون بنا</span>
-                </div>
-                <div>
-                  <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>Cognia</span>
-                  <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
-                </div>
-                <div>
-                  <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>IELTS & SAT</span>
-                  <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>مراكز رسمية</span>
-                </div>
-                <div>
-                  <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>100%</span>
-                  <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>خدمات ذكية</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Left Column: Close-Up Visual Showcase Card (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div className={`relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 hover:scale-[1.01] shadow-2xl ${
-                dark
-                  ? "border-[#f8ca14]/20 bg-[#0b1218] shadow-black/80 ring-1 ring-[#f8ca14]/10"
-                  : "border-[#08467d]/15 bg-white shadow-[#08467d]/10 ring-1 ring-[#08467d]/5"
-              }`}>
-                {/* Close-Up Student Photo */}
-                <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
-                  <VisualImage
-                    id="admissions-hero-student-photo"
-                    label="صورة طلاب العقيق المقربة في المعامل"
-                    src="/covers/student-lab-admissions.jpg"
-                    alt="طلاب مدارس العقيق في المعامل الذكية"
-                    className="h-full w-full object-cover transition duration-700 hover:scale-105"
-                  />
-                  {/* Subtle Gradient Shade at Bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
-
-                  {/* Top Floating Badge */}
-                  <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
-                    <Sparkles size={13} className="text-[#f8ca14]" />
-                    <span>{isNationalDay ? "🇸🇦 مقاعد محدودة · مبادرة اليوم الوطني 94" : "مقاعد محدودة 2026 - 2027"}</span>
-                  </div>
-
-                  {/* Bottom Overlaid Details */}
-                  <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
-                    <div>
-                      <h4 className="text-sm font-black drop-shadow-md">معامل الذكاء الاصطناعي وSTEM</h4>
-                      <p className="text-[11px] text-[#f8ca14] drop-shadow-md">بيئة تفاعلية حديثة ترعى الموهبة</p>
-                    </div>
-                    <span className="rounded-xl bg-[#08467d]/90 text-white px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
-                      بنين وبنات
-                    </span>
-                  </div>
-                </div>
-
-                {/* Overlapping Floating Trust Chip (Bottom) */}
-                <div className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
-                  dark
-                    ? "border-white/10 bg-black/60 text-slate-200"
-                    : "border-[#08467d]/15 bg-[#f8fafc] text-slate-800"
+          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+              {/* Right Column: Hero Content & CTAs (7 cols) */}
+              <div className="lg:col-span-7 text-right">
+                <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black backdrop-blur-md mb-6 shadow-sm ${
+                  isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                      : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d]"
+                    : dark
+                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                    : "border-[#08467d]/20 bg-white/95 text-[#08467d]"
                 }`}>
-                  <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${
-                    dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
-                  }`}>
-                    <ShieldCheck size={20} />
+                  {isNationalDay ? <span>🇸🇦</span> : <Sparkles size={14} className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} />}
+                  <span>{isNationalDay ? "بوابة القبول والتسجيل للعام الجديد · عزّنا بطبعنا 🇸🇦" : "بوابة القبول والتسجيل للعام الدراسي 2026 - 2027"}</span>
+                </div>
+
+                <VisualEditable
+                  id="admissions-hero-title"
+                  tag="text"
+                  label="عنوان هيرو القبول والتسجيل"
+                  defaultText="استثمر في مستقبل أبنائك في صرح العقيق الرائد"
+                  as="h1"
+                  className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
+                    dark ? "text-white" : "text-[#0a192f]"
+                  }`}
+                />
+
+                <VisualEditable
+                  id="admissions-hero-desc"
+                  tag="text"
+                  label="وصف هيرو القبول والتسجيل"
+                  defaultText="نفتح أبواب التميز لأبنائنا وبناتنا في المدينة المنورة. بيئة تعليمية عالمية معتمدة من كوجنيا، تجمع بين أصالة القيم وأحدث علوم العصر، مع أنظمة سداد مرنة وخدمات ذكية لأولياء الأمور."
+                  as="p"
+                  className={`text-base sm:text-lg font-medium leading-relaxed max-w-2xl mb-8 ${
+                    dark ? "text-slate-300" : "text-slate-700"
+                  }`}
+                />
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center gap-4 mb-8">
+                  <Button
+                    onClick={() => scrollToSection("admission-form-section")}
+                    className={`rounded-2xl px-8 py-6 text-base font-black shadow-xl transition active:scale-95 ${
+                      dark
+                        ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
+                        : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
+                    }`}
+                  >
+                    <Send size={18} className="ml-2" />
+                    <span>قدّم طلب تسجيل إلكتروني</span>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => scrollToSection("tuition-fees-section")}
+                    className={`rounded-2xl px-8 py-6 text-base font-black border transition active:scale-95 shadow-sm ${
+                      dark
+                        ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
+                        : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"
+                    }`}
+                  >
+                    <Calculator size={18} className="ml-2" />
+                    <span>جدول الرسوم الدراسية</span>
+                  </Button>
+                </div>
+
+                {/* Quick Metrics Bar */}
+                <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border backdrop-blur-md shadow-sm max-w-3xl ${
+                  dark
+                    ? "border-white/10 bg-white/[0.03]"
+                    : "border-[#08467d]/15 bg-white/80"
+                }`}>
+                  <div>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>+10,000</span>
+                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ولي أمر يثقون بنا</span>
                   </div>
                   <div>
-                    <h5 className="text-xs font-black">خصومات الأخوة والسداد المبكر</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">خصم 10% إلى 15% مع خيارات تقسيط ميسرة</p>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>Cognia</span>
+                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
+                  </div>
+                  <div>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>IELTS & SAT</span>
+                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>مراكز رسمية</span>
+                  </div>
+                  <div>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>100%</span>
+                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>خدمات ذكية</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Left Column: Close-Up Visual Showcase Card (5 cols) */}
+              <div className="lg:col-span-5 relative">
+                <div className={`relative rounded-[2.5rem] p-3 sm:p-4 border transition duration-500 hover:scale-[1.01] shadow-2xl ${
+                  dark
+                    ? "border-[#f8ca14]/20 bg-[#0b1218] shadow-black/80 ring-1 ring-[#f8ca14]/10"
+                    : "border-[#08467d]/15 bg-white shadow-[#08467d]/10 ring-1 ring-[#08467d]/5"
+                }`}>
+                  {/* Close-Up Student Photo */}
+                  <div className="relative overflow-hidden rounded-[2rem] aspect-[4/3] sm:aspect-[16/12]">
+                    <VisualImage
+                      id="admissions-hero-student-photo"
+                      label="صورة طلاب العقيق المقربة في المعامل"
+                      src="/covers/student-lab-admissions.jpg"
+                      alt="طلاب مدارس العقيق في المعامل الذكية"
+                      className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                    />
+                    {/* Subtle Gradient Shade at Bottom */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+
+                    {/* Top Floating Badge */}
+                    <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                      <Sparkles size={13} className="text-[#f8ca14]" />
+                      <span>{isNationalDay ? "🇸🇦 مقاعد محدودة · مبادرة اليوم الوطني 94" : "مقاعد محدودة 2026 - 2027"}</span>
+                    </div>
+
+                    {/* Bottom Overlaid Details */}
+                    <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
+                      <div>
+                        <h4 className="text-sm font-black drop-shadow-md">معامل الذكاء الاصطناعي وSTEM</h4>
+                        <p className="text-[11px] text-[#f8ca14] drop-shadow-md">بيئة تفاعلية حديثة ترعى الموهبة</p>
+                      </div>
+                      <span className="rounded-xl bg-[#08467d]/90 text-white px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow">
+                        بنين وبنات
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Overlapping Floating Trust Chip (Bottom) */}
+                  <div className={`mt-3 p-3.5 rounded-2xl border flex items-center gap-3 transition ${
+                    dark
+                      ? "border-white/10 bg-black/60 text-slate-200"
+                      : "border-[#08467d]/15 bg-[#f8fafc] text-slate-800"
+                  }`}>
+                    <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${
+                      dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                    }`}>
+                      <ShieldCheck size={20} />
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-black">خصومات الأخوة والسداد المبكر</h5>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">خصم 10% إلى 15% مع خيارات تقسيط ميسرة</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
-        </div>
-      </section>
-    }
+        </section>
+      }
     >
       <Dialog open={whatsappConfirmOpen} onOpenChange={setWhatsappConfirmOpen}>
         <DialogContent className="max-w-sm">

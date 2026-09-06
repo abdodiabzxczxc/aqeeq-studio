@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation, useParams } from "wouter";
@@ -7,6 +7,7 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { AqeeqArticleSubmitModal } from "@/components/AqeeqArticleSubmitModal";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { ArticlesScrollParallaxBackdrop, type ArticleBackdropItem } from "@/components/ui/articles-scroll-parallax-backdrop";
 import {
   PenTool,
   Search,
@@ -392,28 +393,49 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
   };
 
 
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const articlesHeroRef = useRef<HTMLDivElement>(null);
+
+  const articleParallaxItems: ArticleBackdropItem[] = useMemo(() => {
+    return rawArticles.map((art) => ({
+      id: art.id,
+      title: art.title,
+      category: art.category,
+      authorName: art.authorName,
+      coverUrl: directDriveImage(art.coverUrl) || art.coverUrl,
+    }));
+  }, [rawArticles]);
+
   return (
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="مقالات وأقلام العقيق" active="articles" />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف أقلام ومقالات العقيق ✦"
       hero={
         <section
-          className={`relative isolate overflow-hidden py-8 sm:py-14 ${
+          ref={articlesHeroRef}
+          style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
+          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between py-8 sm:py-14 transition-colors duration-500 ${
             isNationalDay
               ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
-              : dark ? "bg-black text-white" : "bg-white text-black"
+              : dark ? "bg-[#05080e] text-white" : "bg-white text-black"
           }`}
         >
-        {isNationalDay ? (
-          <>
-            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
-          </>
-        ) : (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
-        )}
+          {/* Scroll-driven 3D Article Columns in background with 3D Entrance Spring */}
+          <ArticlesScrollParallaxBackdrop
+            articles={articleParallaxItems}
+            dark={dark}
+            containerRef={articlesHeroRef}
+          />
 
         <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
           {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}

@@ -10,7 +10,28 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
+import { AccreditationsScrollGlobalBackdrop } from "@/components/ui/accreditations-scroll-global-backdrop";
+import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
 import { useLocation } from "wouter";
+
+const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
+  { title: "اعتماد كوجنيا الأمريكية Cognia", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تقييم 99.2%", date: "اعتماد دولي" },
+  { title: "مركز اختبارات آيلتس IDP IELTS", link: "#accreditations-hub-section", thumbnail: "/covers/cover-admissions.jpg", category: "مقر رسمي بالمدينة", date: "IDP Venue" },
+  { title: "مركز اختبارات السات الرقمي SAT", link: "#accreditations-hub-section", thumbnail: "/covers/student-lab-admissions.jpg", category: "كود رسمي #68412", date: "College Board" },
+  { title: "كأس بطولة فيرست ليجو بالمملكة", link: "#accreditations-hub-section", thumbnail: "/covers/first-lego-champions.png", category: "بطل المملكة 🥇", date: "FLL Champions" },
+  { title: "أولمبياد الروبوت العالمي WRO", link: "#accreditations-hub-section", thumbnail: "/covers/student-robotics-accreditations.jpg", category: "خامس العالم 🌐", date: "WRO International" },
+  { title: "اختبارات ACT الدولية المعيارية", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "مركز رقمي معتمد", date: "ACT Testing" },
+  { title: "شراكة موهبة ورعاية الموهوبين", link: "#accreditations-hub-section", thumbnail: "/covers/student-excellence-about.jpg", category: "فصول موهبة", date: "مؤسسة موهبة" },
+  { title: "معايير السلامة والجودة الأكاديمية", link: "#accreditations-hub-section", thumbnail: "/covers/cover-admissions.jpg", category: "ISO & Cognia", date: "جودة شاملة" },
+  { title: "مناهج كامبريدج للغات والعلوم", link: "#accreditations-hub-section", thumbnail: "/covers/student-lab-admissions.jpg", category: "Cambridge English", date: "معايير بريطانية" },
+  { title: "معامل الروبوت والذكاء الاصطناعي", link: "#accreditations-hub-section", thumbnail: "/covers/first-lego-champions.png", category: "STEM Labs", date: "ابتكار وتقنية" },
+  { title: "أعلى معدلات اختبار القدرات والتحصيلي", link: "#accreditations-hub-section", thumbnail: "/covers/student-excellence-about.jpg", category: "مراكز متقدمة قياس", date: "المركز الوطني قياس" },
+  { title: "شهادات تخرج مقبولة في كبرى الجامعات", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "قبول 100%", date: "مسارات جامعية" },
+  { title: "أكاديميات البرمجة والمستقبل", link: "#accreditations-hub-section", thumbnail: "/covers/student-lab-admissions.jpg", category: "لغات البرمجة", date: "عالم الغد" },
+  { title: "المسار الأكاديمي الدولي المباشر", link: "#accreditations-hub-section", thumbnail: "/covers/cover-admissions.jpg", category: "تأهيل جامعي عالمي", date: "High School Diploma" },
+  { title: "منصات التتويج والجوائز الوطنية", link: "#accreditations-hub-section", thumbnail: "/covers/first-lego-champions.png", category: "تمثيل المملكة", date: "إنجاز وطني" },
+  { title: "شراكات تعليمية وتدريبية مستدامة", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تطوير مستمر", date: "الريادة التعليمية" },
+];
 import {
   Award,
   ShieldCheck,
@@ -43,6 +64,7 @@ export default function AqeeqSchoolAccreditationsPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+  const accreditationsHeroRef = useRef<HTMLDivElement>(null);
 
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
@@ -178,20 +200,18 @@ export default function AqeeqSchoolAccreditationsPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="الاعتمادات والشراكات الدولية" active="accreditations" />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف قاعة الاعتمادات ومراكز الاختبارات العالمية ✦"
       hero={
-        <section
-          className={`relative isolate overflow-hidden py-14 sm:py-24 ${
-            isNationalDay ? (dark ? "snd-hero-dark" : "snd-hero-light") : ""
-          }`}
-        >
-          {/* Subtle Ambient Glowing Orbs */}
-          <div className="pointer-events-none absolute -top-32 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-20 bg-emerald-500" />
-          <div className="pointer-events-none absolute -bottom-32 left-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#f8ca14]" />
-
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <HeroParallax
+          products={ACCREDITATIONS_PARALLAX_PRODUCTS}
+          dark={dark}
+          direction="right-to-left"
+          cardShape="square"
+          rowCount={2}
+          header={
+            <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
                 <div
@@ -438,7 +458,8 @@ export default function AqeeqSchoolAccreditationsPage() {
               </div>
             </div>
           </div>
-        </section>
+        }
+      />
       }
     >
       {/* Kinetic Typographic Ribbon 1 */}

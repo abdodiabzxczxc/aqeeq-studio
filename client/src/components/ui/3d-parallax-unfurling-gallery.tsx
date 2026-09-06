@@ -23,6 +23,7 @@ export interface ParallaxUnfurlingGalleryProps {
   header?: React.ReactNode;
   dark?: boolean;
   className?: string;
+  direction?: "left-to-right" | "right-to-left";
 }
 
 export function ParallaxUnfurlingGallery({
@@ -30,8 +31,10 @@ export function ParallaxUnfurlingGallery({
   header,
   dark = true,
   className = "",
+  direction = "left-to-right",
 }: ParallaxUnfurlingGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isRightToLeft = direction === "right-to-left";
 
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
@@ -68,18 +71,35 @@ export function ParallaxUnfurlingGallery({
   const springConfig = { stiffness: 190, damping: 28, bounce: 35 };
 
   // 3D Matrix Rotation & Perspective Unfurling
-  // Coming from LEFT to CENTER:
-  // Positive rotateY (+16) tilts left side towards viewer
-  // Negative rotateZ (-7) angles grid counter-clockwise
-  // Negative translateX (-140) shifts matrix to the left, smoothly centering to 0 on scroll
+  // Supports left-to-right (default) OR right-to-left (for /about)
   const rawRotateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 8, isDesktop ? 4 : 0]);
-  const rawRotateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? 16 : 7, 0]);
-  const rawRotateZ = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -7 : -3, 0]);
-  const rawTranslateX = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -140 : -50, 0]);
-  const rawTranslateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
+  const rawRotateY = useTransform(
+    scrollYProgress,
+    [0, 0.45],
+    [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -7 : 7), 0]
+  );
+  const rawRotateZ = useTransform(
+    scrollYProgress,
+    [0, 0.45],
+    [isDesktop ? (isRightToLeft ? 7 : -7) : (isRightToLeft ? 3 : -3), 0]
+  );
+  const rawTranslateX = useTransform(
+    scrollYProgress,
+    [0, 0.45],
+    [isDesktop ? (isRightToLeft ? 140 : -140) : (isRightToLeft ? 50 : -50), 0]
+  );
+  const rawTranslateY = useTransform(
+    scrollYProgress,
+    [0, 0.45],
+    [isDesktop ? -180 : -80, isDesktop ? 140 : 60]
+  );
 
-  // Opacity: starts subtle at 0.18 for maximum text legibility, then blooms to 0.95 upon scrolling
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.28], [0.18, 0.95]);
+  // Smooth entrance bloom (0.08 -> 0.88), and dissolves gracefully on scroll down (0.88 -> 0)
+  const rawOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.62, 0.95],
+    [0.08, 0.88, 0.88, 0]
+  );
 
   const rotateX = useSpring(rawRotateX, springConfig);
   const rotateY = useSpring(rawRotateY, springConfig);
@@ -90,19 +110,35 @@ export function ParallaxUnfurlingGallery({
 
   // Column vertical parallax offsets (Opposite directions for true unfurling motion)
   const col1Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -260 : -100, isDesktop ? 260 : 100]),
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [isDesktop ? (isRightToLeft ? 0 : -260) : -100, isDesktop ? (isRightToLeft ? -450 : 260) : 100]
+    ),
     springConfig
   );
   const col2Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? 100 : 40, isDesktop ? -420 : -160]),
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [isDesktop ? (isRightToLeft ? -280 : 100) : 40, isDesktop ? (isRightToLeft ? 300 : -420) : -160]
+    ),
     springConfig
   );
   const col3Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [isDesktop ? -280 : -110, isDesktop ? 300 : 120]),
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [isDesktop ? (isRightToLeft ? 100 : -280) : -110, isDesktop ? (isRightToLeft ? -420 : 300) : 120]
+    ),
     springConfig
   );
   const col4Y = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -450 : -180]),
+    useTransform(
+      scrollYProgress,
+      [0, 1],
+      [isDesktop ? (isRightToLeft ? -260 : 0) : 0, isDesktop ? (isRightToLeft ? 260 : -450) : -180]
+    ),
     springConfig
   );
 
@@ -112,7 +148,7 @@ export function ParallaxUnfurlingGallery({
       className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-12 [perspective:1200px] [transform-style:preserve-3d] ${
         dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
       } ${className}`}
-      style={{ minHeight: isDesktop ? "124vh" : "105vh" }}
+      style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
       dir="rtl"
     >
       {/* Ambient background glow and contrast vignetting */}
@@ -121,21 +157,16 @@ export function ParallaxUnfurlingGallery({
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
-          className={`absolute -top-32 right-1/4 h-[560px] w-[560px] rounded-full blur-[140px] opacity-25 ${
-            dark ? "bg-[#08467d]" : "bg-[#08467d]/20"
+          className={`absolute -top-32 ${isRightToLeft ? "left-1/4" : "right-1/4"} h-[560px] w-[560px] rounded-full blur-[140px] opacity-15 pointer-events-none ${
+            dark ? "bg-[#08467d]" : "bg-[#08467d]/10"
           }`}
         />
+        {/* Soft bottom edge gradient for seamless transition to content */}
         <div
-          className={`absolute top-1/3 left-1/4 h-[500px] w-[500px] rounded-full blur-[130px] opacity-20 ${
-            dark ? "bg-[#f8ca14]" : "bg-[#f8ca14]/20"
-          }`}
-        />
-        {/* Soft bottom edge gradient for seamless transition to issues archive */}
-        <div
-          className={`absolute inset-x-0 bottom-0 h-28 pointer-events-none z-10 ${
+          className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
             dark
-              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/80 to-transparent"
-              : "bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent"
+              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
+              : "bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent"
           }`}
         />
       </div>

@@ -272,6 +272,11 @@ export function getLocalDb(): LocalDbState {
   return memoryState!;
 }
 
+export function reloadLocalDb(): LocalDbState {
+  memoryState = null;
+  return getLocalDb();
+}
+
 export function saveLocalDb() {
   if (!memoryState) return;
   ensureDataDir();

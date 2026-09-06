@@ -51,47 +51,47 @@ export function AqeeqLuxuryPageShell({
     >
       {/* ── خلفيات الهالة المحيطية الحية (Ambient Mesh Glow Orbs) ── */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        {/* هالة علوية ذهبية / خضراء */}
+        {/* هالة علوية كحلية ملكية / خضراء */}
         <div
-          className={`absolute -top-40 right-[-10%] h-[600px] w-[600px] rounded-full blur-[140px] opacity-40 transition-transform duration-1000 ${
+          className={`absolute -top-40 right-[-10%] h-[600px] w-[600px] rounded-full blur-[140px] opacity-30 transition-transform duration-1000 ${
             isNationalDay
               ? dark
                 ? "bg-gradient-to-br from-[#005A36] to-[#5aba1c]/40"
                 : "bg-gradient-to-br from-emerald-300 to-[#5aba1c]/30"
               : dark
-              ? "bg-gradient-to-br from-[#f8ca14]/30 via-amber-600/20 to-transparent"
-              : "bg-gradient-to-br from-[#08467d]/15 via-blue-400/10 to-transparent"
+              ? "bg-gradient-to-br from-[#08467d]/20 via-[#052342]/10 to-transparent"
+              : "bg-gradient-to-br from-[#08467d]/10 via-blue-400/5 to-transparent"
           }`}
         />
 
-        {/* هالة وسطى زمردية / كحلية */}
+        {/* هالة وسطى كحلية هادئة */}
         <div
-          className={`absolute top-[45%] left-[-15%] h-[550px] w-[550px] rounded-full blur-[150px] opacity-35 transition-transform duration-1000 ${
+          className={`absolute top-[45%] left-[-15%] h-[550px] w-[550px] rounded-full blur-[150px] opacity-25 transition-transform duration-1000 ${
             isNationalDay
               ? dark
                 ? "bg-[#003822]/60"
                 : "bg-emerald-200/50"
               : dark
-              ? "bg-[#10b981]/15"
-              : "bg-[#f8ca14]/12"
+              ? "bg-[#08467d]/15"
+              : "bg-slate-200/40"
           }`}
         />
 
         {/* هالة سفلية عميقة */}
         <div
-          className={`absolute -bottom-40 right-[20%] h-[500px] w-[500px] rounded-full blur-[160px] opacity-30 ${
+          className={`absolute -bottom-40 right-[20%] h-[500px] w-[500px] rounded-full blur-[160px] opacity-25 ${
             isNationalDay
               ? dark
                 ? "bg-[#5aba1c]/20"
                 : "bg-emerald-300/30"
               : dark
-              ? "bg-[#08467d]/35"
-              : "bg-[#08467d]/10"
+              ? "bg-[#08467d]/20"
+              : "bg-[#08467d]/08"
           }`}
         />
 
         {/* شبكة ضوئية سائلة دقيقة */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(248,202,20,0.06),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(8,70,125,0.04),transparent_60%)]" />
       </div>
 
       {/* ── رأس الصفحة (Header) ── */}

@@ -19,7 +19,6 @@ import {
   BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
-import { matchSelfieAgainstPhotos, loadFaceRecognitionModels } from "@/lib/aqeeqFaceRecognition";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -92,7 +91,7 @@ export function AqeeqFaceSearchModal({
 
   useEffect(() => {
     if (open) {
-      void loadFaceRecognitionModels();
+      void import("@/lib/aqeeqFaceRecognition").then((m) => m.loadFaceRecognitionModels());
     }
   }, [open]);
 
@@ -134,6 +133,7 @@ export function AqeeqFaceSearchModal({
 
       if (selfie) {
         try {
+          const { matchSelfieAgainstPhotos } = await import("@/lib/aqeeqFaceRecognition");
           const aiMatches = await matchSelfieAgainstPhotos(
             selfie,
             effectivePhotos,

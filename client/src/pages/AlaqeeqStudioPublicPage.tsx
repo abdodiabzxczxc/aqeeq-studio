@@ -1003,7 +1003,7 @@ export default function AlaqeeqStudioPublicPage() {
             <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#08467d]/30 via-[#f8ca14]/10 to-transparent blur-[120px]" />
           </>
         ) : (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(248,202,20,0.14),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(8,70,125,0.12),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
         )}
 
 

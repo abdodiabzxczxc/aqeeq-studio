@@ -10,6 +10,35 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { ArticlesScrollParallaxBackdrop, type ArticleBackdropItem } from "@/components/ui/articles-scroll-parallax-backdrop";
+
+const ABOUT_UNFURLING_ITEMS = [
+  { id: "about-1", title: "تأسيس مدارس العقيق 1994", image: "/covers/cover-about.jpg", badge: "30+ عاماً ريادة", date: "طيبة الطيبة" },
+  { id: "about-2", title: "مجمع البنين - ممشى الهجرة", image: "/covers/cover-admissions.jpg", badge: "حي الرانوناء", date: "صرح تعليمي" },
+  { id: "about-3", title: "مجمع البنات والطفولة المبكرة", image: "/covers/student-excellence-about.jpg", badge: "بيئة رائدة", date: "تعليم وتمكين" },
+  { id: "about-4", title: "حفل الخريجين السنوي والتكريم", image: "/covers/student-excellence-about.jpg", badge: "قادة الغد", date: "أجيال العقيق" },
+  { id: "about-5", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "تقنيات متقدمة", date: "معامل ذكية" },
+  { id: "about-6", title: "أبطال العالم في الروبوت WRO", image: "/covers/first-lego-champions.png", badge: "المركز الخامس عالمياً", date: "إنجاز سعودي" },
+  { id: "about-7", title: "المسرح الملكي والأنشطة الإثرائية", image: "/covers/cover-about.jpg", badge: "سعة 600 مقعد", date: "منبر الإبداع" },
+  { id: "about-8", title: "المسار الدولي الأمريكي Cognia", image: "/covers/cover-admissions.jpg", badge: "معايير عالمية", date: "اعتماد دولي" },
+  { id: "about-9", title: "مجمع الصالات الرياضية والمسبح", image: "/covers/cover-admissions.jpg", badge: "ألعاب قوى وسباحة", date: "لياقة وتفوق" },
+  { id: "about-10", title: "مختبرات الابتكار والبحث العلمي", image: "/covers/student-lab-admissions.jpg", badge: "تجارب وبحوث", date: "حاضنة علمية" },
+  { id: "about-11", title: "أولياء الأمور شركاء النجاح", image: "/covers/student-excellence-about.jpg", badge: "تواصل مستمر", date: "مجتمع العقيق" },
+  { id: "about-12", title: "التحول الرقمي وشاشات 4K", image: "/covers/cover-about.jpg", badge: "فصول ذكية", date: "تعليم المستقبل" },
+  { id: "about-13", title: "كفاءات تعليمية وتربوية نادرة", image: "/covers/student-lab-admissions.jpg", badge: "خبرات 15+ عاماً", date: "كادر متميز" },
+  { id: "about-14", title: "المسابقات والجوائز الوطنية", image: "/covers/first-lego-champions.png", badge: "مراكز أولى", date: "منصات الشرف" },
+  { id: "about-15", title: "برامج تعزيز الهوية الإسلامية", image: "/covers/cover-about.jpg", badge: "أصالة ومعاصرة", date: "بناء الشخصية" },
+  { id: "about-16", title: "رؤية 2030 وبناء الإنسان", image: "/covers/student-excellence-about.jpg", badge: "جيل واعد", date: "رؤية وطن" },
+];
+
+const ABOUT_PARALLAX_ITEMS: ArticleBackdropItem[] = ABOUT_UNFURLING_ITEMS.map((item) => ({
+  id: item.id,
+  title: item.title,
+  category: item.badge || item.date || "مدارس العقيق",
+  authorName: item.date || "صرح العقيق",
+  coverUrl: item.image,
+}));
+
 import {
   Building2,
   Heart,
@@ -177,6 +206,7 @@ export default function AqeeqSchoolAboutPage() {
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const [, navigate] = useLocation();
+  const aboutHeroRef = useRef<HTMLDivElement>(null);
 
   // فحص الشاشات الكبيرة لتفعيل فيزياء البعد الثالث على الكمبيوتر حصرياً
   // وتجنب انبعاج أو ميلان نصوص القراءة على الموبايل
@@ -788,19 +818,26 @@ export default function AqeeqSchoolAboutPage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="عن مدارس العقيق الأهلية والدولية" active="about" />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف صروح ومسيرة العقيق ✦"
       hero={
         <section
-          className={`relative isolate overflow-hidden py-12 sm:py-20 ${
-            isNationalDay ? (dark ? "snd-hero-dark" : "snd-hero-light") : ""
+          ref={aboutHeroRef}
+          style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
+          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between py-8 sm:py-12 transition-colors duration-500 ${
+            dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
           }`}
         >
-          {/* Subtle Ambient Glow */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_20%_25%,rgba(1,90,55,0.22),transparent_60%)]" />
+          {/* Scroll-driven 3D Columns Backdrop from Right to Left (Articles Style) */}
+          <ArticlesScrollParallaxBackdrop
+            articles={ABOUT_PARALLAX_ITEMS}
+            dark={dark}
+            containerRef={aboutHeroRef}
+            direction="right-to-left"
+          />
 
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
                 <div

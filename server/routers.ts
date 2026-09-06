@@ -237,6 +237,65 @@ export const appRouter = router({
         });
       }
     }),
+
+    pullFromLive: adminProcedure.mutation(async () => {
+      const liveUrl = (process.env.LIVE_SITE_URL || "https://aqeeq-studio.onrender.com").replace(/\/$/, "");
+      const syncUrl = `${liveUrl}/api/sync/export`;
+
+      try {
+        const response = await fetch(syncUrl, {
+          headers: {
+            "x-sync-secret": ENV.cookieSecret || ENV.adminPassword,
+          },
+        });
+
+        if (!response.ok) {
+          const errBody = await response.text().catch(() => "");
+          throw new Error(`تعذر الاتصال بموقع ريندر (${response.status}): ${errBody || response.statusText}`);
+        }
+
+        const payload = await response.json();
+        if (!payload || !payload.data) {
+          throw new Error("البيانات المستلمة من ريندر فارغة أو غير متوافقة");
+        }
+
+        const fs = await import("node:fs");
+        const path = await import("node:path");
+        const DATA_DIR = path.resolve(process.cwd(), "data");
+        const DB_FILE = path.join(DATA_DIR, "local_db.json");
+        const SEED_FILE = path.resolve(process.cwd(), "server", "seedData.json");
+
+        if (!fs.existsSync(DATA_DIR)) {
+          fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+
+        const json = JSON.stringify(payload.data, null, 2);
+        fs.writeFileSync(DB_FILE, json, "utf-8");
+        if (fs.existsSync(path.dirname(SEED_FILE))) {
+          fs.writeFileSync(SEED_FILE, json, "utf-8");
+        }
+
+        const { reloadLocalDb } = await import("./localStore");
+        reloadLocalDb();
+
+        const data = payload.data;
+        const albumsCount = data.albums?.length || 0;
+        const issuesCount = data.issues?.length || 0;
+        const overridesCount = Object.keys(data.overrides || {}).length;
+
+        return {
+          success: true,
+          message: `تم سحب التعديلات من ريندر بنجاح! (${albumsCount} ألبوم، ${issuesCount} أعداد مجلة، ${overridesCount} تعديل نصوص)`,
+          exportedAt: payload.exportedAt,
+        };
+      } catch (error: any) {
+        console.error("[Deploy] Pull from live error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "فشل سحب التعديلات من ريندر",
+        });
+      }
+    }),
   }),
 
   auth: router({

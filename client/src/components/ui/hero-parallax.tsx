@@ -31,6 +31,9 @@ export interface HeroParallaxProps {
   isAdmin?: boolean;
   albumsCount?: number;
   dark?: boolean;
+  direction?: "left-to-right" | "right-to-left";
+  cardShape?: "default" | "square";
+  rowCount?: 2 | 3;
 }
 
 export const HeroParallax = ({
@@ -45,21 +48,26 @@ export const HeroParallax = ({
   isAdmin,
   albumsCount,
   dark = true,
+  direction = "left-to-right",
+  cardShape = "default",
+  rowCount = 3,
 }: HeroParallaxProps) => {
-  // Ensure we have at least 15 items by looping if necessary
+  const isRightToLeft = direction === "right-to-left";
+
+  // Ensure we have at least 16 items by looping if necessary
   const displayProducts = React.useMemo(() => {
     if (!products || products.length === 0) return [];
-    if (products.length >= 15) return products.slice(0, 15);
+    if (products.length >= 16) return products.slice(0, 16);
     const repeated: ParallaxProduct[] = [];
-    while (repeated.length < 15) {
+    while (repeated.length < 16) {
       repeated.push(...products);
     }
-    return repeated.slice(0, 15);
+    return repeated.slice(0, 16);
   }, [products]);
 
-  const firstRow = displayProducts.slice(0, 5);
-  const secondRow = displayProducts.slice(5, 10);
-  const thirdRow = displayProducts.slice(10, 15);
+  const firstRow = rowCount === 2 ? displayProducts.slice(0, 8) : displayProducts.slice(0, 5);
+  const secondRow = rowCount === 2 ? displayProducts.slice(8, 16) : displayProducts.slice(5, 10);
+  const thirdRow = rowCount === 2 ? [] : displayProducts.slice(10, 15);
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -79,28 +87,41 @@ export const HeroParallax = ({
 
   const springConfig = { stiffness: 220, damping: 28, bounce: 60 };
 
+  const scrollEnd = rowCount === 2 ? 0.55 : 1;
   const translateX = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 700 : 250]),
+    useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? 550 : 700) : 250]),
     springConfig
   );
   const translateXReverse = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -700 : -250]),
+    useTransform(scrollYProgress, [0, scrollEnd], [0, isDesktop ? (rowCount === 2 ? -550 : -700) : -250]),
     springConfig
   );
   const rotateX = useSpring(
-    useTransform(scrollYProgress, [0, 0.25], [isDesktop ? 14 : 6, 0]),
+    useTransform(scrollYProgress, [0, rowCount === 2 ? 0.18 : 0.25], [isDesktop ? 14 : 6, 0]),
     springConfig
   );
   const opacity = useSpring(
-    useTransform(scrollYProgress, [0, 0.25], [0.12, 1]),
+    useTransform(
+      scrollYProgress,
+      [0, 0.15, rowCount === 2 ? 0.45 : 0.65, rowCount === 2 ? 0.8 : 0.95],
+      [0.08, 0.88, 0.88, 0]
+    ),
     springConfig
   );
   const rotateZ = useSpring(
-    useTransform(scrollYProgress, [0, 0.25], [isDesktop ? 16 : 4, 0]),
+    useTransform(
+      scrollYProgress,
+      [0, rowCount === 2 ? 0.18 : 0.25],
+      [isDesktop ? (isRightToLeft ? -16 : 16) : (isRightToLeft ? -4 : 4), 0]
+    ),
     springConfig
   );
   const translateY = useSpring(
-    useTransform(scrollYProgress, [0, 0.25], [isDesktop ? -480 : -180, isDesktop ? 220 : 80]),
+    useTransform(
+      scrollYProgress,
+      [0, rowCount === 2 ? 0.18 : 0.25],
+      [isDesktop ? (rowCount === 2 ? -280 : -480) : -160, isDesktop ? (rowCount === 2 ? 100 : 220) : 60]
+    ),
     springConfig
   );
 
@@ -110,23 +131,30 @@ export const HeroParallax = ({
       className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-16 [perspective:1200px] [transform-style:preserve-3d] ${
         dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
       }`}
-      style={{ minHeight: isDesktop ? "210vh" : "160vh" }}
+      style={{
+        minHeight: isDesktop
+          ? rowCount === 2
+            ? "104vh"
+            : cardShape === "square"
+            ? "148vh"
+            : "210vh"
+          : rowCount === 2
+          ? "94vh"
+          : cardShape === "square"
+          ? "120vh"
+          : "160vh",
+      }}
     >
-      {/* Ambient background glow & radial highlights */}
+      {/* Ambient background glow & radial highlights (pure dark, no yellow) */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
-          className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-40 ${
+          className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
             dark
-              ? "bg-gradient-to-b from-[#08467d] via-[#f8ca14]/20 to-transparent"
-              : "bg-gradient-to-b from-blue-300 via-amber-200 to-transparent opacity-50"
-          }`}
-        />
-        <div
-          className={`absolute bottom-0 right-0 h-[450px] w-[450px] rounded-full blur-[130px] opacity-25 ${
-            dark ? "bg-[#f8ca14]/15" : "bg-blue-400/15"
+              ? "bg-gradient-to-b from-[#08467d] to-transparent"
+              : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
           }`}
         />
       </div>
@@ -160,47 +188,54 @@ export const HeroParallax = ({
         }}
         className="relative z-10 will-change-transform"
       >
-        {/* Row 1: moves to the right */}
+        {/* Row 1: moves to the right (or left if RTL) */}
         <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8 mb-6 sm:mb-8">
           {firstRow.map((product, idx) => (
             <ProductCard
               product={product}
-              translate={translateX}
+              translate={isRightToLeft ? translateXReverse : translateX}
               key={product.title + "-r1-" + idx}
               dark={dark}
+              cardShape={cardShape}
             />
           ))}
         </div>
 
-        {/* Row 2: moves to the left (reverse) */}
+        {/* Row 2: moves to the left (or right if RTL) */}
         <div className="flex flex-row mb-6 sm:mb-8 space-x-6 sm:space-x-8">
           {secondRow.map((product, idx) => (
             <ProductCard
               product={product}
-              translate={translateXReverse}
+              translate={isRightToLeft ? translateX : translateXReverse}
               key={product.title + "-r2-" + idx}
               dark={dark}
+              cardShape={cardShape}
             />
           ))}
         </div>
 
-        {/* Row 3: moves to the right */}
-        <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8">
-          {thirdRow.map((product, idx) => (
-            <ProductCard
-              product={product}
-              translate={translateX}
-              key={product.title + "-r3-" + idx}
-              dark={dark}
-            />
-          ))}
-        </div>
+        {/* Row 3: moves to the right (or left if RTL) - only when rowCount is 3 */}
+        {rowCount === 3 && (
+          <div className="flex flex-row-reverse space-x-reverse space-x-6 sm:space-x-8">
+            {thirdRow.map((product, idx) => (
+              <ProductCard
+                product={product}
+                translate={isRightToLeft ? translateXReverse : translateX}
+                key={product.title + "-r3-" + idx}
+                dark={dark}
+                cardShape={cardShape}
+              />
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* Bottom fade shadow for seamless connection to next section */}
       <div
-        className={`pointer-events-none absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t ${
-          dark ? "from-[#05080e] to-transparent" : "from-slate-50 to-transparent"
+        className={`pointer-events-none absolute bottom-0 inset-x-0 h-36 bg-gradient-to-t ${
+          dark
+            ? "from-[#05080e] via-[#05080e]/85 to-transparent"
+            : "from-slate-50 via-slate-50/85 to-transparent"
         } z-20`}
       />
     </div>
@@ -361,10 +396,12 @@ export const ProductCard = ({
   product,
   translate,
   dark,
+  cardShape = "default",
 }: {
   product: ParallaxProduct;
   translate: MotionValue<number>;
   dark?: boolean;
+  cardShape?: "default" | "square";
 }) => {
   return (
     <motion.div
@@ -377,7 +414,11 @@ export const ProductCard = ({
         transition: { duration: 0.25, ease: "easeOut" },
       }}
       key={product.title}
-      className="group/product relative h-[280px] sm:h-[340px] md:h-[380px] w-[290px] sm:w-[380px] md:w-[440px] flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 will-change-transform cursor-pointer"
+      className={`group/product relative ${
+        cardShape === "square"
+          ? "h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] md:h-[350px] md:w-[350px] aspect-square"
+          : "h-[280px] sm:h-[340px] md:h-[380px] w-[290px] sm:w-[380px] md:w-[440px]"
+      } flex-shrink-0 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 will-change-transform cursor-pointer`}
     >
       <Link href={product.link} className="block h-full w-full">
         {/* Background Album Photo with smooth zoom on hover */}

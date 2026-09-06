@@ -56,6 +56,7 @@ import {
   Link2,
   Smartphone,
   Laptop,
+  CloudDownload,
 } from "lucide-react";
 
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
@@ -424,6 +425,19 @@ export default function AqeeqAdminDashboardPage() {
     onError: (err) => {
       setIsDeploying(false);
       toast.error(err.message || "فشل نشر التعديلات");
+    },
+  });
+
+  const [isPulling, setIsPulling] = useState(false);
+  const pullMutation = trpc.deploy.pullFromLive.useMutation({
+    onSuccess: (res) => {
+      setIsPulling(false);
+      toast.success(res.message || "📥 تم سحب أحدث تعديلات ريندر بنجاح!");
+      void utils.invalidate();
+    },
+    onError: (err) => {
+      setIsPulling(false);
+      toast.error(err.message || "فشل سحب التعديلات من ريندر");
     },
   });
 
@@ -1090,25 +1104,46 @@ export default function AqeeqAdminDashboardPage() {
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
 
-            {/* Deploy to Live Button (for localhost sync) */}
+            {/* Deploy to Live Button & Pull from Live Button (for localhost sync) */}
             {isLocalhost && (
-              <button
-                onClick={() => {
-                  if (isDeploying) return;
-                  setIsDeploying(true);
-                  deployMutation.mutate();
-                }}
-                disabled={isDeploying}
-                className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 cursor-pointer ${
-                  isDeploying
-                    ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
-                    : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
-                }`}
-                title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
-              >
-                <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
-                <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للإنتاج 🚀"}</span>
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    if (isDeploying || isPulling) return;
+                    setIsDeploying(true);
+                    deployMutation.mutate();
+                  }}
+                  disabled={isDeploying || isPulling}
+                  className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 cursor-pointer ${
+                    isDeploying
+                      ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-400 cursor-wait"
+                      : "border-emerald-500/50 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-400"
+                  }`}
+                  title="مزامنة ونشر التعديلات على الموقع المباشر 🚀"
+                >
+                  <Rocket size={15} className={isDeploying ? "animate-spin" : ""} />
+                  <span className="hidden sm:inline">{isDeploying ? "جارِ النشر..." : "نشر للإنتاج 🚀"}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (isDeploying || isPulling) return;
+                    if (!window.confirm("📥 هل تريد سحب أحدث تعديلات المحتوى من موقع ريندر إلى جهازك الآن؟")) return;
+                    setIsPulling(true);
+                    pullMutation.mutate();
+                  }}
+                  disabled={isDeploying || isPulling}
+                  className={`flex items-center gap-2 px-3 sm:px-4 h-10 rounded-xl border transition shadow-lg text-xs font-black active:scale-95 cursor-pointer ${
+                    isPulling
+                      ? "border-amber-500/40 bg-amber-500/20 text-amber-400 cursor-wait"
+                      : "border-amber-500/50 bg-amber-500/15 text-amber-400 hover:bg-amber-500 hover:text-black hover:border-amber-400"
+                  }`}
+                  title="سحب أحدث تعديلات المحتوى من موقع ريندر إلى جهازك 📥"
+                >
+                  <CloudDownload size={15} className={isPulling ? "animate-bounce" : ""} />
+                  <span className="hidden sm:inline">{isPulling ? "جارِ السحب..." : "سحب من ريندر 📥"}</span>
+                </button>
+              </>
             )}
 
             {/* Logout */}

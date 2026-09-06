@@ -21,6 +21,8 @@ import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
+import { NewsScrollPortalBackdrop } from "@/components/ui/news-scroll-portal-backdrop";
+import { ParallaxUnfurlingGallery, type UnfurlingItem } from "@/components/ui/3d-parallax-unfurling-gallery";
 
 type ShowcasePost = { id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mediaType: "image" | "video"; sourceType?: "drive" | "manual" | "x" | "instagram" | "youtube"; externalUrl?: string | null; title: string | null; description: string | null; viewCount: number; createdAt?: Date; media?: Array<{ id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mimeType: string; mediaType: "image" | "video" }> };
 type ContentType = "all" | "images" | "videos" | "social";
@@ -695,22 +697,47 @@ function UnifiedShowcaseHero({
   const socialCount = posts.filter(isSocialPost).length;
 
   const { isNationalDay } = useSiteTheme();
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  const showcaseUnfurlingItems: UnfurlingItem[] = useMemo(() => {
+    const visualPosts = posts.filter((p) => !isSocialPost(p));
+    const fallbackList: UnfurlingItem[] = [
+      { id: "sh-1", title: "كأس بطولة فيرست ليجو للروبوت", image: "/covers/first-lego-champions.png", badge: "بطل المملكة 🥇", date: "تغطية مميزة" },
+      { id: "sh-2", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "تقنيات ذكية", date: "معامل المستقبل" },
+      { id: "sh-3", title: "حفل تكريم أوائل الطلاب والمتفوقين", image: "/covers/student-excellence-about.jpg", badge: "لوحة الشرف", date: "أجيال العقيق" },
+      { id: "sh-4", title: "المسبح نصف الأولمبي والبطولات", image: "/covers/cover-admissions.jpg", badge: "صرح رياضي", date: "أنشطة وبطولات" },
+      { id: "sh-5", title: "أولمبياد الروبوت الدولي WRO", image: "/covers/student-robotics-accreditations.jpg", badge: "خامس العالم 🌐", date: "إنجاز وطني" },
+      { id: "sh-6", title: "اعتماد كوجنيا والمسار الدولي", image: "/covers/cover-about.jpg", badge: "Cognia USA", date: "اعتماد دولي" },
+      { id: "sh-7", title: "الفصول التفاعلية الذكية 4K", image: "/covers/cover-about.jpg", badge: "فصول ذكية", date: "بيئة تعليمية" },
+      { id: "sh-8", title: "مرحلة الطفولة المبكرة ورياض الأطفال", image: "/covers/student-excellence-about.jpg", badge: "تأسيس مبهج", date: "رياض الأطفال" },
+      { id: "sh-9", title: "معارض الفنون والابتكار الطلابي", image: "/covers/student-lab-admissions.jpg", badge: "إبداع وموهبة", date: "معارض العقيق" },
+      { id: "sh-10", title: "المسرح المدرسي والملتقيات الثقافية", image: "/covers/cover-about.jpg", badge: "سعة 600 مقعد", date: "منبر الإبداع" },
+      { id: "sh-11", title: "الرحلات العلمية والميدانية الاستكشافية", image: "/covers/student-robotics-accreditations.jpg", badge: "تطبيق عملي", date: "أنشطة لا صفية" },
+      { id: "sh-12", title: "برامج رعاية الموهوبين مع مؤسسة موهبة", image: "/covers/student-excellence-about.jpg", badge: "فصول موهبة", date: "رعاية وتميز" },
+      { id: "sh-13", title: "مختبرات العلوم والأبحاث الكيميائية", image: "/covers/student-lab-admissions.jpg", badge: "تجارب علمية", date: "اكتشاف وإبداع" },
+      { id: "sh-14", title: "دورات القدرات والتحصيلي المكثفة", image: "/covers/cover-admissions.jpg", badge: "أعلى الدرجات", date: "تأهيل جامعي" },
+      { id: "sh-15", title: "الأيام العالمية والمناسبات الوطنية", image: "/covers/first-lego-champions.png", badge: "عز وفخر", date: "احتفالات وطنية" },
+      { id: "sh-16", title: "منظومة الشاشات والتقنيات التفاعلية", image: "/covers/cover-about.jpg", badge: "أحدث التقنيات", date: "صروح العقيق" },
+    ];
+
+    const mapped = visualPosts.map((post, idx) => ({
+      id: `post-${post.id}`,
+      title: post.title || post.fileName.replace(/\.[^.]+$/, "") || `خبر ${idx + 1}`,
+      image: getAqeeqShowcaseDisplaySource(post) || "/covers/cover-about.jpg",
+      badge: post.mediaType === "video" ? "فيديو 🎬" : "تغطية 📸",
+      date: post.createdAt ? new Date(post.createdAt).toLocaleDateString("ar-SA") : "المركز الإعلامي",
+    }));
+
+    if (mapped.length >= 16) return mapped.slice(0, 16);
+    return [...mapped, ...fallbackList.slice(0, 16 - mapped.length)];
+  }, [posts]);
 
   return (
-    <VisualEditable id="showcase-hero-section" tag="section" label="غلاف الأخبار والعروض" as="section" className={`relative isolate overflow-hidden border-b ${
-      isNationalDay
-        ? dark ? "snd-hero-dark border-emerald-500/25 text-white" : "snd-hero-light border-emerald-200/80 text-slate-900"
-        : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
-    }`}>
-      {isNationalDay ? (
-        <>
-          <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-60" />
-          <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#005A36]/40 via-[#5aba1c]/10 to-transparent blur-[120px] national-ambient-breath" />
-        </>
-      ) : (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_86%_18%,rgba(248,202,20,0.12),transparent_25%)]" />
-      )}
-      <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 md:grid-cols-[1fr_1.1fr] md:py-16 lg:gap-16">
+    <ParallaxUnfurlingGallery
+      items={showcaseUnfurlingItems}
+      dark={dark}
+      header={
+        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-16 relative z-10">
         <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
           {previousPost ? (
             <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
@@ -819,8 +846,8 @@ function UnifiedShowcaseHero({
           </div>
         </div>
       </div>
-    </VisualEditable>
-
+    }
+  />
   );
 }
 
@@ -922,7 +949,7 @@ export default function AqeeqShowcasePage() {
     <AqeeqLuxuryPageShell
       header={<AlaqeeqStudioSiteHeader title="الأخبار والعروض" active="showcase" logoUrl={showcase.headerLogoUrl || issues[0]?.headerLogoUrl} />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف مسرح الأخبار والعروض ✦"
       hero={
         <div className="relative w-full">

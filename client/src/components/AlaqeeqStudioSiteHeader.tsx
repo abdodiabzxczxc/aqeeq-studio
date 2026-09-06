@@ -45,6 +45,7 @@ import {
   Shield,
   LogIn,
   ChevronLeft,
+  CloudDownload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -83,6 +84,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const [faceSearchOpen, setFaceSearchOpen] = useState(false);
   const [creatorModalOpen, setCreatorModalOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isPulling, setIsPulling] = useState(false);
+  const utils = trpc.useUtils();
   const [portalsOpen, setPortalsOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const portalsRef = useRef<HTMLDivElement>(null);
@@ -130,6 +133,18 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     onError: (err) => {
       setIsDeploying(false);
       toast.error(err.message || "فشل نشر التعديلات");
+    },
+  });
+
+  const pullMutation = trpc.deploy.pullFromLive.useMutation({
+    onSuccess: (res) => {
+      setIsPulling(false);
+      toast.success(res.message || "📥 تم سحب أحدث تعديلات ريندر بنجاح!");
+      void utils.invalidate();
+    },
+    onError: (err) => {
+      setIsPulling(false);
+      toast.error(err.message || "فشل سحب التعديلات من ريندر");
     },
   });
 
@@ -767,22 +782,41 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                         </button>
 
                         {isLocalhost && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (isDeploying) return;
-                              if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                              setIsDeploying(true);
-                              deployMutation.mutate();
-                            }}
-                            disabled={isDeploying}
-                            className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
-                              dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
-                            } rounded-xl transition text-right`}
-                          >
-                            <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
-                            <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isDeploying || isPulling) return;
+                                if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                                setIsDeploying(true);
+                                deployMutation.mutate();
+                              }}
+                              disabled={isDeploying || isPulling}
+                              className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
+                                dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
+                              } rounded-xl transition text-right`}
+                            >
+                              <Rocket size={15} className={`text-emerald-500 shrink-0 ${isDeploying ? "animate-spin" : ""}`} />
+                              <span>{isDeploying ? "جارِ النشر..." : "نشر التعديلات للعامة 🚀"}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isDeploying || isPulling) return;
+                                if (!window.confirm("📥 هل تريد سحب أحدث تعديلات المحتوى والنصوص من موقع ريندر إلى جهازك الآن؟")) return;
+                                setIsPulling(true);
+                                pullMutation.mutate();
+                              }}
+                              disabled={isDeploying || isPulling}
+                              className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
+                                dark ? "hover:bg-white/10 text-white" : "hover:bg-slate-100 text-slate-800"
+                              } rounded-xl transition text-right`}
+                            >
+                              <CloudDownload size={15} className={`text-amber-400 shrink-0 ${isPulling ? "animate-bounce" : ""}`} />
+                              <span>{isPulling ? "جارِ سحب البيانات..." : "سحب التعديلات من ريندر 📥"}</span>
+                            </button>
+                          </>
                         )}
                       </div>
 
@@ -1214,14 +1248,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       </button>
 
                       {/* زر الداشبورد والتحكم */}
-                      <div className={isLocalhost ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
+                      <div className="flex flex-col gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             setMobileMenuOpen(false);
                             go("/admin");
                           }}
-                          className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black border transition cursor-pointer ${
+                          className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black border transition cursor-pointer ${
                             dark
                               ? "border-white/10 bg-white/5 hover:bg-white/10 text-white"
                               : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800"
@@ -1231,22 +1265,39 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                           <span>لوحة الإدارة</span>
                         </button>
 
-                        {/* زر النشر المباشر — خاص باللوكال فقط */}
+                        {/* زرا النشر المباشر وسحب التعديلات — خاص باللوكال فقط */}
                         {isLocalhost && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (isDeploying) return;
-                              if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
-                              setIsDeploying(true);
-                              deployMutation.mutate();
-                            }}
-                            disabled={isDeploying}
-                            className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
-                          >
-                            <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
-                            <span>نشر مباشر 🚀</span>
-                          </button>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isDeploying || isPulling) return;
+                                if (!window.confirm("🚀 هل تريد نشر التعديلات الحالية على الموقع المباشر الآن؟")) return;
+                                setIsDeploying(true);
+                                deployMutation.mutate();
+                              }}
+                              disabled={isDeploying || isPulling}
+                              className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-[#f8ca14]/20 border border-[#f8ca14]/40 text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black transition cursor-pointer"
+                            >
+                              <Rocket size={14} className={isDeploying ? "animate-spin" : ""} />
+                              <span>نشر مباشر 🚀</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isDeploying || isPulling) return;
+                                if (!window.confirm("📥 هل تريد سحب أحدث تعديلات المحتوى من موقع ريندر إلى جهازك؟")) return;
+                                setIsPulling(true);
+                                pullMutation.mutate();
+                              }}
+                              disabled={isDeploying || isPulling}
+                              className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-amber-500/20 border border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-black transition cursor-pointer"
+                            >
+                              <CloudDownload size={14} className={isPulling ? "animate-bounce" : ""} />
+                              <span>سحب ريندر 📥</span>
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>

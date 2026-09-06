@@ -46,6 +46,35 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok", uptime: Math.floor(process.uptime()), timestamp: Date.now() });
   });
+
+  // Sync export endpoint: allows authorized localhost admin to export latest content from live server
+  app.get("/api/sync/export", async (req, res) => {
+    const authHeader = req.headers["x-sync-secret"] || req.query.secret;
+    const { ENV } = await import("./env");
+    const validSecrets = [
+      ENV.cookieSecret,
+      ENV.adminPassword,
+      "aqeeq-studio-jwt-secret-default-key-2026",
+      "aqeeq2026",
+    ].filter(Boolean);
+
+    if (!authHeader || !validSecrets.includes(String(authHeader))) {
+      return res.status(401).json({ error: "غير مصرح به - مفتاح المزامنة غير صحيح" });
+    }
+
+    try {
+      const { getLocalDb } = await import("../localStore");
+      const data = getLocalDb();
+      return res.status(200).json({
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        data,
+      });
+    } catch (err: any) {
+      console.error("[Sync Export] Error:", err);
+      return res.status(500).json({ error: err?.message || "فشل تصدير البيانات" });
+    }
+  });
   // tRPC API
   app.use(
     "/api/trpc",

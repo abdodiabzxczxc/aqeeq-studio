@@ -99,7 +99,7 @@ function isDefaultOrLogoImage(url?: string | null): boolean {
   );
 }
 
-// Smart Cover Art Resolver: returns custom image if valid, or clean musical note / podcast mic default matching Dark/White mode
+// Smart Cover Art Resolver: returns custom image if valid, or royal golden 3D note artwork for songs
 function getSongCover(
   item?: { coverUrl?: string | null; category?: string; title?: string; type?: string } | null,
   theme: "dark" | "light" = "dark"
@@ -110,10 +110,10 @@ function getSongCover(
   if (item?.type === "podcast") {
     return theme === "light" ? "/podcast-default-cover-light.svg" : "/podcast-default-cover-dark.svg";
   }
-  return theme === "light" ? "/audio-default-cover-light.svg" : "/audio-default-cover-dark.svg";
+  return "/covers/aqeeq-anthems-royal-cover.jpg";
 }
 
-// Default fallback school songs with pure musical note default artwork (no ugly school logos)
+// Default fallback school songs with pure 3D golden double note artwork
 const DEFAULT_SCHOOL_SONGS: UniversalAudioItem[] = [
   {
     id: "song-1",
@@ -123,7 +123,7 @@ const DEFAULT_SCHOOL_SONGS: UniversalAudioItem[] = [
     category: "النشيد المدرسي",
     mediaType: "audio",
     mediaUrl: "/audio/aqeeq-royal.mp3",
-    coverUrl: null,
+    coverUrl: "/covers/aqeeq-anthems-royal-cover.jpg",
   },
   {
     id: "song-2",
@@ -133,7 +133,7 @@ const DEFAULT_SCHOOL_SONGS: UniversalAudioItem[] = [
     category: "احتفالي",
     mediaType: "audio",
     mediaUrl: "/audio/aqeeq-celebration.mp3",
-    coverUrl: null,
+    coverUrl: "/covers/aqeeq-anthems-royal-cover.jpg",
   },
   {
     id: "song-3",
@@ -143,7 +143,7 @@ const DEFAULT_SCHOOL_SONGS: UniversalAudioItem[] = [
     category: "بيانو وهدوء",
     mediaType: "audio",
     mediaUrl: "/audio/aqeeq-piano.mp3",
-    coverUrl: null,
+    coverUrl: "/covers/aqeeq-anthems-royal-cover.jpg",
   },
   {
     id: "song-4",
@@ -153,7 +153,7 @@ const DEFAULT_SCHOOL_SONGS: UniversalAudioItem[] = [
     category: "أجواء ملكية",
     mediaType: "audio",
     mediaUrl: "/audio/aqeeq-ambient.mp3",
-    coverUrl: null,
+    coverUrl: "/covers/aqeeq-anthems-royal-cover.jpg",
   },
 ];
 

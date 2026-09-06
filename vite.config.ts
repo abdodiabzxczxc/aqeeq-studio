@@ -18,6 +18,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("framer-motion")) {
+              return "vendor-motion";
+            }
+            if (id.includes("lucide-react")) {
+              return "vendor-lucide";
+            }
+            if (id.includes("@radix-ui")) {
+              return "vendor-radix";
+            }
+          }
+        },
+      },
+    },
   },
   server: {
     host: true,

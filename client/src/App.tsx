@@ -1,63 +1,44 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import ScanGate from "./pages/ScanGate";
-import EventLandingPage from "./pages/EventLandingPage";
-import EventWorkspacePage from "./pages/EventWorkspacePage";
-import ControlCenterPage from "./pages/ControlCenterPage";
-import CustomPage from "./pages/CustomPage";
-import GuestLiveCardPage from "./pages/GuestLiveCardPage";
-import AlaqeeqLivePage from "./pages/AlaqeeqLivePage";
-import SchoolNewsPage from "./pages/SchoolNewsPage";
-import JournalStudioPage from "./pages/JournalStudioPage";
-
-import SchoolNewsReaderPage from "./pages/SchoolNewsReaderPage";
-import SchoolNewsMonthlyPage from "./pages/SchoolNewsMonthlyPage";
-import EventStagePage from "./pages/EventStagePage";
-import EventMemoryPage from "./pages/EventMemoryPage";
-import ActivityBlueprintsPage from "./pages/ActivityBlueprintsPage";
-import JournalArchivePage from "./pages/JournalArchivePage";
-import AlaqeeqStudioPage from "./pages/AlaqeeqStudioPage";
-import AqeeqAlbumsPage from "./pages/AqeeqAlbumsPage";
-import AqeeqAlbumReaderPage from "./pages/AqeeqAlbumReaderPage";
-import AqeeqAlbumStudioPage from "./pages/AqeeqAlbumStudioPage";
-import AqeeqShowcasePage from "./pages/AqeeqShowcasePage";
-import AqeeqShowcaseStudioPage from "./pages/AqeeqShowcaseStudioPage";
-import MaisonExperiencePage from "./pages/MaisonExperiencePage";
-import MaisonVaultPage from "./pages/MaisonVaultPage";
-import SchoolStoryPage from "./pages/SchoolStoryPage";
-import LoginPage from "./pages/LoginPage";
 import { VisualEditorProvider } from "./components/VisualEditor";
 import VisualGlobalSections from "./components/VisualGlobalSections";
-import { AlaqeeqStudioSiteHeader } from "./components/AlaqeeqStudioSiteHeader";
 import { RouteMotion } from "./components/ExperienceMotion";
-import { JOURNAL_ROUTES } from "./lib/journalRoutes";
-import { useAuth } from "./_core/hooks/useAuth";
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
 import { PublishedHomepageProvider, usePublishedHomepage } from "./contexts/PublishedHomepageContext";
-
-
-import AqeeqAdminDashboardPage from "./pages/AqeeqAdminDashboardPage";
-import AqeeqAnalyticsDashboardPage from "./pages/AqeeqAnalyticsDashboardPage";
 import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
 import { AqeeqOccasionRibbon } from "./components/AqeeqOccasionRibbon";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
+import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
+import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
 
-import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
-import AqeeqArticlesStudioPage from "./pages/AqeeqArticlesStudioPage";
-import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
-import AqeeqPodcastStudioPage from "./pages/AqeeqPodcastStudioPage";
+// 🚀 Core Public Pages (Directly Loaded for 0ms Instant Seamless Navigation)
+import AlaqeeqStudioPage from "./pages/AlaqeeqStudioPage";
 import AqeeqSchoolAboutPage from "./pages/AqeeqSchoolAboutPage";
 import AqeeqSchoolAdmissionsPage from "./pages/AqeeqSchoolAdmissionsPage";
 import AqeeqSchoolAccreditationsPage from "./pages/AqeeqSchoolAccreditationsPage";
-import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
-import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
+import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
+import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
+import SchoolNewsPage from "./pages/SchoolNewsPage";
+import AqeeqAlbumsPage from "./pages/AqeeqAlbumsPage";
+import AqeeqShowcasePage from "./pages/AqeeqShowcasePage";
+
+// 📦 Heavy Admin & Studio Chunks (Lazily loaded on demand)
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const AqeeqAdminDashboardPage = lazy(() => import("./pages/AqeeqAdminDashboardPage"));
+const AqeeqAnalyticsDashboardPage = lazy(() => import("./pages/AqeeqAnalyticsDashboardPage"));
+const AqeeqArticlesStudioPage = lazy(() => import("./pages/AqeeqArticlesStudioPage"));
+const AqeeqPodcastStudioPage = lazy(() => import("./pages/AqeeqPodcastStudioPage"));
+const SchoolNewsReaderPage = lazy(() => import("./pages/SchoolNewsReaderPage"));
+const SchoolNewsMonthlyPage = lazy(() => import("./pages/SchoolNewsMonthlyPage"));
+const JournalArchivePage = lazy(() => import("./pages/JournalArchivePage"));
+const JournalStudioPage = lazy(() => import("./pages/JournalStudioPage"));
+const AqeeqAlbumReaderPage = lazy(() => import("./pages/AqeeqAlbumReaderPage"));
+const AqeeqAlbumStudioPage = lazy(() => import("./pages/AqeeqAlbumStudioPage"));
+const AqeeqShowcaseStudioPage = lazy(() => import("./pages/AqeeqShowcaseStudioPage"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 function ArticleDetailRoute({ params }: { params: { slug: string } }) {
   return <AqeeqArticlesPage params={params} />;
@@ -103,48 +84,50 @@ function Router() {
     <>
       <ScrollToTopOnNavigation />
       <RouteMotion routeKey={location}>
-      <Switch>
-      <Route path="/" component={AlaqeeqStudioPage} />
-      <Route path="/studio" component={AlaqeeqStudioPage} />
-      <Route path="/about" component={AqeeqSchoolAboutPage} />
-      <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
-      <Route path="/admission" component={AqeeqSchoolAdmissionsPage} />
-      <Route path="/fees" component={AqeeqSchoolAdmissionsPage} />
-      <Route path="/prices" component={AqeeqSchoolAdmissionsPage} />
-      <Route path="/accreditations" component={AqeeqSchoolAccreditationsPage} />
-      <Route path="/quality" component={AqeeqSchoolAccreditationsPage} />
-      <Route path="/login" component={LoginPage} />
+        <Suspense fallback={null}>
+          <Switch>
+            <Route path="/" component={AlaqeeqStudioPage} />
+            <Route path="/studio" component={AlaqeeqStudioPage} />
+            <Route path="/about" component={AqeeqSchoolAboutPage} />
+            <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
+            <Route path="/admission" component={AqeeqSchoolAdmissionsPage} />
+            <Route path="/fees" component={AqeeqSchoolAdmissionsPage} />
+            <Route path="/prices" component={AqeeqSchoolAdmissionsPage} />
+            <Route path="/accreditations" component={AqeeqSchoolAccreditationsPage} />
+            <Route path="/quality" component={AqeeqSchoolAccreditationsPage} />
+            <Route path="/login" component={LoginPage} />
 
-      <Route path="/admin" component={AqeeqAdminDashboardPage} />
-      <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
-      <Route path="/articles" component={AqeeqArticlesPage} />
-      <Route path="/articles/:slug" component={ArticleDetailRoute} />
-      <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
-      <Route path="/atheer" component={AqeeqPodcastPage} />
-      <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
-      <Route path="/podcast" component={AqeeqPodcastPage} />
-      <Route path="/journal" component={SchoolNewsPage} />
-      <Route path="/journal/archive" component={JournalArchivePage} />
-      <Route path="/journal/manage" component={JournalStudioPage} />
-      <Route path="/journal/month/:monthKey" component={JournalMonthRoute} />
-      <Route path="/journal/issue/:slug" component={JournalIssueRoute} />
-      <Route path="/journal/:slug" component={JournalIssueRoute} />
-      <Route path="/albums/manage" component={AqeeqAlbumStudioPage} />
-      <Route path="/albums/:slug" component={AlbumReaderRoute} />
-      <Route path="/albums" component={AqeeqAlbumsPage} />
-      <Route path="/showcase/manage" component={AqeeqShowcaseStudioPage} />
-      <Route path="/showcase" component={AqeeqShowcasePage} />
-      <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
-      <Route path="/offers" component={AqeeqShowcasePage} />
-      <Route path="/news/manage" component={AqeeqShowcaseStudioPage} />
-      <Route path="/news" component={AqeeqShowcasePage} />
-      <Route path="/news/month/:monthKey" component={LegacyNewsMonthRedirect} />
-      <Route path="/news/:slug" component={LegacyNewsSlugRedirect} />
-      <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
-    </RouteMotion>
+            <Route path="/admin" component={AqeeqAdminDashboardPage} />
+            <Route path="/articles/manage" component={AqeeqArticlesStudioPage} />
+            <Route path="/articles" component={AqeeqArticlesPage} />
+            <Route path="/articles/:slug" component={ArticleDetailRoute} />
+            <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
+            <Route path="/atheer" component={AqeeqPodcastPage} />
+            <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
+            <Route path="/podcast" component={AqeeqPodcastPage} />
+            <Route path="/journal" component={SchoolNewsPage} />
+            <Route path="/journal/archive" component={JournalArchivePage} />
+            <Route path="/journal/manage" component={JournalStudioPage} />
+            <Route path="/journal/month/:monthKey" component={JournalMonthRoute} />
+            <Route path="/journal/issue/:slug" component={JournalIssueRoute} />
+            <Route path="/journal/:slug" component={JournalIssueRoute} />
+            <Route path="/albums/manage" component={AqeeqAlbumStudioPage} />
+            <Route path="/albums/:slug" component={AlbumReaderRoute} />
+            <Route path="/albums" component={AqeeqAlbumsPage} />
+            <Route path="/showcase/manage" component={AqeeqShowcaseStudioPage} />
+            <Route path="/showcase" component={AqeeqShowcasePage} />
+            <Route path="/offers/manage" component={AqeeqShowcaseStudioPage} />
+            <Route path="/offers" component={AqeeqShowcasePage} />
+            <Route path="/news/manage" component={AqeeqShowcaseStudioPage} />
+            <Route path="/news" component={AqeeqShowcasePage} />
+            <Route path="/news/month/:monthKey" component={LegacyNewsMonthRedirect} />
+            <Route path="/news/:slug" component={LegacyNewsSlugRedirect} />
+            <Route path="/admin/analytics" component={AqeeqAnalyticsDashboardPage} />
+            <Route path="/404" component={NotFound} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </RouteMotion>
     </>
   );
 }
@@ -207,7 +190,6 @@ function App() {
 import { useSiteTheme } from "./lib/useSiteTheme";
 import { useAqeeqStudioTheme } from "./lib/aqeeqStudioTheme";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
-import { AqeeqMagneticCursor } from "./components/AqeeqMagneticCursor";
 
 function StudioAppShell() {
   const { snapshot } = usePublishedHomepage();
@@ -227,8 +209,6 @@ function StudioAppShell() {
 
   return (
     <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
-      {/* 🌟 Global Magnetic Spring Cursor on all pages */}
-      <AqeeqMagneticCursor />
       {/* 🎞️ Global Cinematic Film Grain Texture */}
       <div className="aqeeq-grain-overlay" aria-hidden />
       {isNationalDay && <AqeeqCelebrationConfetti />}
