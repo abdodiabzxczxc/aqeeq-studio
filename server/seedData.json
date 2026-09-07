@@ -354,7 +354,7 @@
       "ceremonyId": null,
       "title": "فيديو الأسبوع التمهيدي",
       "slug": "album-20260907-hh8o",
-      "albumDate": "2026-09-04",
+      "albumDate": "2026-09-02",
       "coverUrl": "/api/drive-proxy/1ac_1-EUIDvCQv6BmiqVym6EaN-vkmnUw",
       "description": null,
       "driveFolderUrl": "https://drive.google.com/drive/folders/16gTDwS07FLaTcZZwMupkzWxDUQ8pbh5y?usp=drive_link",
@@ -367,10 +367,10 @@
       "watermarkPosition": "center",
       "watermarkTint": "#d6b96a",
       "status": "published",
-      "publishedAt": "2026-09-07T12:28:29.077Z",
+      "publishedAt": "2026-09-07T12:55:51.255Z",
       "viewCount": 0,
       "createdAt": "2026-09-07T05:51:02.234Z",
-      "updatedAt": "2026-09-07T12:28:29.013Z",
+      "updatedAt": "2026-09-07T12:55:51.196Z",
       "media": [
         {
           "id": 120,
@@ -2162,7 +2162,7 @@
     "album": 8,
     "albumMedia": 133,
     "showcase": 2,
-    "showcasePost": 62,
+    "showcasePost": 58,
     "showcasePostMedia": 1,
     "mediaAsset": 17,
     "admission": 2
