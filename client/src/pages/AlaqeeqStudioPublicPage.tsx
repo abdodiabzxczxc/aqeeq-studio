@@ -412,6 +412,13 @@ export default function AlaqeeqStudioPublicPage() {
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const [storyProgress, setStoryProgress] = useState(0);
   const [isStoryPaused, setIsStoryPaused] = useState(false);
+  const [storyOrigin, setStoryOrigin] = useState<{ x: number; y: number } | null>(null);
+  const [isInitialStoryOpen, setIsInitialStoryOpen] = useState(true);
+  const [hoveredStoryTooltip, setHoveredStoryTooltip] = useState<{
+    story: StoryItem;
+    x: number;
+    y: number;
+  } | null>(null);
   const [likesCount, setLikesCount] = useState(482);
   const [hasLiked, setHasLiked] = useState(false);
   const [isPlayingQuoteAudio, setIsPlayingQuoteAudio] = useState(false);
@@ -647,6 +654,17 @@ export default function AlaqeeqStudioPublicPage() {
     return items;
   }, [activeShowcasePosts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
 
+  // Clear story preview tooltip on scroll or resize
+  useEffect(() => {
+    const handleScrollOrResize = () => setHoveredStoryTooltip(null);
+    window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+    window.addEventListener("resize", handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, []);
+
   // Story Auto-Advance Timer (with pause on hover/hold)
   useEffect(() => {
     if (activeStoryIndex === null) {
@@ -659,6 +677,7 @@ export default function AlaqeeqStudioPublicPage() {
       setStoryProgress((prev) => {
         if (prev >= 100) {
           if (activeStoryIndex < storiesList.length - 1) {
+            setIsInitialStoryOpen(false);
             setActiveStoryIndex(activeStoryIndex + 1);
             return 0;
           } else {
@@ -680,11 +699,13 @@ export default function AlaqeeqStudioPublicPage() {
         setActiveStoryIndex(null);
       } else if (e.key === "ArrowRight") {
         if (activeStoryIndex > 0) {
+          setIsInitialStoryOpen(false);
           setActiveStoryIndex(activeStoryIndex - 1);
           setStoryProgress(0);
         }
       } else if (e.key === "ArrowLeft") {
         if (activeStoryIndex < storiesList.length - 1) {
+          setIsInitialStoryOpen(false);
           setActiveStoryIndex(activeStoryIndex + 1);
           setStoryProgress(0);
         }
@@ -915,7 +936,26 @@ export default function AlaqeeqStudioPublicPage() {
                 <button
                   key={story.id}
                   type="button"
-                  onClick={() => setActiveStoryIndex(index)}
+                  onClick={(e) => {
+                    setHoveredStoryTooltip(null);
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setStoryOrigin({
+                      x: rect.left + rect.width / 2,
+                      y: rect.top + rect.height / 2,
+                    });
+                    setIsInitialStoryOpen(true);
+                    setActiveStoryIndex(index);
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!story.imageUrl) return;
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setHoveredStoryTooltip({
+                      story,
+                      x: rect.left + rect.width / 2,
+                      y: rect.top - 8,
+                    });
+                  }}
+                  onMouseLeave={() => setHoveredStoryTooltip(null)}
                   className="group flex flex-col items-center gap-1.5 shrink-0 text-center transition-opacity duration-200 hover:opacity-90 active:opacity-75 focus:outline-none select-none"
                 >
                   <div className={"relative p-[2.5px] rounded-full transition-all duration-200 " + (
@@ -991,6 +1031,58 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </section>
       ) : null}
+
+      {/* Fixed Floating Preview Tooltip above Story Circle (anchored, no cursor magnetism) */}
+      <AnimatePresence>
+        {hoveredStoryTooltip && (
+          <motion.div
+            key={`story-tooltip-${hoveredStoryTooltip.story.id}`}
+            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="pointer-events-none fixed z-[200] hidden sm:block -translate-x-1/2 -translate-y-full"
+            style={{
+              left: hoveredStoryTooltip.x,
+              top: hoveredStoryTooltip.y,
+            }}
+          >
+            <div className={`w-56 overflow-hidden rounded-2xl border p-1.5 shadow-[0_14px_40px_rgba(0,0,0,0.65)] backdrop-blur-xl ${
+              dark
+                ? "border-white/20 bg-black/92 text-white"
+                : "border-black/15 bg-white/95 text-slate-900 shadow-[0_12px_30px_rgba(0,0,0,0.2)]"
+            }`}>
+              <div className="relative h-28 w-full overflow-hidden rounded-xl bg-black">
+                <img
+                  src={directDriveImage(hoveredStoryTooltip.story.imageUrl) || hoveredStoryTooltip.story.imageUrl || ""}
+                  alt={hoveredStoryTooltip.story.title}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <span className="absolute top-2 right-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md">
+                  {hoveredStoryTooltip.story.category}
+                </span>
+              </div>
+              <div className="p-2 text-right">
+                <p className="line-clamp-2 text-xs font-black leading-snug">
+                  {hoveredStoryTooltip.story.title}
+                </p>
+                <span className={`mt-1 block text-[10px] font-medium ${
+                  dark ? "text-slate-400" : "text-slate-500"
+                }`}>
+                  {hoveredStoryTooltip.story.time}
+                </span>
+              </div>
+            </div>
+            {/* Downward triangle pointer */}
+            <div className={`mx-auto h-2.5 w-2.5 -mt-1 rotate-45 border-r border-b ${
+              dark
+                ? "border-white/20 bg-black/92"
+                : "border-black/15 bg-white/95"
+            }`} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 2. غلاف واجهة مدارس العقيق الرئيسية مع عمق البعد الثالث وانتقال الستارة الملكية */}
       <div className="relative z-0 w-full overflow-hidden">
@@ -1990,12 +2082,16 @@ export default function AlaqeeqStudioPublicPage() {
 
 
 
-      {/* Story Viewer Modal — 3D Ambilight Carousel with Spring Zoom (z-[300] above header with click-outside dismiss) */}
+      {/* Story Viewer Modal — Instagram-Style Morph Zoom from Circle Origin (z-[300] above header with click-outside dismiss) */}
       <AnimatePresence>
         {activeStoryIndex !== null && storiesList[activeStoryIndex] ? (() => {
           const activeStory = storiesList[activeStoryIndex];
           const prevStory = activeStoryIndex > 0 ? storiesList[activeStoryIndex - 1] : null;
           const nextStory = activeStoryIndex < storiesList.length - 1 ? storiesList[activeStoryIndex + 1] : null;
+
+          // Instagram Morph Offset Calculation
+          const originOffsetX = storyOrigin ? storyOrigin.x - window.innerWidth / 2 : 0;
+          const originOffsetY = storyOrigin ? storyOrigin.y - window.innerHeight / 2 : 0;
 
           return (
             <motion.div
@@ -2003,11 +2099,11 @@ export default function AlaqeeqStudioPublicPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setActiveStoryIndex(null)}
               className={`fixed inset-0 z-[300] flex items-center justify-center p-3 sm:p-5 md:p-8 select-none overflow-hidden ${
-                dark ? "bg-black/65" : "bg-slate-950/50"
-              } backdrop-blur-2xl`}
+                dark ? "bg-black/85" : "bg-black/80"
+              } backdrop-blur-xl`}
             >
               {/* Subtle Ambient Ambilight Glow (Takes colors of current story) */}
               {activeStory.imageUrl && (
@@ -2066,6 +2162,7 @@ export default function AlaqeeqStudioPublicPage() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     onClick={(e) => {
                       e.stopPropagation();
+                      setIsInitialStoryOpen(false);
                       setActiveStoryIndex(activeStoryIndex - 1);
                       setStoryProgress(0);
                     }}
@@ -2103,19 +2200,57 @@ export default function AlaqeeqStudioPublicPage() {
                   <div className="hidden lg:block w-[200px] xl:w-[230px] shrink-0" />
                 )}
 
-                {/* Center Main Active Story Card (Pure Silky Fade - Zero Jumps, Zero Springs) */}
+                {/* Center Main Active Story Card (Instagram Morph Zoom from Circle Origin) */}
                 <motion.div
                   key={`active-story-card-${activeStory.id}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  initial={
+                    isInitialStoryOpen && storyOrigin
+                      ? {
+                          x: originOffsetX,
+                          y: originOffsetY,
+                          scale: 0.16,
+                          borderRadius: "9999px",
+                          opacity: 0.35,
+                        }
+                      : {
+                          x: 0,
+                          y: 0,
+                          scale: 1,
+                          borderRadius: "2.2rem",
+                          opacity: 0,
+                        }
+                  }
+                  animate={{
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    borderRadius: "2.2rem",
+                    opacity: 1,
+                  }}
+                  exit={
+                    storyOrigin
+                      ? {
+                          x: originOffsetX,
+                          y: originOffsetY,
+                          scale: 0.16,
+                          borderRadius: "9999px",
+                          opacity: 0,
+                        }
+                      : {
+                          opacity: 0,
+                          scale: 0.96,
+                        }
+                  }
+                  transition={{
+                    duration: 0.28,
+                    ease: [0.32, 0.72, 0, 1], // Instagram cubic-bezier curve
+                  }}
                   onClick={(e) => e.stopPropagation()}
                   onMouseEnter={() => setIsStoryPaused(true)}
                   onMouseLeave={() => setIsStoryPaused(false)}
                   onTouchStart={() => setIsStoryPaused(true)}
                   onTouchEnd={() => setIsStoryPaused(false)}
-                  className={`relative h-[86vh] max-h-[760px] w-full max-w-[420px] sm:max-w-[440px] overflow-hidden rounded-[2.2rem] border bg-black shadow-[0_25px_80px_rgba(0,0,0,0.85)] shrink-0 ${
+                  className={`relative h-[86vh] max-h-[760px] w-full max-w-[420px] sm:max-w-[440px] overflow-hidden rounded-[2.2rem] border bg-black shadow-[0_25px_80px_rgba(0,0,0,0.85)] shrink-0 will-change-transform ${
                     dark
                       ? "border-[#f8ca14]/30 shadow-[0_0_60px_rgba(248,202,20,0.18)]"
                       : "border-white/45 shadow-[0_30px_90px_rgba(0,0,0,0.6)]"
@@ -2290,6 +2425,7 @@ export default function AlaqeeqStudioPublicPage() {
                     type="button"
                     onClick={() => {
                       if (activeStoryIndex > 0) {
+                        setIsInitialStoryOpen(false);
                         setActiveStoryIndex(activeStoryIndex - 1);
                         setStoryProgress(0);
                       }
@@ -2301,6 +2437,7 @@ export default function AlaqeeqStudioPublicPage() {
                     type="button"
                     onClick={() => {
                       if (activeStoryIndex < storiesList.length - 1) {
+                        setIsInitialStoryOpen(false);
                         setActiveStoryIndex(activeStoryIndex + 1);
                         setStoryProgress(0);
                       } else {
@@ -2322,6 +2459,7 @@ export default function AlaqeeqStudioPublicPage() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     onClick={(e) => {
                       e.stopPropagation();
+                      setIsInitialStoryOpen(false);
                       setActiveStoryIndex(activeStoryIndex + 1);
                       setStoryProgress(0);
                     }}
@@ -2366,6 +2504,7 @@ export default function AlaqeeqStudioPublicPage() {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsInitialStoryOpen(false);
                     setActiveStoryIndex(activeStoryIndex - 1);
                     setStoryProgress(0);
                   }}
@@ -2380,6 +2519,7 @@ export default function AlaqeeqStudioPublicPage() {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsInitialStoryOpen(false);
                     setActiveStoryIndex(activeStoryIndex + 1);
                     setStoryProgress(0);
                   }}
