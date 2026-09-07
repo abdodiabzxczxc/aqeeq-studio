@@ -912,39 +912,25 @@ export default function AlaqeeqStudioPublicPage() {
           <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
-                <motion.button
+                <button
                   key={story.id}
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   type="button"
                   onClick={() => setActiveStoryIndex(index)}
-                  onMouseEnter={() => {
-                    if (story.imageUrl) {
-                      triggerCursorPreview({
-                        visible: true,
-                        imageUrl: story.imageUrl,
-                        title: story.title,
-                        badge: "لحظات وقصص العقيق",
-                      });
-                    }
-                  }}
-                  onMouseLeave={() => triggerCursorPreview({ visible: false })}
-                  className={"group flex flex-col items-center gap-1.5 shrink-0 text-center transition active:scale-95"}
+                  className="group flex flex-col items-center gap-1.5 shrink-0 text-center transition-opacity duration-200 hover:opacity-90 active:opacity-75 focus:outline-none select-none"
                 >
-                  <div className={"relative p-[2.5px] rounded-full transition duration-300 group-hover:scale-[1.18] " + (
+                  <div className={"relative p-[2.5px] rounded-full transition-all duration-200 " + (
                     isNationalDay
-                      ? "snd-story-ring bg-gradient-to-tr from-[#f8ca14] via-[#5aba1c] to-[#005A36] shadow-[0_0_14px_rgba(248,202,20,0.35)]"
+                      ? "snd-story-ring bg-gradient-to-tr from-[#f8ca14] via-[#5aba1c] to-[#005A36] shadow-[0_0_14px_rgba(248,202,20,0.35)] group-hover:shadow-[0_0_20px_rgba(248,202,20,0.55)]"
                       : dark
-                      ? "bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] shadow-[0_0_12px_rgba(248,202,20,0.2)] group-hover:shadow-[0_0_22px_rgba(248,202,20,0.55)]"
-                      : "bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] shadow-[0_0_10px_rgba(8,70,125,0.15)]"
+                      ? "bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] shadow-[0_0_12px_rgba(248,202,20,0.2)] group-hover:shadow-[0_0_18px_rgba(248,202,20,0.45)]"
+                      : "bg-gradient-to-tr from-[#08467d] via-[#367453] to-[#f8ca14] shadow-[0_0_10px_rgba(8,70,125,0.15)] group-hover:shadow-[0_0_16px_rgba(8,70,125,0.3)]"
                   )}>
 
                     <div className={"h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-full border-2 flex items-center justify-center " + (
                       dark ? "border-black bg-[#121212]" : "border-white bg-slate-100"
                     )}>
                       {story.imageUrl ? (
-                        <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                        <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt={story.title} className="h-full w-full object-cover transition-opacity duration-200" />
                       ) : story.sourceType === "instagram" ? (
                         <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] text-white">
                           <Instagram size={24} />
@@ -999,7 +985,7 @@ export default function AlaqeeqStudioPublicPage() {
                   )}>
                     {story.title}
                   </p>
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
@@ -2017,7 +2003,7 @@ export default function AlaqeeqStudioPublicPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.28, ease: "easeInOut" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={() => setActiveStoryIndex(null)}
               className={`fixed inset-0 z-[300] flex items-center justify-center p-3 sm:p-5 md:p-8 select-none overflow-hidden ${
                 dark ? "bg-black/65" : "bg-slate-950/50"
@@ -2027,10 +2013,10 @@ export default function AlaqeeqStudioPublicPage() {
               {activeStory.imageUrl && (
                 <motion.div
                   key={`ambilight-${activeStory.id}`}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 0.35, scale: 1.25 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.35 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
                   className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center blur-3xl overflow-hidden"
                 >
                   <img
@@ -2043,10 +2029,10 @@ export default function AlaqeeqStudioPublicPage() {
 
               {/* Top Bar Floating Dismiss Pill */}
               <motion.div
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25, delay: 0.08 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
                 className="absolute top-4 left-4 sm:left-7 z-40 flex items-center gap-2"
               >
                 <button
@@ -2055,7 +2041,7 @@ export default function AlaqeeqStudioPublicPage() {
                     e.stopPropagation();
                     setActiveStoryIndex(null);
                   }}
-                  className="grid h-10 w-10 place-items-center rounded-full bg-black/60 border border-white/25 text-white transition hover:bg-[#de191e] hover:border-[#de191e] hover:scale-105 shadow-2xl backdrop-blur-md"
+                  className="grid h-10 w-10 place-items-center rounded-full bg-black/60 border border-white/25 text-white transition-colors duration-150 hover:bg-[#de191e] hover:border-[#de191e] shadow-2xl backdrop-blur-md"
                   title="إغلاق (ESC)"
                 >
                   <X size={20} />
@@ -2074,16 +2060,16 @@ export default function AlaqeeqStudioPublicPage() {
                 {prevStory ? (
                   <motion.div
                     key={`prev-story-${prevStory.id}`}
-                    initial={{ opacity: 0, x: 35, scale: 0.8 }}
-                    animate={{ opacity: 0.45, x: 0, scale: 0.88 }}
-                    exit={{ opacity: 0, x: 35, scale: 0.8 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.45 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveStoryIndex(activeStoryIndex - 1);
                       setStoryProgress(0);
                     }}
-                    className="group/prev relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-all duration-300 cursor-pointer backdrop-blur-md shrink-0 hover:opacity-85 hover:scale-[0.94] select-none"
+                    className="group/prev relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-opacity duration-200 cursor-pointer backdrop-blur-md shrink-0 hover:opacity-80 select-none"
                     style={{
                       transform: "perspective(1200px) rotateY(-8deg) scale(0.88)",
                     }}
@@ -2117,19 +2103,19 @@ export default function AlaqeeqStudioPublicPage() {
                   <div className="hidden lg:block w-[200px] xl:w-[230px] shrink-0" />
                 )}
 
-                {/* Center Main Active Story Card (With Spring Zoom Physics) */}
+                {/* Center Main Active Story Card (Pure Silky Fade - Zero Jumps, Zero Springs) */}
                 <motion.div
                   key={`active-story-card-${activeStory.id}`}
-                  initial={{ opacity: 0, scale: 0.88, y: 18 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 12 }}
-                  transition={{ type: "spring", damping: 27, stiffness: 330, mass: 0.85 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                   onClick={(e) => e.stopPropagation()}
                   onMouseEnter={() => setIsStoryPaused(true)}
                   onMouseLeave={() => setIsStoryPaused(false)}
                   onTouchStart={() => setIsStoryPaused(true)}
                   onTouchEnd={() => setIsStoryPaused(false)}
-                  className={`relative h-[86vh] max-h-[760px] w-full max-w-[420px] sm:max-w-[440px] overflow-hidden rounded-[2.2rem] border bg-black shadow-[0_25px_80px_rgba(0,0,0,0.85)] shrink-0 transition-shadow duration-300 ${
+                  className={`relative h-[86vh] max-h-[760px] w-full max-w-[420px] sm:max-w-[440px] overflow-hidden rounded-[2.2rem] border bg-black shadow-[0_25px_80px_rgba(0,0,0,0.85)] shrink-0 ${
                     dark
                       ? "border-[#f8ca14]/30 shadow-[0_0_60px_rgba(248,202,20,0.18)]"
                       : "border-white/45 shadow-[0_30px_90px_rgba(0,0,0,0.6)]"
@@ -2330,16 +2316,16 @@ export default function AlaqeeqStudioPublicPage() {
                 {nextStory ? (
                   <motion.div
                     key={`next-story-${nextStory.id}`}
-                    initial={{ opacity: 0, x: -35, scale: 0.8 }}
-                    animate={{ opacity: 0.45, x: 0, scale: 0.88 }}
-                    exit={{ opacity: 0, x: -35, scale: 0.8 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.45 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveStoryIndex(activeStoryIndex + 1);
                       setStoryProgress(0);
                     }}
-                    className="group/next relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-all duration-300 cursor-pointer backdrop-blur-md shrink-0 hover:opacity-85 hover:scale-[0.94] select-none"
+                    className="group/next relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-opacity duration-200 cursor-pointer backdrop-blur-md shrink-0 hover:opacity-80 select-none"
                     style={{
                       transform: "perspective(1200px) rotateY(8deg) scale(0.88)",
                     }}
@@ -2383,7 +2369,7 @@ export default function AlaqeeqStudioPublicPage() {
                     setActiveStoryIndex(activeStoryIndex - 1);
                     setStoryProgress(0);
                   }}
-                  className="hidden sm:grid absolute right-3 md:right-5 lg:right-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:scale-110 hover:border-[#f8ca14] transition-all duration-200 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
+                  className="hidden sm:grid absolute right-3 md:right-5 lg:right-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14] transition-colors duration-150 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
                   title="القصة السابقة"
                 >
                   <ChevronRight size={26} />
@@ -2397,7 +2383,7 @@ export default function AlaqeeqStudioPublicPage() {
                     setActiveStoryIndex(activeStoryIndex + 1);
                     setStoryProgress(0);
                   }}
-                  className="hidden sm:grid absolute left-3 md:left-5 lg:left-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:scale-110 hover:border-[#f8ca14] transition-all duration-200 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
+                  className="hidden sm:grid absolute left-3 md:left-5 lg:left-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14] transition-colors duration-150 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
                   title="القصة التالية"
                 >
                   <ChevronLeft size={26} />
