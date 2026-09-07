@@ -10,6 +10,8 @@ export function getAqeeqThemeLogoFilter(theme: AqeeqStudioTheme) {
 
 export function getAqeeqStudioTheme(): AqeeqStudioTheme {
   if (typeof window === "undefined") return "dark";
+  const urlParam = new URLSearchParams(window.location.search).get("theme");
+  if (urlParam === "light" || urlParam === "dark") return urlParam;
   return window.localStorage.getItem(storageKey) === "light" ? "light" : "dark";
 }
 

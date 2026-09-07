@@ -138,31 +138,26 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     return {
       home: {
         type: "home",
-        title: (orchestration as any)?.heroCovers?.homeCustomTitle || "بوابة مدارس العقيق الذكية",
-        subtitle: (orchestration as any)?.heroCovers?.homeCustomTag || (orchestration?.themeMode?.customBadgeText
+        title: "بوابة مدارس العقيق الذكية",
+        subtitle: orchestration?.themeMode?.customBadgeText
           ? `صرح المدينة المنورة · ${orchestration.themeMode.customBadgeText}`
-          : "الصرح التعليمي والافتراضي المتكامل"),
+          : "الصرح التعليمي والافتراضي المتكامل",
         badge: "✦ البوابة الرقمية الموحدة",
-        description: (orchestration as any)?.heroCovers?.homeCustomDesc || "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
-        image: directDriveImage((orchestration as any)?.heroCovers?.homeCustomImage) ||
-          (orchestration as any)?.heroCovers?.homeCustomImage ||
-          "/covers/cover-about.jpg",
+        description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
+        image: dark ? "/previews/home_dark.webp" : "/previews/home_light.webp",
         routePath: "alaqeeq.edu.sa/",
         stats: "30+ عاماً من التميز · المدينة",
         glowColor: "rgba(248, 202, 20, 0.28)",
       },
       about: {
         type: "about",
-        title: (orchestration as any)?.heroCovers?.aboutCustomTitle || "مجمعات ومسارات العقيق",
-        subtitle: (orchestration as any)?.heroCovers?.aboutCustomTag || "الرؤية والرسالة والبيئة النموذجية",
+        title: "مجمعات ومسارات العقيق",
+        subtitle: "الرؤية والرسالة والبيئة النموذجية",
         badge: "✦ صروح ومجمعات العقيق",
-        description: (orchestration as any)?.heroCovers?.aboutCustomDesc || (orchestration?.schoolCampuses?.boysAddress
+        description: orchestration?.schoolCampuses?.boysAddress
           ? `مجمع الرانوناء ومجمع البنات — ${orchestration.schoolCampuses.boysAddress}`
-          : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد."),
-        image: directDriveImage((orchestration as any)?.heroCovers?.aboutCustomImage) ||
-          (orchestration as any)?.heroCovers?.aboutCustomImage ||
-          (orchestration as any)?.backdrops?.about?.[0]?.image ||
-          "/covers/cover-about.jpg",
+          : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
+        image: dark ? "/previews/about_dark.webp" : "/previews/about_light.webp",
         routePath: "alaqeeq.edu.sa/about",
         stats: "بنين وبنات · مرافق متكاملة",
         glowColor: "rgba(16, 185, 129, 0.28)",
@@ -173,7 +168,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
         badge: "✦ الاعتمادات الأكاديمية الدولية",
         description: "اعتماد كوجنيا الأمريكي Cognia، المقر الرسمي لاختبارات SAT و ACT واختبارات IELTS الدولية المعتمدة.",
-        image: "/covers/cover-accreditations.jpg",
+        image: dark ? "/previews/accreditations_dark.webp" : "/previews/accreditations_light.webp",
         routePath: "alaqeeq.edu.sa/accreditations",
         stats: "Cognia USA · SAT / IELTS",
         glowColor: "rgba(8, 70, 125, 0.38)",
@@ -191,7 +186,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.admissionsSettings?.closedNoticeText && !orchestration.admissionsSettings.isOpen
             ? orchestration.admissionsSettings.closedNoticeText
             : "حاسبة الأقساط الذكية مع خصومات الأشقاء، وخيارات التقسيط الميسر عبر تابي وتمارا بدون فوائد.",
-        image: "/covers/student-lab-admissions.jpg",
+        image: dark ? "/previews/admissions_dark.webp" : "/previews/admissions_light.webp",
         routePath: "alaqeeq.edu.sa/admissions",
         stats: orchestration?.admissionsSettings?.siblingDiscountSecond
           ? `خصم ${orchestration.admissionsSettings.siblingDiscountSecond}% · 4 دفعات`
@@ -207,8 +202,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.journalCustomDesc ||
           activeIssue?.description ||
           "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
-        image: journalPhoto,
-        secondaryImage: secondJournalPhoto,
+        image: dark ? "/previews/journal_dark.webp" : "/previews/journal_light.webp",
         routePath: "alaqeeq.edu.sa/journal",
         stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
         glowColor: "rgba(244, 63, 94, 0.28)",
@@ -224,8 +218,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.albumsCustomDesc ||
           activeAlbum?.description ||
           "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
-        image: albumPhoto,
-        secondaryImage: secondAlbumPhoto,
+        image: dark ? "/previews/albums_dark.webp" : "/previews/albums_light.webp",
         routePath: "alaqeeq.edu.sa/albums",
         stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
         glowColor: "rgba(139, 92, 246, 0.28)",
@@ -241,7 +234,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.podcastsCustomDesc ||
           activePodcast?.description ||
           "استمع لحلقات البودكاست التربوية، لقاءات الطلاب، والإذاعة الصباحية مع مشغل صوتي عائم متطور.",
-        image: podcastPhoto,
+        image: dark ? "/previews/podcast_dark.webp" : "/previews/podcast_light.webp",
         routePath: "alaqeeq.edu.sa/podcast",
         stats: activePodcast?.duration ? `${activePodcast.duration} د · استوديو حي` : "بث صوتي ومرئي · أثير",
         glowColor: "rgba(168, 85, 247, 0.28)",
@@ -257,7 +250,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.articlesCustomDesc ||
           activeArticle?.excerpt ||
           "مقالات حول الذكاء الاصطناعي في التعليم، مهارات المستقبل، وأبحاث متميزة بقلم نخبة المعلمين والطلاب.",
-        image: articlePhoto,
+        image: dark ? "/previews/articles_dark.webp" : "/previews/articles_light.webp",
         routePath: "alaqeeq.edu.sa/articles",
         stats: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName}` : "قراءات ملهمة · أبحاث",
         glowColor: "rgba(6, 182, 212, 0.28)",
@@ -270,13 +263,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         description:
           orchestration?.heroCovers?.showcaseCustomDesc ||
           "أحدث الفعاليات اليومية، فيديوهات المعارض المدرسية، والإعلانات الرسمية الصادرة من الإدارة العامة.",
-        image: showcasePhoto,
+        image: dark ? "/previews/showcase_dark.webp" : "/previews/showcase_light.webp",
         routePath: "alaqeeq.edu.sa/showcase",
         stats: showcase?.postCount ? `${showcase.postCount} منشور إعلامي · مباشر` : "تحديثات وتغطيات يومية",
         glowColor: "rgba(234, 88, 12, 0.28)",
       },
     };
-  }, [orchestration, issues, albums, podcasts, articles, showcases]);
+  }, [orchestration, issues, albums, podcasts, articles, showcases, dark]);
 
   const handleMouseEnterItem = (key: string) => {
     if (timeoutRef.current) {
@@ -444,82 +437,15 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       </div>
                     </div>
 
-                    {/* ── Live Hero Snapshot Visual Component (Authentic In-App Look with Newest Uploaded Content) ── */}
+                    {/* ── Live Hero Snapshot Visual Component (Authentic In-App Screenshot of the Page) ── */}
                     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-                      {/* 1. Journal & Albums Dual Tilted 3D Covers */}
-                      {preview.type === "journal" || preview.type === "albums" ? (
-                        <div className="relative w-full h-full bg-gradient-to-br from-[#12081f] via-[#0b0514] to-black p-2 flex items-center justify-center overflow-hidden">
-                          <div
-                            className="absolute inset-0 transition-opacity duration-500 opacity-25"
-                            style={{
-                              background: `radial-gradient(circle at center, ${preview.glowColor}, transparent 70%)`
-                            }}
-                          />
-                          
-                          {/* Second issue/album rotated card behind */}
-                          {preview.secondaryImage && (
-                            <div
-                              className="absolute h-[85%] w-[48%] rounded-xl overflow-hidden border border-white/15 shadow-xl opacity-60 right-[10%] top-[8%]"
-                              style={{ transform: "rotate(-8deg)" }}
-                            >
-                              <img src={preview.secondaryImage} alt="" className="w-full h-full object-cover" />
-                            </div>
-                          )}
-
-                          {/* Featured newest issue/album tilted front card */}
-                          <div
-                            className="relative z-10 h-[92%] w-[56%] rounded-xl overflow-hidden border border-[#f8ca14]/60 shadow-[0_12px_30px_rgba(0,0,0,0.8)] transition-transform duration-500 group-hover:scale-105"
-                            style={{ transform: "rotate(3deg)" }}
-                          >
-                            <img src={preview.image} alt={preview.title} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                            <div className="absolute bottom-1.5 inset-x-1.5 text-right">
-                              <span className="text-[8px] font-bold text-[#f8ca14] block truncate">
-                                {preview.subtitle}
-                              </span>
-                              <h5 className="text-[11px] font-black text-white leading-tight truncate drop-shadow-md">
-                                {preview.title}
-                              </h5>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Standard Hero Cover Viewport with Live Photo & Real-Time Typography */
-                        <div className="relative w-full h-full overflow-hidden">
-                          <img
-                            src={preview.image}
-                            alt={preview.title}
-                            loading="eager"
-                            className="w-full h-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-105"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              const fallback = "/covers/cover-about.jpg";
-                              if (target.src !== fallback) {
-                                target.src = fallback;
-                              }
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
-
-                          {/* Floating Badge on Image */}
-                          <div className="absolute top-2 right-2 z-10 max-w-[85%]">
-                            <span className="rounded-lg bg-black/75 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
-                              <Sparkles size={10} className="text-amber-300 shrink-0" />
-                              <span className="truncate">{preview.badge}</span>
-                            </span>
-                          </div>
-
-                          {/* Title & Subtitle Over Image */}
-                          <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right">
-                            <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate">
-                              {preview.subtitle}
-                            </span>
-                            <h4 className="text-sm font-black text-white drop-shadow-md truncate">
-                              {preview.title}
-                            </h4>
-                          </div>
-                        </div>
-                      )}
+                      <img
+                        src={preview.image}
+                        alt={preview.title}
+                        loading="eager"
+                        className="w-full h-full object-cover object-top select-none transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
                     </div>
 
                     {/* Description */}
