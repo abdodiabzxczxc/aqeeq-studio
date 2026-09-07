@@ -665,7 +665,7 @@ function SocialPostCard({
     if (!rawDesc) return rawTitle;
     if (rawDesc.includes(rawTitle)) return rawDesc;
     if (rawTitle.includes(rawDesc)) return rawTitle;
-    return `${rawTitle} — ${rawDesc}`;
+    return `${rawTitle} ${rawDesc}`;
   })();
 
   const [liked, setLiked] = useState(false);
@@ -1312,7 +1312,7 @@ export default function AqeeqShowcasePage() {
                           if (!d) return t;
                           if (d.includes(t)) return d;
                           if (t.includes(d)) return t;
-                          return `${t} — ${d}`;
+                          return `${t} ${d}`;
                         })()}
                       </p>
                     ) : (
