@@ -291,7 +291,7 @@ function MediaPostCard({
           }}
           data-aqeeq-video="true"
           data-no-visual-edit="true"
-          className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform flex flex-col justify-between ${
+          className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
             dark
               ? "border-[#08467d]/40 bg-gradient-to-b from-[#06182e]/90 via-[#030d19]/90 to-[#02070e] text-white shadow-[0_16px_45px_rgba(8,70,125,0.25)] hover:border-[#f8ca14] hover:shadow-[0_22px_65px_rgba(248,202,20,0.25)]"
               : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
@@ -347,7 +347,7 @@ function MediaPostCard({
           </div>
 
           {/* Title & Description */}
-          <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+          <div className="p-2 pt-3.5">
             <VisualEditable
               id={`showcase-card-title-${post.id}`}
               tag="text"
@@ -421,7 +421,7 @@ function MediaPostCard({
           transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
         }}
-        className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform flex flex-col justify-between ${
+        className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
           dark
             ? "border-amber-500/35 bg-gradient-to-b from-[#181300]/90 via-[#0e0c04]/90 to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_22px_65px_rgba(245,158,11,0.3)]"
             : "border-amber-300/80 bg-gradient-to-b from-amber-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
@@ -493,7 +493,7 @@ function MediaPostCard({
         </div>
 
         {/* Title & Description */}
-        <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+        <div className="p-2 pt-3.5">
           <VisualEditable
             id={`showcase-card-title-${post.id}`}
             tag="text"
@@ -641,7 +641,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
       }}
-      className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform flex flex-col justify-between ${
+      className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
         dark
           ? "border-[#08467d]/35 bg-gradient-to-b from-[#051120]/90 via-[#030b14]/90 to-[#010408] text-white shadow-[0_16px_45px_rgba(8,70,125,0.2)] hover:border-[#f8ca14] hover:shadow-[0_22px_60px_rgba(248,202,20,0.25)]"
           : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
@@ -683,7 +683,7 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
       </div>
 
       {/* Title & Description */}
-      <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+      <div className="p-2 pt-3.5">
         <VisualEditable
           id={`showcase-social-title-${post.id}`}
           tag="text"
@@ -1082,7 +1082,7 @@ export default function AqeeqShowcasePage() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
           >
             {visiblePosts.map((post) =>
               isSocialPost(post) ? (
