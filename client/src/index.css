@@ -2098,6 +2098,24 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   }
 }
 
+@keyframes marquee-slide-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-slide-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
 .animate-marquee-rtl {
   display: flex;
   width: max-content;
