@@ -411,6 +411,7 @@ export default function AlaqeeqStudioPublicPage() {
   // Interactive States for New Showcased Sections
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const [storyProgress, setStoryProgress] = useState(0);
+  const [isStoryPaused, setIsStoryPaused] = useState(false);
   const [likesCount, setLikesCount] = useState(482);
   const [hasLiked, setHasLiked] = useState(false);
   const [isPlayingQuoteAudio, setIsPlayingQuoteAudio] = useState(false);
@@ -646,13 +647,14 @@ export default function AlaqeeqStudioPublicPage() {
     return items;
   }, [activeShowcasePosts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
 
-  // Story Auto-Advance Timer
+  // Story Auto-Advance Timer (with pause on hover/hold)
   useEffect(() => {
     if (activeStoryIndex === null) {
       setStoryProgress(0);
       return;
     }
-    setStoryProgress(0);
+    if (isStoryPaused) return;
+
     const interval = setInterval(() => {
       setStoryProgress((prev) => {
         if (prev >= 100) {
@@ -668,6 +670,28 @@ export default function AlaqeeqStudioPublicPage() {
       });
     }, 100);
     return () => clearInterval(interval);
+  }, [activeStoryIndex, storiesList.length, isStoryPaused]);
+
+  // Keyboard navigation for Stories (ESC to close, Arrow keys to navigate)
+  useEffect(() => {
+    if (activeStoryIndex === null) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveStoryIndex(null);
+      } else if (e.key === "ArrowRight") {
+        if (activeStoryIndex > 0) {
+          setActiveStoryIndex(activeStoryIndex - 1);
+          setStoryProgress(0);
+        }
+      } else if (e.key === "ArrowLeft") {
+        if (activeStoryIndex < storiesList.length - 1) {
+          setActiveStoryIndex(activeStoryIndex + 1);
+          setStoryProgress(0);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [activeStoryIndex, storiesList.length]);
 
   const toggleLike = () => {
@@ -1978,189 +2002,374 @@ export default function AlaqeeqStudioPublicPage() {
 
 
 
-      {/* Story Viewer Modal */}
-      {activeStoryIndex !== null && storiesList[activeStoryIndex] ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl">
-          <div className="relative h-[85vh] max-h-[750px] w-full max-w-[420px] overflow-hidden rounded-3xl border border-white/20 bg-black shadow-2xl">
-            {/* Progress Bars */}
-            <div className="absolute top-3 inset-x-3 z-20 flex gap-1.5">
-              {storiesList.map((_, i) => (
-                <div key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
-                  <div
-                    className="h-full bg-white transition-all duration-100"
-                    style={{
-                      width:
-                        i < activeStoryIndex
-                          ? "100%"
-                          : i === activeStoryIndex
-                          ? storyProgress + "%"
-                          : "0%",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+      {/* Story Viewer Modal — 3D Ambilight Carousel (z-[300] above header with click-outside dismiss) */}
+      {activeStoryIndex !== null && storiesList[activeStoryIndex] ? (() => {
+        const activeStory = storiesList[activeStoryIndex];
+        const prevStory = activeStoryIndex > 0 ? storiesList[activeStoryIndex - 1] : null;
+        const nextStory = activeStoryIndex < storiesList.length - 1 ? storiesList[activeStoryIndex + 1] : null;
 
-            {/* Header info */}
-            <div className="absolute top-6 inset-x-4 z-20 flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 overflow-hidden rounded-full border border-white/30 bg-black flex items-center justify-center">
-                  {storiesList[activeStoryIndex].imageUrl ? (
-                    <img src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
-                  ) : storiesList[activeStoryIndex].sourceType === "instagram" ? (
-                    <Instagram size={16} className="text-[#f8ca14]" />
-                  ) : storiesList[activeStoryIndex].sourceType === "x" ? (
-                    <span className="text-xs font-black">𝕏</span>
-                  ) : storiesList[activeStoryIndex].sourceType === "article" ? (
-                    <Newspaper size={16} className="text-[#de191e]" />
-                  ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
-                    <Mic size={16} className="text-[#f8ca14]" />
-                  ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
-                    <Video size={16} className="text-[#08467d]" />
-                  ) : storiesList[activeStoryIndex].sourceType === "journal" ? (
-                    <BookOpen size={16} className="text-[#f8ca14]" />
-                  ) : storiesList[activeStoryIndex].sourceType === "album" ? (
-                    <Camera size={16} className="text-[#367453]" />
-                  ) : (
-                    <span className="text-[10px] font-black">العقيق</span>
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-xs font-black">{storiesList[activeStoryIndex].category}</p>
-                    {storiesList[activeStoryIndex].isPinned && (
-                      <span className="rounded bg-[#f8ca14] px-1 py-0.2 text-[8px] font-black text-black">مميز</span>
-                    )}
-                  </div>
-                  <p className="text-[10px] text-white/70">{storiesList[activeStoryIndex].time}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveStoryIndex(null)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/80"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Rich Story Content Display */}
-            <div className="relative h-full w-full flex items-center justify-center bg-black">
-              {storiesList[activeStoryIndex].imageUrl ? (
+        return (
+          <div
+            onClick={() => setActiveStoryIndex(null)}
+            className={`fixed inset-0 z-[300] flex items-center justify-center p-3 sm:p-5 md:p-8 select-none transition-colors duration-500 overflow-hidden ${
+              dark ? "bg-black/65" : "bg-slate-950/50"
+            } backdrop-blur-2xl`}
+          >
+            {/* Subtle Ambient Ambilight Glow (Takes colors of current story) */}
+            {activeStory.imageUrl && (
+              <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-30 dark:opacity-40 blur-3xl scale-125 overflow-hidden transition-all duration-700">
                 <img
-                  src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""}
-                  alt={storiesList[activeStoryIndex].title}
+                  src={directDriveImage(activeStory.imageUrl) || activeStory.imageUrl}
+                  alt=""
                   className="h-full w-full object-cover"
                 />
-              ) : storiesList[activeStoryIndex].sourceType === "x" ? (
-                <div className="w-full px-4 pt-16 pb-28">
-                  <XEmbed url={storiesList[activeStoryIndex].targetUrl} title={storiesList[activeStoryIndex].title} dark={true} />
-                </div>
-              ) : storiesList[activeStoryIndex].sourceType === "instagram" ? (
-                <div className="w-full h-full pt-16 pb-24 overflow-hidden">
-                  <FastInstagramEmbed url={storiesList[activeStoryIndex].targetUrl} title={storiesList[activeStoryIndex].title} />
-                </div>
-              ) : storiesList[activeStoryIndex].sourceType === "youtube" && storiesList[activeStoryIndex].youtubeId ? (
-                <div className="w-full aspect-video overflow-hidden rounded-2xl">
-                  <AqeeqUnifiedVideoFrame
-                    sourceUrl={"https://www.youtube.com/watch?v=" + storiesList[activeStoryIndex].youtubeId}
-                    title={storiesList[activeStoryIndex].title}
-                  />
-                </div>
-              ) : storiesList[activeStoryIndex].videoUrl ? (
-                <div className="w-full aspect-video overflow-hidden rounded-2xl">
-                  <AqeeqUnifiedVideoFrame
-                    sourceUrl={storiesList[activeStoryIndex].videoUrl!}
-                    title={storiesList[activeStoryIndex].title}
-                    posterUrl={storiesList[activeStoryIndex].imageUrl}
-                  />
-                </div>
-              ) : storiesList[activeStoryIndex].sourceType === "article" ? (
-                <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#de191e]/20 border border-[#de191e]/30 flex items-center justify-center text-[#de191e] shadow-[0_0_30px_rgba(222,25,30,0.3)]">
-                    <Newspaper size={40} />
-                  </div>
-                  <span className="inline-block rounded-full bg-[#de191e]/20 px-3 py-1 text-xs font-black text-[#de191e]">مقال أدبي جديد</span>
-                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
-                </div>
-              ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
-                <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#f8ca14]/20 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-[0_0_30px_rgba(248,202,20,0.3)] animate-pulse">
-                    <Mic size={40} />
-                  </div>
-                  <span className="inline-block rounded-full bg-[#f8ca14]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">أثير العقيق 🎙️</span>
-                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
-                </div>
-              ) : storiesList[activeStoryIndex].sourceType === "showcase" ? (
-                <div className="p-8 text-center text-white space-y-4">
-                  <div className="mx-auto h-20 w-20 rounded-3xl bg-[#08467d]/20 border border-[#08467d]/30 flex items-center justify-center text-[#08467d] shadow-[0_0_30px_rgba(8,70,125,0.3)]">
-                    <Video size={40} />
-                  </div>
-                  <span className="inline-block rounded-full bg-[#08467d]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">عرض مرئي وتغطية</span>
-                  <p className="text-lg font-black leading-snug">{storiesList[activeStoryIndex].title}</p>
-                </div>
-              ) : (
-                <div className="p-8 text-center text-white">
-                  <span className="text-3xl font-black">العقيق</span>
-                  <p className="mt-4 text-base font-bold">{storiesList[activeStoryIndex].title}</p>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/50 pointer-events-none" />
-            </div>
+              </div>
+            )}
 
-            {/* Title / Caption & Direct Navigation Button */}
-            <div className="absolute bottom-6 inset-x-5 z-20 text-white text-right">
-              <span className="rounded bg-[#f8ca14] px-2 py-0.5 text-[10px] font-black text-black">
-                {storiesList[activeStoryIndex].category}
-              </span>
-              <h3 className="mt-2 text-base font-black leading-snug">
-                {storiesList[activeStoryIndex].title}
-              </h3>
+            {/* Top Bar Floating Dismiss Pill */}
+            <div className="absolute top-4 left-4 sm:left-7 z-40 flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  const target = storiesList[activeStoryIndex].targetUrl;
+                onClick={(e) => {
+                  e.stopPropagation();
                   setActiveStoryIndex(null);
-                  if (/^https?:\/\//i.test(target)) {
-                    window.open(target, "_blank", "noopener,noreferrer");
-                  } else {
-                    navigate(target);
-                  }
                 }}
-                className={"mt-4 w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition active:scale-95 shadow-xl " + (
-                  dark
-                    ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.4)]"
-                    : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.3)]"
-                )}
+                className="grid h-10 w-10 place-items-center rounded-full bg-black/60 border border-white/25 text-white transition hover:bg-[#de191e] hover:border-[#de191e] hover:scale-105 shadow-2xl backdrop-blur-md"
+                title="إغلاق (ESC)"
               >
-                <span>{storiesList[activeStoryIndex].buttonLabel}</span>
-                <ArrowUpLeft size={16} />
+                <X size={20} />
               </button>
+              <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-white/70 bg-black/50 border border-white/15 px-3 py-1.5 rounded-full backdrop-blur-md">
+                <span>اضغط بالخارج أو</span>
+                <kbd className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-mono text-white">ESC</kbd>
+                <span>للإغلاق</span>
+              </div>
             </div>
 
-            {/* Navigation Overlay Buttons */}
-            <button
-              type="button"
-              onClick={() => {
-                if (activeStoryIndex > 0) setActiveStoryIndex(activeStoryIndex - 1);
-              }}
-              className="absolute inset-y-0 right-0 w-1/3 z-10 opacity-0 hover:opacity-10 flex items-center justify-end pr-2 text-white"
-            >
-              <ChevronRight size={30} />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (activeStoryIndex < storiesList.length - 1) setActiveStoryIndex(activeStoryIndex + 1);
-                else setActiveStoryIndex(null);
-              }}
-              className="absolute inset-y-0 left-0 w-1/3 z-10 opacity-0 hover:opacity-10 flex items-center justify-start pl-2 text-white"
-            >
-              <ChevronLeft size={30} />
-            </button>
+            {/* 3D Story Carousel Stage */}
+            <div className="relative flex items-center justify-center gap-5 lg:gap-8 w-full max-w-6xl h-full max-h-[88vh]">
+
+              {/* Previous Story Card (Desktop 3D Preview on the Right) */}
+              {prevStory ? (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveStoryIndex(activeStoryIndex - 1);
+                    setStoryProgress(0);
+                  }}
+                  className="group/prev relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-all duration-300 cursor-pointer backdrop-blur-md shrink-0 opacity-45 hover:opacity-85 hover:scale-[0.94] select-none"
+                  style={{
+                    transform: "perspective(1200px) rotateY(-8deg) scale(0.88)",
+                  }}
+                  title={`القصة السابقة: ${prevStory.title}`}
+                >
+                  {prevStory.imageUrl ? (
+                    <img
+                      src={directDriveImage(prevStory.imageUrl) || prevStory.imageUrl}
+                      alt={prevStory.title}
+                      className="absolute inset-0 h-full w-full object-cover brightness-[0.6] group-hover/prev:brightness-95 transition duration-500"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#181818] to-black">
+                      <span className="text-3xl font-black text-white/30">العقيق</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60" />
+                  <div className="relative z-10 p-3.5 w-full flex items-center justify-between text-xs text-white/80">
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold backdrop-blur-md">{prevStory.category}</span>
+                    <span className="text-[10px] opacity-70">{prevStory.time}</span>
+                  </div>
+                  <div className="relative z-10 p-4 w-full text-right">
+                    <p className="text-xs font-black line-clamp-2 text-white leading-snug">{prevStory.title}</p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#f8ca14]">
+                      <span>السابق</span>
+                      <ChevronRight size={14} />
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="hidden lg:block w-[200px] xl:w-[230px] shrink-0" />
+              )}
+
+              {/* Center Main Active Story Card */}
+              <div
+                onClick={(e) => e.stopPropagation()}
+                onMouseEnter={() => setIsStoryPaused(true)}
+                onMouseLeave={() => setIsStoryPaused(false)}
+                onTouchStart={() => setIsStoryPaused(true)}
+                onTouchEnd={() => setIsStoryPaused(false)}
+                className={`relative h-[86vh] max-h-[760px] w-full max-w-[420px] sm:max-w-[440px] overflow-hidden rounded-[2.2rem] border bg-black shadow-[0_25px_80px_rgba(0,0,0,0.85)] shrink-0 transition-all duration-300 ${
+                  dark
+                    ? "border-[#f8ca14]/30 shadow-[0_0_60px_rgba(248,202,20,0.18)]"
+                    : "border-white/45 shadow-[0_30px_90px_rgba(0,0,0,0.6)]"
+                }`}
+              >
+                {/* Progress Bars */}
+                <div className="absolute top-3.5 inset-x-3.5 z-20 flex gap-1.5">
+                  {storiesList.map((_, i) => (
+                    <div key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
+                      <div
+                        className="h-full bg-white transition-all duration-100"
+                        style={{
+                          width:
+                            i < activeStoryIndex
+                              ? "100%"
+                              : i === activeStoryIndex
+                              ? storyProgress + "%"
+                              : "0%",
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pause status indicator pill */}
+                {isStoryPaused && (
+                  <span className="absolute top-8 left-1/2 -translate-x-1/2 z-20 rounded-full bg-black/60 border border-white/20 px-2.5 py-0.5 text-[9px] font-bold text-[#f8ca14] backdrop-blur-md animate-pulse">
+                    موقوف مؤقتاً
+                  </span>
+                )}
+
+                {/* Header Info */}
+                <div className="absolute top-6 inset-x-4 z-20 flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 overflow-hidden rounded-full border border-white/30 bg-black flex items-center justify-center shadow-md">
+                      {activeStory.imageUrl ? (
+                        <img src={directDriveImage(activeStory.imageUrl) || activeStory.imageUrl || ""} alt="" className="h-full w-full object-cover" />
+                      ) : activeStory.sourceType === "instagram" ? (
+                        <Instagram size={16} className="text-[#f8ca14]" />
+                      ) : activeStory.sourceType === "x" ? (
+                        <span className="text-xs font-black">𝕏</span>
+                      ) : activeStory.sourceType === "article" ? (
+                        <Newspaper size={16} className="text-[#de191e]" />
+                      ) : activeStory.sourceType === "podcast" ? (
+                        <Mic size={16} className="text-[#f8ca14]" />
+                      ) : activeStory.sourceType === "showcase" ? (
+                        <Video size={16} className="text-[#08467d]" />
+                      ) : activeStory.sourceType === "journal" ? (
+                        <BookOpen size={16} className="text-[#f8ca14]" />
+                      ) : activeStory.sourceType === "album" ? (
+                        <Camera size={16} className="text-[#367453]" />
+                      ) : (
+                        <span className="text-[10px] font-black">العقيق</span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-black">{activeStory.category}</p>
+                        {activeStory.isPinned && (
+                          <span className="rounded bg-[#f8ca14] px-1 py-0.2 text-[8px] font-black text-black">مميز</span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-white/70">{activeStory.time}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveStoryIndex(null)}
+                    className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white transition hover:bg-[#de191e] hover:border-[#de191e]"
+                    title="إغلاق"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Rich Story Content Display */}
+                <div className="relative h-full w-full flex items-center justify-center bg-black">
+                  {activeStory.imageUrl ? (
+                    <img
+                      src={directDriveImage(activeStory.imageUrl) || activeStory.imageUrl || ""}
+                      alt={activeStory.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : activeStory.sourceType === "x" ? (
+                    <div className="w-full px-4 pt-16 pb-28">
+                      <XEmbed url={activeStory.targetUrl} title={activeStory.title} dark={true} />
+                    </div>
+                  ) : activeStory.sourceType === "instagram" ? (
+                    <div className="w-full h-full pt-16 pb-24 overflow-hidden">
+                      <FastInstagramEmbed url={activeStory.targetUrl} title={activeStory.title} />
+                    </div>
+                  ) : activeStory.sourceType === "youtube" && activeStory.youtubeId ? (
+                    <div className="w-full aspect-video overflow-hidden rounded-2xl">
+                      <AqeeqUnifiedVideoFrame
+                        sourceUrl={"https://www.youtube.com/watch?v=" + activeStory.youtubeId}
+                        title={activeStory.title}
+                      />
+                    </div>
+                  ) : activeStory.videoUrl ? (
+                    <div className="w-full aspect-video overflow-hidden rounded-2xl">
+                      <AqeeqUnifiedVideoFrame
+                        sourceUrl={activeStory.videoUrl!}
+                        title={activeStory.title}
+                        posterUrl={activeStory.imageUrl}
+                      />
+                    </div>
+                  ) : activeStory.sourceType === "article" ? (
+                    <div className="p-8 text-center text-white space-y-4">
+                      <div className="mx-auto h-20 w-20 rounded-3xl bg-[#de191e]/20 border border-[#de191e]/30 flex items-center justify-center text-[#de191e] shadow-[0_0_30px_rgba(222,25,30,0.3)]">
+                        <Newspaper size={40} />
+                      </div>
+                      <span className="inline-block rounded-full bg-[#de191e]/20 px-3 py-1 text-xs font-black text-[#de191e]">مقال أدبي جديد</span>
+                      <p className="text-lg font-black leading-snug">{activeStory.title}</p>
+                    </div>
+                  ) : activeStory.sourceType === "podcast" ? (
+                    <div className="p-8 text-center text-white space-y-4">
+                      <div className="mx-auto h-20 w-20 rounded-3xl bg-[#f8ca14]/20 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-[0_0_30px_rgba(248,202,20,0.3)] animate-pulse">
+                        <Mic size={40} />
+                      </div>
+                      <span className="inline-block rounded-full bg-[#f8ca14]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">أثير العقيق 🎙️</span>
+                      <p className="text-lg font-black leading-snug">{activeStory.title}</p>
+                    </div>
+                  ) : activeStory.sourceType === "showcase" ? (
+                    <div className="p-8 text-center text-white space-y-4">
+                      <div className="mx-auto h-20 w-20 rounded-3xl bg-[#08467d]/20 border border-[#08467d]/30 flex items-center justify-center text-[#08467d] shadow-[0_0_30px_rgba(8,70,125,0.3)]">
+                        <Video size={40} />
+                      </div>
+                      <span className="inline-block rounded-full bg-[#08467d]/20 px-3 py-1 text-xs font-black text-[#f8ca14]">عرض مرئي وتغطية</span>
+                      <p className="text-lg font-black leading-snug">{activeStory.title}</p>
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-white">
+                      <span className="text-3xl font-black">العقيق</span>
+                      <p className="mt-4 text-base font-bold">{activeStory.title}</p>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/50 pointer-events-none" />
+                </div>
+
+                {/* Title / Caption & Direct Navigation Button */}
+                <div className="absolute bottom-6 inset-x-5 z-20 text-white text-right">
+                  <span className="rounded bg-[#f8ca14] px-2 py-0.5 text-[10px] font-black text-black">
+                    {activeStory.category}
+                  </span>
+                  <h3 className="mt-2 text-base font-black leading-snug">
+                    {activeStory.title}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = activeStory.targetUrl;
+                      setActiveStoryIndex(null);
+                      if (/^https?:\/\//i.test(target)) {
+                        window.open(target, "_blank", "noopener,noreferrer");
+                      } else {
+                        navigate(target);
+                      }
+                    }}
+                    className={"mt-4 w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition active:scale-95 shadow-xl " + (
+                      dark
+                        ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.4)]"
+                        : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.3)]"
+                    )}
+                  >
+                    <span>{activeStory.buttonLabel}</span>
+                    <ArrowUpLeft size={16} />
+                  </button>
+                </div>
+
+                {/* Mobile Tap Areas (Touch navigation left/right) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeStoryIndex > 0) {
+                      setActiveStoryIndex(activeStoryIndex - 1);
+                      setStoryProgress(0);
+                    }
+                  }}
+                  className="absolute inset-y-0 right-0 w-1/3 z-10 opacity-0 flex items-center justify-end pr-2 text-white"
+                  aria-label="القصة السابقة"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeStoryIndex < storiesList.length - 1) {
+                      setActiveStoryIndex(activeStoryIndex + 1);
+                      setStoryProgress(0);
+                    } else {
+                      setActiveStoryIndex(null);
+                    }
+                  }}
+                  className="absolute inset-y-0 left-0 w-1/3 z-10 opacity-0 flex items-center justify-start pl-2 text-white"
+                  aria-label="القصة التالية"
+                />
+              </div>
+
+              {/* Next Story Card (Desktop 3D Preview on the Left) */}
+              {nextStory ? (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveStoryIndex(activeStoryIndex + 1);
+                    setStoryProgress(0);
+                  }}
+                  className="group/next relative hidden lg:flex flex-col items-center justify-between w-[200px] xl:w-[230px] h-[66vh] max-h-[560px] rounded-[2rem] border border-white/20 bg-black/50 overflow-hidden shadow-2xl transition-all duration-300 cursor-pointer backdrop-blur-md shrink-0 opacity-45 hover:opacity-85 hover:scale-[0.94] select-none"
+                  style={{
+                    transform: "perspective(1200px) rotateY(8deg) scale(0.88)",
+                  }}
+                  title={`القصة التالية: ${nextStory.title}`}
+                >
+                  {nextStory.imageUrl ? (
+                    <img
+                      src={directDriveImage(nextStory.imageUrl) || nextStory.imageUrl}
+                      alt={nextStory.title}
+                      className="absolute inset-0 h-full w-full object-cover brightness-[0.6] group-hover/next:brightness-95 transition duration-500"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#181818] to-black">
+                      <span className="text-3xl font-black text-white/30">العقيق</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60" />
+                  <div className="relative z-10 p-3.5 w-full flex items-center justify-between text-xs text-white/80">
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold backdrop-blur-md">{nextStory.category}</span>
+                    <span className="text-[10px] opacity-70">{nextStory.time}</span>
+                  </div>
+                  <div className="relative z-10 p-4 w-full text-right">
+                    <p className="text-xs font-black line-clamp-2 text-white leading-snug">{nextStory.title}</p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#f8ca14]">
+                      <ChevronLeft size={14} />
+                      <span>التالي</span>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="hidden lg:block w-[200px] xl:w-[230px] shrink-0" />
+              )}
+            </div>
+
+            {/* Floating Navigation Controls on Desktop */}
+            {activeStoryIndex > 0 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveStoryIndex(activeStoryIndex - 1);
+                  setStoryProgress(0);
+                }}
+                className="hidden sm:grid absolute right-3 md:right-5 lg:right-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:scale-110 hover:border-[#f8ca14] transition-all duration-200 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
+                title="القصة السابقة"
+              >
+                <ChevronRight size={26} />
+              </button>
+            )}
+            {activeStoryIndex < storiesList.length - 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveStoryIndex(activeStoryIndex + 1);
+                  setStoryProgress(0);
+                }}
+                className="hidden sm:grid absolute left-3 md:left-5 lg:left-8 top-1/2 -translate-y-1/2 h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/70 text-white hover:bg-[#f8ca14] hover:text-black hover:scale-110 hover:border-[#f8ca14] transition-all duration-200 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 p-2.5"
+                title="القصة التالية"
+              >
+                <ChevronLeft size={26} />
+              </button>
+            )}
           </div>
-        </div>
-      ) : null}
+        );
+      })() : null}
 
       {/* Wellington-style Interactive Cursor Hover Preview */}
       <AqeeqCursorHoverPreview />
