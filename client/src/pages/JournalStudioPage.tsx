@@ -15,14 +15,13 @@ import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
-  ArrowDown,
-  ArrowUp,
   BookOpen,
   CheckCircle2,
   CloudDownload,
   Edit3,
   FilePlus2,
   FileText,
+  GripVertical,
   ImageIcon,
   ImagePlus,
   Loader2,
@@ -35,6 +34,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { Reorder } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -272,13 +272,27 @@ export default function JournalStudioPage() {
     window.open("/journal/" + issue.slug, "_blank", "noopener");
   };
 
-  const movePage = (index: number, direction: -1 | 1) => {
+  const [pagesList, setPagesList] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (issue?.pages) {
+      setPagesList(issue.pages);
+    }
+  }, [issue?.pages]);
+
+  const handleReorderPages = (newPages: any[]) => {
+    setPagesList(newPages);
     if (!issue) return;
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= issue.pages.length) return;
-    const ids = issue.pages.map((p) => p.id);
-    [ids[index], ids[targetIndex]] = [ids[targetIndex], ids[index]];
+    const ids = newPages.map((p) => p.id);
     reorder.mutate({ issueId: issue.id, pageIds: ids });
+  };
+
+  const jumpPageToPosition = (fromIndex: number, targetIndex: number) => {
+    if (targetIndex < 0 || targetIndex >= pagesList.length || fromIndex === targetIndex) return;
+    const updated = [...pagesList];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+    handleReorderPages(updated);
   };
 
   if (authLoading || isLoading) {
@@ -659,110 +673,149 @@ export default function JournalStudioPage() {
               </Button>
             </div>
 
-            <div className="mt-6 space-y-3">
-              {issue.pages.length ? (
-                issue.pages.map((page, index) => (
-                  <article
-                    key={page.id}
-                    className={"group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[120px_1fr_auto] transition " + (
-                      dark ? "border-white/[0.08] bg-[#111111] text-white" : "border-black/[0.08] bg-slate-50 text-black"
-                    )}
-                  >
-                    <div className="relative aspect-[1/1.4] overflow-hidden rounded-xl bg-slate-900 border border-white/10">
-                      <img src={page.imageUrl} alt={page.caption || ""} className="h-full w-full object-cover" />
-                      {index === 0 ? (
-                        <span className="absolute bottom-1 right-1 rounded bg-[#f8ca14] px-1.5 py-0.5 text-[8px] font-black text-black">
-                          الغلاف
-                        </span>
-                      ) : null}
-                    </div>
+            {/* Helpful Drag & Drop Hint */}
+            {pagesList.length > 1 && (
+              <div className={`mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl p-3 text-xs font-bold border transition ${
+                dark ? "border-amber-400/20 bg-amber-400/5 text-amber-300" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <GripVertical size={16} className="opacity-75 shrink-0" />
+                  <span>💡 <strong>سحب وإفلات تفاعلي:</strong> اسحب أي كارت للأعلى أو للأسفل لإعادة الترتيب بسلاسة، أو اضغط على شارة الرقم (#) لنقلها فوراً.</span>
+                </div>
+                {reorder.isPending && (
+                  <span className="flex items-center gap-1.5 text-[10px] text-amber-400 animate-pulse font-black shrink-0">
+                    <Loader2 size={12} className="animate-spin" />
+                    جارِ حفظ الترتيب...
+                  </span>
+                )}
+              </div>
+            )}
 
-                    <div className="min-w-0 py-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={"rounded-full border px-2 py-0.5 text-[9px] font-black " + (
-                          index === 0
-                            ? (dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]")
-                            : (dark ? "border-white/15 bg-white/5 text-slate-300" : "border-black/10 bg-white text-slate-700")
-                        )}>
-                          {index === 0 ? "غلاف العدد الرئيسي" : "صفحة رقم " + (index + 1)}
-                        </span>
+            <div className="mt-6">
+              {pagesList.length ? (
+                <Reorder.Group axis="y" values={pagesList} onReorder={handleReorderPages} className="space-y-3">
+                  {pagesList.map((page, index) => (
+                    <Reorder.Item
+                      key={page.id}
+                      value={page}
+                      whileDrag={{
+                        scale: 1.02,
+                        zIndex: 40,
+                        boxShadow: "0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4)",
+                      }}
+                      className={"group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[auto_120px_1fr_auto] items-center transition select-none " + (
+                        dark ? "border-white/[0.08] bg-[#111111] text-white hover:border-[#f8ca14]/40" : "border-black/[0.08] bg-slate-50 text-black hover:border-[#08467d]/40"
+                      )}
+                    >
+                      {/* Drag Handle & Position Jump Badge */}
+                      <div className="flex sm:flex-col items-center gap-1.5 justify-center">
+                        <div
+                          className="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-400 hover:bg-white/10 transition cursor-grab active:cursor-grabbing"
+                          title="اضغط واسحب لإعادة الترتيب"
+                        >
+                          <GripVertical size={18} />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const targetPos = prompt(`الترتيب الحالي: ${index + 1}\nأدخل رقم الترتيب الجديد (من 1 إلى ${pagesList.length}):`, String(index + 1));
+                            if (targetPos) {
+                              const parsed = parseInt(targetPos, 10);
+                              if (!isNaN(parsed) && parsed >= 1 && parsed <= pagesList.length) {
+                                jumpPageToPosition(index, parsed - 1);
+                              }
+                            }
+                          }}
+                          className={`h-6 w-6 rounded-md text-[10px] font-black flex items-center justify-center border transition shadow-xs cursor-pointer ${
+                            index === 0
+                              ? dark ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "bg-[#08467d] text-white border-[#08467d]"
+                              : dark ? "bg-white/10 text-slate-300 border-white/10 hover:border-amber-400 hover:text-amber-300" : "bg-white text-slate-700 border-black/10 hover:border-[#08467d] hover:text-[#08467d]"
+                          }`}
+                          title="اضغط لتغيير رقم الترتيب مباشرة"
+                        >
+                          {index + 1}
+                        </button>
                       </div>
 
-                      <p className={"mt-2 font-black truncate text-sm " + (dark ? "text-white" : "text-black")}>
-                        {page.caption || ("صفحة " + (index + 1))}
-                      </p>
+                      <div className="relative aspect-[1/1.4] overflow-hidden rounded-xl bg-slate-900 border border-white/10">
+                        <img src={page.imageUrl} alt={page.caption || ""} className="h-full w-full object-cover pointer-events-none" />
+                        {index === 0 ? (
+                          <span className="absolute bottom-1 right-1 rounded bg-[#f8ca14] px-1.5 py-0.5 text-[8px] font-black text-black">
+                            الغلاف
+                          </span>
+                        ) : null}
+                      </div>
 
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {index !== 0 ? (
+                      <div className="min-w-0 py-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={"rounded-full border px-2 py-0.5 text-[9px] font-black " + (
+                            index === 0
+                              ? (dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]")
+                              : (dark ? "border-white/15 bg-white/5 text-slate-300" : "border-black/10 bg-white text-slate-700")
+                          )}>
+                            {index === 0 ? "غلاف العدد الرئيسي" : "صفحة رقم " + (index + 1)}
+                          </span>
+                        </div>
+
+                        <p className={"mt-2 font-black truncate text-sm " + (dark ? "text-white" : "text-black")}>
+                          {page.caption || ("صفحة " + (index + 1))}
+                        </p>
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {index !== 0 ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCover.mutate({ issueId: issue.id, imageUrl: page.imageUrl, imageStorageKey: page.imageStorageKey || null })}
+                              className="h-7 text-[10px] font-bold cursor-pointer"
+                            >
+                              تعيين كغلاف
+                            </Button>
+                          ) : null}
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setCover.mutate({ issueId: issue.id, imageUrl: page.imageUrl, imageStorageKey: page.imageStorageKey || null })}
-                            className="h-7 text-[10px] font-bold"
+                            onClick={() => {
+                              setPageId(page.id);
+                              setTarget("replace");
+                            }}
+                            className="h-7 text-[10px] font-bold cursor-pointer"
                           >
-                            تعيين كغلاف
+                            استبدال الصورة
                           </Button>
-                        ) : null}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setPageId(page.id);
-                            setTarget("replace");
-                          }}
-                          className="h-7 text-[10px] font-bold"
-                        >
-                          استبدال الصورة
-                        </Button>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center">
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => setEditingPage({ id: page.id, caption: page.caption || "" })}
-                        className={"border " + (
-                          dark
-                            ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
-                            : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
-                        )}
-                      >
-                        <Edit3 size={15} />
-                      </Button>
-                      <div className="flex sm:flex-col">
+                      <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center">
                         <Button
                           size="icon"
-                          variant="ghost"
-                          onClick={() => movePage(index, -1)}
-                          disabled={index === 0 || reorder.isPending}
-                          className={dark ? "text-slate-400 hover:text-[#f8ca14]" : "text-slate-500 hover:text-[#08467d]"}
+                          variant="outline"
+                          onClick={() => setEditingPage({ id: page.id, caption: page.caption || "" })}
+                          className={"border cursor-pointer " + (
+                            dark
+                              ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
+                              : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
+                          )}
+                          title="تعديل وصف الصفحة"
                         >
-                          <ArrowUp size={15} />
+                          <Edit3 size={15} />
                         </Button>
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => movePage(index, 1)}
-                          disabled={index === issue.pages.length - 1 || reorder.isPending}
-                          className={dark ? "text-slate-400 hover:text-[#f8ca14]" : "text-slate-500 hover:text-[#08467d]"}
+                          onClick={() => {
+                            if (confirm("هل تريد حذف هذه الصفحة؟")) deletePage.mutate({ id: page.id });
+                          }}
+                          className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
+                          title="حذف الصفحة"
                         >
-                          <ArrowDown size={15} />
+                          <Trash2 size={15} />
                         </Button>
                       </div>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => {
-                          if (confirm("هل تريد حذف هذه الصفحة؟")) deletePage.mutate({ id: page.id });
-                        }}
-                        className="text-[#de191e] hover:bg-[#de191e]/10"
-                      >
-                        <Trash2 size={15} />
-                      </Button>
-                    </div>
-                  </article>
-                ))
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
               ) : (
                 <div className={"rounded-2xl border border-dashed p-12 text-center " + (
                   dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.02]" : "border-[#08467d]/20 bg-[#08467d]/[0.02]"
