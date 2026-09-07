@@ -44,13 +44,10 @@ interface HeaderDockNavProps {
 function DockHeroCover({ preview }: { preview: PagePreviewMetadata; dark: boolean }) {
   return (
     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-      <motion.img
+      <img
         src={preview.image}
         alt={preview.title}
         loading="eager"
-        initial={{ scale: 1.08 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
         className="w-full h-full object-cover object-top select-none"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none opacity-30" />
