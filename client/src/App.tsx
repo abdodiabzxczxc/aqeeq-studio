@@ -60,6 +60,12 @@ function ScrollToTopOnNavigation() {
   const [location] = useLocation();
 
   useEffect(() => {
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
     // 1. Instant scroll reset to top
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     document.documentElement.scrollTop = 0;
@@ -72,7 +78,16 @@ function ScrollToTopOnNavigation() {
       document.body.scrollTop = 0;
     });
 
-    return () => cancelAnimationFrame(frame);
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 60);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, [location]);
 
   return null;

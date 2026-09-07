@@ -282,8 +282,8 @@ export default function AlaqeeqStudioPublicPage() {
   const { data: issues = [], isLoading: issuesLoading } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: albums = [], isLoading: albumsLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: showcases = [], isLoading: showcasesLoading } = trpc.aqeeqShowcases.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
-  const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, { refetchOnWindowFocus: false });
-  const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
+  const { data: articles = [], isLoading: articlesLoading } = trpc.articles.listPublished.useQuery({}, { refetchOnWindowFocus: false });
+  const { data: podcasts = [], isLoading: podcastsLoading } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
   const { data: orchestration, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
 
   // Interactive FX Modal & Media Picker State
@@ -656,6 +656,20 @@ export default function AlaqeeqStudioPublicPage() {
     return items;
   }, [activeShowcasePosts, issues, albums, articles, showcases, podcasts, orchestration?.hiddenStoryIds, orchestration?.customStoryIds, orchestration?.storyExpiryMap]);
 
+  const isStoriesLoading = (issuesLoading || albumsLoading || showcasesLoading || articlesLoading || podcastsLoading) && storiesList.length === 0;
+
+  // Enforce scroll to top on mount / refresh
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, []);
+
   // Story Auto-Advance Timer (with pause on hover/hold)
   useEffect(() => {
     if (activeStoryIndex === null) {
@@ -1011,6 +1025,21 @@ export default function AlaqeeqStudioPublicPage() {
                     {story.title}
                   </p>
                 </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : isStoriesLoading ? (
+        <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
+          dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
+        )}>
+          <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
+            <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
+              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 animate-pulse">
+                  <div className={`h-14 w-14 sm:h-16 sm:w-16 rounded-full border-2 p-[2.5px] ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-200"}`} />
+                  <div className={`h-2.5 w-12 rounded-full ${dark ? "bg-white/10" : "bg-slate-200"}`} />
+                </div>
               ))}
             </div>
           </div>
