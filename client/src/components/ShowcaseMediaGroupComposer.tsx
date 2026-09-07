@@ -14,9 +14,121 @@ export type ShowcaseGroupMediaItem = {
   mediaType: "image" | "video";
 };
 
-export default function ShowcaseMediaGroupComposer({ open, items, pending, onOpenChange, onAddMedia, onRemove, onMove, onSave }: { open: boolean; items: ShowcaseGroupMediaItem[]; pending: boolean; onOpenChange: (open: boolean) => void; onAddMedia: () => void; onRemove: (index: number) => void; onMove: (index: number, direction: -1 | 1) => void; onSave: (title: string, description: string) => void }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  useEffect(() => { if (!open) { setTitle(""); setDescription(""); } }, [open]);
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent dir="rtl" className="max-h-[92svh] max-w-3xl overflow-y-auto border-amber-300/30 bg-[#11151f] text-white"><DialogHeader><DialogTitle className="text-right text-amber-50">منشور واحد، عدة صور وفيديوهات</DialogTitle><DialogDescription className="text-right leading-6 text-slate-400">أضف كل لقطات الخبر أو العرض هنا، رتّبها، ثم اكتب عنوانًا ووصفًا واحدًا للمجموعة.</DialogDescription></DialogHeader><div className="space-y-4"><div className="rounded-2xl border border-[#08467d]/40 bg-[#08467d]/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-black text-amber-100">وسائط المنشور</p><p className="mt-1 text-[11px] text-slate-400">{items.length ? `${items.length} عنصر داخل هذا المنشور` : "ابدأ بإضافة صورة أو فيديو"}</p></div><Button type="button" onClick={onAddMedia} className="bg-[#f8ca14] text-slate-950 font-bold hover:bg-[#e5b84f]"><ImagePlus className="ml-2" size={16} />إضافة صور أو فيديو</Button></div><div className="mt-4 grid gap-3 sm:grid-cols-2">{items.map((item, index) => <article key={`${item.mediaUrl}-${index}`} className="flex gap-3 rounded-xl border border-white/[.1] bg-black/20 p-2"><div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-black">{item.mediaType === "image" ? <img src={item.thumbnailUrl || item.mediaUrl} alt="" className="h-full w-full object-cover" /> : <><video src={item.mediaUrl} className="h-full w-full object-cover" muted preload="metadata" /><Video className="absolute inset-0 m-auto text-white drop-shadow" size={18} /></>}</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-black text-amber-50">{item.fileName}</p><p className="mt-1 text-[10px] text-slate-500">{item.mediaType === "video" ? "فيديو" : "صورة"}</p><div className="mt-2 flex gap-1"><button type="button" onClick={() => onMove(index, -1)} disabled={index === 0} className="rounded border border-white/15 px-1.5 py-1 text-slate-300 disabled:opacity-30"><ArrowUp size={13} /></button><button type="button" onClick={() => onMove(index, 1)} disabled={index === items.length - 1} className="rounded border border-white/15 px-1.5 py-1 text-slate-300 disabled:opacity-30"><ArrowDown size={13} /></button><button type="button" onClick={() => onRemove(index)} className="mr-auto rounded border border-[#de191e]/40 px-1.5 py-1 text-[#de191e] hover:bg-[#de191e]/10"><Trash2 size={13} /></button></div></div></article>)}</div></div><div className="grid gap-4 sm:grid-cols-2"><div><Label>عنوان المنشور</Label><Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="مثال: يوم الأنشطة المدرسية" className="mt-2 border-slate-700 bg-black/20 text-white" /></div><div><Label>وصف المنشور</Label><Textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="اكتب وصفًا يظهر مع كل الصور والفيديوهات…" className="mt-2 min-h-20 border-slate-700 bg-black/20 text-white" /></div></div><Button type="button" onClick={() => onSave(title, description)} disabled={!items.length || pending} className="w-full bg-[#f8ca14] text-slate-950 font-black hover:bg-[#e5b84f]">{pending ? <Loader2 className="ml-2 animate-spin" size={16} /> : null}حفظ المنشور بكل وسائطه</Button></div></DialogContent></Dialog>;
+export default function ShowcaseMediaGroupComposer({
+  open,
+  items,
+  pending,
+  onOpenChange,
+  onAddMedia,
+  onRemove,
+  onMove,
+  onSave,
+}: {
+  open: boolean;
+  items: ShowcaseGroupMediaItem[];
+  pending: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAddMedia: () => void;
+  onRemove: (index: number) => void;
+  onMove: (index: number, direction: -1 | 1) => void;
+  onSave: (caption: string) => void;
+}) {
+  const [caption, setCaption] = useState("");
+  useEffect(() => {
+    if (!open) {
+      setCaption("");
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent dir="rtl" className="max-h-[92svh] max-w-3xl overflow-y-auto border-amber-300/30 bg-[#11151f] text-white">
+        <DialogHeader>
+          <DialogTitle className="text-right text-amber-50">منشور واحد، عدة صور وفيديوهات</DialogTitle>
+          <DialogDescription className="text-right leading-6 text-slate-400">
+            أضف كل لقطات الخبر أو العرض هنا، رتّبها، ثم اكتب كابشن أو نص المنشور.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-[#08467d]/40 bg-[#08467d]/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-black text-amber-100">وسائط المنشور</p>
+                <p className="mt-1 text-[11px] text-slate-400">
+                  {items.length ? `${items.length} عنصر داخل هذا المنشور` : "ابدأ بإضافة صورة أو فيديو"}
+                </p>
+              </div>
+              <Button type="button" onClick={onAddMedia} className="bg-[#f8ca14] text-slate-950 font-bold hover:bg-[#e5b84f]">
+                <ImagePlus className="ml-2" size={16} />
+                إضافة صور أو فيديو
+              </Button>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {items.map((item, index) => (
+                <article key={`${item.mediaUrl}-${index}`} className="flex gap-3 rounded-xl border border-white/[.1] bg-black/20 p-2">
+                  <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-black">
+                    {item.mediaType === "image" ? (
+                      <img src={item.thumbnailUrl || item.mediaUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <>
+                        <video src={item.mediaUrl} className="h-full w-full object-cover" muted preload="metadata" />
+                        <Video className="absolute inset-0 m-auto text-white drop-shadow" size={18} />
+                      </>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-black text-amber-50">{item.fileName}</p>
+                    <p className="mt-1 text-[10px] text-slate-500">{item.mediaType === "video" ? "فيديو" : "صورة"}</p>
+                    <div className="mt-2 flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onMove(index, -1)}
+                        disabled={index === 0}
+                        className="rounded border border-white/15 px-1.5 py-1 text-slate-300 disabled:opacity-30"
+                      >
+                        <ArrowUp size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onMove(index, 1)}
+                        disabled={index === items.length - 1}
+                        className="rounded border border-white/15 px-1.5 py-1 text-slate-300 disabled:opacity-30"
+                      >
+                        <ArrowDown size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onRemove(index)}
+                        className="mr-auto rounded border border-[#de191e]/40 px-1.5 py-1 text-[#de191e] hover:bg-[#de191e]/10"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label className="text-amber-100 font-bold">نص / كابشن المنشور</Label>
+            <Textarea
+              value={caption}
+              onChange={(event) => setCaption(event.target.value)}
+              placeholder="اكتب نص المنشور الذي يظهر مع هذه المجموعة من الوسائط…"
+              className="mt-2 min-h-28 border-slate-700 bg-black/40 text-white"
+            />
+          </div>
+          <Button
+            type="button"
+            onClick={() => onSave(caption)}
+            disabled={!items.length || pending}
+            className="w-full bg-[#f8ca14] text-slate-950 font-black hover:bg-[#e5b84f]"
+          >
+            {pending ? <Loader2 className="ml-2 animate-spin" size={16} /> : null}
+            حفظ المنشور بكل وسائطه
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

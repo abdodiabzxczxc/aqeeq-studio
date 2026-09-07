@@ -354,7 +354,7 @@
       "ceremonyId": null,
       "title": "فيديو الأسبوع التمهيدي",
       "slug": "album-20260907-hh8o",
-      "albumDate": "2026-09-07",
+      "albumDate": "2026-09-02",
       "coverUrl": "/api/drive-proxy/1ac_1-EUIDvCQv6BmiqVym6EaN-vkmnUw",
       "description": null,
       "driveFolderUrl": "https://drive.google.com/drive/folders/16gTDwS07FLaTcZZwMupkzWxDUQ8pbh5y?usp=drive_link",
@@ -367,10 +367,10 @@
       "watermarkPosition": "center",
       "watermarkTint": "#d6b96a",
       "status": "published",
-      "publishedAt": "2026-09-07T05:57:16.634Z",
+      "publishedAt": "2026-09-07T08:02:48.016Z",
       "viewCount": 0,
       "createdAt": "2026-09-07T05:51:02.234Z",
-      "updatedAt": "2026-09-07T05:57:16.233Z",
+      "updatedAt": "2026-09-07T08:02:47.958Z",
       "media": [
         {
           "id": 120,
@@ -756,7 +756,7 @@
       "ceremonyId": null,
       "title": "صور اولياء الامور في الأسبوع التمهيدي",
       "slug": "album-20260907-rxor",
-      "albumDate": "2026-09-02",
+      "albumDate": "2026-09-03",
       "coverUrl": "/api/drive-proxy/1WCQwaXRVnUUraSVAfqkZBJHp5NzllN35",
       "description": null,
       "driveFolderUrl": "https://drive.google.com/drive/folders/1_TBYf0zW0rYoApBmk6sT4yy_S9hSq631?usp=drive_link",
@@ -769,10 +769,10 @@
       "watermarkPosition": "center",
       "watermarkTint": "#d6b96a",
       "status": "published",
-      "publishedAt": "2026-09-07T05:51:50.334Z",
+      "publishedAt": "2026-09-07T08:02:54.405Z",
       "viewCount": 0,
       "createdAt": "2026-09-07T05:41:26.437Z",
-      "updatedAt": "2026-09-07T05:51:49.834Z",
+      "updatedAt": "2026-09-07T08:02:54.348Z",
       "media": [
         {
           "id": 77,
@@ -2162,7 +2162,7 @@
     "album": 8,
     "albumMedia": 133,
     "showcase": 2,
-    "showcasePost": 59,
+    "showcasePost": 79,
     "showcasePostMedia": 1,
     "mediaAsset": 17,
     "admission": 2

@@ -260,6 +260,17 @@ function MediaPostCard({
   const active = groupItems[activeIndex] || groupItems[0];
   const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
 
+  const mergedCaption = (() => {
+    const t = (post.title || "").trim();
+    const d = (post.description || "").trim();
+    if (!t && !d) return post.fileName?.replace(/\.[^.]+$/, "") || "من أخبار وعروض مدارس العقيق";
+    if (!t) return d;
+    if (!d) return t;
+    if (d.includes(t)) return d;
+    if (t.includes(d)) return t;
+    return `${t} ${d}`;
+  })();
+
   const openPost = () => {
     if (hasMultiple) {
       setActiveIndex(0);
@@ -361,27 +372,19 @@ function MediaPostCard({
             </div>
           </div>
 
-          {/* Title & Description */}
-          <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+          {/* Continuous Caption Block (الكلام على بعضه) */}
+          <div className="p-2 pt-3 flex-1 flex flex-col justify-start">
             <VisualEditable
-              id={`showcase-card-title-${post.id}`}
+              id={`showcase-video-caption-${post.id}`}
               tag="text"
-              label={`عنوان ${post.fileName}`}
-              defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
-              as="h3"
-              className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-            >
-              {post.title || post.fileName.replace(/\.[^.]+$/, "")}
-            </VisualEditable>
-            <VisualEditable
-              id={`showcase-card-description-${post.id}`}
-              tag="text"
-              label={`وصف ${post.fileName}`}
-              defaultText={post.description || "من أخبار وعروض مدارس العقيق"}
+              label={`كابشن ${post.fileName}`}
+              defaultText={mergedCaption}
               as="p"
-              className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+              className={`line-clamp-3 min-h-[4.25rem] text-xs sm:text-sm font-semibold leading-6 ${
+                dark ? "text-slate-200" : "text-slate-800"
+              }`}
             >
-              {post.description || "من أخبار وعروض مدارس العقيق"}
+              {mergedCaption}
             </VisualEditable>
           </div>
 
@@ -516,27 +519,19 @@ function MediaPostCard({
           </button>
         </div>
 
-        {/* Title & Description */}
-        <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+        {/* Continuous Caption Block (الكلام على بعضه) */}
+        <div className="p-2 pt-3 flex-1 flex flex-col justify-start">
           <VisualEditable
-            id={`showcase-card-title-${post.id}`}
+            id={`showcase-card-caption-${post.id}`}
             tag="text"
-            label={`عنوان ${post.fileName}`}
-            defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
-            as="h3"
-            className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-          >
-            {post.title || post.fileName.replace(/\.[^.]+$/, "")}
-          </VisualEditable>
-          <VisualEditable
-            id={`showcase-card-description-${post.id}`}
-            tag="text"
-            label={`وصف ${post.fileName}`}
-            defaultText={post.description || "من أخبار وعروض العقيق"}
+            label={`كابشن ${post.fileName}`}
+            defaultText={mergedCaption}
             as="p"
-            className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            className={`line-clamp-3 min-h-[4.25rem] text-xs sm:text-sm font-semibold leading-6 ${
+              dark ? "text-slate-200" : "text-slate-800"
+            }`}
           >
-            {post.description || "من أخبار وعروض العقيق"}
+            {mergedCaption}
           </VisualEditable>
         </div>
 

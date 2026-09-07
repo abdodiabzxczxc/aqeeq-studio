@@ -4,7 +4,7 @@ import ShowcaseMediaGroupComposer, { type ShowcaseGroupMediaItem } from "@/compo
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -122,6 +122,17 @@ function PostPreview({ post }: { post: ShowcasePost }) {
       playSize="compact"
     />
   );
+}
+
+function getMergedPostText(post: { title?: string | null; description?: string | null; fileName?: string }): string {
+  const t = (post.title || "").trim();
+  const d = (post.description || "").trim();
+  if (!t && !d) return post.fileName?.replace(/\.[^.]+$/, "") || "";
+  if (!t) return d;
+  if (!d) return t;
+  if (d.includes(t)) return d;
+  if (t.includes(d)) return t;
+  return `${t} ${d}`;
 }
 
 function ShowcasePostReorderCard({
@@ -247,11 +258,8 @@ function ShowcasePostReorderCard({
           </span>
         </div>
 
-        <h3 className={`mt-3 truncate font-black ${dark ? "text-white" : "text-black"}`}>
-          {post.title || post.fileName.replace(/\.[^.]+$/, "")}
-        </h3>
-        <p className={`mt-1 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-          {post.description || "لا يوجد شرح بعد — افتح تعديل المنشور وأضف الكلام الذي يشرح الصورة أو الفيديو."}
+        <p className={`mt-3 line-clamp-3 text-xs sm:text-sm font-bold leading-6 ${dark ? "text-slate-200" : "text-slate-800"}`}>
+          {getMergedPostText(post) || "لا يوجد نص بعد — اضغط زر التعديل لكتابة كابشن المنشور."}
         </p>
       </div>
 
@@ -265,7 +273,7 @@ function ShowcasePostReorderCard({
               ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
               : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
           }`}
-          title="تعديل الشرح والعنوان"
+          title="تعديل نص المنشور"
         >
           <Edit3 size={15} />
         </Button>
@@ -291,19 +299,15 @@ export default function AqeeqShowcaseStudioPage() {
   const utils = trpc.useUtils();
   const [form, setForm] = useState<ShowcaseForm>(defaultForm);
   const [editingPost, setEditingPost] = useState<ShowcasePost | null>(null);
-  const [postTitle, setPostTitle] = useState("");
-  const [postDescription, setPostDescription] = useState("");
+  const [postCaption, setPostCaption] = useState("");
   const [xPostUrl, setXPostUrl] = useState("");
-  const [xPostTitle, setXPostTitle] = useState("");
-  const [xPostDescription, setXPostDescription] = useState("");
+  const [xPostCaption, setXPostCaption] = useState("");
   const [xPostThumbnailUrl, setXPostThumbnailUrl] = useState("");
   const [instagramPostUrl, setInstagramPostUrl] = useState("");
-  const [instagramPostTitle, setInstagramPostTitle] = useState("");
-  const [instagramPostDescription, setInstagramPostDescription] = useState("");
+  const [instagramPostCaption, setInstagramPostCaption] = useState("");
   const [instagramPostThumbnailUrl, setInstagramPostThumbnailUrl] = useState("");
   const [youtubePostUrl, setYoutubePostUrl] = useState("");
-  const [youtubePostTitle, setYoutubePostTitle] = useState("");
-  const [youtubePostDescription, setYoutubePostDescription] = useState("");
+  const [youtubePostCaption, setYoutubePostCaption] = useState("");
   const [groupComposerOpen, setGroupComposerOpen] = useState(false);
   const [groupMediaLibraryOpen, setGroupMediaLibraryOpen] = useState(false);
   const [groupMedia, setGroupMedia] = useState<ShowcaseGroupMediaItem[]>([]);
@@ -413,8 +417,7 @@ export default function AqeeqShowcaseStudioPage() {
         description: result.added ? "تم جلب غلاف التغريدة تلقائياً وحفظ المنشور." : "لن يتكرر المنشور في الخلاصة.",
       });
       setXPostUrl("");
-      setXPostTitle("");
-      setXPostDescription("");
+      setXPostCaption("");
       setXPostThumbnailUrl("");
       refresh();
     },
@@ -425,17 +428,15 @@ export default function AqeeqShowcaseStudioPage() {
     onSuccess: (result, variables) => {
       const name = variables.source === "instagram" ? "Instagram" : "YouTube";
       toast.success(result.added ? `تمت إضافة ${name}` : "المنشور موجود بالفعل", {
-        description: result.added ? "راجع عنوانه ووصفه ثم احفظ وانشر." : "لن يتكرر المنشور في الخلاصة.",
+        description: result.added ? "تم حفظ المنشور في الخلاصة." : "لن يتكرر المنشور في الخلاصة.",
       });
       if (variables.source === "instagram") {
         setInstagramPostUrl("");
-        setInstagramPostTitle("");
-        setInstagramPostDescription("");
+        setInstagramPostCaption("");
         setInstagramPostThumbnailUrl("");
       } else {
         setYoutubePostUrl("");
-        setYoutubePostTitle("");
-        setYoutubePostDescription("");
+        setYoutubePostCaption("");
       }
       refresh();
     },
@@ -506,8 +507,8 @@ export default function AqeeqShowcaseStudioPage() {
     addXPost.mutate({
       showcaseId: showcase.id,
       xPostUrl: xPostUrl.trim(),
-      title: xPostTitle.trim() || null,
-      description: xPostDescription.trim() || null,
+      title: null,
+      description: xPostCaption.trim() || null,
       thumbnailUrl: xPostThumbnailUrl.trim() || null,
     });
   };
@@ -517,12 +518,13 @@ export default function AqeeqShowcaseStudioPage() {
     const isInstagram = source === "instagram";
     const postUrl = (isInstagram ? instagramPostUrl : youtubePostUrl).trim();
     if (!postUrl) return;
+    const caption = (isInstagram ? instagramPostCaption : youtubePostCaption).trim();
     addSocialPost.mutate({
       showcaseId: showcase.id,
       source,
       postUrl,
-      title: (isInstagram ? instagramPostTitle : youtubePostTitle).trim() || null,
-      description: (isInstagram ? instagramPostDescription : youtubePostDescription).trim() || null,
+      title: null,
+      description: caption || null,
       thumbnailUrl: isInstagram ? (instagramPostThumbnailUrl.trim() || null) : null,
     });
   };
@@ -584,9 +586,14 @@ export default function AqeeqShowcaseStudioPage() {
     );
   };
 
-  const saveMediaGroup = (groupTitle: string, groupDescription: string) => {
+  const saveMediaGroup = (caption: string) => {
     if (!showcase || !groupMedia.length) return;
-    addMediaGroup.mutate({ showcaseId: showcase.id, title: groupTitle.trim() || null, description: groupDescription.trim() || null, media: groupMedia });
+    addMediaGroup.mutate({
+      showcaseId: showcase.id,
+      title: null,
+      description: caption.trim() || null,
+      media: groupMedia,
+    });
   };
 
   if (loading || isLoading) {
@@ -867,20 +874,13 @@ export default function AqeeqShowcaseStudioPage() {
                     placeholder="https://x.com/account/status/…"
                     className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                   />
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Input
-                      value={xPostTitle}
-                      onChange={(event) => setXPostTitle(event.target.value)}
-                      placeholder="عنوان اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                    <Input
-                      value={xPostDescription}
-                      onChange={(event) => setXPostDescription(event.target.value)}
-                      placeholder="وصف اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                  </div>
+                  <Textarea
+                    value={xPostCaption}
+                    onChange={(event) => setXPostCaption(event.target.value)}
+                    placeholder="نص أو كابشن المنشور كاملاً (الكلام على بعضه - اختياري)"
+                    rows={2}
+                    className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
+                  />
                   <Input
                     value={xPostThumbnailUrl}
                     onChange={(event) => setXPostThumbnailUrl(event.target.value)}
@@ -912,20 +912,13 @@ export default function AqeeqShowcaseStudioPage() {
                     placeholder="https://www.instagram.com/p/… أو /reel/…"
                     className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                   />
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Input
-                      value={instagramPostTitle}
-                      onChange={(event) => setInstagramPostTitle(event.target.value)}
-                      placeholder="عنوان اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                    <Input
-                      value={instagramPostDescription}
-                      onChange={(event) => setInstagramPostDescription(event.target.value)}
-                      placeholder="وصف اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                  </div>
+                  <Textarea
+                    value={instagramPostCaption}
+                    onChange={(event) => setInstagramPostCaption(event.target.value)}
+                    placeholder="نص أو كابشن المنشور كاملاً (الكلام على بعضه - اختياري)"
+                    rows={2}
+                    className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
+                  />
                   <Input
                     value={instagramPostThumbnailUrl}
                     onChange={(event) => setInstagramPostThumbnailUrl(event.target.value)}
@@ -957,20 +950,13 @@ export default function AqeeqShowcaseStudioPage() {
                     placeholder="https://www.youtube.com/watch?v=…"
                     className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                   />
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Input
-                      value={youtubePostTitle}
-                      onChange={(event) => setYoutubePostTitle(event.target.value)}
-                      placeholder="عنوان اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                    <Input
-                      value={youtubePostDescription}
-                      onChange={(event) => setYoutubePostDescription(event.target.value)}
-                      placeholder="وصف اختياري"
-                      className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                    />
-                  </div>
+                  <Textarea
+                    value={youtubePostCaption}
+                    onChange={(event) => setYoutubePostCaption(event.target.value)}
+                    placeholder="نص أو كابشن الفيديو كاملاً (الكلام على بعضه - اختياري)"
+                    rows={2}
+                    className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
+                  />
                   <Button
                     onClick={() => addSocialLink("youtube")}
                     disabled={!youtubePostUrl.trim() || addSocialPost.isPending}
@@ -1060,8 +1046,7 @@ export default function AqeeqShowcaseStudioPage() {
                       dark={dark}
                       onEdit={() => {
                         setEditingPost(post);
-                        setPostTitle(post.title || "");
-                        setPostDescription(post.description || "");
+                        setPostCaption(getMergedPostText(post));
                       }}
                       onDelete={() => {
                         if (confirm("هل تريد حذف هذا المنشور؟")) deletePost.mutate({ id: post.id });
@@ -1138,25 +1123,19 @@ export default function AqeeqShowcaseStudioPage() {
           dark ? "border-[#f8ca14]/30 bg-[#080808] text-white" : "border-black/10 bg-white text-black"
         }`}>
           <DialogHeader>
-            <DialogTitle className={`text-right font-black ${dark ? "text-white" : "text-black"}`}>شرح المنشور</DialogTitle>
+            <DialogTitle className={`text-right font-black ${dark ? "text-white" : "text-black"}`}>تعديل نص المنشور</DialogTitle>
+            <DialogDescription className="text-right text-xs text-slate-400">
+              اكتب النص أو الكابشن كاملاً في مكان واحد كما يظهر في منصات التواصل.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <Label className={dark ? "text-slate-200" : "text-slate-800"}>عنوان المنشور</Label>
-              <Input
-                value={postTitle}
-                onChange={(event) => setPostTitle(event.target.value)}
-                placeholder="مثال: تكريم طلاب العقيق"
-                className={`mt-2 ${dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black"}`}
-              />
-            </div>
-            <div>
-              <Label className={dark ? "text-slate-200" : "text-slate-800"}>الكلام الذي يشرح الصورة أو الفيديو</Label>
+              <Label className={dark ? "text-slate-200" : "text-slate-800"}>نص / كابشن المنشور (الكلام على بعضه)</Label>
               <Textarea
-                value={postDescription}
-                onChange={(event) => setPostDescription(event.target.value)}
-                placeholder="اكتب وصفًا واضحًا للزوار…"
-                className={`mt-2 min-h-36 ${dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black"}`}
+                value={postCaption}
+                onChange={(event) => setPostCaption(event.target.value)}
+                placeholder="اكتب نص المنشور بالكامل هنا…"
+                className={`mt-2 min-h-40 ${dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black"}`}
               />
             </div>
             <Button
@@ -1164,8 +1143,8 @@ export default function AqeeqShowcaseStudioPage() {
                 editingPost &&
                 updatePost.mutate({
                   id: editingPost.id,
-                  title: postTitle.trim() || null,
-                  description: postDescription.trim() || null,
+                  title: null,
+                  description: postCaption.trim() || null,
                   isNew: false,
                 })
               }
