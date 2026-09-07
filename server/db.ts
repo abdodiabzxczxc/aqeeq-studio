@@ -561,12 +561,17 @@ export async function setSiteBroadcast(data: SiteBroadcast): Promise<SiteBroadca
 export type SiteOrchestrationConfig = {
   nav: {
     homeLabel: string;
+    aboutLabel?: string | null;
+    accreditationsLabel?: string | null;
+    admissionsLabel?: string | null;
     journalLabel: string;
     albumsLabel: string;
     showcaseLabel: string;
     articlesLabel?: string | null;
     podcastLabel?: string | null;
+    offersLabel?: string | null;
     logoUrl?: string | null;
+    hiddenNavKeys?: string[];
   };
   heroCovers: {
     journalMode: "auto" | "custom";
@@ -752,12 +757,17 @@ export type SiteOrchestrationConfig = {
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
   nav: {
     homeLabel: "الرئيسية",
+    aboutLabel: "مدارسنا",
+    accreditationsLabel: "الاعتمادات",
+    admissionsLabel: "القبول والتسجيل",
     journalLabel: "مجلة العقيق",
     albumsLabel: "ألبوم العقيق",
     showcaseLabel: "الأخبار والعروض",
     articlesLabel: "المقالات ✍️",
     podcastLabel: "أثير العقيق 🎙️",
+    offersLabel: "العروض والخصومات",
     logoUrl: "/alaqeeq-logo.png",
+    hiddenNavKeys: [],
   },
   emergencyBanner: {
     enabled: false,

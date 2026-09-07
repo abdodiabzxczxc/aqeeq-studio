@@ -16,6 +16,11 @@ import {
   Palette,
   Users,
   Eye,
+  EyeOff,
+  Compass,
+  RotateCcw,
+  Save,
+  AlertCircle,
   Plus,
   Trash2,
   ExternalLink,
@@ -82,7 +87,101 @@ export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system"
 export type AdmissionsSubTab = "inbox" | "fees" | "settings";
 export type ContentSubTab = "master" | "articles" | "backdrops";
 export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
-export type SystemSubTab = "theme" | "users" | "campuses" | "marketing" | "backup";
+export type SystemSubTab = "pages" | "theme" | "users" | "campuses" | "marketing" | "backup";
+
+export interface CorePageItem {
+  key: string;
+  labelKey: string;
+  defaultLabel: string;
+  path: string;
+  icon: string;
+  category: string;
+  description: string;
+}
+
+export const CORE_PAGES_CONFIG: CorePageItem[] = [
+  {
+    key: "home",
+    labelKey: "homeLabel",
+    defaultLabel: "الرئيسية",
+    path: "/",
+    icon: "🏠",
+    category: "البوابة الرئيسية",
+    description: "بوابة مدارس العقيق الرسمية: الهيرو الملكي، البنتو الحي، والقصص التفاعلية.",
+  },
+  {
+    key: "about",
+    labelKey: "aboutLabel",
+    defaultLabel: "مدارسنا",
+    path: "/about",
+    icon: "🏛️",
+    category: "الصروح والتعريف",
+    description: "فلسفة ورؤية مدارس العقيق، مجمعات البنين والبنات، والصرح التعليمي الشامل.",
+  },
+  {
+    key: "accreditations",
+    labelKey: "accreditationsLabel",
+    defaultLabel: "الاعتمادات",
+    path: "/accreditations",
+    icon: "🏆",
+    category: "الجودة والاعتماد",
+    description: "الاعتماد الأكاديمي الدولي Cognia، الأوسمة، ومعايير الجودة المدرسية.",
+  },
+  {
+    key: "admissions",
+    labelKey: "admissionsLabel",
+    defaultLabel: "القبول والتسجيل",
+    path: "/admissions",
+    icon: "🎓",
+    category: "التسجيل والرسوم",
+    description: "بوابة التقديم الإلكتروني الفوري، حاسبة الأقساط الذكية، وجداول الرسوم الدراسية.",
+  },
+  {
+    key: "journal",
+    labelKey: "journalLabel",
+    defaultLabel: "مجلة العقيق",
+    path: "/journal",
+    icon: "📖",
+    category: "النشر والتوثيق",
+    description: "الأعداد الدورية لمجلة العقيق، المقالات والأنشطة الطلابية، وقارئ المجلة التفاعلي.",
+  },
+  {
+    key: "albums",
+    labelKey: "albumsLabel",
+    defaultLabel: "ألبوم العقيق",
+    path: "/albums",
+    icon: "📸",
+    category: "الوسائط الحية",
+    description: "معارض الصور والألبومات الحصرية للأنشطة المدرسية والرحلات والاحتفالات.",
+  },
+  {
+    key: "podcast",
+    labelKey: "podcastLabel",
+    defaultLabel: "أثير",
+    path: "/podcast",
+    icon: "🎙️",
+    category: "الإنتاج الصوتي",
+    description: "بودكاست أثير العقيق: حوارات وقصص وإبداعات صوتية من صميم بيئة المدرسة.",
+  },
+  {
+    key: "articles",
+    labelKey: "articlesLabel",
+    defaultLabel: "المقالات",
+    path: "/articles",
+    icon: "✍️",
+    category: "الفكر والتربية",
+    description: "أقلام العقيق: مقالات تربوية ونفسية متخصصة موجهة للأسرة والمجتمع المدرسي.",
+  },
+  {
+    key: "showcase",
+    labelKey: "showcaseLabel",
+    defaultLabel: "الأخبار",
+    path: "/showcase",
+    icon: "📰",
+    category: "المركز الإعلامي",
+    description: "أحدث الأخبار والتعاميم والمستجدات والفعاليات الجارية والعروض الحصرية.",
+  },
+];
 
 const DEFAULT_ORCHESTRATION = {
   nav: {
@@ -392,7 +491,11 @@ export default function AqeeqAdminDashboardPage() {
   const [admissionsSubTab, setAdmissionsSubTab] = useState<AdmissionsSubTab>("inbox");
   const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("master");
   const [campaignsSubTab, setCampaignsSubTab] = useState<CampaignsSubTab>("broadcast");
-  const [systemSubTab, setSystemSubTab] = useState<SystemSubTab>("theme");
+  const [systemSubTab, setSystemSubTab] = useState<SystemSubTab>("pages");
+
+  // Pages & Navigation States
+  const [pagesSearchQuery, setPagesSearchQuery] = useState("");
+  const [pagesFilter, setPagesFilter] = useState<"all" | "visible" | "hidden">("all");
 
   // Auxiliary UI States
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
@@ -626,6 +729,142 @@ export default function AqeeqAdminDashboardPage() {
     },
     onError: (err) => toast.error(err.message || "تعذر حفظ التعديلات"),
   });
+
+  // Navigation & Pages Management Helpers
+  const currentHiddenKeys: string[] = orchestrationForm.nav?.hiddenNavKeys || [];
+
+  const hasNavChanges = useMemo(() => {
+    const savedNav = (orchestrationData as any)?.nav || DEFAULT_ORCHESTRATION.nav;
+    const currentNav = orchestrationForm?.nav || DEFAULT_ORCHESTRATION.nav;
+
+    const savedHidden = ((savedNav.hiddenNavKeys as string[]) || []).slice().sort().join(",");
+    const currentHidden = ((currentNav.hiddenNavKeys as string[]) || []).slice().sort().join(",");
+    if (savedHidden !== currentHidden) return true;
+
+    const keys = [
+      "homeLabel",
+      "aboutLabel",
+      "accreditationsLabel",
+      "admissionsLabel",
+      "journalLabel",
+      "albumsLabel",
+      "podcastLabel",
+      "articlesLabel",
+      "showcaseLabel",
+    ];
+    for (const k of keys) {
+      if ((savedNav[k] ?? "") !== (currentNav[k] ?? "")) return true;
+    }
+    return false;
+  }, [orchestrationData, orchestrationForm?.nav]);
+
+  const handleTogglePageHidden = (pageKey: string) => {
+    const hidden: string[] = orchestrationForm.nav?.hiddenNavKeys || [];
+    const isHidden = hidden.includes(pageKey);
+    const nextHidden = isHidden
+      ? hidden.filter((k) => k !== pageKey)
+      : [...hidden, pageKey];
+
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      nav: {
+        ...prev.nav,
+        hiddenNavKeys: nextHidden,
+      },
+    }));
+  };
+
+  const handleUpdateNavLabel = (labelKey: string, val: string) => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      nav: {
+        ...prev.nav,
+        [labelKey]: val,
+      },
+    }));
+  };
+
+  const handleResetNavLabel = (labelKey: string, defaultVal: string) => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      nav: {
+        ...prev.nav,
+        [labelKey]: defaultVal,
+      },
+    }));
+    toast.info(`تمت استعادة المسمى الافتراضي: "${defaultVal}"`);
+  };
+
+  const handleUnhideAllPages = () => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      nav: {
+        ...prev.nav,
+        hiddenNavKeys: [],
+      },
+    }));
+    toast.success("تم إظهار جميع الصفحات في القائمة بنجاح! 🟢");
+  };
+
+  const handleResetAllNavLabels = () => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      nav: {
+        ...prev.nav,
+        homeLabel: "الرئيسية",
+        aboutLabel: "مدارسنا",
+        accreditationsLabel: "الاعتمادات",
+        admissionsLabel: "القبول والتسجيل",
+        journalLabel: "مجلة العقيق",
+        albumsLabel: "ألبوم العقيق",
+        podcastLabel: "أثير",
+        articlesLabel: "المقالات",
+        showcaseLabel: "الأخبار",
+      },
+    }));
+    toast.success("تمت استعادة كافة المسميات الافتراضية للروابط");
+  };
+
+  const handleSaveNavSettings = () => {
+    setOrchestrationMutation.mutate({
+      ...orchestrationForm,
+      nav: orchestrationForm.nav,
+    });
+  };
+
+  const handleDiscardNavChanges = () => {
+    if (orchestrationData) {
+      setOrchestrationForm((prev: any) => ({
+        ...prev,
+        nav: { ...DEFAULT_ORCHESTRATION.nav, ...(orchestrationData.nav || {}) },
+      }));
+    } else {
+      setOrchestrationForm((prev: any) => ({
+        ...prev,
+        nav: { ...DEFAULT_ORCHESTRATION.nav },
+      }));
+    }
+    toast.info("تم التراجع عن التعديلات غير المحفوظة");
+  };
+
+  const filteredCorePages = useMemo(() => {
+    return CORE_PAGES_CONFIG.filter((page) => {
+      const isHidden = currentHiddenKeys.includes(page.key);
+      if (pagesFilter === "visible" && isHidden) return false;
+      if (pagesFilter === "hidden" && !isHidden) return false;
+
+      if (!pagesSearchQuery.trim()) return true;
+      const q = pagesSearchQuery.toLowerCase().trim();
+      const currentLabel = ((orchestrationForm.nav?.[page.labelKey] as string) || page.defaultLabel).toLowerCase();
+      return (
+        page.defaultLabel.toLowerCase().includes(q) ||
+        currentLabel.includes(q) ||
+        page.path.toLowerCase().includes(q) ||
+        page.category.toLowerCase().includes(q) ||
+        page.description.toLowerCase().includes(q)
+      );
+    });
+  }, [pagesFilter, pagesSearchQuery, currentHiddenKeys, orchestrationForm.nav]);
 
   // Media Picker state
   const [mediaPickerConfig, setMediaPickerConfig] = useState<{
@@ -952,14 +1191,18 @@ export default function AqeeqAdminDashboardPage() {
       setActiveTab("system");
       if (tab === "users" || subTab === "users") {
         setSystemSubTab("users");
-      } else if (subTab === "campuses" || subTab === "header_nav") {
+      } else if (subTab === "header_nav" || subTab === "pages") {
+        setSystemSubTab("pages");
+      } else if (subTab === "campuses") {
         setSystemSubTab("campuses");
       } else if (subTab === "marketing") {
         setSystemSubTab("marketing");
       } else if (subTab === "backup") {
         setSystemSubTab("backup");
-      } else {
+      } else if (subTab === "theme") {
         setSystemSubTab("theme");
+      } else {
+        setSystemSubTab("pages");
       }
     }
   };
@@ -1076,6 +1319,20 @@ export default function AqeeqAdminDashboardPage() {
             >
               <Palette size={14} />
               <span>المحرر البصري 🎨</span>
+            </button>
+
+            {/* Quick Link to Pages Management */}
+            <button
+              onClick={() => { setActiveTab("system"); setSystemSubTab("pages"); }}
+              className={"hidden xl:inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition cursor-pointer " + (
+                activeTab === "system" && systemSubTab === "pages"
+                  ? dark ? "border-amber-400 bg-amber-400 text-black shadow-sm" : "border-[#08467d] bg-[#08467d] text-white shadow-sm"
+                  : dark ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
+              )}
+              title="إدارة الصفحات وشريط التنقل الرئيسي"
+            >
+              <Compass size={14} className={activeTab === "system" && systemSubTab === "pages" ? "text-current" : "text-amber-400"} />
+              <span>إدارة الصفحات 🧭</span>
             </button>
 
             {/* View Live Site */}
@@ -1584,6 +1841,19 @@ export default function AqeeqAdminDashboardPage() {
                       <div className="flex items-center gap-2.5">
                         <Megaphone size={16} className="text-red-400" />
                         <span>شريط التنبيهات العاجلة والاحتفالية</span>
+                      </div>
+                      <ArrowUpLeft size={14} className="text-slate-400" />
+                    </button>
+
+                    <button
+                      onClick={() => { setActiveTab("system"); setSystemSubTab("pages"); }}
+                      className={"flex w-full items-center justify-between rounded-xl border p-3 text-xs font-black transition cursor-pointer " + (
+                        dark ? "border-white/10 hover:bg-white/5" : "border-black/5 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Compass size={16} className="text-[#08467d] dark:text-[#f8ca14]" />
+                        <span>إدارة الصفحات وشريط التنقل (9 صفحات) 🧭</span>
                       </div>
                       <ArrowUpLeft size={14} className="text-slate-400" />
                     </button>
@@ -3093,6 +3363,20 @@ export default function AqeeqAdminDashboardPage() {
             <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
               <button
                 type="button"
+                onClick={() => setSystemSubTab("pages")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "pages"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Compass size={15} />
+                <span>إدارة الصفحات وشريط التنقل 🧭</span>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">9</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setSystemSubTab("theme")}
                 className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   systemSubTab === "theme"
@@ -3157,6 +3441,372 @@ export default function AqeeqAdminDashboardPage() {
                 <span>المزامنة السحابية والنسخ الاحتياطي 💾</span>
               </button>
             </div>
+
+            {/* SUBTAB 0: PAGES & NAVIGATION ARCHITECTURE */}
+            {systemSubTab === "pages" && (
+              <div className="space-y-6">
+                {/* 1. Header Banner & Instructions */}
+                <div className={`relative overflow-hidden rounded-3xl border p-6 sm:p-7 shadow-md transition-all ${
+                  dark ? "border-white/10 bg-gradient-to-br from-[#131922] via-[#0d1218] to-[#080d12]" : "border-black/5 bg-gradient-to-br from-slate-50 via-white to-blue-50/40"
+                }`}>
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <div className="space-y-2 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-400 text-black shadow-md font-black text-lg">
+                          🧭
+                        </span>
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-black tracking-tight">إدارة الصفحات وشريط التنقل الرئيسي</h2>
+                          <p className="text-xs font-bold text-slate-400">التحكم المركزي في ظهور وتسمية صفحات مدارس العقيق الـ 9</p>
+                        </div>
+                      </div>
+                      <p className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                        تحكم فوري ومباشر في ظهور أو إخفاء أي صفحة من شريط التنقل العلوي (Desktop) وقائمة الموبايل الذكية (Mobile Drawer)، مع إمكانية تخصيص مسمى أي صفحة لتناسب متطلبات المواسم والتسجيل دون كسر الروابط الأصلية أو التأثير على المحتوى الداخلي.
+                      </p>
+                    </div>
+
+                    {/* Quick Save & Action Controls */}
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleUnhideAllPages}
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition active:scale-95 cursor-pointer ${
+                          dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-200" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-xs"
+                        }`}
+                        title="إظهار كافة الصفحات المخفية في القوائم"
+                      >
+                        <Eye size={14} className="text-emerald-400" />
+                        <span>إظهار الكل</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleResetAllNavLabels}
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition active:scale-95 cursor-pointer ${
+                          dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-200" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-xs"
+                        }`}
+                        title="استعادة الأسماء الافتراضية الأصلية لكافة الروابط"
+                      >
+                        <RotateCcw size={14} className="text-amber-400" />
+                        <span>استعادة المسميات الافتراضية</span>
+                      </button>
+
+                      <Button
+                        onClick={handleSaveNavSettings}
+                        disabled={setOrchestrationMutation.isPending}
+                        className={`font-black text-xs px-5 py-2.5 rounded-xl shadow-md transition active:scale-95 cursor-pointer ${
+                          hasNavChanges
+                            ? "bg-emerald-500 hover:bg-emerald-600 text-white animate-pulse"
+                            : dark ? "bg-amber-400 hover:bg-yellow-400 text-black" : "bg-[#08467d] hover:bg-[#063560] text-white"
+                        }`}
+                      >
+                        <Save size={15} className={setOrchestrationMutation.isPending ? "animate-spin" : ""} />
+                        <span>{setOrchestrationMutation.isPending ? "جارِ الحفظ..." : hasNavChanges ? "حفظ التعديلات الجديدة 💾" : "حفظ التعديلات 💾"}</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* 2. KPI Metrics Bar */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 mt-5 border-t border-current/10">
+                    <div className={`p-3.5 rounded-2xl border transition ${
+                      dark ? "bg-white/[0.03] border-white/5" : "bg-white border-slate-200/80 shadow-xs"
+                    }`}>
+                      <span className="text-[11px] font-black text-slate-400">إجمالي الصفحات الأساسية</span>
+                      <p className="text-2xl font-black mt-1">9 <span className="text-xs font-bold text-slate-500">صفحات</span></p>
+                      <span className="text-[10px] text-slate-500">منظومة العقيق الرقمية</span>
+                    </div>
+
+                    <div
+                      onClick={() => setPagesFilter(pagesFilter === "visible" ? "all" : "visible")}
+                      className={`p-3.5 rounded-2xl border transition cursor-pointer ${
+                        pagesFilter === "visible"
+                          ? "border-emerald-500/40 bg-emerald-500/10 shadow-sm"
+                          : dark ? "bg-white/[0.03] border-white/5 hover:border-emerald-500/30" : "bg-white border-slate-200/80 hover:border-emerald-500/30 shadow-xs"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-black text-emerald-500">الصفحات الظاهرة للزوار 🟢</span>
+                        {pagesFilter === "visible" && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500 text-white font-black">محدد</span>}
+                      </div>
+                      <p className="text-2xl font-black mt-1 text-emerald-600 dark:text-emerald-400">
+                        {9 - currentHiddenKeys.length} <span className="text-xs font-bold text-slate-500">صفحة</span>
+                      </p>
+                      <span className="text-[10px] text-slate-500">معروضة في الهيدر والموبايل</span>
+                    </div>
+
+                    <div
+                      onClick={() => setPagesFilter(pagesFilter === "hidden" ? "all" : "hidden")}
+                      className={`p-3.5 rounded-2xl border transition cursor-pointer ${
+                        pagesFilter === "hidden"
+                          ? "border-rose-500/40 bg-rose-500/10 shadow-sm"
+                          : dark ? "bg-white/[0.03] border-white/5 hover:border-rose-500/30" : "bg-white border-slate-200/80 hover:border-rose-500/30 shadow-xs"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-black text-rose-500">الصفحات المخفية مؤقتاً 🔴</span>
+                        {pagesFilter === "hidden" && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-500 text-white font-black">محدد</span>}
+                      </div>
+                      <p className="text-2xl font-black mt-1 text-rose-600 dark:text-rose-400">
+                        {currentHiddenKeys.length} <span className="text-xs font-bold text-slate-500">صفحة</span>
+                      </p>
+                      <span className="text-[10px] text-slate-500">غير مرئية في شريط التنقل</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Search & Filter Bar */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  {/* Search Input */}
+                  <div className="relative flex-1 max-w-md">
+                    <Search size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={pagesSearchQuery}
+                      onChange={(e) => setPagesSearchQuery(e.target.value)}
+                      placeholder="ابحث عن صفحة بالاسم، الرابط، أو الوصف..."
+                      className={`w-full pr-10 pl-4 py-2.5 rounded-2xl border text-xs font-bold transition outline-none ${
+                        dark
+                          ? "border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-amber-400/50"
+                          : "border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:border-[#08467d] shadow-xs"
+                      }`}
+                    />
+                    {pagesSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setPagesSearchQuery("")}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-white cursor-pointer"
+                      >
+                        مسح
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+                    <button
+                      type="button"
+                      onClick={() => setPagesFilter("all")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        pagesFilter === "all"
+                          ? dark ? "bg-white text-black" : "bg-slate-900 text-white shadow-xs"
+                          : dark ? "bg-white/5 text-slate-400 hover:bg-white/10" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      الكل (9)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPagesFilter("visible")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                        pagesFilter === "visible"
+                          ? "bg-emerald-600 text-white shadow-xs"
+                          : dark ? "bg-white/5 text-emerald-400 hover:bg-white/10" : "bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50"
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                      <span>الظاهرة ({9 - currentHiddenKeys.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPagesFilter("hidden")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                        pagesFilter === "hidden"
+                          ? "bg-rose-600 text-white shadow-xs"
+                          : dark ? "bg-white/5 text-rose-400 hover:bg-white/10" : "bg-white text-rose-700 border border-rose-200 hover:bg-rose-50"
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-rose-400" />
+                      <span>المخفية ({currentHiddenKeys.length})</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Core Pages Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filteredCorePages.map((page) => {
+                    const isHidden = currentHiddenKeys.includes(page.key);
+                    const currentLabel = (orchestrationForm.nav?.[page.labelKey] as string) || page.defaultLabel;
+                    const isCustomLabel = currentLabel !== page.defaultLabel;
+
+                    return (
+                      <div
+                        key={page.key}
+                        className={`rounded-3xl border p-5 transition-all duration-200 flex flex-col justify-between space-y-4 shadow-sm ${
+                          isHidden
+                            ? dark
+                              ? "border-rose-500/20 bg-gradient-to-b from-[#181113] to-[#100d0f] opacity-85"
+                              : "border-rose-200 bg-rose-50/40 opacity-90"
+                            : dark
+                              ? "border-white/10 bg-[#121212] hover:border-white/20"
+                              : "border-slate-200 bg-white hover:border-slate-300 shadow-slate-100"
+                        }`}
+                      >
+                        {/* Top: Icon + Names + Status Badge */}
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-black/5 dark:bg-white/10 text-2xl shrink-0 shadow-inner">
+                                {page.icon}
+                              </span>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-sm font-black text-current">{page.defaultLabel}</h3>
+                                  <code className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/5 text-slate-500 font-mono">
+                                    {page.path}
+                                  </code>
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400">{page.category}</span>
+                              </div>
+                            </div>
+
+                            {/* Visibility Badge */}
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${
+                              isHidden
+                                ? "bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20"
+                                : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                            }`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${isHidden ? "bg-rose-500" : "bg-emerald-500"}`} />
+                              <span>{isHidden ? "مخفية مؤقتاً" : "ظاهرة للزوار"}</span>
+                            </span>
+                          </div>
+
+                          {/* Description */}
+                          <p className={`text-xs leading-relaxed ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                            {page.description}
+                          </p>
+
+                          {/* Editable Label Input */}
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between text-[11px] font-bold">
+                              <label className="text-slate-400">المسمى في شريط التنقل:</label>
+                              {isCustomLabel && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleResetNavLabel(page.labelKey, page.defaultLabel)}
+                                  className="text-[10px] text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                                  title="استعادة المسمى الافتراضي"
+                                >
+                                  <RotateCcw size={10} />
+                                  <span>استعادة: "{page.defaultLabel}"</span>
+                                </button>
+                              )}
+                            </div>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value={currentLabel}
+                                onChange={(e) => handleUpdateNavLabel(page.labelKey, e.target.value)}
+                                placeholder={`الافتراضي: ${page.defaultLabel}`}
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold transition outline-none ${
+                                  dark
+                                    ? "border-white/10 bg-white/5 text-white focus:border-amber-400/50"
+                                    : "border-slate-200 bg-slate-50/50 text-slate-800 focus:border-[#08467d] focus:bg-white shadow-inner"
+                                }`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Bottom Actions: Toggle Switch + Live Preview */}
+                        <div className="pt-3 border-t border-current/10 flex items-center justify-between gap-2">
+                          {/* Toggle Switch Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePageHidden(page.key)}
+                            className={`flex-1 flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-black transition active:scale-95 cursor-pointer ${
+                              isHidden
+                                ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                            }`}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+                              <span>{isHidden ? "إظهار في القوائم" : "إخفاء عن الزوار"}</span>
+                            </span>
+
+                            {/* Pill Switch Visual */}
+                            <div className={`w-8 h-4 rounded-full transition-colors relative flex items-center px-0.5 ${
+                              isHidden ? "bg-slate-600 dark:bg-slate-700" : "bg-emerald-500"
+                            }`}>
+                              <div className={`w-3 h-3 rounded-full bg-white transition-transform ${
+                                isHidden ? "translate-x-0" : "-translate-x-4"
+                              }`} />
+                            </div>
+                          </button>
+
+                          {/* Live Preview Button */}
+                          <button
+                            type="button"
+                            onClick={() => window.open(page.path, "_blank")}
+                            className={`px-3 py-2 rounded-xl border text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                              dark ? "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-xs"
+                            }`}
+                            title="معاينة الصفحة الحية في تبويب جديد"
+                          >
+                            <span>معاينة</span>
+                            <ExternalLink size={12} className="opacity-70" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {filteredCorePages.length === 0 && (
+                  <div className="rounded-3xl border border-dashed border-current/15 p-12 text-center space-y-3">
+                    <p className="text-sm font-bold text-slate-400">لا توجد صفحات تطابق البحث أو الفلتر المحدد.</p>
+                    <Button
+                      onClick={() => { setPagesSearchQuery(""); setPagesFilter("all"); }}
+                      variant="outline"
+                      className="text-xs font-bold rounded-xl cursor-pointer"
+                    >
+                      إعادة ضبط الفلتر
+                    </Button>
+                  </div>
+                )}
+
+                {/* 5. Sticky Floating Save Bar when Unsaved Changes Exist */}
+                {hasNavChanges && (
+                  <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-xl animate-in slide-in-from-bottom-5 duration-300">
+                    <div className={`rounded-2xl border p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 backdrop-blur-xl ${
+                      dark
+                        ? "border-emerald-500/40 bg-slate-950/95 text-white shadow-emerald-950/40"
+                        : "border-emerald-600/30 bg-white/95 text-slate-900 shadow-slate-400/40"
+                    }`}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0 font-bold">
+                          💾
+                        </span>
+                        <div>
+                          <p className="text-xs font-black">لديك تعديلات غير محفوظة في شريط التنقل!</p>
+                          <p className="text-[10px] text-slate-400">احفظ التعديلات لتنعكس فوراً على الهيدر وقوائم الموبايل.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button
+                          type="button"
+                          onClick={handleDiscardNavChanges}
+                          className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                            dark ? "border-white/10 hover:bg-white/10 text-slate-300" : "border-slate-300 hover:bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          تراجع
+                        </button>
+                        <Button
+                          onClick={handleSaveNavSettings}
+                          disabled={setOrchestrationMutation.isPending}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-4 py-2 rounded-xl shadow-md cursor-pointer"
+                        >
+                          <Save size={14} className={setOrchestrationMutation.isPending ? "animate-spin" : ""} />
+                          <span>{setOrchestrationMutation.isPending ? "جارِ الحفظ..." : "حفظ التعديلات الآن 🚀"}</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* SUBTAB 1: NATIONAL OCCASIONS THEME ENGINE */}
             {systemSubTab === "theme" && (
