@@ -41,44 +41,100 @@ interface HeaderDockNavProps {
   onNavigate: (path: string) => void;
 }
 
-function DockLiveViewport({
-  itemPath,
-  theme,
-  fallbackImage,
-  title,
-}: {
-  itemPath: string;
-  theme: string;
-  fallbackImage: string;
-  title: string;
-}) {
-  const [loaded, setLoaded] = useState(false);
-  const src = `${itemPath}${itemPath.includes("?") ? "&" : "?"}theme=${theme}&dockpreview=1`;
+function DockHeroCover({ preview, dark }: { preview: PagePreviewMetadata; dark: boolean }) {
+  if (preview.type === "journal" || preview.type === "albums") {
+    return (
+      <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-gradient-to-br from-[#0e0717] via-[#090b14] to-black p-2 flex items-center justify-center select-none shadow-inner">
+        {/* Atmosphere Glow */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500 opacity-30 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at center, ${preview.glowColor}, transparent 70%)`,
+          }}
+        />
 
+        {/* Back tilted card */}
+        {preview.secondaryImage && (
+          <div
+            className="absolute h-[85%] w-[48%] rounded-xl overflow-hidden border border-white/15 shadow-xl opacity-60 right-[10%] top-[8%] pointer-events-none"
+            style={{ transform: "rotate(-8deg)" }}
+          >
+            <img
+              src={preview.secondaryImage}
+              alt=""
+              loading="eager"
+              className="w-full h-full object-cover select-none"
+            />
+          </div>
+        )}
+
+        {/* Featured newest card (Tilted Front) */}
+        <div
+          className="relative z-10 h-[92%] w-[56%] rounded-xl overflow-hidden border border-[#f8ca14]/70 shadow-[0_12px_30px_rgba(0,0,0,0.85)]"
+          style={{ transform: "rotate(3deg)" }}
+        >
+          <img
+            src={preview.image}
+            alt={preview.title}
+            loading="eager"
+            className="w-full h-full object-cover select-none"
+            onError={(e) => {
+              const target = e.currentTarget;
+              const fallback = preview.type === "journal" ? "/covers/student-excellence-about.jpg" : "/covers/first-lego-champions.png";
+              if (target.src !== fallback) target.src = fallback;
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+          <div className="absolute bottom-1.5 inset-x-1.5 text-right pointer-events-none">
+            <span className="text-[8px] font-bold text-[#f8ca14] block truncate drop-shadow-sm">
+              {preview.subtitle}
+            </span>
+            <h5 className="text-[11px] font-black text-white leading-tight truncate drop-shadow-md">
+              {preview.title}
+            </h5>
+          </div>
+        </div>
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none opacity-40" />
+      </div>
+    );
+  }
+
+  // Standard Hero Cover Viewport with Live Photo & Real-Time Typography
   return (
     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-      {/* 1. Fast Baseline Screenshot (Always visible instantly in 0ms) */}
       <img
-        src={fallbackImage}
-        alt={title}
+        src={preview.image}
+        alt={preview.title}
         loading="eager"
         className="w-full h-full object-cover object-top select-none"
+        onError={(e) => {
+          const target = e.currentTarget;
+          const fallback = "/covers/cover-about.jpg";
+          if (target.src !== fallback) {
+            target.src = fallback;
+          }
+        }}
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
 
-      {/* 2. Live Real-Time Dynamic Viewport (Reflects live database & Visual Editor changes automatically) */}
-      <iframe
-        src={src}
-        title={title}
-        tabIndex={-1}
-        aria-hidden="true"
-        onLoad={() => setLoaded(true)}
-        className={`absolute inset-0 w-[1280px] h-[720px] scale-[0.243] origin-top-left border-0 pointer-events-none select-none transition-opacity duration-500 ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
-        loading="lazy"
-      />
+      {/* Floating Badge on Image */}
+      <div className="absolute top-2 right-2 z-10 max-w-[85%] pointer-events-none">
+        <span className="rounded-lg bg-black/80 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
+          <Sparkles size={10} className="text-amber-300 shrink-0" />
+          <span className="truncate">{preview.badge}</span>
+        </span>
+      </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
+      {/* Title & Subtitle Over Image */}
+      <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right pointer-events-none">
+        <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate drop-shadow-sm">
+          {preview.subtitle}
+        </span>
+        <h4 className="text-xs font-black text-white leading-snug truncate drop-shadow-md">
+          {preview.title}
+        </h4>
+      </div>
     </div>
   );
 }
@@ -90,29 +146,51 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
   // ── 📡 Live Real-Time Queries: Fresh from Database & Orchestration ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
   const { data: albums = [] } = trpc.aqeeqAlbums.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
   const { data: showcases = [] } = trpc.aqeeqShowcases.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
   const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, {
-    refetchOnWindowFocus: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
+  const { data: aboutOverrides = [] } = trpc.visualEditor.publicList.useQuery(
+    { pagePath: "/about" },
+    { refetchOnWindowFocus: true, staleTime: 5_000 }
+  );
+  const { data: admissionsOverrides = [] } = trpc.visualEditor.publicList.useQuery(
+    { pagePath: "/admissions" },
+    { refetchOnWindowFocus: true, staleTime: 5_000 }
+  );
+
+  const cacheKey = useMemo(() => {
+    const dates = [
+      (orchestration as any)?.updatedAt || (orchestration as any)?.themeMode?.customBadgeText,
+      issues[0]?.updatedAt || issues[0]?.publishedAt,
+      albums[0]?.updatedAt || albums[0]?.publishedAt,
+      (showcases[0] as any)?.updatedAt || (showcases[0] as any)?.coverUrl,
+      articles[0]?.updatedAt || articles[0]?.publishedAt,
+      (podcasts[0] as any)?.updatedAt || (podcasts[0] as any)?.id,
+      aboutOverrides[0]?.updatedAt,
+      admissionsOverrides[0]?.updatedAt,
+    ].filter(Boolean);
+    return dates.length ? encodeURIComponent(dates.join("_")) : "1";
+  }, [orchestration, issues, albums, showcases, articles, podcasts, aboutOverrides, admissionsOverrides]);
 
   // ── 🎯 Compute Live Cover Snapshots & Live Text in Real-Time ──
   const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
@@ -177,6 +255,23 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
       showcase?.coverUrl ||
       "/covers/cover-admissions.jpg";
 
+    // 6. Visual Editor Overrides for About & Admissions
+    const aboutOverride = aboutOverrides.find(
+      (o) => o.elementType === "image" && (o.elementId === "about-hero-student-photo" || Boolean(o.mediaUrl))
+    );
+    const aboutPhoto = aboutOverride?.mediaUrl
+      ? directDriveImage(aboutOverride.mediaUrl) || aboutOverride.mediaUrl
+      : dark
+      ? `/previews/about_dark.webp?v=${cacheKey}`
+      : `/previews/about_light.webp?v=${cacheKey}`;
+
+    const admissionsOverride = admissionsOverrides.find((o) => o.elementType === "image" && Boolean(o.mediaUrl));
+    const admissionsPhoto = admissionsOverride?.mediaUrl
+      ? directDriveImage(admissionsOverride.mediaUrl) || admissionsOverride.mediaUrl
+      : dark
+      ? `/previews/admissions_dark.webp?v=${cacheKey}`
+      : `/previews/admissions_light.webp?v=${cacheKey}`;
+
     return {
       home: {
         type: "home",
@@ -186,7 +281,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           : "الصرح التعليمي والافتراضي المتكامل",
         badge: "✦ البوابة الرقمية الموحدة",
         description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
-        image: dark ? "/previews/home_dark.webp" : "/previews/home_light.webp",
+        image: dark ? `/previews/home_dark.webp?v=${cacheKey}` : `/previews/home_light.webp?v=${cacheKey}`,
         routePath: "alaqeeq.edu.sa/",
         stats: "30+ عاماً من التميز · المدينة",
         glowColor: "rgba(248, 202, 20, 0.28)",
@@ -199,7 +294,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         description: orchestration?.schoolCampuses?.boysAddress
           ? `مجمع الرانوناء ومجمع البنات — ${orchestration.schoolCampuses.boysAddress}`
           : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
-        image: dark ? "/previews/about_dark.webp" : "/previews/about_light.webp",
+        image: aboutPhoto,
         routePath: "alaqeeq.edu.sa/about",
         stats: "بنين وبنات · مرافق متكاملة",
         glowColor: "rgba(16, 185, 129, 0.28)",
@@ -210,7 +305,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
         badge: "✦ الاعتمادات الأكاديمية الدولية",
         description: "اعتماد كوجنيا الأمريكي Cognia، المقر الرسمي لاختبارات SAT و ACT واختبارات IELTS الدولية المعتمدة.",
-        image: dark ? "/previews/accreditations_dark.webp" : "/previews/accreditations_light.webp",
+        image: dark ? `/previews/accreditations_dark.webp?v=${cacheKey}` : `/previews/accreditations_light.webp?v=${cacheKey}`,
         routePath: "alaqeeq.edu.sa/accreditations",
         stats: "Cognia USA · SAT / IELTS",
         glowColor: "rgba(8, 70, 125, 0.38)",
@@ -228,7 +323,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.admissionsSettings?.closedNoticeText && !orchestration.admissionsSettings.isOpen
             ? orchestration.admissionsSettings.closedNoticeText
             : "حاسبة الأقساط الذكية مع خصومات الأشقاء، وخيارات التقسيط الميسر عبر تابي وتمارا بدون فوائد.",
-        image: dark ? "/previews/admissions_dark.webp" : "/previews/admissions_light.webp",
+        image: admissionsPhoto,
         routePath: "alaqeeq.edu.sa/admissions",
         stats: orchestration?.admissionsSettings?.siblingDiscountSecond
           ? `خصم ${orchestration.admissionsSettings.siblingDiscountSecond}% · 4 دفعات`
@@ -244,7 +339,8 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.journalCustomDesc ||
           activeIssue?.description ||
           "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
-        image: dark ? "/previews/journal_dark.webp" : "/previews/journal_light.webp",
+        image: journalPhoto,
+        secondaryImage: secondJournalPhoto,
         routePath: "alaqeeq.edu.sa/journal",
         stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
         glowColor: "rgba(244, 63, 94, 0.28)",
@@ -260,7 +356,8 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.albumsCustomDesc ||
           activeAlbum?.description ||
           "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
-        image: dark ? "/previews/albums_dark.webp" : "/previews/albums_light.webp",
+        image: albumPhoto,
+        secondaryImage: secondAlbumPhoto,
         routePath: "alaqeeq.edu.sa/albums",
         stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
         glowColor: "rgba(139, 92, 246, 0.28)",
@@ -276,7 +373,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.podcastsCustomDesc ||
           activePodcast?.description ||
           "استمع لحلقات البودكاست التربوية، لقاءات الطلاب، والإذاعة الصباحية مع مشغل صوتي عائم متطور.",
-        image: dark ? "/previews/podcast_dark.webp" : "/previews/podcast_light.webp",
+        image: podcastPhoto,
         routePath: "alaqeeq.edu.sa/podcast",
         stats: activePodcast?.duration ? `${activePodcast.duration} د · استوديو حي` : "بث صوتي ومرئي · أثير",
         glowColor: "rgba(168, 85, 247, 0.28)",
@@ -292,7 +389,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           orchestration?.heroCovers?.articlesCustomDesc ||
           activeArticle?.excerpt ||
           "مقالات حول الذكاء الاصطناعي في التعليم، مهارات المستقبل، وأبحاث متميزة بقلم نخبة المعلمين والطلاب.",
-        image: dark ? "/previews/articles_dark.webp" : "/previews/articles_light.webp",
+        image: articlePhoto,
         routePath: "alaqeeq.edu.sa/articles",
         stats: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName}` : "قراءات ملهمة · أبحاث",
         glowColor: "rgba(6, 182, 212, 0.28)",
@@ -305,13 +402,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         description:
           orchestration?.heroCovers?.showcaseCustomDesc ||
           "أحدث الفعاليات اليومية، فيديوهات المعارض المدرسية، والإعلانات الرسمية الصادرة من الإدارة العامة.",
-        image: dark ? "/previews/showcase_dark.webp" : "/previews/showcase_light.webp",
+        image: showcasePhoto,
         routePath: "alaqeeq.edu.sa/showcase",
         stats: showcase?.postCount ? `${showcase.postCount} منشور إعلامي · مباشر` : "تحديثات وتغطيات يومية",
         glowColor: "rgba(234, 88, 12, 0.28)",
       },
     };
-  }, [orchestration, issues, albums, podcasts, articles, showcases, dark]);
+  }, [orchestration, issues, albums, podcasts, articles, showcases, aboutOverrides, admissionsOverrides, cacheKey, dark]);
 
   const handleMouseEnterItem = (key: string) => {
     if (timeoutRef.current) {
@@ -479,13 +576,8 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       </div>
                     </div>
 
-                    {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Viewport) ── */}
-                    <DockLiveViewport
-                      itemPath={item.path}
-                      theme={dark ? "dark" : "light"}
-                      fallbackImage={preview.image}
-                      title={preview.title}
-                    />
+                    {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Authentic Cover) ── */}
+                    <DockHeroCover preview={preview} dark={dark} />
 
                     {/* Description */}
                     <p

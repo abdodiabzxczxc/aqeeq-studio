@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset, deletePageSection, deleteVisualFreeformElement, deleteVisualElementOverride, getCustomPageBySlug, listCustomPageHistory, listCustomPages, listMediaAssets, listPageSectionHistory, listPageSections, listVisualElementTrash, listVisualFreeformElements, listVisualElementOverrideHistory, listVisualElementOverrides, listAllVisualElementOverrides, logAudit, moveVisualElementToTrash, permanentlyDeleteVisualElementTrash, publishPageSection, publishVisualFreeformElement, publishVisualElementOverride, publishAllVisualElementOverrides, reorderPageSections, restoreCustomPageHistory, restorePageSectionHistory, restoreVisualElementTrash, restoreVisualElementOverrideHistory, updateCustomPage, upsertPageSection, upsertVisualFreeformElement, upsertVisualElementOverride } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
+import { triggerAutoPageCapture } from "../previewCapture";
 
 const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditations|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio|atheer|podcast|articles)$|^\/(?:news|albums|offers|journal|atheer|podcast|articles)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2}|archive|[a-z0-9-]+)|albums\/[a-z0-9-]+|articles\/[a-z0-9-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
 const cssTokenSchema = z.string().max(96).regex(/^[#a-zA-Z0-9.%(), /-]*$/, "قيمة النمط غير صالحة").nullable().optional();
@@ -88,18 +89,21 @@ export const visualEditorRouter = router({
   })).mutation(async ({ input, ctx }) => {
     const override = await upsertVisualElementOverride({ ...input, customCss: input.customCss ?? null, updatedBy: ctx.user.id });
     await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.save", details: JSON.stringify({ pagePath: input.pagePath, elementId: input.elementId }) });
+    triggerAutoPageCapture(input.pagePath);
     return override;
   }),
 
   reset: adminProcedure.input(z.object({ pagePath: pagePathSchema, elementId: supportedElementSchema })).mutation(async ({ input, ctx }) => {
     const result = await deleteVisualElementOverride(input.pagePath, input.elementId);
     await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.reset", details: JSON.stringify(input) });
+    triggerAutoPageCapture(input.pagePath);
     return result;
   }),
 
   publish: adminProcedure.input(z.object({ pagePath: pagePathSchema, elementId: supportedElementSchema })).mutation(async ({ input, ctx }) => {
     const result = await publishVisualElementOverride(input.pagePath, input.elementId, ctx.user.id);
     await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.publish", details: JSON.stringify(input) });
+    triggerAutoPageCapture(input.pagePath);
     return result;
   }),
 

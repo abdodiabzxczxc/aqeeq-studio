@@ -7,6 +7,7 @@ import { ENV } from "./_core/env";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, adminAuditorProcedure, adminCoordinatorProcedure, adminCoordinatorAuditorProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { saveLocalDb, localAdmissions } from "./localStore";
+import { triggerAutoPageCapture } from "./previewCapture";
 
 import {
   getUserByUsernameOrEmail,
@@ -633,15 +634,22 @@ export const appRouter = router({
     create: adminProcedure.input(z.object({ title: z.string().trim().min(3).max(255), slug: z.string().trim().regex(/^[a-z0-9-]+$/).min(3).max(128), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), driveFolderUrl: z.string().url().max(1024).nullable().optional(), coverUrl: z.string().max(1024).optional(), description: z.string().max(4000).optional(), seasonLabel: z.string().max(128).optional(), readingMode: z.enum(["spread", "scroll"]).optional(), headerLogoUrl: z.string().max(1024).nullable().optional(), backgroundAudioUrl: z.string().max(1024).nullable().optional(), watermarkUrl: z.string().max(1024).nullable().optional(), watermarkScale: z.number().int().min(20).max(90).optional(), watermarkOpacity: z.number().int().min(0).max(60).optional(), watermarkPosition: z.enum(["center", "top-right", "bottom-left", "bottom-right"]).optional(), watermarkTint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() })).mutation(async ({ input, ctx }) => {
       const issue = await createSchoolNewsIssue({ ...input, createdBy: ctx.user.id });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.create", details: JSON.stringify({ title: input.title, slug: input.slug }) });
+      triggerAutoPageCapture("journal");
+      triggerAutoPageCapture("home");
       return issue;
     }),
-    update: adminProcedure.input(z.object({ id: z.number().int().positive(), title: z.string().trim().min(3).max(255).optional(), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), driveFolderUrl: z.string().url().max(1024).nullable().optional(), coverUrl: z.string().max(1024).nullable().optional(), description: z.string().max(4000).nullable().optional(), seasonLabel: z.string().max(128).optional(), readingMode: z.enum(["spread", "scroll"]).optional(), headerLogoUrl: z.string().max(1024).nullable().optional(), backgroundAudioUrl: z.string().max(1024).nullable().optional(), watermarkUrl: z.string().max(1024).nullable().optional(), watermarkScale: z.number().int().min(20).max(90).optional(), watermarkOpacity: z.number().int().min(0).max(60).optional(), watermarkPosition: z.enum(["center", "top-right", "bottom-left", "bottom-right"]).optional(), watermarkTint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() })).mutation(({ input, ctx }) => {
+    update: adminProcedure.input(z.object({ id: z.number().int().positive(), title: z.string().trim().min(3).max(255).optional(), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), driveFolderUrl: z.string().url().max(1024).nullable().optional(), coverUrl: z.string().max(1024).nullable().optional(), description: z.string().max(4000).nullable().optional(), seasonLabel: z.string().max(128).optional(), readingMode: z.enum(["spread", "scroll"]).optional(), headerLogoUrl: z.string().max(1024).nullable().optional(), backgroundAudioUrl: z.string().max(1024).nullable().optional(), watermarkUrl: z.string().max(1024).nullable().optional(), watermarkScale: z.number().int().min(20).max(90).optional(), watermarkOpacity: z.number().int().min(0).max(60).optional(), watermarkPosition: z.enum(["center", "top-right", "bottom-left", "bottom-right"]).optional(), watermarkTint: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() })).mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
-      return updateSchoolNewsIssue(id, data);
+      const res = await updateSchoolNewsIssue(id, data);
+      triggerAutoPageCapture("journal");
+      triggerAutoPageCapture("home");
+      return res;
     }),
     setCover: adminProcedure.input(z.object({ issueId: z.number().int().positive(), imageUrl: z.string().min(1).max(1024), imageStorageKey: z.string().max(512).nullable().optional() })).mutation(async ({ input, ctx }) => {
       const issue = await setSchoolNewsCover(input.issueId, { imageUrl: input.imageUrl, imageStorageKey: input.imageStorageKey });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.set_cover", details: JSON.stringify({ issueId: input.issueId }) });
+      triggerAutoPageCapture("journal");
+      triggerAutoPageCapture("home");
       return issue;
     }),
     addPages: adminProcedure.input(z.object({ issueId: z.number().int().positive(), pages: z.array(z.object({ imageUrl: z.string().min(1).max(1024), imageStorageKey: z.string().max(512).optional(), caption: z.string().max(255).optional() })).min(1).max(100) })).mutation(async ({ input, ctx }) => {
@@ -717,12 +725,16 @@ export const appRouter = router({
     create: adminProcedure.input(aqeeqAlbumInput).mutation(async ({ input, ctx }) => {
       const album = await createAqeeqAlbum({ ...input, ceremonyId: input.ceremonyId ?? null, createdBy: ctx.user.id });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, ceremonyId: input.ceremonyId ?? undefined, action: "aqeeq_album.create", details: JSON.stringify({ title: input.title, slug: input.slug }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return album;
     }),
     update: adminProcedure.input(aqeeqAlbumInput.partial().extend({ id: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
       const album = await updateAqeeqAlbum(id, data);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, ceremonyId: album?.ceremonyId ?? undefined, action: "aqeeq_album.update", details: JSON.stringify({ id }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return album;
     }),
     importFromDrive: adminProcedure.input(z.object({ albumId: z.number().int().positive(), driveFolderUrl: z.string().url().max(1024) })).mutation(async ({ input, ctx }) => {
@@ -730,6 +742,8 @@ export const appRouter = router({
       const stored = await replaceAqeeqAlbumMedia(input.albumId, media);
       const album = await updateAqeeqAlbum(input.albumId, { driveFolderUrl: input.driveFolderUrl });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, ceremonyId: album?.ceremonyId ?? undefined, action: "aqeeq_album.import_drive", details: JSON.stringify({ id: input.albumId, count: stored.length }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return stored;
     }),
     updateMedia: adminProcedure.input(z.object({ id: z.number().int().positive(), caption: z.string().max(255).nullable().optional(), mediaOrder: z.number().int().min(0).optional() })).mutation(({ input }) => {
@@ -751,16 +765,22 @@ export const appRouter = router({
     publish: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
       const album = await publishAqeeqAlbum(input.id);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, ceremonyId: album?.ceremonyId ?? undefined, action: "aqeeq_album.publish", details: JSON.stringify({ id: input.id }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return album;
     }),
     unpublish: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
       const album = await unpublishAqeeqAlbum(input.id);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, ceremonyId: album?.ceremonyId ?? undefined, action: "aqeeq_album.unpublish", details: JSON.stringify({ id: input.id }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return album;
     }),
     delete: adminProcedure.input(z.object({ id: z.number().int().positive(), confirm: z.literal(true) })).mutation(async ({ input, ctx }) => {
       const result = await deleteAqeeqAlbum(input.id);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_album.delete", details: JSON.stringify({ id: input.id }) });
+      triggerAutoPageCapture("albums");
+      triggerAutoPageCapture("home");
       return result;
     }),
     generateAiStory: publicProcedure
@@ -789,12 +809,16 @@ export const appRouter = router({
     create: adminProcedure.input(aqeeqShowcaseInput).mutation(async ({ input, ctx }) => {
       const showcase = await createAqeeqShowcase({ ...input, createdBy: ctx.user.id });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.create", details: JSON.stringify({ title: input.title, slug: input.slug }) });
+      triggerAutoPageCapture("showcase");
+      triggerAutoPageCapture("home");
       return showcase;
     }),
     update: adminProcedure.input(aqeeqShowcaseInput.partial().extend({ id: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
       const showcase = await updateAqeeqShowcase(id, data);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.update", details: JSON.stringify({ id }) });
+      triggerAutoPageCapture("showcase");
+      triggerAutoPageCapture("home");
       return showcase;
     }),
     syncFromDrive: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), driveFolderUrl: z.string().url().max(1024) })).mutation(async ({ input, ctx }) => {
@@ -802,16 +826,22 @@ export const appRouter = router({
       const result = await syncAqeeqShowcasePosts(input.showcaseId, media);
       await updateAqeeqShowcase(input.showcaseId, { driveFolderUrl: input.driveFolderUrl });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.sync_drive", details: JSON.stringify({ id: input.showcaseId, addedCount: result.addedCount }) });
+      triggerAutoPageCapture("showcase");
+      triggerAutoPageCapture("home");
       return result;
     }),
     addPosts: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), posts: z.array(z.object({ mediaUrl: storedMediaUrl, thumbnailUrl: storedMediaUrl.nullable().optional(), fileName: z.string().min(1).max(255), mimeType: z.string().min(1).max(128), mediaType: z.enum(["image", "video"]), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional() })).min(1).max(100) })).mutation(async ({ input, ctx }) => {
       const posts = await addAqeeqShowcasePosts(input.showcaseId, input.posts);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.add_posts", details: JSON.stringify({ id: input.showcaseId, count: input.posts.length }) });
+      triggerAutoPageCapture("showcase");
+      triggerAutoPageCapture("home");
       return posts;
     }),
     addMediaGroup: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), media: z.array(z.object({ mediaUrl: storedMediaUrl, thumbnailUrl: storedMediaUrl.nullable().optional(), fileName: z.string().min(1).max(255), mimeType: z.string().min(1).max(128), mediaType: z.enum(["image", "video"]) })).min(1).max(30) })).mutation(async ({ input, ctx }) => {
       const post = await addAqeeqShowcaseMediaGroup(input.showcaseId, input);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.add_media_group", details: JSON.stringify({ id: input.showcaseId, postId: post.id, count: input.media.length }) });
+      triggerAutoPageCapture("showcase");
+      triggerAutoPageCapture("home");
       return post;
     }),
     addXPost: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), xPostUrl: z.string().url().max(1024).refine((value) => /^(?:https?:\/\/)?(?:www\.)?(?:x|twitter)\.com\/[^/]+\/status\/\d+/i.test(value), "ضع رابط منشور X صحيحًا"), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), thumbnailUrl: storedMediaUrl.nullable().optional() })).mutation(async ({ input, ctx }) => {
@@ -1393,6 +1423,7 @@ export const appRouter = router({
           action: "admin.set_site_orchestration",
           details: JSON.stringify(input),
         });
+        triggerAutoPageCapture("home");
         return updated;
       }),
 
@@ -1768,7 +1799,10 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        return createAdminArticle(input);
+        const res = await createAdminArticle(input);
+        triggerAutoPageCapture("articles");
+        triggerAutoPageCapture("home");
+        return res;
       }),
 
     moderate: adminProcedure
@@ -1799,7 +1833,10 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        return moderateArticle(input.id, input.status, input.updates);
+        const res = await moderateArticle(input.id, input.status, input.updates);
+        triggerAutoPageCapture("articles");
+        triggerAutoPageCapture("home");
+        return res;
       }),
 
     aiPolish: adminProcedure
@@ -1834,7 +1871,10 @@ export const appRouter = router({
     delete: adminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
-        return deleteArticle(input.id);
+        const res = await deleteArticle(input.id);
+        triggerAutoPageCapture("articles");
+        triggerAutoPageCapture("home");
+        return res;
       }),
   }),
 
@@ -1894,7 +1934,10 @@ export const appRouter = router({
             resolvedMediaUrl = `/api/drive-audio-proxy/${fileId}?ext=mp3`;
           }
         }
-        return createPodcast({ ...input, mediaUrl: resolvedMediaUrl });
+        const res = await createPodcast({ ...input, mediaUrl: resolvedMediaUrl });
+        triggerAutoPageCapture("podcast");
+        triggerAutoPageCapture("home");
+        return res;
       }),
 
 
@@ -1906,13 +1949,19 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        return updatePodcast(input.id, input.data);
+        const res = await updatePodcast(input.id, input.data);
+        triggerAutoPageCapture("podcast");
+        triggerAutoPageCapture("home");
+        return res;
       }),
 
     delete: adminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
-        return deletePodcast(input.id);
+        const res = await deletePodcast(input.id);
+        triggerAutoPageCapture("podcast");
+        triggerAutoPageCapture("home");
+        return res;
       }),
   }),
 

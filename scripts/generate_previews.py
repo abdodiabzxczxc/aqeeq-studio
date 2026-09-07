@@ -65,12 +65,21 @@ def capture_page(key, url, theme, delay):
         resized.save(compat_webp, "WEBP", quality=90)
         resized.save(compat_png, "PNG")
 
+import sys
+
 def main():
-    print("Starting screenshot generation for all pages (Dark & Light)...")
+    target = sys.argv[1].strip().lower() if len(sys.argv) > 1 else None
+    if target:
+        print(f"Starting targeted screenshot generation for '{target}' (Dark & Light)...")
+    else:
+        print("Starting screenshot generation for all pages (Dark & Light)...")
+        
     for key, url, delay in PAGES:
+        if target and key != target:
+            continue
         for theme in ["dark", "light"]:
             capture_page(key, url, theme, delay)
-    print("All screenshots successfully captured and saved!")
+    print("Screenshots successfully captured and saved!")
 
 if __name__ == "__main__":
     main()
