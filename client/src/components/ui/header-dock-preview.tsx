@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ChevronLeft, Monitor } from "lucide-react";
+import { Sparkles, ChevronLeft, Monitor, BookOpen, Camera, Radio, FileText, Newspaper, GraduationCap, Award, Building2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export interface NavDockItemConfig {
@@ -19,9 +19,11 @@ interface PagePreviewMetadata {
   badge: string;
   description: string;
   image: string;
+  secondaryImage?: string | null;
   routePath: string;
   stats: string;
   glowColor: string;
+  type: "journal" | "albums" | "podcast" | "articles" | "showcase" | "admissions" | "accreditations" | "about" | "home";
 }
 
 function directDriveImage(url: string | null | undefined) {
@@ -44,7 +46,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   const [isCardHovered, setIsCardHovered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ── 📡 Live Real-Time Queries (Latest Added Items & Dashboard Customizations) ──
+  // ── 📡 Live Real-Time Queries: Fresh from Database & Orchestration ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     refetchOnWindowFocus: false,
     staleTime: 30_000,
@@ -70,20 +72,25 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     staleTime: 30_000,
   });
 
-  // ── 🎯 Compute Live Cover Images & Live Editable Text in Real-Time ──
+  // ── 🎯 Compute Live Cover Snapshots & Live Text in Real-Time ──
   const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
-    // 1. Journal: Latest added issue photo or custom issue photo
+    // 1. Journal: Latest added issue photo and previous issue photo
     const customIssue =
       orchestration?.heroCovers?.journalMode === "custom" && orchestration?.heroCovers?.customJournalIssueId
         ? issues.find((i) => i.id === orchestration.heroCovers.customJournalIssueId)
         : null;
     const activeIssue = customIssue || issues[0];
+    const secondIssue = issues[1] || null;
     const journalPhoto =
       directDriveImage(activeIssue?.coverUrl) ||
       activeIssue?.coverUrl ||
       "/covers/student-excellence-about.jpg";
+    const secondJournalPhoto =
+      directDriveImage(secondIssue?.coverUrl) ||
+      secondIssue?.coverUrl ||
+      null;
 
-    // 2. Albums: Latest added album photo or custom album photo
+    // 2. Albums: Latest added album photo
     const customAlbum =
       orchestration?.heroCovers?.albumsMode === "custom" && orchestration?.heroCovers?.customAlbumId
         ? albums.find((a) => a.id === orchestration.heroCovers.customAlbumId)
@@ -94,7 +101,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
       activeAlbum?.coverUrl ||
       "/covers/first-lego-champions.png";
 
-    // 3. Podcasts: Latest added podcast cover art or custom podcast art
+    // 3. Podcasts: Latest added podcast artwork
     const customPodcast =
       orchestration?.heroCovers?.podcastsMode === "custom" && orchestration?.heroCovers?.customPodcastId
         ? podcasts.find((p) => p.id === orchestration.heroCovers.customPodcastId)
@@ -105,7 +112,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
       activePodcast?.coverUrl ||
       "/covers/aqeeq-anthems-royal-cover.jpg";
 
-    // 4. Articles: Latest added article artwork or custom article artwork
+    // 4. Articles: Latest added article artwork
     const customArticle =
       orchestration?.heroCovers?.articlesMode === "custom" && orchestration?.heroCovers?.customArticleId
         ? articles.find((a) => a.id === orchestration.heroCovers.customArticleId)
@@ -125,6 +132,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
     return {
       home: {
+        type: "home",
         title: "بوابة مدارس العقيق الذكية",
         subtitle: orchestration?.themeMode?.customBadgeText
           ? `صرح المدينة المنورة · ${orchestration.themeMode.customBadgeText}`
@@ -137,6 +145,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(248, 202, 20, 0.28)",
       },
       about: {
+        type: "about",
         title: "مجمعات ومسارات العقيق",
         subtitle: "الرؤية والرسالة والبيئة النموذجية",
         badge: "✦ صروح ومجمعات العقيق",
@@ -149,6 +158,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(16, 185, 129, 0.28)",
       },
       accreditations: {
+        type: "accreditations",
         title: "الاعتمادات الدولية والشراكات",
         subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
         badge: "✦ الاعتمادات الأكاديمية الدولية",
@@ -159,6 +169,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(8, 70, 125, 0.38)",
       },
       admissions: {
+        type: "admissions",
         title: orchestration?.admissionsSettings?.isOpen
           ? "بوابة القبول وحاسبة الرسوم (متاح الآن)"
           : "بوابة القبول وحاسبة الرسوم",
@@ -178,6 +189,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(248, 202, 20, 0.32)",
       },
       journal: {
+        type: "journal",
         title: orchestration?.heroCovers?.journalCustomTitle || activeIssue?.title || "مجلة صوت العقيق الدورية",
         subtitle: orchestration?.heroCovers?.journalCustomTag || activeIssue?.seasonLabel || "صحافة مدرسية بأقلام وإبداع الطلاب",
         badge: activeIssue?.title ? `✦ أحدث إصدار: ${activeIssue.title}` : "✦ المجلة الدورية",
@@ -186,11 +198,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           activeIssue?.description ||
           "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
         image: journalPhoto,
+        secondaryImage: secondJournalPhoto,
         routePath: "alaqeeq.edu.sa/journal",
         stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
         glowColor: "rgba(244, 63, 94, 0.28)",
       },
       albums: {
+        type: "albums",
         title: orchestration?.heroCovers?.albumsCustomTitle || activeAlbum?.title || "ألبومات وتغطيات العقيق",
         subtitle: orchestration?.heroCovers?.albumsCustomTag || "توثيق فوتوغرافي لأجمل اللحظات والبطولات",
         badge: activeAlbum?.title
@@ -206,6 +220,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(139, 92, 246, 0.28)",
       },
       podcast: {
+        type: "podcast",
         title: orchestration?.heroCovers?.podcastsCustomTitle || activePodcast?.title || "أثير العقيق · راديو وبودكاست",
         subtitle: orchestration?.heroCovers?.podcastsCustomTag || "حوارات فكرية وإذاعة مدرسية ملهمة",
         badge: activePodcast?.title
@@ -221,6 +236,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(168, 85, 247, 0.28)",
       },
       articles: {
+        type: "articles",
         title: orchestration?.heroCovers?.articlesCustomTitle || activeArticle?.title || "مقالات وبحوث العقيق",
         subtitle: orchestration?.heroCovers?.articlesCustomTag || "منبر الفكر والتربية والإبداع الأكاديمي",
         badge: activeArticle?.title
@@ -236,6 +252,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         glowColor: "rgba(6, 182, 212, 0.28)",
       },
       showcase: {
+        type: "showcase",
         title: orchestration?.heroCovers?.showcaseCustomTitle || showcase?.title || "المعرض المرئي والأخبار",
         subtitle: orchestration?.heroCovers?.showcaseCustomSubtitle || "تغطيات حية ومقاطع سينمائية متجددة",
         badge: "✦ أحدث الأخبار والتغطيات",
@@ -356,7 +373,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
               <span className="relative z-10">{item.label}</span>
             </button>
 
-            {/* ── Real Live Image Preview — Positioned Directly Underneath THIS Specific Word! ── */}
+            {/* ── Realistic Live Website Snapshot — Positioned Directly Underneath THIS Specific Word! ── */}
             <AnimatePresence>
               {isHovered && preview && (
                 <div
@@ -373,7 +390,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       setHoveredKey(null);
                       onNavigate(item.path);
                     }}
-                    className={`group w-[300px] sm:w-[325px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden cursor-pointer ${
+                    className={`group w-[310px] sm:w-[335px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden cursor-pointer ${
                       dark
                         ? "bg-[#080d16]/96 border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(248,202,20,0.05)] text-white"
                         : "bg-white/96 border-slate-200/90 shadow-[0_20px_50px_rgba(8,70,125,0.18),0_0_20px_rgba(8,70,125,0.06)] text-slate-900"
@@ -400,7 +417,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                         <span className="w-2 h-2 rounded-full bg-[#27c93f] inline-block shadow-sm" />
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[150px]">
+                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[160px]">
                         <Monitor size={10} className="shrink-0 opacity-70" />
                         <span className="truncate">{preview.routePath}</span>
                       </div>
@@ -415,40 +432,77 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       </div>
                     </div>
 
-                    {/* Actual Newest Photo Artwork / Cover Container */}
-                    <div className="relative h-[155px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner">
-                      <img
-                        src={preview.image}
-                        alt={preview.title}
-                        loading="eager"
-                        className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-[1.03]"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          const fallback = "/covers/cover-about.jpg";
-                          if (target.src !== fallback) {
-                            target.src = fallback;
-                          }
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+                    {/* ── Live Hero Snapshot Visual Component (Authentic In-App Look with Newest Uploaded Content) ── */}
+                    <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
+                      {/* 1. Journal 3D Tilted Snapshot */}
+                      {preview.type === "journal" ? (
+                        <div className="relative w-full h-full bg-gradient-to-br from-[#12081f] via-[#0b0514] to-black p-2 flex items-center justify-center overflow-hidden">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.18),transparent_70%)]" />
+                          
+                          {/* Second issue rotated card behind */}
+                          {preview.secondaryImage && (
+                            <div
+                              className="absolute h-[85%] w-[48%] rounded-xl overflow-hidden border border-white/15 shadow-xl opacity-60 right-[10%] top-[8%]"
+                              style={{ transform: "rotate(-8deg)" }}
+                            >
+                              <img src={preview.secondaryImage} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          )}
 
-                      {/* Floating Badge on Image */}
-                      <div className="absolute top-2 right-2 z-10 max-w-[85%]">
-                        <span className="rounded-lg bg-black/75 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
-                          <Sparkles size={10} className="text-amber-300 shrink-0" />
-                          <span className="truncate">{preview.badge}</span>
-                        </span>
-                      </div>
+                          {/* Featured newest issue tilted front card */}
+                          <div
+                            className="relative z-10 h-[92%] w-[56%] rounded-xl overflow-hidden border border-[#f8ca14]/60 shadow-[0_12px_30px_rgba(0,0,0,0.8)] transition-transform duration-500 group-hover:scale-105"
+                            style={{ transform: "rotate(3deg)" }}
+                          >
+                            <img src={preview.image} alt={preview.title} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                            <div className="absolute bottom-1.5 inset-x-1.5 text-right">
+                              <span className="text-[8px] font-bold text-[#f8ca14] block truncate">
+                                {preview.subtitle}
+                              </span>
+                              <h5 className="text-[11px] font-black text-white leading-tight truncate drop-shadow-md">
+                                {preview.title}
+                              </h5>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Standard Hero Cover Viewport with Live Photo & Real-Time Typography */
+                        <div className="relative w-full h-full overflow-hidden">
+                          <img
+                            src={preview.image}
+                            alt={preview.title}
+                            loading="eager"
+                            className="w-full h-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-105"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              const fallback = "/covers/cover-about.jpg";
+                              if (target.src !== fallback) {
+                                target.src = fallback;
+                              }
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
-                      {/* Title & Subtitle Over Image */}
-                      <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right">
-                        <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate">
-                          {preview.subtitle}
-                        </span>
-                        <h4 className="text-sm font-black text-white drop-shadow-md truncate">
-                          {preview.title}
-                        </h4>
-                      </div>
+                          {/* Floating Badge on Image */}
+                          <div className="absolute top-2 right-2 z-10 max-w-[85%]">
+                            <span className="rounded-lg bg-black/75 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
+                              <Sparkles size={10} className="text-amber-300 shrink-0" />
+                              <span className="truncate">{preview.badge}</span>
+                            </span>
+                          </div>
+
+                          {/* Title & Subtitle Over Image */}
+                          <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right">
+                            <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate">
+                              {preview.subtitle}
+                            </span>
+                            <h4 className="text-sm font-black text-white drop-shadow-md truncate">
+                              {preview.title}
+                            </h4>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Description */}
