@@ -291,7 +291,7 @@ function MediaPostCard({
           }}
           data-aqeeq-video="true"
           data-no-visual-edit="true"
-          className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+          className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
             dark
               ? "border-[#08467d]/40 bg-gradient-to-b from-[#06182e]/90 via-[#030d19]/90 to-[#02070e] text-white shadow-[0_16px_45px_rgba(8,70,125,0.25)] hover:border-[#f8ca14] hover:shadow-[0_22px_65px_rgba(248,202,20,0.25)]"
               : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
@@ -347,32 +347,32 @@ function MediaPostCard({
           </div>
 
           {/* Title & Description */}
-          <div className="p-2 pt-3.5">
+          <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
             <VisualEditable
               id={`showcase-card-title-${post.id}`}
               tag="text"
               label={`عنوان ${post.fileName}`}
               defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
+              as="h3"
+              className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+            >
+              {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+            </VisualEditable>
+            <VisualEditable
+              id={`showcase-card-description-${post.id}`}
+              tag="text"
+              label={`وصف ${post.fileName}`}
+              defaultText={post.description || "من أخبار وعروض مدارس العقيق"}
               as="p"
-              className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-            />
-            {post.description ? (
-              <VisualEditable
-                id={`showcase-card-description-${post.id}`}
-                tag="text"
-                label={`وصف ${post.fileName}`}
-                defaultText={post.description}
-                as="p"
-                className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
-              />
-            ) : (
-              <p className={`mt-1 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من أخبار وعروض العقيق</p>
-            )}
+              className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            >
+              {post.description || "من أخبار وعروض مدارس العقيق"}
+            </VisualEditable>
           </div>
 
           {/* Bottom Action Capsule */}
           <div
-            className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+            className={`mt-auto flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
               dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
             }`}
           >
@@ -421,7 +421,7 @@ function MediaPostCard({
           transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
         }}
-        className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
           dark
             ? "border-amber-500/35 bg-gradient-to-b from-[#181300]/90 via-[#0e0c04]/90 to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_22px_65px_rgba(245,158,11,0.3)]"
             : "border-amber-300/80 bg-gradient-to-b from-amber-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
@@ -493,32 +493,32 @@ function MediaPostCard({
         </div>
 
         {/* Title & Description */}
-        <div className="p-2 pt-3.5">
+        <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
           <VisualEditable
             id={`showcase-card-title-${post.id}`}
             tag="text"
             label={`عنوان ${post.fileName}`}
             defaultText={post.title || post.fileName.replace(/\.[^.]+$/, "")}
+            as="h3"
+            className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+          >
+            {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+          </VisualEditable>
+          <VisualEditable
+            id={`showcase-card-description-${post.id}`}
+            tag="text"
+            label={`وصف ${post.fileName}`}
+            defaultText={post.description || "من أخبار وعروض العقيق"}
             as="p"
-            className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-          />
-          {post.description ? (
-            <VisualEditable
-              id={`showcase-card-description-${post.id}`}
-              tag="text"
-              label={`وصف ${post.fileName}`}
-              defaultText={post.description}
-              as="p"
-              className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
-            />
-          ) : (
-            <p className={`mt-1 text-xs font-bold ${dark ? "text-amber-400/80" : "text-amber-800"}`}>من أخبار وعروض العقيق</p>
-          )}
+            className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+          >
+            {post.description || "من أخبار وعروض العقيق"}
+          </VisualEditable>
         </div>
 
         {/* Bottom Action Capsule */}
         <div
-          className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+          className={`mt-auto flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
             dark ? "border-amber-500/20 bg-black/40" : "border-amber-200 bg-white shadow-sm"
           }`}
         >
@@ -611,12 +611,32 @@ function MediaPostCard({
   );
 }
 
-// 3) SOCIAL MEDIA CARD (لون الوردي والأرجواني الموثق 📱)
-function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: () => void; dark: boolean }) {
+// 3) SOCIAL MEDIA CARD (المنصات الرسمية الموحدة بأبعاد 16:9 الفاخرة 📱)
+function SocialPostCard({
+  post,
+  onOpen,
+  onSelect,
+  dark,
+}: {
+  post: ShowcasePost;
+  onOpen: () => void;
+  onSelect?: () => void;
+  dark: boolean;
+}) {
   const postUrl = post.externalUrl || post.mediaUrl;
   const isInstagram = post.sourceType === "instagram";
+  const isX = post.sourceType === "x";
+  const isYouTube = post.sourceType === "youtube";
+  const groupItems = post.media?.length ? post.media : [post];
+  const hasMultiple = groupItems.length > 1;
+  const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
+  const displaySrc = getAqeeqShowcaseDisplaySource(post);
+
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 2) + 14 : 29);
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = groupItems[activeIndex] || groupItems[0];
   const { ref, tilt, onMove, onLeave } = useMagneticTilt(6);
 
   const handleLike = (e: React.MouseEvent) => {
@@ -631,116 +651,237 @@ function SocialPostCard({ post, onOpen, dark }: { post: ShowcasePost; onOpen: ()
     }
   };
 
+  const handleMediaClick = () => {
+    if (hasMultiple) {
+      setActiveIndex(0);
+      setGroupOpen(true);
+    } else if (onSelect) {
+      onSelect();
+    } else if (postUrl) {
+      window.open(postUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
-    <motion.article
-      variants={fadeUpSpring}
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{
-        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
-      }}
-      className={`group/card relative overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
-        dark
-          ? "border-[#08467d]/35 bg-gradient-to-b from-[#051120]/90 via-[#030b14]/90 to-[#010408] text-white shadow-[0_16px_45px_rgba(8,70,125,0.2)] hover:border-[#f8ca14] hover:shadow-[0_22px_60px_rgba(248,202,20,0.25)]"
-          : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
-      }`}
-    >
-      {/* Specular glare following cursor */}
-      <div
-        className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+    <>
+      <motion.article
+        variants={fadeUpSpring}
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
         style={{
-          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+          transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+          transition: "transform 0.15s cubic-bezier(0.2, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
         }}
-      />
-      {/* Top Bar Header inside Card */}
-      <div className="flex items-center justify-between border-b border-[#08467d]/20 pb-2.5 mb-3.5">
-        <div className="flex items-center gap-1.5">
-          <span className="grid h-6 w-6 place-items-center rounded-lg bg-[#08467d] text-[#f8ca14] shadow-sm">
-            <Share2 size={12} />
-          </span>
-          <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-            {post.sourceType === "x" ? "منصة 𝕏 الرسمية" : isInstagram ? "إنستغرام العقيق" : "يوتيوب العقيق"}
+        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+          dark
+            ? "border-[#08467d]/35 bg-gradient-to-b from-[#051120]/90 via-[#030b14]/90 to-[#010408] text-white shadow-[0_16px_45px_rgba(8,70,125,0.2)] hover:border-[#f8ca14] hover:shadow-[0_22px_60px_rgba(248,202,20,0.25)]"
+            : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
+        }`}
+      >
+        {/* Specular glare following cursor */}
+        <div
+          className="pointer-events-none absolute inset-0 z-20 rounded-[2.2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.14) 0%, transparent 60%)`,
+          }}
+        />
+        {/* Top Bar Header inside Card */}
+        <div className="flex items-center justify-between border-b border-[#08467d]/20 pb-2.5 mb-3.5">
+          <div className="flex items-center gap-1.5">
+            <span className="grid h-6 w-6 place-items-center rounded-lg bg-[#08467d] text-[#f8ca14] shadow-sm">
+              <Share2 size={12} />
+            </span>
+            <span className={`text-[11px] font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+              {isX ? "منصة 𝕏 الرسمية" : isInstagram ? "إنستغرام العقيق" : "يوتيوب العقيق"}
+            </span>
+          </div>
+          <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-black border ${
+            dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/20"
+          }`}>
+            {isX ? "X" : isInstagram ? "Instagram" : "YouTube"}
           </span>
         </div>
-        <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-black border ${
-          dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d] border-[#08467d]/20"
-        }`}>
-          {post.sourceType === "x" ? "X" : isInstagram ? "Instagram" : "YouTube"}
-        </span>
-      </div>
 
-      {/* Embed Frame */}
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-        {post.sourceType === "x" ? (
-          <XPostEmbed post={post} dark={dark} />
-        ) : isInstagram ? (
-          <InstagramPostEmbed post={post} />
-        ) : (
-          <YouTubePostEmbed post={post} />
-        )}
-      </div>
+        {/* 16:9 Cinema Frame Screen */}
+        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.15)]">
+          {isYouTube ? (
+            <YouTubePostEmbed post={post} />
+          ) : (
+            <button
+              type="button"
+              onClick={handleMediaClick}
+              className="group/screen relative block h-full w-full overflow-hidden bg-black text-right focus:outline-none"
+            >
+              {hasMultiple ? (
+                <div className="grid grid-cols-2 gap-0.5 h-full w-full bg-black">
+                  {groupItems.slice(0, 4).map((item, index) => (
+                    <div key={item.id || index} className="relative h-full w-full overflow-hidden">
+                      <img
+                        src={getAqeeqShowcaseDisplaySource(item) || displaySrc}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="h-full w-full object-cover transition duration-500 group-hover/screen:scale-105"
+                        loading="lazy"
+                      />
+                      {index === 3 && groupItems.length > 4 ? (
+                        <span className="absolute inset-0 grid place-items-center bg-black/70 text-lg font-black text-[#f8ca14]">
+                          +{groupItems.length - 4}
+                        </span>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : displaySrc ? (
+                <img
+                  src={displaySrc}
+                  alt={post.title || post.fileName}
+                  className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="relative flex h-full w-full flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-[#06182e] via-[#030d19] to-black">
+                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d] text-[#f8ca14] shadow-lg mb-2">
+                    <Share2 size={20} />
+                  </div>
+                  <p className="text-xs font-black text-white/90 line-clamp-1">{post.title || "منشور رسمي"}</p>
+                  <span className="text-[10px] text-[#f8ca14] mt-1 font-bold">مدارس العقيق الأهلية والدولية</span>
+                </div>
+              )}
 
-      {/* Title & Description */}
-      <div className="p-2 pt-3.5">
-        <VisualEditable
-          id={`showcase-social-title-${post.id}`}
-          tag="text"
-          label={`عنوان ${post.fileName}`}
-          defaultText={post.title || post.fileName}
-          as="p"
-          className={`truncate text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-        />
-        {post.description ? (
+              {/* Video Play Overlay if it's a video */}
+              {isVideo && !hasMultiple && (
+                <div className="absolute inset-0 grid place-items-center pointer-events-none bg-black/25">
+                  <div className="grid h-12 w-12 place-items-center rounded-full bg-[#08467d] text-[#f8ca14] shadow-[0_0_25px_rgba(8,70,125,0.8)] ring-2 ring-white/30 transition-all duration-300 group-hover/screen:scale-110">
+                    <Play size={18} className="mr-0.5 fill-current" />
+                  </div>
+                </div>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Title & Description */}
+        <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+          <VisualEditable
+            id={`showcase-social-title-${post.id}`}
+            tag="text"
+            label={`عنوان ${post.fileName}`}
+            defaultText={post.title || post.fileName}
+            as="h3"
+            className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
+          >
+            {post.title || post.fileName}
+          </VisualEditable>
           <VisualEditable
             id={`showcase-social-description-${post.id}`}
             tag="text"
             label={`وصف ${post.fileName}`}
-            defaultText={post.description}
+            defaultText={post.description || "من منصات تواصل العقيق الرسمية"}
             as="p"
-            className={`mt-1.5 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}
-          />
-        ) : (
-          <p className={`mt-1 text-xs font-bold ${dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"}`}>من منصات تواصل العقيق الرسمية</p>
-        )}
-      </div>
-
-      {/* Bottom Action Capsule */}
-      <div
-        className={`mt-3 flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
-          dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
-        }`}
-      >
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleLike}
-            className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
-              liked
-                ? "bg-[#de191e]/20 text-[#de191e]"
-                : "text-slate-400 hover:text-[#de191e]"
-            }`}
-            title="إعجاب"
+            className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
           >
-            <Heart size={12} className={liked ? "fill-[#de191e] text-[#de191e]" : ""} />
-            <span>{likeCount}</span>
-          </button>
-          <ViewCount post={post} />
+            {post.description || "من منصات تواصل العقيق الرسمية"}
+          </VisualEditable>
         </div>
 
-        <a
-          onClick={onOpen}
-          href={postUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#08467d] hover:bg-[#063560] text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+        {/* Bottom Action Capsule */}
+        <div
+          className={`mt-auto flex items-center justify-between rounded-xl border p-2 backdrop-blur-md ${
+            dark ? "border-white/10 bg-black/40" : "border-slate-200 bg-white shadow-sm"
+          }`}
         >
-          <span>فتح المصدر</span>
-          <ArrowUpLeft size={13} />
-        </a>
-      </div>
-    </motion.article>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleLike}
+              className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                liked
+                  ? "bg-[#de191e]/20 text-[#de191e]"
+                  : "text-slate-400 hover:text-[#de191e]"
+              }`}
+              title="إعجاب"
+            >
+              <Heart size={12} className={liked ? "fill-[#de191e] text-[#de191e]" : ""} />
+              <span>{likeCount}</span>
+            </button>
+            <ViewCount post={post} />
+          </div>
+
+          <a
+            onClick={onOpen}
+            href={postUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#08467d] hover:bg-[#063560] text-white px-2.5 py-1 text-[11px] font-black shadow-sm transition active:scale-95"
+          >
+            <span>{isX ? "فتح في 𝕏" : isInstagram ? "فتح في إنستغرام" : isYouTube ? "مشاهدة في يوتيوب" : "فتح المصدر"}</span>
+            <ArrowUpLeft size={13} />
+          </a>
+        </div>
+      </motion.article>
+
+      {/* Lightbox / Group Modal for multi-photo social posts */}
+      {hasMultiple && (
+        <Dialog open={groupOpen} onOpenChange={setGroupOpen}>
+          <DialogContent
+            className={`w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-5xl max-h-[94svh] overflow-y-auto p-0 text-right rounded-[1.6rem] sm:rounded-[2rem] border shadow-[0_32px_100px_rgba(0,0,0,0.9)] backdrop-blur-2xl ${
+              dark ? "border-[#08467d]/40 bg-[#070a10] text-white" : "border-black/10 bg-white text-black"
+            }`}
+          >
+            <DialogTitle className="sr-only">{post.title || "مجموعة صور"}</DialogTitle>
+            <div dir="rtl">
+              <div className="relative bg-black">
+                <img
+                  src={getAqeeqShowcaseDisplaySource(active) || displaySrc}
+                  alt=""
+                  className="max-h-[74svh] w-full object-contain"
+                />
+                {groupItems.length > 1 ? (
+                  <>
+                    <button
+                      onClick={() => setActiveIndex((idx) => Math.max(0, idx - 1))}
+                      disabled={activeIndex === 0}
+                      className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30"
+                    >
+                      <ChevronRight size={22} />
+                    </button>
+                    <button
+                      onClick={() => setActiveIndex((idx) => Math.min(groupItems.length - 1, idx + 1))}
+                      disabled={activeIndex === groupItems.length - 1}
+                      className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white disabled:opacity-30"
+                    >
+                      <ChevronLeft size={22} />
+                    </button>
+                  </>
+                ) : null}
+              </div>
+              <div className="p-5 sm:p-7">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className={`text-xl font-black ${dark ? "text-white" : "text-black"}`}>
+                      {post.title || post.fileName}
+                    </h3>
+                    {post.description ? (
+                      <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
+                        {post.description}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs font-black ${
+                      dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/20 text-[#08467d]"
+                    }`}
+                  >
+                    {activeIndex + 1} / {groupItems.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 
@@ -1082,7 +1223,7 @@ export default function AqeeqShowcasePage() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
           >
             {visiblePosts.map((post) =>
               isSocialPost(post) ? (
@@ -1091,6 +1232,7 @@ export default function AqeeqShowcasePage() {
                   post={post}
                   dark={dark}
                   onOpen={() => void recordPostView.mutateAsync({ id: post.id, viewerKey: getAqeeqViewerKey() }).catch(() => undefined)}
+                  onSelect={() => setSelected(post)}
                 />
               ) : (
                 <MediaPostCard
@@ -1119,7 +1261,7 @@ export default function AqeeqShowcasePage() {
           {selected ? (
             <div ref={showcaseModalRef} dir="rtl" className="flex flex-col h-full w-full bg-black">
               <div className="relative bg-black aspect-video w-full overflow-hidden flex-1 min-h-0">
-                {selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl) ? (
+                {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && selected.sourceType !== "x" && selected.sourceType !== "instagram" ? (
                   <AqeeqUnifiedVideoFrame sourceUrl={selected.mediaUrl} title={selected.title || selected.fileName} posterUrl={getAqeeqShowcaseDisplaySource(selected)} />
                 ) : (
                   <ShowcaseMedia post={selected} className="max-h-[74svh] object-contain" />
@@ -1132,7 +1274,7 @@ export default function AqeeqShowcasePage() {
                     {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && (
+                    {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && selected.sourceType !== "x" && selected.sourceType !== "instagram" && (
                       <button
                         type="button"
                         onClick={toggleShowcaseFullscreen}
@@ -1156,6 +1298,19 @@ export default function AqeeqShowcasePage() {
                       >
                         <ExternalLink size={13} />
                         Drive
+                      </a>
+                    ) : null}
+                    {selected.externalUrl ? (
+                      <a
+                        href={selected.externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                          dark ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10" : "border-[#08467d]/30 text-[#08467d] hover:bg-[#08467d]/10"
+                        }`}
+                      >
+                        <ExternalLink size={13} />
+                        <span>{selected.sourceType === "x" ? "فتح في 𝕏" : selected.sourceType === "instagram" ? "إنستغرام" : "المصدر"}</span>
                       </a>
                     ) : null}
                     <button
