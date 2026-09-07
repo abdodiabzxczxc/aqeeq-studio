@@ -531,7 +531,7 @@ export default function AlaqeeqStudioPublicPage() {
           id,
           title: post.title || post.fileName || "منشور من منصة 𝕏",
           category: "منشور 𝕏",
-          imageUrl: null,
+          imageUrl: post.thumbnailUrl ? (directDriveImage(post.thumbnailUrl) || post.thumbnailUrl) : null,
           time: label,
           sourceType: "x",
           targetUrl: postUrl || "/offers",
@@ -544,7 +544,7 @@ export default function AlaqeeqStudioPublicPage() {
           id,
           title: post.title || post.fileName || "منشور Instagram",
           category: "Instagram",
-          imageUrl: null,
+          imageUrl: post.thumbnailUrl ? (directDriveImage(post.thumbnailUrl) || post.thumbnailUrl) : null,
           time: label,
           sourceType: "instagram",
           targetUrl: postUrl || "/offers",
@@ -917,7 +917,9 @@ export default function AlaqeeqStudioPublicPage() {
                     <div className={"h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-full border-2 flex items-center justify-center " + (
                       dark ? "border-black bg-[#121212]" : "border-white bg-slate-100"
                     )}>
-                      {story.sourceType === "instagram" ? (
+                      {story.imageUrl ? (
+                        <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                      ) : story.sourceType === "instagram" ? (
                         <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] text-white">
                           <Instagram size={24} />
                         </div>
@@ -925,8 +927,6 @@ export default function AlaqeeqStudioPublicPage() {
                         <div className="grid h-full w-full place-items-center bg-black text-white font-black text-xl">
                           𝕏
                         </div>
-                      ) : story.imageUrl ? (
-                        <img src={story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
                       ) : story.sourceType === "article" ? (
                         <div className="grid h-full w-full place-items-center bg-[#de191e]/20 text-[#de191e]">
                           <Newspaper size={22} />
@@ -951,13 +951,22 @@ export default function AlaqeeqStudioPublicPage() {
                         <span className="text-xs font-black">العقيق</span>
                       )}
                     </div>
-                    {story.isPinned ? (
-                      <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f8ca14] text-[9px] font-black text-black shadow-md">
+                    {story.isPinned && (
+                      <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f8ca14] text-[9px] font-black text-black shadow-md z-10">
                         ★
                       </span>
-                    ) : (
-                      <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 border-black animate-pulse" />
                     )}
+                    {story.imageUrl && (story.sourceType === "x" || story.sourceType === "instagram") ? (
+                      <span className={`absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full border shadow-md z-10 ${
+                        story.sourceType === "x"
+                          ? "border-white/30 bg-black text-white text-[10px] font-black"
+                          : "border-white/30 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white"
+                      }`}>
+                        {story.sourceType === "x" ? "𝕏" : <Instagram size={10} />}
+                      </span>
+                    ) : !story.isPinned ? (
+                      <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 border-black animate-pulse" />
+                    ) : null}
                   </div>
                   <p className={"max-w-[72px] sm:max-w-[84px] truncate text-[10px] sm:text-[11px] font-black transition " + (
                     dark ? "text-slate-200 group-hover:text-[#f8ca14]" : "text-slate-800 group-hover:text-[#08467d]"
@@ -1996,12 +2005,12 @@ export default function AlaqeeqStudioPublicPage() {
             <div className="absolute top-6 inset-x-4 z-20 flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 overflow-hidden rounded-full border border-white/30 bg-black flex items-center justify-center">
-                  {storiesList[activeStoryIndex].sourceType === "instagram" ? (
+                  {storiesList[activeStoryIndex].imageUrl ? (
+                    <img src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
+                  ) : storiesList[activeStoryIndex].sourceType === "instagram" ? (
                     <Instagram size={16} className="text-[#f8ca14]" />
                   ) : storiesList[activeStoryIndex].sourceType === "x" ? (
                     <span className="text-xs font-black">𝕏</span>
-                  ) : storiesList[activeStoryIndex].imageUrl ? (
-                    <img src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""} alt="" className="h-full w-full object-cover" />
                   ) : storiesList[activeStoryIndex].sourceType === "article" ? (
                     <Newspaper size={16} className="text-[#de191e]" />
                   ) : storiesList[activeStoryIndex].sourceType === "podcast" ? (
@@ -2037,7 +2046,13 @@ export default function AlaqeeqStudioPublicPage() {
 
             {/* Rich Story Content Display */}
             <div className="relative h-full w-full flex items-center justify-center bg-black">
-              {storiesList[activeStoryIndex].sourceType === "x" ? (
+              {storiesList[activeStoryIndex].imageUrl ? (
+                <img
+                  src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""}
+                  alt={storiesList[activeStoryIndex].title}
+                  className="h-full w-full object-cover"
+                />
+              ) : storiesList[activeStoryIndex].sourceType === "x" ? (
                 <div className="w-full px-4 pt-16 pb-28">
                   <XEmbed url={storiesList[activeStoryIndex].targetUrl} title={storiesList[activeStoryIndex].title} dark={true} />
                 </div>
@@ -2060,12 +2075,6 @@ export default function AlaqeeqStudioPublicPage() {
                     posterUrl={storiesList[activeStoryIndex].imageUrl}
                   />
                 </div>
-              ) : storiesList[activeStoryIndex].imageUrl ? (
-                <img
-                  src={directDriveImage(storiesList[activeStoryIndex].imageUrl) || storiesList[activeStoryIndex].imageUrl || ""}
-                  alt={storiesList[activeStoryIndex].title}
-                  className="h-full w-full object-cover"
-                />
               ) : storiesList[activeStoryIndex].sourceType === "article" ? (
                 <div className="p-8 text-center text-white space-y-4">
                   <div className="mx-auto h-20 w-20 rounded-3xl bg-[#de191e]/20 border border-[#de191e]/30 flex items-center justify-center text-[#de191e] shadow-[0_0_30px_rgba(222,25,30,0.3)]">
@@ -2112,7 +2121,11 @@ export default function AlaqeeqStudioPublicPage() {
                 onClick={() => {
                   const target = storiesList[activeStoryIndex].targetUrl;
                   setActiveStoryIndex(null);
-                  navigate(target);
+                  if (/^https?:\/\//i.test(target)) {
+                    window.open(target, "_blank", "noopener,noreferrer");
+                  } else {
+                    navigate(target);
+                  }
                 }}
                 className={"mt-4 w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black transition active:scale-95 shadow-xl " + (
                   dark

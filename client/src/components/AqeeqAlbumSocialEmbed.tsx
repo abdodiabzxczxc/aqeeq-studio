@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, ExternalLink, Instagram, Loader2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPoster";
 
 type Source = "x" | "instagram" | "youtube";
@@ -8,7 +8,7 @@ type XWidgetsWindow = Window & { twttr?: { widgets?: { load: (element?: HTMLElem
 
 // ─── X / Twitter Embed ──────────────────────────────────────────────────────
 
-export function XEmbed({
+export const XEmbed = React.memo(function XEmbed({
   url,
   title,
   dark = false,
@@ -18,6 +18,7 @@ export function XEmbed({
   dark?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastInjectedHtmlRef = useRef<string | null>(null);
   const [scriptReady, setScriptReady] = useState(false);
 
   // Fetch oEmbed data (cached 12h server-side)
@@ -58,22 +59,33 @@ export function XEmbed({
     document.body.appendChild(script);
   }, []);
 
-  // Enhance blockquote with widgets.js as soon as HTML is rendered
+  // Safely inject HTML only when it actually changes, and trigger Twitter widgets.js
+  // This isolates Twitter's DOM modifications from React's virtual DOM reconciliation,
+  // preventing hover, mouse movement, or tilt re-renders from destroying the Twitter iframe!
   useEffect(() => {
-    if (!themeAdjustedHtml || !containerRef.current) return;
+    if (!containerRef.current || !themeAdjustedHtml) return;
 
-    const renderWidget = () => {
-      const twttr = (window as XWidgetsWindow).twttr;
-      if (twttr?.widgets && containerRef.current) {
-        try {
-          twttr.widgets.load(containerRef.current);
-        } catch {}
-      }
-    };
+    if (lastInjectedHtmlRef.current !== themeAdjustedHtml) {
+      lastInjectedHtmlRef.current = themeAdjustedHtml;
+      containerRef.current.innerHTML = themeAdjustedHtml;
 
-    renderWidget();
-    const t = setTimeout(renderWidget, 100);
-    return () => clearTimeout(t);
+      const renderWidget = () => {
+        const twttr = (window as XWidgetsWindow).twttr;
+        if (twttr?.widgets && containerRef.current) {
+          try {
+            twttr.widgets.load(containerRef.current);
+          } catch {}
+        }
+      };
+
+      renderWidget();
+      const t1 = setTimeout(renderWidget, 100);
+      const t2 = setTimeout(renderWidget, 350);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
   }, [themeAdjustedHtml, scriptReady, dark]);
 
   return (
@@ -86,7 +98,6 @@ export function XEmbed({
         <div
           ref={containerRef}
           className="w-full px-2 py-2 flex justify-center [&_.twitter-tweet]:!my-0 [&_.twitter-tweet]:!max-w-full"
-          dangerouslySetInnerHTML={{ __html: themeAdjustedHtml }}
         />
       ) : isLoading ? (
         <div className="flex flex-col items-center justify-center p-8 text-center min-h-[180px]">
@@ -120,11 +131,11 @@ export function XEmbed({
       )}
     </div>
   );
-}
+});
 
 // ─── Instagram Embed ─────────────────────────────────────────────────────────
 
-export function FastInstagramEmbed({ url, title }: { url: string; title: string }) {
+export const FastInstagramEmbed = React.memo(function FastInstagramEmbed({ url, title }: { url: string; title: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -183,7 +194,7 @@ export function FastInstagramEmbed({ url, title }: { url: string; title: string 
       )}
     </div>
   );
-}
+});
 
 // ─── Unified Social Embed ─────────────────────────────────────────────────────
 

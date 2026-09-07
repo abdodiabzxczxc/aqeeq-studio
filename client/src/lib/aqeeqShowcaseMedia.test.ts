@@ -21,5 +21,6 @@ describe("getAqeeqShowcaseDisplaySource", () => {
 
   it("يستخدم thumbnailUrl عند توفره لمنشورات السوشيال", () => {
     expect(getAqeeqShowcaseDisplaySource({ mediaType: "image", mediaUrl: "https://x.com/alaqeeq_school/status/123456", thumbnailUrl: "https://pbs.twimg.com/media/test.jpg" })).toBe("https://pbs.twimg.com/media/test.jpg");
+    expect(getAqeeqShowcaseDisplaySource({ mediaType: "image", mediaUrl: "https://www.instagram.com/p/abc1234/", thumbnailUrl: "https://instagram.fsnc.net/thumb.jpg" })).toBe("https://instagram.fsnc.net/thumb.jpg");
   });
 });

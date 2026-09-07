@@ -14,7 +14,7 @@ import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Instagram, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -122,14 +122,15 @@ function ShowcaseHeroCover({ post, className = "" }: { post: ShowcasePost; class
 
 import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
 
-function XPostEmbed({ post, dark }: { post: ShowcasePost; dark: boolean }) {
+const XPostEmbed = React.memo(function XPostEmbed({ post, dark }: { post: ShowcasePost; dark: boolean }) {
   const xPostUrl = post.externalUrl || post.mediaUrl;
   return <XEmbed url={xPostUrl} title={post.title || post.fileName} dark={dark} />;
-}
-function InstagramPostEmbed({ post }: { post: ShowcasePost }) {
+});
+
+const InstagramPostEmbed = React.memo(function InstagramPostEmbed({ post }: { post: ShowcasePost }) {
   const postUrl = post.externalUrl || post.mediaUrl;
   return <FastInstagramEmbed url={postUrl} title={post.title || post.fileName} />;
-}
+});
 function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const postUrl = post.externalUrl || post.mediaUrl;
