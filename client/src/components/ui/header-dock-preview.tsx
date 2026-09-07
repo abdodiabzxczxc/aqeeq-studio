@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ChevronLeft, Monitor, Radio } from "lucide-react";
+import { Sparkles, ChevronLeft, Monitor } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export interface NavDockItemConfig {
@@ -22,7 +22,6 @@ interface PagePreviewMetadata {
   routePath: string;
   stats: string;
   glowColor: string;
-  isLiveUpdate?: boolean;
 }
 
 function directDriveImage(url: string | null | undefined) {
@@ -45,7 +44,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   const [isCardHovered, setIsCardHovered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ── 📡 Live Real-Time Data from DB & Site Orchestration ──
+  // ── 📡 Live Real-Time Queries (Latest Added Items & Dashboard Customizations) ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     refetchOnWindowFocus: false,
     staleTime: 30_000,
@@ -71,43 +70,58 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     staleTime: 30_000,
   });
 
-  // ── 🎯 Compute 100% Live Covers, Titles, & Descriptions in Real Time ──
+  // ── 🎯 Compute Live Cover Images & Live Editable Text in Real-Time ──
   const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
-    // 1. Journal: Custom issue or latest added issue
+    // 1. Journal: Latest added issue photo or custom issue photo
     const customIssue =
       orchestration?.heroCovers?.journalMode === "custom" && orchestration?.heroCovers?.customJournalIssueId
         ? issues.find((i) => i.id === orchestration.heroCovers.customJournalIssueId)
         : null;
     const activeIssue = customIssue || issues[0];
-    const journalCover = directDriveImage(activeIssue?.coverUrl) || activeIssue?.coverUrl || "/previews/journal.webp";
+    const journalPhoto =
+      directDriveImage(activeIssue?.coverUrl) ||
+      activeIssue?.coverUrl ||
+      "/covers/student-excellence-about.jpg";
 
-    // 2. Albums: Custom album or latest added album
+    // 2. Albums: Latest added album photo or custom album photo
     const customAlbum =
       orchestration?.heroCovers?.albumsMode === "custom" && orchestration?.heroCovers?.customAlbumId
         ? albums.find((a) => a.id === orchestration.heroCovers.customAlbumId)
         : null;
     const activeAlbum = customAlbum || albums[0];
-    const albumCover = directDriveImage(activeAlbum?.coverUrl) || activeAlbum?.coverUrl || "/previews/albums.webp";
+    const albumPhoto =
+      directDriveImage(activeAlbum?.coverUrl) ||
+      activeAlbum?.coverUrl ||
+      "/covers/first-lego-champions.png";
 
-    // 3. Podcasts: Custom podcast or latest added podcast
+    // 3. Podcasts: Latest added podcast cover art or custom podcast art
     const customPodcast =
       orchestration?.heroCovers?.podcastsMode === "custom" && orchestration?.heroCovers?.customPodcastId
         ? podcasts.find((p) => p.id === orchestration.heroCovers.customPodcastId)
         : null;
     const activePodcast = customPodcast || podcasts[0];
-    const podcastCover = directDriveImage(activePodcast?.coverUrl) || activePodcast?.coverUrl || "/previews/podcast.webp";
+    const podcastPhoto =
+      directDriveImage(activePodcast?.coverUrl) ||
+      activePodcast?.coverUrl ||
+      "/covers/aqeeq-anthems-royal-cover.jpg";
 
-    // 4. Articles: Custom article or latest added article
+    // 4. Articles: Latest added article artwork or custom article artwork
     const customArticle =
       orchestration?.heroCovers?.articlesMode === "custom" && orchestration?.heroCovers?.customArticleId
         ? articles.find((a) => a.id === orchestration.heroCovers.customArticleId)
         : null;
     const activeArticle = customArticle || articles[0];
-    const articleCover = directDriveImage(activeArticle?.coverUrl) || activeArticle?.coverUrl || "/previews/articles.webp";
+    const articlePhoto =
+      directDriveImage(activeArticle?.coverUrl) ||
+      activeArticle?.coverUrl ||
+      "/articles/ai-in-education-comprehensive-research.jpg";
 
-    // 5. Showcase / News: Latest showcase post cover or showcase cover
+    // 5. Showcase / News: Latest added news media photo
     const showcase = showcases[0];
-    const showcaseCover = directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "/previews/showcase.webp";
+    const showcasePhoto =
+      directDriveImage(showcase?.coverUrl) ||
+      showcase?.coverUrl ||
+      "/covers/cover-admissions.jpg";
 
     return {
       home: {
@@ -115,37 +129,34 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         subtitle: orchestration?.themeMode?.customBadgeText
           ? `صرح المدينة المنورة · ${orchestration.themeMode.customBadgeText}`
           : "الصرح التعليمي والافتراضي المتكامل",
-        badge: "✦ كافر الهيدر المحدث",
+        badge: "✦ البوابة الرقمية الموحدة",
         description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
-        image: "/previews/home.webp",
+        image: "/covers/cover-about.jpg",
         routePath: "alaqeeq.edu.sa/",
         stats: "30+ عاماً من التميز · المدينة",
         glowColor: "rgba(248, 202, 20, 0.28)",
-        isLiveUpdate: true,
       },
       about: {
         title: "مجمعات ومسارات العقيق",
         subtitle: "الرؤية والرسالة والبيئة النموذجية",
-        badge: "✦ كافر هيدر صروحنا",
+        badge: "✦ صروح ومجمعات العقيق",
         description: orchestration?.schoolCampuses?.boysAddress
           ? `مجمع الرانوناء ومجمع البنات — ${orchestration.schoolCampuses.boysAddress}`
           : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
-        image: "/previews/about.webp",
+        image: "/covers/cover-about.jpg",
         routePath: "alaqeeq.edu.sa/about",
         stats: "بنين وبنات · مرافق متكاملة",
         glowColor: "rgba(16, 185, 129, 0.28)",
-        isLiveUpdate: Boolean(orchestration?.schoolCampuses?.boysAddress),
       },
       accreditations: {
         title: "الاعتمادات الدولية والشراكات",
         subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
-        badge: "✦ كافر هيدر الاعتمادات",
+        badge: "✦ الاعتمادات الأكاديمية الدولية",
         description: "اعتماد كوجنيا الأمريكي Cognia، المقر الرسمي لاختبارات SAT و ACT واختبارات IELTS الدولية المعتمدة.",
-        image: "/previews/accreditations.webp",
+        image: "/covers/cover-accreditations.jpg",
         routePath: "alaqeeq.edu.sa/accreditations",
         stats: "Cognia USA · SAT / IELTS",
         glowColor: "rgba(8, 70, 125, 0.38)",
-        isLiveUpdate: true,
       },
       admissions: {
         title: orchestration?.admissionsSettings?.isOpen
@@ -154,80 +165,75 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         subtitle: orchestration?.admissionsSettings?.siblingDiscountSecond
           ? `خصم الأشقاء ${orchestration.admissionsSettings.siblingDiscountSecond}% · عام 2026 - 2027`
           : "احجز مقعدك للعام الجديد 2026 - 2027",
-        badge: orchestration?.admissionsSettings?.isOpen ? "✦ التسجيل متاح الآن" : "✦ كافر هيدر القبول",
+        badge: orchestration?.admissionsSettings?.isOpen ? "✦ التسجيل متاح الآن" : "✦ بوابة التسجيل",
         description:
           orchestration?.admissionsSettings?.closedNoticeText && !orchestration.admissionsSettings.isOpen
             ? orchestration.admissionsSettings.closedNoticeText
             : "حاسبة الأقساط الذكية مع خصومات الأشقاء، وخيارات التقسيط الميسر عبر تابي وتمارا بدون فوائد.",
-        image: "/previews/admissions.webp",
+        image: "/covers/student-lab-admissions.jpg",
         routePath: "alaqeeq.edu.sa/admissions",
         stats: orchestration?.admissionsSettings?.siblingDiscountSecond
           ? `خصم ${orchestration.admissionsSettings.siblingDiscountSecond}% · 4 دفعات`
           : "خصم 15% · 4 دفعات",
         glowColor: "rgba(248, 202, 20, 0.32)",
-        isLiveUpdate: Boolean(orchestration?.admissionsSettings),
       },
       journal: {
         title: orchestration?.heroCovers?.journalCustomTitle || activeIssue?.title || "مجلة صوت العقيق الدورية",
         subtitle: orchestration?.heroCovers?.journalCustomTag || activeIssue?.seasonLabel || "صحافة مدرسية بأقلام وإبداع الطلاب",
-        badge: activeIssue?.title ? `✦ أحدث عدد: ${activeIssue.title}` : "✦ كافر هيدر المجلة 3D",
+        badge: activeIssue?.title ? `✦ أحدث إصدار: ${activeIssue.title}` : "✦ المجلة الدورية",
         description:
           orchestration?.heroCovers?.journalCustomDesc ||
           activeIssue?.description ||
           "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
-        image: journalCover,
+        image: journalPhoto,
         routePath: "alaqeeq.edu.sa/journal",
         stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
         glowColor: "rgba(244, 63, 94, 0.28)",
-        isLiveUpdate: Boolean(activeIssue),
       },
       albums: {
         title: orchestration?.heroCovers?.albumsCustomTitle || activeAlbum?.title || "ألبومات وتغطيات العقيق",
         subtitle: orchestration?.heroCovers?.albumsCustomTag || "توثيق فوتوغرافي لأجمل اللحظات والبطولات",
         badge: activeAlbum?.title
-          ? `✦ أحدث ألبوم: ${activeAlbum.title.length > 22 ? activeAlbum.title.slice(0, 22) + "..." : activeAlbum.title}`
-          : "✦ كافر هيدر الألبومات",
+          ? `✦ أحدث ألبوم: ${activeAlbum.title.length > 24 ? activeAlbum.title.slice(0, 24) + "..." : activeAlbum.title}`
+          : "✦ ألبومات الفعاليات",
         description:
           orchestration?.heroCovers?.albumsCustomDesc ||
           activeAlbum?.description ||
           "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
-        image: albumCover,
+        image: albumPhoto,
         routePath: "alaqeeq.edu.sa/albums",
         stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
         glowColor: "rgba(139, 92, 246, 0.28)",
-        isLiveUpdate: Boolean(activeAlbum),
       },
       podcast: {
         title: orchestration?.heroCovers?.podcastsCustomTitle || activePodcast?.title || "أثير العقيق · راديو وبودكاست",
         subtitle: orchestration?.heroCovers?.podcastsCustomTag || "حوارات فكرية وإذاعة مدرسية ملهمة",
         badge: activePodcast?.title
-          ? `✦ أحدث حلقة: ${activePodcast.title.length > 20 ? activePodcast.title.slice(0, 20) + "..." : activePodcast.title}`
-          : "✦ كافر هيدر أثير",
+          ? `✦ أحدث حلقة: ${activePodcast.title.length > 22 ? activePodcast.title.slice(0, 22) + "..." : activePodcast.title}`
+          : "✦ أثير العقيق",
         description:
           orchestration?.heroCovers?.podcastsCustomDesc ||
           activePodcast?.description ||
           "استمع لحلقات البودكاست التربوية، لقاءات الطلاب، والإذاعة الصباحية مع مشغل صوتي عائم متطور.",
-        image: podcastCover,
+        image: podcastPhoto,
         routePath: "alaqeeq.edu.sa/podcast",
         stats: activePodcast?.duration ? `${activePodcast.duration} د · استوديو حي` : "بث صوتي ومرئي · أثير",
         glowColor: "rgba(168, 85, 247, 0.28)",
-        isLiveUpdate: Boolean(activePodcast),
       },
       articles: {
         title: orchestration?.heroCovers?.articlesCustomTitle || activeArticle?.title || "مقالات وبحوث العقيق",
         subtitle: orchestration?.heroCovers?.articlesCustomTag || "منبر الفكر والتربية والإبداع الأكاديمي",
         badge: activeArticle?.title
-          ? `✦ أحدث مقال: ${activeArticle.title.length > 20 ? activeArticle.title.slice(0, 20) + "..." : activeArticle.title}`
-          : "✦ كافر هيدر المقالات",
+          ? `✦ أحدث مقال: ${activeArticle.title.length > 22 ? activeArticle.title.slice(0, 22) + "..." : activeArticle.title}`
+          : "✦ مقالات وبحوث",
         description:
           orchestration?.heroCovers?.articlesCustomDesc ||
           activeArticle?.excerpt ||
           "مقالات حول الذكاء الاصطناعي في التعليم، مهارات المستقبل، وأبحاث متميزة بقلم نخبة المعلمين والطلاب.",
-        image: articleCover,
+        image: articlePhoto,
         routePath: "alaqeeq.edu.sa/articles",
         stats: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName}` : "قراءات ملهمة · أبحاث",
         glowColor: "rgba(6, 182, 212, 0.28)",
-        isLiveUpdate: Boolean(activeArticle),
       },
       showcase: {
         title: orchestration?.heroCovers?.showcaseCustomTitle || showcase?.title || "المعرض المرئي والأخبار",
@@ -236,11 +242,10 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         description:
           orchestration?.heroCovers?.showcaseCustomDesc ||
           "أحدث الفعاليات اليومية، فيديوهات المعارض المدرسية، والإعلانات الرسمية الصادرة من الإدارة العامة.",
-        image: showcaseCover,
+        image: showcasePhoto,
         routePath: "alaqeeq.edu.sa/showcase",
         stats: showcase?.postCount ? `${showcase.postCount} منشور إعلامي · مباشر` : "تحديثات وتغطيات يومية",
         glowColor: "rgba(234, 88, 12, 0.28)",
-        isLiveUpdate: Boolean(showcase),
       },
     };
   }, [orchestration, issues, albums, podcasts, articles, showcases]);
@@ -351,7 +356,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
               <span className="relative z-10">{item.label}</span>
             </button>
 
-            {/* ── Realistic Header Cover Live Preview — Positioned Directly Underneath THIS Specific Word! ── */}
+            {/* ── Real Live Image Preview — Positioned Directly Underneath THIS Specific Word! ── */}
             <AnimatePresence>
               {isHovered && preview && (
                 <div
@@ -406,20 +411,20 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span>محدث لايف</span>
+                        <span>مباشر</span>
                       </div>
                     </div>
 
-                    {/* Actual Live Page Header Cover */}
+                    {/* Actual Newest Photo Artwork / Cover Container */}
                     <div className="relative h-[155px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner">
                       <img
                         src={preview.image}
                         alt={preview.title}
                         loading="eager"
-                        className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover:scale-[1.02]"
+                        className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-[1.03]"
                         onError={(e) => {
                           const target = e.currentTarget;
-                          const fallback = `/previews/${item.key}.webp`;
+                          const fallback = "/covers/cover-about.jpg";
                           if (target.src !== fallback) {
                             target.src = fallback;
                           }
@@ -427,7 +432,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
-                      {/* Floating Badge on Cover */}
+                      {/* Floating Badge on Image */}
                       <div className="absolute top-2 right-2 z-10 max-w-[85%]">
                         <span className="rounded-lg bg-black/75 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
                           <Sparkles size={10} className="text-amber-300 shrink-0" />
@@ -435,7 +440,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                         </span>
                       </div>
 
-                      {/* Header Title & Subtitle Over Cover */}
+                      {/* Title & Subtitle Over Image */}
                       <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right">
                         <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate">
                           {preview.subtitle}
