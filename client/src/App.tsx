@@ -207,6 +207,8 @@ import { useAqeeqStudioTheme } from "./lib/aqeeqStudioTheme";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
 
 function StudioAppShell() {
+  const [location] = useLocation();
+  const isLoginPage = location === "/login";
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
   const { activeItem } = usePodcastPlayer();
@@ -225,10 +227,10 @@ function StudioAppShell() {
   return (
     <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
       {/* 🎞️ Global Cinematic Film Grain Texture */}
-      <div className="aqeeq-grain-overlay" aria-hidden />
-      {isNationalDay && <AqeeqCelebrationConfetti />}
+      {!isLoginPage && <div className="aqeeq-grain-overlay" aria-hidden />}
+      {!isLoginPage && isNationalDay && <AqeeqCelebrationConfetti />}
       {/* 🌟 Floating Gold & Emerald Stars Particles on ALL Pages */}
-      {isNationalDay && (
+      {!isLoginPage && isNationalDay && (
         <div className="pointer-events-none fixed inset-0 overflow-hidden z-20">
           <span className="snd-floating-star text-xs top-[92vh] left-[8%] [animation-duration:14s] [animation-delay:0s]">★</span>
           <span className="snd-floating-star text-sm top-[96vh] left-[22%] [animation-duration:19s] [animation-delay:3s]">✦</span>
@@ -239,14 +241,14 @@ function StudioAppShell() {
           <span className="snd-floating-star text-xs top-[93vh] left-[35%] [animation-duration:20s] [animation-delay:4s]">★</span>
         </div>
       )}
-      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
-        <ErrorBoundary fallback={null}><AqeeqOccasionRibbon /></ErrorBoundary>
-        <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>
+      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
+        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqOccasionRibbon /></ErrorBoundary>}
+        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>}
         <ErrorBoundary><Router /></ErrorBoundary>
 
-        <ErrorBoundary fallback={null}><VisualGlobalSections /></ErrorBoundary>
-        <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>
-        <ErrorBoundary fallback={null}><AqeeqAiAssistantWidget /></ErrorBoundary>
+        {!isLoginPage && <ErrorBoundary fallback={null}><VisualGlobalSections /></ErrorBoundary>}
+        {!isLoginPage && <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>}
+        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqAiAssistantWidget /></ErrorBoundary>}
       </div>
 
     </div>

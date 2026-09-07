@@ -23,6 +23,16 @@ body {
   overflow-x: clip;
 }
 
+body.dark {
+  background-color: #04070c;
+  color: #f8fafc;
+}
+
+body.light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
 button, a, input, select, textarea, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }

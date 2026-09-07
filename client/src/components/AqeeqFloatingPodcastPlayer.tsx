@@ -1046,7 +1046,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       {/* ========================================================================= */}
       {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK */}
       {/* ========================================================================= */}
-      {!location.startsWith("/admin") && (
+      {!location.startsWith("/admin") && location !== "/login" && (
       <>
       <div
         dir="rtl"

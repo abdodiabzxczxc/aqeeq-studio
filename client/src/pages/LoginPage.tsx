@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { LoginAmbientBackdrop } from "@/components/ui/login-ambient-backdrop";
+import { SignInCard2 } from "@/components/ui/sign-in-card-2";
 import { toast } from "sonner";
-import { ArrowRight, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, User } from "lucide-react";
+import { Sun, Moon, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated, loading, login } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const { theme, toggleTheme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -18,9 +20,11 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, loading, navigate, user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username.trim() || !password) {
+  const handleSubmit = async (
+    e: React.FormEvent,
+    data: { username: string; password: string; rememberMe: boolean }
+  ) => {
+    if (!data.username.trim() || !data.password) {
       toast.error("يرجى إدخال اسم المستخدم وكلمة المرور");
       return;
     }
@@ -28,11 +32,11 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login({
-        username: username.trim(),
-        password,
+        username: data.username.trim(),
+        password: data.password,
       });
       toast.success("تم تسجيل الدخول بنجاح", {
-        description: "مرحبًا بك في بوابة مدارس العقيق الأهلية والدولية",
+        description: "مرحبًا بك في بوابة إدارة مدارس العقيق الأهلية والدولية",
       });
       navigate("/");
     } catch (err: any) {
@@ -47,127 +51,55 @@ export default function LoginPage() {
   return (
     <main
       dir="rtl"
-      className="relative flex min-h-screen items-center justify-center bg-[#07090f] p-4 text-slate-100"
+      className={`fixed inset-0 z-50 flex min-h-screen w-screen flex-col items-center justify-center overflow-x-hidden overflow-y-auto px-4 py-8 transition-colors duration-700 select-none ${
+        dark ? "bg-[#04070c] text-white" : "bg-[#f8fafc] text-slate-900"
+      }`}
     >
-      {/* Background ambient lighting */}
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle_at_50% 20%, rgba(214,185,106,0.12), transparent 45%), radial-gradient(circle_at_80% 80%, rgba(22,86,119,0.18), transparent 50%)",
-        }}
-      />
+      {/* 1. Dynamic Auto-moving Ambient Backdrop with Very Low Opacity */}
+      <LoginAmbientBackdrop dark={dark} />
 
-      <div className="relative w-full max-w-md">
-        {/* Back Link */}
-        <div className="mb-6 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 transition hover:text-amber-200"
-          >
-            <ArrowRight size={15} />
-            العودة إلى بوابة مدارس العقيق
-          </button>
-          <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-300/80">
-            <Sparkles size={13} />
-            نظام المصادقة الآمن
-          </span>
-        </div>
+      {/* 2. Top Minimal Bar (Theme Switcher + Quick Portal Return) */}
+      <div className="absolute top-4 inset-x-0 mx-auto max-w-5xl px-5 sm:px-8 flex items-center justify-between z-20 pointer-events-auto">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-black backdrop-blur-md border transition-all ${
+            dark
+              ? "border-white/10 bg-white/5 text-slate-300 hover:text-amber-300 hover:border-white/20 hover:bg-white/10"
+              : "border-slate-200 bg-white/80 text-slate-600 hover:text-[#08467d] hover:border-slate-300 hover:bg-white"
+          }`}
+        >
+          <ArrowRight size={14} />
+          <span>بوابة العقيق</span>
+        </button>
 
-        {/* Card */}
-        <div className="overflow-hidden rounded-[2rem] border border-amber-300/25 bg-[#0e131f]/90 p-7 shadow-[0_32px_90px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-9">
-          {/* Header */}
-          <div className="text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-300/20 to-amber-500/10 text-amber-200 shadow-inner">
-              <Lock size={26} />
-            </div>
-            <h1 className="mt-5 text-2xl font-black tracking-tight text-amber-50">
-              تسجيل الدخول
-            </h1>
-            <p className="mt-2 text-xs leading-6 text-slate-400">
-              أدخل بيانات حسابك للوصول إلى لوحة التحكم وإدارة المنصة.
-            </p>
-          </div>
+        {/* Theme Toggle Button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={dark ? "التبديل إلى الوضع النهاري (Light Mode)" : "التبديل إلى الوضع الليلي (Dark Mode)"}
+          className={`grid h-9 w-9 place-items-center rounded-full border backdrop-blur-md transition-all ${
+            dark
+              ? "border-white/10 bg-white/5 text-amber-300 hover:bg-white/10 hover:border-amber-300/40"
+              : "border-slate-200 bg-white/80 text-slate-700 hover:bg-white hover:text-[#08467d]"
+          }`}
+        >
+          {dark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+      </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300">
-                اسم المستخدم أو البريد الإلكتروني
-              </label>
-              <div className="relative mt-2">
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
-                  autoComplete="username"
-                  required
-                  className="w-full rounded-xl border border-slate-700 bg-black/40 py-3 pl-3 pr-10 text-sm font-medium text-white placeholder-slate-500 outline-none transition focus:border-amber-300/80 focus:ring-1 focus:ring-amber-300/50"
-                />
-                <User
-                  size={16}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-              </div>
-            </div>
+      {/* 3. Luxury 3D Sign In Card */}
+      <div className="relative z-10 w-full flex justify-center items-center my-auto">
+        <SignInCard2
+          dark={dark}
+          onSubmit={handleSubmit}
+          isLoading={submitting}
+        />
+      </div>
 
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300">
-                كلمة المرور
-              </label>
-              <div className="relative mt-2">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  required
-                  className="w-full rounded-xl border border-slate-700 bg-black/40 py-3 pl-10 pr-10 text-sm font-medium text-white placeholder-slate-500 outline-none transition focus:border-amber-300/80 focus:ring-1 focus:ring-amber-300/50"
-                />
-                <KeyRound
-                  size={16}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-200"
-                  aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting || !username.trim() || !password}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-300 py-3.5 text-sm font-black text-slate-950 shadow-lg shadow-amber-300/20 transition duration-200 hover:bg-amber-200 disabled:opacity-50"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  جاري تسجيل الدخول…
-                </>
-              ) : (
-                <>
-                  <ShieldCheck size={16} />
-                  تسجيل الدخول
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Helper hint for default admin */}
-          <div className="mt-6 rounded-xl border border-amber-300/15 bg-amber-300/[.04] p-3 text-center text-[10px] leading-5 text-slate-400">
-            <span className="font-bold text-amber-200">ملاحظة المدير:</span> يتم
-            إنشاء الحساب الإداري الافتراضي تلقائيًا عند بدء التشغيل إذا تم تعيينه
-            في متغيرات البيئة.
-          </div>
-        </div>
+      {/* 4. Bottom School Identity Note */}
+      <div className="relative z-10 text-center mt-3 text-[11px] font-bold text-slate-500 pointer-events-none">
+        <p>مدارس العقيق الأهلية والدولية بالمدينة المنورة · جميع الحقوق محفوظة © 2026</p>
       </div>
     </main>
   );
