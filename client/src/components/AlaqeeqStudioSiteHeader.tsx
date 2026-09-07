@@ -53,6 +53,7 @@ import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 import { AqeeqCreatorStudioModal } from "./AqeeqCreatorStudioModal";
 import { Button } from "@/components/ui/button";
+import { HeaderDockNav, NavDockItemConfig } from "./ui/header-dock-preview";
 
 export type Section =
   | "studio"
@@ -516,138 +517,94 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             </div>
           </div>
 
-          {/* Center 9 Core Navigation Links (Desktop) — Isolated in Grid Center with zero horizontal drift */}
-          <nav
-            dir="rtl"
-            className={`hidden lg:flex items-center justify-self-center gap-2 xl:gap-4 whitespace-nowrap text-[13px] font-bold font-['Tajawal',sans-serif] transition-[opacity,transform] duration-250 ease-out ${
+          {/* Center 9 Core Navigation Links with Dock Magnification & Live Page Hover Preview */}
+          <div
+            className={`transition-[opacity,transform] duration-250 ease-out ${
               isScrolled
                 ? "opacity-0 -translate-y-2 pointer-events-none"
                 : "opacity-100 translate-y-0 pointer-events-auto"
             }`}
           >
-              {/* 1. الرئيسية */}
-              {!isNavHidden("home") && (
-                <button
-                  onClick={() => go("/")}
-                  data-visual-id="header-nav-home"
-                  data-visual-tag="text"
-                  data-visual-label="رابط الرئيسية"
-                  className={`aq-studio-toplink ${currentActive === "studio" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navHomeText}
-                </button>
-              )}
-
-              {/* 2. مدارسنا */}
-              {!isNavHidden("about") && (
-                <button
-                  onClick={() => go("/about")}
-                  data-visual-id="header-nav-about"
-                  data-visual-tag="text"
-                  data-visual-label="رابط مدارسنا"
-                  className={`aq-studio-toplink ${
-                    currentActive === "about" ? "aq-studio-toplink--active" : ""
-                  } ${dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80"}`}
-                >
-                  {navAboutText}
-                </button>
-              )}
-
-              {/* 3. الاعتمادات */}
-              {!isNavHidden("accreditations") && (
-                <button
-                  onClick={() => go("/accreditations")}
-                  data-visual-id="header-nav-accreditations"
-                  data-visual-tag="text"
-                  data-visual-label="رابط الاعتمادات"
-                  className={`aq-studio-toplink ${
-                    currentActive === "accreditations" ? "aq-studio-toplink--active" : ""
-                  }`}
-                >
-                  {navAccreditationsText}
-                </button>
-              )}
-
-              {/* 4. القبول والتسجيل */}
-              {!isNavHidden("admissions") && (
-                <button
-                  onClick={() => go("/admissions")}
-                  data-visual-id="header-nav-admissions"
-                  data-visual-tag="text"
-                  data-visual-label="رابط القبول والتسجيل"
-                  className={`aq-studio-toplink ${
-                    currentActive === "admissions" ? "aq-studio-toplink--active" : ""
-                  }`}
-                >
-                  {navAdmissionsText}
-                </button>
-              )}
-
-              {/* 5. المجلة */}
-              {!isNavHidden("journal") && (
-                <button
-                  onClick={() => go("/journal")}
-                  data-visual-id="header-nav-journal"
-                  data-visual-tag="text"
-                  data-visual-label="رابط مجلة العقيق"
-                  className={`aq-studio-toplink ${currentActive === "journal" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navJournalText}
-                </button>
-              )}
-
-              {/* 6. الألبومات */}
-              {!isNavHidden("albums") && (
-                <button
-                  onClick={() => go("/albums")}
-                  data-visual-id="header-nav-albums"
-                  data-visual-tag="text"
-                  data-visual-label="رابط الألبومات"
-                  className={`aq-studio-toplink ${currentActive === "albums" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navAlbumsText}
-                </button>
-              )}
-
-              {/* 7. أثير البودكاست */}
-              {!isNavHidden("podcast") && (
-                <button
-                  onClick={() => go("/podcast")}
-                  data-visual-id="header-nav-podcast"
-                  data-visual-tag="text"
-                  data-visual-label="رابط البودكاست"
-                  className={`aq-studio-toplink ${currentActive === "podcast" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navPodcastText}
-                </button>
-              )}
-
-              {/* 8. المقالات */}
-              {!isNavHidden("articles") && (
-                <button
-                  onClick={() => go("/articles")}
-                  data-visual-id="header-nav-articles"
-                  data-visual-tag="text"
-                  data-visual-label="رابط المقالات"
-                  className={`aq-studio-toplink ${currentActive === "articles" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navArticlesText}
-                </button>
-              )}
-
-              {/* 9. الأخبار */}
-              {!isNavHidden("showcase") && (
-                <button
-                  onClick={() => go("/showcase")}
-                  data-visual-id="header-nav-offers"
-                  data-visual-tag="text"
-                  data-visual-label="رابط الأخبار"
-                  className={`aq-studio-toplink ${currentActive === "showcase" ? "aq-studio-toplink--active" : ""}`}
-                >
-                  {navOffersText}
-                </button>
-              )}
-            </nav>
+            <HeaderDockNav
+              items={[
+                {
+                  key: "home",
+                  label: navHomeText,
+                  path: "/",
+                  active: currentActive === "studio",
+                  visualId: "header-nav-home",
+                  visualLabel: "رابط الرئيسية",
+                },
+                {
+                  key: "about",
+                  label: navAboutText,
+                  path: "/about",
+                  active: currentActive === "about",
+                  visualId: "header-nav-about",
+                  visualLabel: "رابط مدارسنا",
+                  customClass: dark ? "text-[#f8ca14]/90 hover:text-[#f8ca14]" : "text-[#08467d] hover:text-[#08467d]/80",
+                },
+                {
+                  key: "accreditations",
+                  label: navAccreditationsText,
+                  path: "/accreditations",
+                  active: currentActive === "accreditations",
+                  visualId: "header-nav-accreditations",
+                  visualLabel: "رابط الاعتمادات",
+                },
+                {
+                  key: "admissions",
+                  label: navAdmissionsText,
+                  path: "/admissions",
+                  active: currentActive === "admissions",
+                  visualId: "header-nav-admissions",
+                  visualLabel: "رابط القبول والتسجيل",
+                },
+                {
+                  key: "journal",
+                  label: navJournalText,
+                  path: "/journal",
+                  active: currentActive === "journal",
+                  visualId: "header-nav-journal",
+                  visualLabel: "رابط مجلة العقيق",
+                },
+                {
+                  key: "albums",
+                  label: navAlbumsText,
+                  path: "/albums",
+                  active: currentActive === "albums",
+                  visualId: "header-nav-albums",
+                  visualLabel: "رابط الألبومات",
+                },
+                {
+                  key: "podcast",
+                  label: navPodcastText,
+                  path: "/podcast",
+                  active: currentActive === "podcast",
+                  visualId: "header-nav-podcast",
+                  visualLabel: "رابط البودكاست",
+                },
+                {
+                  key: "articles",
+                  label: navArticlesText,
+                  path: "/articles",
+                  active: currentActive === "articles",
+                  visualId: "header-nav-articles",
+                  visualLabel: "رابط المقالات",
+                },
+                {
+                  key: "showcase",
+                  label: navOffersText,
+                  path: "/showcase",
+                  active: currentActive === "showcase",
+                  visualId: "header-nav-offers",
+                  visualLabel: "رابط الأخبار",
+                },
+              ].filter((it) => !isNavHidden(it.key))}
+              dark={dark}
+              onNavigate={go}
+            />
+          </div>
 
           {/* Left Action Buttons — Permanently rounded pill island, zero circle morphing */}
           <div className="relative shrink-0 lg:justify-self-end">
