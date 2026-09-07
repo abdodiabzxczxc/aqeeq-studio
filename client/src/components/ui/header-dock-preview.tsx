@@ -90,16 +90,21 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
       secondIssue?.coverUrl ||
       null;
 
-    // 2. Albums: Latest added album photo
+    // 2. Albums: Latest added album photo & second album photo
     const customAlbum =
       orchestration?.heroCovers?.albumsMode === "custom" && orchestration?.heroCovers?.customAlbumId
         ? albums.find((a) => a.id === orchestration.heroCovers.customAlbumId)
         : null;
     const activeAlbum = customAlbum || albums[0];
+    const secondAlbum = albums.find((a) => a.id !== activeAlbum?.id) || albums[1] || null;
     const albumPhoto =
       directDriveImage(activeAlbum?.coverUrl) ||
       activeAlbum?.coverUrl ||
       "/covers/first-lego-champions.png";
+    const secondAlbumPhoto =
+      directDriveImage(secondAlbum?.coverUrl) ||
+      secondAlbum?.coverUrl ||
+      null;
 
     // 3. Podcasts: Latest added podcast artwork
     const customPodcast =
@@ -215,6 +220,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           activeAlbum?.description ||
           "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
         image: albumPhoto,
+        secondaryImage: secondAlbumPhoto,
         routePath: "alaqeeq.edu.sa/albums",
         stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
         glowColor: "rgba(139, 92, 246, 0.28)",
@@ -382,10 +388,11 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                   onMouseLeave={handleMouseLeaveCard}
                 >
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 450, damping: 28 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    style={{ transformOrigin: "top center" }}
                     onClick={() => {
                       setHoveredKey(null);
                       onNavigate(item.path);
@@ -434,12 +441,17 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
                     {/* ── Live Hero Snapshot Visual Component (Authentic In-App Look with Newest Uploaded Content) ── */}
                     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-                      {/* 1. Journal 3D Tilted Snapshot */}
-                      {preview.type === "journal" ? (
+                      {/* 1. Journal & Albums Dual Tilted 3D Covers */}
+                      {preview.type === "journal" || preview.type === "albums" ? (
                         <div className="relative w-full h-full bg-gradient-to-br from-[#12081f] via-[#0b0514] to-black p-2 flex items-center justify-center overflow-hidden">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.18),transparent_70%)]" />
+                          <div
+                            className="absolute inset-0 transition-opacity duration-500 opacity-25"
+                            style={{
+                              background: `radial-gradient(circle at center, ${preview.glowColor}, transparent 70%)`
+                            }}
+                          />
                           
-                          {/* Second issue rotated card behind */}
+                          {/* Second issue/album rotated card behind */}
                           {preview.secondaryImage && (
                             <div
                               className="absolute h-[85%] w-[48%] rounded-xl overflow-hidden border border-white/15 shadow-xl opacity-60 right-[10%] top-[8%]"
@@ -449,7 +461,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                             </div>
                           )}
 
-                          {/* Featured newest issue tilted front card */}
+                          {/* Featured newest issue/album tilted front card */}
                           <div
                             className="relative z-10 h-[92%] w-[56%] rounded-xl overflow-hidden border border-[#f8ca14]/60 shadow-[0_12px_30px_rgba(0,0,0,0.8)] transition-transform duration-500 group-hover:scale-105"
                             style={{ transform: "rotate(3deg)" }}
