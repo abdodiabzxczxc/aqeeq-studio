@@ -439,14 +439,11 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
                     {/* ── Live Hero Snapshot Visual Component (Authentic In-App Screenshot of the Page) ── */}
                     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-                      <motion.img
+                      <img
                         src={preview.image}
                         alt={preview.title}
                         loading="eager"
-                        initial={{ scale: 1.08 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.45, ease: "easeOut" }}
-                        className="w-full h-full object-cover object-top select-none transition-transform duration-500 ease-out group-hover:scale-105"
+                        className="w-full h-full object-cover object-top select-none"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
                     </div>
