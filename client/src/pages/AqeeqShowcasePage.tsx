@@ -1118,7 +1118,7 @@ export default function AqeeqShowcasePage() {
   const [selected, setSelected] = useState<ShowcasePost | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState<AqeeqSortOption>("newest");
+  const [sort, setSort] = useState<AqeeqSortOption>("custom");
   const [contentType, setContentType] = useState<ContentType>("all");
   const audioRef = useRef<HTMLAudioElement>(null);
   const showcaseModalRef = useRef<HTMLDivElement | null>(null);

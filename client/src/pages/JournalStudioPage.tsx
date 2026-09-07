@@ -381,8 +381,15 @@ export default function JournalStudioPage() {
           if (!old) return old;
           return { ...old, pages: updatedPages as any };
         });
+        utils.schoolNews.publicIssue.setData({ slug }, (old) => {
+          if (!old) return old;
+          return { ...old, pages: updatedPages as any };
+        });
+        void utils.schoolNews.publicIssue.invalidate({ slug });
+        void utils.schoolNews.allPublicPages.invalidate();
       }
       void utils.schoolNews.publicList.invalidate();
+      toast.success("تم حفظ وتحديث ترتيب صفحات المجلة خارجياً فوراً");
     },
     onError: (error) => {
       toast.error(error.message || "تعذر حفظ الترتيب");

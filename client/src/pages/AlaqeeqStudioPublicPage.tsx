@@ -368,10 +368,12 @@ export default function AlaqeeqStudioPublicPage() {
 
   const newestShowcasePosts = useMemo(() => {
     return [...activeShowcasePosts].sort((a, b) => {
+      const orderA = typeof a.postOrder === "number" ? a.postOrder : 9999;
+      const orderB = typeof b.postOrder === "number" ? b.postOrder : 9999;
+      if (orderA !== orderB) return orderA - orderB;
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      if (dateA && dateB && dateA !== dateB) return dateB - dateA;
-      return (a.postOrder ?? 0) - (b.postOrder ?? 0);
+      return dateB - dateA;
     });
   }, [activeShowcasePosts]);
 

@@ -364,8 +364,14 @@ export default function AqeeqAlbumStudioPage() {
           if (!old) return old;
           return { ...old, media: updatedMedia as any };
         });
+        utils.aqeeqAlbums.publicAlbum.setData({ slug: selectedSlug }, (old) => {
+          if (!old) return old;
+          return { ...old, media: updatedMedia as any };
+        });
+        void utils.aqeeqAlbums.publicAlbum.invalidate({ slug: selectedSlug });
       }
       void utils.aqeeqAlbums.publicList.invalidate();
+      toast.success("تم حفظ وتحديث ترتيب صور الألبوم خارجياً فوراً");
     },
     onError: (error) => {
       toast.error(error.message || "تعذر حفظ الترتيب");

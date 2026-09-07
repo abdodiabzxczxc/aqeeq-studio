@@ -1,4 +1,5 @@
 export const AQEEQ_SORT_OPTIONS = [
+  { id: "custom", label: "الترتيب المعتمد" },
   { id: "newest", label: "الأحدث" },
   { id: "oldest", label: "الأقدم" },
   { id: "nameAsc", label: "الاسم: أ–ي" },
@@ -50,6 +51,7 @@ function contentTitle(item: SearchableAqeeqContent) {
 }
 
 export function sortAqeeqContent<T extends SearchableAqeeqContent>(items: T[], sort: AqeeqSortOption) {
+  if (sort === "custom") return [...items];
   return [...items].sort((left, right) => {
     if (sort === "oldest") return contentDate(left) - contentDate(right) || contentTitle(left).localeCompare(contentTitle(right), "ar");
     if (sort === "nameAsc") return contentTitle(left).localeCompare(contentTitle(right), "ar");

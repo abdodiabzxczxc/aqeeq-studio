@@ -17,6 +17,7 @@ describe("البحث وترتيب أرشيف العقيق", () => {
 
   it("يرتب المحتوى حسب الأحدث والأقدم والاسم والمشاهدات", () => {
     expect(sortAqeeqContent(items, "newest").map((item) => item.title)).toEqual(["معرض العلوم", "احتفال التخرج", "أنشطة المدرسة"]);
+    expect(sortAqeeqContent(items, "custom").map((item) => item.title)).toEqual(["احتفال التخرج", "أنشطة المدرسة", "معرض العلوم"]);
     expect(sortAqeeqContent(items, "oldest").map((item) => item.title)).toEqual(["أنشطة المدرسة", "احتفال التخرج", "معرض العلوم"]);
     expect(sortAqeeqContent(items, "mostViewed")[0]?.title).toBe("أنشطة المدرسة");
     expect(sortAqeeqContent(items, "leastViewed")[0]?.title).toBe("معرض العلوم");
