@@ -656,6 +656,18 @@ function SocialPostCard({
   const isVideo = post.mediaType === "video" || isEmbeddableVideo(post.mediaUrl);
   const displaySrc = getAqeeqShowcaseDisplaySource(post);
 
+  // دمج العنوان والوصف في كابشن متصل طبيعي لمنشورات التواصل دون تكرار أو فقدان أي نص
+  const rawTitle = (post.title || "").trim();
+  const rawDesc = (post.description || "").trim();
+  const mergedCaption = (() => {
+    if (!rawTitle && !rawDesc) return post.fileName || "منشور من منصات العقيق الرسمية";
+    if (!rawTitle) return rawDesc;
+    if (!rawDesc) return rawTitle;
+    if (rawDesc.includes(rawTitle)) return rawDesc;
+    if (rawTitle.includes(rawDesc)) return rawTitle;
+    return `${rawTitle} — ${rawDesc}`;
+  })();
+
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.viewCount ? Math.floor(post.viewCount / 2) + 14 : 29);
   const [groupOpen, setGroupOpen] = useState(false);
@@ -794,27 +806,19 @@ function SocialPostCard({
           )}
         </div>
 
-        {/* Title & Description */}
-        <div className="p-2 pt-3.5 flex-1 flex flex-col justify-start">
+        {/* Merged Continuous Social Caption (كابشن المنشور المتصل) */}
+        <div className="p-2 pt-3 flex-1 flex flex-col justify-start">
           <VisualEditable
-            id={`showcase-social-title-${post.id}`}
+            id={`showcase-social-caption-${post.id}`}
             tag="text"
-            label={`عنوان ${post.fileName}`}
-            defaultText={post.title || post.fileName}
-            as="h3"
-            className={`line-clamp-1 min-h-[1.75rem] text-base font-black ${dark ? "text-white" : "text-slate-900"}`}
-          >
-            {post.title || post.fileName}
-          </VisualEditable>
-          <VisualEditable
-            id={`showcase-social-description-${post.id}`}
-            tag="text"
-            label={`وصف ${post.fileName}`}
-            defaultText={post.description || "من منصات تواصل العقيق الرسمية"}
+            label={`كابشن ${post.fileName}`}
+            defaultText={mergedCaption}
             as="p"
-            className={`mt-1 line-clamp-2 min-h-[2.5rem] text-xs leading-5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            className={`line-clamp-3 min-h-[4.25rem] text-xs sm:text-sm font-semibold leading-6 ${
+              dark ? "text-slate-200" : "text-slate-800"
+            }`}
           >
-            {post.description || "من منصات تواصل العقيق الرسمية"}
+            {mergedCaption}
           </VisualEditable>
         </div>
 
@@ -891,15 +895,10 @@ function SocialPostCard({
               </div>
               <div className="p-5 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className={`text-xl font-black ${dark ? "text-white" : "text-black"}`}>
-                      {post.title || post.fileName}
-                    </h3>
-                    {post.description ? (
-                      <p className={`mt-3 max-w-2xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                        {post.description}
-                      </p>
-                    ) : null}
+                  <div className="min-w-0">
+                    <p className={`max-w-2xl text-base sm:text-lg font-bold leading-8 ${dark ? "text-slate-100" : "text-slate-900"}`}>
+                      {mergedCaption}
+                    </p>
                   </div>
                   <span
                     className={`rounded-full border px-3 py-1 text-xs font-black ${
@@ -1303,8 +1302,25 @@ export default function AqeeqShowcasePage() {
               <div className={`p-4 sm:p-6 border-t shrink-0 ${dark ? "bg-[#0c101a] border-white/[.08]" : "bg-slate-50 border-black/[.06]"}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <h3 className={`text-base sm:text-xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{selected.title || selected.fileName.replace(/\.[^.]+$/, "")}</h3>
-                    {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
+                    {isSocialPost(selected) ? (
+                      <p className={`max-w-3xl text-sm sm:text-base font-bold leading-8 ${dark ? "text-slate-100" : "text-slate-900"}`}>
+                        {(() => {
+                          const t = (selected.title || "").trim();
+                          const d = (selected.description || "").trim();
+                          if (!t && !d) return selected.fileName || "";
+                          if (!t) return d;
+                          if (!d) return t;
+                          if (d.includes(t)) return d;
+                          if (t.includes(d)) return t;
+                          return `${t} — ${d}`;
+                        })()}
+                      </p>
+                    ) : (
+                      <>
+                        <h3 className={`text-base sm:text-xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>{selected.title || selected.fileName.replace(/\.[^.]+$/, "")}</h3>
+                        {selected.description ? <p className={`mt-2 max-w-2xl text-xs sm:text-sm leading-7 ${dark ? "text-slate-300" : "text-slate-600"}`}>{selected.description}</p> : null}
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {(selected.mediaType === "video" || isEmbeddableVideo(selected.mediaUrl) || isAqeeqDriveVideo(selected.mediaUrl)) && selected.sourceType !== "x" && selected.sourceType !== "instagram" && (
