@@ -302,10 +302,8 @@ export default function AqeeqShowcaseStudioPage() {
   const [postCaption, setPostCaption] = useState("");
   const [xPostUrl, setXPostUrl] = useState("");
   const [xPostCaption, setXPostCaption] = useState("");
-  const [xPostThumbnailUrl, setXPostThumbnailUrl] = useState("");
   const [instagramPostUrl, setInstagramPostUrl] = useState("");
   const [instagramPostCaption, setInstagramPostCaption] = useState("");
-  const [instagramPostThumbnailUrl, setInstagramPostThumbnailUrl] = useState("");
   const [youtubePostUrl, setYoutubePostUrl] = useState("");
   const [youtubePostCaption, setYoutubePostCaption] = useState("");
   const [groupComposerOpen, setGroupComposerOpen] = useState(false);
@@ -418,7 +416,6 @@ export default function AqeeqShowcaseStudioPage() {
       });
       setXPostUrl("");
       setXPostCaption("");
-      setXPostThumbnailUrl("");
       refresh();
     },
     onError: (error) => toast.error(error.message || "تعذر إضافة رابط X"),
@@ -433,7 +430,6 @@ export default function AqeeqShowcaseStudioPage() {
       if (variables.source === "instagram") {
         setInstagramPostUrl("");
         setInstagramPostCaption("");
-        setInstagramPostThumbnailUrl("");
       } else {
         setYoutubePostUrl("");
         setYoutubePostCaption("");
@@ -509,7 +505,7 @@ export default function AqeeqShowcaseStudioPage() {
       xPostUrl: xPostUrl.trim(),
       title: null,
       description: xPostCaption.trim() || null,
-      thumbnailUrl: xPostThumbnailUrl.trim() || null,
+      thumbnailUrl: null,
     });
   };
 
@@ -525,7 +521,7 @@ export default function AqeeqShowcaseStudioPage() {
       postUrl,
       title: null,
       description: caption || null,
-      thumbnailUrl: isInstagram ? (instagramPostThumbnailUrl.trim() || null) : null,
+      thumbnailUrl: null,
     });
   };
 
@@ -881,13 +877,6 @@ export default function AqeeqShowcaseStudioPage() {
                     rows={2}
                     className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                   />
-                  <Input
-                    value={xPostThumbnailUrl}
-                    onChange={(event) => setXPostThumbnailUrl(event.target.value)}
-                    dir="ltr"
-                    placeholder="رابط صورة غلاف مخصصة (اختياري - يتم الجلب تلقائياً من X)"
-                    className={dark ? "border-white/15 bg-black text-white text-xs" : "border-black/15 bg-white text-black text-xs"}
-                  />
                   <Button
                     onClick={addXLink}
                     disabled={!xPostUrl.trim() || addXPost.isPending}
@@ -918,13 +907,6 @@ export default function AqeeqShowcaseStudioPage() {
                     placeholder="نص أو كابشن المنشور كاملاً (الكلام على بعضه - اختياري)"
                     rows={2}
                     className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
-                  />
-                  <Input
-                    value={instagramPostThumbnailUrl}
-                    onChange={(event) => setInstagramPostThumbnailUrl(event.target.value)}
-                    dir="ltr"
-                    placeholder="رابط صورة غلاف المنشور (اختياري)"
-                    className={dark ? "border-white/15 bg-black text-white text-xs" : "border-black/15 bg-white text-black text-xs"}
                   />
                   <Button
                     onClick={() => addSocialLink("instagram")}
