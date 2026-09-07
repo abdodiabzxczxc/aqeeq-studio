@@ -44,10 +44,13 @@ interface HeaderDockNavProps {
 function DockHeroCover({ preview }: { preview: PagePreviewMetadata; dark: boolean }) {
   return (
     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-      <img
+      <motion.img
         src={preview.image}
         alt={preview.title}
         loading="eager"
+        initial={{ scale: 1.08 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
         className="w-full h-full object-cover object-top select-none"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none opacity-30" />
@@ -439,10 +442,10 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                   onMouseLeave={handleMouseLeaveCard}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.92, y: 6, filter: "blur(8px)" }}
+                    initial={{ opacity: 0, scale: 0.78, y: 8, filter: "blur(10px)" }}
                     animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 0.94, y: 4, filter: "blur(6px)" }}
-                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    exit={{ opacity: 0, scale: 0.82, y: 5, filter: "blur(8px)" }}
+                    transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                     style={{ transformOrigin: "top center" }}
                     onClick={() => {
                       setHoveredKey(null);
