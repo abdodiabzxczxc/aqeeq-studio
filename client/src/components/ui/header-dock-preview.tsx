@@ -439,11 +439,10 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                   onMouseLeave={handleMouseLeaveCard}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.78, y: 8, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 0.82, y: 5, filter: "blur(8px)" }}
-                    transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ transformOrigin: "top center" }}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.16, ease: "easeOut" }}
                     onClick={() => {
                       setHoveredKey(null);
                       onNavigate(item.path);
