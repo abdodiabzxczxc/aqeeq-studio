@@ -11,9 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Clapperboard, Edit3, GripVertical, ImageIcon, Link2, Loader2, Music2, Play, Plus, RefreshCw, Settings2, Sparkles, Trash2, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Reorder } from "framer-motion";
+import { ArrowDown, ArrowUp, CheckCircle2, Clapperboard, Edit3, GripVertical, ImageIcon, Link2, Loader2, Music2, Play, Plus, RefreshCw, Settings2, Sparkles, Trash2, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Reorder, useDragControls } from "framer-motion";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
@@ -124,6 +124,165 @@ function PostPreview({ post }: { post: ShowcasePost }) {
   );
 }
 
+function ShowcasePostReorderCard({
+  post,
+  index,
+  total,
+  dark,
+  onEdit,
+  onDelete,
+  onJump,
+  onMoveStep,
+}: {
+  post: ShowcasePost;
+  index: number;
+  total: number;
+  dark: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onJump: (from: number, to: number) => void;
+  onMoveStep: (from: number, dir: -1 | 1) => void;
+}) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={post}
+      id={String(post.id)}
+      dragListener={false}
+      dragControls={dragControls}
+      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+      whileDrag={{
+        scale: 1.015,
+        zIndex: 50,
+        boxShadow: "0 20px 30px -10px rgba(0,0,0,0.45)",
+      }}
+      className={`group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[auto_150px_1fr_auto] items-center select-none transition-colors duration-150 ${
+        dark ? "border-white/[0.08] bg-[#111111] text-white hover:border-[#f8ca14]/40" : "border-black/[0.08] bg-slate-50 text-black hover:border-[#08467d]/40"
+      }`}
+      style={{ userSelect: "none" }}
+    >
+      {/* Drag Handle & Position Jump Badge + Quick 1-Step Buttons */}
+      <div className="flex sm:flex-col items-center gap-1.5 justify-center shrink-0">
+        <div
+          onPointerDown={(e) => dragControls.start(e)}
+          className="p-2 rounded-lg text-slate-400 group-hover:text-amber-400 hover:bg-white/10 transition-colors cursor-grab active:cursor-grabbing touch-none select-none"
+          title="اضغط واسحب لإعادة الترتيب بسلاسة"
+        >
+          <GripVertical size={18} />
+        </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            const targetPos = prompt(`الترتيب الحالي: ${index + 1}\nأدخل رقم الترتيب الجديد (من 1 إلى ${total}):`, String(index + 1));
+            if (targetPos) {
+              const parsed = parseInt(targetPos, 10);
+              if (!isNaN(parsed) && parsed >= 1 && parsed <= total) {
+                onJump(index, parsed - 1);
+              }
+            }
+          }}
+          className={`h-6 w-6 rounded-md text-[10px] font-black flex items-center justify-center border transition-colors shadow-xs cursor-pointer ${
+            index === 0
+              ? dark ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "bg-[#08467d] text-white border-[#08467d]"
+              : dark ? "bg-white/10 text-slate-300 border-white/10 hover:border-amber-400 hover:text-amber-300" : "bg-white text-slate-700 border-black/10 hover:border-[#08467d] hover:text-[#08467d]"
+          }`}
+          title="اضغط لتغيير رقم الترتيب مباشرة"
+        >
+          {index + 1}
+        </button>
+        <div className="flex sm:flex-col gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveStep(index, -1);
+            }}
+            disabled={index === 0}
+            className="p-1 rounded text-slate-400 hover:text-amber-400 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+            title="تقديم خطوة للأعلى"
+          >
+            <ArrowUp size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveStep(index, 1);
+            }}
+            disabled={index === total - 1}
+            className="p-1 rounded text-slate-400 hover:text-amber-400 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+            title="تأخير خطوة للأسفل"
+          >
+            <ArrowDown size={13} />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative h-32 overflow-hidden rounded-xl bg-slate-900 border border-white/10">
+        <PostPreview post={post} />
+        {post.mediaType === "video" && !socialPostLabel(post) ? (
+          <span className="absolute inset-0 grid place-items-center bg-black/25 text-white">
+            <Play size={22} fill="currentColor" />
+          </span>
+        ) : null}
+      </div>
+
+      <div className="min-w-0 py-1">
+        <div className="flex flex-wrap items-center gap-2">
+          {post.isNew ? (
+            <span className="rounded-full border border-[#367453]/40 bg-[#367453]/15 px-2 py-1 text-[9px] font-black text-[#367453]">
+              جديد — أضف شرحه
+            </span>
+          ) : (
+            <span className={`rounded-full border px-2 py-1 text-[9px] font-black ${
+              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+            }`}>
+              تمت المراجعة
+            </span>
+          )}
+          <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
+            {socialPostLabel(post) || (post.sourceType === "x" ? "X" : post.mediaType === "video" ? "فيديو" : "صورة")}
+          </span>
+        </div>
+
+        <h3 className={`mt-3 truncate font-black ${dark ? "text-white" : "text-black"}`}>
+          {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+        </h3>
+        <p className={`mt-1 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}>
+          {post.description || "لا يوجد شرح بعد — افتح تعديل المنشور وأضف الكلام الذي يشرح الصورة أو الفيديو."}
+        </p>
+      </div>
+
+      <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center shrink-0">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={onEdit}
+          className={`border cursor-pointer ${
+            dark
+              ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
+              : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
+          }`}
+          title="تعديل الشرح والعنوان"
+        >
+          <Edit3 size={15} />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onDelete}
+          className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
+          title="حذف المنشور"
+        >
+          <Trash2 size={15} />
+        </Button>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export default function AqeeqShowcaseStudioPage() {
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
@@ -156,9 +315,11 @@ export default function AqeeqShowcaseStudioPage() {
   );
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const [postsList, setPostsList] = useState<ShowcasePost[]>([]);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInteractingRef = useRef(false);
 
   useEffect(() => {
-    if (showcase?.posts) {
+    if (showcase?.posts && !isInteractingRef.current) {
       setPostsList(showcase.posts as ShowcasePost[]);
     }
   }, [showcase?.posts]);
@@ -289,7 +450,12 @@ export default function AqeeqShowcaseStudioPage() {
     onError: (error) => toast.error(error.message || "تعذر تحديث الأغلفة"),
   });
 
-  const reorder = trpc.aqeeqShowcases.reorderPosts.useMutation({ onSuccess: refresh, onError: (error) => toast.error(error.message || "تعذر ترتيب المنشورات") });
+  const reorder = trpc.aqeeqShowcases.reorderPosts.useMutation({
+    onError: (error) => {
+      toast.error(error.message || "تعذر ترتيب المنشورات");
+      if (showcase?.posts) setPostsList(showcase.posts as ShowcasePost[]);
+    },
+  });
   const deletePost = trpc.aqeeqShowcases.deletePost.useMutation({ onSuccess: () => { toast.message("تم حذف المنشور"); refresh(); }, onError: (error) => toast.error(error.message || "تعذر حذف المنشور") });
   const publish = trpc.aqeeqShowcases.publish.useMutation({
     onSuccess: () => {
@@ -343,19 +509,38 @@ export default function AqeeqShowcaseStudioPage() {
     });
   };
 
-  const handleReorderPosts = (newPosts: ShowcasePost[]) => {
-    setPostsList(newPosts);
+  const persistReorder = (items: ShowcasePost[]) => {
     if (!showcase) return;
-    const ids = newPosts.map((post) => post.id);
+    const ids = items.map((post) => post.id);
     reorder.mutate({ showcaseId: showcase.id, postIds: ids });
+  };
+
+  const handleReorderPosts = (newPosts: ShowcasePost[]) => {
+    isInteractingRef.current = true;
+    setPostsList(newPosts);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      persistReorder(newPosts);
+      setTimeout(() => { isInteractingRef.current = false; }, 800);
+    }, 450);
   };
 
   const jumpPostToPosition = (fromIndex: number, targetIndex: number) => {
     if (targetIndex < 0 || targetIndex >= postsList.length || fromIndex === targetIndex) return;
+    isInteractingRef.current = true;
     const updated = [...postsList];
     const [moved] = updated.splice(fromIndex, 1);
     updated.splice(targetIndex, 0, moved);
-    handleReorderPosts(updated);
+    setPostsList(updated);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    persistReorder(updated);
+    setTimeout(() => { isInteractingRef.current = false; }, 800);
+  };
+
+  const movePostStep = (fromIndex: number, direction: -1 | 1) => {
+    const targetIndex = fromIndex + direction;
+    if (targetIndex < 0 || targetIndex >= postsList.length) return;
+    jumpPostToPosition(fromIndex, targetIndex);
   };
 
   const selectAsset = (asset: { url: string; kind: "image" | "video" | "audio" | "embed"; mimeType: string | null; fileName: string }) => {
@@ -849,115 +1034,23 @@ export default function AqeeqShowcaseStudioPage() {
               {postsList.length ? (
                 <Reorder.Group axis="y" values={postsList} onReorder={handleReorderPosts} className="space-y-3">
                   {postsList.map((post, index) => (
-                    <Reorder.Item
+                    <ShowcasePostReorderCard
                       key={post.id}
-                      value={post}
-                      whileDrag={{
-                        scale: 1.02,
-                        zIndex: 40,
-                        boxShadow: "0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4)",
+                      post={post}
+                      index={index}
+                      total={postsList.length}
+                      dark={dark}
+                      onEdit={() => {
+                        setEditingPost(post);
+                        setPostTitle(post.title || "");
+                        setPostDescription(post.description || "");
                       }}
-                      className={`group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[auto_150px_1fr_auto] items-center transition select-none ${
-                        dark ? "border-white/[0.08] bg-[#111111] text-white hover:border-[#f8ca14]/40" : "border-black/[0.08] bg-slate-50 text-black hover:border-[#08467d]/40"
-                      }`}
-                    >
-                      {/* Drag Handle & Position Jump Badge */}
-                      <div className="flex sm:flex-col items-center gap-1.5 justify-center">
-                        <div
-                          className="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-400 hover:bg-white/10 transition cursor-grab active:cursor-grabbing"
-                          title="اضغط واسحب لإعادة الترتيب"
-                        >
-                          <GripVertical size={18} />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const targetPos = prompt(`الترتيب الحالي: ${index + 1}\nأدخل رقم الترتيب الجديد (من 1 إلى ${postsList.length}):`, String(index + 1));
-                            if (targetPos) {
-                              const parsed = parseInt(targetPos, 10);
-                              if (!isNaN(parsed) && parsed >= 1 && parsed <= postsList.length) {
-                                jumpPostToPosition(index, parsed - 1);
-                              }
-                            }
-                          }}
-                          className={`h-6 w-6 rounded-md text-[10px] font-black flex items-center justify-center border transition shadow-xs cursor-pointer ${
-                            index === 0
-                              ? dark ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "bg-[#08467d] text-white border-[#08467d]"
-                              : dark ? "bg-white/10 text-slate-300 border-white/10 hover:border-amber-400 hover:text-amber-300" : "bg-white text-slate-700 border-black/10 hover:border-[#08467d] hover:text-[#08467d]"
-                          }`}
-                          title="اضغط لتغيير رقم الترتيب مباشرة"
-                        >
-                          {index + 1}
-                        </button>
-                      </div>
-
-                      <div className="relative h-32 overflow-hidden rounded-xl bg-slate-900 border border-white/10">
-                        <PostPreview post={post} />
-                        {post.mediaType === "video" && !socialPostLabel(post) ? (
-                          <span className="absolute inset-0 grid place-items-center bg-black/25 text-white">
-                            <Play size={22} fill="currentColor" />
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div className="min-w-0 py-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          {post.isNew ? (
-                            <span className="rounded-full border border-[#367453]/40 bg-[#367453]/15 px-2 py-1 text-[9px] font-black text-[#367453]">
-                              جديد — أضف شرحه
-                            </span>
-                          ) : (
-                            <span className={`rounded-full border px-2 py-1 text-[9px] font-black ${
-                              dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-                            }`}>
-                              تمت المراجعة
-                            </span>
-                          )}
-                          <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-500"}`}>
-                            {socialPostLabel(post) || (post.sourceType === "x" ? "X" : post.mediaType === "video" ? "فيديو" : "صورة")}
-                          </span>
-                        </div>
-
-                        <h3 className={`mt-3 truncate font-black ${dark ? "text-white" : "text-black"}`}>
-                          {post.title || post.fileName.replace(/\.[^.]+$/, "")}
-                        </h3>
-                        <p className={`mt-1 line-clamp-2 text-xs leading-6 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                          {post.description || "لا يوجد شرح بعد — افتح تعديل المنشور وأضف الكلام الذي يشرح الصورة أو الفيديو."}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center">
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingPost(post);
-                            setPostTitle(post.title || "");
-                            setPostDescription(post.description || "");
-                          }}
-                          className={`border cursor-pointer ${
-                            dark
-                              ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
-                              : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
-                          }`}
-                          title="تعديل الشرح والعنوان"
-                        >
-                          <Edit3 size={15} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => {
-                            if (confirm("هل تريد حذف هذا المنشور؟")) deletePost.mutate({ id: post.id });
-                          }}
-                          className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
-                          title="حذف المنشور"
-                        >
-                          <Trash2 size={15} />
-                        </Button>
-                      </div>
-                    </Reorder.Item>
+                      onDelete={() => {
+                        if (confirm("هل تريد حذف هذا المنشور؟")) deletePost.mutate({ id: post.id });
+                      }}
+                      onJump={jumpPostToPosition}
+                      onMoveStep={movePostStep}
+                    />
                   ))}
                 </Reorder.Group>
               ) : (

@@ -15,6 +15,8 @@ import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import {
+  ArrowDown,
+  ArrowUp,
   Camera,
   CheckCircle2,
   CloudDownload,
@@ -34,8 +36,8 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
-import { Reorder } from "framer-motion";
-import { useEffect, useState } from "react";
+import { Reorder, useDragControls } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
@@ -45,6 +47,188 @@ type AlbumMode = "spread" | "scroll" | "gallery";
 type AlbumPage = { mediaUrl: string; thumbnailUrl: string; fileName: string; mimeType: string; mediaType: "image"; caption: string };
 const watermarkPositions = ["center", "top-right", "bottom-left", "bottom-right"] as const;
 const today = () => new Date().toISOString().slice(0, 10);
+
+function AlbumMediaReorderCard({
+  item,
+  index,
+  total,
+  dark,
+  coverUrl,
+  onSetCover,
+  onEdit,
+  onDelete,
+  onJump,
+  onMoveStep,
+}: {
+  item: any;
+  index: number;
+  total: number;
+  dark: boolean;
+  coverUrl: string | null;
+  onSetCover: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onJump: (from: number, to: number) => void;
+  onMoveStep: (from: number, dir: -1 | 1) => void;
+}) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={item}
+      id={String(item.id)}
+      dragListener={false}
+      dragControls={dragControls}
+      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+      whileDrag={{
+        scale: 1.015,
+        zIndex: 50,
+        boxShadow: "0 20px 30px -10px rgba(0,0,0,0.45)",
+      }}
+      className={"group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[auto_140px_1fr_auto] items-center select-none transition-colors duration-150 " + (
+        dark
+          ? "border-white/[0.08] bg-[#111111] text-white hover:border-[#f8ca14]/40"
+          : "border-black/[0.08] bg-slate-50 text-black hover:border-[#08467d]/40"
+      )}
+      style={{ userSelect: "none" }}
+    >
+      {/* Drag Handle & Position Jump Badge + Quick 1-Step Buttons */}
+      <div className="flex sm:flex-col items-center gap-1.5 justify-center shrink-0">
+        <div
+          onPointerDown={(e) => dragControls.start(e)}
+          className="p-2 rounded-lg text-slate-400 group-hover:text-amber-400 hover:bg-white/10 transition-colors cursor-grab active:cursor-grabbing touch-none select-none"
+          title="اضغط واسحب لإعادة الترتيب بسلاسة"
+        >
+          <GripVertical size={18} />
+        </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            const targetPos = prompt(`الترتيب الحالي: ${index + 1}\nأدخل رقم الترتيب الجديد (من 1 إلى ${total}):`, String(index + 1));
+            if (targetPos) {
+              const parsed = parseInt(targetPos, 10);
+              if (!isNaN(parsed) && parsed >= 1 && parsed <= total) {
+                onJump(index, parsed - 1);
+              }
+            }
+          }}
+          className={`h-6 w-6 rounded-md text-[10px] font-black flex items-center justify-center border transition-colors shadow-xs cursor-pointer ${
+            coverUrl === item.mediaUrl
+              ? dark ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "bg-[#08467d] text-white border-[#08467d]"
+              : dark ? "bg-white/10 text-slate-300 border-white/10 hover:border-amber-400 hover:text-amber-300" : "bg-white text-slate-700 border-black/10 hover:border-[#08467d] hover:text-[#08467d]"
+          }`}
+          title="اضغط لتغيير رقم الترتيب مباشرة"
+        >
+          {index + 1}
+        </button>
+        <div className="flex sm:flex-col gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveStep(index, -1);
+            }}
+            disabled={index === 0}
+            className="p-1 rounded text-slate-400 hover:text-amber-400 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+            title="تقديم خطوة للأعلى"
+          >
+            <ArrowUp size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveStep(index, 1);
+            }}
+            disabled={index === total - 1}
+            className="p-1 rounded text-slate-400 hover:text-amber-400 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+            title="تأخير خطوة للأسفل"
+          >
+            <ArrowDown size={13} />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-900 border border-white/10">
+        {item.mediaType === "video" ? (
+          <AqeeqVideoPoster
+            sourceUrl={item.mediaUrl}
+            posterUrl={item.thumbnailUrl}
+            title={item.caption || item.fileName}
+            playSize="compact"
+          />
+        ) : (
+          <img
+            src={getAqeeqAlbumImageSource(item)}
+            alt={item.caption || item.fileName}
+            className="h-full w-full object-cover pointer-events-none select-none"
+            referrerPolicy="no-referrer"
+          />
+        )}
+        {coverUrl === item.mediaUrl ? (
+          <span className="absolute bottom-1 right-1 rounded bg-[#f8ca14] px-1.5 py-0.5 text-[8px] font-black text-black">
+            الغلاف
+          </span>
+        ) : null}
+      </div>
+
+      <div className="min-w-0 py-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={"rounded-full border px-2 py-0.5 text-[9px] font-black " + (
+            coverUrl === item.mediaUrl
+              ? (dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]")
+              : (dark ? "border-white/15 bg-white/5 text-slate-300" : "border-black/10 bg-white text-slate-700")
+          )}>
+            {coverUrl === item.mediaUrl ? "غلاف الألبوم" : item.mediaType === "video" ? "فيديو" : "صورة"}
+          </span>
+        </div>
+
+        <p className={"mt-2 font-black truncate text-sm " + (dark ? "text-white" : "text-black")}>
+          {item.caption || item.fileName}
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {coverUrl !== item.mediaUrl && item.mediaType === "image" ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onSetCover}
+              className="h-7 text-[10px] font-bold cursor-pointer"
+            >
+              تعيين كغلاف
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center shrink-0">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={onEdit}
+          className={"border cursor-pointer " + (
+            dark
+              ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
+              : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
+          )}
+          title="تعديل وصف الوسيط"
+        >
+          <Edit3 size={15} />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onDelete}
+          className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
+          title="حذف الملف"
+        >
+          <Trash2 size={15} />
+        </Button>
+      </div>
+    </Reorder.Item>
+  );
+}
 
 export default function AqeeqAlbumStudioPage() {
   const { theme } = useAqeeqStudioTheme();
@@ -174,8 +358,10 @@ export default function AqeeqAlbumStudioPage() {
   });
 
   const reorderMedia = trpc.aqeeqAlbums.reorderMedia.useMutation({
-    onSuccess: refresh,
-    onError: (error) => toast.error(error.message),
+    onError: (error) => {
+      toast.error(error.message || "تعذر حفظ الترتيب");
+      if (album?.media) setMediaList(album.media);
+    },
   });
 
   const deleteMedia = trpc.aqeeqAlbums.deleteMedia.useMutation({
@@ -265,26 +451,47 @@ export default function AqeeqAlbumStudioPage() {
   };
 
   const [mediaList, setMediaList] = useState<any[]>([]);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInteractingRef = useRef(false);
 
   useEffect(() => {
-    if (album?.media) {
+    if (album?.media && !isInteractingRef.current) {
       setMediaList(album.media);
     }
   }, [album?.media]);
 
-  const handleReorderMedia = (newMedia: any[]) => {
-    setMediaList(newMedia);
+  const persistReorder = (items: any[]) => {
     if (!album) return;
-    const ids = newMedia.map((m) => m.id);
+    const ids = items.map((m) => m.id);
     reorderMedia.mutate({ albumId: album.id, mediaIds: ids });
+  };
+
+  const handleReorderMedia = (newMedia: any[]) => {
+    isInteractingRef.current = true;
+    setMediaList(newMedia);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      persistReorder(newMedia);
+      setTimeout(() => { isInteractingRef.current = false; }, 800);
+    }, 450);
   };
 
   const jumpMediaToPosition = (fromIndex: number, targetIndex: number) => {
     if (targetIndex < 0 || targetIndex >= mediaList.length || fromIndex === targetIndex) return;
+    isInteractingRef.current = true;
     const updated = [...mediaList];
     const [moved] = updated.splice(fromIndex, 1);
     updated.splice(targetIndex, 0, moved);
-    handleReorderMedia(updated);
+    setMediaList(updated);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    persistReorder(updated);
+    setTimeout(() => { isInteractingRef.current = false; }, 800);
+  };
+
+  const moveMediaStep = (fromIndex: number, direction: -1 | 1) => {
+    const targetIndex = fromIndex + direction;
+    if (targetIndex < 0 || targetIndex >= mediaList.length) return;
+    jumpMediaToPosition(fromIndex, targetIndex);
   };
 
   if (authLoading || isLoading) {
@@ -678,131 +885,24 @@ export default function AqeeqAlbumStudioPage() {
               {mediaList.length ? (
                 <Reorder.Group axis="y" values={mediaList} onReorder={handleReorderMedia} className="space-y-3">
                   {mediaList.map((item, index) => (
-                    <Reorder.Item
+                    <AlbumMediaReorderCard
                       key={item.id}
-                      value={item}
-                      whileDrag={{
-                        scale: 1.02,
-                        zIndex: 40,
-                        boxShadow: "0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4)",
+                      item={item}
+                      index={index}
+                      total={mediaList.length}
+                      dark={dark}
+                      coverUrl={coverUrl}
+                      onSetCover={() => {
+                        setCoverUrl(item.mediaUrl);
+                        toast.success("تم تعيين هذه الصورة كغلاف للألبوم");
                       }}
-                      className={"group grid gap-3 rounded-2xl border p-3 sm:grid-cols-[auto_140px_1fr_auto] items-center transition select-none " + (
-                        dark ? "border-white/[0.08] bg-[#111111] text-white hover:border-[#f8ca14]/40" : "border-black/[0.08] bg-slate-50 text-black hover:border-[#08467d]/40"
-                      )}
-                    >
-                      {/* Drag Handle & Position Jump Badge */}
-                      <div className="flex sm:flex-col items-center gap-1.5 justify-center">
-                        <div
-                          className="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-400 hover:bg-white/10 transition cursor-grab active:cursor-grabbing"
-                          title="اضغط واسحب لإعادة الترتيب"
-                        >
-                          <GripVertical size={18} />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const targetPos = prompt(`الترتيب الحالي: ${index + 1}\nأدخل رقم الترتيب الجديد (من 1 إلى ${mediaList.length}):`, String(index + 1));
-                            if (targetPos) {
-                              const parsed = parseInt(targetPos, 10);
-                              if (!isNaN(parsed) && parsed >= 1 && parsed <= mediaList.length) {
-                                jumpMediaToPosition(index, parsed - 1);
-                              }
-                            }
-                          }}
-                          className={`h-6 w-6 rounded-md text-[10px] font-black flex items-center justify-center border transition shadow-xs cursor-pointer ${
-                            coverUrl === item.mediaUrl
-                              ? dark ? "bg-[#f8ca14] text-black border-[#f8ca14]" : "bg-[#08467d] text-white border-[#08467d]"
-                              : dark ? "bg-white/10 text-slate-300 border-white/10 hover:border-amber-400 hover:text-amber-300" : "bg-white text-slate-700 border-black/10 hover:border-[#08467d] hover:text-[#08467d]"
-                          }`}
-                          title="اضغط لتغيير رقم الترتيب مباشرة"
-                        >
-                          {index + 1}
-                        </button>
-                      </div>
-
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-900 border border-white/10">
-                        {item.mediaType === "video" ? (
-                          <AqeeqVideoPoster
-                            sourceUrl={item.mediaUrl}
-                            posterUrl={item.thumbnailUrl}
-                            title={item.caption || item.fileName}
-                            playSize="compact"
-                          />
-                        ) : (
-                          <img
-                            src={getAqeeqAlbumImageSource(item)}
-                            alt={item.caption || item.fileName}
-                            className="h-full w-full object-cover pointer-events-none"
-                            referrerPolicy="no-referrer"
-                          />
-                        )}
-                        {coverUrl === item.mediaUrl ? (
-                          <span className="absolute bottom-1 right-1 rounded bg-[#f8ca14] px-1.5 py-0.5 text-[8px] font-black text-black">
-                            الغلاف
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div className="min-w-0 py-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={"rounded-full border px-2 py-0.5 text-[9px] font-black " + (
-                            coverUrl === item.mediaUrl
-                              ? (dark ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]")
-                              : (dark ? "border-white/15 bg-white/5 text-slate-300" : "border-black/10 bg-white text-slate-700")
-                          )}>
-                            {coverUrl === item.mediaUrl ? "غلاف الألبوم" : item.mediaType === "video" ? "فيديو" : "صورة"}
-                          </span>
-                        </div>
-
-                        <p className={"mt-2 font-black truncate text-sm " + (dark ? "text-white" : "text-black")}>
-                          {item.caption || item.fileName}
-                        </p>
-
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {coverUrl !== item.mediaUrl && item.mediaType === "image" ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setCoverUrl(item.mediaUrl);
-                                toast.success("تم تعيين هذه الصورة كغلاف للألبوم");
-                              }}
-                              className="h-7 text-[10px] font-bold cursor-pointer"
-                            >
-                              تعيين كغلاف
-                            </Button>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-2 sm:flex-col sm:justify-center">
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          onClick={() => setEditingMedia({ id: item.id, caption: item.caption || "" })}
-                          className={"border cursor-pointer " + (
-                            dark
-                              ? "border-[#f8ca14]/30 text-[#f8ca14] hover:bg-[#f8ca14]/10"
-                              : "border-[#08467d]/25 text-[#08467d] hover:bg-[#08467d]/10"
-                          )}
-                          title="تعديل وصف الوسيط"
-                        >
-                          <Edit3 size={15} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => {
-                            if (confirm("هل تريد حذف هذا الملف؟")) deleteMedia.mutate({ id: item.id });
-                          }}
-                          className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
-                          title="حذف الملف"
-                        >
-                          <Trash2 size={15} />
-                        </Button>
-                      </div>
-                    </Reorder.Item>
+                      onEdit={() => setEditingMedia({ id: item.id, caption: item.caption || "" })}
+                      onDelete={() => {
+                        if (confirm("هل تريد حذف هذا الملف؟")) deleteMedia.mutate({ id: item.id });
+                      }}
+                      onJump={jumpMediaToPosition}
+                      onMoveStep={moveMediaStep}
+                    />
                   ))}
                 </Reorder.Group>
               ) : (
