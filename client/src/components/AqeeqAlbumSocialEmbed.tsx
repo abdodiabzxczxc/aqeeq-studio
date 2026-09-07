@@ -139,7 +139,7 @@ export const FastInstagramEmbed = React.memo(function FastInstagramEmbed({ url, 
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  const embedUrl = url.replace(/\/?$/, "/") + "embed/captioned/";
+  const embedUrl = url.replace(/\/?$/, "/") + "embed/";
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -157,7 +157,7 @@ export const FastInstagramEmbed = React.memo(function FastInstagramEmbed({ url, 
   }, []);
 
   return (
-    <div ref={containerRef} className="relative min-h-[480px] w-full overflow-hidden rounded-2xl bg-black">
+    <div ref={containerRef} className="relative min-h-[380px] w-full overflow-hidden rounded-2xl bg-black">
       {!iframeLoaded && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-[#181818] to-[#0c0c0c] text-white">
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-0.5 shadow-xl">
@@ -186,7 +186,7 @@ export const FastInstagramEmbed = React.memo(function FastInstagramEmbed({ url, 
           src={embedUrl}
           title={title}
           onLoad={() => setIframeLoaded(true)}
-          className="h-[540px] w-full border-0 bg-white"
+          className="h-[430px] w-full border-0 bg-white"
           loading="lazy"
           allow="encrypted-media; picture-in-picture"
           referrerPolicy="strict-origin-when-cross-origin"
