@@ -451,6 +451,24 @@ export default function AqeeqShowcaseStudioPage() {
   });
 
   const reorder = trpc.aqeeqShowcases.reorderPosts.useMutation({
+    onSuccess: (updatedPosts) => {
+      utils.aqeeqShowcases.showcase.setData({ slug: SHOWCASE_SLUG }, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: updatedPosts as any,
+        };
+      });
+      utils.aqeeqShowcases.publicShowcase.setData({ slug: SHOWCASE_SLUG }, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: updatedPosts as any,
+        };
+      });
+      void utils.aqeeqShowcases.publicShowcase.invalidate({ slug: SHOWCASE_SLUG });
+      void utils.aqeeqShowcases.publicList.invalidate();
+    },
     onError: (error) => {
       toast.error(error.message || "تعذر ترتيب المنشورات");
       if (showcase?.posts) setPostsList(showcase.posts as ShowcasePost[]);

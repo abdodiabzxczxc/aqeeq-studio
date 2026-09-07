@@ -950,7 +950,7 @@ export default function AqeeqShowcasePage() {
   const [selected, setSelected] = useState<ShowcasePost | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState<AqeeqSortOption>("newest");
+  const [sort, setSort] = useState<AqeeqSortOption>("oldest");
   const [contentType, setContentType] = useState<ContentType>("all");
   const audioRef = useRef<HTMLAudioElement>(null);
   const showcaseModalRef = useRef<HTMLDivElement | null>(null);
@@ -976,7 +976,13 @@ export default function AqeeqShowcasePage() {
   const recordPostView = trpc.aqeeqShowcases.recordPostView.useMutation();
   const isAdmin = isAuthenticated && user?.role === "admin";
   const posts = useMemo(() => (showcase?.posts || []) as ShowcasePost[], [showcase?.posts]);
-  const visiblePosts = useMemo(() => searchAndSortAqeeqContent(posts.filter((post) => matchesContentType(post, contentType)), searchQuery, sort), [posts, contentType, searchQuery, sort]);
+  const visiblePosts = useMemo(() => {
+    const filtered = posts.filter((post) => matchesContentType(post, contentType));
+    if (!searchQuery && sort === "oldest") {
+      return filtered;
+    }
+    return searchAndSortAqeeqContent(filtered, searchQuery, sort);
+  }, [posts, contentType, searchQuery, sort]);
   const typeOptionsWithCounts = useMemo(() => {
     return SHOWCASE_TYPE_OPTIONS.map((opt) => ({
       ...opt,

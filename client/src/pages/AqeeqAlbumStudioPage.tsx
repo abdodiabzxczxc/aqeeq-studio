@@ -358,6 +358,15 @@ export default function AqeeqAlbumStudioPage() {
   });
 
   const reorderMedia = trpc.aqeeqAlbums.reorderMedia.useMutation({
+    onSuccess: (updatedMedia) => {
+      if (selectedSlug) {
+        utils.aqeeqAlbums.album.setData({ slug: selectedSlug }, (old) => {
+          if (!old) return old;
+          return { ...old, media: updatedMedia as any };
+        });
+      }
+      void utils.aqeeqAlbums.publicList.invalidate();
+    },
     onError: (error) => {
       toast.error(error.message || "تعذر حفظ الترتيب");
       if (album?.media) setMediaList(album.media);

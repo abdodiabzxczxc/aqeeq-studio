@@ -2545,13 +2545,17 @@ type ShowcaseImportedMedia = Pick<typeof aqeeqShowcasePosts.$inferInsert, "drive
 
 export async function syncAqeeqShowcasePosts(showcaseId: number, media: ShowcaseImportedMedia[]) {
   const db = await getDb();
+  // Sort media chronologically from oldest to newest (natural filename/date ordering)
+  const sortedMedia = [...media].sort((a, b) =>
+    (a.fileName || "").localeCompare(b.fileName || "", undefined, { numeric: true, sensitivity: "base" })
+  );
   if (!db) {
-    localShowcases.addPosts(showcaseId, media);
-    return { addedCount: media.length, posts: localShowcases.getBySlug("news-offers", true)?.posts || [] };
+    localShowcases.addPosts(showcaseId, sortedMedia);
+    return { addedCount: sortedMedia.length, posts: localShowcases.getBySlug("news-offers", true)?.posts || [] };
   }
   const existing = await db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId)).orderBy(aqeeqShowcasePosts.postOrder);
   const existingIds = new Set(existing.map((post) => post.driveFileId));
-  const additions = media.filter((item) => !existingIds.has(item.driveFileId));
+  const additions = sortedMedia.filter((item) => !existingIds.has(item.driveFileId));
   if (additions.length) {
     await db.insert(aqeeqShowcasePosts).values(additions.map((item, index) => ({ ...item, showcaseId, isNew: true, postOrder: existing.length + index })));
   }
@@ -2561,10 +2565,13 @@ export async function syncAqeeqShowcasePosts(showcaseId: number, media: Showcase
 
 export async function addAqeeqShowcasePosts(showcaseId: number, media: Array<Omit<typeof aqeeqShowcasePosts.$inferInsert, "id" | "showcaseId" | "driveFileId" | "isNew" | "postOrder" | "createdAt">>) {
   const db = await getDb();
-  if (!db) return localShowcases.addPosts(showcaseId, media);
+  const sortedMedia = [...media].sort((a, b) =>
+    (a.fileName || "").localeCompare(b.fileName || "", undefined, { numeric: true, sensitivity: "base" })
+  );
+  if (!db) return localShowcases.addPosts(showcaseId, sortedMedia);
   const existing = await db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId)).orderBy(aqeeqShowcasePosts.postOrder);
-  if (!media.length) return existing;
-  await db.insert(aqeeqShowcasePosts).values(media.map((item, index) => ({ ...item, showcaseId, driveFileId: `manual-${nanoid(18)}`, isNew: true, postOrder: existing.length + index })));
+  if (!sortedMedia.length) return existing;
+  await db.insert(aqeeqShowcasePosts).values(sortedMedia.map((item, index) => ({ ...item, showcaseId, driveFileId: `manual-${nanoid(18)}`, isNew: true, postOrder: existing.length + index })));
   return db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId)).orderBy(aqeeqShowcasePosts.postOrder);
 }
 
@@ -2751,7 +2758,7 @@ export async function recordAqeeqContentView(contentType: AqeeqViewedContentType
 
 export async function reorderAqeeqShowcasePosts(showcaseId: number, postIds: number[]) {
   const db = await getDb();
-  if (!db) return localShowcases.getBySlug("news-offers", true)?.posts || [];
+  if (!db) return localShowcases.reorderPosts(showcaseId, postIds);
   const current = await db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId));
   if (current.length !== postIds.length || new Set(postIds).size !== postIds.length || current.some((post) => !postIds.includes(post.id))) throw new Error("ترتيب المنشورات غير صالح");
   await Promise.all(postIds.map((id, index) => db.update(aqeeqShowcasePosts).set({ postOrder: index }).where(eq(aqeeqShowcasePosts.id, id))));

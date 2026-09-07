@@ -963,9 +963,16 @@ export const localShowcases = {
     const showcase = db.showcases.find((s) => s.id === showcaseId) || db.showcases[0];
     if (!showcase) throw new Error("المعرض غير موجود");
     const now = new Date();
+    // Sort incoming additions chronologically from oldest to newest (by date or natural filename)
+    const sortedAdditions = [...posts].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA && dateB && dateA !== dateB) return dateA - dateB;
+      return (a.fileName || "").localeCompare(b.fileName || "", undefined, { numeric: true, sensitivity: "base" });
+    });
     const startOrder = showcase.posts.length;
-    posts.forEach((item, idx) => {
-      showcase.posts.unshift({
+    sortedAdditions.forEach((item, idx) => {
+      showcase.posts.push({
         id: db.nextId.showcasePost++,
         showcaseId: showcase.id,
         driveFileId: item.driveFileId || null,
@@ -981,10 +988,11 @@ export const localShowcases = {
         isNew: true,
         postOrder: startOrder + idx,
         viewCount: 0,
-        createdAt: now,
+        createdAt: item.createdAt ? new Date(item.createdAt) : now,
         media: [],
       });
     });
+    showcase.posts.forEach((p, idx) => { p.postOrder = idx; });
     saveLocalDb();
     return showcase.posts.map((p) => ({
       ...p,
@@ -1018,6 +1026,7 @@ export const localShowcases = {
       mediaOrder: idx,
       createdAt: now,
     }));
+    const startOrder = showcase.posts.length;
     const post: LocalShowcasePost = {
       id: postId,
       showcaseId: showcase.id,
@@ -1032,12 +1041,13 @@ export const localShowcases = {
       title: group.title || null,
       description: group.description || null,
       isNew: !(group.title || group.description),
-      postOrder: 0,
+      postOrder: startOrder,
       viewCount: 0,
       createdAt: now,
       media: postMedia,
     };
-    showcase.posts.unshift(post);
+    showcase.posts.push(post);
+    showcase.posts.forEach((p, idx) => { p.postOrder = idx; });
     saveLocalDb();
     return {
       ...post,
@@ -1079,10 +1089,40 @@ export const localShowcases = {
     throw new Error("المنشور غير موجود");
   },
 
+  reorderPosts(showcaseId: number, postIds: number[]): LocalShowcasePost[] {
+    const db = getLocalDb();
+    const showcase = db.showcases.find((s) => s.id === showcaseId) || db.showcases[0];
+    if (!showcase) throw new Error("المعرض غير موجود");
+    const map = new Map(showcase.posts.map((p) => [p.id, p]));
+    showcase.posts = postIds.map((id, idx) => {
+      const p = map.get(id);
+      if (p) p.postOrder = idx;
+      return p;
+    }).filter((p): p is LocalShowcasePost => Boolean(p));
+    saveLocalDb();
+    return showcase.posts.map((p) => ({
+      ...p,
+      driveFileId: p.driveFileId || null,
+      thumbnailUrl: p.thumbnailUrl || null,
+      externalUrl: p.externalUrl || null,
+      title: p.title || null,
+      description: p.description || null,
+      isNew: Boolean(p.isNew),
+      createdAt: new Date(p.createdAt),
+      media: (p.media || []).map((m) => ({
+        ...m,
+        driveFileId: m.driveFileId || null,
+        thumbnailUrl: m.thumbnailUrl || null,
+        createdAt: new Date(m.createdAt),
+      })),
+    }));
+  },
+
   deletePost(id: number) {
     const db = getLocalDb();
     db.showcases.forEach((showcase) => {
       showcase.posts = showcase.posts.filter((p) => p.id !== id);
+      showcase.posts.forEach((p, idx) => (p.postOrder = idx));
     });
     saveLocalDb();
     return { success: true };

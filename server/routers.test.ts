@@ -585,6 +585,14 @@ describe("aqeeq showcases", () => {
     const caller = appRouter.createCaller(createUserCtx());
     await expect(caller.aqeeqShowcases.syncFromDrive({ showcaseId: 91, driveFolderUrl: "https://drive.google.com/drive/folders/AQEEQ_2026" })).rejects.toMatchObject({ code: "FORBIDDEN" });
     await expect(caller.aqeeqShowcases.publish({ id: 91 })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(caller.aqeeqShowcases.reorderPosts({ showcaseId: 91, postIds: [2, 1] })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("يتيح للأدمن إعادة ترتيب منشورات المعرض", async () => {
+    const { reorderAqeeqShowcasePosts } = await import("./db");
+    const caller = appRouter.createCaller(createAdminCtx());
+    await caller.aqeeqShowcases.reorderPosts({ showcaseId: 91, postIds: [10, 20, 30] });
+    expect(vi.mocked(reorderAqeeqShowcasePosts)).toHaveBeenCalledWith(91, [10, 20, 30]);
   });
 });
 

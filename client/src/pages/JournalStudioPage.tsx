@@ -375,6 +375,15 @@ export default function JournalStudioPage() {
   });
 
   const reorder = trpc.schoolNews.reorderPages.useMutation({
+    onSuccess: (updatedPages) => {
+      if (slug) {
+        utils.schoolNews.issue.setData({ slug }, (old) => {
+          if (!old) return old;
+          return { ...old, pages: updatedPages as any };
+        });
+      }
+      void utils.schoolNews.publicList.invalidate();
+    },
     onError: (error) => {
       toast.error(error.message || "تعذر حفظ الترتيب");
       if (issue?.pages) setPagesList(issue.pages);
