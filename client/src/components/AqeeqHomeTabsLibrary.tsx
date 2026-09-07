@@ -153,7 +153,12 @@ export function AqeeqHomeTabsLibrary({
           }))
         };
       case "showcase":
-        const posts = (showcase?.posts || []) as any[];
+        const posts = [...((showcase?.posts || []) as any[])].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          if (dateA && dateB && dateA !== dateB) return dateB - dateA;
+          return (a.postOrder ?? 0) - (b.postOrder ?? 0);
+        });
         return {
           title: "شاشة العروض والتغطيات الفورية",
           subtitle: "فيديوهات حية ورسائل بصرية سريعة تنبض بأحدث لحظات المدارس اليومية.",

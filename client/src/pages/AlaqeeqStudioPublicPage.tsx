@@ -366,11 +366,20 @@ export default function AlaqeeqStudioPublicPage() {
     ? (showcaseDetail.posts as any[])
     : ((showcase as any)?.posts as any[]) || [];
 
+  const newestShowcasePosts = useMemo(() => {
+    return [...activeShowcasePosts].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA && dateB && dateA !== dateB) return dateB - dateA;
+      return (a.postOrder ?? 0) - (b.postOrder ?? 0);
+    });
+  }, [activeShowcasePosts]);
+
   const defaultJournalCovers = resolveStudioCardCovers(issues, (entry) => entry.coverUrl);
   const defaultAlbumCovers = resolveStudioCardCovers(albums, (entry) => directDriveImage(entry.coverUrl) || entry.coverUrl);
   const defaultShowcaseCovers = resolveStudioCardCovers(
-    activeShowcasePosts,
-    (entry) => directDriveImage(entry.thumbnailUrl) || entry.thumbnailUrl || entry.mediaUrl
+    newestShowcasePosts,
+    (entry) => directDriveImage(entry.thumbnailUrl) || entry.thumbnailUrl || (entry.mediaType === "image" ? entry.mediaUrl : null)
   );
 
   // Dynamic Custom / Auto Cover resolution based on Admin Orchestration
@@ -387,9 +396,9 @@ export default function AlaqeeqStudioPublicPage() {
       })()
     : null;
 
-  const primaryShowcaseCover = showcase?.coverUrl
-    ? (directDriveImage(showcase.coverUrl) || showcase.coverUrl)
-    : (defaultShowcaseCovers.front || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE");
+  const primaryShowcaseCover = defaultShowcaseCovers.front
+    || (showcase?.coverUrl ? (directDriveImage(showcase.coverUrl) || showcase.coverUrl) : null)
+    || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE";
 
   const journalCovers = {
     front: customJournalCover || defaultJournalCovers.front,
@@ -404,8 +413,8 @@ export default function AlaqeeqStudioPublicPage() {
     back: defaultShowcaseCovers.back || primaryShowcaseCover,
   };
   const featuredEventPost = orchestration?.weeklyBento?.featuredMode === "custom" && orchestration?.weeklyBento?.customPostId
-    ? activeShowcasePosts.find((p) => p.id === orchestration.weeklyBento.customPostId) || activeShowcasePosts[0]
-    : activeShowcasePosts[0];
+    ? activeShowcasePosts.find((p) => p.id === orchestration.weeklyBento.customPostId) || newestShowcasePosts[0]
+    : newestShowcasePosts[0];
   const logoUrl = issues.find((entry) => entry.headerLogoUrl)?.headerLogoUrl || null;
 
   // Interactive States for New Showcased Sections

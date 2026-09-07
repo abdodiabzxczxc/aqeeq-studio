@@ -44,7 +44,7 @@ describe("حفظ ترتيب منشورات الأخبار والعروض وال�
     expect(restored?.posts[0]?.id).toBe(originalIds[0]);
   });
 
-  it("يرتب الإضافات الجديدة تلقائياً من الأقدم للأحدث بناءً على التاريخ أو الاسم", () => {
+  it("يرتب الإضافات الجديدة ويضع الأحدث أولاً في بداية المعرض", () => {
     const showcase = localShowcases.getBySlug("news-offers", true);
     expect(showcase).toBeDefined();
 
@@ -68,16 +68,23 @@ describe("حفظ ترتيب منشورات الأخبار والعروض وال�
     const currentCount = showcase!.posts.length;
     const added = localShowcases.addPosts(showcase!.id, newAdditions);
 
-    // Newly added items must be sorted chronologically: file-01 (older) before file-02 (newer)
+    // Newly added items must be placed at the beginning: file-02 (newer) comes before file-01 (older)
     const addedOlder = added.find((p) => p.fileName === "file-01.jpg");
     const addedNewer = added.find((p) => p.fileName === "file-02.jpg");
     expect(addedOlder).toBeDefined();
     expect(addedNewer).toBeDefined();
-    expect(addedOlder!.postOrder).toBeLessThan(addedNewer!.postOrder);
+    expect(addedNewer!.postOrder).toBeLessThan(addedOlder!.postOrder);
 
     // Clean up added test posts
     localShowcases.deletePost(addedOlder!.id);
     localShowcases.deletePost(addedNewer!.id);
     expect(localShowcases.getBySlug("news-offers", true)?.posts.length).toBe(currentCount);
+  });
+
+  it("يختار صورة أحدث خبر لتكون غلاف المعرض coverUrl في القائمة الرئيسية", () => {
+    const list = localShowcases.list();
+    expect(list[0]?.coverUrl).toBeTruthy();
+    const newestPost = localShowcases.getBySlug("news-offers", true)?.posts[0];
+    expect(list[0]?.coverUrl).toBe(newestPost?.thumbnailUrl || newestPost?.mediaUrl);
   });
 });

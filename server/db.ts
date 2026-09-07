@@ -2509,8 +2509,8 @@ export async function listAqeeqShowcases(status?: "draft" | "published") {
   const posts = await db.select().from(aqeeqShowcasePosts);
   return showcases.map((showcase) => {
     const showcasePosts = posts.filter((post) => post.showcaseId === showcase.id).sort((a, b) => a.postOrder - b.postOrder);
-    const coverPost = showcasePosts.find((post) => !["x", "instagram", "youtube"].includes(post.sourceType));
-    return { ...showcase, postCount: showcasePosts.length, coverUrl: coverPost?.thumbnailUrl || coverPost?.mediaUrl || null };
+    const coverPost = showcasePosts.find((post) => Boolean(post.thumbnailUrl || (post.mediaType === "image" && post.mediaUrl))) || showcasePosts[0];
+    return { ...showcase, postCount: showcasePosts.length, coverUrl: coverPost?.thumbnailUrl || (coverPost?.mediaType === "image" ? coverPost?.mediaUrl : null) || coverPost?.thumbnailUrl || coverPost?.mediaUrl || null };
   });
 }
 
