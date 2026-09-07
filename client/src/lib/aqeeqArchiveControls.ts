@@ -50,10 +50,43 @@ function contentTitle(item: SearchableAqeeqContent) {
   return normalizeAqeeqSearchTerm(item.title || item.fileName || "");
 }
 
+function contentOrder(item: SearchableAqeeqContent): number | null {
+  const anyItem = item as any;
+  if (typeof anyItem.postOrder === "number") return anyItem.postOrder;
+  if (typeof anyItem.pageOrder === "number") return anyItem.pageOrder;
+  if (typeof anyItem.mediaOrder === "number") return anyItem.mediaOrder;
+  if (typeof anyItem.order === "number") return anyItem.order;
+  return null;
+}
+
 export function sortAqeeqContent<T extends SearchableAqeeqContent>(items: T[], sort: AqeeqSortOption) {
-  if (sort === "custom") return [...items];
+  if (sort === "custom") {
+    return [...items].sort((left, right) => {
+      const orderLeft = contentOrder(left);
+      const orderRight = contentOrder(right);
+      if (orderLeft !== null && orderRight !== null && orderLeft !== orderRight) {
+        return orderLeft - orderRight;
+      }
+      return 0;
+    });
+  }
   return [...items].sort((left, right) => {
-    if (sort === "oldest") return contentDate(left) - contentDate(right) || contentTitle(left).localeCompare(contentTitle(right), "ar");
+    if (sort === "newest") {
+      const orderLeft = contentOrder(left);
+      const orderRight = contentOrder(right);
+      if (orderLeft !== null && orderRight !== null && orderLeft !== orderRight) {
+        return orderLeft - orderRight;
+      }
+      return contentDate(right) - contentDate(left) || contentTitle(left).localeCompare(contentTitle(right), "ar");
+    }
+    if (sort === "oldest") {
+      const orderLeft = contentOrder(left);
+      const orderRight = contentOrder(right);
+      if (orderLeft !== null && orderRight !== null && orderLeft !== orderRight) {
+        return orderRight - orderLeft;
+      }
+      return contentDate(left) - contentDate(right) || contentTitle(left).localeCompare(contentTitle(right), "ar");
+    }
     if (sort === "nameAsc") return contentTitle(left).localeCompare(contentTitle(right), "ar");
     if (sort === "nameDesc") return contentTitle(right).localeCompare(contentTitle(left), "ar");
     if (sort === "mostViewed") return Number(right.viewCount || 0) - Number(left.viewCount || 0) || contentDate(right) - contentDate(left);

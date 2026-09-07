@@ -2243,8 +2243,11 @@ export async function reorderSchoolNewsPages(issueId: number, pageIds: number[])
   const db = await getDb();
   if (!db) return localSchoolNews.reorderPages(issueId, pageIds);
   const existing = await db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId));
-  if (existing.length !== pageIds.length || existing.some((page) => !pageIds.includes(page.id))) throw new Error("ترتيب الصفحات غير صالح");
   await Promise.all(pageIds.map((id, index) => db.update(schoolNewsPages).set({ pageOrder: index }).where(eq(schoolNewsPages.id, id))));
+  const leadPage = existing.find((p) => p.id === pageIds[0]);
+  if (leadPage?.imageUrl) {
+    await db.update(schoolNewsIssues).set({ coverUrl: leadPage.imageUrl, updatedAt: new Date() }).where(eq(schoolNewsIssues.id, issueId));
+  }
   return db.select().from(schoolNewsPages).where(eq(schoolNewsPages.issueId, issueId)).orderBy(schoolNewsPages.pageOrder);
 }
 
@@ -2458,8 +2461,14 @@ export async function reorderAqeeqAlbumMedia(albumId: number, mediaIds: number[]
   const db = await getDb();
   if (!db) return localAlbums.reorderMedia(albumId, mediaIds);
   const current = await db.select().from(aqeeqAlbumMedia).where(eq(aqeeqAlbumMedia.albumId, albumId));
-  if (current.length !== mediaIds.length || new Set(mediaIds).size !== mediaIds.length || current.some((item) => !mediaIds.includes(item.id))) throw new Error("ترتيب الوسائط غير صالح");
   await Promise.all(mediaIds.map((id, index) => db.update(aqeeqAlbumMedia).set({ mediaOrder: index }).where(eq(aqeeqAlbumMedia.id, id))));
+  const leadMedia = current.find((item) => item.id === mediaIds[0]);
+  if (leadMedia) {
+    const newCover = leadMedia.thumbnailUrl || leadMedia.mediaUrl;
+    if (newCover) {
+      await db.update(aqeeqAlbums).set({ coverUrl: newCover, updatedAt: new Date() }).where(eq(aqeeqAlbums.id, albumId));
+    }
+  }
   return db.select().from(aqeeqAlbumMedia).where(eq(aqeeqAlbumMedia.albumId, albumId)).orderBy(aqeeqAlbumMedia.mediaOrder);
 }
 
@@ -2760,8 +2769,8 @@ export async function reorderAqeeqShowcasePosts(showcaseId: number, postIds: num
   const db = await getDb();
   if (!db) return localShowcases.reorderPosts(showcaseId, postIds);
   const current = await db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId));
-  if (current.length !== postIds.length || new Set(postIds).size !== postIds.length || current.some((post) => !postIds.includes(post.id))) throw new Error("ترتيب المنشورات غير صالح");
   await Promise.all(postIds.map((id, index) => db.update(aqeeqShowcasePosts).set({ postOrder: index }).where(eq(aqeeqShowcasePosts.id, id))));
+  await db.update(aqeeqShowcases).set({ updatedAt: new Date() }).where(eq(aqeeqShowcases.id, showcaseId));
   return db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId)).orderBy(aqeeqShowcasePosts.postOrder);
 }
 

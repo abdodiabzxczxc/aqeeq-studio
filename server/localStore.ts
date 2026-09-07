@@ -519,6 +519,10 @@ export const localSchoolNews = {
       if (p) p.pageOrder = idx;
       return p;
     }).filter((p): p is LocalNewsPage => Boolean(p));
+    if (issue.pages[0]?.imageUrl) {
+      issue.coverUrl = issue.pages[0].imageUrl;
+    }
+    issue.updatedAt = new Date();
     saveLocalDb();
     return issue.pages.map((p) => ({
       ...p,
@@ -787,6 +791,11 @@ export const localAlbums = {
       if (m) m.mediaOrder = idx;
       return m;
     }).filter((m): m is LocalAlbumMedia => Boolean(m));
+    const leadMedia = album.media[0];
+    if (leadMedia) {
+      album.coverUrl = leadMedia.thumbnailUrl || leadMedia.mediaUrl || album.coverUrl;
+    }
+    album.updatedAt = new Date();
     saveLocalDb();
     return album.media.map((m) => ({
       ...m,
@@ -1096,6 +1105,7 @@ export const localShowcases = {
       if (p) p.postOrder = idx;
       return p;
     }).filter((p): p is LocalShowcasePost => Boolean(p));
+    showcase.updatedAt = new Date();
     saveLocalDb();
     return showcase.posts.map((p) => ({
       ...p,

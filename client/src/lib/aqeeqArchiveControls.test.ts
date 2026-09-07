@@ -41,4 +41,15 @@ describe("البحث وترتيب أرشيف العقيق", () => {
     expect(searchAndSortAqeeqContent(videos, "", "oldest").map((item) => item.title)).toEqual(["فيديو قديم", "فيديو حديث"]);
     expect(searchAndSortAqeeqContent(videos, "", "mostViewed").map((item) => item.title)).toEqual(["فيديو حديث", "فيديو قديم"]);
   });
+
+  it("يعتمد ترتيب الاستوديو المخصص كأحدث ترتيب عند الفرز بالأحدث أو المعتمد", () => {
+    const posts = [
+      { id: 1, title: "منشور أقدم لكن وضعه الأدمن أولاً", postOrder: 0, createdAt: "2026-01-01" },
+      { id: 2, title: "منشور أحدث تاريخاً لكن وضعه الأدمن ثانياً", postOrder: 1, createdAt: "2026-09-01" },
+      { id: 3, title: "منشور ثالث", postOrder: 2, createdAt: "2026-05-01" },
+    ];
+    // الفرز بالأحدث يعتمد الترتيب المعتمد من الاستوديو
+    expect(sortAqeeqContent(posts, "newest").map((p) => p.id)).toEqual([1, 2, 3]);
+    expect(sortAqeeqContent(posts, "custom").map((p) => p.id)).toEqual([1, 2, 3]);
+  });
 });

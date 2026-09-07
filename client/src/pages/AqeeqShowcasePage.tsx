@@ -23,6 +23,7 @@ import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPre
 import { motion } from "framer-motion";
 import { NewsScrollPortalBackdrop } from "@/components/ui/news-scroll-portal-backdrop";
 import { ParallaxUnfurlingGallery, type UnfurlingItem } from "@/components/ui/3d-parallax-unfurling-gallery";
+import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
 
 type ShowcasePost = { id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mediaType: "image" | "video"; sourceType?: "drive" | "manual" | "x" | "instagram" | "youtube"; externalUrl?: string | null; title: string | null; description: string | null; viewCount: number; createdAt?: Date; media?: Array<{ id: number; mediaUrl: string; thumbnailUrl: string | null; fileName: string; mimeType: string; mediaType: "image" | "video" }> };
 type ContentType = "all" | "images" | "videos" | "social";
@@ -119,8 +120,6 @@ function ShowcaseHeroCover({ post, className = "" }: { post: ShowcasePost; class
     </div>
   );
 }
-
-import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
 
 const XPostEmbed = React.memo(function XPostEmbed({ post, dark }: { post: ShowcasePost; dark: boolean }) {
   const xPostUrl = post.externalUrl || post.mediaUrl;

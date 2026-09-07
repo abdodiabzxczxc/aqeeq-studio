@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { motion, AnimatePresence, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ChevronLeft, Monitor, BookOpen, Camera, Radio, FileText, Newspaper, GraduationCap, Award, Building2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -59,33 +59,6 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [isCardHovered, setIsCardHovered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const navRef = useRef<HTMLElement | null>(null);
-  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  // Exactly mirror AqeeqCursorHoverPreview spring physics
-  const springConfig = { damping: 18, stiffness: 180, mass: 0.3 };
-  const navX = useSpring(0, springConfig);
-  const hasInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!hoveredKey) {
-      hasInitialized.current = false;
-      return;
-    }
-    const itemEl = itemRefs.current[hoveredKey];
-    const navEl = navRef.current;
-    if (itemEl && navEl) {
-      const itemRect = itemEl.getBoundingClientRect();
-      const navRect = navEl.getBoundingClientRect();
-      const centerX = (itemRect.left + itemRect.width / 2) - navRect.left;
-      if (!hasInitialized.current) {
-        navX.jump(centerX);
-        hasInitialized.current = true;
-      } else {
-        navX.set(centerX);
-      }
-    }
-  }, [hoveredKey, navX]);
 
   // ── 📡 Live Real-Time Queries: Fresh from Database & Orchestration ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
@@ -390,7 +363,6 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
   return (
     <nav
-      ref={navRef}
       dir="rtl"
       className="relative hidden lg:flex items-center justify-self-center gap-1 xl:gap-1.5 whitespace-nowrap text-[13px] font-['Tajawal',sans-serif] pointer-events-auto select-none py-1 px-1 rounded-full"
       role="toolbar"
@@ -398,13 +370,11 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     >
       {items.map((item) => {
         const isHovered = hoveredKey === item.key;
+        const preview = livePreviews[item.key];
 
         return (
           <div
             key={item.key}
-            ref={(el) => {
-              itemRefs.current[item.key] = el;
-            }}
             className="relative"
             onMouseEnter={() => handleMouseEnterItem(item.key)}
             onMouseLeave={handleMouseLeaveItem}
@@ -459,115 +429,110 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
               <span className="relative z-10">{item.label}</span>
             </button>
+
+            {/* ── Realistic Live Website Snapshot — Smooth spring gliding under each item! ── */}
+            <AnimatePresence>
+              {isHovered && preview && (
+                <div
+                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2.5 z-[350] pointer-events-auto"
+                  onMouseEnter={handleMouseEnterCard}
+                  onMouseLeave={handleMouseLeaveCard}
+                >
+                  <motion.div
+                    layoutId="header-dock-preview-window"
+                    initial={{ opacity: 0, scale: 0.82, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 0.85, filter: "blur(6px)" }}
+                    transition={{
+                      duration: 0.28,
+                      ease: [0.22, 1, 0.36, 1],
+                      layout: { type: "spring", stiffness: 350, damping: 28, mass: 0.4 },
+                    }}
+                    onClick={() => {
+                      setHoveredKey(null);
+                      onNavigate(item.path);
+                    }}
+                    className={`group w-[310px] sm:w-[335px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden cursor-pointer select-none ${
+                      dark
+                        ? "bg-[#080d16]/96 border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(248,202,20,0.05)] text-white"
+                        : "bg-white/96 border-slate-200/90 shadow-[0_20px_50px_rgba(8,70,125,0.18),0_0_20px_rgba(8,70,125,0.06)] text-slate-900"
+                    }`}
+                  >
+                    {/* Dynamic Glow Halo */}
+                    <div
+                      className="absolute -top-14 -right-14 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-colors duration-500 opacity-60"
+                      style={{ backgroundColor: preview.glowColor }}
+                    />
+
+                    {/* Browser Window Chrome */}
+                    <div
+                      dir="ltr"
+                      className={`flex items-center justify-between px-2.5 py-1 rounded-t-xl mb-2 border text-[10px] font-mono select-none ${
+                        dark
+                          ? "bg-black/40 border-white/10 text-slate-400"
+                          : "bg-slate-100/90 border-slate-200 text-slate-600"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#ff5f56] inline-block shadow-sm" />
+                        <span className="w-2 h-2 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
+                        <span className="w-2 h-2 rounded-full bg-[#27c93f] inline-block shadow-sm" />
+                      </div>
+
+                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[160px]">
+                        <Monitor size={10} className="shrink-0 opacity-70" />
+                        <span className="truncate">{preview.routePath}</span>
+                      </div>
+
+                      {/* Live Pulsing Badge */}
+                      <div className="flex items-center gap-1 text-[9px] font-sans font-bold text-emerald-500 shrink-0">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>مباشر</span>
+                      </div>
+                    </div>
+
+                    {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Authentic Cover) ── */}
+                    <DockHeroCover preview={preview} dark={dark} />
+
+                    {/* Description */}
+                    <p
+                      className={`text-xs leading-relaxed line-clamp-2 mb-2 font-medium ${
+                        dark ? "text-slate-300" : "text-slate-600"
+                      }`}
+                    >
+                      {preview.description}
+                    </p>
+
+                    {/* Footer */}
+                    <div
+                      className={`flex items-center justify-between pt-2 border-t text-[11px] font-bold ${
+                        dark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-500"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1 text-[10px] text-amber-400 font-medium truncate max-w-[65%]">
+                        <span>✦</span>
+                        <span className="truncate">{preview.stats}</span>
+                      </span>
+
+                      <div
+                        className={`flex items-center gap-1 group-hover:-translate-x-1 transition-transform font-black shrink-0 ${
+                          dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                        }`}
+                      >
+                        <span>فتح الصفحة</span>
+                        <ChevronLeft size={13} />
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
           </div>
         );
       })}
-
-      {/* ── Single Continuous Floating Preview Window (100% Mirroring AqeeqCursorHoverPreview Physics) ── */}
-      <AnimatePresence>
-        {hoveredKey && livePreviews[hoveredKey] && (() => {
-          const preview = livePreviews[hoveredKey];
-          return (
-            <motion.div
-              key="dock-floating-preview-window"
-              style={{
-                x: navX,
-              }}
-              initial={{ opacity: 0, scale: 0.75, filter: "blur(8px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute top-full left-0 -translate-x-1/2 pt-2.5 z-[350] pointer-events-auto"
-              onMouseEnter={handleMouseEnterCard}
-              onMouseLeave={handleMouseLeaveCard}
-            >
-              <div
-                onClick={() => {
-                  const currentItem = items.find((i) => i.key === hoveredKey);
-                  if (currentItem) {
-                    setHoveredKey(null);
-                    onNavigate(currentItem.path);
-                  }
-                }}
-                className={`group w-[310px] sm:w-[335px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl overflow-hidden cursor-pointer select-none ${
-                  dark
-                    ? "bg-[#080d16]/96 border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(248,202,20,0.05)] text-white"
-                    : "bg-white/96 border-slate-200/90 shadow-[0_20px_50px_rgba(8,70,125,0.18),0_0_20px_rgba(8,70,125,0.06)] text-slate-900"
-                }`}
-              >
-                {/* Dynamic Glow Halo */}
-                <div
-                  className="absolute -top-14 -right-14 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-colors duration-500 opacity-60"
-                  style={{ backgroundColor: preview.glowColor }}
-                />
-
-                {/* Browser Window Chrome */}
-                <div
-                  dir="ltr"
-                  className={`flex items-center justify-between px-2.5 py-1 rounded-t-xl mb-2 border text-[10px] font-mono select-none ${
-                    dark
-                      ? "bg-black/40 border-white/10 text-slate-400"
-                      : "bg-slate-100/90 border-slate-200 text-slate-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#ff5f56] inline-block shadow-sm" />
-                    <span className="w-2 h-2 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
-                    <span className="w-2 h-2 rounded-full bg-[#27c93f] inline-block shadow-sm" />
-                  </div>
-
-                  <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[160px]">
-                    <Monitor size={10} className="shrink-0 opacity-70" />
-                    <span className="truncate">{preview.routePath}</span>
-                  </div>
-
-                  {/* Live Pulsing Badge */}
-                  <div className="flex items-center gap-1 text-[9px] font-sans font-bold text-emerald-500 shrink-0">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span>مباشر</span>
-                  </div>
-                </div>
-
-                {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Authentic Cover) ── */}
-                <DockHeroCover preview={preview} dark={dark} />
-
-                {/* Description */}
-                <p
-                  className={`text-xs leading-relaxed line-clamp-2 mb-2 font-medium ${
-                    dark ? "text-slate-300" : "text-slate-600"
-                  }`}
-                >
-                  {preview.description}
-                </p>
-
-                {/* Footer */}
-                <div
-                  className={`flex items-center justify-between pt-2 border-t text-[11px] font-bold ${
-                    dark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-500"
-                  }`}
-                >
-                  <span className="flex items-center gap-1 text-[10px] text-amber-400 font-medium truncate max-w-[65%]">
-                    <span>✦</span>
-                    <span className="truncate">{preview.stats}</span>
-                  </span>
-
-                  <div
-                    className={`flex items-center gap-1 group-hover:-translate-x-1 transition-transform font-black shrink-0 ${
-                      dark ? "text-[#f8ca14]" : "text-[#08467d]"
-                    }`}
-                  >
-                    <span>فتح الصفحة</span>
-                    <ChevronLeft size={13} />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
     </nav>
   );
 }

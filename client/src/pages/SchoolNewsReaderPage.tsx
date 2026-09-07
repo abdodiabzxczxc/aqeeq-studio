@@ -14,7 +14,7 @@ import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioControl
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { usePublishedHomepage } from "@/contexts/PublishedHomepageContext";
 import { Archive, Loader2, Newspaper, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 
@@ -46,6 +46,11 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
   const dark = readerTheme === "dark";
 
   const [flipZoom, setFlipZoom] = useState<number>(1);
+
+  const sortedPages = useMemo(() => {
+    if (!issue?.pages) return [];
+    return [...issue.pages].sort((a, b) => (a.pageOrder ?? 0) - (b.pageOrder ?? 0));
+  }, [issue?.pages]);
 
   useEffect(() => {
     if (issue) {
@@ -130,11 +135,11 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
     );
   }
 
-  const pageHasCover = Boolean(issue.coverUrl && issue.pages.some((page) => page.imageUrl === issue.coverUrl));
+  const pageHasCover = Boolean(issue.coverUrl && sortedPages.some((page: any) => page.imageUrl === issue.coverUrl));
   const readerPages: NewsPagerPage[] =
     issue.coverUrl && !pageHasCover
-      ? [{ id: -issue.id, imageUrl: issue.coverUrl, caption: `غلاف ${issue.title}` }, ...issue.pages]
-      : issue.pages;
+      ? [{ id: -issue.id, imageUrl: issue.coverUrl, caption: `غلاف ${issue.title}` }, ...sortedPages]
+      : sortedPages;
   const shareUrl = isPreview || typeof window === "undefined" ? undefined : getJournalIssueShareUrl(window.location.origin, issue.slug);
   const isFlipbook = readerMode === "spread";
   const siteLogoUrl = snapshot?.settings.school_logo || null;
@@ -352,7 +357,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
               title={issue.title}
               kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
               pages={readerPages}
-              coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
+              coverImageUrl={sortedPages[0]?.imageUrl || issue.coverUrl || undefined}
               watermark={readerWatermark}
               shareUrl={shareUrl}
               hideHeader={true}
@@ -365,7 +370,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
               title={issue.title}
               kicker={`${issue.seasonLabel} · ${issue.issueDate}`}
               pages={readerPages}
-              coverImageUrl={issue.coverUrl || issue.pages[0]?.imageUrl}
+              coverImageUrl={sortedPages[0]?.imageUrl || issue.coverUrl || undefined}
               shareUrl={shareUrl}
               initialMode={readerMode}
               onArchive={() => navigate("/journal")}

@@ -4,7 +4,7 @@ import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import { triggerAutoPageCapture } from "../previewCapture";
 
-const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditations|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio|atheer|podcast|articles)$|^\/(?:news|albums|offers|journal|atheer|podcast|articles)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2}|archive|[a-z0-9-]+)|albums\/[a-z0-9-]+|articles\/[a-z0-9-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
+const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditations|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio|atheer|podcast|articles|showcase)$|^\/(?:news|albums|offers|journal|atheer|podcast|articles|showcase)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2}|archive|[a-z0-9-]+)|albums\/[a-z0-9-]+|articles\/[a-z0-9-]+|showcase\/[a-z0-9-]+|studio\/[a-zA-Z0-9_/-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
 const cssTokenSchema = z.string().max(96).regex(/^[#a-zA-Z0-9.%(), /-]*$/, "قيمة النمط غير صالحة").nullable().optional();
 const supportedElementSchema = z.string().min(2).max(128).regex(/^[a-zA-Z0-9_.-]+$/, "معرف العنصر غير صالح");
 const sectionTypeSchema = z.enum(["hero", "features", "gallery", "video", "cta", "custom"]);
