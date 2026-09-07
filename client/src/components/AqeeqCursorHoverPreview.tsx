@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
 import { Edit3, Pin, X, ExternalLink, Sparkles } from "lucide-react";
 import { useVisualEditorState } from "@/components/VisualEditor";
+import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 
 export interface HoverPreviewState {
   visible: boolean;
@@ -29,10 +30,14 @@ const OFFSET = 20;  // distance from cursor
 
 /**
  * AqeeqCursorHoverPreview — Smart Positioning Wellington-Style Cursor Preview
+ * يدعم الوايت مود (Light Mode) والدارك مود (Dark Mode) بدقة فائقة
  * أزرار التثبيت (Pin/Freeze) والتعديل المباشر تظهر حصرياً في وضع المحرر المرئي فقط
- * للمستخدم العادي والزوار: بطاقة معاينة سينمائية نظيفة وخفيفة تتبع المؤشر بدون أي أدوات تحرير
+ * للمستخدم العادي والزوار: بطاقة معاينة سينمائية نظيفة تتبع المؤشر بدون أدوات تحرير
  */
 export function AqeeqCursorHoverPreview() {
+  const { theme } = useAqeeqStudioTheme();
+  const dark = theme === "dark";
+
   const { isEditing, isPreviewing } = useVisualEditorState();
   const isEditorActive = isEditing && !isPreviewing;
 
@@ -169,7 +174,7 @@ export function AqeeqCursorHoverPreview() {
               }
             }}
             onClick={isEditorActive && preview.onEdit ? handleCardClick : undefined}
-            className={`relative overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl transition-all duration-300 ${
+            className={`relative overflow-hidden rounded-2xl backdrop-blur-2xl transition-all duration-300 ${
               isEditorActive ? "pointer-events-auto" : "pointer-events-none"
             } ${
               isEditorActive && preview.onEdit ? "cursor-pointer" : ""
@@ -178,7 +183,9 @@ export function AqeeqCursorHoverPreview() {
                 ? "ring-2 ring-[#f8ca14] shadow-[0_0_35px_rgba(248,202,20,0.45)]"
                 : isEditorActive && preview.onEdit
                 ? "ring-2 ring-[#f8ca14]/80 shadow-[0_0_25px_rgba(248,202,20,0.3)]"
-                : "border border-white/10"
+                : dark
+                ? "border border-white/15 bg-[#0c0c0e]/95 shadow-[0_24px_60px_rgba(0,0,0,0.85)] ring-1 ring-white/10"
+                : "border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(8,70,125,0.14)] ring-1 ring-black/5"
             }`}
             style={{ width: CARD_W }}
             dir="rtl"
@@ -214,7 +221,9 @@ export function AqeeqCursorHoverPreview() {
                     className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-black shadow-md backdrop-blur-md transition cursor-pointer ${
                       isFrozen
                         ? "bg-[#08467d] text-white hover:bg-[#063560]"
-                        : "bg-black/75 text-[#f8ca14] border border-[#f8ca14]/40 hover:bg-black"
+                        : dark
+                        ? "bg-black/75 text-[#f8ca14] border border-[#f8ca14]/40 hover:bg-black"
+                        : "bg-white/95 text-[#08467d] border border-[#08467d]/30 hover:bg-slate-50 shadow-sm"
                     }`}
                     title={isFrozen ? "إلغاء التثبيت" : "تثبيت البطاقة على الشاشة"}
                   >
@@ -231,7 +240,11 @@ export function AqeeqCursorHoverPreview() {
                         e.stopPropagation();
                         preview.onEdit?.();
                       }}
-                      className="inline-flex items-center gap-1 rounded-lg bg-black/80 hover:bg-black text-[#f8ca14] border border-[#f8ca14]/50 px-2 py-0.5 text-[10px] font-black shadow-md transition cursor-pointer"
+                      className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-black shadow-md transition cursor-pointer ${
+                        dark
+                          ? "bg-black/80 hover:bg-black text-[#f8ca14] border border-[#f8ca14]/50"
+                          : "bg-white/95 hover:bg-slate-50 text-[#08467d] border border-[#08467d]/30 shadow-sm"
+                      }`}
                       title="تعديل هذا العنصر التفاعلي"
                     >
                       <Edit3 size={11} />
@@ -245,7 +258,11 @@ export function AqeeqCursorHoverPreview() {
                   type="button"
                   data-no-visual-edit="true"
                   onClick={handleClose}
-                  className="rounded-lg bg-black/80 hover:bg-[#de191e] text-white p-1 shadow-md transition cursor-pointer"
+                  className={`rounded-lg p-1 shadow-md transition cursor-pointer ${
+                    dark
+                      ? "bg-black/80 hover:bg-[#de191e] text-white"
+                      : "bg-white/95 hover:bg-[#de191e] hover:text-white text-slate-700 border border-slate-200 shadow-sm"
+                  }`}
                   title="إغلاق المعاينة"
                 >
                   <X size={12} />
@@ -263,8 +280,12 @@ export function AqeeqCursorHoverPreview() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              {/* Theme-aware gradient overlay */}
+              <div className={`absolute inset-0 ${
+                dark
+                  ? "bg-gradient-to-t from-[#0c0c0e] via-black/25 to-transparent"
+                  : "bg-gradient-to-t from-white/95 via-transparent to-black/10"
+              }`} />
 
               {/* Badge */}
               {preview.badge && (
@@ -272,7 +293,11 @@ export function AqeeqCursorHoverPreview() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.12 }}
-                  className="absolute bottom-2 right-2 rounded-full bg-black/70 border border-[#f8ca14]/40 px-2.5 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md"
+                  className={`absolute bottom-2 right-2 rounded-full px-2.5 py-0.5 text-[9px] font-black backdrop-blur-md shadow-sm ${
+                    dark
+                      ? "bg-black/75 border border-[#f8ca14]/40 text-[#f8ca14]"
+                      : "bg-white/90 border border-slate-200 text-[#08467d]"
+                  }`}
                 >
                   {preview.badge}
                 </motion.div>
@@ -285,16 +310,22 @@ export function AqeeqCursorHoverPreview() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-black/95 px-3 py-2.5 border-t border-white/10"
+                className={`px-3 py-2.5 border-t transition-colors ${
+                  dark
+                    ? "bg-[#0c0c0e]/95 border-white/10"
+                    : "bg-white/95 border-slate-100"
+                }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-right text-[11px] font-black text-white line-clamp-2 leading-relaxed flex-1">
+                  <p className={`text-right text-[11px] font-black line-clamp-2 leading-relaxed flex-1 ${
+                    dark ? "text-white" : "text-slate-900"
+                  }`}>
                     {preview.title}
                   </p>
-                  {preview.targetUrl && (
+                  {isEditorActive && preview.targetUrl && (
                     <span
                       data-no-visual-edit="true"
-                      className="text-slate-400 p-1"
+                      className={`p-1 ${dark ? "text-slate-400" : "text-slate-500"}`}
                     >
                       <ExternalLink size={12} />
                     </span>
@@ -303,8 +334,10 @@ export function AqeeqCursorHoverPreview() {
               </motion.div>
             )}
 
-            {/* Shimmer border */}
-            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/[0.12]" />
+            {/* Shimmer / subtle border highlight */}
+            <div className={`pointer-events-none absolute inset-0 rounded-2xl ring-1 ${
+              dark ? "ring-white/[0.10]" : "ring-black/[0.04]"
+            }`} />
           </div>
         </motion.div>
       )}

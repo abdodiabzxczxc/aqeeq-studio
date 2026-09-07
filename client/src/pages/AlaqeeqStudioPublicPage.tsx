@@ -991,7 +991,9 @@ export default function AlaqeeqStudioPublicPage() {
                         {story.sourceType === "x" ? "𝕏" : <Instagram size={10} />}
                       </span>
                     ) : !story.isPinned ? (
-                      <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 border-black animate-pulse" />
+                      <span className={`absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-[#367453] border-2 ${
+                        dark ? "border-black" : "border-white"
+                      } animate-pulse`} />
                     ) : null}
                   </div>
                   <p className={"max-w-[72px] sm:max-w-[84px] truncate text-[10px] sm:text-[11px] font-black transition " + (
