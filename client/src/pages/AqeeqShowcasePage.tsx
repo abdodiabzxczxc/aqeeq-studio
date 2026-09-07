@@ -156,7 +156,7 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
 
   if (isPlaying) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+      <div className="relative h-full w-full overflow-hidden rounded-2xl bg-black">
         <AqeeqUnifiedVideoFrame
           sourceUrl={postUrl}
           title={post.title || post.fileName}
@@ -169,15 +169,23 @@ function YouTubePostEmbed({ post }: { post: ShowcasePost }) {
   return (
     <div
       onClick={() => setIsPlaying(true)}
-      className="group/yt relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black"
+      className="group/yt relative h-full w-full cursor-pointer overflow-hidden rounded-2xl bg-black"
     >
       {poster ? (
-        <img
-          src={poster}
-          alt={post.title || post.fileName}
-          className="h-full w-full object-cover transition duration-700 group-hover/yt:scale-105"
-          onError={handleImgError}
-        />
+        <>
+          <img
+            src={poster}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-xl scale-125 opacity-40"
+          />
+          <img
+            src={poster}
+            alt={post.title || post.fileName}
+            className="relative h-full w-full object-cover transition duration-700 group-hover/yt:scale-105"
+            onError={handleImgError}
+          />
+        </>
       ) : (
         <div className="h-full w-full bg-gradient-to-br from-red-950/40 via-black to-slate-950" />
       )}
@@ -319,7 +327,7 @@ function MediaPostCard({
             </span>
           </div>
 
-          {/* 16:9 Cinema Box Screen */}
+          {/* 4:5 Portrait Cinema Box Screen */}
           <div
             onClick={openPost}
             role="button"
@@ -327,14 +335,21 @@ function MediaPostCard({
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPost(); } }}
             data-aqeeq-video="true"
             data-no-visual-edit="true"
-            className="group/screen relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#08467d]"
+            className="group/screen relative aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-2xl bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#08467d]"
           >
+            {/* Ambient blur backdrop for wide/horizontal videos */}
+            <img
+              src={getAqeeqShowcaseDisplaySource(post)}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-xl scale-125 opacity-40"
+            />
             <img
               src={getAqeeqShowcaseDisplaySource(post)}
               alt=""
               loading="lazy"
               data-no-visual-edit="true"
-              className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+              className="relative h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
 
@@ -447,13 +462,13 @@ function MediaPostCard({
           </span>
         </div>
 
-        {/* Media Frame Screen */}
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+        {/* Media Frame Screen - 4:5 Portrait */}
+        <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-black border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
           <button onClick={openPost} className="group/screen relative block h-full w-full overflow-hidden bg-black text-right">
             {hasMultiple ? (
-              <div className="grid grid-cols-2 gap-0.5 h-full w-full bg-black">
+              <div className="grid grid-cols-2 grid-rows-2 gap-1 h-full w-full bg-black p-0.5">
                 {groupItems.slice(0, 4).map((item, index) => (
-                  <div key={item.id} className="relative h-full w-full overflow-hidden">
+                  <div key={item.id} className="relative h-full w-full overflow-hidden rounded-lg">
                     <img
                       src={getAqeeqShowcaseDisplaySource(item)}
                       alt=""
@@ -470,12 +485,21 @@ function MediaPostCard({
                 ))}
               </div>
             ) : (
-              <img
-                src={getAqeeqShowcaseDisplaySource(post)}
-                alt=""
-                className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
-                loading="lazy"
-              />
+              <>
+                {/* Ambient blur backdrop for landscape photos */}
+                <img
+                  src={getAqeeqShowcaseDisplaySource(post)}
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-xl scale-125 opacity-40"
+                />
+                <img
+                  src={getAqeeqShowcaseDisplaySource(post)}
+                  alt=""
+                  className="relative h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+                  loading="lazy"
+                />
+              </>
             )}
             {watermarkUrl ? (
               <img
@@ -703,8 +727,8 @@ function SocialPostCard({
           </span>
         </div>
 
-        {/* 16:9 Cinema Frame Screen */}
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.15)]">
+        {/* 4:5 Portrait Cinema Frame Screen */}
+        <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-black border border-[#08467d]/30 shadow-[0_0_30px_rgba(8,70,125,0.15)]">
           {isYouTube ? (
             <YouTubePostEmbed post={post} />
           ) : (
@@ -714,9 +738,9 @@ function SocialPostCard({
               className="group/screen relative block h-full w-full overflow-hidden bg-black text-right focus:outline-none"
             >
               {hasMultiple ? (
-                <div className="grid grid-cols-2 gap-0.5 h-full w-full bg-black">
+                <div className="grid grid-cols-2 grid-rows-2 gap-1 h-full w-full bg-black p-0.5">
                   {groupItems.slice(0, 4).map((item, index) => (
-                    <div key={item.id || index} className="relative h-full w-full overflow-hidden">
+                    <div key={item.id || index} className="relative h-full w-full overflow-hidden rounded-lg">
                       <img
                         src={getAqeeqShowcaseDisplaySource(item) || displaySrc}
                         alt=""
@@ -733,12 +757,21 @@ function SocialPostCard({
                   ))}
                 </div>
               ) : displaySrc ? (
-                <img
-                  src={displaySrc}
-                  alt={post.title || post.fileName}
-                  className="h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
-                  loading="lazy"
-                />
+                <>
+                  {/* Ambient blur backdrop for wide/horizontal social posts */}
+                  <img
+                    src={displaySrc}
+                    alt=""
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-xl scale-125 opacity-40"
+                  />
+                  <img
+                    src={displaySrc}
+                    alt={post.title || post.fileName}
+                    className="relative h-full w-full object-cover transition duration-700 group-hover/screen:scale-105"
+                    loading="lazy"
+                  />
+                </>
               ) : (
                 <div className="relative flex h-full w-full flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-[#06182e] via-[#030d19] to-black">
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#08467d] text-[#f8ca14] shadow-lg mb-2">
