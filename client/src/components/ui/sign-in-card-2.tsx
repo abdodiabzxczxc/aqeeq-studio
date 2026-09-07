@@ -71,14 +71,14 @@ export function SignInCard2({ dark = true, onSubmit, isLoading = false }: SignIn
 
           {/* Card Header & Branding */}
           <div className="text-center relative z-10 mb-6">
-            {/* Free-Floating Larger Logo (No box) */}
+            {/* Free-Floating Balanced Logo (70px & Pure White in Dark Mode) */}
             <div className="mx-auto flex justify-center items-center mb-3">
               <img
                 src="/alaqeeq-logo.png"
                 alt="مدارس العقيق"
                 className={cn(
-                  "h-20 sm:h-24 w-auto object-contain drop-shadow-md select-none transition-transform duration-300 hover:scale-105",
-                  dark ? "brightness-110" : ""
+                  "h-[70px] w-auto object-contain drop-shadow-md select-none transition-transform duration-300 hover:scale-105",
+                  dark ? "brightness-0 invert opacity-95" : ""
                 )}
               />
             </div>
