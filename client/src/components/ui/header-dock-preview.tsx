@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ChevronLeft, Monitor } from "lucide-react";
+import { Sparkles, ChevronLeft, Monitor, Radio } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export interface NavDockItemConfig {
   key: string;
@@ -21,100 +22,17 @@ interface PagePreviewMetadata {
   routePath: string;
   stats: string;
   glowColor: string;
+  isLiveUpdate?: boolean;
 }
 
-const PREVIEW_DATA: Record<string, PagePreviewMetadata> = {
-  home: {
-    title: "بوابة مدارس العقيق الذكية",
-    subtitle: "الصرح التعليمي والافتراضي المتكامل",
-    badge: "✦ كافر الهيدر الرسمي",
-    description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
-    image: "/previews/home.webp",
-    routePath: "alaqeeq.edu.sa/",
-    stats: "30+ عاماً من التميز · المدينة",
-    glowColor: "rgba(248, 202, 20, 0.28)",
-  },
-  about: {
-    title: "مجمعات ومسارات العقيق",
-    subtitle: "الرؤية والرسالة والبيئة النموذجية",
-    badge: "✦ كافر هيدر صروحنا",
-    description: "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
-    image: "/previews/about.webp",
-    routePath: "alaqeeq.edu.sa/about",
-    stats: "بنين وبنات · مرافق متكاملة",
-    glowColor: "rgba(16, 185, 129, 0.28)",
-  },
-  accreditations: {
-    title: "الاعتمادات الدولية والشراكات",
-    subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
-    badge: "✦ كافر هيدر الاعتمادات",
-    description: "اعتماد كوجنيا الأمريكي Cognia، المقر الرسمي لاختبارات SAT و ACT واختبارات IELTS الدولية المعتمدة.",
-    image: "/previews/accreditations.webp",
-    routePath: "alaqeeq.edu.sa/accreditations",
-    stats: "Cognia USA · SAT / IELTS",
-    glowColor: "rgba(8, 70, 125, 0.38)",
-  },
-  admissions: {
-    title: "بوابة القبول وحاسبة الرسوم",
-    subtitle: "احجز مقعدك للعام الجديد 2026 - 2027",
-    badge: "✦ كافر هيدر التسجيل",
-    description: "حاسبة الأقساط الذكية مع خصومات الأشقاء 15%، وخيارات التقسيط الميسر عبر تابي وتمارا بدون فوائد.",
-    image: "/previews/admissions.webp",
-    routePath: "alaqeeq.edu.sa/admissions",
-    stats: "خصم الأشقاء 15% · تقسيط 4 دفعات",
-    glowColor: "rgba(248, 202, 20, 0.32)",
-  },
-  journal: {
-    title: "مجلة صوت العقيق الدورية",
-    subtitle: "صحافة مدرسية بأقلام وإبداع الطلاب",
-    badge: "✦ كافر هيدر المجلة 3D",
-    description: "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
-    image: "/previews/journal.webp",
-    routePath: "alaqeeq.edu.sa/journal",
-    stats: "أعداد دورية · تقليب ثلاثي الأبعاد",
-    glowColor: "rgba(244, 63, 94, 0.28)",
-  },
-  albums: {
-    title: "ألبومات وتغطيات العقيق",
-    subtitle: "توثيق فوتوغرافي لأجمل اللحظات والبطولات",
-    badge: "✦ كافر هيدر الألبومات",
-    description: "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
-    image: "/previews/albums.webp",
-    routePath: "alaqeeq.edu.sa/albums",
-    stats: "صور فائقة الدقة 4K · تحميل مباشر",
-    glowColor: "rgba(139, 92, 246, 0.28)",
-  },
-  podcast: {
-    title: "أثير العقيق · راديو وبودكاست",
-    subtitle: "حوارات فكرية وإذاعة مدرسية ملهمة",
-    badge: "✦ كافر هيدر أثير",
-    description: "استمع لحلقات البودكاست التربوية، لقاءات الطلاب، والإذاعة الصباحية مع مشغل صوتي عائم متطور.",
-    image: "/previews/podcast.webp",
-    routePath: "alaqeeq.edu.sa/podcast",
-    stats: "بث صوتي ومرئي · حلقات حصرية",
-    glowColor: "rgba(168, 85, 247, 0.28)",
-  },
-  articles: {
-    title: "مقالات وبحوث العقيق",
-    subtitle: "منبر الفكر والتربية والإبداع الأكاديمي",
-    badge: "✦ كافر هيدر المقالات",
-    description: "مقالات حول الذكاء الاصطناعي في التعليم، مهارات المستقبل، وأبحاث متميزة بقلم نخبة المعلمين والطلاب.",
-    image: "/previews/articles.webp",
-    routePath: "alaqeeq.edu.sa/articles",
-    stats: "قراءات ملهمة · وقت القراءة التقديري",
-    glowColor: "rgba(6, 182, 212, 0.28)",
-  },
-  showcase: {
-    title: "المعرض المرئي والأخبار",
-    subtitle: "تغطيات حية ومقاطع سينمائية متجددة",
-    badge: "✦ كافر هيدر الأخبار",
-    description: "أحدث الفعاليات اليومية، فيديوهات المعارض المدرسية، والإعلانات الرسمية الصادرة من الإدارة العامة.",
-    image: "/previews/showcase.webp",
-    routePath: "alaqeeq.edu.sa/showcase",
-    stats: "فيديوهات وتحديثات حية يومية",
-    glowColor: "rgba(234, 88, 12, 0.28)",
-  },
-};
+function directDriveImage(url: string | null | undefined) {
+  if (!url) return null;
+  const id =
+    url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    url.match(/[?&]id=([^&]+)/)?.[1] ||
+    url.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/)?.[1];
+  return id ? "/api/drive-proxy/" + id : url;
+}
 
 interface HeaderDockNavProps {
   items: NavDockItemConfig[];
@@ -126,6 +44,206 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [isCardHovered, setIsCardHovered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ── 📡 Live Real-Time Data from DB & Site Orchestration ──
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const { data: albums = [] } = trpc.aqeeqAlbums.publicList.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const { data: showcases = [] } = trpc.aqeeqShowcases.publicList.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+
+  // ── 🎯 Compute 100% Live Covers, Titles, & Descriptions in Real Time ──
+  const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
+    // 1. Journal: Custom issue or latest added issue
+    const customIssue =
+      orchestration?.heroCovers?.journalMode === "custom" && orchestration?.heroCovers?.customJournalIssueId
+        ? issues.find((i) => i.id === orchestration.heroCovers.customJournalIssueId)
+        : null;
+    const activeIssue = customIssue || issues[0];
+    const journalCover = directDriveImage(activeIssue?.coverUrl) || activeIssue?.coverUrl || "/previews/journal.webp";
+
+    // 2. Albums: Custom album or latest added album
+    const customAlbum =
+      orchestration?.heroCovers?.albumsMode === "custom" && orchestration?.heroCovers?.customAlbumId
+        ? albums.find((a) => a.id === orchestration.heroCovers.customAlbumId)
+        : null;
+    const activeAlbum = customAlbum || albums[0];
+    const albumCover = directDriveImage(activeAlbum?.coverUrl) || activeAlbum?.coverUrl || "/previews/albums.webp";
+
+    // 3. Podcasts: Custom podcast or latest added podcast
+    const customPodcast =
+      orchestration?.heroCovers?.podcastsMode === "custom" && orchestration?.heroCovers?.customPodcastId
+        ? podcasts.find((p) => p.id === orchestration.heroCovers.customPodcastId)
+        : null;
+    const activePodcast = customPodcast || podcasts[0];
+    const podcastCover = directDriveImage(activePodcast?.coverUrl) || activePodcast?.coverUrl || "/previews/podcast.webp";
+
+    // 4. Articles: Custom article or latest added article
+    const customArticle =
+      orchestration?.heroCovers?.articlesMode === "custom" && orchestration?.heroCovers?.customArticleId
+        ? articles.find((a) => a.id === orchestration.heroCovers.customArticleId)
+        : null;
+    const activeArticle = customArticle || articles[0];
+    const articleCover = directDriveImage(activeArticle?.coverUrl) || activeArticle?.coverUrl || "/previews/articles.webp";
+
+    // 5. Showcase / News: Latest showcase post cover or showcase cover
+    const showcase = showcases[0];
+    const showcaseCover = directDriveImage(showcase?.coverUrl) || showcase?.coverUrl || "/previews/showcase.webp";
+
+    return {
+      home: {
+        title: "بوابة مدارس العقيق الذكية",
+        subtitle: orchestration?.themeMode?.customBadgeText
+          ? `صرح المدينة المنورة · ${orchestration.themeMode.customBadgeText}`
+          : "الصرح التعليمي والافتراضي المتكامل",
+        badge: "✦ كافر الهيدر المحدث",
+        description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
+        image: "/previews/home.webp",
+        routePath: "alaqeeq.edu.sa/",
+        stats: "30+ عاماً من التميز · المدينة",
+        glowColor: "rgba(248, 202, 20, 0.28)",
+        isLiveUpdate: true,
+      },
+      about: {
+        title: "مجمعات ومسارات العقيق",
+        subtitle: "الرؤية والرسالة والبيئة النموذجية",
+        badge: "✦ كافر هيدر صروحنا",
+        description: orchestration?.schoolCampuses?.boysAddress
+          ? `مجمع الرانوناء ومجمع البنات — ${orchestration.schoolCampuses.boysAddress}`
+          : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
+        image: "/previews/about.webp",
+        routePath: "alaqeeq.edu.sa/about",
+        stats: "بنين وبنات · مرافق متكاملة",
+        glowColor: "rgba(16, 185, 129, 0.28)",
+        isLiveUpdate: Boolean(orchestration?.schoolCampuses?.boysAddress),
+      },
+      accreditations: {
+        title: "الاعتمادات الدولية والشراكات",
+        subtitle: "أعلى معايير الجودة الأكاديمية العالمية",
+        badge: "✦ كافر هيدر الاعتمادات",
+        description: "اعتماد كوجنيا الأمريكي Cognia، المقر الرسمي لاختبارات SAT و ACT واختبارات IELTS الدولية المعتمدة.",
+        image: "/previews/accreditations.webp",
+        routePath: "alaqeeq.edu.sa/accreditations",
+        stats: "Cognia USA · SAT / IELTS",
+        glowColor: "rgba(8, 70, 125, 0.38)",
+        isLiveUpdate: true,
+      },
+      admissions: {
+        title: orchestration?.admissionsSettings?.isOpen
+          ? "بوابة القبول وحاسبة الرسوم (متاح الآن)"
+          : "بوابة القبول وحاسبة الرسوم",
+        subtitle: orchestration?.admissionsSettings?.siblingDiscountSecond
+          ? `خصم الأشقاء ${orchestration.admissionsSettings.siblingDiscountSecond}% · عام 2026 - 2027`
+          : "احجز مقعدك للعام الجديد 2026 - 2027",
+        badge: orchestration?.admissionsSettings?.isOpen ? "✦ التسجيل متاح الآن" : "✦ كافر هيدر القبول",
+        description:
+          orchestration?.admissionsSettings?.closedNoticeText && !orchestration.admissionsSettings.isOpen
+            ? orchestration.admissionsSettings.closedNoticeText
+            : "حاسبة الأقساط الذكية مع خصومات الأشقاء، وخيارات التقسيط الميسر عبر تابي وتمارا بدون فوائد.",
+        image: "/previews/admissions.webp",
+        routePath: "alaqeeq.edu.sa/admissions",
+        stats: orchestration?.admissionsSettings?.siblingDiscountSecond
+          ? `خصم ${orchestration.admissionsSettings.siblingDiscountSecond}% · 4 دفعات`
+          : "خصم 15% · 4 دفعات",
+        glowColor: "rgba(248, 202, 20, 0.32)",
+        isLiveUpdate: Boolean(orchestration?.admissionsSettings),
+      },
+      journal: {
+        title: orchestration?.heroCovers?.journalCustomTitle || activeIssue?.title || "مجلة صوت العقيق الدورية",
+        subtitle: orchestration?.heroCovers?.journalCustomTag || activeIssue?.seasonLabel || "صحافة مدرسية بأقلام وإبداع الطلاب",
+        badge: activeIssue?.title ? `✦ أحدث عدد: ${activeIssue.title}` : "✦ كافر هيدر المجلة 3D",
+        description:
+          orchestration?.heroCovers?.journalCustomDesc ||
+          activeIssue?.description ||
+          "تصفح تفاعلي واقعي بتقليب الصفحات 3D وقراءة صوتية ذكية لكافة أعداد ومقالات العقيق الفصلية.",
+        image: journalCover,
+        routePath: "alaqeeq.edu.sa/journal",
+        stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
+        glowColor: "rgba(244, 63, 94, 0.28)",
+        isLiveUpdate: Boolean(activeIssue),
+      },
+      albums: {
+        title: orchestration?.heroCovers?.albumsCustomTitle || activeAlbum?.title || "ألبومات وتغطيات العقيق",
+        subtitle: orchestration?.heroCovers?.albumsCustomTag || "توثيق فوتوغرافي لأجمل اللحظات والبطولات",
+        badge: activeAlbum?.title
+          ? `✦ أحدث ألبوم: ${activeAlbum.title.length > 22 ? activeAlbum.title.slice(0, 22) + "..." : activeAlbum.title}`
+          : "✦ كافر هيدر الألبومات",
+        description:
+          orchestration?.heroCovers?.albumsCustomDesc ||
+          activeAlbum?.description ||
+          "تغطيات احتفالات التخرج، بطولات الروبوت WRO العالمية، المناسبات الوطنية والأنشطة اللاصفية.",
+        image: albumCover,
+        routePath: "alaqeeq.edu.sa/albums",
+        stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
+        glowColor: "rgba(139, 92, 246, 0.28)",
+        isLiveUpdate: Boolean(activeAlbum),
+      },
+      podcast: {
+        title: orchestration?.heroCovers?.podcastsCustomTitle || activePodcast?.title || "أثير العقيق · راديو وبودكاست",
+        subtitle: orchestration?.heroCovers?.podcastsCustomTag || "حوارات فكرية وإذاعة مدرسية ملهمة",
+        badge: activePodcast?.title
+          ? `✦ أحدث حلقة: ${activePodcast.title.length > 20 ? activePodcast.title.slice(0, 20) + "..." : activePodcast.title}`
+          : "✦ كافر هيدر أثير",
+        description:
+          orchestration?.heroCovers?.podcastsCustomDesc ||
+          activePodcast?.description ||
+          "استمع لحلقات البودكاست التربوية، لقاءات الطلاب، والإذاعة الصباحية مع مشغل صوتي عائم متطور.",
+        image: podcastCover,
+        routePath: "alaqeeq.edu.sa/podcast",
+        stats: activePodcast?.duration ? `${activePodcast.duration} د · استوديو حي` : "بث صوتي ومرئي · أثير",
+        glowColor: "rgba(168, 85, 247, 0.28)",
+        isLiveUpdate: Boolean(activePodcast),
+      },
+      articles: {
+        title: orchestration?.heroCovers?.articlesCustomTitle || activeArticle?.title || "مقالات وبحوث العقيق",
+        subtitle: orchestration?.heroCovers?.articlesCustomTag || "منبر الفكر والتربية والإبداع الأكاديمي",
+        badge: activeArticle?.title
+          ? `✦ أحدث مقال: ${activeArticle.title.length > 20 ? activeArticle.title.slice(0, 20) + "..." : activeArticle.title}`
+          : "✦ كافر هيدر المقالات",
+        description:
+          orchestration?.heroCovers?.articlesCustomDesc ||
+          activeArticle?.excerpt ||
+          "مقالات حول الذكاء الاصطناعي في التعليم، مهارات المستقبل، وأبحاث متميزة بقلم نخبة المعلمين والطلاب.",
+        image: articleCover,
+        routePath: "alaqeeq.edu.sa/articles",
+        stats: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName}` : "قراءات ملهمة · أبحاث",
+        glowColor: "rgba(6, 182, 212, 0.28)",
+        isLiveUpdate: Boolean(activeArticle),
+      },
+      showcase: {
+        title: orchestration?.heroCovers?.showcaseCustomTitle || showcase?.title || "المعرض المرئي والأخبار",
+        subtitle: orchestration?.heroCovers?.showcaseCustomSubtitle || "تغطيات حية ومقاطع سينمائية متجددة",
+        badge: "✦ أحدث الأخبار والتغطيات",
+        description:
+          orchestration?.heroCovers?.showcaseCustomDesc ||
+          "أحدث الفعاليات اليومية، فيديوهات المعارض المدرسية، والإعلانات الرسمية الصادرة من الإدارة العامة.",
+        image: showcaseCover,
+        routePath: "alaqeeq.edu.sa/showcase",
+        stats: showcase?.postCount ? `${showcase.postCount} منشور إعلامي · مباشر` : "تحديثات وتغطيات يومية",
+        glowColor: "rgba(234, 88, 12, 0.28)",
+        isLiveUpdate: Boolean(showcase),
+      },
+    };
+  }, [orchestration, issues, albums, podcasts, articles, showcases]);
 
   const handleMouseEnterItem = (key: string) => {
     if (timeoutRef.current) {
@@ -173,7 +291,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     >
       {items.map((item) => {
         const isHovered = hoveredKey === item.key;
-        const preview = PREVIEW_DATA[item.key];
+        const preview = livePreviews[item.key];
 
         return (
           <div
@@ -250,7 +368,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       setHoveredKey(null);
                       onNavigate(item.path);
                     }}
-                    className={`group w-[300px] sm:w-[320px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden cursor-pointer ${
+                    className={`group w-[300px] sm:w-[325px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden cursor-pointer ${
                       dark
                         ? "bg-[#080d16]/96 border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(248,202,20,0.05)] text-white"
                         : "bg-white/96 border-slate-200/90 shadow-[0_20px_50px_rgba(8,70,125,0.18),0_0_20px_rgba(8,70,125,0.06)] text-slate-900"
@@ -277,17 +395,22 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                         <span className="w-2 h-2 rounded-full bg-[#27c93f] inline-block shadow-sm" />
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[170px]">
+                      <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[150px]">
                         <Monitor size={10} className="shrink-0 opacity-70" />
                         <span className="truncate">{preview.routePath}</span>
                       </div>
 
-                      <span className="text-[9px] font-sans font-bold text-amber-400 shrink-0">
-                        كافر الهيدر
-                      </span>
+                      {/* Live Pulsing Badge */}
+                      <div className="flex items-center gap-1 text-[9px] font-sans font-bold text-emerald-500 shrink-0">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>محدث لايف</span>
+                      </div>
                     </div>
 
-                    {/* Actual Page Header Cover Snapshot */}
+                    {/* Actual Live Page Header Cover */}
                     <div className="relative h-[155px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner">
                       <img
                         src={preview.image}
@@ -296,27 +419,28 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                         className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover:scale-[1.02]"
                         onError={(e) => {
                           const target = e.currentTarget;
-                          if (target.src.endsWith(".webp")) {
-                            target.src = target.src.replace(".webp", ".png");
+                          const fallback = `/previews/${item.key}.webp`;
+                          if (target.src !== fallback) {
+                            target.src = fallback;
                           }
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
                       {/* Floating Badge on Cover */}
-                      <div className="absolute top-2 right-2 z-10">
-                        <span className="rounded-lg bg-black/70 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md">
-                          <Sparkles size={10} className="text-amber-300" />
-                          <span>{preview.badge}</span>
+                      <div className="absolute top-2 right-2 z-10 max-w-[85%]">
+                        <span className="rounded-lg bg-black/75 border border-white/20 px-2 py-0.5 text-[9px] font-black text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md truncate">
+                          <Sparkles size={10} className="text-amber-300 shrink-0" />
+                          <span className="truncate">{preview.badge}</span>
                         </span>
                       </div>
 
                       {/* Header Title & Subtitle Over Cover */}
                       <div className="absolute inset-x-0 bottom-0 p-2.5 z-10 text-right">
-                        <span className="text-[10px] font-bold text-amber-300 block mb-0.5">
+                        <span className="text-[10px] font-bold text-amber-300 block mb-0.5 truncate">
                           {preview.subtitle}
                         </span>
-                        <h4 className="text-sm font-black text-white drop-shadow-md">
+                        <h4 className="text-sm font-black text-white drop-shadow-md truncate">
                           {preview.title}
                         </h4>
                       </div>
@@ -337,13 +461,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                         dark ? "border-white/10 text-slate-400" : "border-slate-200 text-slate-500"
                       }`}
                     >
-                      <span className="flex items-center gap-1 text-[10px] text-amber-400 font-medium">
+                      <span className="flex items-center gap-1 text-[10px] text-amber-400 font-medium truncate max-w-[65%]">
                         <span>✦</span>
-                        <span>{preview.stats}</span>
+                        <span className="truncate">{preview.stats}</span>
                       </span>
 
                       <div
-                        className={`flex items-center gap-1 group-hover:-translate-x-1 transition-transform font-black ${
+                        className={`flex items-center gap-1 group-hover:-translate-x-1 transition-transform font-black shrink-0 ${
                           dark ? "text-[#f8ca14]" : "text-[#08467d]"
                         }`}
                       >
