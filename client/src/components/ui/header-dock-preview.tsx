@@ -138,26 +138,31 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     return {
       home: {
         type: "home",
-        title: "بوابة مدارس العقيق الذكية",
-        subtitle: orchestration?.themeMode?.customBadgeText
+        title: (orchestration as any)?.heroCovers?.homeCustomTitle || "بوابة مدارس العقيق الذكية",
+        subtitle: (orchestration as any)?.heroCovers?.homeCustomTag || (orchestration?.themeMode?.customBadgeText
           ? `صرح المدينة المنورة · ${orchestration.themeMode.customBadgeText}`
-          : "الصرح التعليمي والافتراضي المتكامل",
+          : "الصرح التعليمي والافتراضي المتكامل"),
         badge: "✦ البوابة الرقمية الموحدة",
-        description: "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
-        image: "/covers/cover-about.jpg",
+        description: (orchestration as any)?.heroCovers?.homeCustomDesc || "استكشف جولة الرانوناء الافتراضية، أحدث الأخبار المصورة، والخدمات الرقمية للمنسوبين والطلاب.",
+        image: directDriveImage((orchestration as any)?.heroCovers?.homeCustomImage) ||
+          (orchestration as any)?.heroCovers?.homeCustomImage ||
+          "/covers/cover-about.jpg",
         routePath: "alaqeeq.edu.sa/",
         stats: "30+ عاماً من التميز · المدينة",
         glowColor: "rgba(248, 202, 20, 0.28)",
       },
       about: {
         type: "about",
-        title: "مجمعات ومسارات العقيق",
-        subtitle: "الرؤية والرسالة والبيئة النموذجية",
+        title: (orchestration as any)?.heroCovers?.aboutCustomTitle || "مجمعات ومسارات العقيق",
+        subtitle: (orchestration as any)?.heroCovers?.aboutCustomTag || "الرؤية والرسالة والبيئة النموذجية",
         badge: "✦ صروح ومجمعات العقيق",
-        description: orchestration?.schoolCampuses?.boysAddress
+        description: (orchestration as any)?.heroCovers?.aboutCustomDesc || (orchestration?.schoolCampuses?.boysAddress
           ? `مجمع الرانوناء ومجمع البنات — ${orchestration.schoolCampuses.boysAddress}`
-          : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد.",
-        image: "/covers/cover-about.jpg",
+          : "مجمع الرانوناء ومجمع البنات، الملاعب والمسبح نصف الأولمبي والمسار الأمريكي المعتمد."),
+        image: directDriveImage((orchestration as any)?.heroCovers?.aboutCustomImage) ||
+          (orchestration as any)?.heroCovers?.aboutCustomImage ||
+          (orchestration as any)?.backdrops?.about?.[0]?.image ||
+          "/covers/cover-about.jpg",
         routePath: "alaqeeq.edu.sa/about",
         stats: "بنين وبنات · مرافق متكاملة",
         glowColor: "rgba(16, 185, 129, 0.28)",
@@ -388,10 +393,10 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                   onMouseLeave={handleMouseLeaveCard}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    initial={{ opacity: 0, scale: 0.75, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                     style={{ transformOrigin: "top center" }}
                     onClick={() => {
                       setHoveredKey(null);
