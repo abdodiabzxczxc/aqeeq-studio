@@ -235,9 +235,16 @@ export function AqeeqWeeklyHighlightsSection({
                       وسام التميز الأكاديمي · الأسبوع 14
                     </span>
                   </div>
-                  <h3 className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}>
+                  <VisualEditable
+                    id="studio-bento-card2-title"
+                    tag="text"
+                    label="عنوان وسام التميز"
+                    defaultText="تكريم فرسان موهبة وأبطال الروبوتيكس"
+                    as="h3"
+                    className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
+                  >
                     تكريم فرسان موهبة وأبطال الروبوتيكس
-                  </h3>
+                  </VisualEditable>
                   <p className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
                     تحقيق المراكز الأولى في مسابقات الابتكار والذكاء الاصطناعي على مستوى المنطقة وتكريم الطلاب وأولياء أمورهم في حفل بهيج.
                   </p>
@@ -258,7 +265,9 @@ export function AqeeqWeeklyHighlightsSection({
                 <div className={`order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border shadow-lg ${
                   dark ? "border-white/10" : "border-amber-200"
                 }`}>
-                  <img
+                  <VisualImage
+                    id="studio-bento-card2-image"
+                    label="صورة وسام التميز والتكريم"
                     src={medalThumb}
                     alt="وسام التميز"
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
@@ -341,7 +350,9 @@ export function AqeeqWeeklyHighlightsSection({
                 <div className={`order-1 lg:order-2 relative h-56 sm:h-72 lg:h-80 overflow-hidden rounded-[1.8rem] border shadow-lg ${
                   dark ? "border-white/10" : "border-[#de191e]/20"
                 }`}>
-                  <img
+                  <VisualImage
+                    id="studio-bento-card3-image"
+                    label="صورة نبض المجتمع"
                     src="/covers/student-excellence-about.jpg"
                     alt="نبض المجتمع"
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
