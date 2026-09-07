@@ -6,13 +6,13 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualBackground, VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
+import { searchAndSortAqeeqContent, sortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { getAqeeqDriveFallbackUrl, isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
+import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Instagram, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -33,7 +33,92 @@ const isSocialPost = (post: ShowcasePost) => ["x", "instagram", "youtube"].inclu
 const matchesContentType = (post: ShowcasePost, type: ContentType) => type === "all" || type === "social" ? (type === "all" ? true : isSocialPost(post)) : !isSocialPost(post) && post.mediaType === (type === "images" ? "image" : "video");
 
 function ShowcaseMedia({ post, className = "", playing = false }: { post: ShowcasePost; className?: string; playing?: boolean }) { if (post.mediaType === "image") return <img src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className={`block h-auto w-full ${className}`} loading="lazy" />; if (playing) return <div className={className}><AqeeqUnifiedVideoFrame sourceUrl={post.mediaUrl} title={post.title || post.fileName} /></div>; return <AqeeqVideoPoster sourceUrl={post.mediaUrl} posterUrl={getAqeeqShowcaseDisplaySource(post)} title={post.title || post.fileName.replace(/\.[^.]+$/, "")} className={className} interactive={false} />; }
-function ShowcaseHeroCover({ post, className = "" }: { post: ShowcasePost; className?: string }) { return <VisualImage id={`showcase-hero-cover-${post.id}`} label="صورة غلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className={`block h-full w-full object-cover ${className}`} />; }
+function ShowcaseHeroCover({ post, className = "" }: { post: ShowcasePost; className?: string }) {
+  const src = getAqeeqShowcaseDisplaySource(post);
+
+  if (src) {
+    return (
+      <VisualImage
+        id={`showcase-hero-cover-${post.id}`}
+        label="صورة غلاف الأخبار والعروض"
+        src={src}
+        alt={post.title || post.fileName}
+        className={`block h-full w-full object-cover ${className}`}
+      />
+    );
+  }
+
+  // Luxury Branded Social Fallback Card when no image is available
+  const isX = post.sourceType === "x";
+  const isIg = post.sourceType === "instagram";
+
+  return (
+    <div className={`relative flex h-full w-full flex-col justify-between p-6 text-right overflow-hidden ${
+      isX
+        ? "bg-gradient-to-br from-[#0c1322] via-[#05080e] to-black text-white"
+        : isIg
+        ? "bg-gradient-to-br from-[#280c2e] via-[#120516] to-[#040008] text-white"
+        : "bg-gradient-to-br from-[#2b0c0c] via-[#130404] to-black text-white"
+    } ${className}`}>
+      {/* Ambient background glow */}
+      <div className={`pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full blur-3xl opacity-35 ${
+        isX ? "bg-[#08467d]" : isIg ? "bg-[#e1306c]" : "bg-red-600"
+      }`} />
+      <div className={`pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full blur-3xl opacity-25 ${
+        isX ? "bg-[#f8ca14]" : isIg ? "bg-[#fd1d1d]" : "bg-amber-500"
+      }`} />
+
+      {/* Top Header Badge */}
+      <div className="relative z-10 flex items-center justify-between">
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-black backdrop-blur-md ${
+          isX
+            ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+            : isIg
+            ? "border-pink-500/30 bg-pink-500/10 text-pink-300"
+            : "border-red-500/30 bg-red-500/10 text-red-300"
+        }`}>
+          {isX ? "منشور 𝕏 الرسمي" : isIg ? "إنستغرام العقيق" : "يوتيوب العقيق"}
+        </span>
+        <div className={`grid h-10 w-10 place-items-center rounded-2xl border shadow-lg ${
+          isX
+            ? "border-white/20 bg-black/80 text-white"
+            : isIg
+            ? "border-pink-500/30 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white p-0.5"
+            : "border-red-500/30 bg-red-600 text-white"
+        }`}>
+          {isX ? (
+            <span className="text-lg font-black leading-none">𝕏</span>
+          ) : isIg ? (
+            <div className="grid h-full w-full place-items-center rounded-[0.8rem] bg-black">
+              <Instagram size={18} />
+            </div>
+          ) : (
+            <Play size={18} fill="currentColor" />
+          )}
+        </div>
+      </div>
+
+      {/* Center Content / Typography */}
+      <div className="relative z-10 my-auto py-4">
+        <span className="text-[10px] font-black tracking-wider text-slate-400">تغطية موثقة من العقيق</span>
+        <h3 className="mt-2 text-lg sm:text-xl font-black leading-snug line-clamp-3 text-white">
+          {post.title || post.fileName.replace(/\.[^.]+$/, "")}
+        </h3>
+        {post.description ? (
+          <p className="mt-2 line-clamp-3 text-xs leading-6 text-slate-300/90 font-medium">
+            {post.description}
+          </p>
+        ) : null}
+      </div>
+
+      {/* Bottom Footer Handle */}
+      <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-3 text-[11px] font-black text-slate-400">
+        <span>@alaqeeq_school</span>
+        <span className="text-[#f8ca14]">مدارس العقيق ✦</span>
+      </div>
+    </div>
+  );
+}
 
 import { FastInstagramEmbed, XEmbed } from "@/components/AqeeqAlbumSocialEmbed";
 
@@ -689,18 +774,21 @@ function UnifiedShowcaseHero({
   onOpenStudio: () => void;
   dark: boolean;
 }) {
-  const visualPosts = posts.filter((post) => !isSocialPost(post));
-  const newestPost = (customPostId ? visualPosts.find((p) => p.id === customPostId) : undefined) || visualPosts[0];
-  const previousPost = (secondaryPostId ? visualPosts.find((p) => p.id === secondaryPostId) : undefined) || visualPosts.find((p) => p.id !== newestPost?.id) || newestPost;
-  const imageCount = visualPosts.filter((post) => post.mediaType === "image").length;
-  const videoCount = visualPosts.filter((post) => post.mediaType === "video").length;
+  const postsWithDisplay = posts.filter((post) => Boolean(getAqeeqShowcaseDisplaySource(post)));
+  const heroCandidates = postsWithDisplay.length ? postsWithDisplay : posts;
+  const sortedHeroCandidates = useMemo(() => sortAqeeqContent(heroCandidates, "newest"), [heroCandidates]);
+  const newestPost = (customPostId ? posts.find((p) => p.id === customPostId) : undefined) || sortedHeroCandidates[0] || posts[0];
+  const previousPost = (secondaryPostId ? posts.find((p) => p.id === secondaryPostId) : undefined) || sortedHeroCandidates.find((p) => p.id !== newestPost?.id) || posts.find((p) => p.id !== newestPost?.id) || newestPost;
+  const imageCount = posts.filter((post) => post.mediaType === "image" && !isSocialPost(post)).length;
+  const videoCount = posts.filter((post) => post.mediaType === "video" || post.sourceType === "youtube").length;
   const socialCount = posts.filter(isSocialPost).length;
 
   const { isNationalDay } = useSiteTheme();
   const heroRef = useRef<HTMLDivElement>(null);
 
   const showcaseUnfurlingItems: UnfurlingItem[] = useMemo(() => {
-    const visualPosts = posts.filter((p) => !isSocialPost(p));
+    const postsWithCovers = posts.filter((p) => Boolean(getAqeeqShowcaseDisplaySource(p)));
+    const galleryCandidates = postsWithCovers.length ? postsWithCovers : posts;
     const fallbackList: UnfurlingItem[] = [
       { id: "sh-1", title: "كأس بطولة فيرست ليجو للروبوت", image: "/covers/first-lego-champions.png", badge: "بطل المملكة 🥇", date: "تغطية مميزة" },
       { id: "sh-2", title: "معامل الذكاء الاصطناعي وSTEM", image: "/covers/student-lab-admissions.jpg", badge: "تقنيات ذكية", date: "معامل المستقبل" },
@@ -720,11 +808,11 @@ function UnifiedShowcaseHero({
       { id: "sh-16", title: "منظومة الشاشات والتقنيات التفاعلية", image: "/covers/cover-about.jpg", badge: "أحدث التقنيات", date: "صروح العقيق" },
     ];
 
-    const mapped = visualPosts.map((post, idx) => ({
+    const mapped = galleryCandidates.map((post, idx) => ({
       id: `post-${post.id}`,
       title: post.title || post.fileName.replace(/\.[^.]+$/, "") || `خبر ${idx + 1}`,
       image: getAqeeqShowcaseDisplaySource(post) || "/covers/cover-about.jpg",
-      badge: post.mediaType === "video" ? "فيديو 🎬" : "تغطية 📸",
+      badge: post.sourceType === "x" ? "منشور 𝕏" : post.sourceType === "instagram" ? "إنستغرام" : post.mediaType === "video" ? "فيديو 🎬" : "تغطية 📸",
       date: post.createdAt ? new Date(post.createdAt).toLocaleDateString("ar-SA") : "المركز الإعلامي",
     }));
 
@@ -745,7 +833,7 @@ function UnifiedShowcaseHero({
                 ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
                 : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
             }`} style={{ transform: "rotate(-7deg)" }}>
-              <VisualBackground id={`showcase-hero-previous-cover-${previousPost.id}`} label="الصورة الخلفية لغلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(previousPost)} alt="" className="h-full w-full rounded-[1.12rem]" />
+              <VisualBackground id={`showcase-hero-previous-cover-${previousPost.id}`} label="الصورة الخلفية لغلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(previousPost) || "/covers/cover-about.jpg"} alt="" className="h-full w-full rounded-[1.12rem]" />
             </div>
           ) : null}
           <div className={`group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${

@@ -7,6 +7,7 @@ import { ENV } from "./_core/env";
 import { PLATFORM_CONTENT_DEFAULTS } from "./platformContent";
 import { resolveAqeeqAlbumCover } from "./aqeeqAlbumCover";
 import { parseAqeeqSocialPostUrl, type AqeeqSocialPostSource } from "./socialPostEmbed";
+import { fetchAqeeqXTweetMeta } from "./xPostEmbed";
 import { localSchoolNews, localAlbums, localShowcases, localMediaAssets, localSettings, getLocalDb, saveLocalDb } from "./localStore";
 
 
@@ -2585,24 +2586,41 @@ export function parseAqeeqXPostUrl(value: string) {
   }
 }
 
-export async function addAqeeqShowcaseXPost(showcaseId: number, data: { xPostUrl: string; title?: string | null; description?: string | null }) {
+export async function addAqeeqShowcaseXPost(showcaseId: number, data: { xPostUrl: string; title?: string | null; description?: string | null; thumbnailUrl?: string | null }) {
   const db = await getDb();
   const parsed = parseAqeeqXPostUrl(data.xPostUrl);
   if (!parsed) throw new Error("ضع رابط منشور X صحيحًا يحتوي على status");
   const sourceId = `x-${parsed.postId}`;
 
+  let fetchedThumbnail = data.thumbnailUrl || null;
+  let fetchedMediaType: "image" | "video" = "image";
+  let fetchedTitle = data.title?.trim() || null;
+  let fetchedDesc = data.description?.trim() || null;
+
+  try {
+    const meta = await fetchAqeeqXTweetMeta(parsed.author, parsed.postId);
+    if (meta) {
+      if (!fetchedThumbnail && meta.thumbnailUrl) fetchedThumbnail = meta.thumbnailUrl;
+      fetchedMediaType = meta.mediaType;
+      if (!fetchedDesc && meta.text) fetchedDesc = meta.text;
+      if (!fetchedTitle && meta.text) {
+        fetchedTitle = meta.text.length > 60 ? meta.text.slice(0, 60).trim() + "…" : meta.text.trim();
+      }
+    }
+  } catch {}
+
   if (!db) {
     const posts = localShowcases.addPosts(showcaseId, [{
       driveFileId: sourceId,
       mediaUrl: parsed.url,
-      thumbnailUrl: null,
+      thumbnailUrl: fetchedThumbnail,
       fileName: `منشور X · @${parsed.author}`,
       mimeType: "application/x-x-post",
-      mediaType: "image",
+      mediaType: fetchedMediaType,
       sourceType: "x",
       externalUrl: parsed.url,
-      title: data.title?.trim() || null,
-      description: data.description?.trim() || null,
+      title: fetchedTitle,
+      description: fetchedDesc,
     }]);
     return { post: posts[0], added: true };
   }
@@ -2614,31 +2632,33 @@ export async function addAqeeqShowcaseXPost(showcaseId: number, data: { xPostUrl
     showcaseId,
     driveFileId: sourceId,
     mediaUrl: parsed.url,
-    thumbnailUrl: null,
+    thumbnailUrl: fetchedThumbnail,
     fileName: `منشور X · @${parsed.author}`,
     mimeType: "application/x-x-post",
-    mediaType: "image",
+    mediaType: fetchedMediaType,
     sourceType: "x",
     externalUrl: parsed.url,
-    title: data.title?.trim() || null,
-    description: data.description?.trim() || null,
-    isNew: !(data.title?.trim() || data.description?.trim()),
+    title: fetchedTitle,
+    description: fetchedDesc,
+    isNew: !(fetchedTitle || fetchedDesc),
     postOrder: current.length,
   });
   const post = (await db.select().from(aqeeqShowcasePosts).where(and(eq(aqeeqShowcasePosts.showcaseId, showcaseId), eq(aqeeqShowcasePosts.driveFileId, sourceId))).limit(1))[0];
   return { post, added: true };
 }
 
-export async function addAqeeqShowcaseSocialPost(showcaseId: number, data: { source: AqeeqSocialPostSource; postUrl: string; title?: string | null; description?: string | null }) {
+export async function addAqeeqShowcaseSocialPost(showcaseId: number, data: { source: AqeeqSocialPostSource; postUrl: string; title?: string | null; description?: string | null; thumbnailUrl?: string | null }) {
   const db = await getDb();
   const parsed = parseAqeeqSocialPostUrl(data.source, data.postUrl);
   if (!parsed) throw new Error(data.source === "instagram" ? "ضع رابط منشور أو Reel عام صحيح من Instagram" : "ضع رابط فيديو صحيح من YouTube");
+
+  const finalThumbnail = data.thumbnailUrl?.trim() || parsed.thumbnailUrl || null;
 
   if (!db) {
     const posts = localShowcases.addPosts(showcaseId, [{
       driveFileId: parsed.sourceId,
       mediaUrl: parsed.url,
-      thumbnailUrl: null,
+      thumbnailUrl: finalThumbnail,
       fileName: parsed.label,
       mimeType: parsed.mimeType,
       mediaType: parsed.mediaType,
@@ -2653,16 +2673,51 @@ export async function addAqeeqShowcaseSocialPost(showcaseId: number, data: { sou
   const existing = (await db.select().from(aqeeqShowcasePosts).where(and(eq(aqeeqShowcasePosts.showcaseId, showcaseId), eq(aqeeqShowcasePosts.driveFileId, parsed.sourceId))).limit(1))[0];
   if (existing) return { post: existing, added: false };
   const current = await db.select({ id: aqeeqShowcasePosts.id }).from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.showcaseId, showcaseId));
-  await db.insert(aqeeqShowcasePosts).values({ showcaseId, driveFileId: parsed.sourceId, mediaUrl: parsed.url, thumbnailUrl: null, fileName: parsed.label, mimeType: parsed.mimeType, mediaType: parsed.mediaType, sourceType: parsed.source, externalUrl: parsed.url, title: data.title?.trim() || null, description: data.description?.trim() || null, isNew: !(data.title?.trim() || data.description?.trim()), postOrder: current.length });
+  await db.insert(aqeeqShowcasePosts).values({ showcaseId, driveFileId: parsed.sourceId, mediaUrl: parsed.url, thumbnailUrl: finalThumbnail, fileName: parsed.label, mimeType: parsed.mimeType, mediaType: parsed.mediaType, sourceType: parsed.source, externalUrl: parsed.url, title: data.title?.trim() || null, description: data.description?.trim() || null, isNew: !(data.title?.trim() || data.description?.trim()), postOrder: current.length });
   const post = (await db.select().from(aqeeqShowcasePosts).where(and(eq(aqeeqShowcasePosts.showcaseId, showcaseId), eq(aqeeqShowcasePosts.driveFileId, parsed.sourceId))).limit(1))[0];
   return { post, added: true };
 }
 
-export async function updateAqeeqShowcasePost(id: number, data: Partial<Pick<typeof aqeeqShowcasePosts.$inferInsert, "title" | "description" | "postOrder" | "isNew">>) {
+export async function updateAqeeqShowcasePost(id: number, data: Partial<Pick<typeof aqeeqShowcasePosts.$inferInsert, "title" | "description" | "postOrder" | "isNew" | "thumbnailUrl" | "mediaType">>) {
   const db = await getDb();
   if (!db) return localShowcases.updatePost(id, data);
   await db.update(aqeeqShowcasePosts).set(data).where(eq(aqeeqShowcasePosts.id, id));
   return (await db.select().from(aqeeqShowcasePosts).where(eq(aqeeqShowcasePosts.id, id)).limit(1))[0];
+}
+
+export async function refreshAqeeqShowcaseSocialThumbnails(showcaseId: number) {
+  const showcase = await getAqeeqShowcaseBySlug("news-offers", true);
+  if (!showcase) return { updatedCount: 0 };
+
+  let updatedCount = 0;
+  for (const post of showcase.posts) {
+    if (post.sourceType === "x" && !post.thumbnailUrl) {
+      const parsed = parseAqeeqXPostUrl(post.mediaUrl || post.externalUrl || "");
+      if (parsed) {
+        try {
+          const meta = await fetchAqeeqXTweetMeta(parsed.author, parsed.postId);
+          if (meta?.thumbnailUrl) {
+            await updateAqeeqShowcasePost(post.id, {
+              thumbnailUrl: meta.thumbnailUrl,
+              mediaType: meta.mediaType,
+            });
+            updatedCount++;
+          }
+        } catch {}
+      }
+    } else if (post.sourceType === "youtube" && !post.thumbnailUrl) {
+      const parsed = parseAqeeqSocialPostUrl("youtube", post.mediaUrl || post.externalUrl || "");
+      if (parsed?.thumbnailUrl) {
+        await updateAqeeqShowcasePost(post.id, {
+          thumbnailUrl: parsed.thumbnailUrl,
+          mediaType: "video",
+        });
+        updatedCount++;
+      }
+    }
+  }
+
+  return { updatedCount };
 }
 
 type AqeeqViewedContentType = "journal" | "album" | "showcase_post";

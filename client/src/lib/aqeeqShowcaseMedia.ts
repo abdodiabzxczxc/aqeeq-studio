@@ -6,21 +6,28 @@ export type AqeeqShowcaseMedia = {
   thumbnailUrl?: string | null;
 };
 
+const SOCIAL_PAGE_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:x\.com|twitter\.com|instagram\.com|youtube\.com|youtu\.be)\//i;
+
 /** يستخدم رابط بروكسي Drive للصور — يضمن التحميل السريع بدون CORS أو انتهاء صلاحية الرابط */
 export function getAqeeqShowcaseDisplaySource(media: AqeeqShowcaseMedia): string {
-  // Try thumbnailUrl first, then mediaUrl — extract Drive File ID from either
-  const sources = [media.thumbnailUrl, media.mediaUrl].filter(Boolean) as string[];
-
-  for (const src of sources) {
-    const fileId = getAqeeqDriveFileId(src);
-    if (fileId) {
-      // Always route Drive files through our fast in-memory proxy
-      return `/api/drive-proxy/${fileId}`;
-    }
+  // If thumbnailUrl is available, prioritize it
+  if (media.thumbnailUrl) {
+    const fileId = getAqeeqDriveFileId(media.thumbnailUrl);
+    if (fileId) return `/api/drive-proxy/${fileId}`;
+    return media.thumbnailUrl;
   }
 
-  // Non-Drive URL (Unsplash, CDN, direct): use as-is
-  return sources[0] || "";
+  // If only mediaUrl is available, ensure it's not a social media webpage
+  if (media.mediaUrl) {
+    if (SOCIAL_PAGE_REGEX.test(media.mediaUrl)) {
+      return "";
+    }
+    const fileId = getAqeeqDriveFileId(media.mediaUrl);
+    if (fileId) return `/api/drive-proxy/${fileId}`;
+    return media.mediaUrl;
+  }
+
+  return "";
 }
 
 export function getAqeeqShowcaseVideoStreamPath(slug: string, postId: number) {

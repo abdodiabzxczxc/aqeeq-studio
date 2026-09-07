@@ -91,6 +91,7 @@ import {
   addAqeeqShowcaseXPost,
   addAqeeqShowcaseSocialPost,
   updateAqeeqShowcasePost,
+  refreshAqeeqShowcaseSocialThumbnails,
   recordAqeeqContentView,
   reorderAqeeqShowcasePosts,
   deleteAqeeqShowcasePost,
@@ -813,19 +814,24 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.add_media_group", details: JSON.stringify({ id: input.showcaseId, postId: post.id, count: input.media.length }) });
       return post;
     }),
-    addXPost: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), xPostUrl: z.string().url().max(1024).refine((value) => /^(?:https?:\/\/)?(?:www\.)?(?:x|twitter)\.com\/[^/]+\/status\/\d+/i.test(value), "ضع رابط منشور X صحيحًا"), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional() })).mutation(async ({ input, ctx }) => {
+    addXPost: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), xPostUrl: z.string().url().max(1024).refine((value) => /^(?:https?:\/\/)?(?:www\.)?(?:x|twitter)\.com\/[^/]+\/status\/\d+/i.test(value), "ضع رابط منشور X صحيحًا"), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), thumbnailUrl: storedMediaUrl.nullable().optional() })).mutation(async ({ input, ctx }) => {
       const result = await addAqeeqShowcaseXPost(input.showcaseId, input);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.add_x_post", details: JSON.stringify({ id: input.showcaseId, postId: result.post.id, added: result.added }) });
       return result;
     }),
-    addSocialPost: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), source: z.enum(["instagram", "youtube"]), postUrl: z.string().url().max(1024), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional() })).mutation(async ({ input, ctx }) => {
+    addSocialPost: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), source: z.enum(["instagram", "youtube"]), postUrl: z.string().url().max(1024), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), thumbnailUrl: storedMediaUrl.nullable().optional() })).mutation(async ({ input, ctx }) => {
       const result = await addAqeeqShowcaseSocialPost(input.showcaseId, input);
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.add_social_post", details: JSON.stringify({ id: input.showcaseId, source: input.source, postId: result.post.id, added: result.added }) });
       return result;
     }),
-    updatePost: adminProcedure.input(z.object({ id: z.number().int().positive(), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), isNew: z.boolean().optional() })).mutation(({ input }) => {
+    updatePost: adminProcedure.input(z.object({ id: z.number().int().positive(), title: z.string().max(255).nullable().optional(), description: z.string().max(4000).nullable().optional(), isNew: z.boolean().optional(), thumbnailUrl: storedMediaUrl.nullable().optional() })).mutation(({ input }) => {
       const { id, ...data } = input;
       return updateAqeeqShowcasePost(id, { ...data, isNew: data.isNew ?? false });
+    }),
+    refreshSocialThumbnails: adminProcedure.input(z.object({ showcaseId: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
+      const result = await refreshAqeeqShowcaseSocialThumbnails(input.showcaseId);
+      await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "aqeeq_showcase.refresh_thumbnails", details: JSON.stringify({ id: input.showcaseId, updatedCount: result.updatedCount }) });
+      return result;
     }),
     reorderPosts: adminProcedure.input(z.object({ showcaseId: z.number().int().positive(), postIds: z.array(z.number().int().positive()).min(1).max(250) })).mutation(({ input }) => reorderAqeeqShowcasePosts(input.showcaseId, input.postIds)),
     deletePost: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => deleteAqeeqShowcasePost(input.id)),

@@ -61,3 +61,54 @@ export async function getAqeeqXPostEmbed(value: string) {
   xEmbedCache.set(normalized, { data: fallbackResult, cachedAt: Date.now() });
   return fallbackResult;
 }
+
+export type AqeeqXTweetMeta = {
+  text?: string | null;
+  authorName?: string | null;
+  authorScreenName?: string | null;
+  authorAvatarUrl?: string | null;
+  thumbnailUrl?: string | null;
+  mediaType: "image" | "video";
+};
+
+export async function fetchAqeeqXTweetMeta(author: string, postId: string): Promise<AqeeqXTweetMeta | null> {
+  try {
+    const url = `https://api.fxtwitter.com/${encodeURIComponent(author)}/status/${encodeURIComponent(postId)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) return null;
+    const data = (await res.json()) as any;
+    if (!data?.tweet) return null;
+    const tweet = data.tweet;
+
+    let thumbnailUrl: string | null = null;
+    let mediaType: "image" | "video" = "image";
+
+    if (tweet.media?.photos?.length) {
+      thumbnailUrl = tweet.media.photos[0].url || null;
+      mediaType = "image";
+    } else if (tweet.media?.videos?.length) {
+      thumbnailUrl = tweet.media.videos[0].thumbnail_url || null;
+      mediaType = "video";
+    } else if (tweet.media?.all?.length) {
+      const first = tweet.media.all[0];
+      thumbnailUrl = first.thumbnail_url || first.url || null;
+      if (first.type === "video") mediaType = "video";
+    }
+
+    if (!thumbnailUrl && tweet.author?.banner_url) {
+      thumbnailUrl = tweet.author.banner_url;
+    }
+
+    return {
+      text: tweet.text || null,
+      authorName: tweet.author?.name || null,
+      authorScreenName: tweet.author?.screen_name || author,
+      authorAvatarUrl: tweet.author?.avatar_url || null,
+      thumbnailUrl,
+      mediaType,
+    };
+  } catch {
+    return null;
+  }
+}
+

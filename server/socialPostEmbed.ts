@@ -7,6 +7,7 @@ export type AqeeqSocialPost = {
   label: string;
   mimeType: string;
   mediaType: "image" | "video";
+  thumbnailUrl: string | null;
 };
 
 export function parseAqeeqSocialPostUrl(source: AqeeqSocialPostSource, value: string): AqeeqSocialPost | null {
@@ -19,7 +20,7 @@ export function parseAqeeqSocialPostUrl(source: AqeeqSocialPostSource, value: st
       if (!match) return null;
       const kind = match[1].toLowerCase();
       const shortCode = match[2];
-      return { source, sourceId: `instagram-${shortCode}`, url: `https://www.instagram.com/${kind}/${shortCode}/`, label: "منشور Instagram", mimeType: "application/x-instagram-post", mediaType: kind === "reel" ? "video" : "image" };
+      return { source, sourceId: `instagram-${shortCode}`, url: `https://www.instagram.com/${kind}/${shortCode}/`, label: "منشور Instagram", mimeType: "application/x-instagram-post", mediaType: kind === "reel" ? "video" : "image", thumbnailUrl: null };
     }
     let videoId: string | null = null;
     if (hostname === "youtu.be") videoId = parsed.pathname.split("/").filter(Boolean)[0] || null;
@@ -27,7 +28,7 @@ export function parseAqeeqSocialPostUrl(source: AqeeqSocialPostSource, value: st
       videoId = parsed.searchParams.get("v") || parsed.pathname.match(/^\/(?:shorts|embed|live)\/([A-Za-z0-9_-]+)/i)?.[1] || null;
     }
     if (!videoId || !/^[A-Za-z0-9_-]{6,}$/.test(videoId)) return null;
-    return { source, sourceId: `youtube-${videoId}`, url: `https://www.youtube.com/watch?v=${videoId}`, label: "فيديو YouTube", mimeType: "application/x-youtube-video", mediaType: "video" };
+    return { source, sourceId: `youtube-${videoId}`, url: `https://www.youtube.com/watch?v=${videoId}`, label: "فيديو YouTube", mimeType: "application/x-youtube-video", mediaType: "video", thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` };
   } catch {
     return null;
   }

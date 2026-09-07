@@ -13,4 +13,13 @@ describe("getAqeeqShowcaseDisplaySource", () => {
   it("يبني مسار بث محليًا آمنًا لمشغل فيديو الخبر", () => {
     expect(getAqeeqShowcaseVideoStreamPath("news-offers", 42)).toBe("/api/showcases/news-offers/posts/42/stream");
   });
+
+  it("يمنع استخدام روابط صفحات X و Instagram كصور مباشرة لمنع فشل المتصفح", () => {
+    expect(getAqeeqShowcaseDisplaySource({ mediaType: "image", mediaUrl: "https://x.com/alaqeeq_school/status/123456" })).toBe("");
+    expect(getAqeeqShowcaseDisplaySource({ mediaType: "image", mediaUrl: "https://www.instagram.com/p/abc1234/" })).toBe("");
+  });
+
+  it("يستخدم thumbnailUrl عند توفره لمنشورات السوشيال", () => {
+    expect(getAqeeqShowcaseDisplaySource({ mediaType: "image", mediaUrl: "https://x.com/alaqeeq_school/status/123456", thumbnailUrl: "https://pbs.twimg.com/media/test.jpg" })).toBe("https://pbs.twimg.com/media/test.jpg");
+  });
 });

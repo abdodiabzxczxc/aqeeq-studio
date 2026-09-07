@@ -71,17 +71,47 @@ function socialPostLabel(post: ShowcasePost) {
 }
 
 function PostPreview({ post }: { post: ShowcasePost }) {
+  const displaySrc = getAqeeqShowcaseDisplaySource(post);
+
+  if (displaySrc) {
+    return (
+      <div className="relative h-full w-full overflow-hidden">
+        <img src={displaySrc} alt={post.title || post.fileName} className="h-full w-full object-cover" />
+        {isXPost(post) ? (
+          <span className="absolute top-2 right-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-black/80 border border-white/20 text-xs font-black text-white shadow-md">𝕏</span>
+        ) : post.sourceType === "instagram" ? (
+          <span className="absolute top-2 right-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-xs font-black text-white shadow-md">IG</span>
+        ) : post.sourceType === "youtube" ? (
+          <span className="absolute top-2 right-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-red-600 text-xs font-black text-white shadow-md">YT</span>
+        ) : null}
+      </div>
+    );
+  }
+
   if (isXPost(post)) {
     return (
-      <div className="grid h-full w-full place-items-center bg-black/40 p-4 text-center">
+      <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0c1322] to-black p-3 text-center border border-white/10">
         <div>
-          <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/20 bg-black/60 text-lg font-black text-white">X</span>
-          <p className="mt-3 text-xs font-black">منشور من X</p>
-          <p className="mt-1 text-[10px] opacity-70">يفتح من الرابط الأصلي</p>
+          <span className="inline-grid h-8 w-8 place-items-center rounded-xl border border-white/20 bg-black/80 text-sm font-black text-white">𝕏</span>
+          <p className="mt-2 text-xs font-black text-slate-200 line-clamp-1">{post.title || "منشور من X"}</p>
+          <p className="mt-0.5 text-[9px] text-[#f8ca14]">@alaqeeq_school</p>
         </div>
       </div>
     );
   }
+
+  if (post.sourceType === "instagram") {
+    return (
+      <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#280c2e] to-black p-3 text-center border border-white/10">
+        <div>
+          <span className="inline-grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-xs font-black text-white">IG</span>
+          <p className="mt-2 text-xs font-black text-slate-200 line-clamp-1">{post.title || "منشور Instagram"}</p>
+          <p className="mt-0.5 text-[9px] text-pink-300">إنستغرام العقيق</p>
+        </div>
+      </div>
+    );
+  }
+
   if (post.mediaType === "image") return <img src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className="h-full w-full object-cover" />;
   return (
     <AqeeqVideoPoster
@@ -106,9 +136,11 @@ export default function AqeeqShowcaseStudioPage() {
   const [xPostUrl, setXPostUrl] = useState("");
   const [xPostTitle, setXPostTitle] = useState("");
   const [xPostDescription, setXPostDescription] = useState("");
+  const [xPostThumbnailUrl, setXPostThumbnailUrl] = useState("");
   const [instagramPostUrl, setInstagramPostUrl] = useState("");
   const [instagramPostTitle, setInstagramPostTitle] = useState("");
   const [instagramPostDescription, setInstagramPostDescription] = useState("");
+  const [instagramPostThumbnailUrl, setInstagramPostThumbnailUrl] = useState("");
   const [youtubePostUrl, setYoutubePostUrl] = useState("");
   const [youtubePostTitle, setYoutubePostTitle] = useState("");
   const [youtubePostDescription, setYoutubePostDescription] = useState("");
@@ -208,11 +240,12 @@ export default function AqeeqShowcaseStudioPage() {
   const addXPost = trpc.aqeeqShowcases.addXPost.useMutation({
     onSuccess: (result) => {
       toast.success(result.added ? "تمت إضافة منشور X" : "المنشور موجود بالفعل", {
-        description: result.added ? "راجع عنوانه ووصفه ثم احفظ وانشر." : "لن يتكرر المنشور في الخلاصة.",
+        description: result.added ? "تم جلب غلاف التغريدة تلقائياً وحفظ المنشور." : "لن يتكرر المنشور في الخلاصة.",
       });
       setXPostUrl("");
       setXPostTitle("");
       setXPostDescription("");
+      setXPostThumbnailUrl("");
       refresh();
     },
     onError: (error) => toast.error(error.message || "تعذر إضافة رابط X"),
@@ -228,6 +261,7 @@ export default function AqeeqShowcaseStudioPage() {
         setInstagramPostUrl("");
         setInstagramPostTitle("");
         setInstagramPostDescription("");
+        setInstagramPostThumbnailUrl("");
       } else {
         setYoutubePostUrl("");
         setYoutubePostTitle("");
@@ -236,6 +270,14 @@ export default function AqeeqShowcaseStudioPage() {
       refresh();
     },
     onError: (error) => toast.error(error.message || "تعذر إضافة الرابط"),
+  });
+
+  const refreshSocialThumbnails = trpc.aqeeqShowcases.refreshSocialThumbnails.useMutation({
+    onSuccess: (result) => {
+      toast.success(`تم تحديث أغلفة ${result.updatedCount} منشور بنجاح ✦`);
+      refresh();
+    },
+    onError: (error) => toast.error(error.message || "تعذر تحديث الأغلفة"),
   });
 
   const reorder = trpc.aqeeqShowcases.reorderPosts.useMutation({ onSuccess: refresh, onError: (error) => toast.error(error.message || "تعذر ترتيب المنشورات") });
@@ -268,7 +310,13 @@ export default function AqeeqShowcaseStudioPage() {
 
   const addXLink = () => {
     if (!showcase || !xPostUrl.trim()) return;
-    addXPost.mutate({ showcaseId: showcase.id, xPostUrl: xPostUrl.trim(), title: xPostTitle.trim() || null, description: xPostDescription.trim() || null });
+    addXPost.mutate({
+      showcaseId: showcase.id,
+      xPostUrl: xPostUrl.trim(),
+      title: xPostTitle.trim() || null,
+      description: xPostDescription.trim() || null,
+      thumbnailUrl: xPostThumbnailUrl.trim() || null,
+    });
   };
 
   const addSocialLink = (source: "instagram" | "youtube") => {
@@ -282,6 +330,7 @@ export default function AqeeqShowcaseStudioPage() {
       postUrl,
       title: (isInstagram ? instagramPostTitle : youtubePostTitle).trim() || null,
       description: (isInstagram ? instagramPostDescription : youtubePostDescription).trim() || null,
+      thumbnailUrl: isInstagram ? (instagramPostThumbnailUrl.trim() || null) : null,
     });
   };
 
@@ -614,6 +663,13 @@ export default function AqeeqShowcaseStudioPage() {
                       className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                     />
                   </div>
+                  <Input
+                    value={xPostThumbnailUrl}
+                    onChange={(event) => setXPostThumbnailUrl(event.target.value)}
+                    dir="ltr"
+                    placeholder="رابط صورة غلاف مخصصة (اختياري - يتم الجلب تلقائياً من X)"
+                    className={dark ? "border-white/15 bg-black text-white text-xs" : "border-black/15 bg-white text-black text-xs"}
+                  />
                   <Button
                     onClick={addXLink}
                     disabled={!xPostUrl.trim() || addXPost.isPending}
@@ -652,6 +708,13 @@ export default function AqeeqShowcaseStudioPage() {
                       className={dark ? "border-white/15 bg-black text-white" : "border-black/15 bg-white text-black"}
                     />
                   </div>
+                  <Input
+                    value={instagramPostThumbnailUrl}
+                    onChange={(event) => setInstagramPostThumbnailUrl(event.target.value)}
+                    dir="ltr"
+                    placeholder="رابط صورة غلاف المنشور (اختياري)"
+                    className={dark ? "border-white/15 bg-black text-white text-xs" : "border-black/15 bg-white text-black text-xs"}
+                  />
                   <Button
                     onClick={() => addSocialLink("instagram")}
                     disabled={!instagramPostUrl.trim() || addSocialPost.isPending}
@@ -720,18 +783,34 @@ export default function AqeeqShowcaseStudioPage() {
                 أي منشور عليه «جديد» يحتاج منك عنوانًا وشرحًا قبل اعتماد محتواه.
               </p>
             </div>
-            <Button
-              onClick={() => setLibraryField("post")}
-              variant="outline"
-              className={`border font-black transition ${
-                dark
-                  ? "border-[#f8ca14]/35 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
-                  : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
-              }`}
-            >
-              <Upload className="ml-2" size={16} />
-              إضافة مباشرة
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={() => showcase && refreshSocialThumbnails.mutate({ showcaseId: showcase.id })}
+                disabled={refreshSocialThumbnails.isPending}
+                variant="outline"
+                className={`border font-black text-xs transition ${
+                  dark
+                    ? "border-amber-400/35 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+                    : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                }`}
+                title="جلب وتحديث صور المعاينة لمنشورات X ويوتيوب تلقائياً"
+              >
+                {refreshSocialThumbnails.isPending ? <Loader2 className="ml-1.5 animate-spin" size={14} /> : <Sparkles className="ml-1.5" size={14} />}
+                تحديث أغلفة السوشيال
+              </Button>
+              <Button
+                onClick={() => setLibraryField("post")}
+                variant="outline"
+                className={`border font-black transition ${
+                  dark
+                    ? "border-[#f8ca14]/35 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                    : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                }`}
+              >
+                <Upload className="ml-2" size={16} />
+                إضافة مباشرة
+              </Button>
+            </div>
           </div>
 
           <div className="mt-6 space-y-3">
