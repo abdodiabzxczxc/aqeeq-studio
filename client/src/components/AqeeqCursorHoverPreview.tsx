@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
 import { Edit3, Pin, X, ExternalLink, Sparkles } from "lucide-react";
+import { useVisualEditorState } from "@/components/VisualEditor";
 
 export interface HoverPreviewState {
   visible: boolean;
@@ -28,10 +29,13 @@ const OFFSET = 20;  // distance from cursor
 
 /**
  * AqeeqCursorHoverPreview — Smart Positioning Wellington-Style Cursor Preview
- * يدعم التثبيت التلقائي (Auto-Freeze FX) والتعديل المباشر (Inline Edit)
- * محمي من اعتراض نقرات المحرر عبر [data-no-visual-edit] و [data-interactive-fx]
+ * أزرار التثبيت (Pin/Freeze) والتعديل المباشر تظهر حصرياً في وضع المحرر المرئي فقط
+ * للمستخدم العادي والزوار: بطاقة معاينة سينمائية نظيفة وخفيفة تتبع المؤشر بدون أي أدوات تحرير
  */
 export function AqeeqCursorHoverPreview() {
+  const { isEditing, isPreviewing } = useVisualEditorState();
+  const isEditorActive = isEditing && !isPreviewing;
+
   const [preview, setPreview] = useState<HoverPreviewState>({ visible: false });
   const [isFrozen, setIsFrozen] = useState(false);
   const [isMouseOverCard, setIsMouseOverCard] = useState(false);
@@ -40,6 +44,14 @@ export function AqeeqCursorHoverPreview() {
   const springConfig = { damping: 18, stiffness: 180, mass: 0.3 };
   const cursorX = useSpring(-500, springConfig);
   const cursorY = useSpring(-500, springConfig);
+
+  // إبراء التثبيت فوراً إذا تم إغلاق وضع المحرر
+  useEffect(() => {
+    if (!isEditorActive) {
+      setIsFrozen(false);
+      setIsMouseOverCard(false);
+    }
+  }, [isEditorActive]);
 
   useEffect(() => {
     setGlobalHover = (incoming: HoverPreviewState) => {
@@ -51,27 +63,29 @@ export function AqeeqCursorHoverPreview() {
       }
 
       setPreview((prev) => {
-        // If already frozen or mouse is currently over card, reject automatic hide
-        if ((isFrozen || isMouseOverCard) && !incoming.visible) {
+        // في وضع المحرر فقط: إذا كانت البطاقة مثبتة أو الماوس عليها نمنع الإخفاء التلقائي
+        if (isEditorActive && (isFrozen || isMouseOverCard) && !incoming.visible) {
           return prev;
         }
 
-        // Automatic freeze if incoming.isFrozen is true
-        if (incoming.isFrozen !== undefined) {
+        // التثبيت التلقائي مسموح فقط في وضع المحرر النشط
+        if (isEditorActive && incoming.isFrozen !== undefined) {
           setIsFrozen(incoming.isFrozen);
+        } else if (!isEditorActive) {
+          setIsFrozen(false);
         }
 
         return {
           ...incoming,
-          // Retain onEdit callback if not explicitly provided in hide event
-          onEdit: incoming.onEdit || prev.onEdit,
+          // الاحتفاظ برابط التعديل فقط في وضع المحرر
+          onEdit: isEditorActive ? (incoming.onEdit || prev.onEdit) : undefined,
         };
       });
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Do not shift card if frozen or when user is interacting with card
-      if (isFrozen || isMouseOverCard) return;
+      // لا نحرك البطاقة إذا كانت مثبتة أو المستخدم يتفاعل معها في وضع المحرر
+      if (isEditorActive && (isFrozen || isMouseOverCard)) return;
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -102,7 +116,7 @@ export function AqeeqCursorHoverPreview() {
       setGlobalHover = null;
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [cursorX, cursorY, isFrozen, isMouseOverCard]);
+  }, [cursorX, cursorY, isFrozen, isMouseOverCard, isEditorActive]);
 
   const handleClose = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -113,12 +127,13 @@ export function AqeeqCursorHoverPreview() {
 
   const handleToggleFreeze = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isEditorActive) return;
     setIsFrozen((prev) => !prev);
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (preview.onEdit) {
+    if (isEditorActive && preview.onEdit) {
       preview.onEdit();
     }
   };
@@ -142,28 +157,34 @@ export function AqeeqCursorHoverPreview() {
             data-no-visual-edit="true"
             data-interactive-fx="true"
             data-hover-preview="true"
-            onMouseEnter={() => setIsMouseOverCard(true)}
+            onMouseEnter={() => {
+              if (isEditorActive) {
+                setIsMouseOverCard(true);
+              }
+            }}
             onMouseLeave={() => {
               setIsMouseOverCard(false);
-              if (!isFrozen) {
+              if (!isEditorActive || !isFrozen) {
                 setPreview({ visible: false });
               }
             }}
-            onClick={preview.onEdit ? handleCardClick : undefined}
-            className={`pointer-events-auto relative overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl transition-all duration-300 ${
-              preview.onEdit ? "cursor-pointer" : ""
+            onClick={isEditorActive && preview.onEdit ? handleCardClick : undefined}
+            className={`relative overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl transition-all duration-300 ${
+              isEditorActive ? "pointer-events-auto" : "pointer-events-none"
             } ${
-              isFrozen
+              isEditorActive && preview.onEdit ? "cursor-pointer" : ""
+            } ${
+              isEditorActive && isFrozen
                 ? "ring-2 ring-[#f8ca14] shadow-[0_0_35px_rgba(248,202,20,0.45)]"
-                : preview.onEdit
+                : isEditorActive && preview.onEdit
                 ? "ring-2 ring-[#f8ca14]/80 shadow-[0_0_25px_rgba(248,202,20,0.3)]"
-                : ""
+                : "border border-white/10"
             }`}
             style={{ width: CARD_W }}
             dir="rtl"
           >
             {/* If in edit mode: Top Banner prompting click to edit */}
-            {preview.onEdit && (
+            {isEditorActive && preview.onEdit && (
               <div
                 data-no-visual-edit="true"
                 className="bg-[#f8ca14] px-3 py-1.5 text-black flex items-center justify-between text-[11px] font-black border-b border-black/15 shadow-sm"
@@ -178,57 +199,59 @@ export function AqeeqCursorHoverPreview() {
               </div>
             )}
 
-            {/* Top Interactive Controls Bar */}
-            <div
-              data-no-visual-edit="true"
-              className="absolute top-8 inset-x-2 z-30 flex items-center justify-between gap-1 pointer-events-auto"
-            >
-              <div className="flex items-center gap-1.5">
-                {/* Freeze Status Button */}
-                <button
-                  type="button"
-                  data-no-visual-edit="true"
-                  onClick={handleToggleFreeze}
-                  className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-black shadow-md backdrop-blur-md transition cursor-pointer ${
-                    isFrozen
-                      ? "bg-[#08467d] text-white hover:bg-[#063560]"
-                      : "bg-black/75 text-[#f8ca14] border border-[#f8ca14]/40 hover:bg-black"
-                  }`}
-                  title={isFrozen ? "إلغاء التثبيت" : "تثبيت البطاقة على الشاشة"}
-                >
-                  <Pin size={11} className={isFrozen ? "rotate-45" : ""} />
-                  <span>{isFrozen ? "مثبت 📌" : "تثبيت ❄️"}</span>
-                </button>
-
-                {/* Edit Button */}
-                {preview.onEdit && (
+            {/* Top Interactive Controls Bar - Editor Mode ONLY */}
+            {isEditorActive && (
+              <div
+                data-no-visual-edit="true"
+                className={`absolute ${preview.onEdit ? "top-8" : "top-2"} inset-x-2 z-30 flex items-center justify-between gap-1 pointer-events-auto`}
+              >
+                <div className="flex items-center gap-1.5">
+                  {/* Freeze / Pin Status Button */}
                   <button
                     type="button"
                     data-no-visual-edit="true"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      preview.onEdit?.();
-                    }}
-                    className="inline-flex items-center gap-1 rounded-lg bg-black/80 hover:bg-black text-[#f8ca14] border border-[#f8ca14]/50 px-2 py-0.5 text-[10px] font-black shadow-md transition cursor-pointer"
-                    title="تعديل هذا العنصر التفاعلي"
+                    onClick={handleToggleFreeze}
+                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-black shadow-md backdrop-blur-md transition cursor-pointer ${
+                      isFrozen
+                        ? "bg-[#08467d] text-white hover:bg-[#063560]"
+                        : "bg-black/75 text-[#f8ca14] border border-[#f8ca14]/40 hover:bg-black"
+                    }`}
+                    title={isFrozen ? "إلغاء التثبيت" : "تثبيت البطاقة على الشاشة"}
                   >
-                    <Edit3 size={11} />
-                    <span>تعديل</span>
+                    <Pin size={11} className={isFrozen ? "rotate-45" : ""} />
+                    <span>{isFrozen ? "مثبت 📌" : "تثبيت ❄️"}</span>
                   </button>
-                )}
-              </div>
 
-              {/* Close Button */}
-              <button
-                type="button"
-                data-no-visual-edit="true"
-                onClick={handleClose}
-                className="rounded-lg bg-black/80 hover:bg-[#de191e] text-white p-1 shadow-md transition cursor-pointer"
-                title="إغلاق المعاينة"
-              >
-                <X size={12} />
-              </button>
-            </div>
+                  {/* Edit Button */}
+                  {preview.onEdit && (
+                    <button
+                      type="button"
+                      data-no-visual-edit="true"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        preview.onEdit?.();
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg bg-black/80 hover:bg-black text-[#f8ca14] border border-[#f8ca14]/50 px-2 py-0.5 text-[10px] font-black shadow-md transition cursor-pointer"
+                      title="تعديل هذا العنصر التفاعلي"
+                    >
+                      <Edit3 size={11} />
+                      <span>تعديل</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  data-no-visual-edit="true"
+                  onClick={handleClose}
+                  className="rounded-lg bg-black/80 hover:bg-[#de191e] text-white p-1 shadow-md transition cursor-pointer"
+                  title="إغلاق المعاينة"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
 
             {/* Image */}
             <div className="relative h-36 w-full overflow-hidden">
