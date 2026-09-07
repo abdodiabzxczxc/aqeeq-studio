@@ -386,10 +386,10 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                   onMouseLeave={handleMouseLeaveCard}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.75, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
-                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    initial={{ opacity: 0, scale: 0.95, y: 6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.96, y: 3 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                     style={{ transformOrigin: "top center" }}
                     onClick={() => {
                       setHoveredKey(null);
@@ -439,11 +439,14 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
 
                     {/* ── Live Hero Snapshot Visual Component (Authentic In-App Screenshot of the Page) ── */}
                     <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-                      <img
+                      <motion.img
                         src={preview.image}
                         alt={preview.title}
                         loading="eager"
-                        className="w-full h-full object-cover object-top select-none transition-transform duration-700 ease-out group-hover:scale-105"
+                        initial={{ scale: 1.08 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.45, ease: "easeOut" }}
+                        className="w-full h-full object-cover object-top select-none transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
                     </div>

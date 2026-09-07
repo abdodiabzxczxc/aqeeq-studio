@@ -9,18 +9,18 @@ OUT_DIR = "client/public/previews"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 PAGES = [
-    ("home", "http://localhost:3000/"),
-    ("about", "http://localhost:3000/about"),
-    ("accreditations", "http://localhost:3000/accreditations"),
-    ("admissions", "http://localhost:3000/admissions"),
-    ("journal", "http://localhost:3000/journal"),
-    ("albums", "http://localhost:3000/albums"),
-    ("podcast", "http://localhost:3000/podcast"),
-    ("articles", "http://localhost:3000/articles"),
-    ("showcase", "http://localhost:3000/showcase"),
+    ("home", "http://localhost:3000/", 3500),
+    ("about", "http://localhost:3000/about", None),
+    ("accreditations", "http://localhost:3000/accreditations", None),
+    ("admissions", "http://localhost:3000/admissions", None),
+    ("journal", "http://localhost:3000/journal", None),
+    ("albums", "http://localhost:3000/albums", None),
+    ("podcast", "http://localhost:3000/podcast", 3500),
+    ("articles", "http://localhost:3000/articles", None),
+    ("showcase", "http://localhost:3000/showcase", 3500),
 ]
 
-def capture_page(key, url, theme):
+def capture_page(key, url, theme, delay):
     sep = "&" if "?" in url else "?"
     full_url = f"{url}{sep}theme={theme}"
     tmp_png = f"/tmp/snap_{key}_{theme}.png"
@@ -31,9 +31,13 @@ def capture_page(key, url, theme):
         "--disable-gpu",
         "--hide-scrollbars",
         "--window-size=1280,720",
+    ]
+    if delay:
+        cmd.append(f"--virtual-time-budget={delay}")
+    cmd.extend([
         f"--screenshot={tmp_png}",
         full_url
-    ]
+    ])
     
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
@@ -63,9 +67,9 @@ def capture_page(key, url, theme):
 
 def main():
     print("Starting screenshot generation for all pages (Dark & Light)...")
-    for key, url in PAGES:
+    for key, url, delay in PAGES:
         for theme in ["dark", "light"]:
-            capture_page(key, url, theme)
+            capture_page(key, url, theme, delay)
     print("All screenshots successfully captured and saved!")
 
 if __name__ == "__main__":

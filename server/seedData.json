@@ -757,7 +757,7 @@
       "title": "صور اولياء الامور في الأسبوع التمهيدي",
       "slug": "album-20260907-rxor",
       "albumDate": "2026-09-03",
-      "coverUrl": "/api/drive-proxy/1WCQwaXRVnUUraSVAfqkZBJHp5NzllN35",
+      "coverUrl": "/api/drive-proxy/1LEoaK7KNhY3fDuwYUVrtKzJcrTvjW3vP",
       "description": null,
       "driveFolderUrl": "https://drive.google.com/drive/folders/1_TBYf0zW0rYoApBmk6sT4yy_S9hSq631?usp=drive_link",
       "readingMode": "spread",
@@ -769,10 +769,10 @@
       "watermarkPosition": "center",
       "watermarkTint": "#d6b96a",
       "status": "published",
-      "publishedAt": "2026-09-07T08:02:54.405Z",
+      "publishedAt": "2026-09-07T12:15:11.447Z",
       "viewCount": 0,
       "createdAt": "2026-09-07T05:41:26.437Z",
-      "updatedAt": "2026-09-07T08:02:54.348Z",
+      "updatedAt": "2026-09-07T12:15:11.384Z",
       "media": [
         {
           "id": 77,
@@ -2162,7 +2162,7 @@
     "album": 8,
     "albumMedia": 133,
     "showcase": 2,
-    "showcasePost": 82,
+    "showcasePost": 60,
     "showcasePostMedia": 1,
     "mediaAsset": 17,
     "admission": 2
