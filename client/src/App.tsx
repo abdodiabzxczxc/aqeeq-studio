@@ -209,6 +209,14 @@ import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti"
 function StudioAppShell() {
   const [location] = useLocation();
   const isLoginPage = location === "/login";
+  const isDockPreview = typeof window !== "undefined" && (window.self !== window.top || new URLSearchParams(window.location.search).get("dockpreview") === "1");
+
+  useEffect(() => {
+    if (isDockPreview) {
+      document.documentElement.dataset.dockPreview = "true";
+    }
+  }, [isDockPreview]);
+
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
   const { activeItem } = usePodcastPlayer();
@@ -223,6 +231,14 @@ function StudioAppShell() {
     "--aq-blue": isNationalDay ? "#005A36" : (brand?.brand_primary || "#08467d"),
     fontFamily: brand?.brand_font ? `'${brand.brand_font}', Tajawal, sans-serif` : undefined,
   } as React.CSSProperties;
+
+  if (isDockPreview) {
+    return (
+      <div style={brandStyle} className={`aq-brand-shell overflow-hidden ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
+        <ErrorBoundary><Router /></ErrorBoundary>
+      </div>
+    );
+  }
 
   return (
     <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>

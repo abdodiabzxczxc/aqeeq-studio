@@ -41,6 +41,48 @@ interface HeaderDockNavProps {
   onNavigate: (path: string) => void;
 }
 
+function DockLiveViewport({
+  itemPath,
+  theme,
+  fallbackImage,
+  title,
+}: {
+  itemPath: string;
+  theme: string;
+  fallbackImage: string;
+  title: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const src = `${itemPath}${itemPath.includes("?") ? "&" : "?"}theme=${theme}&dockpreview=1`;
+
+  return (
+    <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
+      {/* 1. Fast Baseline Screenshot (Always visible instantly in 0ms) */}
+      <img
+        src={fallbackImage}
+        alt={title}
+        loading="eager"
+        className="w-full h-full object-cover object-top select-none"
+      />
+
+      {/* 2. Live Real-Time Dynamic Viewport (Reflects live database & Visual Editor changes automatically) */}
+      <iframe
+        src={src}
+        title={title}
+        tabIndex={-1}
+        aria-hidden="true"
+        onLoad={() => setLoaded(true)}
+        className={`absolute inset-0 w-[1280px] h-[720px] scale-[0.243] origin-top-left border-0 pointer-events-none select-none transition-opacity duration-500 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        loading="lazy"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
+    </div>
+  );
+}
+
 export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [isCardHovered, setIsCardHovered] = useState(false);
@@ -437,16 +479,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       </div>
                     </div>
 
-                    {/* ── Live Hero Snapshot Visual Component (Authentic In-App Screenshot of the Page) ── */}
-                    <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-                      <img
-                        src={preview.image}
-                        alt={preview.title}
-                        loading="eager"
-                        className="w-full h-full object-cover object-top select-none"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none opacity-40" />
-                    </div>
+                    {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Viewport) ── */}
+                    <DockLiveViewport
+                      itemPath={item.path}
+                      theme={dark ? "dark" : "light"}
+                      fallbackImage={preview.image}
+                      title={preview.title}
+                    />
 
                     {/* Description */}
                     <p

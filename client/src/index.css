@@ -2607,3 +2607,26 @@ body.aq-smart-editable-active [data-visual-selected="true"] {
   box-shadow: 0 0 0 5px rgba(251, 191, 36, 0.25), 0 0 25px rgba(251, 191, 36, 0.4) !important;
 }
 
+/* ── Real-Time Live Dock Preview Isolated Styles ─────────────────── */
+html[data-dock-preview="true"],
+html[data-dock-preview="true"] body {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+html[data-dock-preview="true"] #aqeeq-floating-podcast-player,
+html[data-dock-preview="true"] #mobile-sticky-action-bar,
+html[data-dock-preview="true"] #aqeeq-ai-assistant-button,
+html[data-dock-preview="true"] .aqeeq-grain-overlay,
+html[data-dock-preview="true"] .snd-floating-star,
+html[data-dock-preview="true"] .aq-opening,
+html[data-dock-preview="true"] audio,
+html[data-dock-preview="true"] video {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
