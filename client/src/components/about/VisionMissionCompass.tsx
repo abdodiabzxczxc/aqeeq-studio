@@ -100,7 +100,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
           {/* Vision Plaque */}
           <div
             className={`rounded-3xl border p-6 sm:p-8 relative overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.01] hover:border-[#f8ca14]/50 ${
-              dark ? "border-white/10 bg-white/[0.03]" : "border-[#08467d]/15 bg-[#08467d]/[0.03]"
+              dark ? "border-white/10 bg-white/[0.03]" : "border-[#08467d]/15 bg-white shadow-md"
             }`}
           >
             <div className="flex items-center gap-3.5 mb-4">
@@ -141,7 +141,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
           {/* Mission Plaque */}
           <div
             className={`rounded-3xl border p-6 sm:p-8 relative overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.01] hover:border-[#f8ca14]/50 ${
-              dark ? "border-white/10 bg-white/[0.03]" : "border-[#f8ca14]/20 bg-[#f8ca14]/[0.03]"
+              dark ? "border-white/10 bg-white/[0.03]" : "border-[#f8ca14]/25 bg-white shadow-md"
             }`}
           >
             <div className="flex items-center gap-3.5 mb-4">
@@ -181,11 +181,11 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
         </div>
 
         {/* 4. Lower Section: The 5 Core Virtues Compass */}
-        <div className="relative z-10 pt-8 border-t border-white/10 text-right">
+        <div className={`relative z-10 pt-8 border-t text-right ${dark ? "border-white/10" : "border-slate-200"}`}>
           <div className="mb-6">
-            <span className="text-xs font-black text-[#f8ca14] uppercase tracking-wider block mb-1">
-              ✦ بوصلة السلوك والقيم المؤسسية ✦
-            </span>
+            <div className="inline-flex items-center gap-1.5 text-xs font-black text-[#f8ca14] mb-1">
+              <span>✦ بوصلة السلوك والقيم المؤسسية ✦</span>
+            </div>
             <h4 className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
               قيم العقيق الجوهرية الخمس (The 5 Virtues)
             </h4>
@@ -194,8 +194,8 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
             </p>
           </div>
 
-          {/* 5 Values Selector Chips */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-6">
+          {/* Virtues Grid Pills */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3 mb-6">
             {FIVE_VALUES.map((val) => {
               const VIcon = val.icon;
               const isSelected = activeValueId === val.id;
@@ -209,7 +209,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                       ? "bg-gradient-to-r from-[#08467d] to-[#042442] border-[#f8ca14]/60 text-white shadow-lg ring-1 ring-[#f8ca14]/50 scale-[1.02]"
                       : dark
                       ? "border-white/10 bg-black/40 text-slate-400 hover:text-white hover:border-white/20"
-                      : "border-slate-200 bg-white text-slate-700 hover:text-[#08467d] hover:border-slate-300"
+                      : "border-slate-200 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/40 shadow-sm"
                   }`}
                 >
                   <div className="flex items-center justify-center gap-2 mb-1">
@@ -237,7 +237,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
               className={`p-5 sm:p-7 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
                 dark
                   ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.04]"
-                  : "border-[#08467d]/20 bg-[#08467d]/[0.02]"
+                  : "border-slate-200 bg-white shadow-md"
               }`}
             >
               <div className="space-y-1.5 flex-1">
@@ -260,7 +260,11 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                 </div>
               </div>
 
-              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-black/50 border border-white/15 text-[#f8ca14] shadow-md">
+              <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl border shadow-md ${
+                dark
+                  ? "bg-black/50 border-white/15 text-[#f8ca14]"
+                  : "bg-slate-50 border-slate-200 text-[#08467d]"
+              }`}>
                 <ActiveValueIcon size={30} />
               </div>
             </motion.div>

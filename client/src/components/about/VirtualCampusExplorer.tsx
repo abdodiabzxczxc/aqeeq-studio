@@ -239,13 +239,17 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           className={`rounded-[2.5rem] border p-3 sm:p-5 backdrop-blur-2xl shadow-2xl relative transition-all ${
             dark
               ? "bg-[#091218]/95 border-[#08467d]/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
-              : "bg-slate-900 border-[#08467d]/30 text-white shadow-2xl"
+              : "bg-white/95 border-slate-200/90 shadow-[0_20px_50px_-10px_rgba(8,70,125,0.08)]"
           }`}
         >
           {/* 2. Integrated Control Header Bar inside the container */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-white/10">
+          <div className={`flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b ${
+            dark ? "border-white/10" : "border-slate-200"
+          }`}>
             {/* Campus Switcher Pills - Embedded inside the shell */}
-            <div className="inline-flex items-center rounded-2xl border border-white/15 bg-black/50 p-1 sm:p-1.5 shadow-inner backdrop-blur-md">
+            <div className={`inline-flex items-center rounded-2xl border p-1 sm:p-1.5 shadow-inner backdrop-blur-md ${
+              dark ? "border-white/15 bg-black/50" : "border-slate-200 bg-slate-100/90"
+            }`}>
               <button
                 type="button"
                 onClick={() => {
@@ -256,7 +260,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
                   campusTab === "boys"
                     ? "text-[#f8ca14]"
-                    : "text-slate-300 hover:text-white"
+                    : dark
+                    ? "text-slate-300 hover:text-white"
+                    : "text-slate-600 hover:text-[#08467d]"
                 }`}
               >
                 {campusTab === "boys" && (
@@ -282,7 +288,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
                   campusTab === "girls"
                     ? "text-[#f8ca14]"
-                    : "text-slate-300 hover:text-white"
+                    : dark
+                    ? "text-slate-300 hover:text-white"
+                    : "text-slate-600 hover:text-[#08467d]"
                 }`}
               >
                 {campusTab === "girls" && (
@@ -300,12 +308,20 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
             </div>
 
             {/* Live Indicator & Quick Location Info */}
-            <div className="hidden sm:flex items-center gap-3 text-xs font-bold text-slate-300">
-              <span className="flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl backdrop-blur-md">
+            <div className={`hidden sm:flex items-center gap-3 text-xs font-bold ${
+              dark ? "text-slate-300" : "text-slate-600"
+            }`}>
+              <span className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border backdrop-blur-md ${
+                dark
+                  ? "bg-white/5 border-white/10 text-[#f8ca14]"
+                  : "bg-amber-50/80 border-amber-200 text-[#08467d]"
+              }`}>
                 <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
-                <span className="text-[#f8ca14] font-black">5 مرافق نموذجية مجهزة</span>
+                <span className="font-black">5 مرافق نموذجية مجهزة</span>
               </span>
-              <span className="text-slate-300">حي الرانوناء · ممشى الهجرة 📍</span>
+              <span className={dark ? "text-slate-300" : "text-slate-600"}>
+                حي الرانوناء · ممشى الهجرة 📍
+              </span>
             </div>
           </div>
 
@@ -328,8 +344,12 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 }}
                 className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
                   isExpanded
-                    ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
-                    : "flex-1 min-w-[76px] border-white/10 hover:border-[#f8ca14]/40 cursor-pointer opacity-85 hover:opacity-100 group"
+                    ? dark
+                      ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
+                      : "flex-[5] border-[#08467d]/50 shadow-2xl ring-1 ring-[#08467d]/30"
+                    : dark
+                    ? "flex-1 min-w-[76px] border-white/10 hover:border-[#f8ca14]/40 cursor-pointer opacity-85 hover:opacity-100 group"
+                    : "flex-1 min-w-[76px] border-slate-200 hover:border-[#08467d]/40 cursor-pointer opacity-90 hover:opacity-100 group shadow-sm"
                 }`}
               >
                 {/* Background Photo */}
@@ -427,7 +447,11 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                         {fac.giantMetrics.map((gm, gIdx) => (
                           <div
                             key={gIdx}
-                            className="p-3 rounded-2xl border border-white/15 bg-black/50 backdrop-blur-xl text-center"
+                            className={`p-3 rounded-2xl border text-center transition-all ${
+                              dark
+                                ? "border-white/15 bg-black/50 backdrop-blur-xl"
+                                : "border-white/30 bg-white/20 backdrop-blur-xl shadow-md"
+                            }`}
                           >
                             <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
                               {gm.num}
@@ -435,7 +459,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                             <span className="block text-[11px] font-black text-white truncate mt-0.5">
                               {gm.label}
                             </span>
-                            <span className="block text-[10px] text-slate-300 truncate">
+                            <span className="block text-[10px] text-slate-200 truncate">
                               {gm.sub}
                             </span>
                           </div>
@@ -444,7 +468,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     </div>
 
                     {/* Bottom CTA Row */}
-                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                    <div className={`flex flex-wrap items-center gap-3 pt-4 border-t ${
+                      dark ? "border-white/10" : "border-white/25"
+                    }`}>
                       <a
                         href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                         target="_blank"
@@ -456,7 +482,11 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       </a>
                       <a
                         href={campusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
-                        className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold transition backdrop-blur-md"
+                        className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition backdrop-blur-md ${
+                          dark
+                            ? "border-white/20 bg-white/10 hover:bg-white/20 text-white"
+                            : "border-white/40 bg-white/25 hover:bg-white/35 text-white shadow-sm"
+                        }`}
                       >
                         <Phone size={14} />
                         <span>{campusTab === "boys" ? "0148131652" : "0148644466"}</span>
@@ -464,7 +494,11 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       <Button
                         onClick={() => navigate("/admissions")}
                         variant="outline"
-                        className="rounded-2xl text-xs font-black border-white/20 text-white hover:bg-white/10"
+                        className={`rounded-2xl text-xs font-black border transition ${
+                          dark
+                            ? "border-white/20 text-white hover:bg-white/10"
+                            : "border-white/40 text-white bg-white/15 hover:bg-white/25 shadow-sm"
+                        }`}
                       >
                         <CalendarCheck size={14} className="ml-1.5 text-[#f8ca14]" />
                         <span>حجز جولة تعريفية VIP ✦</span>
@@ -474,13 +508,21 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 ) : (
                   /* Compressed Vertical Spine */
                   <div className="relative z-10 h-full flex flex-col items-center justify-between py-8 select-none">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-black/70 border border-white/20 text-[#f8ca14] shadow-md backdrop-blur-md group-hover:border-[#f8ca14]/40 transition">
+                    <div className={`grid h-12 w-12 place-items-center rounded-2xl border shadow-md backdrop-blur-md transition ${
+                      dark
+                        ? "bg-black/70 border-white/20 text-[#f8ca14] group-hover:border-[#f8ca14]/40"
+                        : "bg-white/90 border-slate-200 text-[#08467d] group-hover:border-[#08467d]/40"
+                    }`}>
                       <FacIcon size={20} />
                     </div>
-                    <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 group-hover:text-[#f8ca14] transition">
+                    <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 group-hover:text-[#f8ca14] transition drop-shadow-md">
                       {fac.name}
                     </span>
-                    <span className="text-[10px] font-bold text-[#f8ca14] bg-black/70 border border-[#f8ca14]/30 px-2.5 py-1 rounded-full backdrop-blur-md">
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md border ${
+                      dark
+                        ? "text-[#f8ca14] bg-black/70 border-[#f8ca14]/30"
+                        : "text-white bg-[#08467d]/90 border-[#f8ca14]/40"
+                    }`}>
                       ✦ انقر للعرض
                     </span>
                   </div>
@@ -502,21 +544,37 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 onClick={() => setActiveFacilityIndex(fIdx)}
                 className={`rounded-3xl border overflow-hidden transition ${
                   isExpanded
-                    ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
-                    : "border-white/10 bg-[#0b1015] p-3.5 cursor-pointer"
+                    ? dark
+                      ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
+                      : "border-[#08467d]/40 bg-slate-50 shadow-md p-4"
+                    : dark
+                    ? "border-white/10 bg-[#0b1015] p-3.5 cursor-pointer"
+                    : "border-slate-200 bg-white p-3.5 cursor-pointer hover:bg-slate-50 shadow-sm"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/60 border border-white/15 text-[#f8ca14]">
+                    <div className={`grid h-10 w-10 place-items-center rounded-xl border ${
+                      dark
+                        ? "bg-black/60 border-white/15 text-[#f8ca14]"
+                        : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+                    }`}>
                       <FacIcon size={18} />
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-[#f8ca14] font-bold block">{fac.tag}</span>
-                      <h4 className="text-sm font-black text-white">{fac.name}</h4>
+                      <span className={`text-[10px] font-bold block ${
+                        dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                      }`}>{fac.tag}</span>
+                      <h4 className={`text-sm font-black ${
+                        dark ? "text-white" : "text-[#0a192f]"
+                      }`}>{fac.name}</h4>
                     </div>
                   </div>
-                  <span className={`text-xs font-black transition-transform ${isExpanded ? "rotate-90 text-[#f8ca14]" : "text-slate-400"}`}>
+                  <span className={`text-xs font-black transition-transform ${
+                    isExpanded
+                      ? dark ? "rotate-90 text-[#f8ca14]" : "rotate-90 text-[#08467d]"
+                      : "text-slate-400"
+                  }`}>
                     ❯
                   </span>
                 </div>
@@ -528,17 +586,29 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="mt-4 pt-4 border-t border-white/10 space-y-4 text-right"
+                      className={`mt-4 pt-4 border-t space-y-4 text-right ${
+                        dark ? "border-white/10" : "border-slate-200"
+                      }`}
                     >
                       <div className="rounded-2xl overflow-hidden aspect-video relative">
                         <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
                       </div>
-                      <p className="text-xs leading-relaxed text-slate-300 font-medium">{fac.desc}</p>
+                      <p className={`text-xs leading-relaxed font-medium ${
+                        dark ? "text-slate-300" : "text-slate-600"
+                      }`}>{fac.desc}</p>
                       <div className="grid grid-cols-2 gap-2">
                         {fac.giantMetrics.map((gm, gIdx) => (
-                          <div key={gIdx} className="p-2.5 rounded-xl border border-white/10 bg-black/40 text-center">
-                            <span className="block text-lg font-black text-[#f8ca14]">{gm.num}</span>
-                            <span className="block text-[10px] font-bold text-white">{gm.label}</span>
+                          <div key={gIdx} className={`p-2.5 rounded-xl border text-center ${
+                            dark
+                              ? "border-white/10 bg-black/40"
+                              : "border-slate-200 bg-white shadow-sm"
+                          }`}>
+                            <span className={`block text-lg font-black ${
+                              dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                            }`}>{gm.num}</span>
+                            <span className={`block text-[10px] font-bold ${
+                              dark ? "text-white" : "text-slate-900"
+                            }`}>{gm.label}</span>
                           </div>
                         ))}
                       </div>
@@ -547,7 +617,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                           href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-center py-2.5 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] text-white text-xs font-black"
+                          className="text-center py-2.5 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] text-[#f8ca14] text-xs font-black shadow-md border border-[#f8ca14]/30"
                         >
                           الموقع في Google Maps 📍
                         </a>
@@ -557,7 +627,11 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                             navigate("/admissions");
                           }}
                           variant="outline"
-                          className="text-xs font-black border-white/20 text-white"
+                          className={`text-xs font-black border ${
+                            dark
+                              ? "border-white/20 text-white hover:bg-white/10"
+                              : "border-slate-300 text-slate-800 hover:bg-slate-100"
+                          }`}
                         >
                           حجز جولة تعريفية VIP ✦
                         </Button>

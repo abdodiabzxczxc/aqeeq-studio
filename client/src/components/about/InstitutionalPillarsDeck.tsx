@@ -190,14 +190,23 @@ function PillarCardItem({
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
-              className="pt-4 mt-4 border-t border-white/10 space-y-2 relative z-10"
+              className={`pt-4 mt-4 border-t space-y-2 relative z-10 ${
+                dark ? "border-white/10" : "border-slate-200"
+              }`}
             >
               <div className="flex items-center gap-1.5 text-xs font-black text-[#f8ca14] mb-2">
                 <BookOpen size={14} />
                 <span>ما يتعلمه الطالب ويحققه واقعياً:</span>
               </div>
               {pillar.studentOutcomes.map((outcome, oIdx) => (
-                <div key={oIdx} className="p-2.5 rounded-xl border border-white/10 bg-black/40 text-[11px] font-bold text-slate-200">
+                <div
+                  key={oIdx}
+                  className={`p-2.5 rounded-xl border text-[11px] font-bold ${
+                    dark
+                      ? "border-white/10 bg-black/40 text-slate-200"
+                      : "border-slate-200 bg-slate-50 text-slate-700 shadow-sm"
+                  }`}
+                >
                   ✦ {outcome}
                 </div>
               ))}

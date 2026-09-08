@@ -128,7 +128,7 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
 
               {/* Selected Neighborhood Status Box */}
               <div className={`p-4 rounded-2xl border ${
-                dark ? "border-white/10 bg-black/50" : "border-slate-200 bg-slate-50"
+                dark ? "border-white/10 bg-black/50" : "border-slate-200 bg-white shadow-sm"
               }`}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -139,7 +139,9 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
                     زمن الوصول التقريبي: <span className="text-[#f8ca14]">{selectedNeighborhood.eta}</span>
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium text-slate-300">
+                <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium ${
+                  dark ? "text-slate-300" : "text-slate-600"
+                }`}>
                   <div className="flex items-center gap-1.5">
                     <ShieldCheck size={13} className="text-[#f8ca14]" />
                     <span>{selectedNeighborhood.coverage}</span>
@@ -154,7 +156,9 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
           </div>
 
           {/* Direct Navigation Action Row */}
-          <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-3">
+          <div className={`pt-6 border-t flex flex-wrap items-center gap-3 ${
+            dark ? "border-white/10" : "border-slate-200"
+          }`}>
             <a
               href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
               target="_blank"
@@ -199,7 +203,7 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
             </p>
 
             <div className={`space-y-4 text-xs font-bold ${dark ? "text-slate-200" : "text-slate-800"}`}>
-              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50 hover:bg-white shadow-sm"}`}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-black text-[#08467d] dark:text-[#f8ca14]">مجمع البنين (الأهلي والدولي)</span>
                   <Phone size={14} className="text-slate-400" />
@@ -209,7 +213,7 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
                 </a>
               </div>
 
-              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-white/5 bg-white/5" : "border-slate-200 bg-slate-50 hover:bg-white shadow-sm"}`}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-black text-[#08467d] dark:text-[#f8ca14]">مجمع البنات والطفولة المبكرة</span>
                   <Phone size={14} className="text-slate-400" />
@@ -219,9 +223,9 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
                 </a>
               </div>
 
-              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-[#f8ca14]/20 bg-[#f8ca14]/5" : "border-amber-200 bg-amber-50/50"}`}>
+              <div className={`p-4 rounded-2xl border transition hover:scale-[1.01] ${dark ? "border-[#f8ca14]/20 bg-[#f8ca14]/5" : "border-amber-200 bg-amber-50/70 hover:bg-white shadow-sm"}`}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-black text-[#f8ca14]">الواتساب الموحد للقبول والتسجيل</span>
+                  <span className="font-black text-[#08467d] dark:text-[#f8ca14]">الواتساب الموحد للقبول والتسجيل</span>
                   <MessageCircle size={15} className="text-emerald-500" />
                 </div>
                 <a href="tel:+966531896000" className="text-base font-black hover:underline dir-ltr block text-right">
@@ -232,7 +236,7 @@ export function MedinaLogisticsRadar({ dark = true }: MedinaLogisticsRadarProps)
           </div>
 
           {/* Careers Callout */}
-          <div className="pt-6 border-t border-white/10 mt-6">
+          <div className={`pt-6 border-t mt-6 ${dark ? "border-white/10" : "border-slate-200"}`}>
             <a
               href="https://live.aqeeq.edu.sa/jobs"
               target="_blank"
