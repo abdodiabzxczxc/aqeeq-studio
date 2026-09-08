@@ -121,7 +121,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
   const activeEra = TIMELINE_ERAS[activeIndex];
 
   return (
-    <section id="timeline-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
+    <section id="timeline-section" className="py-12 sm:py-16 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
       {/* 1. Unified Section Header (Clean Institutional Luxury - No Emojis) */}
       <AqeeqSectionHeader
         id="about-timeline"
@@ -133,18 +133,18 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         align="right"
       />
 
-      {/* 2. Unified Master Time Capsule Container */}
+      {/* 2. Unified Master Time Capsule Container (Compact Luxury) */}
       <div
-        className={`w-full rounded-[2.5rem] border p-5 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden transition-all duration-300 ${
+        className={`w-full max-w-[1180px] mx-auto rounded-[2rem] border p-5 sm:p-6 md:p-7 shadow-xl relative overflow-hidden transition-all duration-300 ${
           dark
             ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98"
-            : "border-slate-200/90 bg-white/95 shadow-xl"
+            : "border-slate-200/90 bg-white/95 shadow-md"
         }`}
       >
         {/* Monolithic Holographic Year Watermark */}
         <span
-          className={`pointer-events-none absolute left-6 -bottom-10 select-none font-black text-8xl sm:text-[12rem] md:text-[16rem] leading-none transition-all duration-700 font-serif ${
-            dark ? "text-white/[0.03]" : "text-[#08467d]/[0.04]"
+          className={`pointer-events-none absolute left-6 -bottom-8 select-none font-black text-7xl sm:text-9xl md:text-[12rem] leading-none transition-all duration-700 font-serif ${
+            dark ? "text-white/[0.025]" : "text-[#08467d]/[0.035]"
           }`}
         >
           {activeEra.shortYear}
@@ -152,24 +152,24 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
 
         {/* Top Control Bar: Magnetic Time-Ruler */}
         <div
-          className={`pb-6 mb-8 border-b flex flex-col lg:flex-row items-center justify-between gap-5 relative z-10 ${
+          className={`pb-4 mb-5 border-b flex flex-col sm:flex-row items-center justify-between gap-3.5 relative z-10 ${
             dark ? "border-white/10" : "border-slate-200"
           }`}
         >
           {/* Era Counter & Milestone Badge */}
-          <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
-                <Clock size={19} />
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
+                <Clock size={16} />
               </div>
               <div className="text-right">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black text-[#f8ca14]">
                     المحطة {activeIndex + 1} من {TIMELINE_ERAS.length}
                   </span>
-                  <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14] animate-pulse" />
                 </div>
-                <span className={`text-xs font-bold block mt-0.5 ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                <span className={`text-[11px] font-bold block ${dark ? "text-slate-300" : "text-slate-600"}`}>
                   خريطة الحقب التاريخية (1994 — 2026)
                 </span>
               </div>
@@ -178,7 +178,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
 
           {/* Integrated Magnetic Time-Ruler Tabs */}
           <div
-            className={`relative p-1.5 rounded-2xl border flex items-center gap-1.5 w-full lg:w-auto overflow-x-auto scrollbar-hide shadow-inner ${
+            className={`relative p-1 rounded-xl border flex items-center gap-1 w-full sm:w-auto overflow-x-auto scrollbar-hide shadow-inner ${
               dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
             }`}
           >
@@ -189,7 +189,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   key={era.shortYear}
                   type="button"
                   onClick={() => setActiveIndex(eraIdx)}
-                  className={`relative px-4 sm:px-5 py-2.5 rounded-xl text-center transition-all duration-300 z-10 select-none flex-1 lg:flex-none ${
+                  className={`relative px-3.5 sm:px-4 py-2 rounded-lg text-center transition-all duration-300 z-10 select-none flex-1 sm:flex-none ${
                     isActive
                       ? "text-white font-black"
                       : dark
@@ -200,19 +200,19 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   {isActive && (
                     <motion.div
                       layoutId="activeHeritagePill"
-                      className={`absolute inset-0 rounded-xl shadow-lg ${
+                      className={`absolute inset-0 rounded-lg shadow-md ${
                         dark
                           ? "bg-gradient-to-r from-[#08467d] to-[#042442] border border-[#f8ca14]/40"
-                          : "bg-[#08467d] border border-[#f8ca14]/50 shadow-md"
+                          : "bg-[#08467d] border border-[#f8ca14]/50 shadow-sm"
                       }`}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
                   <div className="relative z-10">
-                    <span className={`block text-sm sm:text-base font-black ${isActive ? "text-[#f8ca14]" : ""}`}>
+                    <span className={`block text-xs sm:text-sm font-black ${isActive ? "text-[#f8ca14]" : ""}`}>
                       {era.shortYear}
                     </span>
-                    <span className="text-[10px] sm:text-[11px] font-bold block truncate mt-0.5 opacity-90">
+                    <span className="text-[9px] sm:text-[10px] font-bold block truncate mt-0.5 opacity-90">
                       {era.label}
                     </span>
                   </div>
@@ -226,21 +226,21 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         <AnimatePresence mode="wait">
           <motion.div
             key={activeEra.shortYear}
-            initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+            initial={{ opacity: 0, y: 12, filter: "blur(3px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
-            transition={{ duration: 0.32, ease: "easeOut" }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 text-right"
+            exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10 text-right"
           >
             {/* Story & Achievements Column (7 cols) */}
             <div className="lg:col-span-7">
               {/* Milestone Tag & Era Hijri Date */}
-              <div className="flex flex-wrap items-center gap-2.5 mb-4">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/15 border border-[#f8ca14]/35 px-3.5 py-1 text-xs font-black text-[#f8ca14]">
-                  <Sparkles size={12} />
-                  <span>محطة تاريخية فارقة</span>
+              <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14]/15 border border-[#f8ca14]/35 px-2.5 py-0.5 text-[11px] font-black text-[#f8ca14]">
+                  <Sparkles size={11} />
+                  <span>محطة فارقة</span>
                 </span>
-                <span className={`text-xs font-black px-3 py-1 rounded-full border ${
+                <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full border ${
                   dark ? "border-white/10 bg-white/5 text-slate-300" : "border-slate-200 bg-slate-50 text-[#08467d]"
                 }`}>
                   {activeEra.year}
@@ -248,77 +248,76 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
               </div>
 
               {/* Grand Era Title */}
-              <h3 className={`text-2xl sm:text-3xl lg:text-4xl font-black mb-4 leading-tight drop-shadow-sm ${
+              <h3 className={`text-xl sm:text-2xl font-black mb-2.5 leading-snug drop-shadow-sm ${
                 dark ? "text-white" : "text-[#08467d]"
               }`}>
                 {activeEra.title}
               </h3>
 
               {/* Narrative Description */}
-              <p className={`text-sm sm:text-base leading-relaxed mb-6 font-medium ${
-                dark ? "text-slate-300" : "text-slate-700"
+              <p className={`text-xs sm:text-sm leading-relaxed mb-3.5 font-medium ${
+                dark ? "text-slate-300" : "text-slate-600"
               }`}>
                 {activeEra.desc}
               </p>
 
-              {/* Growth Leap Transformation Box */}
+              {/* Compact Growth Leap Transformation Box */}
               <div
-                className={`p-4 rounded-2xl border mb-6 flex items-center justify-between gap-3 transition-all ${
+                className={`p-3 rounded-xl border mb-3 flex items-center justify-between gap-3 transition-all ${
                   dark
                     ? "border-emerald-500/25 bg-emerald-950/25 text-emerald-300"
                     : "border-emerald-600/20 bg-emerald-50/80 text-emerald-950 shadow-sm"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-500">
-                    <TrendingUp size={18} />
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-500">
+                    <TrendingUp size={14} />
                   </div>
                   <div>
-                    <span className="block text-[10px] font-black uppercase tracking-wider opacity-75">
-                      الوثبة والقفزة النوعية
+                    <span className="block text-[9px] font-black uppercase tracking-wider opacity-75">
+                      الوثبة والتحول النوعي
                     </span>
-                    <span className="text-xs sm:text-sm font-black block mt-0.5">
+                    <span className="text-xs font-black block mt-0.5">
                       {activeEra.leap.to}
                     </span>
                   </div>
                 </div>
-                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 shrink-0 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 size={12} />
-                  <span>قفزة معتمدة</span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 shrink-0 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 size={11} />
+                  <span>معتمد ✦</span>
                 </span>
               </div>
 
-              {/* Archival Quote Ribbon */}
+              {/* Archival Quote Ribbon (Slim) */}
               <div
-                className={`p-4 sm:p-5 rounded-2xl border mb-6 relative overflow-hidden ${
+                className={`p-3 rounded-xl border mb-3 relative overflow-hidden ${
                   dark
                     ? "border-[#f8ca14]/25 bg-white/[0.02]"
-                    : "border-[#08467d]/20 bg-[#08467d]/5 shadow-sm"
+                    : "border-[#08467d]/15 bg-[#08467d]/5 shadow-sm"
                 }`}
               >
-                <span className="absolute top-2 right-3 text-4xl font-serif text-[#f8ca14]/20 pointer-events-none select-none">
-                  “
-                </span>
-                <p className={`text-xs sm:text-sm font-bold leading-relaxed relative z-10 ${
+                <p className={`text-xs font-bold leading-relaxed relative z-10 ${
                   dark ? "text-[#f8ca14]" : "text-[#08467d]"
                 }`}>
+                  <span className="font-serif ml-1 opacity-60">“</span>
                   {activeEra.quote}
+                  <span className="font-serif mr-1 opacity-60">”</span>
                 </p>
               </div>
 
-              {/* Key Metrics Triad */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
+              {/* Key Metrics Triad (Compact) */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
                 {activeEra.metrics.map((m, mIdx) => (
                   <div
                     key={mIdx}
-                    className={`p-3.5 rounded-2xl border text-center transition hover:scale-[1.02] ${
+                    className={`p-2 sm:p-2.5 rounded-xl border text-center transition hover:scale-[1.01] ${
                       dark
                         ? "border-white/10 bg-black/40 backdrop-blur-md"
                         : "border-slate-200/90 bg-white shadow-sm"
                     }`}
                   >
-                    <span className="block text-[10px] text-slate-400 font-bold truncate">{m.label}</span>
-                    <span className={`text-xs sm:text-sm font-black mt-1 block truncate ${
+                    <span className="block text-[9px] text-slate-400 dark:text-slate-500 font-bold truncate">{m.label}</span>
+                    <span className={`text-[11px] sm:text-xs font-black mt-0.5 block truncate ${
                       dark ? "text-white" : "text-[#08467d]"
                     }`}>
                       {m.val}
@@ -328,14 +327,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
               </div>
 
               {/* Interactive Prev/Next Navigation Controls */}
-              <div className={`flex items-center justify-between pt-5 border-t ${
+              <div className={`flex items-center justify-between pt-3 border-t ${
                 dark ? "border-white/10" : "border-slate-200"
               }`}>
                 <button
                   type="button"
                   disabled={activeIndex === 0}
                   onClick={() => setActiveIndex((idx) => Math.max(0, idx - 1))}
-                  className={`inline-flex items-center gap-2 text-xs font-black transition px-3 py-2 rounded-xl ${
+                  className={`inline-flex items-center gap-1.5 text-xs font-black transition px-2.5 py-1.5 rounded-lg ${
                     activeIndex === 0
                       ? "opacity-30 cursor-not-allowed text-slate-400"
                       : dark
@@ -343,14 +342,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                       : "text-slate-700 hover:text-[#08467d] hover:bg-slate-100"
                   }`}
                 >
-                  <ChevronRight size={17} />
+                  <ChevronRight size={15} />
                   <span>
-                    المحطة السابقة {activeIndex > 0 ? `(${TIMELINE_ERAS[activeIndex - 1].shortYear})` : ""}
+                    السابق {activeIndex > 0 ? `(${TIMELINE_ERAS[activeIndex - 1].shortYear})` : ""}
                   </span>
                 </button>
 
-                <div className="flex items-center gap-1.5 text-xs font-black text-slate-400">
-                  <span className="text-[#f8ca14] text-sm">{activeIndex + 1}</span>
+                <div className="flex items-center gap-1 text-xs font-black text-slate-400">
+                  <span className="text-[#f8ca14]">{activeIndex + 1}</span>
                   <span>/</span>
                   <span>{TIMELINE_ERAS.length}</span>
                 </div>
@@ -359,7 +358,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   type="button"
                   disabled={activeIndex === TIMELINE_ERAS.length - 1}
                   onClick={() => setActiveIndex((idx) => Math.min(TIMELINE_ERAS.length - 1, idx + 1))}
-                  className={`inline-flex items-center gap-2 text-xs font-black transition px-3 py-2 rounded-xl ${
+                  className={`inline-flex items-center gap-1.5 text-xs font-black transition px-2.5 py-1.5 rounded-lg ${
                     activeIndex === TIMELINE_ERAS.length - 1
                       ? "opacity-30 cursor-not-allowed text-slate-400"
                       : dark
@@ -368,20 +367,20 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   }`}
                 >
                   <span>
-                    المحطة التالية {activeIndex < TIMELINE_ERAS.length - 1 ? `(${TIMELINE_ERAS[activeIndex + 1].shortYear})` : ""}
+                    التالي {activeIndex < TIMELINE_ERAS.length - 1 ? `(${TIMELINE_ERAS[activeIndex + 1].shortYear})` : ""}
                   </span>
-                  <ChevronLeft size={17} />
+                  <ChevronLeft size={15} />
                 </button>
               </div>
             </div>
 
             {/* Archival Photo Column with Royal Seal (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border border-white/20 aspect-[4/3] group">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-white/20 aspect-[16/11] max-h-[360px] group">
                 {/* Official Archival Seal (Golden Stamp) */}
-                <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-lg text-[#f8ca14] text-[10px] font-black tracking-wider">
-                  <ShieldCheck size={13} className="text-[#f8ca14]" />
-                  <span>وثيقة أرشيفية معتمدة ✦</span>
+                <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-md text-[#f8ca14] text-[9px] font-black tracking-wider">
+                  <ShieldCheck size={11} className="text-[#f8ca14]" />
+                  <span>وثيقة أرشيفية ✦</span>
                 </div>
 
                 {/* Photo with Smooth Scale Hover */}
@@ -392,15 +391,15 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                 />
 
                 {/* Cinematic Vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
 
                 {/* Bottom Overlay Info Banner */}
-                <div className="absolute bottom-4 right-4 left-4 text-white">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Milestone size={16} className="text-[#f8ca14]" />
-                    <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
+                <div className="absolute bottom-3 right-3 left-3 text-white">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Milestone size={14} className="text-[#f8ca14]" />
+                    <span className="text-[11px] font-black text-[#f8ca14]">{activeEra.stats}</span>
                   </div>
-                  <p className="text-[11px] text-slate-200 line-clamp-2 leading-relaxed font-medium">
+                  <p className="text-[10px] text-slate-200 line-clamp-2 leading-relaxed font-medium">
                     {activeEra.highlight}
                   </p>
                 </div>
@@ -410,8 +409,8 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         </AnimatePresence>
       </div>
 
-      {/* 3. Bottom Historical Legacy Pillars Triad */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-right">
+      {/* 3. Bottom Historical Legacy Pillars Triad (Compact) */}
+      <div className="mt-6 max-w-[1180px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-right">
         <div
           className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
             dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200/90 bg-white shadow-sm"
