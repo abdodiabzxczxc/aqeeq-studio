@@ -365,7 +365,7 @@ export default function SchoolNewsPage() {
             items={unfurlingGalleryItems}
             dark={dark}
             header={
-              <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-16">
+              <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-16">
                 {/* Cover perspective on left in RTL */}
                 <div className="relative order-2 mx-auto h-[340px] w-full max-w-[540px] md:order-1 md:h-[450px]">
                   {secondIssue ? (
@@ -570,7 +570,7 @@ export default function SchoolNewsPage() {
             <section className={`border-b py-10 ${
               dark ? "border-white/[0.08] bg-[#080808]" : "border-black/[0.06] bg-[#fbfbfb]"
             }`}>
-              <div className="mx-auto max-w-[1320px] 2xl:max-w-[1560px] px-5 md:px-8">
+              <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
                 <div className="mb-6 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FolderArchive size={18} className={dark ? "text-[#f8ca14]" : isNationalDay ? "text-[#005A36]" : "text-[#08467d]"} />
@@ -629,7 +629,7 @@ export default function SchoolNewsPage() {
           ) : null}
 
           {/* Issues Archive Grid Section */}
-          <section className="mx-auto max-w-[1320px] 2xl:max-w-[1560px] px-5 py-12 md:px-8 md:py-16">
+          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
             <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
               isNationalDay ? (dark ? "border-[#f8ca14]/20" : "border-[#08467d]/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
             }`}>

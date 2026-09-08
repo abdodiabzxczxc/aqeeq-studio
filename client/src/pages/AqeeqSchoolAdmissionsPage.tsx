@@ -499,7 +499,7 @@ export default function AqeeqSchoolAdmissionsPage() {
             direction="right-to-left"
           />
 
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl 2xl:max-w-[1560px] relative z-10 py-8 sm:py-12">
+          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-8 sm:py-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
@@ -694,7 +694,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       <AqeeqAdmissionsScrubReel onSelectStage={handleSelectReelStage} />
 
       {/* Tuition Fees & Calculator Section */}
-      <section id="tuition-fees-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section id="tuition-fees-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
             <Calculator size={14} />
@@ -1220,7 +1220,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       <section ref={roadmapRef} className={`py-20 border-y relative overflow-hidden ${
         dark ? "border-white/10 bg-[#06080d]" : "border-[#08467d]/15 bg-[#f8fafc]"
       }`}>
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
               <Sparkles size={14} />
@@ -1357,7 +1357,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       </section>
 
       {/* Admission Online Form Section */}
-      <section id="admission-form-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section id="admission-form-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="max-w-4xl mx-auto">
           <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl backdrop-blur-xl ${
             dark ? "border-[#f8ca14]/20 bg-[#0c1218]/90" : "border-[#08467d]/20 bg-white/95"

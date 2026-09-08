@@ -217,7 +217,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           cardShape="square"
           rowCount={2}
           header={
-            <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+            <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-8 sm:py-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
@@ -476,7 +476,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           مغلفة بـ AqeeqScrollRevealSection لترتفع كستارة ملكية مع السكرول
       ======================================================== */}
       <AqeeqScrollRevealSection scrollVh={70} neonLine={true} className="py-14 sm:py-20">
-        <section ref={hubSectionRef} id="cognia-section" className="container mx-auto px-4 sm:px-6 relative">
+        <section ref={hubSectionRef} id="cognia-section" className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <div
               className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
@@ -1174,7 +1174,7 @@ export default function AqeeqSchoolAccreditationsPage() {
       <AqeeqScrollRevealSection scrollVh={70} neonLine={true} className="py-14 sm:py-24">
         <section
           ref={pipelineSectionRef}
-          className={`container mx-auto px-4 sm:px-6 relative z-10`}
+          className={`w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10`}
         >
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div
@@ -1461,7 +1461,7 @@ export default function AqeeqSchoolAccreditationsPage() {
         {/* ========================================================
             STAGE 4: COMPACT & SLEEK 3D RADAR CONSOLE (رادار جاهزية ابنك المدمج)
         ======================================================== */}
-        <div className="container mx-auto px-4 sm:px-6 mb-16">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 mb-16">
           {/* Section Header (Compact) */}
           <div className="text-center max-w-xl mx-auto mb-7">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 text-[11px] font-black text-[#f8ca14] mb-2 shadow-sm">
@@ -1704,7 +1704,7 @@ export default function AqeeqSchoolAccreditationsPage() {
         </div>
 
         {/* Interactive FAQ Accordion */}
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <div

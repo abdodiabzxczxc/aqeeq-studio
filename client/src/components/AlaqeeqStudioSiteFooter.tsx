@@ -65,7 +65,7 @@ export function AlaqeeqStudioSiteFooter() {
           : "border-black/[0.06] bg-[#fafafa] text-slate-900"
       }`}
     >
-      <div className="mx-auto max-w-[1360px] 2xl:max-w-[1560px] px-5 pt-8 pb-28 md:pb-10 md:px-8">
+      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 pb-28 md:pb-10">
         {/* 1. Pre-Footer Call-to-Excellence Card */}
         <div
           className={`mb-8 rounded-2xl sm:rounded-[1.8rem] border p-5 sm:p-6 md:p-7 relative overflow-hidden backdrop-blur-2xl transition-all duration-300 shadow-xl ${

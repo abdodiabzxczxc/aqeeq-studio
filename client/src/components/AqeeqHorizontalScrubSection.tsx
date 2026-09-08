@@ -82,7 +82,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
       {/* Sticky Fullscreen Cinema Stage */}
       <div className="sticky top-0 flex h-screen w-full flex-col justify-between overflow-hidden pb-4 sm:pb-8 pt-16 sm:pt-20">
         {/* Cinema Stage Header */}
-        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 shrink-0">
+        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 shrink-0">
           <div className="text-right">
             <div
               className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[10px] font-black tracking-widest uppercase mb-1.5 ${
@@ -231,7 +231,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
         </div>
 
         {/* Bottom Film Progress Scrubber */}
-        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8 z-10 shrink-0">
+        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 z-10 shrink-0">
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs font-mono font-bold text-slate-500">01</span>
             <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${dark ? "bg-white/10" : "bg-black/10"}`}>

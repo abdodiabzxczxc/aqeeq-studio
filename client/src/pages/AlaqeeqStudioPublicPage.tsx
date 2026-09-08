@@ -968,7 +968,7 @@ export default function AlaqeeqStudioPublicPage() {
             ? dark ? "border-[#f8ca14]/10 bg-[#010f08]/90" : "border-[#005A36]/10 bg-[#f0fdf4]/90"
             : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
-          <div className="mx-auto max-w-[1360px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
                 <button
@@ -1069,7 +1069,7 @@ export default function AlaqeeqStudioPublicPage() {
         <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
           dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
-          <div className="mx-auto max-w-[1360px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 animate-pulse">
@@ -1885,7 +1885,7 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.01]"
         )}
       >
-        <div className="mx-auto max-w-[1340px] 2xl:max-w-[1560px] px-5 md:px-8">
+        <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-editorial-kicker"

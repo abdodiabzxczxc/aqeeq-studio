@@ -860,7 +860,7 @@ export default function AqeeqSchoolAboutPage() {
             direction="right-to-left"
           />
 
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-8 sm:py-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
@@ -1116,7 +1116,7 @@ export default function AqeeqSchoolAboutPage() {
       {/* ========================================================
           STAGE 1: The 30-Year Legacy Time Machine (Scroll-Driven Parallax + Luminous Conduit)
       ======================================================== */}
-      <section ref={timelineSectionRef} id="timeline-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section ref={timelineSectionRef} id="timeline-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div
             className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
@@ -1336,7 +1336,7 @@ export default function AqeeqSchoolAboutPage() {
         <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#08467d]" />
         <div className="pointer-events-none absolute -bottom-40 left-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#f8ca14]" />
 
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <div className="inline-flex items-center gap-2 text-xs font-black text-[#f8ca14] mb-2">
@@ -1638,7 +1638,7 @@ export default function AqeeqSchoolAboutPage() {
       {/* ========================================================
           STAGE 3: Royal Strategic Document: Vision & Mission 2030 (Dual-Wing 3D Pivot)
       ======================================================== */}
-      <section ref={visionSectionRef} id="vision-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section ref={visionSectionRef} id="vision-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div
           className={`max-w-5xl mx-auto rounded-[3rem] border p-5 sm:p-10 md:p-14 shadow-2xl relative overflow-hidden ${
             dark
@@ -1728,7 +1728,7 @@ export default function AqeeqSchoolAboutPage() {
           dark ? "border-white/10 bg-[#06080d]" : "border-[#08467d]/15 bg-white"
         }`}
       >
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
               <Sparkles size={14} />
@@ -1765,7 +1765,7 @@ export default function AqeeqSchoolAboutPage() {
       {/* ========================================================
           STAGE 5: Medina Interactive Map & Campus Logistics (Live Radar)
       ======================================================== */}
-      <section id="map-contact-section" className="py-20 container mx-auto px-4 sm:px-6">
+      <section id="map-contact-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 text-xs font-black text-[#08467d] dark:text-[#f8ca14] mb-2">
             <MapPin size={14} />

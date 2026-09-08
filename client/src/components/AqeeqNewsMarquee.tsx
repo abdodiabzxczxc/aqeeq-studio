@@ -268,7 +268,7 @@ export function AqeeqNewsMarquee({
       as="div"
       className="w-full py-3 sm:py-4 select-none"
     >
-      <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         <div
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
