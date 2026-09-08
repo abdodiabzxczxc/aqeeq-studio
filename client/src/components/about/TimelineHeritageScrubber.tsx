@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Milestone, ChevronRight, ChevronLeft, Award, GraduationCap, Building2 } from "lucide-react";
+import {
+  Sparkles,
+  Milestone,
+  ChevronRight,
+  ChevronLeft,
+  Award,
+  GraduationCap,
+  Building2,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  ShieldCheck,
+} from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 
 export interface TimelineEra {
@@ -13,6 +25,7 @@ export interface TimelineEra {
   stats: string;
   image: string;
   quote: string;
+  leap: { from: string; to: string };
   metrics: { label: string; val: string }[];
 }
 
@@ -23,14 +36,18 @@ export const TIMELINE_ERAS: TimelineEra[] = [
     label: "التأسيس والانطلاقة",
     title: "غراس البدايات وتأسيس أول مجمع تعليمي بالمدينة المنورة",
     desc: "انطلقت مدارس العقيق برؤية واضحة لتكون نموذجاً تعليمياً وتربوياً فريداً بطيبة الطيبة. بدأت المدارس بتأسيس المراحل التأسيسية وتخريج أجيال متمكنة في القرآن الكريم واللغة والعلوم، وتكريس منظومة القيم الأخلاقية الأصيلة في نفوس الطلاب.",
-    highlight: "نواة التميز والانطلاقة الأولى بالمدينة المنورة",
+    highlight: "نواة التميز والانطلاقة الأولى بطيبة الطيبة",
     stats: "أكثر من 30 دفعة تخرجت منذ التأسيس",
-    image: "/covers/cover-about.jpg",
+    image: "/covers/student-excellence-about.jpg",
     quote: "ثلاثون عاماً من غراس الخير في طيبة الطيبة، خرّجت أجيالاً تقود الحاضر وتصنع المستقبل.",
+    leap: {
+      from: "البدايات الأولى في المدينة",
+      to: "تأسيس أول صرح تعليمي رائد بطيبة الطيبة",
+    },
     metrics: [
       { label: "سنة التأسيس", val: "1415 هـ / 1994 م" },
       { label: "الدفعة الأولى", val: "أول صرح متكامل" },
-      { label: "الموقع الأصلي", val: "طيبة الطيبة" },
+      { label: "الموقع الأصلي", val: "المدينة المنورة" },
     ],
   },
   {
@@ -39,14 +56,18 @@ export const TIMELINE_ERAS: TimelineEra[] = [
     label: "المجمعات والمسابح",
     title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
     desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل ومجمع البنات في حي الرانوناء بمحاذاة ممشى الهجرة، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
-    highlight: "مجمعات صرحية مستقلة بمواصفات هندسية وتعليمية قياسية",
+    highlight: "مجمعات صرحية مستقلة بمواصفات هندسية قياسية",
     stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
     image: "/covers/student-lab-admissions.jpg",
     quote: "صروح معمارية مستقلة صُممت لتكون بيئة حياة ونمو متكامل للطالب فكرياً وبدنياً.",
+    leap: {
+      from: "المباني التعليمية الأولى",
+      to: "صروح مستقلة 25,000م² ومسابح شبه أولمبية",
+    },
     metrics: [
-      { label: "المساحة الإنشائية", val: "مجمعات نموذجية 25,000م²" },
-      { label: "المسابح المغطاة", val: "شبه أولمبية FINA" },
-      { label: "الصالات", val: "ملاعب عشبية وقاعات جمباز" },
+      { label: "المساحة الإنشائية", val: "25,000م² نموذجية" },
+      { label: "المسابح المغطاة", val: "معايير FINA الدولية" },
+      { label: "الصالات", val: "ملاعب ومسارح مغلقة" },
     ],
   },
   {
@@ -59,6 +80,10 @@ export const TIMELINE_ERAS: TimelineEra[] = [
     stats: "تقييم جودة معتمد عالمياً بنسبة تفوق 98%",
     image: "/covers/cover-accreditations.jpg",
     quote: "شهادة عالمية تؤكد أن ما نقدمه لأبنائنا يضاهي أرقى المعايير التعليمية في العالم.",
+    leap: {
+      from: "الريادة المحلية",
+      to: "الاعتماد الدولي الأمريكي (Cognia USA)",
+    },
     metrics: [
       { label: "جهة الاعتماد", val: "Cognia USA العالمية" },
       { label: "الشهادة الممنوحة", val: "American Diploma" },
@@ -71,10 +96,14 @@ export const TIMELINE_ERAS: TimelineEra[] = [
     label: "مراكز الاختبارات والـ AI",
     title: "اعتماد مراكز IELTS و SAT الدولية ومنظومة الذكاء الاصطناعي",
     desc: "العصر الرقمي والريادة العالمية: اعتماد مدارس العقيق كمركز رسمي لاختبارات IELTS IDP و SAT بالمدينة المنورة، مع تتويج الطلاب بالمركز الخامس عالمياً في أولمبياد الروبوت WRO، وتكامل المناهج مع الذكاء الاصطناعي والتحول الرقمي المتوافق 100% مع رؤية 2030.",
-    highlight: "مركز اختبارات دولي معتمد وحضور عالمي في منافسات الـ AI",
+    highlight: "مركز اختبارات دولي معتمد وحضور عالمي في الـ AI",
     stats: "المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO",
     image: "/covers/first-lego-champions.png",
     quote: "من طيبة الطيبة إلى منصات التتويج العالمية، أبناؤنا ينافسون ويحصدون المراكز الأولى دولياً.",
+    leap: {
+      from: "التعليم التفاعلي الذكي",
+      to: "مراكز IELTS و SAT الرسمية والخامس عالمياً WRO",
+    },
     metrics: [
       { label: "مراكز الاختبارات", val: "IDP IELTS & SAT Official" },
       { label: "أولمبياد الروبوت", val: "الخامس عالمياً WRO" },
@@ -93,172 +122,236 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
 
   return (
     <section id="timeline-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
-      {/* 1. Unified Section Header */}
+      {/* 1. Unified Section Header (Clean Institutional Luxury - No Emojis) */}
       <AqeeqSectionHeader
         id="about-timeline"
         badge="ثلاثة عقود من العطاء التربوي بطيبة الطيبة (1994 - 2026)"
         badgeIcon={<Sparkles size={14} className="text-[#f8ca14]" />}
-        title="مسيرة العقيق المضيئة عبر الزمن 📜"
+        title="مسيرة العقيق المضيئة عبر الزمن"
         subtitle="رحلة تربوية رائدة خطت خطواتها الأولى في المدينة المنورة قبل أكثر من 30 عاماً لتغدو اليوم صرحاً تعليمياً بمواصفات عالمية متطورة."
         dark={dark}
         align="right"
       />
 
-      {/* 2. Interactive Scrubber Track (Conduit) */}
-      <div className="relative max-w-2xl mx-auto mt-6 mb-6 px-4 hidden sm:block">
-        <div className={`h-2 w-full rounded-full ${dark ? "bg-white/10" : "bg-emerald-950/10"} relative overflow-hidden shadow-inner`}>
-          <motion.div
-            className="h-full bg-gradient-to-r from-[#08467d] via-[#f8ca14] to-emerald-500 rounded-full transition-all duration-500"
-            style={{
-              width: `${(activeIndex / (TIMELINE_ERAS.length - 1)) * 100}%`,
-            }}
-          />
-        </div>
-        {/* Milestone Indicator Beads */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none">
-          {TIMELINE_ERAS.map((era, idx) => (
-            <div
-              key={era.shortYear}
-              className={`w-5 h-5 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                idx <= activeIndex
-                  ? "border-[#f8ca14] bg-[#08467d] scale-125 shadow-[0_0_15px_rgba(248,202,20,0.8)]"
-                  : dark
-                  ? "border-white/20 bg-[#0c1218]"
-                  : "border-slate-300 bg-white"
-              }`}
-            >
-              {idx <= activeIndex && <div className="w-1.5 h-1.5 rounded-full bg-[#f8ca14]" />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 3. Interactive Era Buttons Grid */}
+      {/* 2. Unified Master Time Capsule Container */}
       <div
-        className={`grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto p-1.5 rounded-2xl border shadow-sm transition mb-8 ${
-          dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-white"
-        }`}
-      >
-        {TIMELINE_ERAS.map((era, eraIdx) => {
-          const isActive = activeIndex === eraIdx;
-          return (
-            <button
-              key={era.shortYear}
-              type="button"
-              onClick={() => setActiveIndex(eraIdx)}
-              className={`relative p-3 rounded-xl text-center transition active:scale-95 ${
-                isActive
-                  ? "bg-gradient-to-r from-[#08467d] to-[#042442] text-white shadow-md ring-1 ring-[#f8ca14]/40"
-                  : dark
-                  ? "text-slate-400 hover:text-white hover:bg-white/5"
-                  : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
-              }`}
-            >
-              <span className={`block text-base font-black ${isActive ? "text-[#f8ca14]" : ""}`}>
-                {era.shortYear}
-              </span>
-              <span className="text-[11px] font-bold truncate block mt-0.5">{era.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 4. Dynamic Era Showcase Card with Holographic Watermark */}
-      <div
-        className={`w-full rounded-[2.5rem] border p-6 sm:p-10 md:p-12 shadow-2xl relative overflow-hidden transition-colors duration-300 ${
+        className={`w-full rounded-[2.5rem] border p-5 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden transition-all duration-300 ${
           dark
-            ? "border-emerald-500/20 bg-gradient-to-b from-[#0c141a]/95 to-[#060a0e]/95"
-            : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8]"
+            ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98"
+            : "border-slate-200/90 bg-white/95 shadow-xl"
         }`}
       >
-        {/* Holographic Watermark Year */}
+        {/* Monolithic Holographic Year Watermark */}
         <span
-          className={`pointer-events-none absolute left-4 -bottom-6 select-none font-black text-7xl sm:text-9xl md:text-[11rem] leading-none transition-all duration-700 ${
-            dark ? "text-white/[0.03]" : "text-black/[0.03]"
+          className={`pointer-events-none absolute left-6 -bottom-10 select-none font-black text-8xl sm:text-[12rem] md:text-[16rem] leading-none transition-all duration-700 font-serif ${
+            dark ? "text-white/[0.03]" : "text-[#08467d]/[0.04]"
           }`}
         >
           {activeEra.shortYear}
         </span>
 
+        {/* Top Control Bar: Magnetic Time-Ruler */}
+        <div
+          className={`pb-6 mb-8 border-b flex flex-col lg:flex-row items-center justify-between gap-5 relative z-10 ${
+            dark ? "border-white/10" : "border-slate-200"
+          }`}
+        >
+          {/* Era Counter & Milestone Badge */}
+          <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
+                <Clock size={19} />
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-[#f8ca14]">
+                    المحطة {activeIndex + 1} من {TIMELINE_ERAS.length}
+                  </span>
+                  <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                </div>
+                <span className={`text-xs font-bold block mt-0.5 ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                  خريطة الحقب التاريخية (1994 — 2026)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Integrated Magnetic Time-Ruler Tabs */}
+          <div
+            className={`relative p-1.5 rounded-2xl border flex items-center gap-1.5 w-full lg:w-auto overflow-x-auto scrollbar-hide shadow-inner ${
+              dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
+            }`}
+          >
+            {TIMELINE_ERAS.map((era, eraIdx) => {
+              const isActive = activeIndex === eraIdx;
+              return (
+                <button
+                  key={era.shortYear}
+                  type="button"
+                  onClick={() => setActiveIndex(eraIdx)}
+                  className={`relative px-4 sm:px-5 py-2.5 rounded-xl text-center transition-all duration-300 z-10 select-none flex-1 lg:flex-none ${
+                    isActive
+                      ? "text-white font-black"
+                      : dark
+                      ? "text-slate-400 hover:text-white hover:bg-white/5"
+                      : "text-slate-600 hover:text-[#08467d] hover:bg-white/60"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeHeritagePill"
+                      className={`absolute inset-0 rounded-xl shadow-lg ${
+                        dark
+                          ? "bg-gradient-to-r from-[#08467d] to-[#042442] border border-[#f8ca14]/40"
+                          : "bg-[#08467d] border border-[#f8ca14]/50 shadow-md"
+                      }`}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <div className="relative z-10">
+                    <span className={`block text-sm sm:text-base font-black ${isActive ? "text-[#f8ca14]" : ""}`}>
+                      {era.shortYear}
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-bold block truncate mt-0.5 opacity-90">
+                      {era.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Era Showcase Stage (Master-Detail View) */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeEra.shortYear}
-            initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
+            initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -14, filter: "blur(4px)" }}
+            exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
             transition={{ duration: 0.32, ease: "easeOut" }}
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 text-right"
           >
-            {/* Story & Details Column (7 cols) */}
+            {/* Story & Achievements Column (7 cols) */}
             <div className="lg:col-span-7">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="rounded-full bg-[#f8ca14]/15 border border-[#f8ca14]/30 px-3.5 py-1 text-xs font-black text-[#f8ca14]">
-                  محطة تاريخية بارزة ✦
+              {/* Milestone Tag & Era Hijri Date */}
+              <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/15 border border-[#f8ca14]/35 px-3.5 py-1 text-xs font-black text-[#f8ca14]">
+                  <Sparkles size={12} />
+                  <span>محطة تاريخية فارقة</span>
                 </span>
-                <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                <span className={`text-xs font-black px-3 py-1 rounded-full border ${
+                  dark ? "border-white/10 bg-white/5 text-slate-300" : "border-slate-200 bg-slate-50 text-[#08467d]"
+                }`}>
                   {activeEra.year}
                 </span>
               </div>
 
-              <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${dark ? "text-white" : "text-[#08467d]"}`}>
+              {/* Grand Era Title */}
+              <h3 className={`text-2xl sm:text-3xl lg:text-4xl font-black mb-4 leading-tight drop-shadow-sm ${
+                dark ? "text-white" : "text-[#08467d]"
+              }`}>
                 {activeEra.title}
               </h3>
 
-              <p className={`text-sm sm:text-base leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}>
+              {/* Narrative Description */}
+              <p className={`text-sm sm:text-base leading-relaxed mb-6 font-medium ${
+                dark ? "text-slate-300" : "text-slate-700"
+              }`}>
                 {activeEra.desc}
               </p>
 
-              {/* Quote Ribbon */}
+              {/* Growth Leap Transformation Box */}
               <div
-                className={`p-4 rounded-2xl border mb-6 text-xs sm:text-sm font-bold leading-relaxed ${
+                className={`p-4 rounded-2xl border mb-6 flex items-center justify-between gap-3 transition-all ${
                   dark
-                    ? "border-white/10 bg-white/[0.03] text-[#f8ca14]"
-                    : "border-[#08467d]/15 bg-[#08467d]/5 text-[#08467d]"
+                    ? "border-emerald-500/25 bg-emerald-950/25 text-emerald-300"
+                    : "border-emerald-600/20 bg-emerald-50/80 text-emerald-950 shadow-sm"
                 }`}
               >
-                <span className="text-base font-serif ml-1">❝</span>
-                {activeEra.quote}
-                <span className="text-base font-serif mr-1">❞</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-500">
+                    <TrendingUp size={18} />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-black uppercase tracking-wider opacity-75">
+                      الوثبة والقفزة النوعية
+                    </span>
+                    <span className="text-xs sm:text-sm font-black block mt-0.5">
+                      {activeEra.leap.to}
+                    </span>
+                  </div>
+                </div>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-black px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 shrink-0 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 size={12} />
+                  <span>قفزة معتمدة</span>
+                </span>
               </div>
 
-              {/* Key Metrics Row */}
+              {/* Archival Quote Ribbon */}
+              <div
+                className={`p-4 sm:p-5 rounded-2xl border mb-6 relative overflow-hidden ${
+                  dark
+                    ? "border-[#f8ca14]/25 bg-white/[0.02]"
+                    : "border-[#08467d]/20 bg-[#08467d]/5 shadow-sm"
+                }`}
+              >
+                <span className="absolute top-2 right-3 text-4xl font-serif text-[#f8ca14]/20 pointer-events-none select-none">
+                  “
+                </span>
+                <p className={`text-xs sm:text-sm font-bold leading-relaxed relative z-10 ${
+                  dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                }`}>
+                  {activeEra.quote}
+                </p>
+              </div>
+
+              {/* Key Metrics Triad */}
               <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
                 {activeEra.metrics.map((m, mIdx) => (
                   <div
                     key={mIdx}
-                    className={`p-3 rounded-2xl border text-center transition hover:scale-[1.02] ${
-                      dark ? "border-white/10 bg-black/40" : "border-black/5 bg-slate-50"
+                    className={`p-3.5 rounded-2xl border text-center transition hover:scale-[1.02] ${
+                      dark
+                        ? "border-white/10 bg-black/40 backdrop-blur-md"
+                        : "border-slate-200/90 bg-white shadow-sm"
                     }`}
                   >
-                    <span className="block text-[10px] text-slate-400 font-bold">{m.label}</span>
-                    <span className={`text-xs sm:text-sm font-black mt-1 block truncate ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                    <span className="block text-[10px] text-slate-400 font-bold truncate">{m.label}</span>
+                    <span className={`text-xs sm:text-sm font-black mt-1 block truncate ${
+                      dark ? "text-white" : "text-[#08467d]"
+                    }`}>
                       {m.val}
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Navigation Controls between Eras */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              {/* Interactive Prev/Next Navigation Controls */}
+              <div className={`flex items-center justify-between pt-5 border-t ${
+                dark ? "border-white/10" : "border-slate-200"
+              }`}>
                 <button
                   type="button"
                   disabled={activeIndex === 0}
                   onClick={() => setActiveIndex((idx) => Math.max(0, idx - 1))}
-                  className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+                  className={`inline-flex items-center gap-2 text-xs font-black transition px-3 py-2 rounded-xl ${
                     activeIndex === 0
-                      ? "opacity-30 cursor-not-allowed"
+                      ? "opacity-30 cursor-not-allowed text-slate-400"
                       : dark
-                      ? "text-slate-300 hover:text-[#f8ca14]"
-                      : "text-slate-700 hover:text-[#08467d]"
+                      ? "text-slate-200 hover:text-[#f8ca14] hover:bg-white/5"
+                      : "text-slate-700 hover:text-[#08467d] hover:bg-slate-100"
                   }`}
                 >
-                  <ChevronRight size={16} />
-                  <span>المحطة السابقة</span>
+                  <ChevronRight size={17} />
+                  <span>
+                    المحطة السابقة {activeIndex > 0 ? `(${TIMELINE_ERAS[activeIndex - 1].shortYear})` : ""}
+                  </span>
                 </button>
 
                 <div className="flex items-center gap-1.5 text-xs font-black text-slate-400">
-                  <span className="text-[#f8ca14]">{activeIndex + 1}</span>
-                  <span>من</span>
+                  <span className="text-[#f8ca14] text-sm">{activeIndex + 1}</span>
+                  <span>/</span>
                   <span>{TIMELINE_ERAS.length}</span>
                 </div>
 
@@ -266,36 +359,50 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   type="button"
                   disabled={activeIndex === TIMELINE_ERAS.length - 1}
                   onClick={() => setActiveIndex((idx) => Math.min(TIMELINE_ERAS.length - 1, idx + 1))}
-                  className={`inline-flex items-center gap-1.5 text-xs font-black transition ${
+                  className={`inline-flex items-center gap-2 text-xs font-black transition px-3 py-2 rounded-xl ${
                     activeIndex === TIMELINE_ERAS.length - 1
-                      ? "opacity-30 cursor-not-allowed"
+                      ? "opacity-30 cursor-not-allowed text-slate-400"
                       : dark
-                      ? "text-slate-300 hover:text-[#f8ca14]"
-                      : "text-slate-700 hover:text-[#08467d]"
+                      ? "text-slate-200 hover:text-[#f8ca14] hover:bg-white/5"
+                      : "text-slate-700 hover:text-[#08467d] hover:bg-slate-100"
                   }`}
                 >
-                  <span>المحطة التالية</span>
-                  <ChevronLeft size={16} />
+                  <span>
+                    المحطة التالية {activeIndex < TIMELINE_ERAS.length - 1 ? `(${TIMELINE_ERAS[activeIndex + 1].shortYear})` : ""}
+                  </span>
+                  <ChevronLeft size={17} />
                 </button>
               </div>
             </div>
 
-            {/* Photo Column with Archival Frame (5 cols) */}
+            {/* Archival Photo Column with Royal Seal (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/15 aspect-[4/3] group">
+              <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border border-white/20 aspect-[4/3] group">
+                {/* Official Archival Seal (Golden Stamp) */}
+                <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-lg text-[#f8ca14] text-[10px] font-black tracking-wider">
+                  <ShieldCheck size={13} className="text-[#f8ca14]" />
+                  <span>وثيقة أرشيفية معتمدة ✦</span>
+                </div>
+
+                {/* Photo with Smooth Scale Hover */}
                 <img
                   src={activeEra.image}
                   alt={activeEra.title}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
 
+                {/* Cinematic Vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+
+                {/* Bottom Overlay Info Banner */}
                 <div className="absolute bottom-4 right-4 left-4 text-white">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Milestone size={16} className="text-[#f8ca14]" />
                     <span className="text-xs font-black text-[#f8ca14]">{activeEra.stats}</span>
                   </div>
-                  <p className="text-[11px] text-slate-200 line-clamp-2 leading-relaxed">{activeEra.highlight}</p>
+                  <p className="text-[11px] text-slate-200 line-clamp-2 leading-relaxed font-medium">
+                    {activeEra.highlight}
+                  </p>
                 </div>
               </div>
             </div>
@@ -303,11 +410,13 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         </AnimatePresence>
       </div>
 
-      {/* 5. Bottom Historical Badges Triad */}
+      {/* 3. Bottom Historical Legacy Pillars Triad */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-right">
-        <div className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
-          dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white shadow-sm"
-        }`}>
+        <div
+          className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
+            dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200/90 bg-white shadow-sm"
+          }`}
+        >
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#f8ca14]/10 text-[#f8ca14] border border-[#f8ca14]/30">
             <GraduationCap size={22} />
           </div>
@@ -319,9 +428,11 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
           </div>
         </div>
 
-        <div className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
-          dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white shadow-sm"
-        }`}>
+        <div
+          className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
+            dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200/90 bg-white shadow-sm"
+          }`}
+        >
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#08467d]/20 text-[#08467d] dark:text-[#f8ca14] border border-[#08467d]/30">
             <Award size={22} />
           </div>
@@ -333,9 +444,11 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
           </div>
         </div>
 
-        <div className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
-          dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white shadow-sm"
-        }`}>
+        <div
+          className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
+            dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200/90 bg-white shadow-sm"
+          }`}
+        >
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
             <Building2 size={22} />
           </div>
@@ -350,3 +463,4 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
     </section>
   );
 }
+
