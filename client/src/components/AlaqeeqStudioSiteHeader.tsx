@@ -487,6 +487,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   data-visual-id="header-logo"
                   data-visual-tag="image"
                   data-visual-label="شعار مدارس العقيق"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="sync"
+                  width={160}
+                  height={54}
                   className={`max-h-full max-w-full object-contain transition duration-200 ${
                     dark
                       ? "brightness-0 invert opacity-95"
