@@ -255,10 +255,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         isScrolled ? "pointer-events-none" : "pointer-events-auto"
       }`}>
         {/* 1. Top Executive Utility Bar */}
-        <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 overflow-hidden ${
+        <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 ${
           isScrolled
-            ? "max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
-            : `border-b max-h-12 py-1.5 opacity-100 ${
+            ? "overflow-hidden max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
+            : `overflow-visible border-b max-h-12 py-1.5 opacity-100 ${
                 dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
               }`
         }`}>
@@ -318,7 +318,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               {portalsOpen && (
                 <div
                   dir="rtl"
-                  className={`absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 ${
+                  className={`absolute left-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 ${
                     dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
                   }`}
                 >
