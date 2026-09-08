@@ -221,7 +221,7 @@ export function AqeeqHomeTabsLibrary({
           style={{ backgroundColor: currentConfig.themeColor }}
         />
 
-        <div className="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+        <div className="max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           
           {/* Section Header */}
           <div className="mb-10 sm:mb-12 text-right">
@@ -350,7 +350,7 @@ export function AqeeqHomeTabsLibrary({
                         navigate(heroItem.href);
                       }
                     }}
-                    className={`group relative flex-1 min-h-[440px] sm:min-h-[480px] lg:h-[480px] rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-6 sm:p-10 ${
+                    className={`group relative flex-1 min-h-[380px] sm:min-h-[440px] lg:h-[480px] 2xl:h-[520px] rounded-[2rem] sm:rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-5 sm:p-8 lg:p-10 ${
                       dark
                         ? "bg-[#0b1016] border-white/15 shadow-black/80 hover:border-[#f8ca14]/50"
                         : "bg-white border-slate-200 shadow-xl hover:border-[#08467d]/40"

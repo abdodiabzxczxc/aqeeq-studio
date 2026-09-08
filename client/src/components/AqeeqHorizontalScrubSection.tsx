@@ -80,12 +80,12 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
       }`}
     >
       {/* Sticky Fullscreen Cinema Stage */}
-      <div className="sticky top-0 flex h-screen w-full flex-col justify-between overflow-hidden py-8 sm:py-12">
+      <div className="sticky top-0 flex h-screen w-full flex-col justify-between overflow-hidden pb-4 sm:pb-8 pt-16 sm:pt-20">
         {/* Cinema Stage Header */}
-        <div className="mx-auto w-full max-w-[1380px] px-5 md:px-8 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8 z-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 shrink-0">
           <div className="text-right">
             <div
-              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[10px] font-black tracking-widest uppercase mb-2 ${
+              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[10px] font-black tracking-widest uppercase mb-1.5 ${
                 isNationalDay
                   ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
                   : dark
@@ -102,7 +102,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
               label="عنوان أروقة العقيق الإعلامية"
               defaultText="أروقة العقيق الإعلامية"
               as="h2"
-              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}
+              className={`text-xl sm:text-3xl lg:text-4xl xl:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}
             />
             {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
             <motion.div
@@ -110,7 +110,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
               whileInView={{ width: 175, opacity: 1 }}
               viewport={{ once: false, margin: "-20px" }}
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className={`h-1 sm:h-[3.5px] rounded-full my-3 ${
+              className={`h-1 sm:h-[3px] rounded-full my-2 sm:my-3 ${
                 dark
                   ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
                   : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
@@ -122,14 +122,14 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
               label="وصف أروقة العقيق الإعلامية"
               defaultText="اسحب أو مرر بالماوس لاستكشاف أحدث أعداد المجلة المدرسية والتوثيقات المصورة للفعاليات الكبرى."
               as="p"
-              className={`mt-1.5 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}
+              className={`mt-1 text-xs sm:text-sm ${dark ? "text-slate-400" : "text-slate-600"}`}
             />
           </div>
 
           {/* Reel Controls & Scene Counter */}
-          <div className="flex items-center gap-4 self-end sm:self-auto">
+          <div className="flex items-center gap-3 sm:gap-4 self-end sm:self-auto shrink-0">
             {/* Active Scene Badge */}
-            <div className={`flex items-center gap-2 rounded-2xl border px-4 py-2 text-xs font-mono font-black ${
+            <div className={`flex items-center gap-2 rounded-2xl border px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-mono font-black ${
               dark ? "border-white/10 bg-white/5 text-amber-400" : "border-black/10 bg-slate-100 text-[#08467d]"
             }`}>
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -148,13 +148,13 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
 
         {/* 3D Cinema Curved Track Container */}
         <div
-          className="relative w-full overflow-visible my-auto"
+          className="relative w-full overflow-visible my-auto py-2"
           style={{ perspective: "1400px" }}
         >
           <motion.div
             ref={trackRef}
             style={{ x: smoothX, transformStyle: "preserve-3d" }}
-            className="flex items-center gap-6 sm:gap-8 px-6 sm:px-12 w-max will-change-transform"
+            className="flex items-center gap-5 sm:gap-8 px-6 sm:px-12 w-max will-change-transform"
           >
             {items.map((item, index) => (
               <motion.div
@@ -163,9 +163,9 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                 tabIndex={0}
                 onClick={() => navigate(item.href)}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate(item.href)}
-                whileHover={{ y: -12, scale: 1.04 }}
+                whileHover={{ y: -8, scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className={`group relative h-[420px] sm:h-[480px] w-[290px] sm:w-[360px] shrink-0 cursor-pointer overflow-hidden rounded-[2.5rem] border transition-all duration-500 shadow-2xl ${
+                className={`group relative h-[clamp(280px,46vh,480px)] w-[clamp(200px,32vh,360px)] shrink-0 cursor-pointer overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border transition-all duration-500 shadow-2xl ${
                   isNationalDay
                     ? dark
                       ? "border-[#f8ca14]/30 bg-[#001f13] shadow-[0_25px_60px_rgba(0,90,54,0.4)]"
@@ -194,33 +194,33 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20" />
 
                   {/* Top Film Reel Badge */}
-                  <div className="absolute top-5 inset-x-5 z-10 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 rounded-full bg-black/70 border border-white/20 px-3.5 py-1 text-[11px] font-black text-[#f8ca14] backdrop-blur-md shadow-md">
-                      {item.category === "journal" ? <BookOpen size={13} /> : <ImageIcon size={13} />}
+                  <div className="absolute top-4 inset-x-4 sm:top-5 sm:inset-x-5 z-10 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 rounded-full bg-black/70 border border-white/20 px-3 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-[11px] font-black text-[#f8ca14] backdrop-blur-md shadow-md">
+                      {item.category === "journal" ? <BookOpen size={12} /> : <ImageIcon size={12} />}
                       <span>{item.badge}</span>
                     </div>
-                    <span className="rounded-full bg-black/60 border border-white/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-slate-400">
+                    <span className="rounded-full bg-black/60 border border-white/10 px-2 py-0.5 font-mono text-[9px] sm:text-[10px] font-bold text-slate-400">
                       REEL // {String(index + 1).padStart(2, "0")}
                     </span>
                   </div>
 
                   {/* Bottom Card Content */}
-                  <div className="absolute bottom-0 inset-x-0 p-6 text-right z-10">
+                  <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 text-right z-10">
                     {item.metaText && (
-                      <p className="text-[11px] font-bold text-amber-300/90 mb-1 tracking-wide">{item.metaText}</p>
+                      <p className="text-[10px] sm:text-[11px] font-bold text-amber-300/90 mb-1 tracking-wide">{item.metaText}</p>
                     )}
-                    <h3 className="text-xl sm:text-2xl font-black text-white leading-snug line-clamp-2 drop-shadow-md font-cairo">
+                    <h3 className="text-base sm:text-xl lg:text-2xl font-black text-white leading-snug line-clamp-2 drop-shadow-md font-cairo">
                       {item.title}
                     </h3>
 
                     {/* Action Bar */}
-                    <div className="mt-5 flex items-center justify-between border-t border-white/15 pt-4">
-                      <span className="text-xs font-black text-[#f8ca14] group-hover:underline inline-flex items-center gap-1.5">
+                    <div className="mt-3 sm:mt-5 flex items-center justify-between border-t border-white/15 pt-2.5 sm:pt-4">
+                      <span className="text-[11px] sm:text-xs font-black text-[#f8ca14] group-hover:underline inline-flex items-center gap-1.5">
                         <span>فتح العمل بالكامل</span>
-                        <ArrowUpLeft size={15} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                        <ArrowUpLeft size={14} className="transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
                       </span>
-                      <span className="h-9 w-9 rounded-2xl bg-white/10 border border-white/20 grid place-items-center text-white transition group-hover:bg-[#f8ca14] group-hover:text-black group-hover:border-[#f8ca14]">
-                        <ChevronLeft size={18} />
+                      <span className="h-7 w-7 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl bg-white/10 border border-white/20 grid place-items-center text-white transition group-hover:bg-[#f8ca14] group-hover:text-black group-hover:border-[#f8ca14]">
+                        <ChevronLeft size={16} />
                       </span>
                     </div>
                   </div>
@@ -231,7 +231,7 @@ export function AqeeqHorizontalScrubSection({ items }: AqeeqHorizontalScrubSecti
         </div>
 
         {/* Bottom Film Progress Scrubber */}
-        <div className="mx-auto w-full max-w-[1380px] px-5 md:px-8 z-10">
+        <div className="mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8 z-10 shrink-0">
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs font-mono font-bold text-slate-500">01</span>
             <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${dark ? "bg-white/10" : "bg-black/10"}`}>

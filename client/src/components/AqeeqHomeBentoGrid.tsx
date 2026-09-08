@@ -110,7 +110,7 @@ export function AqeeqHomeBentoGrid({
             : ""
         )}
       >
-        <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 md:px-8">
+        <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
           {/* Section Header */}
           <div className="mb-10 sm:mb-12 text-right">
             <VisualEditable

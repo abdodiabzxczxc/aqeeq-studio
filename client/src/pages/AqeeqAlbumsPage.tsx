@@ -322,7 +322,7 @@ export default function AqeeqAlbumsPage() {
       <AqeeqLuxuryPageShell
         header={<AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={journalIssues[0]?.headerLogoUrl} />}
       >
-        <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+        <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
           <div className="grid gap-6 lg:grid-cols-2">
             {[1, 2, 3, 4].map(i => <AlbumCardSkeleton key={i} dark={dark} />)}
           </div>
@@ -341,7 +341,7 @@ export default function AqeeqAlbumsPage() {
           products={parallaxProducts}
           dark={dark}
           header={
-            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 py-6 md:grid-cols-[1fr_1.1fr] md:py-10 lg:gap-16">
+            <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 py-6 md:grid-cols-[1fr_1.1fr] md:py-10 lg:gap-16">
               {/* Left Column: 2 tilted cards — exactly as it was */}
               <div className="relative order-2 mx-auto h-[340px] w-full max-w-[540px] md:order-1 md:h-[450px]">
                 {secondAlbum ? (
@@ -597,7 +597,7 @@ export default function AqeeqAlbumsPage() {
         />
       }
     >
-      <section id="albums-grid-section" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+      <section id="albums-grid-section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
             <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
               <div>
                 <VisualEditable id="albums-archive-kicker" tag="text" label="شارة أرشيف الألبومات" defaultText="THE MEMORY WALL" as="p" className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />

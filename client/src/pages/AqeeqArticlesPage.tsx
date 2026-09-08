@@ -437,7 +437,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             containerRef={articlesHeroRef}
           />
 
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
           {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
           <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
             {secondArticle ? (
@@ -658,7 +658,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     }
   >
     {/* Articles Feed Section */}
-    <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+    <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
         <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
           dark ? "border-white/[0.08]" : "border-black/[0.08]"
         }`}>

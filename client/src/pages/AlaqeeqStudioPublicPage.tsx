@@ -880,7 +880,7 @@ export default function AlaqeeqStudioPublicPage() {
         <div className={`h-[60px] border-b ${dark ? "border-white/[0.08] bg-[#050505]" : "border-black/[0.06] bg-white"}`} />
         {/* Skeleton Hero */}
         <div className={`border-b py-12 md:py-16 ${dark ? "border-white/[0.08]" : "border-black/[0.06]"}`}>
-          <div className="mx-auto max-w-[1380px] px-5 md:px-8">
+          <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8">
             <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
               <div className="space-y-4 animate-pulse">
                 <div className={`h-3 w-32 rounded-full ${dark ? "bg-white/10" : "bg-black/10"}`} />
@@ -897,7 +897,7 @@ export default function AlaqeeqStudioPublicPage() {
         </div>
         {/* Skeleton Bento Grid */}
         <div className={`border-b py-14 md:py-20 ${dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.015]"}`}>
-          <div className="mx-auto max-w-[1380px] px-5 md:px-8">
+          <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8">
             <div className={`h-8 w-48 rounded-full mb-8 animate-pulse ${dark ? "bg-white/10" : "bg-black/10"}`} />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               {[1,2,3,4].map(i => (
@@ -968,7 +968,7 @@ export default function AlaqeeqStudioPublicPage() {
             ? dark ? "border-[#f8ca14]/10 bg-[#010f08]/90" : "border-[#005A36]/10 bg-[#f0fdf4]/90"
             : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
-          <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-[1360px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
                 <button
@@ -1069,7 +1069,7 @@ export default function AlaqeeqStudioPublicPage() {
         <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
           dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
         )}>
-          <div className="mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-[1360px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 animate-pulse">
@@ -1114,7 +1114,7 @@ export default function AlaqeeqStudioPublicPage() {
         )}
 
 
-        <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-5 pt-5 pb-12 md:px-8 md:pt-7 md:pb-16 lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
+        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 2xl:gap-20 px-4 sm:px-6 md:px-8 pt-3 sm:pt-6 md:pt-7 pb-8 sm:pb-12 md:pb-16 md:grid-cols-[minmax(340px,0.95fr)_minmax(0,1.05fr)] lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)]">
           <div>
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
@@ -1137,7 +1137,7 @@ export default function AlaqeeqStudioPublicPage() {
               />
             )}
 
-            <h1 className={"mt-4 text-4xl font-black leading-[1.1] md:text-6xl " + (
+            <h1 className={"mt-2.5 sm:mt-4 text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-black leading-[1.15] " + (
               isNationalDay
                 ? dark ? "text-white" : "text-[#08467d]"
                 : dark ? "text-white" : "text-black"
@@ -1161,7 +1161,7 @@ export default function AlaqeeqStudioPublicPage() {
               label="الوصف الرئيسي"
               defaultText="الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - نلهم الأجيال ونصنع الأثر من خلال بيئة تعليمية رائدة ومعتمدة عالمياً."
               as="p"
-              className={"mt-5 max-w-xl text-sm leading-8 " + (
+              className={"mt-3 sm:mt-5 max-w-xl text-xs sm:text-sm leading-6 sm:leading-8 " + (
                 isNationalDay
                   ? dark ? "text-slate-300" : "text-slate-600"
                   : dark ? "text-slate-300" : "text-slate-600"
@@ -1170,14 +1170,14 @@ export default function AlaqeeqStudioPublicPage() {
 
 
             {/* Quick Action CTA Buttons */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
               <button
                 type="button"
                 onClick={() => navigate("/admissions")}
                 data-visual-id="hero-cta-admissions"
                 data-visual-tag="button"
                 data-visual-label="زر القبول والتسجيل في الهيرو"
-                className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black shadow-lg transition active:scale-95 ${
+                className={`inline-flex items-center gap-2 rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-black shadow-lg transition active:scale-95 ${
                   dark
                     ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
                     : "bg-gradient-to-r from-[#08467d] to-[#052c52] text-white shadow-[#08467d]/25 hover:opacity-95"
@@ -1193,7 +1193,7 @@ export default function AlaqeeqStudioPublicPage() {
                 data-visual-id="hero-cta-accreditations"
                 data-visual-tag="button"
                 data-visual-label="زر الاعتمادات الدولية في الهيرو"
-                className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
+                className={`inline-flex items-center gap-2 rounded-2xl border px-4 sm:px-5 py-2.5 sm:py-3 text-xs font-black transition active:scale-95 ${
                   dark
                     ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
                     : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
@@ -1206,7 +1206,7 @@ export default function AlaqeeqStudioPublicPage() {
 
 
             {/* Stats Bar */}
-            <div className={"mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-4 " + (
+            <div className={"mt-5 sm:mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-2.5 sm:py-4 " + (
               isNationalDay
                 ? dark
                   ? "divide-[#f8ca14]/20 border-[#f8ca14]/20 bg-[#0c1218] rounded-2xl px-3 backdrop-blur-sm"
@@ -1316,7 +1316,7 @@ export default function AlaqeeqStudioPublicPage() {
               onMouseMove={isEditorActive ? undefined : handleHeroMouseMove}
               onMouseLeave={isEditorActive ? undefined : handleHeroMouseLeave}
               style={isEditorActive ? {} : { rotateX: heroTiltX, rotateY: heroTiltY, transformStyle: "preserve-3d" }}
-              className="relative mx-auto h-[290px] w-full max-w-[620px] sm:h-[360px] lg:h-[430px] perspective-1000 will-change-transform"
+              className="relative mx-auto h-[270px] sm:h-[340px] md:h-[380px] lg:h-[430px] xl:h-[470px] w-full max-w-[620px] xl:max-w-[680px] perspective-1000 will-change-transform"
             >
               {/* Back Card: Showcase / Vision & Excellence */}
               <motion.div
@@ -1524,7 +1524,7 @@ export default function AlaqeeqStudioPublicPage() {
           dark ? "border-white/10 bg-[#06080d]/90 text-white" : "border-black/5 bg-slate-50/90 text-slate-800"
         }`}
       >
-        <div data-no-visual-edit="true" data-interactive-fx="true" className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8">
+        <div data-no-visual-edit="true" data-interactive-fx="true" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
           <div data-no-visual-edit="true" data-interactive-fx="true" className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
             {/* Cognia */}
             <div data-no-visual-edit="true" data-interactive-fx="true" className="flex items-center gap-1.5">
@@ -1885,7 +1885,7 @@ export default function AlaqeeqStudioPublicPage() {
             : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.01]"
         )}
       >
-        <div className="mx-auto max-w-[1340px] px-5 md:px-8">
+        <div className="mx-auto max-w-[1340px] 2xl:max-w-[1560px] px-5 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
             <VisualEditable
               id="studio-editorial-kicker"

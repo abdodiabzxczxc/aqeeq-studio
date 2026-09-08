@@ -499,7 +499,7 @@ export default function AqeeqSchoolAdmissionsPage() {
             direction="right-to-left"
           />
 
-          <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 py-8 sm:py-12">
+          <div className="container mx-auto px-4 sm:px-6 max-w-7xl 2xl:max-w-[1560px] relative z-10 py-8 sm:py-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">

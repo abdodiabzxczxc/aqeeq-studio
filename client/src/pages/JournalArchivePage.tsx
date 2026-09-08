@@ -178,7 +178,7 @@ export default function JournalArchivePage() {
       <VisualEditable id="journal-header-shell" tag="section" label="شريط هوية المكتبة" as="section">
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={journalLogoUrl} />
       </VisualEditable>
-      <div className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 pt-4">
+      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-4">
         <nav className="flex items-center gap-2 text-xs font-bold text-slate-400">
           <button onClick={() => navigate("/")} className="hover:text-current transition">الرئيسية</button>
           <span className="opacity-40">›</span>
@@ -189,7 +189,7 @@ export default function JournalArchivePage() {
         <>
           <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className={`relative isolate overflow-hidden border-b ${dark ? "border-amber-300/15 bg-black" : "border-slate-200 bg-white"}`}>
             <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} />
-            <div className="relative mx-auto grid max-w-[1380px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
+            <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
               <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
                 {secondIssue ? (
                   <button onClick={() => navigate(getJournalIssuePath(secondIssue.slug))} className="absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border border-amber-100/15 bg-black p-2 opacity-60 shadow-[0_25px_50px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>
@@ -232,7 +232,7 @@ export default function JournalArchivePage() {
             </div>
           </VisualEditable>
           <VisualSections pagePath="/journal" anchorId="journal-after-hero" />
-          <section className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
             <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section">
               <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-amber-300/15" : "border-slate-200"}`}>
                 <div>

@@ -262,7 +262,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
               }`
         }`}>
-        <div className="mx-auto flex max-w-[1380px] items-center justify-between px-3.5 sm:px-6 md:px-8">
+        <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-3.5 sm:px-6 md:px-8">
           <div className="flex items-center gap-4">
             <span
               data-visual-id="header-top-location"
@@ -451,7 +451,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
             }`
       }`}>
-        <div className={`relative mx-auto max-w-[1380px] flex items-center justify-between lg:grid lg:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
+        <div className={`relative mx-auto max-w-[1380px] 2xl:max-w-[1560px] flex items-center justify-between lg:grid lg:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
           isScrolled
             ? "px-3.5 sm:px-6 md:px-8 h-[54px] sm:h-[62px] pointer-events-none"
             : "px-3.5 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"

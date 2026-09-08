@@ -274,7 +274,7 @@ export function AqeeqAiAssistantWidget() {
   return (
     <div
       dir="rtl"
-      className="fixed left-3 sm:left-6 z-50 font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out"
+      className="fixed left-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] z-50 font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out"
       style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
     >
       {/* ── 1. Permanent Luxury Spatial Morphing Orb (When Closed) ── */}
