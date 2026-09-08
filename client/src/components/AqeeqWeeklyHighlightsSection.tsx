@@ -61,7 +61,7 @@ export function AqeeqWeeklyHighlightsSection({
           : dark ? "border-white/[0.05] bg-gradient-to-b from-transparent via-[#060608]/40 to-transparent" : "border-black/[0.04] bg-slate-50/50"
       }`}
     >
-      <div className="mx-auto max-w-[1240px] px-5 md:px-8">
+      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         {/* Section Header */}
         <div className="mb-12 md:mb-16 text-right max-w-2xl">
           <VisualEditable

@@ -124,10 +124,64 @@ export function AqeeqLiveArchiveSection({
       tag="section"
       label="قسم الأرشيف المفتوح"
       as="section"
-      className="mx-auto max-w-[1380px] px-4 sm:px-6 md:px-8 py-16 md:py-24 relative overflow-hidden"
+      className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-16 md:py-24 relative overflow-hidden"
     >
+      {/* Top Header Row — Flush with the Magnetic Grid Guideline */}
+      <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="max-w-2xl text-right">
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-4 text-[10px] font-black tracking-widest uppercase ${
+            dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+          }`}>
+            <Sparkles size={13} />
+            <span>THE OPEN DIGITAL CORE · الذاكرة الرقمية الحية</span>
+          </div>
+
+          <VisualEditable
+            id="studio-livearchive-title"
+            tag="text"
+            label="عنوان أرشيف العقيق"
+            defaultText="أرشيف العقيق المفتوح الشامل."
+            as="h2"
+            className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}
+          />
+
+          {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
+          <motion.div
+            initial={{ width: 0, opacity: 0.3 }}
+            whileInView={{ width: 175, opacity: 1 }}
+            viewport={{ once: false, margin: "-20px" }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
+              dark
+                ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
+            }`}
+          />
+
+          <VisualEditable
+            id="studio-livearchive-desc"
+            tag="text"
+            label="وصف أرشيف العقيق"
+            defaultText="منظومة إحصائية حية توثق النبض اليومي لمدارس العقيق، من الأخبار والعروض المباشرة والمجلات والألبومات، متاحة بشفافية تامة للمجتمع المدرسي."
+            as="p"
+            className={`mt-3 text-xs sm:text-sm leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}
+          />
+        </div>
+
+        {/* Live System Status Pill */}
+        <div className={`self-start md:self-auto flex items-center gap-3 px-4 py-2 rounded-2xl border text-xs font-bold ${
+          dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-slate-50 border-slate-200 text-slate-700"
+        }`}>
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+          </span>
+          <span className="font-mono text-[11px]">محدث لحظياً · 100% شفافية</span>
+        </div>
+      </div>
+
       {/* Container with Cybernetic Glass Architecture */}
-      <div className={`rounded-[3rem] border relative overflow-hidden backdrop-blur-3xl shadow-2xl p-6 sm:p-10 md:p-14 ${
+      <div className={`rounded-[3rem] border relative overflow-hidden backdrop-blur-3xl shadow-2xl p-6 sm:p-8 md:p-10 ${
         dark
           ? "border-white/10 bg-[#060a0f]/95 text-white shadow-black/90"
           : "border-slate-200 bg-white/95 text-slate-900 shadow-2xl shadow-slate-200"
@@ -140,64 +194,10 @@ export function AqeeqLiveArchiveSection({
         <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#f8ca14]/10 blur-[120px]" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-[120px]" />
 
-        {/* Top Header Row */}
-        <div className={`relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b ${dark ? "border-white/10" : "border-slate-200"}`}>
-          <div className="max-w-2xl text-right">
-            <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-4 text-[10px] font-black tracking-widest uppercase ${
-              dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
-            }`}>
-              <Sparkles size={13} />
-              <span>THE OPEN DIGITAL CORE · الذاكرة الرقمية الحية</span>
-            </div>
-
-            <VisualEditable
-              id="studio-livearchive-title"
-              tag="text"
-              label="عنوان أرشيف العقيق"
-              defaultText="أرشيف العقيق المفتوح الشامل."
-              as="h2"
-              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}
-            />
-
-            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
-            <motion.div
-              initial={{ width: 0, opacity: 0.3 }}
-              whileInView={{ width: 175, opacity: 1 }}
-              viewport={{ once: false, margin: "-20px" }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
-                dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
-              }`}
-            />
-
-            <VisualEditable
-              id="studio-livearchive-desc"
-              tag="text"
-              label="وصف أرشيف العقيق"
-              defaultText="منظومة إحصائية حية توثق النبض اليومي لمدارس العقيق، من الأخبار والعروض المباشرة والمجلات والألبومات، متاحة بشفافية تامة للمجتمع المدرسي."
-              as="p"
-              className={`mt-3 text-xs sm:text-sm leading-relaxed max-w-xl ${dark ? "text-slate-300" : "text-slate-600"}`}
-            />
-          </div>
-
-          {/* Live System Status Pill */}
-          <div className={`self-start md:self-auto flex items-center gap-3 px-4 py-2 rounded-2xl border text-xs font-bold ${
-            dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-slate-50 border-slate-200 text-slate-700"
-          }`}>
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <span className="font-mono text-[11px]">محدث لحظياً · 100% شفافية</span>
-          </div>
-        </div>
-
         {/* ========================================================================= */}
         {/* 5 3D HOLOGRAPHIC DATA PODS (PILLARS)                                      */}
         {/* ========================================================================= */}
-        <div className="relative z-10 mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
           {pods.map((pod, idx) => (
             <motion.div
               key={pod.id}

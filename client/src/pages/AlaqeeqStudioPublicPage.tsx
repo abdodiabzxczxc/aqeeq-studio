@@ -1525,7 +1525,7 @@ export default function AlaqeeqStudioPublicPage() {
         }`}
       >
         <div data-no-visual-edit="true" data-interactive-fx="true" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
-          <div data-no-visual-edit="true" data-interactive-fx="true" className="flex flex-wrap items-center justify-around gap-4 sm:gap-6 text-xs font-black">
+          <div data-no-visual-edit="true" data-interactive-fx="true" className="flex flex-wrap items-center justify-between gap-4 sm:gap-6 text-xs font-black">
             {/* Cognia */}
             <div data-no-visual-edit="true" data-interactive-fx="true" className="flex items-center gap-1.5">
               <button

@@ -120,7 +120,7 @@ export default function AqeeqSchoolAppShowcaseSection({
         style={{ background: "radial-gradient(circle, #f8ca14, transparent)" }}
       />
 
-      <div className="relative mx-auto max-w-[1360px] px-4 sm:px-6 md:px-8">
+      <div className="relative mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         {/* Unified Section Header — Aligned Right Matching Site Identity */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

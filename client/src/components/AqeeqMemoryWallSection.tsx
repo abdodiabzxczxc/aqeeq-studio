@@ -56,7 +56,7 @@ export function AqeeqMemoryWallSection({
           : dark ? "border-white/[0.05] bg-transparent" : "border-black/[0.04] bg-transparent"
       )}
     >
-      <div ref={sectionRef} className="mx-auto max-w-[1340px] px-5 md:px-8">
+      <div ref={sectionRef} className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
           <div className="text-right">
             <div className="mb-2">
