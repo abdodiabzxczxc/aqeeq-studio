@@ -121,7 +121,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
   const activeEra = TIMELINE_ERAS[activeIndex];
 
   return (
-    <section id="timeline-section" className="py-12 sm:py-16 w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8">
+    <section id="timeline-section" className="py-16 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
       {/* 1. Unified Section Header (Clean Institutional Luxury - No Emojis) */}
       <AqeeqSectionHeader
         id="about-timeline"
@@ -133,9 +133,9 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         align="right"
       />
 
-      {/* 2. Unified Master Time Capsule Container (Compact Luxury) */}
+      {/* 2. Unified Master Time Capsule Container (Flawlessly Aligned to 1380px Ruler) */}
       <div
-        className={`w-full max-w-[1180px] mx-auto rounded-[2rem] border p-5 sm:p-6 md:p-7 shadow-xl relative overflow-hidden transition-all duration-300 ${
+        className={`w-full rounded-[2.5rem] border p-6 sm:p-8 md:p-9 shadow-xl relative overflow-hidden transition-all duration-300 ${
           dark
             ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98"
             : "border-slate-200/90 bg-white/95 shadow-md"
@@ -409,8 +409,8 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
         </AnimatePresence>
       </div>
 
-      {/* 3. Bottom Historical Legacy Pillars Triad (Compact) */}
-      <div className="mt-6 max-w-[1180px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-right">
+      {/* 3. Bottom Historical Legacy Pillars Triad */}
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-right">
         <div
           className={`p-4 rounded-2xl border flex items-center gap-3.5 transition hover:scale-[1.01] ${
             dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200/90 bg-white shadow-sm"
