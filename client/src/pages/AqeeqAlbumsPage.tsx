@@ -582,17 +582,23 @@ export default function AqeeqAlbumsPage() {
                           <Camera size={42} />
                         </div>
                       )}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16 text-right">
-                        <span className="text-[10px] font-black text-[#f8ca14]">
-                          {featuredAlbum.mediaCount} ملف
-                        </span>
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-5 pb-5 pt-20 text-right">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black shadow-md">
+                            <Sparkles size={11} />
+                            ألبوم معتمد
+                          </span>
+                          <span className="text-[10px] font-bold text-[#f8ca14]/90">
+                            {featuredAlbum.mediaCount} صورة وملف
+                          </span>
+                        </div>
                         <VisualEditable
                           id="albums-hero-featured-title"
                           tag="text"
                           label="عنوان غلاف الألبوم الحالي"
                           defaultText={featuredAlbum.title}
-                          as="h2"
-                          className="mt-1 text-lg font-black text-white"
+                          as="p"
+                          className="mt-1 text-base sm:text-lg font-black text-white leading-snug line-clamp-2 drop-shadow-md"
                         />
                       </div>
                     </div>
@@ -605,13 +611,49 @@ export default function AqeeqAlbumsPage() {
       }
     >
       <section id="albums-grid-section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
-            <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
-              <div>
-                <VisualEditable id="albums-archive-kicker" tag="text" label="شارة أرشيف الألبومات" defaultText="THE MEMORY WALL" as="p" className={`text-[10px] font-black tracking-[0.18em] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
-                <VisualEditable id="albums-archive-title" tag="text" label="عنوان أرشيف الألبومات" defaultText="ألبومات العقيق" as="h2" className={`mt-2 text-2xl font-black ${dark ? "text-white" : "text-black"}`} />
-              </div>
-              <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-600 font-bold"}`}>{visibleAlbums.length} من {albums.length} ألبوم</span>
+        <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+          <div className="max-w-2xl text-right">
+            <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
+              dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+            }`}>
+              <Camera size={13} />
+              <VisualEditable id="albums-archive-kicker" tag="text" label="شارة أرشيف الألبومات" defaultText="THE MEMORY WALL · الأرشيف المصور" as="span" />
             </div>
+
+            <VisualEditable
+              id="albums-archive-title"
+              tag="text"
+              label="عنوان أرشيف الألبومات"
+              defaultText="ألبومات وذاكرة العقيق المصورة"
+              as="h2"
+              className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}
+            />
+
+            {/* Glowing Golden Accent Line */}
+            <div
+              className={`h-1 sm:h-[3.5px] w-40 rounded-full my-3.5 ${
+                dark
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
+              }`}
+            />
+
+            <VisualEditable
+              id="albums-archive-desc"
+              tag="text"
+              label="وصف أرشيف الألبومات"
+              defaultText="سجل فوتوغرافي ومرئي متكامل يوثق أبرز فعاليات ومحطات مدارس العقيق بالمدينة المنورة، متاح للمشاهدة والتنزيل بجودة عالية."
+              as="p"
+              className={`mt-2 max-w-xl text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300 font-medium" : "text-slate-600 font-medium"}`}
+            />
+          </div>
+
+          <span className={`self-start md:self-end rounded-full border px-3.5 py-1.5 text-xs font-black shrink-0 ${
+            dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+          }`}>
+            {visibleAlbums.length} من {albums.length} ألبوم
+          </span>
+        </div>
             <AqeeqArchiveControls id="albums-archive-controls" label="البحث وترتيب الألبومات" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />
             {visibleAlbums.length ? (
               <motion.div

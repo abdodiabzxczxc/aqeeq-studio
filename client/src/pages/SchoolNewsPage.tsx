@@ -543,17 +543,23 @@ export default function SchoolNewsPage() {
                         </div>
                       )}
 
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16">
-                        <span className="text-[10px] font-black text-[#f8ca14]">
-                          {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
-                        </span>
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-5 pb-5 pt-20 text-right">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black shadow-md">
+                            <Newspaper size={11} />
+                            عدد رسمي
+                          </span>
+                          <span className="text-[10px] font-bold text-[#f8ca14]/90">
+                            {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
+                          </span>
+                        </div>
                         <VisualEditable
                           id="journal-hero-featured-title"
                           tag="text"
                           label="عنوان غلاف العدد الحالي"
                           defaultText={featuredIssue.title}
                           as="p"
-                          className="mt-1 text-lg font-black text-white"
+                          className="mt-1 text-base sm:text-lg font-black text-white leading-snug line-clamp-2 drop-shadow-md"
                         />
                       </div>
                     </div>
@@ -632,31 +638,54 @@ export default function SchoolNewsPage() {
 
           {/* Issues Archive Grid Section */}
           <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
-            <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${
+            <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${
               isNationalDay ? (dark ? "border-[#f8ca14]/20" : "border-[#08467d]/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
             }`}>
-              <div>
-                <VisualEditable
-                  id="journal-archive-kicker"
-                  tag="text"
-                  label="شارة أرشيف الأعداد"
-                  defaultText="JOURNAL ARCHIVE"
-                  as="p"
-                  className={`text-[10px] font-black tracking-[0.18em] ${
-                    isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")
-                  }`}
-                />
+              <div className="max-w-2xl text-right">
+                <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
+                  dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+                }`}>
+                  <Newspaper size={13} />
+                  <VisualEditable
+                    id="journal-archive-kicker"
+                    tag="text"
+                    label="شارة أرشيف الأعداد"
+                    defaultText="JOURNAL ARCHIVE · صحيفة ومجلة العقيق"
+                    as="span"
+                  />
+                </div>
+
                 <VisualEditable
                   id="journal-archive-title"
                   tag="text"
                   label="عنوان أرشيف الأعداد"
-                  defaultText="أعداد مجلة العقيق"
+                  defaultText="أعداد ونشرات مجلة العقيق"
                   as="h2"
-                  className={`mt-2 text-2xl font-black ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
+                  className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"}`}
+                />
+
+                {/* Glowing Golden Accent Line */}
+                <div
+                  className={`h-1 sm:h-[3.5px] w-40 rounded-full my-3.5 ${
+                    dark
+                      ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                      : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
+                  }`}
+                />
+
+                <VisualEditable
+                  id="journal-archive-desc"
+                  tag="text"
+                  label="وصف أرشيف الأعداد"
+                  defaultText="أرشيف دوري شامل يضم أعداد المجلة المدرسية والكتيبات التوثيقية لأولياء الأمور والمجتمع التعليمي."
+                  as="p"
+                  className={`mt-2 max-w-xl text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300 font-medium" : "text-slate-600 font-medium"}`}
                 />
               </div>
 
-              <span className={`text-xs ${dark ? "text-slate-500" : "text-slate-400"}`}>
+              <span className={`self-start md:self-end rounded-full border px-3.5 py-1.5 text-xs font-black shrink-0 ${
+                dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+              }`}>
                 {visibleIssues.length} من {issues.length} عدد
               </span>
             </div>

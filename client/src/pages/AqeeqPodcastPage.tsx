@@ -718,11 +718,17 @@ export default function AqeeqPodcastPage() {
                       </div>
                     )}
 
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
-                      <span className="text-[10px] font-black text-[#f8ca14]">
-                        {featuredPodcast.category} · {featuredPodcast.hostName || "استوديو أثير"}
-                      </span>
-                      <p className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-5 pb-5 pt-20 text-right">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black shadow-md">
+                          <Mic size={11} />
+                          حلقة مميزة
+                        </span>
+                        <span className="text-[10px] font-bold text-[#f8ca14]/90">
+                          {featuredPodcast.category} · {featuredPodcast.hostName || "استوديو أثير"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-base sm:text-lg font-black text-white leading-snug line-clamp-2 drop-shadow-md">
                         {featuredPodcast.title}
                       </p>
                     </div>
