@@ -398,21 +398,55 @@ export default function AlaqeeqStudioPublicPage() {
       })()
     : null;
 
+  const [cachedHeroCovers] = useState(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("aqeeq-hero-cached-covers");
+        if (raw) return JSON.parse(raw) as { journal?: string; album?: string; showcase?: string };
+      }
+    } catch {}
+    return {
+      journal: "/covers/student-excellence-about.jpg",
+      album: "/covers/first-lego-champions.png",
+      showcase: "/covers/cover-admissions.jpg",
+    };
+  });
+
   const primaryShowcaseCover = defaultShowcaseCovers.front
     || (showcase?.coverUrl ? (directDriveImage(showcase.coverUrl) || showcase.coverUrl) : null)
-    || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE";
+    || cachedHeroCovers?.showcase
+    || "/covers/cover-admissions.jpg";
+
+  const resolvedJournalCover = customJournalCover || defaultJournalCovers.front || cachedHeroCovers?.journal || "/covers/student-excellence-about.jpg";
+  const resolvedAlbumCover = customAlbumCover || defaultAlbumCovers.front || cachedHeroCovers?.album || "/covers/first-lego-champions.png";
+  const resolvedShowcaseCover = customShowcaseCover || primaryShowcaseCover;
+
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && resolvedJournalCover && resolvedAlbumCover && resolvedShowcaseCover) {
+        localStorage.setItem(
+          "aqeeq-hero-cached-covers",
+          JSON.stringify({
+            journal: resolvedJournalCover,
+            album: resolvedAlbumCover,
+            showcase: resolvedShowcaseCover,
+          })
+        );
+      }
+    } catch {}
+  }, [resolvedJournalCover, resolvedAlbumCover, resolvedShowcaseCover]);
 
   const journalCovers = {
-    front: customJournalCover || defaultJournalCovers.front,
-    back: defaultJournalCovers.back,
+    front: resolvedJournalCover,
+    back: defaultJournalCovers.back || resolvedJournalCover,
   };
   const albumCovers = {
-    front: customAlbumCover || defaultAlbumCovers.front,
-    back: defaultAlbumCovers.back,
+    front: resolvedAlbumCover,
+    back: defaultAlbumCovers.back || resolvedAlbumCover,
   };
   const showcaseCovers = {
-    front: customShowcaseCover || primaryShowcaseCover,
-    back: defaultShowcaseCovers.back || primaryShowcaseCover,
+    front: resolvedShowcaseCover,
+    back: defaultShowcaseCovers.back || resolvedShowcaseCover,
   };
   const featuredEventPost = orchestration?.weeklyBento?.featuredMode === "custom" && orchestration?.weeklyBento?.customPostId
     ? activeShowcasePosts.find((p) => p.id === orchestration.weeklyBento.customPostId) || newestShowcasePosts[0]
@@ -1314,8 +1348,9 @@ export default function AlaqeeqStudioPublicPage() {
                 <VisualImage
                   id="studio-hero-showcase-image"
                   label="صورة غلاف الأخبار"
-                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : (showcaseCovers.front || "/api/drive-proxy/1Un4kxqTwsFgTRy1N4T93vi92gptWvDHE")}
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_showcase_national.webp" : showcaseCovers.front}
                   alt="غلاف الأخبار والعروض"
+                  priority={true}
                   className="h-full w-full object-cover"
                 />
                 {isEditorActive ? (
@@ -1368,8 +1403,9 @@ export default function AlaqeeqStudioPublicPage() {
                 <VisualImage
                   id="studio-hero-album-image"
                   label="صورة غلاف الألبومات"
-                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : (albumCovers.front || "")}
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_album_national.webp" : albumCovers.front}
                   alt="غلاف ألبوم العقيق"
+                  priority={true}
                   className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.03]"
                 />
                 {isEditorActive ? (
@@ -1424,8 +1460,9 @@ export default function AlaqeeqStudioPublicPage() {
                 <VisualImage
                   id="studio-hero-journal-image"
                   label="صورة غلاف المجلة"
-                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : (journalCovers.front || "")}
+                  src={isNationalDay ? "/themes/saudi-national-day/opt/cover_journal_national.webp" : journalCovers.front}
                   alt="غلاف مجلة العقيق"
+                  priority={true}
                   className="h-full w-full rounded-[1.4rem] object-cover transition duration-700 group-hover:scale-[1.03]"
                 />
                 {isEditorActive ? (
