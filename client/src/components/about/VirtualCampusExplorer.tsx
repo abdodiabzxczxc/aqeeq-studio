@@ -11,9 +11,9 @@ import {
   Phone,
   CalendarCheck,
   ChevronLeft,
-  Eye,
-  Layers,
   ShieldCheck,
+  ArrowLeft,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
@@ -28,7 +28,6 @@ export interface FacilityItem {
   badge: string;
   desc: string;
   giantMetrics: { num: string; label: string; sub: string }[];
-  hotspots?: { id: string; title: string; desc: string; top: string; left: string }[];
 }
 
 const BOYS_FACILITIES: FacilityItem[] = [
@@ -46,10 +45,6 @@ const BOYS_FACILITIES: FacilityItem[] = [
       { num: "100%", label: "تعقيم متواصل", sub: "فلاتر أوزون صديقة" },
       { num: "4+", label: "مدربين معتمدين", sub: "إنقاذ وتدريب مائي" },
     ],
-    hotspots: [
-      { id: "h1", title: "مستشعرات التعقيم", desc: "نظام ضخ فلترة ثلاثي بالأوزون للحفاظ على نقاء المياه على مدار الساعة.", top: "35%", left: "25%" },
-      { id: "h2", title: "مدرجات الجمهور الآمنة", desc: "مدرجات تسع 200 متفرج لحضور البطولات المدرسية والأولمبياد.", top: "60%", left: "70%" },
-    ],
   },
   {
     id: "stem-lab",
@@ -64,10 +59,6 @@ const BOYS_FACILITIES: FacilityItem[] = [
       { num: "40+", label: "حقيبة روبوت VEX", sub: "أحدث أجيال الأتمتة" },
       { num: "100%", label: "مناهج برمجة", sub: "بايثون وخوارزميات AI" },
       { num: "8", label: "جوائز سنوية", sub: "في المعارض الوزارية" },
-    ],
-    hotspots: [
-      { id: "h3", title: "طاولات حلبات التحدي", desc: "طاولات بمقاسات معتمدة دولياً لمحاكاة مهمات أولمبياد الروبوت.", top: "45%", left: "30%" },
-      { id: "h4", title: "محطات البرمجة الفردية", desc: "أجهزة متصلة بسحابة برمجية لتدريب الطلاب على بايثون ومفاهيم AI.", top: "25%", left: "65%" },
     ],
   },
   {
@@ -203,10 +194,10 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
   const [, navigate] = useLocation();
   const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
 
   const facilities = campusTab === "boys" ? BOYS_FACILITIES : GIRLS_FACILITIES;
   const activeFac = facilities[activeFacilityIndex] || facilities[0];
+  const ActiveIcon = activeFac.icon;
 
   return (
     <section
@@ -232,7 +223,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
         />
 
         {/* 2. Campus Switcher Tabs (Boys vs Girls) */}
-        <div className="flex justify-start mb-8">
+        <div className="flex justify-start mb-10">
           <div
             className={`inline-flex items-center rounded-2xl border p-1 sm:p-1.5 shadow-sm transition overflow-hidden ${
               dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-slate-50"
@@ -243,9 +234,8 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
               onClick={() => {
                 setCampusTab("boys");
                 setActiveFacilityIndex(0);
-                setActiveHotspot(null);
               }}
-              className={`relative z-10 rounded-xl px-4 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+              className={`relative z-10 rounded-xl px-5 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                 campusTab === "boys"
                   ? "text-[#f8ca14]"
                   : dark
@@ -271,9 +261,8 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
               onClick={() => {
                 setCampusTab("girls");
                 setActiveFacilityIndex(0);
-                setActiveHotspot(null);
               }}
-              className={`relative z-10 rounded-xl px-4 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
+              className={`relative z-10 rounded-xl px-5 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
                 campusTab === "girls"
                   ? "text-[#f8ca14]"
                   : dark
@@ -296,265 +285,220 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           </div>
         </div>
 
-        {/* 3. Desktop Expanding Architectural Accordion (5 Columns) */}
-        <div className="hidden lg:flex h-[600px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-[#08467d]/30">
-          {facilities.map((fac, fIdx) => {
-            const FacIcon = fac.icon;
-            const isExpanded = activeFacilityIndex === fIdx;
+        {/* 3. MASTER-DETAIL SPLIT STUDIO LAYOUT (Apple/Tesla Style) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          
+          {/* RIGHT COLUMN: Interactive Facility Selector (5 cols, 42%) */}
+          <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-3 text-right">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <span className="text-xs font-black text-[#f8ca14] uppercase tracking-wider">
+                ✦ اختر المرفق لاستعراض تجهيزاته ✦
+              </span>
+              <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
+                5 مرافق نموذجية
+              </span>
+            </div>
 
-            return (
-              <motion.div
-                key={fac.id}
-                layout
-                transition={{ type: "spring", stiffness: 220, damping: 26, mass: 0.9 }}
-                onClick={() => {
-                  if (!isExpanded) {
-                    setActiveFacilityIndex(fIdx);
-                    setActiveHotspot(null);
-                  }
-                }}
-                className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
-                  isExpanded
-                    ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
-                    : "flex-1 min-w-[76px] border-white/10 hover:border-[#f8ca14]/40 cursor-pointer opacity-85 hover:opacity-100 group"
-                }`}
-              >
-                {/* Background Photo */}
-                <img
-                  src={fac.image}
-                  alt={fac.name}
-                  className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
-                    isExpanded ? "scale-105" : "grayscale-[25%] group-hover:scale-110"
-                  }`}
-                />
-                {/* Dark Scrim */}
-                <div
-                  className={`absolute inset-0 transition-opacity duration-500 ${
-                    isExpanded
-                      ? "bg-gradient-to-t from-black/95 via-black/60 to-black/30"
-                      : "bg-black/75 group-hover:bg-black/60"
-                  }`}
-                />
+            {facilities.map((fac, idx) => {
+              const FacIcon = fac.icon;
+              const isActive = activeFacilityIndex === idx;
 
-                {/* Hotspots overlay if expanded */}
-                {isExpanded && fac.hotspots && (
-                  <div className="absolute inset-0 pointer-events-auto z-20">
-                    {fac.hotspots.map((hs) => (
-                      <div
-                        key={hs.id}
-                        style={{ top: hs.top, left: hs.left }}
-                        className="absolute group/pin"
-                      >
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveHotspot(activeHotspot === hs.id ? null : hs.id);
-                          }}
-                          className="relative flex items-center justify-center h-8 w-8 rounded-full bg-[#f8ca14] text-black shadow-lg animate-bounce"
+              return (
+                <button
+                  key={fac.id}
+                  type="button"
+                  onClick={() => setActiveFacilityIndex(idx)}
+                  className={`group relative w-full p-4 rounded-2xl border text-right transition-all duration-300 active:scale-[0.99] flex items-center justify-between gap-4 ${
+                    isActive
+                      ? "bg-gradient-to-r from-[#08467d]/95 to-[#042442]/95 border-[#f8ca14]/70 shadow-xl ring-1 ring-[#f8ca14]/40 scale-[1.01]"
+                      : dark
+                      ? "border-white/10 bg-[#0c141a]/80 hover:bg-white/[0.05] hover:border-white/20 text-slate-300"
+                      : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm"
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div
+                      className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl border transition-colors duration-300 ${
+                        isActive
+                          ? "bg-black/50 border-[#f8ca14]/50 text-[#f8ca14] shadow-md"
+                          : dark
+                          ? "border-white/10 bg-black/40 text-slate-400 group-hover:text-[#f8ca14] group-hover:border-[#f8ca14]/30"
+                          : "border-slate-200 bg-slate-100 text-slate-600 group-hover:text-[#08467d]"
+                      }`}
+                    >
+                      <FacIcon size={22} />
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className={`text-[10px] font-black px-2 py-0.5 rounded-full border truncate ${
+                            isActive
+                              ? "border-[#f8ca14]/40 bg-[#f8ca14]/15 text-[#f8ca14]"
+                              : dark
+                              ? "border-white/10 bg-white/5 text-slate-400"
+                              : "border-slate-200 bg-slate-100 text-slate-600"
+                          }`}
                         >
-                          <span className="absolute -inset-1 rounded-full bg-[#f8ca14]/40 animate-ping" />
-                          <Eye size={14} className="font-bold relative z-10" />
-                        </button>
-
-                        {/* Tooltip Card */}
-                        <AnimatePresence>
-                          {activeHotspot === hs.id && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.9, y: 8 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.9, y: 8 }}
-                              className="absolute top-10 right-0 w-64 p-3.5 rounded-2xl bg-black/90 text-white border border-[#f8ca14]/40 backdrop-blur-xl shadow-2xl z-30 text-right"
-                            >
-                              <div className="flex items-center gap-1.5 text-xs font-black text-[#f8ca14] mb-1">
-                                <ShieldCheck size={14} />
-                                <span>{hs.title}</span>
-                              </div>
-                              <p className="text-[11px] text-slate-200 leading-relaxed font-medium">
-                                {hs.desc}
-                              </p>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Expanded View Content */}
-                {isExpanded ? (
-                  <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white">
-                    {/* Top Bar with Badges & Live Status */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-xl bg-[#08467d]/90 border border-[#f8ca14]/40 px-3.5 py-1 text-xs font-black text-[#f8ca14] shadow-lg backdrop-blur-md">
-                          {fac.tag} ✦
-                        </span>
-                        <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
                           {fac.badge}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-[#f8ca14] bg-black/60 px-3.5 py-1 rounded-full border border-[#f8ca14]/30 backdrop-blur-md">
-                        <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
-                        <span>مرفق حي مجهز 100%</span>
-                      </div>
-                    </div>
-
-                    {/* Center Story */}
-                    <div className="max-w-2xl my-auto py-4">
-                      <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
+                      <h4
+                        className={`text-sm sm:text-base font-black truncate transition-colors ${
+                          isActive
+                            ? "text-white"
+                            : dark
+                            ? "text-slate-200 group-hover:text-white"
+                            : "text-slate-900 group-hover:text-[#08467d]"
+                        }`}
+                      >
                         {fac.name}
-                      </h3>
-                      <p className="text-sm sm:text-base leading-relaxed text-slate-200 font-medium mb-6 drop-shadow">
-                        {fac.desc}
+                      </h4>
+                      <p
+                        className={`text-[11px] font-medium truncate mt-0.5 ${
+                          isActive ? "text-slate-200" : dark ? "text-slate-400" : "text-slate-600"
+                        }`}
+                      >
+                        {fac.tag}
                       </p>
-
-                      {/* 4 Giant Metrics Chips */}
-                      <div className="grid grid-cols-4 gap-3">
-                        {fac.giantMetrics.map((gm, gIdx) => (
-                          <div
-                            key={gIdx}
-                            className="p-3 rounded-2xl border border-white/15 bg-black/50 backdrop-blur-xl text-center"
-                          >
-                            <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
-                              {gm.num}
-                            </span>
-                            <span className="block text-[11px] font-black text-white truncate mt-0.5">
-                              {gm.label}
-                            </span>
-                            <span className="block text-[10px] text-slate-300 truncate">
-                              {gm.sub}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Bottom CTA Row */}
-                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-                      <a
-                        href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d] to-[#042442] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/30 px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
-                      >
-                        <MapPin size={15} />
-                        <span>الموقع في Google Maps 📍</span>
-                      </a>
-                      <a
-                        href={campusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
-                        className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 text-white px-5 py-3 text-xs font-bold transition backdrop-blur-md"
-                      >
-                        <Phone size={14} />
-                        <span>{campusTab === "boys" ? "0148131652" : "0148644466"}</span>
-                      </a>
-                      <Button
-                        onClick={() => navigate("/admissions")}
-                        variant="outline"
-                        className="rounded-2xl text-xs font-black border-white/20 text-white hover:bg-white/10"
-                      >
-                        <CalendarCheck size={14} className="ml-1.5 text-[#f8ca14]" />
-                        <span>حجز جولة تعريفية VIP ✦</span>
-                      </Button>
                     </div>
                   </div>
-                ) : (
-                  /* Compressed Vertical Spine */
-                  <div className="relative z-10 h-full flex flex-col items-center justify-between py-8 select-none">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-black/70 border border-white/20 text-[#f8ca14] shadow-md backdrop-blur-md group-hover:border-[#f8ca14]/40 transition">
-                      <FacIcon size={20} />
-                    </div>
-                    <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 group-hover:text-[#f8ca14] transition">
-                      {fac.name}
-                    </span>
-                    <span className="text-[10px] font-bold text-[#f8ca14] bg-black/70 border border-[#f8ca14]/30 px-2.5 py-1 rounded-full backdrop-blur-md">
-                      ✦ انقر للعرض
-                    </span>
+
+                  <div className="shrink-0 flex items-center">
+                    <ChevronLeft
+                      size={18}
+                      className={`transition-transform duration-300 ${
+                        isActive
+                          ? "text-[#f8ca14] translate-x-[-3px]"
+                          : dark
+                          ? "text-slate-500 group-hover:text-slate-300"
+                          : "text-slate-400 group-hover:text-slate-700"
+                      }`}
+                    />
                   </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* 4. Mobile & Tablet Interactive Accordion */}
-        <div className="flex lg:hidden flex-col gap-3">
-          {facilities.map((fac, fIdx) => {
-            const FacIcon = fac.icon;
-            const isExpanded = activeFacilityIndex === fIdx;
-
-            return (
-              <div
-                key={fac.id}
-                onClick={() => setActiveFacilityIndex(fIdx)}
-                className={`rounded-3xl border overflow-hidden transition ${
-                  isExpanded
-                    ? "border-[#f8ca14]/60 bg-[#0c1815] shadow-xl p-4"
-                    : "border-white/10 bg-[#0b1015] p-3.5 cursor-pointer"
+          {/* LEFT COLUMN: Cinematic Showcase Stage & Specs Studio (7 cols, 58%) */}
+          <div className="lg:col-span-7 order-1 lg:order-2 w-full">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFac.id}
+                initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`rounded-[2.5rem] border shadow-2xl overflow-hidden transition-colors ${
+                  dark ? "border-white/15 bg-[#091218]/95" : "border-slate-200 bg-white"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/60 border border-white/15 text-[#f8ca14]">
-                      <FacIcon size={18} />
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-[#f8ca14] font-bold block">{fac.tag}</span>
-                      <h4 className="text-sm font-black text-white">{fac.name}</h4>
-                    </div>
+                {/* 1. Cinematic 16:9 Image Showcase (Completely clean, NO text covering students) */}
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black/40">
+                  <img
+                    src={activeFac.image}
+                    alt={activeFac.name}
+                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                  />
+                  {/* Subtle edge scrims */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+
+                  {/* Corner Status Badges */}
+                  <div className="absolute top-4 right-4 left-4 flex items-center justify-between pointer-events-none">
+                    <span className="rounded-xl bg-[#08467d]/90 border border-[#f8ca14]/40 px-3.5 py-1 text-xs font-black text-[#f8ca14] shadow-lg backdrop-blur-md">
+                      {activeFac.tag} ✦
+                    </span>
+                    <span className="rounded-xl bg-black/70 border border-white/20 px-3 py-1 text-xs font-bold text-white shadow-lg backdrop-blur-md flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>مرفق حي مجهز 100%</span>
+                    </span>
                   </div>
-                  <span className={`text-xs font-black transition-transform ${isExpanded ? "rotate-90 text-[#f8ca14]" : "text-slate-400"}`}>
-                    ❯
-                  </span>
                 </div>
 
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-4 pt-4 border-t border-white/10 space-y-4 text-right"
+                {/* 2. Clean Dedicated Story & Specs Body (Below the Photo) */}
+                <div className="p-6 sm:p-8 text-right">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#08467d]/20 text-[#08467d] dark:bg-[#f8ca14]/15 dark:text-[#f8ca14] border border-[#f8ca14]/30">
+                      <ActiveIcon size={20} />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-black text-[#f8ca14] block">
+                        {activeFac.badge}
+                      </span>
+                      <h3 className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                        {activeFac.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <p className={`text-xs sm:text-sm leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                    {activeFac.desc}
+                  </p>
+
+                  {/* 3. 4 Giant Metrics Cards (Clean separation) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mb-6">
+                    {activeFac.giantMetrics.map((gm, gIdx) => (
+                      <div
+                        key={gIdx}
+                        className={`p-3 rounded-2xl border text-center transition-all hover:scale-[1.02] ${
+                          dark ? "border-white/10 bg-black/50" : "border-slate-200 bg-slate-50 shadow-sm"
+                        }`}
+                      >
+                        <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
+                          {gm.num}
+                        </span>
+                        <span className={`block text-xs font-black truncate mt-0.5 ${dark ? "text-white" : "text-black"}`}>
+                          {gm.label}
+                        </span>
+                        <span className="block text-[10px] text-slate-400 truncate mt-0.5">
+                          {gm.sub}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 4. Action Buttons Row */}
+                  <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-white/10">
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d] to-[#042442] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/30 px-5 py-3 text-xs font-black shadow-lg transition active:scale-95"
                     >
-                      <div className="rounded-2xl overflow-hidden aspect-video relative">
-                        <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
-                      </div>
-                      <p className="text-xs leading-relaxed text-slate-300 font-medium">{fac.desc}</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {fac.giantMetrics.map((gm, gIdx) => (
-                          <div key={gIdx} className="p-2.5 rounded-xl border border-white/10 bg-black/40 text-center">
-                            <span className="block text-lg font-black text-[#f8ca14]">{gm.num}</span>
-                            <span className="block text-[10px] font-bold text-white">{gm.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                        <a
-                          href="https://www.google.com/maps/search/?api=1&query=Al+Aqiq+Schools+Al+Ranuna+Madinah"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-center py-2.5 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] text-white text-xs font-black"
-                        >
-                          الموقع في Google Maps 📍
-                        </a>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/admissions");
-                          }}
-                          variant="outline"
-                          className="text-xs font-black border-white/20 text-white"
-                        >
-                          حجز جولة تعريفية VIP ✦
-                        </Button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+                      <MapPin size={15} />
+                      <span>الموقع في Google Maps 📍</span>
+                    </a>
+
+                    <a
+                      href={campusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                      className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-xs font-bold transition backdrop-blur-md ${
+                        dark
+                          ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                          : "border-slate-200 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                      }`}
+                    >
+                      <Phone size={14} />
+                      <span>{campusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                    </a>
+
+                    <Button
+                      onClick={() => navigate("/admissions")}
+                      variant="outline"
+                      className={`rounded-2xl text-xs font-black border transition ${
+                        dark
+                          ? "border-white/20 text-white hover:bg-white/10"
+                          : "border-slate-300 text-slate-800 hover:bg-slate-100"
+                      }`}
+                    >
+                      <CalendarCheck size={14} className="ml-1.5 text-[#f8ca14]" />
+                      <span>حجز جولة تعريفية VIP ✦</span>
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>
