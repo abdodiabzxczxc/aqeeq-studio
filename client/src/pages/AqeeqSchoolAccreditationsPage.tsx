@@ -217,7 +217,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           cardShape="square"
           rowCount={2}
           header={
-            <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-8 sm:py-12">
+            <div className="w-full relative z-10 py-4 sm:py-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
@@ -477,7 +477,7 @@ export default function AqeeqSchoolAccreditationsPage() {
       ======================================================== */}
       <AqeeqScrollRevealSection scrollVh={70} neonLine={true} className="py-14 sm:py-20">
         <section ref={hubSectionRef} id="cognia-section" className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative">
-          <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="mb-12 text-right">
             <div
               className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
                 dark ? "text-[#f8ca14]" : "text-[#c59b27]"
@@ -551,7 +551,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           </div>
 
           {/* Dynamic Interactive Portal Showcase with 3D Perspective Scrubbing */}
-          <div className="max-w-6xl mx-auto">
+          <div className="w-full">
             <AnimatePresence mode="wait">
               {/* PORTAL 1: COGNIA USA */}
               {activeHubTab === "cognia" && (
@@ -1176,7 +1176,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           ref={pipelineSectionRef}
           className={`w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10`}
         >
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="mb-16 text-right">
             <div
               className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
                 dark ? "text-[#f8ca14]" : "text-[#c59b27]"
@@ -1244,7 +1244,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           </div>
 
           {/* Connected 4-Station Visual Future Pipeline with 3D Z-Depth Stagger */}
-          <div className="max-w-5xl mx-auto">
+          <div className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
               {/* Animated Connecting Energy Beam (Desktop) */}
               <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-white/10 -translate-y-1/2 z-0">
@@ -1463,7 +1463,7 @@ export default function AqeeqSchoolAccreditationsPage() {
         ======================================================== */}
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 mb-16">
           {/* Section Header (Compact) */}
-          <div className="text-center max-w-xl mx-auto mb-7">
+          <div className="mb-7 text-right">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 text-[11px] font-black text-[#f8ca14] mb-2 shadow-sm">
               <Radar size={13} className="animate-spin text-[#f8ca14]" style={{ animationDuration: "6s" }} />
               <span>مصفوفة الرصد الأكاديمي المباشر 2030</span>
@@ -1471,7 +1471,7 @@ export default function AqeeqSchoolAccreditationsPage() {
             <h3 className={`text-xl sm:text-2xl md:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
               رادار جاهزية ابنك: خارطة الاعتمادات المخصصة 🎯
             </h3>
-            <p className={`text-xs mt-1.5 leading-relaxed ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
+            <p className={`text-xs mt-1.5 leading-relaxed max-w-xl ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
               حدد مرحلة وطموح ابنك لتشاهد قفل الرادار التفاعلي على المسار المعتمد وشهاداته الدولية.
             </p>
           </div>
@@ -1484,7 +1484,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               scale: radarScale,
               transformStyle: "preserve-3d",
             }}
-            className={`max-w-4xl mx-auto rounded-[2rem] border shadow-2xl p-5 sm:p-7 relative overflow-hidden backdrop-blur-xl will-change-transform ${
+            className={`w-full rounded-[2rem] border shadow-2xl p-5 sm:p-7 relative overflow-hidden backdrop-blur-xl will-change-transform ${
               dark
                 ? "border-[#f8ca14]/30 bg-[#071118]/95 ring-1 ring-[#f8ca14]/20"
                 : "border-[#08467d]/20 bg-white shadow-xl"

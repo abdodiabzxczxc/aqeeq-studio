@@ -32,7 +32,7 @@ export function AqeeqGrandFinaleCta({
   const dark = theme === "dark";
 
   return (
-    <div className="relative mx-auto my-16 sm:my-28 max-w-[1240px] px-4 sm:px-6 md:px-8">
+    <div className="relative mx-auto my-16 sm:my-28 max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
       <div
         className={`relative overflow-hidden rounded-[2.5rem] sm:rounded-[3.5rem] border p-8 sm:p-14 md:p-16 text-center shadow-2xl backdrop-blur-2xl transition-all duration-500 ${
           isNationalDay

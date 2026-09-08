@@ -1117,7 +1117,7 @@ export default function AqeeqSchoolAboutPage() {
           STAGE 1: The 30-Year Legacy Time Machine (Scroll-Driven Parallax + Luminous Conduit)
       ======================================================== */}
       <section ref={timelineSectionRef} id="timeline-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="mb-10 text-right">
           <div
             className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
               dark ? "text-[#f8ca14]" : "text-[#c59b27]"
@@ -1193,7 +1193,7 @@ export default function AqeeqSchoolAboutPage() {
             scale: isDesktop ? timelineScale : 1,
             transformPerspective: 1200,
           }}
-          className={`max-w-5xl mx-auto rounded-[2.5rem] border p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden transition-colors duration-300 will-change-transform ${
+          className={`w-full rounded-[2.5rem] border p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden transition-colors duration-300 will-change-transform ${
             dark ? "border-emerald-500/20 bg-[#0c1218]/90" : "border-emerald-700/20 bg-white/95"
           }`}
         >
@@ -1338,7 +1338,7 @@ export default function AqeeqSchoolAboutPage() {
 
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+          <div className="mb-10 sm:mb-12 text-right">
             <div className="inline-flex items-center gap-2 text-xs font-black text-[#f8ca14] mb-2">
               <Building2 size={15} />
               <span>✦ الصروح والمجمعات التعليمية النموذجية · حي الرانوناء ✦</span>
@@ -1417,7 +1417,7 @@ export default function AqeeqSchoolAboutPage() {
           {/* ========================================================
               ARCHITECTURAL EXPANDING ACCORDION (الستارة المعمارية)
           ======================================================== */}
-          <div className="max-w-6xl mx-auto">
+          <div className="w-full">
             {/* Desktop Expanding Panels (5 side-by-side columns) */}
             <div className="hidden lg:flex h-[580px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-[#08467d]/30">
               {currentFacilities.map((fac, fIdx) => {
@@ -1640,7 +1640,7 @@ export default function AqeeqSchoolAboutPage() {
       ======================================================== */}
       <section ref={visionSectionRef} id="vision-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div
-          className={`max-w-5xl mx-auto rounded-[3rem] border p-5 sm:p-10 md:p-14 shadow-2xl relative overflow-hidden ${
+          className={`w-full rounded-[3rem] border p-5 sm:p-10 md:p-14 shadow-2xl relative overflow-hidden ${
             dark
               ? "border-emerald-500/30 bg-gradient-to-b from-[#0c141a] to-[#060a0e] ring-1 ring-emerald-500/20"
               : "border-emerald-700/20 bg-gradient-to-b from-white to-[#fbfaf8] ring-1 ring-emerald-900/10 shadow-xl"
@@ -1650,7 +1650,7 @@ export default function AqeeqSchoolAboutPage() {
           <div className="pointer-events-none absolute -top-24 right-1/4 w-80 h-80 bg-[#08467d]/10 rounded-full blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 left-1/4 w-80 h-80 bg-[#f8ca14]/10 rounded-full blur-3xl" />
 
-          <div className="text-center max-w-xl mx-auto mb-12 relative z-10">
+          <div className="mb-12 relative z-10 text-right">
             <div
               className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-black mb-3 border ${
                 isNationalDay
@@ -1729,7 +1729,7 @@ export default function AqeeqSchoolAboutPage() {
         }`}
       >
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="mb-16 text-right">
             <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"} mb-2`}>
               <Sparkles size={14} />
               <span>ركائز مسيرة العقيق</span>
@@ -1766,7 +1766,7 @@ export default function AqeeqSchoolAboutPage() {
           STAGE 5: Medina Interactive Map & Campus Logistics (Live Radar)
       ======================================================== */}
       <section id="map-contact-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
+        <div className="mb-14 text-right">
           <div className="inline-flex items-center gap-2 text-xs font-black text-[#08467d] dark:text-[#f8ca14] mb-2">
             <MapPin size={14} />
             <span>الموقع الجغرافي والوصول المباشر</span>
@@ -1779,7 +1779,7 @@ export default function AqeeqSchoolAboutPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch w-full">
           {/* Map Preview & Transportation Coverage Card (7 cols) */}
           <div
             className={`lg:col-span-7 rounded-3xl border p-5 sm:p-8 flex flex-col justify-between shadow-xl ${

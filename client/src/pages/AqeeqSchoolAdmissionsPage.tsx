@@ -695,7 +695,7 @@ export default function AqeeqSchoolAdmissionsPage() {
 
       {/* Tuition Fees & Calculator Section */}
       <section id="tuition-fees-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="mb-12 text-right">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
             <Calculator size={14} />
             <span>الشفافية والمرونة المالية والخصومات</span>
@@ -1358,20 +1358,21 @@ export default function AqeeqSchoolAdmissionsPage() {
 
       {/* Admission Online Form Section */}
       <section id="admission-form-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
+        <div className="mb-10 text-right">
+          <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
+            <Send size={14} />
+            <span>التسجيل الإلكتروني السريع</span>
+          </div>
+          <h2 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>نموذج حجز مقعد دراسي</h2>
+          <p className={`text-xs sm:text-sm mt-2 max-w-2xl ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
+            املأ النموذج وسيتصل بك أحد مسؤولي القبول خلال 24 ساعة للرد على استفساراتكم وتأكيد المقابلة.
+          </p>
+        </div>
+
         <div className="max-w-4xl mx-auto">
           <div className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl backdrop-blur-xl ${
             dark ? "border-[#f8ca14]/20 bg-[#0c1218]/90" : "border-[#08467d]/20 bg-white/95"
           }`}>
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <div className={`inline-flex items-center gap-2 text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
-                <Send size={14} />
-                <span>التسجيل الإلكتروني السريع</span>
-              </div>
-              <h2 className={`text-2xl sm:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>نموذج حجز مقعد دراسي</h2>
-              <p className={`text-xs sm:text-sm mt-2 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-                املأ النموذج وسيتصل بك أحد مسؤولي القبول خلال 24 ساعة للرد على استفساراتكم وتأكيد المقابلة.
-              </p>
-            </div>
 
             {submitted ? (
               <div className="text-center py-12">
