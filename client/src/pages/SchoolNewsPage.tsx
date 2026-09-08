@@ -365,78 +365,10 @@ export default function SchoolNewsPage() {
             items={unfurlingGalleryItems}
             dark={dark}
             header={
-              <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-16">
-                {/* Cover perspective on left in RTL */}
-                <div className="relative order-2 mx-auto h-[340px] w-full max-w-[540px] md:order-1 md:h-[450px]">
-                  {secondIssue ? (
-                    <button
-                      onClick={() => navigate(`/journal/${secondIssue.slug}`)}
-                      className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition hover:opacity-90 ${
-                        isNationalDay
-                          ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]" : "border-[#08467d]/20 bg-white"
-                          : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-                      }`}
-                      style={{ transform: "rotate(-7deg)" }}
-                      aria-label={`العدد السابق: ${secondIssue.title}`}
-                    >
-                      {secondIssue.coverUrl ? (
-                        <VisualImage
-                          id={`journal-hero-previous-cover-${secondIssue.id}`}
-                          label="غلاف العدد السابق"
-                          src={directDriveImage(secondIssue.coverUrl) || secondIssue.coverUrl}
-                          alt=""
-                          className="h-full w-full rounded-[1.2rem] object-cover"
-                        />
-                      ) : null}
-                    </button>
-                  ) : null}
-
-                  <button
-                    onClick={() => navigate(`/journal/${featuredIssue.slug}`)}
-                    className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition hover:scale-[1.02] ${
-                      isNationalDay
-                        ? dark
-                          ? "border-[#f8ca14]/70 bg-[#0c1218] shadow-[0_20px_50px_rgba(8,70,125,0.4)]"
-                          : "border-[#08467d]/30 bg-white shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
-                        : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
-                    }`}
-                    style={{ transform: "rotate(3deg)" }}
-                    aria-label={`العدد الحالي: ${featuredIssue.title}`}
-                  >
-                    <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-                      {featuredIssue.coverUrl ? (
-                        <VisualImage
-                          id={`journal-hero-current-cover-${featuredIssue.id}`}
-                          label="غلاف العدد الحالي"
-                          src={directDriveImage(featuredIssue.coverUrl) || featuredIssue.coverUrl}
-                          alt={`غلاف ${featuredIssue.title}`}
-                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"}`}>
-                          <Newspaper size={42} />
-                        </div>
-                      )}
-
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16">
-                        <span className="text-[10px] font-black text-[#f8ca14]">
-                          {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
-                        </span>
-                        <VisualEditable
-                          id="journal-hero-featured-title"
-                          tag="text"
-                          label="عنوان غلاف العدد الحالي"
-                          defaultText={featuredIssue.title}
-                          as="h2"
-                          className="mt-1 text-lg font-black text-white"
-                        />
-                      </div>
-                    </div>
-                  </button>
-                </div>
-
+              <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
+                {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
                 {/* Text info */}
-                <div className="order-1 md:order-2 text-right relative z-10">
+                <div className="text-right relative z-10">
                   {/* Ambient soft dark contrast scrim behind text for 100% crystal clear readability */}
                   <div
                     aria-hidden="true"
@@ -556,6 +488,76 @@ export default function SchoolNewsPage() {
                       </button>
                     ) : null}
                   </div>
+                </div>
+
+                {/* Left Column: Cover perspective (Second in RTL DOM order -> ends at left guideline 62px) */}
+                {/* Cover perspective on left in RTL */}
+                <div className="relative mx-auto h-[340px] w-full max-w-[540px] md:h-[450px]">
+                  {secondIssue ? (
+                    <button
+                      onClick={() => navigate(`/journal/${secondIssue.slug}`)}
+                      className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition hover:opacity-90 ${
+                        isNationalDay
+                          ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]" : "border-[#08467d]/20 bg-white"
+                          : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                      }`}
+                      style={{ transform: "rotate(-7deg)" }}
+                      aria-label={`العدد السابق: ${secondIssue.title}`}
+                    >
+                      {secondIssue.coverUrl ? (
+                        <VisualImage
+                          id={`journal-hero-previous-cover-${secondIssue.id}`}
+                          label="غلاف العدد السابق"
+                          src={directDriveImage(secondIssue.coverUrl) || secondIssue.coverUrl}
+                          alt=""
+                          className="h-full w-full rounded-[1.2rem] object-cover"
+                        />
+                      ) : null}
+                    </button>
+                  ) : null}
+
+                  <button
+                    onClick={() => navigate(`/journal/${featuredIssue.slug}`)}
+                    className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition hover:scale-[1.02] ${
+                      isNationalDay
+                        ? dark
+                          ? "border-[#f8ca14]/70 bg-[#0c1218] shadow-[0_20px_50px_rgba(8,70,125,0.4)]"
+                          : "border-[#08467d]/30 bg-white shadow-[0_20px_50px_rgba(8,70,125,0.15)]"
+                        : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                    }`}
+                    style={{ transform: "rotate(3deg)" }}
+                    aria-label={`العدد الحالي: ${featuredIssue.title}`}
+                  >
+                    <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                      {featuredIssue.coverUrl ? (
+                        <VisualImage
+                          id={`journal-hero-current-cover-${featuredIssue.id}`}
+                          label="غلاف العدد الحالي"
+                          src={directDriveImage(featuredIssue.coverUrl) || featuredIssue.coverUrl}
+                          alt={`غلاف ${featuredIssue.title}`}
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"}`}>
+                          <Newspaper size={42} />
+                        </div>
+                      )}
+
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent px-4 pb-4 pt-16">
+                        <span className="text-[10px] font-black text-[#f8ca14]">
+                          {featuredIssue.pageCount} صفحات · {featuredIssue.issueDate}
+                        </span>
+                        <VisualEditable
+                          id="journal-hero-featured-title"
+                          tag="text"
+                          label="عنوان غلاف العدد الحالي"
+                          defaultText={featuredIssue.title}
+                          as="p"
+                          className="mt-1 text-lg font-black text-white"
+                        />
+                      </div>
+                    </div>
+                  </button>
                 </div>
               </div>
             }

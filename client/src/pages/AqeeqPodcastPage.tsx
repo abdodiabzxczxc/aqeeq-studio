@@ -477,110 +477,10 @@ export default function AqeeqPodcastPage() {
             containerRef={podcastHeroRef}
           />
 
-          <div className="relative z-10 mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-14">
-            {/* 3D Tilted Dual-Cover on left (order-2 md:order-1) */}
-            <div className="relative order-2 mx-auto h-[280px] sm:h-[340px] w-full max-w-[560px] md:order-1 md:h-[440px]">
-              {secondPodcast ? (
-                <button
-                  onClick={() => handlePlayOrOpen(secondPodcast)}
-                  className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
-                    isNationalDay
-                      ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
-                      : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-                  }`}
-                  style={{ transform: "rotate(-7deg)" }}
-                  aria-label={`الحلقة السابقة: ${secondPodcast.title}`}
-                >
-                  {secondPodcast.coverUrl ? (
-                    <img
-                      src={directDriveImage(secondPodcast.coverUrl) || secondPodcast.coverUrl}
-                      alt=""
-                      className="h-full w-full rounded-[1.2rem] object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
-                      <Mic size={30} className="text-slate-400" />
-                      <div>
-                        <span className="text-[10px] font-black text-[#f8ca14]">{secondPodcast.category}</span>
-                        <p className="line-clamp-2 text-xs font-black text-white">{secondPodcast.title}</p>
-                      </div>
-                    </div>
-                  )}
-                </button>
-              ) : null}
-
-              {featuredPodcast ? (
-                <button
-                  onClick={() => handlePlayOrOpen(featuredPodcast)}
-                  className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
-                    (activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying
-                      ? "border-[#f8ca14] ring-2 ring-[#f8ca14]/50 bg-[#161616]"
-                      : isNationalDay
-                      ? dark
-                        ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                        : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
-                      : dark
-                      ? "border-[#f8ca14]/50 bg-[#111111]"
-                      : "border-[#08467d]/30 bg-white"
-                  }`}
-                  style={{ transform: "rotate(3deg)" }}
-                  aria-label={`الحلقة الحالية: ${featuredPodcast.title}`}
-                >
-                  <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-                    {featuredPodcast.coverUrl ? (
-                      <div className="relative h-full w-full">
-                        <img
-                          src={directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl}
-                          alt={`غلاف ${featuredPodcast.title}`}
-                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                        />
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <div className="grid h-16 w-16 place-items-center rounded-full bg-[#f8ca14] text-black shadow-2xl transition group-hover:scale-110">
-                            {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? (
-                              <Pause size={28} />
-                            ) : (
-                              <Play size={28} className="mr-0.5" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={`flex h-full flex-col justify-between p-6 text-right ${
-                          dark
-                            ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
-                            : isNationalDay
-                            ? "bg-emerald-50 text-[#005A36]"
-                            : "bg-slate-100 text-[#08467d]"
-                        }`}
-                      >
-                        <Mic size={42} />
-                        <div>
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
-                            <Sparkles size={11} /> بودكاست مميز
-                          </span>
-                          <h2 className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
-                            {featuredPodcast.title}
-                          </h2>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
-                      <span className="text-[10px] font-black text-[#f8ca14]">
-                        {featuredPodcast.category} · {featuredPodcast.hostName || "استوديو أثير"}
-                      </span>
-                      <h2 className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
-                        {featuredPodcast.title}
-                      </h2>
-                    </div>
-                  </div>
-                </button>
-              ) : null}
-            </div>
-
+          <div className="relative z-10 mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-14">
+            {/* Right Column: Title, Kicker, Desc, Stats, CTA Buttons (First in RTL DOM order -> starts at right guideline 1378px) */}
             {/* Right Column: Title, Kicker, Desc, Stats, CTA Buttons (order-1 md:order-2) */}
-            <div className="order-1 md:order-2 text-right">
+            <div className="text-right">
               <VisualEditable
                 id="podcast-hero-kicker"
                 tag="text"
@@ -727,6 +627,108 @@ export default function AqeeqPodcastPage() {
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* Left Column: 3D Tilted Dual-Cover on left (Second in RTL DOM order -> ends at left guideline 62px) */}
+            {/* 3D Tilted Dual-Cover on left (order-2 md:order-1) */}
+            <div className="relative mx-auto h-[280px] sm:h-[340px] w-full max-w-[560px] md:h-[440px]">
+              {secondPodcast ? (
+                <button
+                  onClick={() => handlePlayOrOpen(secondPodcast)}
+                  className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
+                    isNationalDay
+                      ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                      : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                  }`}
+                  style={{ transform: "rotate(-7deg)" }}
+                  aria-label={`الحلقة السابقة: ${secondPodcast.title}`}
+                >
+                  {secondPodcast.coverUrl ? (
+                    <img
+                      src={directDriveImage(secondPodcast.coverUrl) || secondPodcast.coverUrl}
+                      alt=""
+                      className="h-full w-full rounded-[1.2rem] object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
+                      <Mic size={30} className="text-slate-400" />
+                      <div>
+                        <span className="text-[10px] font-black text-[#f8ca14]">{secondPodcast.category}</span>
+                        <p className="line-clamp-2 text-xs font-black text-white">{secondPodcast.title}</p>
+                      </div>
+                    </div>
+                  )}
+                </button>
+              ) : null}
+
+              {featuredPodcast ? (
+                <button
+                  onClick={() => handlePlayOrOpen(featuredPodcast)}
+                  className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
+                    (activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying
+                      ? "border-[#f8ca14] ring-2 ring-[#f8ca14]/50 bg-[#161616]"
+                      : isNationalDay
+                      ? dark
+                        ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                        : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                      : dark
+                      ? "border-[#f8ca14]/50 bg-[#111111]"
+                      : "border-[#08467d]/30 bg-white"
+                  }`}
+                  style={{ transform: "rotate(3deg)" }}
+                  aria-label={`الحلقة الحالية: ${featuredPodcast.title}`}
+                >
+                  <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                    {featuredPodcast.coverUrl ? (
+                      <div className="relative h-full w-full">
+                        <img
+                          src={directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl}
+                          alt={`غلاف ${featuredPodcast.title}`}
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                        />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <div className="grid h-16 w-16 place-items-center rounded-full bg-[#f8ca14] text-black shadow-2xl transition group-hover:scale-110">
+                            {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? (
+                              <Pause size={28} />
+                            ) : (
+                              <Play size={28} className="mr-0.5" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className={`flex h-full flex-col justify-between p-6 text-right ${
+                          dark
+                            ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
+                            : isNationalDay
+                            ? "bg-emerald-50 text-[#005A36]"
+                            : "bg-slate-100 text-[#08467d]"
+                        }`}
+                      >
+                        <Mic size={42} />
+                        <div>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
+                            <Sparkles size={11} /> بودكاست مميز
+                          </span>
+                          <p className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
+                            {featuredPodcast.title}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
+                      <span className="text-[10px] font-black text-[#f8ca14]">
+                        {featuredPodcast.category} · {featuredPodcast.hostName || "استوديو أثير"}
+                      </span>
+                      <p className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
+                        {featuredPodcast.title}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ) : null}
             </div>
           </div>
         </section>

@@ -993,40 +993,8 @@ function UnifiedShowcaseHero({
       items={showcaseUnfurlingItems}
       dark={dark}
       header={
-        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1fr_1.1fr] md:py-12 lg:gap-16 relative z-10">
-        <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
-          {previousPost ? (
-            <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
-              isNationalDay
-                ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
-                : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-            }`} style={{ transform: "rotate(-7deg)" }}>
-              <VisualBackground id={`showcase-hero-previous-cover-${previousPost.id}`} label="الصورة الخلفية لغلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(previousPost) || "/covers/cover-about.jpg"} alt="" className="h-full w-full rounded-[1.12rem]" />
-            </div>
-          ) : null}
-          <div className={`group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
-            isNationalDay
-              ? dark
-                ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
-              : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
-          }`} style={{ transform: "rotate(3deg)" }}>
-            <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-              {newestPost ? (
-                <ShowcaseHeroCover post={newestPost} className="transition duration-700 group-hover:scale-[1.03]" />
-              ) : (
-                <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
-                  <VisualIcon id="showcase-cover-empty-icon" label="أيقونة غلاف الأخبار الفارغ" icon="sparkles" size={42} />
-                </div>
-              )}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/45 to-transparent px-4 pb-4 pt-16">
-                <span className="text-[10px] font-black text-[#f8ca14]">{posts.length} منشور</span>
-                <VisualEditable id="showcase-cover-title" tag="text" label="عنوان غلاف الأخبار" defaultText={showcase.title} as="h2" className="mt-1 text-lg font-black text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="order-1 md:order-2">
+        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16 relative z-10">
+        <div className="text-right relative z-10">
           {isNationalDay ? (
             <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
               dark
@@ -1099,6 +1067,38 @@ function UnifiedShowcaseHero({
                 <VisualIcon id="showcase-sound-icon" label="أيقونة موسيقى الأخبار" icon="send" className="ml-2" size={16} />{soundEnabled ? "إيقاف الموسيقى" : "تشغيل الموسيقى"}
               </VisualEditable>
             ) : null}
+          </div>
+        </div>
+        <div className="relative mx-auto h-[370px] w-full max-w-[580px] md:h-[470px]">
+          {previousPost ? (
+            <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
+              isNationalDay
+                ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+            }`} style={{ transform: "rotate(-7deg)" }}>
+              <VisualBackground id={`showcase-hero-previous-cover-${previousPost.id}`} label="الصورة الخلفية لغلاف الأخبار والعروض" src={getAqeeqShowcaseDisplaySource(previousPost) || "/covers/cover-about.jpg"} alt="" className="h-full w-full rounded-[1.12rem]" />
+            </div>
+          ) : null}
+          <div className={`group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl ${
+            isNationalDay
+              ? dark
+                ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+              : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+          }`} style={{ transform: "rotate(3deg)" }}>
+            <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+              {newestPost ? (
+                <ShowcaseHeroCover post={newestPost} className="transition duration-700 group-hover:scale-[1.03]" />
+              ) : (
+                <div className={`grid h-full place-items-center ${dark ? "bg-[#181818] text-[#f8ca14]" : isNationalDay ? "bg-emerald-50 text-[#005A36]" : "bg-slate-100 text-[#08467d]"}`}>
+                  <VisualIcon id="showcase-cover-empty-icon" label="أيقونة غلاف الأخبار الفارغ" icon="sparkles" size={42} />
+                </div>
+              )}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/45 to-transparent px-4 pb-4 pt-16">
+                <span className="text-[10px] font-black text-[#f8ca14]">{posts.length} منشور</span>
+                <VisualEditable id="showcase-cover-title" tag="text" label="عنوان غلاف الأخبار" defaultText={showcase.title} as="p" className="mt-1 text-lg font-black text-white" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

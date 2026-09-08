@@ -2132,7 +2132,7 @@ html.light .aq-public-shell { background: #f8fafc !important; color: #0f172a !im
 [data-visual-id="albums-hero-title"] { display: block; max-width: 15ch; }
 
 /* أخبار وعروض العقيق تتبع إيقاع عنوان ورف مجلة وألبوم العقيق، بينما تبقى خلاصة المنشورات متعددة الوسائط. */
-#aqeeq-showcase-feed { max-width: 1320px; }
+#aqeeq-showcase-feed { max-width: 1380px; }
 #aqeeq-showcase-feed > div:first-child { flex-wrap: nowrap; }
 #aqeeq-showcase-feed > div:first-child h2 { font-size: 1.5rem; }
 #aqeeq-showcase-feed > div:first-child h2 span { color: inherit !important; }

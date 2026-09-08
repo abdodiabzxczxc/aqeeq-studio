@@ -437,95 +437,10 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             containerRef={articlesHeroRef}
           />
 
-        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
-          {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
-          <div className="relative order-2 mx-auto h-[360px] w-full max-w-[580px] md:order-1 md:h-[470px]">
-            {secondArticle ? (
-              <button
-                onClick={() => setReadingArticle(secondArticle)}
-                className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
-                  isNationalDay
-                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
-                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
-                }`}
-                style={{ transform: "rotate(-7deg)" }}
-                aria-label={`المقال السابق: ${secondArticle.title}`}
-              >
-                {secondArticle.coverUrl ? (
-                  <img
-                    src={directDriveImage(secondArticle.coverUrl) || secondArticle.coverUrl}
-                    alt=""
-                    className="h-full w-full rounded-[1.2rem] object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
-                    <BookOpen size={30} className="text-slate-400" />
-                    <div>
-                      <span className="text-[10px] font-black text-[#f8ca14]">{secondArticle.category}</span>
-                      <p className="line-clamp-2 text-xs font-black text-white">{secondArticle.title}</p>
-                    </div>
-                  </div>
-                )}
-              </button>
-            ) : null}
-
-            {featuredArticle ? (
-              <button
-                onClick={() => setReadingArticle(featuredArticle)}
-                className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
-                  isNationalDay
-                    ? dark
-                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
-                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
-                    : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
-                }`}
-                style={{ transform: "rotate(3deg)" }}
-                aria-label={`المقال الحالي: ${featuredArticle.title}`}
-              >
-                <div className="relative h-full overflow-hidden rounded-[1.35rem]">
-                  {featuredArticle.coverUrl ? (
-                    <img
-                      src={directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl}
-                      alt={`غلاف ${featuredArticle.title}`}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div
-                      className={`flex h-full flex-col justify-between p-6 text-right ${
-                        dark
-                          ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
-                          : isNationalDay
-                          ? "bg-emerald-50 text-[#005A36]"
-                          : "bg-slate-100 text-[#08467d]"
-                      }`}
-                    >
-                      <BookOpen size={42} />
-                      <div>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
-                          <Sparkles size={11} /> مقال مميز
-                        </span>
-                        <h2 className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
-                          {featuredArticle.title}
-                        </h2>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
-                    <span className="text-[10px] font-black text-[#f8ca14]">
-                      {featuredArticle.category} · بقلم: {featuredArticle.authorName}
-                    </span>
-                    <h2 className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
-                      {featuredArticle.title}
-                    </h2>
-                  </div>
-                </div>
-              </button>
-            ) : null}
-          </div>
-
+        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(390px,.9fr)] md:py-16 lg:gap-16">
+          {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
           {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
-          <div className="order-1 md:order-2 text-right">
+          <div className="text-right">
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                 dark
@@ -652,6 +567,93 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Left Column: 3D Tilted Dual-Cover on left in RTL (Second in RTL DOM order -> ends at left guideline 62px) */}
+          {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
+          <div className="relative mx-auto h-[360px] w-full max-w-[580px] md:h-[470px]">
+            {secondArticle ? (
+              <button
+                onClick={() => setReadingArticle(secondArticle)}
+                className={`absolute left-[4%] top-[5%] h-[80%] w-[58%] overflow-hidden rounded-[1.7rem] border p-2 opacity-65 shadow-2xl transition duration-300 hover:scale-105 hover:opacity-100 ${
+                  isNationalDay
+                    ? dark ? "border-emerald-500/20 bg-[#001c10]" : "border-emerald-500/20 bg-white"
+                    : dark ? "border-white/[0.1] bg-[#111111]" : "border-black/[0.08] bg-[#f0f0f0]"
+                }`}
+                style={{ transform: "rotate(-7deg)" }}
+                aria-label={`المقال السابق: ${secondArticle.title}`}
+              >
+                {secondArticle.coverUrl ? (
+                  <img
+                    src={directDriveImage(secondArticle.coverUrl) || secondArticle.coverUrl}
+                    alt=""
+                    className="h-full w-full rounded-[1.2rem] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col justify-between rounded-[1.2rem] bg-gradient-to-br from-white/5 to-transparent p-5 text-right">
+                    <BookOpen size={30} className="text-slate-400" />
+                    <div>
+                      <span className="text-[10px] font-black text-[#f8ca14]">{secondArticle.category}</span>
+                      <p className="line-clamp-2 text-xs font-black text-white">{secondArticle.title}</p>
+                    </div>
+                  </div>
+                )}
+              </button>
+            ) : null}
+
+            {featuredArticle ? (
+              <button
+                onClick={() => setReadingArticle(featuredArticle)}
+                className={`group absolute bottom-1 right-[5%] h-[90%] w-[68%] overflow-hidden rounded-[1.85rem] border p-2 shadow-2xl transition duration-300 hover:scale-[1.02] ${
+                  isNationalDay
+                    ? dark
+                      ? "border-[#f8ca14]/70 bg-[#001f13] shadow-[0_20px_50px_rgba(0,90,54,0.4)]"
+                      : "border-emerald-500/50 bg-white shadow-[0_20px_50px_rgba(0,90,54,0.15)]"
+                    : dark ? "border-[#f8ca14]/50 bg-[#111111]" : "border-[#08467d]/30 bg-white"
+                }`}
+                style={{ transform: "rotate(3deg)" }}
+                aria-label={`المقال الحالي: ${featuredArticle.title}`}
+              >
+                <div className="relative h-full overflow-hidden rounded-[1.35rem]">
+                  {featuredArticle.coverUrl ? (
+                    <img
+                      src={directDriveImage(featuredArticle.coverUrl) || featuredArticle.coverUrl}
+                      alt={`غلاف ${featuredArticle.title}`}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div
+                      className={`flex h-full flex-col justify-between p-6 text-right ${
+                        dark
+                          ? "bg-gradient-to-br from-[#1c1500] via-[#0f0f0f] to-black text-[#f8ca14]"
+                          : isNationalDay
+                          ? "bg-emerald-50 text-[#005A36]"
+                          : "bg-slate-100 text-[#08467d]"
+                      }`}
+                    >
+                      <BookOpen size={42} />
+                      <div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8ca14] px-2.5 py-0.5 text-[10px] font-black text-black">
+                          <Sparkles size={11} /> مقال مميز
+                        </span>
+                        <p className="mt-2 text-xl font-black leading-snug text-white line-clamp-3">
+                          {featuredArticle.title}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent px-4 pb-4 pt-16 text-right">
+                    <span className="text-[10px] font-black text-[#f8ca14]">
+                      {featuredArticle.category} · بقلم: {featuredArticle.authorName}
+                    </span>
+                    <p className="mt-1 text-base sm:text-lg font-black text-white line-clamp-2">
+                      {featuredArticle.title}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            ) : null}
           </div>
         </div>
       </section>
