@@ -231,73 +231,86 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           align="right"
         />
 
-        {/* 2. Campus Switcher Tabs (Boys vs Girls) */}
-        <div className="flex justify-start mb-8">
-          <div
-            className={`inline-flex items-center rounded-2xl border p-1 sm:p-1.5 shadow-sm transition overflow-hidden ${
-              dark ? "border-white/10 bg-[#0c141a]" : "border-slate-200/90 bg-slate-50"
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setCampusTab("boys");
-                setActiveFacilityIndex(0);
-                setActiveHotspot(null);
-              }}
-              className={`relative z-10 rounded-xl px-4 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
-                campusTab === "boys"
-                  ? "text-[#f8ca14]"
-                  : dark
-                  ? "text-slate-400 hover:text-white"
-                  : "text-slate-600 hover:text-[#08467d]"
-              }`}
-            >
-              {campusTab === "boys" && (
-                <motion.div
-                  layoutId="campusActiveTab"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-2">
-                <span>مجمع البنين (الأهلي والدولي)</span>
-                <span>🎓</span>
-              </span>
-            </button>
+        {/* ========================================================
+            UNIFIED ARCHITECTURAL ACCORDION STUDIO SHELL
+            (Integrated Campus Switcher + Expanding Accordion)
+        ======================================================== */}
+        <div
+          className={`rounded-[2.5rem] border p-3 sm:p-5 backdrop-blur-2xl shadow-2xl relative transition-all ${
+            dark
+              ? "bg-[#091218]/95 border-[#08467d]/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
+              : "bg-slate-900 border-[#08467d]/30 text-white shadow-2xl"
+          }`}
+        >
+          {/* 2. Integrated Control Header Bar inside the container */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-white/10">
+            {/* Campus Switcher Pills - Embedded inside the shell */}
+            <div className="inline-flex items-center rounded-2xl border border-white/15 bg-black/50 p-1 sm:p-1.5 shadow-inner backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => {
+                  setCampusTab("boys");
+                  setActiveFacilityIndex(0);
+                  setActiveHotspot(null);
+                }}
+                className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
+                  campusTab === "boys"
+                    ? "text-[#f8ca14]"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                {campusTab === "boys" && (
+                  <motion.div
+                    layoutId="campusActiveTab"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <span>مجمع البنين (الأهلي والدولي)</span>
+                  <span>🦅</span>
+                </span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setCampusTab("girls");
-                setActiveFacilityIndex(0);
-                setActiveHotspot(null);
-              }}
-              className={`relative z-10 rounded-xl px-4 sm:px-8 py-2.5 text-xs sm:text-sm font-black transition active:scale-95 ${
-                campusTab === "girls"
-                  ? "text-[#f8ca14]"
-                  : dark
-                  ? "text-slate-400 hover:text-white"
-                  : "text-slate-600 hover:text-[#08467d]"
-              }`}
-            >
-              {campusTab === "girls" && (
-                <motion.div
-                  layoutId="campusActiveTab"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-2">
-                <span>مجمع البنات والطفولة المبكرة</span>
-                <span>🌸</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCampusTab("girls");
+                  setActiveFacilityIndex(0);
+                  setActiveHotspot(null);
+                }}
+                className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
+                  campusTab === "girls"
+                    ? "text-[#f8ca14]"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                {campusTab === "girls" && (
+                  <motion.div
+                    layoutId="campusActiveTab"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
+                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <span>مجمع البنات والطفولة المبكرة</span>
+                  <span>🌸</span>
+                </span>
+              </button>
+            </div>
+
+            {/* Live Indicator & Quick Location Info */}
+            <div className="hidden sm:flex items-center gap-3 text-xs font-bold text-slate-300">
+              <span className="flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                <span className="text-[#f8ca14] font-black">5 مرافق نموذجية مجهزة</span>
               </span>
-            </button>
+              <span className="text-slate-300">حي الرانوناء · ممشى الهجرة 📍</span>
+            </div>
           </div>
-        </div>
 
-        {/* 3. Desktop Expanding Architectural Accordion (5 Columns) */}
-        <div className="hidden lg:flex h-[600px] gap-3 p-3 rounded-[2.5rem] border overflow-hidden backdrop-blur-2xl shadow-2xl relative bg-[#091218]/90 border-[#08467d]/30">
+          {/* 3. Desktop Expanding Architectural Accordion (5 Columns) */}
+          <div className="hidden lg:flex h-[580px] gap-3 relative">
           {facilities.map((fac, fIdx) => {
             const FacIcon = fac.icon;
             const isExpanded = activeFacilityIndex === fIdx;
@@ -555,6 +568,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
               </div>
             );
           })}
+        </div>
         </div>
       </div>
     </section>
