@@ -11,9 +11,7 @@ import {
   Phone,
   CalendarCheck,
   ChevronLeft,
-  Eye,
   Layers,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
@@ -203,7 +201,6 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
   const [, navigate] = useLocation();
   const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
 
   const facilities = campusTab === "boys" ? BOYS_FACILITIES : GIRLS_FACILITIES;
   const activeFac = facilities[activeFacilityIndex] || facilities[0];
@@ -255,7 +252,6 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 onClick={() => {
                   setCampusTab("boys");
                   setActiveFacilityIndex(0);
-                  setActiveHotspot(null);
                 }}
                 className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
                   campusTab === "boys"
@@ -283,7 +279,6 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 onClick={() => {
                   setCampusTab("girls");
                   setActiveFacilityIndex(0);
-                  setActiveHotspot(null);
                 }}
                 className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
                   campusTab === "girls"
@@ -339,7 +334,6 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 onClick={() => {
                   if (!isExpanded) {
                     setActiveFacilityIndex(fIdx);
-                    setActiveHotspot(null);
                   }
                 }}
                 className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
@@ -368,51 +362,6 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       : "bg-black/75 group-hover:bg-black/60"
                   }`}
                 />
-
-                {/* Hotspots overlay if expanded */}
-                {isExpanded && fac.hotspots && (
-                  <div className="absolute inset-0 pointer-events-auto z-20">
-                    {fac.hotspots.map((hs) => (
-                      <div
-                        key={hs.id}
-                        style={{ top: hs.top, left: hs.left }}
-                        className="absolute group/pin"
-                      >
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveHotspot(activeHotspot === hs.id ? null : hs.id);
-                          }}
-                          className="relative flex items-center justify-center h-8 w-8 rounded-full bg-[#f8ca14] text-black shadow-lg animate-bounce"
-                        >
-                          <span className="absolute -inset-1 rounded-full bg-[#f8ca14]/40 animate-ping" />
-                          <Eye size={14} className="font-bold relative z-10" />
-                        </button>
-
-                        {/* Tooltip Card */}
-                        <AnimatePresence>
-                          {activeHotspot === hs.id && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.9, y: 8 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.9, y: 8 }}
-                              className="absolute top-10 right-0 w-64 p-3.5 rounded-2xl bg-black/90 text-white border border-[#f8ca14]/40 backdrop-blur-xl shadow-2xl z-30 text-right"
-                            >
-                              <div className="flex items-center gap-1.5 text-xs font-black text-[#f8ca14] mb-1">
-                                <ShieldCheck size={14} />
-                                <span>{hs.title}</span>
-                              </div>
-                              <p className="text-[11px] text-slate-200 leading-relaxed font-medium">
-                                {hs.desc}
-                              </p>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    ))}
-                  </div>
-                )}
 
                 {/* Expanded View Content */}
                 {isExpanded ? (
