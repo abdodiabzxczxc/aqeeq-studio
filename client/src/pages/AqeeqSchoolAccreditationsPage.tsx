@@ -58,6 +58,10 @@ import {
   Share2,
   Layers,
   Crosshair,
+  Cpu,
+  Stethoscope,
+  Briefcase,
+  BookOpen,
 } from "lucide-react";
 
 export default function AqeeqSchoolAccreditationsPage() {
@@ -487,25 +491,67 @@ export default function AqeeqSchoolAccreditationsPage() {
               <span>منظومة الاعتمادات ومراكز الاختبارات الدولية الرسمية</span>
             </div>
             <h2 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              بوابة الاعتمادات الدولية ومراكز القياس بالمدينة المنورة 🏛️
+              بوابة الاعتمادات الدولية ومراكز القياس بالمدينة المنورة
             </h2>
             <p className={`mt-3 text-sm sm:text-base ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
               مدارس العقيق ليست مجرد صرح تعليمي، بل مركز اختبارات دولي معتمد يخدم الطلاب والمجتمع في المدينة المنورة وفق أعلى
               معايير الجودة العالمية.
             </p>
+          </div>
 
-            {/* 4-Portal Interactive Switcher Capsule */}
-            <div className="mt-8 w-full max-w-3xl mx-auto px-2">
+          {/* Unified Architectural Credentials Shell (Strict 1380px Ruler Alignment) */}
+          <div
+            className={`w-full rounded-[2.5rem] border p-6 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden transition-all duration-300 ${
+              dark
+                ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98"
+                : "border-slate-200/90 bg-white/95 shadow-xl"
+            }`}
+          >
+            {/* Top Architectural Control Bar: Header Meta & Full-Width 4-Portal Switcher Grid */}
+            <div
+              className={`pb-5 mb-8 border-b flex flex-col gap-4 relative z-10 ${
+                dark ? "border-white/10" : "border-slate-200"
+              }`}
+            >
+              {/* Meta Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
+                    <ShieldCheck size={19} />
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-[#f8ca14]">
+                        منظومة الاعتمادات الرسمية
+                      </span>
+                      <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                    </div>
+                    <span className={`text-xs font-bold block mt-0.5 ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                      4 مراكز دولية معتمدة بطيبة الطيبة
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-black px-3 py-1.5 rounded-full border ${
+                    dark ? "border-emerald-500/30 bg-emerald-950/30 text-emerald-400" : "border-emerald-600/30 bg-emerald-50 text-emerald-900"
+                  }`}>
+                    تراخيص واعتمادات سارية ومحدثة 2026 ✦
+                  </span>
+                </div>
+              </div>
+
+              {/* Full-Width 4-Portal Interactive Switcher Grid */}
               <div
-                className={`grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-2xl border shadow-lg backdrop-blur-xl transition ${
-                  dark ? "border-white/10 bg-[#0c141a]/95" : "border-slate-200/90 bg-white"
+                className={`grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-1.5 rounded-2xl border shadow-inner w-full ${
+                  dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
                 }`}
               >
                 {[
-                  { id: "cognia", label: "اعتماد كوجنيا الأمريكية", shortLabel: "اعتماد كوجنيا", icon: ShieldCheck, badge: "USA 🇺🇸" },
-                  { id: "ielts", label: "مركز اختبارات IELTS", shortLabel: "اختبارات IELTS", icon: Globe2, badge: "IDP 🌐" },
-                  { id: "sat", label: "مراكز SAT & ACT الرقمية", shortLabel: "مراكز SAT & ACT", icon: BookOpenCheck, badge: "Code #68412" },
-                  { id: "stem", label: "الروبوت والذكاء الاصطناعي", shortLabel: "الروبوت والذكاء", icon: Trophy, badge: "بطل المملكة 🏆" },
+                  { id: "cognia", label: "اعتماد كوجنيا الأمريكية", icon: ShieldCheck, badge: "USA 🇺🇸" },
+                  { id: "ielts", label: "مركز اختبارات IELTS", icon: Globe2, badge: "IDP 🌐" },
+                  { id: "sat", label: "مراكز SAT & ACT الرقمية", icon: BookOpenCheck, badge: "Digital" },
+                  { id: "stem", label: "الروبوت والذكاء الاصطناعي", icon: Trophy, badge: "STEM 🏆" },
                 ].map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeHubTab === tab.id;
@@ -514,57 +560,61 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveHubTab(tab.id as any)}
-                      className={`relative flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 sm:py-3 sm:px-2 text-center text-xs font-black transition active:scale-95 min-w-0 w-full overflow-hidden ${
+                      className={`relative px-2.5 sm:px-3 py-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-center gap-2 w-full ${
                         isActive
-                          ? "text-white"
+                          ? "text-white font-black"
                           : dark
                           ? "text-slate-400 hover:text-white hover:bg-white/5"
-                          : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
+                          : "text-slate-600 hover:text-[#08467d] hover:bg-white/60"
                       }`}
                     >
                       {isActive && (
                         <motion.div
                           layoutId="activeHubPortalPill"
-                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] shadow-md ring-1 ring-[#f8ca14]/50"
-                          transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                          className={`absolute inset-0 rounded-xl shadow-lg ${
+                            dark
+                              ? "bg-gradient-to-r from-[#08467d] to-[#042442] border border-[#f8ca14]/40"
+                              : "bg-[#08467d] border border-[#f8ca14]/50 shadow-md"
+                          }`}
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
                         />
                       )}
-                      <div className="relative z-10 flex items-center justify-center gap-1 w-full min-w-0 max-w-full px-1">
-                        <Icon size={14} className={`shrink-0 ${isActive ? "text-[#f8ca14]" : "text-slate-400"}`} />
-                        <span className="truncate text-[11px] sm:text-xs font-black leading-tight">
-                          <span className="sm:hidden">{tab.shortLabel}</span>
-                          <span className="hidden sm:inline">{tab.label}</span>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
+                        <Icon size={16} className={`shrink-0 ${isActive ? "text-[#f8ca14]" : "text-slate-400"}`} />
+                        <span className="text-xs sm:text-[13px] xl:text-sm font-black whitespace-nowrap">
+                          {tab.label}
+                        </span>
+                        <span
+                          className={`hidden xl:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${
+                            isActive
+                              ? "bg-white/15 text-[#f8ca14] border-white/20"
+                              : dark
+                              ? "bg-white/5 text-slate-400 border-white/5"
+                              : "bg-black/5 text-slate-600 border-black/5"
+                          }`}
+                        >
+                          {tab.badge}
                         </span>
                       </div>
-                      <span
-                        className={`relative z-10 text-[9.5px] sm:text-[10px] font-bold truncate max-w-full px-1 ${
-                          isActive ? "text-[#f8ca14]" : "text-slate-500"
-                        }`}
-                      >
-                        {tab.badge}
-                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
-          </div>
 
-          {/* Dynamic Interactive Portal Showcase with 3D Perspective Scrubbing */}
-          <div className="w-full">
-            <AnimatePresence mode="wait">
-              {/* PORTAL 1: COGNIA USA */}
-              {activeHubTab === "cognia" && (
-                <motion.div
-                  key="cognia"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden backdrop-blur-xl ${
-                    dark ? "border-emerald-500/35 bg-[#091218]/95" : "border-emerald-700/25 bg-white/95"
-                  }`}
-                >
+            {/* Dynamic Interactive Portal Showcase Content */}
+            <div className="w-full relative z-10">
+              <AnimatePresence mode="wait">
+                {/* PORTAL 1: COGNIA USA */}
+                {activeHubTab === "cognia" && (
+                  <motion.div
+                    key="cognia"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.32 }}
+                    className="w-full"
+                  >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                     <div className="lg:col-span-7 text-right">
                       <div className="flex items-center gap-3 mb-4">
@@ -639,7 +689,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                         className={`rounded-3xl border p-6 sm:p-8 shadow-2xl relative overflow-hidden ${
                           dark
                             ? "border-emerald-500/40 bg-black/70 ring-1 ring-emerald-500/30"
-                            : "border-emerald-950/15 bg-[#fbfaf8] ring-1 ring-emerald-900/10"
+                            : "border-slate-200 bg-white ring-1 ring-slate-100 shadow-xl"
                         }`}
                       >
                         {/* Laser Scan Sweep Line */}
@@ -679,7 +729,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                             <div key={cIdx}>
                               <div className="flex justify-between mb-1.5 text-[11px] font-bold">
                                 <span className={dark ? "text-slate-200" : "text-slate-800"}>{crit.title}</span>
-                                <span className="text-[#f8ca14] font-black">{crit.score}</span>
+                                <span className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>{crit.score}</span>
                               </div>
                               <div className="h-2.5 w-full rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                                 <motion.div
@@ -708,13 +758,11 @@ export default function AqeeqSchoolAccreditationsPage() {
               {activeHubTab === "ielts" && (
                 <motion.div
                   key="ielts"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden backdrop-blur-xl ${
-                    dark ? "border-blue-500/35 bg-[#091218]/95" : "border-blue-700/25 bg-white/95"
-                  }`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.32 }}
+                  className="w-full"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                     <div className="lg:col-span-7 text-right">
@@ -874,13 +922,11 @@ export default function AqeeqSchoolAccreditationsPage() {
               {activeHubTab === "sat" && (
                 <motion.div
                   key="sat"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className={`rounded-[2.5rem] border p-8 sm:p-12 shadow-2xl relative overflow-hidden backdrop-blur-xl ${
-                    dark ? "border-amber-500/35 bg-[#091218]/95" : "border-amber-700/25 bg-white/95"
-                  }`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.32 }}
+                  className="w-full"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                     {/* Digital SAT Card */}
@@ -1010,13 +1056,11 @@ export default function AqeeqSchoolAccreditationsPage() {
               {activeHubTab === "stem" && (
                 <motion.div
                   key="stem"
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className={`rounded-[2.5rem] border p-6 sm:p-10 shadow-2xl relative overflow-hidden backdrop-blur-xl ${
-                    dark ? "border-emerald-500/35 bg-[#091218]/95" : "border-emerald-700/25 bg-white/95"
-                  }`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.32 }}
+                  className="w-full"
                 >
                   <div className="max-w-3xl mb-8 text-right">
                     <div className="inline-flex items-center gap-2 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3.5 py-1.5 text-xs font-black text-[#f8ca14] mb-3">
@@ -1043,7 +1087,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                     {/* Championship 1: FIRST LEGO League */}
                     <div
                       className={`rounded-3xl border p-5 shadow-lg relative overflow-hidden transition hover:shadow-xl ${
-                        dark ? "border-amber-500/30 bg-[#080d14]" : "border-amber-600/20 bg-[#fffdf7]"
+                        dark ? "border-amber-500/30 bg-[#080d14]" : "border-slate-200 bg-white shadow-md ring-1 ring-slate-100"
                       }`}
                     >
                       <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
@@ -1088,7 +1132,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                     {/* Championship 2: World Robot Olympiad */}
                     <div
                       className={`rounded-3xl border p-5 shadow-lg relative overflow-hidden transition hover:shadow-xl ${
-                        dark ? "border-[#08467d]/40 bg-[#06182e]" : "border-[#08467d]/20 bg-white"
+                        dark ? "border-[#08467d]/40 bg-[#06182e]" : "border-slate-200 bg-white shadow-md ring-1 ring-slate-100"
                       }`}
                     >
                       <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
@@ -1137,7 +1181,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
                     }`}
                   >
-                    <h5 className="text-xs font-black mb-3 text-right text-white">
+                    <h5 className={`text-xs font-black mb-3 text-right ${dark ? "text-white" : "text-[#08467d]"}`}>
                       التجهيزات والبنية التحتية لأكاديمية الروبوت والـ STEM بمدارس العقيق:
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -1158,6 +1202,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               )}
             </AnimatePresence>
           </div>
+        </div>
         </section>
       </AqeeqScrollRevealSection>
 
@@ -1176,33 +1221,75 @@ export default function AqeeqSchoolAccreditationsPage() {
           ref={pipelineSectionRef}
           className={`w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10`}
         >
-          <div className="mb-16 text-right">
+          <div className="mb-10 text-right">
             <div
               className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
-                dark ? "text-[#f8ca14]" : "text-[#c59b27]"
+                dark ? "text-[#f8ca14]" : "text-[#08467d]"
               } mb-2`}
             >
               <GraduationCap size={16} />
               <span>طريق المستقبل السريع · محاكي مسارات القبول 2030</span>
             </div>
             <h3 className={`text-2xl sm:text-4xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              خريطة عبور المستقبل: من مقاعد العقيق إلى هارفارد والبترول 🎓
+              خريطة عبور المستقبل: من مقاعد العقيق إلى هارفارد والبترول
             </h3>
             <p className={`text-xs sm:text-sm mt-3 ${dark ? "text-slate-400" : "text-slate-700 font-medium"}`}>
-              اختر وجهة طموح ابنك لتكتشف كيف تضمن له اعتمادات العقيق ومراكزها الدولية القبول الفوري:
+              اختر وجهة طموح ابنك لتكتشف كيف تضمن له اعتمادات العقيق ومراكزها الدولية القبول الفوري وفق أعلى المعايير العالمية:
             </p>
+          </div>
 
-            {/* Pathway Selector Pills */}
-            <div className="mt-8 w-full max-w-2xl mx-auto px-2">
+          {/* Unified Architectural Pipeline Shell (Strict 1380px Ruler) */}
+          <div
+            className={`w-full rounded-[2.5rem] border p-6 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden transition-all duration-300 ${
+              dark
+                ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98"
+                : "border-slate-200/90 bg-white/95 shadow-xl"
+            }`}
+          >
+            {/* Top Architectural Control Bar: Meta & 3-Pathway Selector Grid */}
+            <div
+              className={`pb-6 mb-8 border-b flex flex-col gap-4 relative z-10 ${
+                dark ? "border-white/10" : "border-slate-200"
+              }`}
+            >
+              {/* Meta Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
+                    <Compass size={19} />
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-[#f8ca14]">
+                        محاكي مسارات القبول الجامعي
+                      </span>
+                      <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                    </div>
+                    <span className={`text-xs font-bold block mt-0.5 ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                      وجهات نخبوية مضمونة لخريجي العقيق
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-black px-3.5 py-1.5 rounded-full border ${
+                    dark ? "border-emerald-500/30 bg-emerald-950/30 text-emerald-400" : "border-emerald-600/30 bg-emerald-50 text-emerald-900"
+                  }`}>
+                    قبول مباشر وإعفاء من التحضيرية ✦
+                  </span>
+                </div>
+              </div>
+
+              {/* Full-Width 3-Pathway Switcher Grid */}
               <div
-                className={`grid grid-cols-3 gap-2 p-1.5 rounded-2xl border shadow-lg backdrop-blur-xl transition ${
-                  dark ? "border-white/10 bg-[#0c141a]/95" : "border-slate-200/90 bg-white"
+                className={`grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-1.5 rounded-2xl border shadow-inner w-full ${
+                  dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
                 }`}
               >
                 {[
-                  { id: "saudi", label: "الجامعات السعودية 🇸🇦", shortLabel: "السعودية 🇸🇦", sub: "KFUPM & كاوست" },
-                  { id: "scholarship", label: "برنامج الابتعاث ✈️", shortLabel: "الابتعاث ✈️", sub: "مسار الرواد" },
-                  { id: "global", label: "الجامعات الدولية 🌐", shortLabel: "الدولية 🌐", sub: "Harvard & Oxford" },
+                  { id: "saudi", label: "الجامعات السعودية", sub: "KFUPM & كاوست", badge: "السعودية 🇸🇦" },
+                  { id: "scholarship", label: "برنامج الابتعاث", sub: "مسار الرواد", badge: "خادم الحرمين ✈️" },
+                  { id: "global", label: "الجامعات الدولية", sub: "Harvard & Oxford", badge: "Ivy League 🌐" },
                 ].map((p) => {
                   const isActive = activePathway === p.id;
                   return (
@@ -1210,157 +1297,166 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={p.id}
                       type="button"
                       onClick={() => setActivePathway(p.id as any)}
-                      className={`relative rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 text-xs font-black transition active:scale-95 text-center min-w-0 w-full overflow-hidden ${
+                      className={`relative px-4 py-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-between gap-2 w-full ${
                         isActive
-                          ? "text-white"
+                          ? "text-white font-black"
                           : dark
                           ? "text-slate-400 hover:text-white hover:bg-white/5"
-                          : "text-slate-700 hover:text-[#08467d] hover:bg-slate-50"
+                          : "text-slate-600 hover:text-[#08467d] hover:bg-white/60"
                       }`}
                     >
                       {isActive && (
                         <motion.div
                           layoutId="activePathwayPill"
-                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] shadow-md ring-1 ring-[#f8ca14]/40"
-                          transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                          className={`absolute inset-0 rounded-xl shadow-lg ${
+                            dark
+                              ? "bg-gradient-to-r from-[#08467d] to-[#042442] border border-[#f8ca14]/40"
+                              : "bg-[#08467d] border border-[#f8ca14]/50 shadow-md"
+                          }`}
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
                         />
                       )}
-                      <span className="relative z-10 block truncate text-[11px] sm:text-xs font-black">
-                        <span className="sm:hidden">{p.shortLabel}</span>
-                        <span className="hidden sm:inline">{p.label}</span>
-                      </span>
+                      <div className="relative z-10 text-right">
+                        <span className="block text-xs sm:text-sm font-black">
+                          {p.label}
+                        </span>
+                        <span className={`block text-[11px] font-bold mt-0.5 ${isActive ? "text-[#f8ca14]" : dark ? "text-slate-400" : "text-slate-500"}`}>
+                          {p.sub}
+                        </span>
+                      </div>
                       <span
-                        className={`relative z-10 block text-[9.5px] sm:text-[10px] mt-0.5 truncate px-0.5 ${
-                          isActive ? "text-[#f8ca14]" : "text-slate-500"
+                        className={`relative z-10 text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
+                          isActive
+                            ? "bg-white/15 text-[#f8ca14] border-white/20"
+                            : dark
+                            ? "bg-white/5 text-slate-400 border-white/5"
+                            : "bg-black/5 text-slate-600 border-black/5"
                         }`}
                       >
-                        {p.sub}
+                        {p.badge}
                       </span>
                     </button>
                   );
                 })}
               </div>
             </div>
-          </div>
 
-          {/* Connected 4-Station Visual Future Pipeline with 3D Z-Depth Stagger */}
-          <div className="w-full">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-              {/* Animated Connecting Energy Beam (Desktop) */}
-              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-white/10 -translate-y-1/2 z-0">
+            {/* Connected 4-Station Future Trajectory (Level Alignment) */}
+            <div className="w-full relative z-10 mb-8">
+              {/* Animated Connecting Track */}
+              <div className="hidden lg:block absolute top-[44px] left-6 right-6 h-0.5 bg-slate-200 dark:bg-white/10 z-0">
                 <motion.div
                   style={{ width: beamHeight }}
-                  className="h-full bg-gradient-to-r from-[#08467d] via-[#f8ca14] to-[#f8ca14] shadow-[0_0_15px_rgba(248,202,20,0.8)]"
+                  className="h-full bg-gradient-to-r from-[#08467d] via-[#f8ca14] to-[#f8ca14] shadow-[0_0_12px_rgba(248,202,20,0.8)]"
                 />
               </div>
 
-              {[
-                {
-                  step: "01",
-                  title: "مقاعد العقيق التأسيسية",
-                  badge: "المعايير الدولية",
-                  desc: "تأسيس لغوي وعلمي متقدم وفق معايير كوجنيا وروبوتات STEM المعتمدة.",
-                  icon: Building2,
-                  accent: "text-[#08467d] border-[#08467d]/30 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/40 dark:bg-[#f8ca14]/10",
-                  offset: staggerCol1,
-                },
-                {
-                  step: "02",
-                  title: "شهادة Cognia & SAT",
-                  badge: "الدبلومة المعتمدة",
-                  desc: "اختبار الطالب داخل المدرسة والحصول على Band 7.5+ و 1400+ في SAT.",
-                  icon: Award,
-                  accent: "text-[#f8ca14] border-[#f8ca14]/40 bg-[#f8ca14]/10",
-                  offset: staggerCol2,
-                },
-                {
-                  step: "03",
-                  title: "ملف القبول والابتعاث",
-                  badge: "مسار الرواد",
-                  desc: "سيرة ذاتية متكاملة وساعات AP معتمدة تؤهل لمنحة خادم الحرمين الشريفين.",
-                  icon: Compass,
-                  accent: "text-[#08467d] border-[#08467d]/40 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/30",
-                  offset: staggerCol1,
-                },
-                {
-                  step: "04",
-                  title: "هارفارد والبترول",
-                  badge: "القبول النهائي",
-                  desc: "القبول المباشر دون قيود، والإعفاء من السنة التحضيرية كقائد لرؤية 2030.",
-                  icon: Trophy,
-                  accent: "text-[#f8ca14] border-[#f8ca14]/50 bg-[#f8ca14]/15",
-                  offset: staggerCol2,
-                },
-              ].map((station, sIdx) => {
-                const StationIcon = station.icon;
-                return (
-                  <motion.div
-                    key={sIdx}
-                    style={{ y: station.offset }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className={`relative z-10 rounded-3xl border p-6 text-right backdrop-blur-xl shadow-xl transition ${
-                      dark ? "border-white/10 bg-[#0a1218]/90" : "border-slate-200 bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-mono text-xs font-black text-slate-500">STAGE {station.step}</span>
-                      <div className={`grid h-10 w-10 place-items-center rounded-2xl border ${station.accent}`}>
-                        <StationIcon size={18} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+                {[
+                  {
+                    step: "01",
+                    title: "مقاعد العقيق التأسيسية",
+                    badge: "المعايير الدولية",
+                    desc: "تأسيس لغوي وعلمي متقدم وفق معايير كوجنيا وروبوتات STEM المعتمدة.",
+                    icon: Building2,
+                    accent: "text-[#08467d] border-[#08467d]/30 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/40 dark:bg-[#f8ca14]/10",
+                  },
+                  {
+                    step: "02",
+                    title: "شهادة Cognia & SAT",
+                    badge: "الدبلومة المعتمدة",
+                    desc: "اختبار الطالب داخل المدرسة والحصول على Band 7.5+ و 1400+ في SAT.",
+                    icon: Award,
+                    accent: "text-[#f8ca14] border-[#f8ca14]/40 bg-[#f8ca14]/10",
+                  },
+                  {
+                    step: "03",
+                    title: "ملف القبول والابتعاث",
+                    badge: "مسار الرواد",
+                    desc: "سيرة ذاتية متكاملة وساعات AP معتمدة تؤهل لمنحة خادم الحرمين الشريفين.",
+                    icon: Compass,
+                    accent: "text-[#08467d] border-[#08467d]/40 bg-[#08467d]/10 dark:text-[#f8ca14] dark:border-[#f8ca14]/30",
+                  },
+                  {
+                    step: "04",
+                    title: "هارفارد والبترول",
+                    badge: "القبول النهائي",
+                    desc: "القبول المباشر دون قيود، والإعفاء من السنة التحضيرية كقائد لرؤية 2030.",
+                    icon: Trophy,
+                    accent: "text-[#f8ca14] border-[#f8ca14]/50 bg-[#f8ca14]/15",
+                  },
+                ].map((station, sIdx) => {
+                  const StationIcon = station.icon;
+                  return (
+                    <motion.div
+                      key={sIdx}
+                      whileHover={{ y: -4, scale: 1.01 }}
+                      className={`relative z-10 rounded-2xl border p-5 text-right backdrop-blur-xl shadow-md transition ${
+                        dark
+                          ? "border-white/10 bg-[#0c141a]/90 hover:border-white/20"
+                          : "border-slate-200 bg-white hover:border-[#08467d]/30 shadow-sm"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-black text-slate-400 dark:text-slate-500">STAGE {station.step}</span>
+                        <div className={`grid h-9 w-9 place-items-center rounded-xl border ${station.accent}`}>
+                          <StationIcon size={17} />
+                        </div>
                       </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-[#f8ca14] block mb-1">{station.badge}</span>
-                    <h4 className={`text-base font-black mb-2 ${dark ? "text-white" : "text-[#08467d]"}`}>{station.title}</h4>
-                    <p className={`text-xs leading-relaxed font-medium ${dark ? "text-slate-300" : "text-slate-600"}`}>{station.desc}</p>
-                  </motion.div>
-                );
-              })}
+                      <span className="text-[11px] font-bold text-[#f8ca14] block mb-1">{station.badge}</span>
+                      <h4 className={`text-sm sm:text-base font-black mb-1.5 ${dark ? "text-white" : "text-[#08467d]"}`}>{station.title}</h4>
+                      <p className={`text-xs leading-relaxed font-medium ${dark ? "text-slate-300" : "text-slate-600"}`}>{station.desc}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Pathway Detail Card */}
+            {/* Dynamic Destination Requirements Container */}
             <div
-              className={`mt-14 rounded-3xl border p-8 sm:p-10 shadow-2xl relative overflow-hidden ${
+              className={`rounded-2xl border p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${
                 dark
-                  ? "border-[#f8ca14]/30 bg-gradient-to-b from-[#0c161d] to-[#080d12]"
-                  : "border-[#08467d]/20 bg-white shadow-xl"
+                  ? "border-[#f8ca14]/25 bg-black/40"
+                  : "border-slate-200 bg-slate-50/80 shadow-sm"
               }`}
             >
               {activePathway === "saudi" && (
                 <div className="space-y-4 text-right">
-                  <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                  <h4 className={`text-lg sm:text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     القبول في جامعة الملك فهد للبترول والمعادن (KFUPM)، كاوست (KAUST)، وجامعة الملك سعود:
                   </h4>
-                  <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
                     تشترط هذه الجامعات الرائدة درجات تنافسية عالية في اختبارات قياس (القدرات والتحصيلي) بالإضافة إلى اختبار
                     لغة إنجليزية معتمد (IELTS 6.0+ أو SAT Math 650+). توفر مدارس العقيق كل هذه الاختبارات والتأهيل داخل
                     أسوارها.
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>الآيلتس المباشر</span>
-                      <span className="font-black text-sm text-[#f8ca14]">تحقيق Band 6.5 - 7.5</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>تحقيق Band 6.5 - 7.5</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>اختبار الطالب داخل قاعات مدارسه المعتمدة</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>القدرات والتحصيلي</span>
-                      <span className="font-black text-sm text-[#f8ca14]">معدلات 90+ و 95+</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>برامج تدريب يومية متخصصة ومحاكاة دورية</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>معدلات 90+ و 95+</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>برامج تدريب يومية متخصصة ومحاكاة دورية</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>السنة التحضيرية</span>
-                      <span className="font-black text-sm text-[#f8ca14]">إعفاء واجتياز مباشر</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>بفضل مناهج العلوم واللغات المتطورة</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>إعفاء واجتياز مباشر</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>بفضل مناهج العلوم واللغات المتطورة</p>
                     </div>
                   </div>
                 </div>
@@ -1368,41 +1464,41 @@ export default function AqeeqSchoolAccreditationsPage() {
 
               {activePathway === "scholarship" && (
                 <div className="space-y-4 text-right">
-                  <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  <h4 className={`text-lg sm:text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     برنامج خادم الحرمين الشريفين للابتعاث (مسار الرواد لأفضل 30 جامعة بالعالم):
                   </h4>
-                  <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
                     يتطلب مسار الرواد قبولاً غير مشروط من كبرى الجامعات (مثل Harvard, MIT, Oxford, Stanford). بفضل اعتماد
                     كوجنيا ومراكز SAT و IELTS داخل العقيق، يحصل الطالب على ملف أكاديمي متكامل يطابق معايير القبول في رابطة
                     اللبلاب (Ivy League).
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>شهادة كوجنيا الأمريكية</span>
-                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>High School Diploma</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>معادلة ومقبولة فورياً عالمياً ومحلياً</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>High School Diploma</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>معادلة ومقبولة فورياً عالمياً ومحلياً</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>اختبارات SAT الرسمية</span>
-                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>درجات تنافسية 1350+</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>مركز الاختبارات الرسمي داخل المدرسة</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>درجات تنافسية 1350+</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>مركز الاختبارات الرسمي داخل المدرسة</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>الإرشاد الجامعي الدولي</span>
-                      <span className={`font-black text-sm ${dark ? "text-amber-400" : "text-amber-700"}`}>College Counseling</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>خطابات توصية وسيرة ذاتية متكاملة للمنح</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>College Counseling</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>خطابات توصية وسيرة ذاتية متكاملة للمنح</p>
                     </div>
                   </div>
                 </div>
@@ -1410,40 +1506,40 @@ export default function AqeeqSchoolAccreditationsPage() {
 
               {activePathway === "global" && (
                 <div className="space-y-4 text-right">
-                  <h4 className={`text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#015a37]"}`}>
+                  <h4 className={`text-lg sm:text-xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                     كليات الطب والعلوم والهندسة في بريطانيا، كندا، وأمريكا ودول الخليج:
                   </h4>
-                  <p className={`text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
+                  <p className={`text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-700 font-medium"}`}>
                     توفر مدارس العقيق مسارات نوعية للمواد العلمية والإنجليزية المكثفة مع إمكانية احتساب الساعات الجامعية
                     المعتمدة (AP Courses)، مما يوفر على الطالب سنة دراسية كاملة ويسرع انطلاقه في المجال الطبي والهندسي.
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>ساعات AP المعتمدة</span>
-                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>Advanced Placement</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>معادلة مقررات الجامعة المبكرة وتوفير سنة</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>Advanced Placement</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>معادلة مقررات الجامعة المبكرة وتوفير سنة</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>المعامل والبحث العلمي</span>
-                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>STEM Research</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>تجارب معملية وبحوث موثقة تنمي الابتكار</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>STEM Research</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>تجارب معملية وبحوث موثقة تنمي الابتكار</p>
                     </div>
                     <div
-                      className={`p-4 rounded-2xl border ${
-                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                      className={`p-4 rounded-xl border ${
+                        dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-white shadow-sm"
                       }`}
                     >
                       <span className={`block text-xs font-bold mb-1 ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>اللغة الإنجليزية التخصصية</span>
-                      <span className={`font-black text-sm ${dark ? "text-blue-400" : "text-blue-700"}`}>Academic Fluency</span>
-                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-600"}`}>طلاقة كاملة في المصطلحات الطبية والهندسية</p>
+                      <span className={`font-black text-sm block ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>Academic Fluency</span>
+                      <p className={`text-[11px] mt-1 ${dark ? "text-slate-400" : "text-slate-500 font-medium"}`}>طلاقة كاملة في المصطلحات الطبية والهندسية</p>
                     </div>
                   </div>
                 </div>
@@ -1462,21 +1558,21 @@ export default function AqeeqSchoolAccreditationsPage() {
             STAGE 4: COMPACT & SLEEK 3D RADAR CONSOLE (رادار جاهزية ابنك المدمج)
         ======================================================== */}
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 mb-16">
-          {/* Section Header (Compact) */}
-          <div className="mb-7 text-right">
+          {/* Section Header */}
+          <div className="mb-10 text-right">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f8ca14]/10 border border-[#f8ca14]/30 px-3 py-1 text-[11px] font-black text-[#f8ca14] mb-2 shadow-sm">
               <Radar size={13} className="animate-spin text-[#f8ca14]" style={{ animationDuration: "6s" }} />
               <span>مصفوفة الرصد الأكاديمي المباشر 2030</span>
             </div>
             <h3 className={`text-xl sm:text-2xl md:text-3xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              رادار جاهزية ابنك: خارطة الاعتمادات المخصصة 🎯
+              رادار جاهزية ابنك: خارطة الاعتمادات المخصصة
             </h3>
-            <p className={`text-xs mt-1.5 leading-relaxed max-w-xl ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-              حدد مرحلة وطموح ابنك لتشاهد قفل الرادار التفاعلي على المسار المعتمد وشهاداته الدولية.
+            <p className={`text-xs sm:text-sm mt-2 leading-relaxed max-w-2xl ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
+              حدد مرحلة وطموح ابنك لتشاهد قفل الرادار التفاعلي على المسار المعتمد وشهاداته الدولية وفق المعايير العالمية.
             </p>
           </div>
 
-          {/* Unified Compact 3D Cockpit Console */}
+          {/* Unified Compact Cockpit Console (Strict 1380px Ruler Alignment) */}
           <motion.div
             ref={radarSectionRef}
             style={{
@@ -1484,85 +1580,144 @@ export default function AqeeqSchoolAccreditationsPage() {
               scale: radarScale,
               transformStyle: "preserve-3d",
             }}
-            className={`w-full rounded-[2rem] border shadow-2xl p-5 sm:p-7 relative overflow-hidden backdrop-blur-xl will-change-transform ${
+            className={`w-full rounded-[2.5rem] border shadow-2xl p-6 sm:p-8 md:p-10 relative overflow-hidden backdrop-blur-xl will-change-transform transition-all duration-300 ${
               dark
-                ? "border-[#f8ca14]/30 bg-[#071118]/95 ring-1 ring-[#f8ca14]/20"
-                : "border-[#08467d]/20 bg-white shadow-xl"
+                ? "border-white/10 bg-gradient-to-b from-[#0c141a]/98 via-[#091016]/98 to-[#060a0e]/98 ring-1 ring-[#f8ca14]/20"
+                : "border-slate-200/90 bg-white/95 shadow-xl"
             }`}
           >
-            {/* Top Segmented Controls Row (Apple/Linear Style) */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 mb-5 border-b text-right ${dark ? "border-white/10" : "border-slate-200"}`}>
-              {/* Grade Selector */}
-              <div>
-                <span className={`text-[10px] font-bold block mb-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>المرحلة الدراسية:</span>
-                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-xl border ${dark ? "bg-black/50 border-white/10" : "bg-slate-100 border-slate-200"}`}>
-                  {[
-                    { id: "primary", label: "الابتدائية 🧸" },
-                    { id: "middle", label: "المتوسطة 🎒" },
-                    { id: "high", label: "الثانوية 🎓" },
-                  ].map((g) => (
-                    <button
-                      key={g.id}
-                      type="button"
-                      onClick={() => selectScannerGrade(g.id as any)}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-black transition active:scale-95 text-center truncate ${
-                        scannerGrade === g.id
-                          ? "bg-[#f8ca14] text-black shadow font-black"
-                          : dark
-                          ? "text-slate-400 hover:text-white"
-                          : "text-slate-600 hover:text-black font-bold"
-                      }`}
-                    >
-                      {g.label}
-                    </button>
-                  ))}
+            {/* Top Architectural Control Bar: Meta & 2-Segmented Switcher Grid */}
+            <div className={`pb-6 mb-8 border-b flex flex-col gap-5 text-right ${dark ? "border-white/10" : "border-slate-200"}`}>
+              {/* Meta Status Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-2xl bg-[#f8ca14]/15 border border-[#f8ca14]/30 flex items-center justify-center text-[#f8ca14] shadow-sm">
+                    <Target size={19} />
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-[#f8ca14]">
+                        كونسول الرصد التفاعلي الذكي
+                      </span>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    </div>
+                    <span className={`text-xs font-bold block mt-0.5 ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                      مطابقة فورية للمسارات والشهادات الدولية المعتمدة
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-mono font-black px-3 py-1 rounded-full border ${
+                    dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/30 bg-[#08467d]/10 text-[#08467d]"
+                  }`}>
+                    PASSPORT #AQ-2030
+                  </span>
                 </div>
               </div>
 
-              {/* Ambition Selector */}
-              <div>
-                <span className={`text-[10px] font-bold block mb-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>الطموح المستقبلي:</span>
-                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-xl border ${dark ? "bg-black/50 border-white/10" : "bg-slate-100 border-slate-200"}`}>
-                  {[
-                    { id: "stem", label: "ذكاء اصطناعي 🤖" },
-                    { id: "medicine", label: "طب وعلوم 🩺" },
-                    { id: "business", label: "قيادة وأعمال 🏛️" },
-                  ].map((goal) => (
-                    <button
-                      key={goal.id}
-                      type="button"
-                      onClick={() => selectScannerGoal(goal.id as any)}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-black transition active:scale-95 text-center truncate ${
-                        scannerGoal === goal.id
-                          ? "bg-[#f8ca14] text-black shadow font-black"
-                          : dark
-                          ? "text-slate-400 hover:text-white"
-                          : "text-slate-600 hover:text-black font-bold"
-                      }`}
-                    >
-                      {goal.label}
-                    </button>
-                  ))}
+              {/* Segmented Controls: Grade & Ambition Selectors */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* 1. Grade Selector */}
+                <div className="flex flex-col gap-2">
+                  <span className={`text-xs font-black flex items-center gap-1.5 ${dark ? "text-slate-300" : "text-[#08467d]"}`}>
+                    <GraduationCap size={15} />
+                    <span>المرحلة الدراسية الحالية:</span>
+                  </span>
+                  <div className={`grid grid-cols-3 gap-2 p-1.5 rounded-2xl border shadow-inner ${
+                    dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
+                  }`}>
+                    {[
+                      { id: "primary", label: "المرحلة الابتدائية", icon: BookOpen },
+                      { id: "middle", label: "المرحلة المتوسطة", icon: Layers },
+                      { id: "high", label: "المرحلة الثانوية", icon: GraduationCap },
+                    ].map((g) => {
+                      const GIcon = g.icon;
+                      const isSelected = scannerGrade === g.id;
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => selectScannerGrade(g.id as any)}
+                          className={`relative py-2.5 px-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-1.5 text-center truncate ${
+                            isSelected
+                              ? dark
+                                ? "bg-[#f8ca14] text-black shadow-md"
+                                : "bg-[#08467d] text-white shadow-md"
+                              : dark
+                              ? "text-slate-400 hover:text-white hover:bg-white/5"
+                              : "text-slate-600 hover:text-[#08467d] hover:bg-white"
+                          }`}
+                        >
+                          <GIcon size={14} className="shrink-0" />
+                          <span className="truncate">{g.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Ambition Selector */}
+                <div className="flex flex-col gap-2">
+                  <span className={`text-xs font-black flex items-center gap-1.5 ${dark ? "text-slate-300" : "text-[#08467d]"}`}>
+                    <Cpu size={15} />
+                    <span>الطموح والتخصص المستقبلي:</span>
+                  </span>
+                  <div className={`grid grid-cols-3 gap-2 p-1.5 rounded-2xl border shadow-inner ${
+                    dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
+                  }`}>
+                    {[
+                      { id: "stem", label: "ذكاء اصطناعي وهندسة", icon: Cpu },
+                      { id: "medicine", label: "طب وعلوم صحية", icon: Stethoscope },
+                      { id: "business", label: "قيادة وإدارة أعمال", icon: Briefcase },
+                    ].map((goal) => {
+                      const GoalIcon = goal.icon;
+                      const isSelected = scannerGoal === goal.id;
+                      return (
+                        <button
+                          key={goal.id}
+                          type="button"
+                          onClick={() => selectScannerGoal(goal.id as any)}
+                          className={`relative py-2.5 px-2 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-1.5 text-center truncate ${
+                            isSelected
+                              ? dark
+                                ? "bg-[#f8ca14] text-black shadow-md"
+                                : "bg-[#08467d] text-white shadow-md"
+                              : dark
+                              ? "text-slate-400 hover:text-white hover:bg-white/5"
+                              : "text-slate-600 hover:text-[#08467d] hover:bg-white"
+                          }`}
+                        >
+                          <GoalIcon size={14} className="shrink-0" />
+                          <span className="truncate">{goal.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Core Display: Compact Circular Radar + Dynamic Academic Pathway */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            {/* Core Display: Precision HUD Radar + Dynamic Target Passport */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
-              {/* Left Column: Sleek Miniature Holographic Radar Screen (5 cols) */}
-              <div className="md:col-span-5 flex flex-col items-center justify-center order-2 md:order-1">
-                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border border-[#08467d]/50 bg-[#03080c] p-2 shadow-[0_0_35px_rgba(8,70,125,0.3)] select-none">
+              {/* Column 1: Tactical HUD Radar Screen (5 cols) */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center order-2 lg:order-1">
+                <div className={`relative w-48 h-48 sm:w-56 sm:h-56 rounded-full border p-2 select-none transition-all duration-300 ${
+                  dark
+                    ? "border-[#08467d]/50 bg-[#03080c] shadow-[0_0_35px_rgba(8,70,125,0.35)] ring-1 ring-white/10"
+                    : "border-slate-300 bg-slate-950 shadow-2xl ring-4 ring-slate-100"
+                }`}>
                   
                   {/* Rotating Compass Outer Rim */}
                   <motion.div
                     style={{ rotate: radarRotateRing }}
-                    className="absolute inset-0.5 rounded-full border border-dashed border-[#f8ca14]/30 pointer-events-none"
+                    className="absolute inset-1 rounded-full border border-dashed border-[#f8ca14]/30 pointer-events-none"
                   >
                     <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono font-black text-[#f8ca14]">N</span>
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-slate-600">S</span>
-                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-600">E</span>
-                    <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-600">W</span>
+                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-slate-500">S</span>
+                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-500">E</span>
+                    <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-mono text-slate-500">W</span>
                   </motion.div>
 
                   {/* Concentric Rings & Crosshairs */}
@@ -1584,7 +1739,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       <div
                         className="h-1/2 w-1/2 absolute top-0 right-0 origin-bottom-left"
                         style={{
-                          background: "conic-gradient(from 0deg at 0% 100%, rgba(248,202,20,0.2) 0deg, transparent 65deg)",
+                          background: "conic-gradient(from 0deg at 0% 100%, rgba(248,202,20,0.25) 0deg, transparent 65deg)",
                         }}
                       />
                       <div className="h-1/2 w-0.5 bg-gradient-to-t from-[#f8ca14] to-transparent absolute top-0 right-1/2 origin-bottom shadow-[0_0_8px_#f8ca14]" />
@@ -1632,69 +1787,78 @@ export default function AqeeqSchoolAccreditationsPage() {
                   </div>
                 </div>
 
-                <span className={`text-[9px] font-mono mt-2 tracking-wider uppercase ${dark ? "text-[#f8ca14]/80" : "text-[#08467d] font-bold"}`}>
-                  RADAR LOCKED · 98.9% MATCH
-                </span>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className={`text-[11px] font-mono tracking-wider uppercase font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                    RADAR LOCKED · 98.9% MATCH
+                  </span>
+                </div>
               </div>
 
-              {/* Right Column: Sleek Academic Target Passport Card (7 cols) */}
-              <div className="md:col-span-7 text-right order-1 md:order-2">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="text-[10px] font-mono font-black text-[#f8ca14]">PASSPORT #AQ-2030</span>
-                  <span className="text-[10px] font-mono text-[#f8ca14] bg-[#f8ca14]/10 px-2 py-0.5 rounded-md border border-[#f8ca14]/30 font-bold">
-                    TARGET ACQUIRED
+              {/* Column 2: Sleek Academic Target Passport Card (7 cols) */}
+              <div className="lg:col-span-7 text-right order-1 lg:order-2">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className={`text-xs font-mono font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                    مسار الاعتماد المخصص ✦
+                  </span>
+                  <span className={`text-xs font-mono px-3 py-1 rounded-full border font-black ${
+                    dark
+                      ? "text-emerald-400 bg-emerald-950/40 border-emerald-500/40"
+                      : "text-emerald-900 bg-emerald-50 border-emerald-300"
+                  }`}>
+                    TARGET ACQUIRED · مطابقة تامة
                   </span>
                 </div>
 
-                <h4 className={`text-base sm:text-lg font-black mb-2 ${dark ? "text-white" : "text-[#08467d]"}`}>
+                <h4 className={`text-lg sm:text-2xl font-black mb-3 ${dark ? "text-white" : "text-[#08467d]"}`}>
                   {scannerGrade === "high"
                     ? scannerGoal === "stem"
-                      ? "مسار النخبة للذكاء الاصطناعي والهندسة 🤖"
+                      ? "مسار النخبة للذكاء الاصطناعي والهندسة"
                       : scannerGoal === "medicine"
-                      ? "مسار العلوم الطبية والصحية المتقدم 🩺"
-                      : "مسار الرواد الدولي لإدارة الأعمال 🏛️"
+                      ? "مسار العلوم الطبية والصحية المتقدم"
+                      : "مسار الرواد الدولي لإدارة الأعمال"
                     : scannerGrade === "middle"
-                    ? "مسار الابتكار التأسيسي وبطولات الروبوت 🎒"
-                    : "مسار التأسيس الدولي واللغات المبكر 🧸"}
+                    ? "مسار الابتكار التأسيسي وبطولات الروبوت"
+                    : "مسار التأسيس الدولي واللغات المبكر"}
                 </h4>
 
                 {/* 3 Clean Bullet Highlights */}
-                <div className="space-y-1.5 text-xs mb-4">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
+                <div className="space-y-2.5 text-xs sm:text-sm mb-6">
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${dark ? "text-[#f8ca14]" : "text-emerald-600"}`} />
                     <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
                       <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>اعتماد كوجنيا (Cognia):</strong> دبلومة دولية معتمدة ومقبولة محلياً وعالمياً.
                     </span>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${dark ? "text-[#f8ca14]" : "text-emerald-600"}`} />
                     <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
-                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>مراكز IELTS & SAT:</strong> أداء الاختبارات الرسمية داخل قاعات المدارس.
+                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>مراكز IELTS & SAT:</strong> أداء الاختبارات الرسمية داخل قاعات المدارس بطيبة.
                     </span>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-[#f8ca14] shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${dark ? "text-[#f8ca14]" : "text-emerald-600"}`} />
                     <span className={dark ? "text-slate-300" : "text-slate-700 font-medium"}>
-                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>توفير سنة كاملة:</strong> إعفاء مباشر من السنة التحضيرية في الجامعات.
+                      <strong className={dark ? "text-white" : "text-[#08467d] font-black"}>توفير سنة كاملة:</strong> إعفاء مباشر من السنة التحضيرية في الجامعات الرائدة.
                     </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <div className="flex flex-wrap items-center gap-3 pt-2">
                   <Button
                     onClick={() => navigate("/admissions")}
-                    className="rounded-xl bg-gradient-to-r from-[#08467d] to-[#0d2a45] hover:opacity-95 text-[#f8ca14] border border-[#f8ca14]/40 px-5 py-2.5 text-xs font-black shadow-md transition active:scale-95"
+                    className="rounded-xl bg-[#08467d] hover:bg-[#06335c] text-white border border-[#f8ca14]/40 px-6 py-3 text-xs sm:text-sm font-black shadow-md transition active:scale-95"
                   >
-                    <span>حجز مقعد دراسي ✦</span>
+                    <span>حجز مقعد دراسي للمسار ✦</span>
                   </Button>
                   <button
                     type="button"
                     onClick={handleShareRadarWhatsapp}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] px-4 py-2 text-xs font-black transition active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] px-5 py-3 text-xs sm:text-sm font-black transition active:scale-95"
                   >
-                    <Share2 size={13} />
-                    <span>مشاركة عبر واتساب</span>
+                    <Share2 size={14} />
+                    <span>مشاركة مسار ابنك عبر واتساب</span>
                   </button>
                 </div>
               </div>
