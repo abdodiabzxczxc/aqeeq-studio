@@ -123,7 +123,7 @@ export function AdmissionsScrollCampusBackdrop({
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.18 : 0.14;
+  const opacity = dark ? 0.24 : 0.18;
 
   // Parallax horizontal glides for the two grand rows in opposite directions
   const rawRow1X = useTransform(

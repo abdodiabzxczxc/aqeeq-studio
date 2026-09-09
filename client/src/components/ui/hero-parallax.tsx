@@ -103,7 +103,7 @@ export const HeroParallax = ({
   );
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.18 : 0.14;
+  const opacity = dark ? 0.24 : 0.18;
 
   // Organic gliding inertia with ZERO bounce (The magnet that smooths out wheel ticks!)
   const translateX = useSpring(rawTranslateX, smoothConfig);
@@ -546,7 +546,7 @@ export function HeroParallaxBackdrop({
   );
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = opacityLevel ?? (dark ? 0.18 : 0.14);
+  const opacity = opacityLevel ?? (dark ? 0.24 : 0.18);
 
   const translateX = useSpring(rawTranslateX, smoothConfig);
   const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);

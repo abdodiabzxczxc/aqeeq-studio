@@ -151,7 +151,7 @@ export function AboutScrollCampusBackdrop({
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.18 : 0.14;
+  const opacity = dark ? 0.24 : 0.18;
 
   // 3D perspective tilt with critically damped inertia
   const rawRotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);
