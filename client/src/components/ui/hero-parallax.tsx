@@ -493,6 +493,7 @@ export interface HeroParallaxBackdropProps {
   dark?: boolean;
   direction?: "left-to-right" | "right-to-left";
   cardShape?: "default" | "square";
+  opacityLevel?: number;
 }
 
 export function HeroParallaxBackdrop({
@@ -501,6 +502,7 @@ export function HeroParallaxBackdrop({
   dark = true,
   direction = "left-to-right",
   cardShape = "default",
+  opacityLevel,
 }: HeroParallaxBackdropProps) {
   const isRightToLeft = direction === "right-to-left";
 
@@ -547,11 +549,8 @@ export function HeroParallaxBackdrop({
     [isDesktop ? -100 : -50, isDesktop ? 60 : 30]
   );
 
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.7, 1],
-    [0.35, 0.5, 0.45, 0.15]
-  );
+  // Constant steady opacity — stays fully visible and vibrant even while scrolling down
+  const opacity = opacityLevel ?? (dark ? 0.48 : 0.42);
 
   const translateX = useSpring(rawTranslateX, smoothConfig);
   const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
