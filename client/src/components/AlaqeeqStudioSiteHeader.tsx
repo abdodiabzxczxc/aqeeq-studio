@@ -268,14 +268,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const logoOverride = editor?.getOverride?.("header-logo");
   const activeLogo = logoOverride?.mediaUrl || logoUrl || "/alaqeeq-logo.png";
 
-  const topLocationText = editor?.getOverride?.("header-top-location")?.contentText || "المدينة المنورة — المملكة العربية السعودية";
-  const topPhoneText = editor?.getOverride?.("header-top-phone")?.contentText || "+966 53 189 6000";
-  const topPhoneLink = editor?.getOverride?.("header-top-phone")?.linkUrl || "tel:+966531896000";
-  const topEmailText = editor?.getOverride?.("header-top-email")?.contentText || "info@alaqeeqholding.com";
-  const topEmailLink = editor?.getOverride?.("header-top-email")?.linkUrl || "mailto:info@alaqeeqholding.com";
+  const topLocationText = editor?.getOverride?.("header-top-location")?.contentText || orchestration?.topBar?.locationText || "المدينة المنورة — المملكة العربية السعودية";
+  const topPhoneText = editor?.getOverride?.("header-top-phone")?.contentText || orchestration?.topBar?.phone || "+966 53 189 6000";
+  const topPhoneLink = editor?.getOverride?.("header-top-phone")?.linkUrl || orchestration?.topBar?.phoneUrl || "tel:+966531896000";
+  const topEmailText = editor?.getOverride?.("header-top-email")?.contentText || orchestration?.topBar?.email || "info@alaqeeqholding.com";
+  const topEmailLink = editor?.getOverride?.("header-top-email")?.linkUrl || orchestration?.topBar?.emailUrl || "mailto:info@alaqeeqholding.com";
   const topPortalsText = editor?.getOverride?.("header-top-portals")?.contentText || "بوابات الأنظمة والخدمات";
-  const topJobsText = editor?.getOverride?.("header-top-jobs")?.contentText || "بوابة التوظيف";
-  const topJobsLink = editor?.getOverride?.("header-top-jobs")?.linkUrl || "https://live.aqeeq.edu.sa/jobs";
+  const topJobsText = editor?.getOverride?.("header-top-jobs")?.contentText || orchestration?.topBar?.jobsText || "بوابة التوظيف";
+  const topJobsLink = editor?.getOverride?.("header-top-jobs")?.linkUrl || orchestration?.topBar?.jobsUrl || "https://live.aqeeq.edu.sa/jobs";
 
   const hiddenNavKeys: string[] = (orchestration?.nav as any)?.hiddenNavKeys || [];
   const isNavHidden = (key: string) => hiddenNavKeys.includes(key);

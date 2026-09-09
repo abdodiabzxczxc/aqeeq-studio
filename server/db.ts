@@ -660,9 +660,28 @@ export type SiteOrchestrationConfig = {
     facebookUrl?: string | null;
     whatsappNumber?: string | null;
   };
+  topBar?: {
+    phone?: string | null;
+    phoneUrl?: string | null;
+    email?: string | null;
+    emailUrl?: string | null;
+    locationText?: string | null;
+    jobsText?: string | null;
+    jobsUrl?: string | null;
+  };
   footer: {
     copyrightText?: string | null;
     subText?: string | null;
+    badge1Text?: string | null;
+    badge1Url?: string | null;
+    badge2Text?: string | null;
+    badge2Url?: string | null;
+    quickLink1Text?: string | null;
+    quickLink1Url?: string | null;
+    quickLink2Text?: string | null;
+    quickLink2Url?: string | null;
+    quickLink3Text?: string | null;
+    quickLink3Url?: string | null;
   };
   location: {
     enabled?: boolean;
@@ -872,9 +891,28 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     facebookUrl: "https://facebook.com/alaqeeqschools",
     whatsappNumber: "966500000000",
   },
+  topBar: {
+    phone: "+966 53 189 6000",
+    phoneUrl: "tel:+966531896000",
+    email: "info@alaqeeqholding.com",
+    emailUrl: "mailto:info@alaqeeqholding.com",
+    locationText: "المدينة المنورة — المملكة العربية السعودية",
+    jobsText: "بوابة التوظيف",
+    jobsUrl: "https://live.aqeeq.edu.sa/jobs",
+  },
   footer: {
     copyrightText: "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026",
     subText: "صُنعت المنصة الرقمية بأحدث التقنيات لخدمة الطلاب وأولياء الأمور والمعلمين",
+    badge1Text: "اعتماد Cognia",
+    badge1Url: "/accreditations",
+    badge2Text: "مركز اختبارات SAT & IELTS",
+    badge2Url: "/accreditations",
+    quickLink1Text: "القبول والتسجيل ✦",
+    quickLink1Url: "/admissions",
+    quickLink2Text: "الاعتمادات",
+    quickLink2Url: "/accreditations",
+    quickLink3Text: "المجمعات 🏫",
+    quickLink3Url: "/about",
   },
   location: {
     enabled: true,
@@ -948,6 +986,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           sections: { ...DEFAULT_SITE_ORCHESTRATION.sections, ...(parsed.sections || {}) },
           editorialVoice: { ...DEFAULT_SITE_ORCHESTRATION.editorialVoice, ...(parsed.editorialVoice || {}) },
           social: { ...DEFAULT_SITE_ORCHESTRATION.social, ...(parsed.social || {}) },
+          topBar: { ...DEFAULT_SITE_ORCHESTRATION.topBar, ...(parsed.topBar || {}) },
           footer: { ...DEFAULT_SITE_ORCHESTRATION.footer, ...(parsed.footer || {}) },
           location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
           hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
@@ -980,6 +1019,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         sections: { ...DEFAULT_SITE_ORCHESTRATION.sections, ...(parsed.sections || {}) },
         editorialVoice: { ...DEFAULT_SITE_ORCHESTRATION.editorialVoice, ...(parsed.editorialVoice || {}) },
         social: { ...DEFAULT_SITE_ORCHESTRATION.social, ...(parsed.social || {}) },
+        topBar: { ...DEFAULT_SITE_ORCHESTRATION.topBar, ...(parsed.topBar || {}) },
         footer: { ...DEFAULT_SITE_ORCHESTRATION.footer, ...(parsed.footer || {}) },
         location: { ...DEFAULT_SITE_ORCHESTRATION.location, ...(parsed.location || {}) },
         hiddenStoryIds: parsed.hiddenStoryIds || DEFAULT_SITE_ORCHESTRATION.hiddenStoryIds,
@@ -1012,7 +1052,8 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     sections: { ...current.sections, ...(data.sections || {}) },
     editorialVoice: { ...current.editorialVoice, ...(data.editorialVoice || {}) },
     social: { ...current.social, ...(data.social || {}) },
-    footer: { ...current.footer, ...(data.footer || {}) },
+    topBar: { ...(current.topBar || DEFAULT_SITE_ORCHESTRATION.topBar!), ...(data.topBar || {}) },
+    footer: { ...(current.footer || DEFAULT_SITE_ORCHESTRATION.footer), ...(data.footer || {}) },
     location: { ...current.location, ...(data.location || {}) },
     appShowcase: { ...(current.appShowcase || DEFAULT_SITE_ORCHESTRATION.appShowcase!), ...(data.appShowcase || {}) },
     schoolCampuses: { ...(current.schoolCampuses || DEFAULT_SITE_ORCHESTRATION.schoolCampuses!), ...(data.schoolCampuses || {}) },

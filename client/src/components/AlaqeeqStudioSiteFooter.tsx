@@ -198,65 +198,109 @@ export function AlaqeeqStudioSiteFooter() {
                   مدارس العقيق الأهلية والدولية
                 </h3>
                 <div className="mt-1.5 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                  <div
-                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm ${
+                  <a
+                    href={orchestration?.footer?.badge1Url || "/accreditations"}
+                    onClick={(e) => {
+                      const url = orchestration?.footer?.badge1Url || "/accreditations";
+                      if (url.startsWith("/")) {
+                        e.preventDefault();
+                        navigate(url);
+                      }
+                    }}
+                    target={orchestration?.footer?.badge1Url?.startsWith("http") ? "_blank" : undefined}
+                    rel={orchestration?.footer?.badge1Url?.startsWith("http") ? "noreferrer" : undefined}
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
                       dark
-                        ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                        : "border-amber-500/40 bg-amber-50 text-[#855e09]"
+                        ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                        : "border-amber-500/40 bg-amber-50 text-[#855e09] hover:bg-amber-100"
                     }`}
                   >
                     <Award size={11} className="text-[#f8ca14] shrink-0" />
-                    <span>اعتماد Cognia</span>
-                  </div>
-                  <div
-                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm ${
+                    <span>{orchestration?.footer?.badge1Text || "اعتماد Cognia"}</span>
+                  </a>
+                  <a
+                    href={orchestration?.footer?.badge2Url || "/accreditations"}
+                    onClick={(e) => {
+                      const url = orchestration?.footer?.badge2Url || "/accreditations";
+                      if (url.startsWith("/")) {
+                        e.preventDefault();
+                        navigate(url);
+                      }
+                    }}
+                    target={orchestration?.footer?.badge2Url?.startsWith("http") ? "_blank" : undefined}
+                    rel={orchestration?.footer?.badge2Url?.startsWith("http") ? "noreferrer" : undefined}
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold shadow-sm transition hover:scale-105 active:scale-95 cursor-pointer ${
                       dark
-                        ? "border-[#08467d]/60 bg-[#08467d]/20 text-slate-200"
-                        : "border-[#08467d]/25 bg-[#08467d]/5 text-[#08467d]"
+                        ? "border-[#08467d]/60 bg-[#08467d]/20 text-slate-200 hover:bg-[#08467d]/30"
+                        : "border-[#08467d]/25 bg-[#08467d]/5 text-[#08467d] hover:bg-[#08467d]/15"
                     }`}
                   >
                     <GraduationCap size={11} className="text-[#08467d] dark:text-[#f8ca14] shrink-0" />
-                    <span>مركز اختبارات SAT & IELTS</span>
-                  </div>
+                    <span>{orchestration?.footer?.badge2Text || "مركز اختبارات SAT & IELTS"}</span>
+                  </a>
                 </div>
               </div>
             </div>
 
             {/* Quick Links Capsule Navigation */}
             <div className="flex items-center justify-center gap-2 flex-wrap text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => navigate("/admissions")}
-                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
+              <a
+                href={orchestration?.footer?.quickLink1Url || "/admissions"}
+                onClick={(e) => {
+                  const url = orchestration?.footer?.quickLink1Url || "/admissions";
+                  if (url.startsWith("/")) {
+                    e.preventDefault();
+                    navigate(url);
+                  }
+                }}
+                target={orchestration?.footer?.quickLink1Url?.startsWith("http") ? "_blank" : undefined}
+                rel={orchestration?.footer?.quickLink1Url?.startsWith("http") ? "noreferrer" : undefined}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 cursor-pointer ${
                   dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
                     : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
               >
-                القبول والتسجيل ✦
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/accreditations")}
-                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
+                {orchestration?.footer?.quickLink1Text || "القبول والتسجيل ✦"}
+              </a>
+              <a
+                href={orchestration?.footer?.quickLink2Url || "/accreditations"}
+                onClick={(e) => {
+                  const url = orchestration?.footer?.quickLink2Url || "/accreditations";
+                  if (url.startsWith("/")) {
+                    e.preventDefault();
+                    navigate(url);
+                  }
+                }}
+                target={orchestration?.footer?.quickLink2Url?.startsWith("http") ? "_blank" : undefined}
+                rel={orchestration?.footer?.quickLink2Url?.startsWith("http") ? "noreferrer" : undefined}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 cursor-pointer ${
                   dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
                     : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
               >
-                الاعتمادات
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/about")}
-                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 ${
+                {orchestration?.footer?.quickLink2Text || "الاعتمادات"}
+              </a>
+              <a
+                href={orchestration?.footer?.quickLink3Url || "/about"}
+                onClick={(e) => {
+                  const url = orchestration?.footer?.quickLink3Url || "/about";
+                  if (url.startsWith("/")) {
+                    e.preventDefault();
+                    navigate(url);
+                  }
+                }}
+                target={orchestration?.footer?.quickLink3Url?.startsWith("http") ? "_blank" : undefined}
+                rel={orchestration?.footer?.quickLink3Url?.startsWith("http") ? "noreferrer" : undefined}
+                className={`px-3 py-1.5 rounded-full border transition hover:scale-105 active:scale-95 cursor-pointer ${
                   dark
                     ? "border-white/10 bg-white/5 text-slate-300 hover:text-[#f8ca14] hover:border-[#f8ca14]/40"
                     : "border-black/10 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 shadow-sm"
                 }`}
               >
-                المجمعات 🏫
-              </button>
+                {orchestration?.footer?.quickLink3Text || "المجمعات 🏫"}
+              </a>
             </div>
 
             {/* Clean Uniform Social Media Circles (Including WhatsApp) */}
@@ -363,32 +407,21 @@ export function AlaqeeqStudioSiteFooter() {
           </div>
         </div>
 
-        {/* 3. Minimal Copyright Line & Back to Top (with Safe Clearance from Floating Widgets) */}
+        {/* 3. Centered Copyright Line (Clean Clearance from Floating Widgets) */}
         <div
-          className={`mt-4 pt-3 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 text-center sm:text-right text-[11px] font-bold ${
-            dark ? "text-slate-500" : "text-slate-600"
+          className={`mt-4 pt-3 flex items-center justify-center text-center text-[11px] font-bold ${
+            dark ? "text-slate-400" : "text-slate-600"
           }`}
         >
-          <div className="flex items-center gap-2">
-            <p>{orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}</p>
+          <p className="mx-auto text-center leading-relaxed">
+            {orchestration?.footer?.copyrightText || "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}
             {orchestration?.location?.enabled !== false && (
-              <span className="hidden sm:inline text-slate-400">· {orchestration?.location?.text || "المدينة المنورة"}</span>
+              <span className={dark ? "text-slate-400" : "text-slate-500"}>
+                {" · "}
+                {orchestration?.location?.text || "المدينة المنورة · المملكة العربية السعودية"}
+              </span>
             )}
-          </div>
-
-          <button
-            type="button"
-            onClick={scrollToTop}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-black transition hover:scale-105 active:scale-95 ${
-              dark
-                ? "border-white/10 bg-white/5 text-slate-300 hover:border-[#f8ca14] hover:text-[#f8ca14]"
-                : "border-black/10 bg-white text-slate-600 hover:border-[#08467d] hover:text-[#08467d] shadow-sm"
-            }`}
-            title="العودة لأعلى الصفحة"
-          >
-            <span>للأعلى</span>
-            <ArrowUp size={12} />
-          </button>
+          </p>
         </div>
       </div>
     </footer>
