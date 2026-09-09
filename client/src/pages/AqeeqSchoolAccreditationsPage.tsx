@@ -201,7 +201,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                   defaultText="اعتمادات دولية مرموقة ومراكز اختبارات معتمدة."
                   as="h1"
                   className={`text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.18] mb-6 ${
-                    dark ? "text-white" : "text-[#08467d]"
+                    dark ? "text-white" : "text-black"
                   }`}
                 >
                   {(text) => {
@@ -210,10 +210,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                     if (match) {
                       return (
                         <>
-                          <span className={`block ${dark ? "text-white" : "text-[#08467d]"}`}>
+                          <span className={`block ${dark ? "text-white" : "text-black"}`}>
                             {match[1].trim()}
                           </span>
-                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                             {match[2].trim()}
                           </span>
                         </>
@@ -224,10 +224,10 @@ export default function AqeeqSchoolAccreditationsPage() {
                       const mid = Math.floor(words.length / 2);
                       return (
                         <>
-                          <span className={`block ${dark ? "text-white" : "text-[#08467d]"}`}>
+                          <span className={`block ${dark ? "text-white" : "text-black"}`}>
                             {words.slice(0, mid).join(" ")}
                           </span>
-                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
                             {words.slice(mid).join(" ")}
                           </span>
                         </>

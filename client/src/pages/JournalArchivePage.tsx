@@ -197,7 +197,7 @@ export default function JournalArchivePage() {
                 }`}>
                   {(text) => <><Sparkles size={14} />{text}</>}
                 </VisualEditable>
-                <VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${dark ? "text-amber-50" : "text-slate-900"}`} />
+                <VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${dark ? "text-white" : "text-black"}`} />
                 <VisualEditable id="journal-hero-title-second" tag="text" label="السطر الذهبي لعنوان المكتبة" defaultText="بنبض لحظته." as="h1" className={`text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
                 <VisualEditable id="journal-hero-description" tag="text" label="وصف واجهة المكتبة" defaultText="رفوف رقمية تحفظ أعداد النشرة، وتفتح كل صفحة كجزء من ذاكرة مدارس العقيق." as="p" className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : "text-slate-600 font-medium"}`} />
                 <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold">

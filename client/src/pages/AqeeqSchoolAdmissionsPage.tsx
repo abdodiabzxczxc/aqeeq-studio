@@ -520,12 +520,44 @@ export default function AqeeqSchoolAdmissionsPage() {
                   id="admissions-hero-title"
                   tag="text"
                   label="عنوان هيرو القبول والتسجيل"
-                  defaultText="استثمر في مستقبل أبنائك في صرح العقيق الرائد"
+                  defaultText="استثمر في مستقبل أبنائك في صرح العقيق الرائد."
                   as="h1"
-                  className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
-                    dark ? "text-white" : "text-[#0a192f]"
+                  className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.18] mb-6 ${
+                    dark ? "text-white" : "text-black"
                   }`}
-                />
+                >
+                  {(text) => {
+                    const raw = text || "استثمر في مستقبل أبنائك في صرح العقيق الرائد.";
+                    const match = raw.match(/^(استثمر في مستقبل أبنائك)(.*)$/);
+                    if (match) {
+                      return (
+                        <>
+                          <span className={`block ${dark ? "text-white" : "text-black"}`}>
+                            {match[1].trim()}
+                          </span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                            {match[2].trim()}
+                          </span>
+                        </>
+                      );
+                    }
+                    const words = raw.trim().split(/\s+/);
+                    if (words.length >= 4) {
+                      const mid = Math.floor(words.length / 2);
+                      return (
+                        <>
+                          <span className={`block ${dark ? "text-white" : "text-black"}`}>
+                            {words.slice(0, mid).join(" ")}
+                          </span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                            {words.slice(mid).join(" ")}
+                          </span>
+                        </>
+                      );
+                    }
+                    return <span>{raw}</span>;
+                  }}
+                </VisualEditable>
 
                 <VisualEditable
                   id="admissions-hero-desc"
