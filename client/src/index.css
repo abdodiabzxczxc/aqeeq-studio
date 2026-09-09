@@ -2147,15 +2147,7 @@ html.light .aq-public-shell { background: #f8fafc !important; color: #0f172a !im
 /* يظل العنوان قابلًا للتحرير، مع الحفاظ على كسره المقصود إلى سطرين في كل المقاسات. */
 [data-visual-id="albums-hero-title"] { display: block; max-width: none; }
 
-/* أخبار وعروض العقيق تتبع إيقاع عنوان ورف مجلة وألبوم العقيق، بينما تبقى خلاصة المنشورات متعددة الوسائط. */
-#aqeeq-showcase-feed { max-width: 1380px; }
-#aqeeq-showcase-feed > div:first-child { flex-wrap: nowrap; }
-#aqeeq-showcase-feed > div:first-child h2 { font-size: 1.5rem; }
-#aqeeq-showcase-feed > div:first-child h2 span { color: inherit !important; }
-#aqeeq-showcase-feed > div:first-child > span { border: 0; background: transparent; border-radius: 0; padding: 0; font-size: .75rem; color: inherit; }
-@media (max-width: 640px) {
-  #aqeeq-showcase-feed > div:first-child { flex-wrap: wrap; }
-}
+
 
 /* الاستوديوهات الإدارية وأزرار الحالة تتبع الأخضر والأصفر بدلاً من ألوان افتراضية. */
 main:has(.aq-journal-studio-preview) { background: radial-gradient(circle at 80% -10%, rgb(171 29 34 / .22), transparent 22rem), linear-gradient(180deg, var(--aq-blue), var(--aq-black)) !important; }
