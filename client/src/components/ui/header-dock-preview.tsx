@@ -58,7 +58,7 @@ function DockHeroCover({ preview, dark }: { preview: PagePreviewMetadata; dark: 
         className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover/cover:scale-[1.02]"
         onError={(e) => {
           const target = e.currentTarget;
-          if (target.src.endsWith(".webp")) {
+          if (target.src.includes(".webp")) {
             target.src = target.src.replace(".webp", ".png");
           }
         }}

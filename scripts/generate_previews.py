@@ -8,22 +8,25 @@ CHROME_BIN = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 OUT_DIR = "client/public/previews"
 os.makedirs(OUT_DIR, exist_ok=True)
 
+# Every page gets a solid delay (4500ms) to ensure React hydration, tRPC queries, images, and fonts are 100% loaded
 PAGES = [
-    ("home", "http://localhost:3000/", 3500),
-    ("about", "http://localhost:3000/about", None),
-    ("accreditations", "http://localhost:3000/accreditations", None),
-    ("admissions", "http://localhost:3000/admissions", None),
-    ("journal", "http://localhost:3000/journal", None),
-    ("albums", "http://localhost:3000/albums", None),
-    ("podcast", "http://localhost:3000/podcast", 3500),
-    ("articles", "http://localhost:3000/articles", None),
-    ("showcase", "http://localhost:3000/showcase", 3500),
+    ("home", "http://localhost:3000/", 4500),
+    ("about", "http://localhost:3000/about", 4500),
+    ("accreditations", "http://localhost:3000/accreditations", 4500),
+    ("admissions", "http://localhost:3000/admissions", 4500),
+    ("journal", "http://localhost:3000/journal", 4500),
+    ("albums", "http://localhost:3000/albums", 4500),
+    ("podcast", "http://localhost:3000/podcast", 4500),
+    ("articles", "http://localhost:3000/articles", 4500),
+    ("showcase", "http://localhost:3000/showcase", 4500),
 ]
 
-def capture_page(key, url, theme, delay):
+def capture_page(key, url, theme, delay=4500, retries=1):
     sep = "&" if "?" in url else "?"
     full_url = f"{url}{sep}theme={theme}"
     tmp_png = f"/tmp/snap_{key}_{theme}.png"
+    if os.path.exists(tmp_png):
+        os.remove(tmp_png)
     
     cmd = [
         CHROME_BIN,
@@ -56,7 +59,17 @@ def capture_page(key, url, theme, delay):
     out_png = os.path.join(OUT_DIR, f"{key}_{theme}.png")
     resized.save(out_webp, "WEBP", quality=90)
     resized.save(out_png, "PNG")
-    print(f"Saved {out_webp} ({os.path.getsize(out_webp)} bytes)")
+    
+    size = os.path.getsize(out_webp)
+    print(f"Saved {out_webp} ({size} bytes)")
+    
+    # If size is suspiciously small (< 32KB), it might have snapped during initial loading skeleton
+    # Retry once with longer delay if retries left
+    if size < 32000 and retries > 0:
+        print(f"Warning: {key}_{theme} appears under-loaded ({size} bytes). Retrying with 6500ms delay...")
+        time.sleep(1)
+        capture_page(key, url, theme, delay=6500, retries=retries - 1)
+        return
     
     # Also save standard without theme suffix for backwards compatibility
     if theme == "dark":
