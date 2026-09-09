@@ -10,6 +10,7 @@ import { normalizeJournalCoverScale } from "@/lib/journalCover";
 import { getJournalIssuePath, getJournalIssueShareUrl } from "@/lib/journalRoutes";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
+import { AqeeqAmbientLighting } from "@/components/AqeeqAmbientLighting";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, BookOpen, Eye, FolderArchive, LibraryBig, ScanLine, Settings2, Share2, Sparkles } from "lucide-react";
 import { useMemo, useState, useRef } from "react";
@@ -200,19 +201,7 @@ export default function JournalArchivePage() {
       }}
     >
       {/* ── خلفية الإضاءة المحيطية العالمية السلسة الممتدة بدون أي حواف أو قطع ── */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-100 transition-opacity duration-700"
-        aria-hidden="true"
-        style={{
-          background: isNationalDay
-            ? dark
-              ? "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.42) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.16) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.12) 0%, transparent 60%)"
-              : "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.04) 0%, transparent 60%)"
-            : dark
-            ? "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.35) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.16) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.09) 0%, transparent 60%)"
-            : "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.03) 0%, transparent 60%)",
-        }}
-      />
+      <AqeeqAmbientLighting />
       <VisualEditable id="journal-header-shell" tag="section" label="شريط هوية المكتبة" as="section">
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={journalLogoUrl} />
       </VisualEditable>

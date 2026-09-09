@@ -4,6 +4,7 @@ import { resolveStudioCardCovers } from "@/lib/studioCardCovers";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
+import { AqeeqAmbientLighting } from "@/components/AqeeqAmbientLighting";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
@@ -923,41 +924,7 @@ export default function AlaqeeqStudioPublicPage() {
       }}
     >
       {/* Global Unclipped Ambient Lighting Aura — floats smoothly across the entire page with zero borders */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-100 transition-opacity duration-700"
-        aria-hidden
-        style={{
-          background: isNationalDay
-            ? dark
-              ? "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.42) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.16) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.12) 0%, transparent 60%)"
-              : "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.04) 0%, transparent 60%)"
-            : dark
-            ? "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.35) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.16) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.09) 0%, transparent 60%)"
-            : "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.03) 0%, transparent 60%)",
-        }}
-      />
-      {/* 🇸🇦 Floating Gold Stars — National Day Ambient Particles */}
-      {isNationalDay && (
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-          {[
-            { char: "★", left: "5%",  dur: "9s",  delay: "0s",   size: "12px" },
-            { char: "☆", left: "18%", dur: "13s", delay: "2s",   size: "9px"  },
-            { char: "★", left: "32%", dur: "11s", delay: "4.5s", size: "15px" },
-            { char: "☆", left: "48%", dur: "8s",  delay: "1s",   size: "10px" },
-            { char: "★", left: "63%", dur: "14s", delay: "3s",   size: "8px"  },
-            { char: "☆", left: "77%", dur: "10s", delay: "6s",   size: "13px" },
-            { char: "★", left: "91%", dur: "12s", delay: "0.5s", size: "11px" },
-          ].map((p, i) => (
-            <span
-              key={i}
-              className="snd-floating-star absolute"
-              style={{ left: p.left, animationDuration: p.dur, animationDelay: p.delay, fontSize: p.size }}
-            >
-              {p.char}
-            </span>
-          ))}
-        </div>
-      )}
+      <AqeeqAmbientLighting />
 
       <AlaqeeqStudioSiteHeader title="مدارس العقيق الأهلية والدولية" active="studio" logoUrl={logoUrl} />
 
