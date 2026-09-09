@@ -107,9 +107,7 @@ export function AqeeqNationalTraitsSection({ dark = true }: Props) {
   return (
     <section
       aria-label="القيم الوطنية الست - عزنا بطبعنا"
-      className={`relative overflow-hidden py-12 sm:py-20 transition-colors duration-300 ${
-        dark ? "bg-transparent" : "bg-gradient-to-b from-[#f0fdf4]/80 via-white to-[#f7fdf9]"
-      }`}
+      className="relative overflow-visible py-12 sm:py-20 transition-colors duration-300 bg-transparent border-0"
     >
       {/* Subtle Ambient Background Light corresponding to the active trait color */}
       <div

@@ -51,14 +51,8 @@ export function AlaqeeqStudioSiteFooter() {
   return (
     <footer
       dir="rtl"
-      className={`border-t relative overflow-hidden transition-colors duration-300 font-['Tajawal',sans-serif] ${
-        isNationalDay
-          ? dark
-            ? "border-emerald-500/20 bg-[#021008] text-white"
-            : "border-emerald-200 bg-[#f7fbf9] text-slate-900"
-          : dark
-          ? "border-white/[0.08] bg-[#000000] text-white"
-          : "border-black/[0.06] bg-[#fafafa] text-slate-900"
+      className={`border-0 relative overflow-visible transition-colors duration-300 font-['Tajawal',sans-serif] bg-transparent ${
+        dark ? "text-white" : "text-slate-900"
       }`}
     >
       <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 pb-28 md:pb-10">

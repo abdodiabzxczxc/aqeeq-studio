@@ -104,11 +104,7 @@ export default function AqeeqSchoolAppShowcaseSection({
     <section
       ref={sectionRef}
       id="aqeeq-app-section"
-      className={`relative py-16 md:py-24 border-b overflow-hidden transition-colors duration-300 ${
-        dark
-          ? "border-white/10 bg-[#070b10] text-white"
-          : "border-slate-200/80 bg-[#f8faf9] text-slate-900"
-      }`}
+      className="relative py-16 md:py-24 border-0 overflow-visible transition-colors duration-300 bg-transparent text-slate-900 dark:text-white"
     >
       {/* Ambient Background Gradients */}
       <div

@@ -346,7 +346,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen ${dark ? "bg-[#080b12] text-white" : "bg-white text-black"}`}>
+      <main dir="rtl" className={`min-h-screen ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
         <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" />
         <div className="mx-auto max-w-[1500px] px-4 py-8 animate-pulse">
           <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
@@ -357,7 +357,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   }
   if (isError && !album) {
     return (
-      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#080b12] text-white" : "bg-[#fbfaf8] text-slate-900"}`}>
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-black text-white" : "bg-white text-slate-900"}`}>
         <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
         <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
           <RotateCcw className="text-amber-400 animate-spin mb-4" size={48} />
@@ -380,7 +380,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
   }
   if (!album) {
     return (
-      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#080b12] text-white" : "bg-[#fbfaf8] text-slate-900"}`}>
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-black text-white" : "bg-white text-slate-900"}`}>
         <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />
         <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
           <ImageIcon className={dark ? "text-amber-300" : "text-[#08467d]"} size={48} />
@@ -417,11 +417,7 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
     <main
       dir="rtl"
       className={`aq-album-reader-theme aq-album-reader-theme-${theme} min-h-screen transition-colors ${
-        isNationalDay
-          ? dark
-            ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
-            : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
-          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f8fafc] text-slate-900"
+        dark ? "bg-black text-white" : "bg-white text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="ألبوم العقيق" active="albums" logoUrl={brandLogo} />

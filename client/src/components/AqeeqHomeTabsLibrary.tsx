@@ -209,11 +209,7 @@ export function AqeeqHomeTabsLibrary({
         tag="section"
         label="قسم استكشف المكتبة"
         as="section"
-        className={`w-full py-16 md:py-24 transition-colors duration-500 relative overflow-hidden ${
-          isNationalDay
-            ? dark ? "snd-library-dark" : "snd-library-light"
-            : dark ? "bg-[#05080c]" : "bg-gradient-to-b from-[#f8fafc] to-[#ffffff]"
-        }`}
+        className="w-full py-16 md:py-24 transition-colors duration-500 relative overflow-visible bg-transparent border-0"
       >
         {/* Ambient Radial Spotlight */}
         <div 

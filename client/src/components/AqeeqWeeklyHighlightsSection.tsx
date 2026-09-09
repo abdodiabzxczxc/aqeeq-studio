@@ -55,11 +55,7 @@ export function AqeeqWeeklyHighlightsSection({
       tag="section"
       label="قسم إنجازات وأحداث الأسبوع"
       as="section"
-      className={`border-b pt-16 pb-28 md:pt-20 md:pb-36 transition ${
-        isNationalDay
-          ? dark ? "border-[#f8ca14]/10 snd-section-dark" : "border-[#005A36]/10 snd-section-light"
-          : dark ? "border-white/[0.05] bg-gradient-to-b from-transparent via-[#060608]/40 to-transparent" : "border-black/[0.04] bg-slate-50/50"
-      }`}
+      className="border-0 pt-16 pb-28 md:pt-20 md:pb-36 transition bg-transparent"
     >
       <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         {/* Section Header */}

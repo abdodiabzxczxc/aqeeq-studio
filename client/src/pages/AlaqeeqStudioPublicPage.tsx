@@ -877,9 +877,9 @@ export default function AlaqeeqStudioPublicPage() {
     return (
       <main dir="rtl" className={"min-h-screen overflow-x-hidden " + (dark ? "bg-black" : "bg-white")}>
         {/* Skeleton Header */}
-        <div className={`h-[60px] border-b ${dark ? "border-white/[0.08] bg-[#050505]" : "border-black/[0.06] bg-white"}`} />
+        <div className="h-[60px] bg-transparent border-0" />
         {/* Skeleton Hero */}
-        <div className={`border-b py-12 md:py-16 ${dark ? "border-white/[0.08]" : "border-black/[0.06]"}`}>
+        <div className="py-12 md:py-16 bg-transparent border-0">
           <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8">
             <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
               <div className="space-y-4 animate-pulse">
@@ -896,7 +896,7 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
         {/* Skeleton Bento Grid */}
-        <div className={`border-b py-14 md:py-20 ${dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.015]"}`}>
+        <div className="py-14 md:py-20 bg-transparent border-0">
           <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-5 md:px-8">
             <div className={`h-8 w-48 rounded-full mb-8 animate-pulse ${dark ? "bg-white/10" : "bg-black/10"}`} />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">

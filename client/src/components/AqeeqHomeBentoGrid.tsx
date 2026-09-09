@@ -104,11 +104,7 @@ export function AqeeqHomeBentoGrid({
         tag="section"
         label="قسم جديد مدارس العقيق (Bento Grid)"
         as="div"
-        className={"w-full pt-8 sm:pt-10 pb-14 md:pb-20 overflow-visible " + (
-          isNationalDay
-            ? dark ? "snd-section-dark-alt" : "snd-section-light-alt"
-            : ""
-        )}
+        className="w-full pt-8 sm:pt-10 pb-14 md:pb-20 overflow-visible bg-transparent border-0"
       >
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
           {/* Section Header */}

@@ -2560,13 +2560,10 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 }
 
 /* ── Footer backgrounds ── */
-:root[data-site-theme="saudi-national-day"] .snd-footer-dark {
-  background: linear-gradient(180deg, #010c07 0%, #000905 100%) !important;
-  border-color: rgba(248,202,20,0.11) !important;
-}
+:root[data-site-theme="saudi-national-day"] .snd-footer-dark,
 :root[data-site-theme="saudi-national-day"] .snd-footer-light {
-  background: linear-gradient(180deg, #f0fdf4 0%, #e8faf0 100%) !important;
-  border-color: rgba(0,90,54,0.14) !important;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 /* ── Memory cards ── */
@@ -2581,12 +2578,10 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 }
 
 /* ── Library section ── */
-:root[data-site-theme="saudi-national-day"] .snd-library-dark {
-  background: #010c07 !important;
-  border-color: rgba(90,186,28,0.08) !important;
-}
+:root[data-site-theme="saudi-national-day"] .snd-library-dark,
 :root[data-site-theme="saudi-national-day"] .snd-library-light {
-  background: #f7fdf9 !important;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 /* ── Tab bar ── */

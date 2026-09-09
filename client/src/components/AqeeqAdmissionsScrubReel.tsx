@@ -159,11 +159,7 @@ export function AqeeqAdmissionsScrubReel({ onSelectStage }: AqeeqAdmissionsScrub
     <section
       ref={containerRef}
       id="admissions-cinema-reel"
-      className={`relative h-[250vh] w-full transition-colors duration-500 overflow-visible ${
-        isNationalDay
-          ? dark ? "bg-[#010905]" : "bg-[#f5fbf7]"
-          : dark ? "bg-[#05070a]" : "bg-[#f8fafc]"
-      }`}
+      className="relative h-[250vh] w-full transition-colors duration-500 overflow-visible bg-transparent border-0"
     >
       {/* Sticky Fullscreen Cinema Stage */}
       <div className="sticky top-0 flex h-screen w-full flex-col justify-between overflow-hidden pb-4 sm:pb-8 pt-16 sm:pt-20">

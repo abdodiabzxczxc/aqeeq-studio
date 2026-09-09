@@ -69,7 +69,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen ${dark ? "bg-[#090b11] text-white" : "bg-white text-black"}`}>
+      <main dir="rtl" className={`min-h-screen ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
         <div className="container py-8 animate-pulse">
           <div className="h-5 w-48 rounded-lg bg-current/10 mb-6" />
@@ -81,7 +81,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   if (isError && !issue) {
     return (
-      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#fbfaf8] text-slate-900"}`}>
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-black text-slate-100" : "bg-white text-slate-900"}`}>
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
         <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
           <RotateCcw size={48} className="text-amber-400 animate-spin mb-4" />
@@ -105,7 +105,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
 
   if (!issue) {
     return (
-      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-[#090b11] text-slate-100" : "bg-[#fbfaf8] text-slate-900"}`}>
+      <main dir="rtl" className={`min-h-screen flex flex-col justify-between ${dark ? "bg-black text-slate-100" : "bg-white text-slate-900"}`}>
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
         <div className="flex flex-1 flex-col items-center justify-center py-20 px-4 text-center">
           <Newspaper size={48} className={dark ? "text-amber-300" : "text-[#08467d]"} />
@@ -168,11 +168,7 @@ export default function SchoolNewsReaderPage({ slug, standalone = false }: { slu
     <main
       dir="rtl"
       className={`aq-journal-reader-theme aq-journal-reader-theme-${readerTheme} min-h-screen transition-colors ${
-        isNationalDay
-          ? dark
-            ? "bg-gradient-to-b from-[#00140c] via-[#002215] to-[#001008] text-white"
-            : "bg-gradient-to-b from-[#f0fdf4] via-[#f7fbf9] to-[#ecfdf5] text-slate-900"
-          : dark ? "bg-[#080b12] text-slate-100" : "bg-[#f8fafc] text-slate-900"
+        dark ? "bg-black text-white" : "bg-white text-slate-900"
       }`}
     >
       <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={brandLogoUrl} />

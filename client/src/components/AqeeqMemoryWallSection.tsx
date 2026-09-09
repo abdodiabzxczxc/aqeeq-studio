@@ -50,11 +50,7 @@ export function AqeeqMemoryWallSection({
       tag="section"
       label="قسم ذاكرة العقيق"
       as="section"
-      className={"border-b py-16 md:py-24 " + (
-        isNationalDay
-          ? dark ? "border-[#f8ca14]/8 snd-section-dark" : "border-[#005A36]/8 snd-section-light"
-          : dark ? "border-white/[0.05] bg-transparent" : "border-black/[0.04] bg-transparent"
-      )}
+      className="py-16 md:py-24 bg-transparent border-0"
     >
       <div ref={sectionRef} className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] items-center">
