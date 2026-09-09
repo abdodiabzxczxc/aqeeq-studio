@@ -99,8 +99,8 @@ export function AdmissionsCampusParallax({
     offset: ["start start", "end start"],
   });
 
-  // Constant, elegant subtle opacity throughout scroll
-  const opacity = dark ? 0.30 : 0.24;
+  // Constant, ultra-subtle whisper opacity throughout scroll
+  const opacity = dark ? 0.18 : 0.14;
   const translateY = useTransform(
     scrollYProgress,
     [0, 0.38],

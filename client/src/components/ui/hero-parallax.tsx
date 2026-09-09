@@ -102,8 +102,8 @@ export const HeroParallax = ({
     [isDesktop ? (rowCount === 2 ? -240 : -440) : -140, isDesktop ? (rowCount === 2 ? 80 : 180) : 50]
   );
 
-  // Constant, elegant subtle opacity throughout scroll
-  const opacity = dark ? 0.30 : 0.24;
+  // Constant, ultra-subtle whisper opacity throughout scroll
+  const opacity = dark ? 0.18 : 0.14;
 
   // Organic gliding inertia with ZERO bounce (The magnet that smooths out wheel ticks!)
   const translateX = useSpring(rawTranslateX, smoothConfig);
@@ -545,8 +545,8 @@ export function HeroParallaxBackdrop({
     [isDesktop ? -100 : -50, isDesktop ? 60 : 30]
   );
 
-  // Constant, elegant subtle opacity throughout scroll
-  const opacity = opacityLevel ?? (dark ? 0.30 : 0.24);
+  // Constant, ultra-subtle whisper opacity throughout scroll
+  const opacity = opacityLevel ?? (dark ? 0.18 : 0.14);
 
   const translateX = useSpring(rawTranslateX, smoothConfig);
   const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
