@@ -95,7 +95,7 @@ export function ParallaxUnfurlingGallery({
   );
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.24 : 0.18;
+  const opacity = dark ? 0.12 : 0.08;
 
   const rotateX = useSpring(rawRotateX, smoothConfig);
   const rotateY = useSpring(rawRotateY, smoothConfig);

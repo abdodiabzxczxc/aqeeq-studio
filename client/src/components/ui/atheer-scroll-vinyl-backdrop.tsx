@@ -234,7 +234,7 @@ export function AtheerScrollVinylBackdrop({
   });
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.24 : 0.18;
+  const opacity = dark ? 0.12 : 0.08;
 
   // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
   // ZERO bounce, ZERO lag, ultra-silky glide identical to other pages

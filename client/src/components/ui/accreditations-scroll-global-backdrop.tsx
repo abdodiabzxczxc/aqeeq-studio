@@ -190,7 +190,7 @@ export function AccreditationsScrollGlobalBackdrop({
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.24 : 0.18;
+  const opacity = dark ? 0.12 : 0.08;
 
   // 3D perspective tilt with critically damped inertia
   const rawRotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);

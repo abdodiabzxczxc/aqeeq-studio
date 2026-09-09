@@ -69,7 +69,7 @@ export function ArticlesScrollParallaxBackdrop({
   const rawTranslateY = useTransform(scrollYProgress, [0, 0.45], [isDesktop ? -180 : -80, isDesktop ? 140 : 60]);
 
   // Constant, ultra-subtle whisper opacity throughout scroll
-  const opacity = dark ? 0.24 : 0.18;
+  const opacity = dark ? 0.12 : 0.08;
 
   const rotateX = useSpring(rawRotateX, smoothConfig);
   const rotateY = useSpring(rawRotateY, smoothConfig);
