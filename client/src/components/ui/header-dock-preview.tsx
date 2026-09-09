@@ -24,6 +24,13 @@ interface PagePreviewMetadata {
   stats: string;
   glowColor: string;
   type: "journal" | "albums" | "podcast" | "articles" | "showcase" | "admissions" | "accreditations" | "about" | "home";
+  heroTitleLine1: string;
+  heroTitleLine2: string;
+  heroTag: string;
+  heroPhoto: string;
+  secondaryPhoto?: string | null;
+  countBadge?: string;
+  ctaText: string;
 }
 
 function directDriveImage(url: string | null | undefined) {
@@ -41,16 +48,210 @@ interface HeaderDockNavProps {
   onNavigate: (path: string) => void;
 }
 
-function DockHeroCover({ preview }: { preview: PagePreviewMetadata; dark: boolean }) {
+function DockLiveMicroViewport({ preview, dark }: { preview: PagePreviewMetadata; dark: boolean }) {
   return (
-    <div className="relative h-[165px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none">
-      <img
-        src={preview.image}
-        alt={preview.title}
-        loading="eager"
-        className="w-full h-full object-cover object-top select-none"
+    <div
+      className={`relative h-[180px] w-full rounded-2xl overflow-hidden mb-2.5 border select-none transition-all duration-300 ${
+        dark
+          ? "bg-[#060b13] border-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]"
+          : "bg-slate-900 border-slate-700 shadow-md"
+      }`}
+    >
+      {/* Dynamic Glow Spotlight */}
+      <div
+        className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-2xl pointer-events-none opacity-45 transition-colors duration-500"
+        style={{ backgroundColor: preview.glowColor }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none opacity-30" />
+      <div
+        className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full blur-2xl pointer-events-none opacity-30 transition-colors duration-500"
+        style={{ backgroundColor: preview.glowColor }}
+      />
+
+      {/* Live Indicator Badge (Corner) */}
+      <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[8.5px] font-bold text-emerald-400 select-none">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+        </span>
+        <span>مباشر حي</span>
+      </div>
+
+      {/* Main Content Grid: Text on Right, Live 3D Visual on Left */}
+      <div className="relative z-10 h-full p-3 flex items-center justify-between gap-2.5" dir="rtl">
+        {/* Right: Real-time Page Headings & Live Rhythm */}
+        <div className="flex-1 min-w-0 pr-1 flex flex-col justify-center text-right">
+          {/* Tag / Category Badge */}
+          <div className="inline-flex items-center gap-1 mb-1 self-start">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+            <span className="text-[9px] font-black text-amber-400/95 tracking-wide truncate max-w-[155px]">
+              {preview.heroTag}
+            </span>
+          </div>
+
+          {/* 2-Line Balanced Hero Title (Golden & Crisp) */}
+          <div className="font-black text-[13.5px] leading-[1.28] tracking-tight mb-1 text-right">
+            <div className="text-white">{preview.heroTitleLine1}</div>
+            <div className="text-[#f8ca14]">{preview.heroTitleLine2}</div>
+          </div>
+
+          {/* Micro Description */}
+          <p className="text-[9px] text-slate-300 line-clamp-2 leading-relaxed opacity-80 mb-2 font-medium">
+            {preview.description}
+          </p>
+
+          {/* Mini CTA Action Button */}
+          <div className="self-start inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black bg-[#f8ca14] hover:bg-[#ffe359] text-black shadow-sm transition-all duration-150">
+            <span>{preview.ctaText}</span>
+            <ChevronLeft size={10} />
+          </div>
+        </div>
+
+        {/* Left: Specialized 3D Visual Simulation */}
+        <div className="w-[110px] h-[150px] shrink-0 relative flex items-center justify-center">
+          {preview.type === "journal" && (
+            <div className="relative w-[92px] h-[135px]">
+              {preview.secondaryPhoto && (
+                <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/10 shadow-lg transform -rotate-6 translate-x-3 translate-y-1 opacity-60 scale-95 bg-slate-800">
+                  <img src={preview.secondaryPhoto} alt="" className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/20 shadow-2xl transform rotate-2 group-hover:rotate-0 transition-transform duration-300 bg-slate-900">
+                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-y-0 right-0 w-2.5 bg-gradient-to-l from-black/40 to-transparent pointer-events-none" />
+                <div className="absolute bottom-1 right-1 left-1 px-1 py-0.5 rounded bg-black/75 backdrop-blur-sm text-[7.5px] font-black text-amber-300 text-center truncate">
+                  {preview.countBadge || "عدد رسمي"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {preview.type === "albums" && (
+            <div className="relative w-[95px] h-[130px]">
+              {preview.secondaryPhoto && (
+                <div className="absolute inset-0 rounded-xl overflow-hidden border border-white/10 shadow-lg transform rotate-6 translate-x-2 translate-y-1 opacity-70 bg-slate-800">
+                  <img src={preview.secondaryPhoto} alt="" className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-xl overflow-hidden border border-white/25 shadow-2xl transform -rotate-3 group-hover:rotate-0 transition-transform duration-300 bg-slate-900">
+                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+                <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-black text-[7px] font-black shadow">
+                  ألبوم معتمد
+                </div>
+                <div className="absolute bottom-1 right-1 left-1 px-1 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[7.5px] font-bold text-white text-center truncate">
+                  {preview.countBadge || "صور 4K"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {preview.type === "podcast" && (
+            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
+              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <div className="absolute bottom-6 inset-x-2 flex items-end justify-center gap-1 h-4">
+                {[35, 75, 100, 60, 90, 45, 80].map((h, i) => (
+                  <span
+                    key={i}
+                    className="w-1 bg-amber-400 rounded-full animate-pulse"
+                    style={{ height: `${h}%`, animationDelay: `${i * 120}ms` }}
+                  />
+                ))}
+              </div>
+              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-black text-white bg-black/60 rounded px-1 py-0.5 truncate">
+                {preview.countBadge || "أثير العقيق"}
+              </div>
+            </div>
+          )}
+
+          {preview.type === "showcase" && (
+            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
+              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20" />
+              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-black text-[7px] font-black flex items-center gap-0.5 shadow">
+                <Camera size={7} />
+                <span>تغطية حية</span>
+              </div>
+              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-black text-white bg-black/60 rounded px-1 py-0.5 truncate">
+                {preview.countBadge || "منشور إعلامي"}
+              </div>
+            </div>
+          )}
+
+          {preview.type === "articles" && (
+            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
+              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-cyan-400 text-black text-[7px] font-black flex items-center gap-0.5 shadow">
+                <FileText size={7} />
+                <span>مقال مميز</span>
+              </div>
+              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-bold text-slate-200 bg-black/70 rounded px-1 py-0.5 truncate">
+                {preview.countBadge || "أقلام العقيق"}
+              </div>
+            </div>
+          )}
+
+          {preview.type === "admissions" && (
+            <div className="relative w-[102px] h-[130px] rounded-xl overflow-hidden border border-amber-400/30 shadow-xl bg-gradient-to-br from-[#0c1829] to-[#040810] p-2 flex flex-col justify-between text-right">
+              <div className="flex items-center justify-between">
+                <GraduationCap size={15} className="text-amber-400" />
+                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[6.5px] font-black border border-emerald-500/30">
+                  متاح الآن
+                </span>
+              </div>
+              <div>
+                <div className="text-[15px] font-black text-amber-400 leading-none mb-0.5">15%</div>
+                <div className="text-[7.5px] text-slate-300 font-bold leading-tight">خصم الأشقاء</div>
+              </div>
+              <div className="pt-1 border-t border-white/10 text-[7px] text-slate-400 font-medium truncate">
+                تقسيط تابي وتمارا
+              </div>
+            </div>
+          )}
+
+          {preview.type === "accreditations" && (
+            <div className="relative w-[102px] h-[130px] rounded-xl overflow-hidden border border-amber-400/30 shadow-xl bg-gradient-to-br from-[#081b33] to-[#030c17] p-2 flex flex-col justify-between items-center text-center">
+              <Award size={24} className="text-amber-400 mt-1" />
+              <div>
+                <div className="text-[10.5px] font-black text-white">Cognia USA</div>
+                <div className="text-[7px] text-amber-300/90 font-bold">اعتماد كوجنيا الدولي</div>
+              </div>
+              <div className="px-1 py-0.5 rounded bg-white/10 text-[6.5px] font-black text-slate-300 border border-white/10 w-full truncate">
+                SAT · ACT · IELTS
+              </div>
+            </div>
+          )}
+
+          {preview.type === "about" && (
+            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
+              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[7px] font-black flex items-center gap-0.5 shadow">
+                <Building2 size={7} />
+                <span>مجمعاتنا</span>
+              </div>
+              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-bold text-white bg-black/70 rounded px-1 py-0.5 truncate">
+                بنين وبنات · مسار دولي
+              </div>
+            </div>
+          )}
+
+          {preview.type === "home" && (
+            <div className="relative w-[98px] h-[130px]">
+              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/10 transform rotate-6 translate-x-2 translate-y-1 opacity-60 bg-slate-800">
+                <img src={preview.secondaryPhoto || preview.heroPhoto} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/25 shadow-2xl transform -rotate-2 bg-slate-900">
+                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-1 inset-x-1 text-center text-[7.5px] font-black text-amber-300 bg-black/70 rounded px-1 py-0.5 truncate">
+                  بوابة العقيق 2026
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -228,6 +429,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/",
         stats: "30+ عاماً من التميز · المدينة",
         glowColor: "rgba(248, 202, 20, 0.28)",
+        heroTitleLine1: "ذاكرة العقيق",
+        heroTitleLine2: "في مكان واحد.",
+        heroTag: "ALAQEEQ SCHOOLS · PORTAL",
+        heroPhoto: journalPhoto,
+        secondaryPhoto: albumPhoto,
+        countBadge: "بوابة العقيق 2026",
+        ctaText: "استكشف البوابة",
       },
       about: {
         type: "about",
@@ -241,6 +449,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/about",
         stats: "بنين وبنات · مرافق متكاملة",
         glowColor: "rgba(16, 185, 129, 0.28)",
+        heroTitleLine1: "صروح العقيق",
+        heroTitleLine2: "بيئة نموذجية متكاملة.",
+        heroTag: "مجمعات ومسارات العقيق",
+        heroPhoto: aboutPhoto,
+        countBadge: "بنين وبنات · دولي",
+        ctaText: "جولة في المدارس",
       },
       accreditations: {
         type: "accreditations",
@@ -252,6 +466,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/accreditations",
         stats: "Cognia USA · SAT / IELTS",
         glowColor: "rgba(8, 70, 125, 0.38)",
+        heroTitleLine1: "الاعتمادات الدولية",
+        heroTitleLine2: "والشراكات الأكاديمية العالمية.",
+        heroTag: "الجودة الأكاديمية الدولية",
+        heroPhoto: "/covers/cognia-accreditation-seal.png",
+        countBadge: "Cognia USA · SAT",
+        ctaText: "استكشف الاعتمادات",
       },
       admissions: {
         type: "admissions",
@@ -272,6 +492,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
           ? `خصم ${orchestration.admissionsSettings.siblingDiscountSecond}% · 4 دفعات`
           : "خصم 15% · 4 دفعات",
         glowColor: "rgba(248, 202, 20, 0.32)",
+        heroTitleLine1: "بوابة القبول",
+        heroTitleLine2: "وحاسبة الرسوم الذكية.",
+        heroTag: orchestration?.admissionsSettings?.isOpen ? "التسجيل متاح 2026-2027" : "بوابة التسجيل والقبول",
+        heroPhoto: admissionsPhoto,
+        countBadge: "خصم 15% · 4 دفعات",
+        ctaText: "احسب الرسوم وسجل",
       },
       journal: {
         type: "journal",
@@ -286,6 +512,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/journal",
         stats: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحة تفاعلية · 3D` : "أعداد دورية · تقليب 3D",
         glowColor: "rgba(244, 63, 94, 0.28)",
+        heroTitleLine1: "خبرٌ يُقلب",
+        heroTitleLine2: "ليغدو ذكرى خالدة.",
+        heroTag: "موسم العقيق · النشرة الدورية",
+        heroPhoto: journalPhoto,
+        secondaryPhoto: secondJournalPhoto,
+        countBadge: activeIssue?.pageCount ? `${activeIssue.pageCount} صفحات · 3D` : "تقليب 3D",
+        ctaText: "اقرأ العدد الحالي",
       },
       albums: {
         type: "albums",
@@ -302,6 +535,13 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/albums",
         stats: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة وفيديو · 4K` : "صور فائقة الدقة 4K",
         glowColor: "rgba(139, 92, 246, 0.28)",
+        heroTitleLine1: "كل فعالية",
+        heroTitleLine2: "تخلّد أثمن اللحظات.",
+        heroTag: "موسم العقيق · أرشيف الفعاليات",
+        heroPhoto: albumPhoto,
+        secondaryPhoto: secondAlbumPhoto,
+        countBadge: activeAlbum?.mediaCount ? `${activeAlbum.mediaCount} صورة · 4K` : "ألبوم 4K",
+        ctaText: "ابدأ بالألبوم الحالي",
       },
       podcast: {
         type: "podcast",
@@ -318,6 +558,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/podcast",
         stats: activePodcast?.duration ? `${activePodcast.duration} د · استوديو حي` : "بث صوتي ومرئي · أثير",
         glowColor: "rgba(168, 85, 247, 0.28)",
+        heroTitleLine1: "أثير العقيق",
+        heroTitleLine2: "صوتٌ ينبض بالإبداع.",
+        heroTag: "أثير العقيق · بودكاست وراديو",
+        heroPhoto: podcastPhoto,
+        countBadge: activePodcast?.duration ? `${activePodcast.duration} دقيقة` : "استوديو حي",
+        ctaText: "استمع للحلقة",
       },
       articles: {
         type: "articles",
@@ -334,6 +580,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/articles",
         stats: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName}` : "قراءات ملهمة · أبحاث",
         glowColor: "rgba(6, 182, 212, 0.28)",
+        heroTitleLine1: "أقلام العقيق",
+        heroTitleLine2: "تفيض فكراً وإلهاماً.",
+        heroTag: "منبر الفكر والتربية",
+        heroPhoto: articlePhoto,
+        countBadge: activeArticle?.authorName ? `بقلم: ${activeArticle.authorName.slice(0, 15)}` : "مقال مميز",
+        ctaText: "قراءة المقال",
       },
       showcase: {
         type: "showcase",
@@ -347,6 +599,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
         routePath: "alaqeeq.edu.sa/showcase",
         stats: showcase?.postCount ? `${showcase.postCount} منشور إعلامي · مباشر` : "تحديثات وتغطيات يومية",
         glowColor: "rgba(234, 88, 12, 0.28)",
+        heroTitleLine1: "أخبار العقيق",
+        heroTitleLine2: "تتجدد أولاً بأول.",
+        heroTag: "موسم العقيق · النشرة الدورية",
+        heroPhoto: showcasePhoto,
+        countBadge: showcase?.postCount ? `${showcase.postCount} منشور` : "تغطية حية",
+        ctaText: "استكشف المزيد",
       },
     };
   }, [orchestration, issues, albums, podcasts, articles, showcases, aboutOverrides, admissionsOverrides, cacheKey, dark]);
@@ -502,7 +760,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                     onNavigate(currentItem.path);
                   }
                 }}
-                className={`group w-[310px] sm:w-[335px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl overflow-hidden cursor-pointer select-none ${
+                className={`group w-[330px] sm:w-[355px] rounded-[1.4rem] border p-3 shadow-2xl backdrop-blur-2xl overflow-hidden cursor-pointer select-none ${
                   dark
                     ? "bg-[#080d16]/96 border-white/15 shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(248,202,20,0.05)] text-white"
                     : "bg-white/96 border-slate-200/90 shadow-[0_20px_50px_rgba(8,70,125,0.18),0_0_20px_rgba(8,70,125,0.06)] text-slate-900"
@@ -529,7 +787,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                     <span className="w-2 h-2 rounded-full bg-[#27c93f] inline-block shadow-sm" />
                   </div>
 
-                  <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[160px]">
+                  <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400 truncate max-w-[170px]">
                     <Monitor size={10} className="shrink-0 opacity-70" />
                     <span className="truncate">{preview.routePath}</span>
                   </div>
@@ -540,21 +798,12 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span>مباشر</span>
+                    <span>مباشر حي</span>
                   </div>
                 </div>
 
-                {/* ── Live Hero Snapshot Visual Component (100% Real-Time Live Authentic Cover) ── */}
-                <DockHeroCover preview={preview} dark={dark} />
-
-                {/* Description */}
-                <p
-                  className={`text-xs leading-relaxed line-clamp-2 mb-2 font-medium ${
-                    dark ? "text-slate-300" : "text-slate-600"
-                  }`}
-                >
-                  {preview.description}
-                </p>
+                {/* ── 100% Real-Time Live Micro-Viewport Hero Simulation (Zero Cache, Zero Delay) ── */}
+                <DockLiveMicroViewport preview={preview} dark={dark} />
 
                 {/* Footer */}
                 <div
