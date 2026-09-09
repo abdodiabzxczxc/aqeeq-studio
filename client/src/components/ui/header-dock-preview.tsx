@@ -55,6 +55,8 @@ function DockHeroCover({ preview, dark }: { preview: PagePreviewMetadata; dark: 
         src={preview.image}
         alt={preview.title}
         loading="eager"
+        decoding="sync"
+        fetchPriority="high"
         className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover/cover:scale-[1.02]"
         onError={(e) => {
           const target = e.currentTarget;
@@ -134,8 +136,8 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     { refetchOnWindowFocus: true, staleTime: 5_000 }
   );
 
-  const { data: previewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
-    refetchInterval: 5_000,
+  const { data: previewVersion, refetch: refetchPreviewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
+    refetchInterval: 1_500,
     refetchOnWindowFocus: true,
   });
 
@@ -417,6 +419,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   }, [orchestration, issues, albums, podcasts, articles, showcases, aboutOverrides, admissionsOverrides, cacheKey, dark]);
 
   const handleMouseEnterItem = (key: string) => {
+    refetchPreviewVersion();
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
