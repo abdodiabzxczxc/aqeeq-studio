@@ -62,6 +62,7 @@ import {
   SystemPortalItem,
   PORTAL_CATEGORY_LABELS,
 } from "@shared/portals";
+import { renderPortalIcon } from "@/components/PortalIconRenderer";
 
 export type Section =
   | "studio"
@@ -135,28 +136,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     [systemPortalsList]
   );
 
-  const renderPortalIcon = (iconName: string, size = 16, className = "") => {
-    switch (iconName) {
-      case "file-text":
-        return <FileText size={size} className={className} />;
-      case "smartphone":
-        return <Smartphone size={size} className={className} />;
-      case "briefcase":
-        return <Briefcase size={size} className={className} />;
-      case "mail":
-        return <Mail size={size} className={className} />;
-      case "cloud":
-        return <Cloud size={size} className={className} />;
-      case "ticket":
-        return <Ticket size={size} className={className} />;
-      case "video":
-        return <Video size={size} className={className} />;
-      case "shield":
-        return <Shield size={size} className={className} />;
-      default:
-        return <ExternalLink size={size} className={className} />;
-    }
-  };
+
 
   const dark = theme === "dark";
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("manus.space"));

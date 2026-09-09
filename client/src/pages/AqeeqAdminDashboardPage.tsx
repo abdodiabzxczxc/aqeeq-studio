@@ -80,7 +80,10 @@ import {
   SystemPortalCategory,
   PORTAL_CATEGORY_LABELS,
   AVAILABLE_PORTAL_ICONS,
+  PORTAL_ICON_CATEGORY_LABELS,
+  PortalIconCategory,
 } from "@shared/portals";
+import { renderPortalIcon } from "@/components/PortalIconRenderer";
 
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
 import { DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
@@ -917,6 +920,25 @@ export default function AqeeqAdminDashboardPage() {
     openInNewTab: true,
   });
 
+  const [portalIconCategory, setPortalIconCategory] = useState<PortalIconCategory>("all");
+  const [portalIconSearch, setPortalIconSearch] = useState("");
+
+  const filteredAvailableIcons = useMemo(() => {
+    const q = portalIconSearch.trim().toLowerCase();
+    return AVAILABLE_PORTAL_ICONS.filter((ic) => {
+      // When searching, search across all icons
+      if (!q && portalIconCategory !== "all" && ic.category !== portalIconCategory) {
+        return false;
+      }
+      if (!q) return true;
+      const matchLabel = ic.label.toLowerCase().includes(q);
+      const matchId = ic.id.toLowerCase().includes(q);
+      const matchIcon = ic.icon.toLowerCase().includes(q);
+      const matchKeywords = ic.keywords?.some((k) => k.toLowerCase().includes(q));
+      return matchLabel || matchId || matchIcon || matchKeywords;
+    });
+  }, [portalIconCategory, portalIconSearch]);
+
   const currentSystemPortals: SystemPortalItem[] = useMemo(() => {
     return ((orchestrationForm?.systemPortals || DEFAULT_SYSTEM_PORTALS) as SystemPortalItem[])
       .slice()
@@ -1001,6 +1023,8 @@ export default function AqeeqAdminDashboardPage() {
 
   const handleOpenAddPortalModal = () => {
     setEditingPortal(null);
+    setPortalIconCategory("all");
+    setPortalIconSearch("");
     setPortalForm({
       title: "",
       description: "",
@@ -1017,6 +1041,8 @@ export default function AqeeqAdminDashboardPage() {
 
   const handleOpenEditPortalModal = (portal: SystemPortalItem) => {
     setEditingPortal(portal);
+    setPortalIconCategory("all");
+    setPortalIconSearch("");
     setPortalForm({
       id: portal.id,
       title: portal.title,
@@ -1085,26 +1111,7 @@ export default function AqeeqAdminDashboardPage() {
   };
 
   const renderDashboardPortalIcon = (iconName: string, size = 16, className = "") => {
-    switch (iconName) {
-      case "file-text":
-        return <FileText size={size} className={className} />;
-      case "smartphone":
-        return <Smartphone size={size} className={className} />;
-      case "briefcase":
-        return <Briefcase size={size} className={className} />;
-      case "mail":
-        return <Mail size={size} className={className} />;
-      case "cloud":
-        return <Cloud size={size} className={className} />;
-      case "ticket":
-        return <Ticket size={size} className={className} />;
-      case "video":
-        return <Video size={size} className={className} />;
-      case "shield":
-        return <Shield size={size} className={className} />;
-      default:
-        return <ExternalLink size={size} className={className} />;
-    }
+    return renderPortalIcon(iconName, size, className);
   };
 
   // Media Picker state
@@ -5977,7 +5984,7 @@ export default function AqeeqAdminDashboardPage() {
       <Dialog open={isPortalModalOpen} onOpenChange={setIsPortalModalOpen}>
         <DialogContent
           dir="rtl"
-          className={"sm:max-w-[540px] max-h-[90vh] overflow-y-auto rounded-3xl " + (
+          className={"sm:max-w-[650px] max-h-[90vh] overflow-y-auto rounded-3xl " + (
             dark ? "bg-[#121820] text-white border-white/15" : "bg-white text-slate-900 border-black/10"
           )}
         >
@@ -6071,27 +6078,136 @@ export default function AqeeqAdminDashboardPage() {
               </div>
             </div>
 
-            {/* Icon Picker */}
-            <div>
-              <label className="text-xs font-black text-slate-300 block mb-1.5">
-                أيقونة البوابة
-              </label>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {AVAILABLE_PORTAL_ICONS.map((ic) => (
+            {/* Icon Picker (82+ categorized & searchable icons) */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-black text-slate-300">
+                  أيقونة البوابة ({AVAILABLE_PORTAL_ICONS.length} خيار متاح)
+                </label>
+                {/* Active Icon Indicator */}
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-bold ${
+                  dark ? "bg-amber-400/15 border-amber-400/30 text-amber-300" : "bg-amber-50 border-amber-300 text-amber-900"
+                }`}>
+                  <span className="text-[10px] opacity-75">المحددة:</span>
+                  {renderDashboardPortalIcon(portalForm.iconName, 14)}
+                  <span className="truncate max-w-[120px]">
+                    {AVAILABLE_PORTAL_ICONS.find((i) => i.id === portalForm.iconName)?.label.split("/")[0].trim() || portalForm.iconName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {(Object.entries(PORTAL_ICON_CATEGORY_LABELS) as [PortalIconCategory, { label: string; emoji: string }][]).map(([catKey, catMeta]) => {
+                  const count = catKey === "all"
+                    ? AVAILABLE_PORTAL_ICONS.length
+                    : AVAILABLE_PORTAL_ICONS.filter((i) => i.category === catKey).length;
+                  const isCatSelected = portalIconCategory === catKey;
+                  return (
+                    <button
+                      key={catKey}
+                      type="button"
+                      onClick={() => setPortalIconCategory(catKey)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition shrink-0 cursor-pointer flex items-center gap-1 ${
+                        isCatSelected
+                          ? dark
+                            ? "bg-amber-400 text-black border-amber-400"
+                            : "bg-[#08467d] text-white border-[#08467d]"
+                          : dark
+                          ? "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                          : "bg-slate-100 border-slate-200 text-slate-600 hover:text-black"
+                      }`}
+                    >
+                      <span>{catMeta.emoji}</span>
+                      <span>{catMeta.label}</span>
+                      <span className="text-[9px] opacity-70">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search Bar for Icons */}
+              <div className="relative">
+                <Search size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={portalIconSearch}
+                  onChange={(e) => {
+                    setPortalIconSearch(e.target.value);
+                    if (e.target.value.trim() && portalIconCategory !== "all") {
+                      setPortalIconCategory("all");
+                    }
+                  }}
+                  placeholder="ابحث بالاسم أو الغرض... (باص، تخرج، كتاب، دفع، محادثة، تقرير، هاتف...)"
+                  className={`w-full pr-8 pl-8 py-2 rounded-xl border text-xs font-bold outline-none ${
+                    dark ? "bg-black/30 border-white/10 text-white placeholder:text-slate-500 focus:border-amber-400" : "bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600"
+                  }`}
+                />
+                {portalIconSearch && (
                   <button
-                    key={ic.id}
                     type="button"
-                    onClick={() => setPortalForm({ ...portalForm, iconName: ic.id })}
-                    className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition cursor-pointer ${
-                      portalForm.iconName === ic.id
-                        ? dark ? "bg-amber-400/20 border-amber-400 text-amber-400" : "bg-amber-50 border-amber-500 text-amber-900"
-                        : dark ? "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10" : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                    }`}
+                    onClick={() => setPortalIconSearch("")}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
                   >
-                    {renderDashboardPortalIcon(ic.id, 16)}
-                    <span className="text-[10px] font-bold truncate max-w-full">{ic.label.split("/")[0]}</span>
+                    ✕
                   </button>
-                ))}
+                )}
+              </div>
+
+              {/* Icon Grid (Scrollable) */}
+              <div className={`p-2 rounded-2xl border max-h-56 overflow-y-auto ${
+                dark ? "bg-black/20 border-white/10" : "bg-slate-50/70 border-slate-200"
+              }`}>
+                {filteredAvailableIcons.length === 0 ? (
+                  <div className="text-center py-6 text-slate-400 text-xs">
+                    <p>لا توجد أيقونة مطابقة لبحثك "{portalIconSearch}"</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPortalIconSearch("");
+                        setPortalIconCategory("all");
+                      }}
+                      className="mt-2 text-amber-400 font-bold underline hover:opacity-80"
+                    >
+                      إعادة ضبط الفلاتر
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
+                    {filteredAvailableIcons.map((ic) => {
+                      const isSelected = portalForm.iconName === ic.id;
+                      return (
+                        <button
+                          key={ic.id}
+                          type="button"
+                          onClick={() => setPortalForm({ ...portalForm, iconName: ic.id })}
+                          title={ic.label}
+                          className={`flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition cursor-pointer min-h-[58px] group ${
+                            isSelected
+                              ? dark
+                                ? "bg-amber-400/20 border-amber-400 text-amber-400 shadow-sm ring-1 ring-amber-400"
+                                : "bg-amber-50 border-amber-500 text-amber-900 shadow-sm ring-1 ring-amber-500"
+                              : dark
+                              ? "bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:border-white/20"
+                              : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          <div className="relative">
+                            {renderDashboardPortalIcon(ic.id, 16)}
+                            {isSelected && (
+                              <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-amber-400 text-black text-[9px] font-black rounded-full flex items-center justify-center">
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[9px] font-bold truncate max-w-full text-center leading-tight">
+                            {ic.label.split("/")[0].trim()}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
