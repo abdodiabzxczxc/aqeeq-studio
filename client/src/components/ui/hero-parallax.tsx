@@ -545,15 +545,11 @@ export function HeroParallaxBackdrop({
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none [perspective:1000px] [transform-style:preserve-3d]"
+      style={{
+        maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+      }}
     >
-      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
-      <div
-        className={`absolute inset-0 z-10 pointer-events-none ${
-          dark
-            ? "bg-gradient-to-t from-black via-black/60 to-transparent"
-            : "bg-gradient-to-t from-white via-white/60 to-transparent"
-        }`}
-      />
 
       {/* 3D Moving Perspective Rows */}
       <motion.div

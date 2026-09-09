@@ -277,15 +277,11 @@ export function AtheerScrollVinylBackdrop({
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden [perspective:1400px] [transform-style:preserve-3d]"
+      style={{
+        maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+      }}
     >
-      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
-      <div
-        className={`absolute inset-0 z-10 pointer-events-none ${
-          dark
-            ? "bg-gradient-to-t from-black via-black/60 to-transparent"
-            : "bg-gradient-to-t from-white via-white/60 to-transparent"
-        }`}
-      />
 
       {/* 3D Vinyl Stage:
           Positioned from the VERY TOP (-top-10 sm:-top-16) just like News & Articles!
@@ -334,15 +330,6 @@ export function AtheerScrollVinylBackdrop({
           ))}
         </motion.div>
       </motion.div>
-
-      {/* Soft Bottom Edge Gradient for clean transition to the content below */}
-      <div
-        className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
-          dark
-            ? "bg-gradient-to-t from-black via-black/85 to-transparent"
-            : "bg-gradient-to-t from-white via-white/85 to-transparent"
-        }`}
-      />
     </div>
   );
 }

@@ -139,29 +139,6 @@ export function ParallaxUnfurlingGallery({
       style={{ minHeight: isDesktop ? "74vh" : "auto" }}
       dir="rtl"
     >
-      {/* Ambient background glow and contrast vignetting */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
-        <div
-          className={`absolute inset-0 z-10 pointer-events-none ${
-            dark
-              ? "bg-gradient-to-t from-black via-black/60 to-transparent"
-              : "bg-gradient-to-t from-white via-white/60 to-transparent"
-          }`}
-        />
-        {/* Soft bottom edge gradient for seamless transition to content */}
-        <div
-          className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
-            dark
-              ? "bg-gradient-to-t from-black via-black/85 to-transparent"
-              : "bg-gradient-to-t from-white via-white/85 to-transparent"
-          }`}
-        />
-      </div>
-
       {/* 3D Angled Unfurling Matrix Grid (Background) - Directed from LEFT to CENTER */}
       <motion.div
         dir="ltr"
@@ -172,6 +149,8 @@ export function ParallaxUnfurlingGallery({
           translateX,
           translateY,
           opacity,
+          maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
         }}
         className="pointer-events-none absolute -inset-x-12 -top-24 sm:-top-32 h-[190%] flex justify-center gap-3 sm:gap-6 md:gap-7 [transform-style:preserve-3d] will-change-transform select-none"
       >
