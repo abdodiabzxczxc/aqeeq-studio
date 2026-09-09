@@ -26,6 +26,7 @@ import {
   ChevronDown,
   Layers,
   Award,
+  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -437,10 +438,9 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             containerRef={articlesHeroRef}
           />
 
-        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(390px,.9fr)] md:py-16 lg:gap-16">
+        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
           {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
-          {/* Text info on left in visual / right in RTL (order-1 md:order-2) */}
-          <div className="text-right">
+          <div className="text-right relative z-10">
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
                 dark
@@ -460,21 +460,44 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                   dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
-                    : "border-[#08467d]/25 bg-white text-[#08467d]"
+                    : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
                 }`}
-              />
+              >
+                {(text) => (
+                  <>
+                    <Sparkles size={14} />
+                    <span>{text}</span>
+                  </>
+                )}
+              </VisualEditable>
             )}
 
             <VisualEditable
               id="articles-hero-title"
               tag="text"
               label="عنوان هيرو المقالات"
-              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام العقيق ومقالات الموسم"}
+              defaultText={orchestration?.heroCovers?.articlesCustomTitle || "أقلام العقيق ومقالات الموسم."}
               as="h1"
-              className={`text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.25] ${
-                dark ? "text-white" : "text-[#0a192f]"
+              className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
+                dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
               }`}
-            />
+            >
+              {(text) => {
+                const raw = text || "أقلام العقيق ومقالات الموسم.";
+                const parts = raw.split(/(ومقالات الموسم\.?|وفكر الموسم\.?)/);
+                if (parts.length >= 2) {
+                  return (
+                    <>
+                      <span className="block">{parts[0]}</span>
+                      <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                        {parts[1]}
+                      </span>
+                    </>
+                  );
+                }
+                return raw;
+              }}
+            </VisualEditable>
 
             <VisualEditable
               id="articles-hero-desc"
@@ -482,13 +505,13 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               label="وصف هيرو المقالات"
               defaultText={orchestration?.heroCovers?.articlesCustomDesc || "منصة فكرية وتربوية توثق رؤى المعلمين وإبداعات الطلاب وقصص النجاح في مسيرة مدارس العقيق بالمدينة المنورة."}
               as="p"
-              className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"}`}
+              className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"}`}
             />
 
             {/* Stats pills */}
-            <div className={`mt-6 flex flex-wrap gap-2 text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
+            <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold">
               <span
-                className={`rounded-full border px-3 py-2 ${
+                className={`rounded-full border px-3.5 py-2 ${
                   isNationalDay
                     ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                     : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -498,7 +521,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 {rawArticles.length} مقال منشور
               </span>
               <span
-                className={`rounded-full border px-3 py-2 ${
+                className={`rounded-full border px-3.5 py-2 ${
                   isNationalDay
                     ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                     : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -508,7 +531,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 {new Set(rawArticles.map((a) => a.authorName)).size || 1} كاتب وقلم
               </span>
               <span
-                className={`rounded-full border px-3 py-2 ${
+                className={`rounded-full border px-3.5 py-2 ${
                   isNationalDay
                     ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                     : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -520,7 +543,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             </div>
 
             {/* CTA Buttons */}
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               {featuredArticle ? (
                 <button
                   onClick={() => setReadingArticle(featuredArticle)}
@@ -540,7 +563,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
               <button
                 type="button"
                 onClick={() => setIsSubmitOpen(true)}
-                className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                   dark
                     ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
                     : isNationalDay
@@ -549,21 +572,21 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 }`}
               >
                 <PenTool size={16} />
-                <span>شاركنا بمقالك ✍️</span>
+                <span>شاركنا بمقالك</span>
               </button>
 
               {isAdmin && (
                 <button
                   type="button"
                   onClick={() => navigate("/articles/manage")}
-                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-black transition ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                     dark
                       ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
                       : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d] hover:bg-[#08467d]/10"
                   }`}
                 >
-                  <Sparkles size={15} />
-                  <span>إدارة وتحرير المقالات ✍️</span>
+                  <Settings2 size={16} />
+                  <span>دخول استوديو المقالات</span>
                 </button>
               )}
             </div>

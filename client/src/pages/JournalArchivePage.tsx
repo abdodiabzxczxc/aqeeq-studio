@@ -189,8 +189,40 @@ export default function JournalArchivePage() {
         <>
           <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className={`relative isolate overflow-hidden border-b ${dark ? "border-amber-300/15 bg-black" : "border-slate-200 bg-white"}`}>
             <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} />
-            <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-12 grid-cols-1 lg:grid-cols-[minmax(390px,.9fr)_minmax(0,1.1fr)] md:py-16 lg:gap-16">
-              <div className="relative order-2 mx-auto h-[370px] w-full max-w-[580px] md:order-1 md:h-[470px]">
+            <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
+              {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
+              <div className="text-right relative z-10">
+                <VisualEditable id="journal-hero-badge" tag="text" label="شارة المكتبة" defaultText="موسم العقيق · أرشيف الأعداد" as="div" className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
+                  dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                }`}>
+                  {(text) => <><Sparkles size={14} />{text}</>}
+                </VisualEditable>
+                <VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${dark ? "text-amber-50" : "text-slate-900"}`} />
+                <VisualEditable id="journal-hero-title-second" tag="text" label="السطر الذهبي لعنوان المكتبة" defaultText="بنبض لحظته." as="h1" className={`text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} />
+                <VisualEditable id="journal-hero-description" tag="text" label="وصف واجهة المكتبة" defaultText="رفوف رقمية تحفظ أعداد النشرة، وتفتح كل صفحة كجزء من ذاكرة مدارس العقيق." as="p" className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : "text-slate-600 font-medium"}`} />
+                <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold">
+                  <span className={`rounded-full border px-3.5 py-2 ${dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"}`}><BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{issues.length} عدد منشور</span>
+                  <span className={`rounded-full border px-3.5 py-2 ${dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"}`}><ScanLine className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{totalPages} صفحة محفوظة</span>
+                  <span className={`rounded-full border px-3.5 py-2 ${dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"}`}><FolderArchive className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />{months} مواسم</span>
+                </div>
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  <button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
+                    dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
+                  }`}>
+                    <ArrowUpLeft size={16} />ابدأ بأحدث عدد
+                  </button>
+                  {isAdmin ? (
+                    <button onClick={() => navigate("/journal/manage")} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
+                      dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                    }`}>
+                      <Settings2 size={16} />إدارة أعداد المجلة
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Left Column: 3D Dual-Cover on left (Second in RTL DOM order -> ends at left guideline 62px) */}
+              <div className="relative mx-auto h-[370px] w-full max-w-[580px] md:h-[470px]">
                 {secondIssue ? (
                   <button onClick={() => navigate(getJournalIssuePath(secondIssue.slug))} className="absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border border-amber-100/15 bg-black p-2 opacity-60 shadow-[0_25px_50px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>
                     <img src={secondIssue.coverUrl || ""} alt="" className="h-full w-full rounded-[1.12rem] object-cover" />
@@ -205,29 +237,6 @@ export default function JournalArchivePage() {
                     </div>
                   </div>
                 </button>
-              </div>
-              <div className="order-1 md:order-2">
-                <VisualEditable id="journal-hero-badge" tag="text" label="شارة المكتبة" defaultText="موسم العقيق · أرشيف الأعداد" as="div" className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/[.07] px-3 py-1.5 text-[11px] font-black text-amber-200">
-                  {(text) => <><Sparkles size={14} />{text}</>}
-                </VisualEditable>
-                <VisualEditable id="journal-hero-title-first" tag="text" label="السطر الأول لعنوان المكتبة" defaultText="كل عدد يحتفظ" as="h1" className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${dark ? "text-amber-50" : "text-slate-900"}`} />
-                <VisualEditable id="journal-hero-title-second" tag="text" label="السطر الذهبي لعنوان المكتبة" defaultText="بنبض لحظته." as="h1" className="text-4xl font-black leading-[1.12] text-amber-400 md:text-6xl" />
-                <VisualEditable id="journal-hero-description" tag="text" label="وصف واجهة المكتبة" defaultText="رفوف رقمية تحفظ أعداد النشرة، وتفتح كل صفحة كجزء من ذاكرة مدارس العقيق." as="p" className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : "text-slate-600"}`} />
-                <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-300">
-                  <span className={`rounded-full border px-3 py-2 ${dark ? "border-white/[.1] bg-black/15 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-700"}`}><BookOpen className="ml-1 inline text-amber-400" size={13} />{issues.length} عدد منشور</span>
-                  <span className={`rounded-full border px-3 py-2 ${dark ? "border-white/[.1] bg-black/15 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-700"}`}><ScanLine className="ml-1 inline text-amber-400" size={13} />{totalPages} صفحة محفوظة</span>
-                  <span className={`rounded-full border px-3 py-2 ${dark ? "border-white/[.1] bg-black/15 text-slate-300" : "border-slate-200 bg-slate-100 text-slate-700"}`}><FolderArchive className="ml-1 inline text-amber-400" size={13} />{months} مواسم</span>
-                </div>
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="inline-flex items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-xs font-black text-black transition hover:bg-amber-200">
-                    <ArrowUpLeft size={16} />ابدأ بأحدث عدد
-                  </button>
-                  {isAdmin ? (
-                    <button onClick={() => navigate("/journal/manage")} className="inline-flex items-center gap-2 rounded-xl border border-amber-300/35 bg-amber-300/[.06] px-5 py-3 text-xs font-black text-amber-100 transition hover:bg-amber-300/[.13]">
-                      <Settings2 size={16} />إدارة أعداد المجلة
-                    </button>
-                  ) : null}
-                </div>
               </div>
             </div>
           </VisualEditable>

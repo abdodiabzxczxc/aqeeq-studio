@@ -50,6 +50,7 @@ import {
   LayoutGrid,
   List,
   User,
+  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -477,10 +478,9 @@ export default function AqeeqPodcastPage() {
             containerRef={podcastHeroRef}
           />
 
-          <div className="relative z-10 mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-14">
+          <div className="relative z-10 mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
             {/* Right Column: Title, Kicker, Desc, Stats, CTA Buttons (First in RTL DOM order -> starts at right guideline 1378px) */}
-            {/* Right Column: Title, Kicker, Desc, Stats, CTA Buttons (order-1 md:order-2) */}
-            <div className="text-right">
+            <div className="text-right relative z-10">
               <VisualEditable
                 id="podcast-hero-kicker"
                 tag="text"
@@ -488,7 +488,7 @@ export default function AqeeqPodcastPage() {
                 defaultText={
                   isNationalDay
                     ? "أثير العقيق في اليوم الوطني · نغم الفخر والاعتزاز 🇸🇦"
-                    : orchestration?.heroCovers?.podcastsCustomTag || "أثير العقيق الرقمي · إذاعة وبودكاست"
+                    : orchestration?.heroCovers?.podcastsCustomTag || "موسم العقيق · أثير وبودكاست"
                 }
                 as="div"
                 className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
@@ -515,10 +515,26 @@ export default function AqeeqPodcastPage() {
                 label="عنوان صفحة البودكاست"
                 defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
                 as="h1"
-                className={`mt-4 text-3xl font-black leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl ${
+                className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                   dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                 }`}
-              />
+              >
+                {(text) => {
+                  const raw = text || "صوت ينبض بالحياة والإبداع.";
+                  const parts = raw.split(/(والإبداع\.?)/);
+                  if (parts.length >= 2) {
+                    return (
+                      <>
+                        <span className="block">{parts[0]}</span>
+                        <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                          {parts[1]}
+                        </span>
+                      </>
+                    );
+                  }
+                  return raw;
+                }}
+              </VisualEditable>
 
               <VisualEditable
                 id="podcast-hero-desc"
@@ -527,38 +543,38 @@ export default function AqeeqPodcastPage() {
                 defaultText={orchestration?.heroCovers?.podcastsCustomDesc ||
                   "استمع وشاهد حلقات الإذاعة الصباحية، واللقاءات الحوارية التربوية، والتغطيات الصوتية والمرئية لحفلات التخرج والبطولات المدرسية."}
                 as="p"
-                className={`mt-4 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${
-                  dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"
+                className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${
+                  dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"
                 }`}
               />
 
               {/* Stats pills */}
-              <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-bold">
+              <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold">
                 <span
-                  className={`rounded-full border px-3 py-1.5 ${
+                  className={`rounded-full border px-3.5 py-2 ${
                     isNationalDay
                       ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}
                 >
                   <Music className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                   {songs?.length || 0} أناشيد رسمية
                 </span>
                 <span
-                  className={`rounded-full border px-3 py-1.5 ${
+                  className={`rounded-full border px-3.5 py-2 ${
                     isNationalDay
                       ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}
                 >
                   <Radio className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                   {rawPodcasts.length} حلقة منشورة
                 </span>
                 <span
-                  className={`rounded-full border px-3 py-1.5 ${
+                  className={`rounded-full border px-3.5 py-2 ${
                     isNationalDay
                       ? dark ? "border-emerald-500/20 bg-[#001c10] text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
-                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-black/[0.08] bg-slate-50 text-slate-700"
+                      : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
                   }`}
                 >
                   <Headphones className={`ml-1 inline ${isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
@@ -567,11 +583,11 @@ export default function AqeeqPodcastPage() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="mt-6 flex flex-wrap gap-2.5">
+              <div className="mt-7 flex flex-wrap items-center gap-3">
                 {featuredPodcast ? (
                   <button
                     onClick={() => handlePlayOrOpen(featuredPodcast)}
-                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
+                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:opacity-90 ${
                       dark
                         ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]"
                         : isNationalDay
@@ -581,12 +597,12 @@ export default function AqeeqPodcastPage() {
                   >
                     {(activeItem?.id === featuredPodcast.id || activePodcast?.id === featuredPodcast.id) && isPlaying ? (
                       <>
-                        <Pause size={15} />
+                        <Pause size={16} />
                         <span>إيقاف مؤقت</span>
                       </>
                     ) : (
                       <>
-                        <Play size={15} className="mr-0.5" />
+                        <Play size={16} className="mr-0.5" />
                         <span>{featuredPodcast.mediaType === "video" ? "مشاهدة الحلقة المميزة" : "استمع للحلقة الآن"}</span>
                       </>
                     )}
@@ -597,7 +613,7 @@ export default function AqeeqPodcastPage() {
                   <button
                     type="button"
                     onClick={() => playSong(0)}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
+                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                       isNationalDay
                         ? dark
                           ? "border-[#f8ca14]/60 bg-gradient-to-r from-[#002617] to-[#003822] text-[#f8ca14] hover:scale-105 shadow-md"
@@ -607,8 +623,8 @@ export default function AqeeqPodcastPage() {
                         : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                     }`}
                   >
-                    <Disc size={14} className="animate-[spin_4s_linear_infinite]" />
-                    <span>{isNationalDay ? "🇸🇦 تشغيل أناشيد الوطن والعقيق" : "تشغيل الأناشيد 🎵"}</span>
+                    <Disc size={15} className="animate-[spin_4s_linear_infinite]" />
+                    <span>{isNationalDay ? "🇸🇦 تشغيل أناشيد الوطن والعقيق" : "تشغيل الأناشيد"}</span>
                   </button>
                 )}
 
@@ -616,14 +632,14 @@ export default function AqeeqPodcastPage() {
                   <button
                     type="button"
                     onClick={() => navigate("/atheer/manage")}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black transition ${
+                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                       dark
                         ? "border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
                         : "border-[#08467d]/30 bg-[#08467d]/5 text-[#08467d] hover:bg-[#08467d]/10"
                     }`}
                   >
-                    <Sparkles size={14} />
-                    <span>استوديو أثير 🎙️</span>
+                    <Settings2 size={16} />
+                    <span>دخول استوديو أثير</span>
                   </button>
                 )}
               </div>

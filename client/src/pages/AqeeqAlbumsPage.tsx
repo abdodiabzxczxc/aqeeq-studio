@@ -6,7 +6,7 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
-import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay, Layers } from "lucide-react";
+import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay, Layers, FolderCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
@@ -346,7 +346,7 @@ export default function AqeeqAlbumsPage() {
           products={parallaxProducts}
           dark={dark}
           header={
-            <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 py-6 md:grid-cols-[1.1fr_1fr] md:py-10 lg:gap-16">
+            <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
               {/* Right Column: Exact original text, colors, badges and buttons */}
               <div className="text-right relative z-10">
                 {/* Ambient soft dark contrast scrim behind text for 100% clarity */}
@@ -374,7 +374,7 @@ export default function AqeeqAlbumsPage() {
                     label="شارة غلاف الألبومات"
                     defaultText={orchestration?.heroCovers?.albumsCustomTag || "موسم العقيق · أرشيف الفعاليات"}
                     as="div"
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+                    className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                       dark
                         ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
                         : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
@@ -391,10 +391,26 @@ export default function AqeeqAlbumsPage() {
                   label="عنوان غلاف الألبومات"
                   defaultText={orchestration?.heroCovers?.albumsCustomTitle || "كل فعالية تحفظ لحظتها."}
                   as="h1"
-                  className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
+                  className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                     dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                   }`}
-                />
+                >
+                  {(text) => {
+                    const raw = text || "كل فعالية تحفظ لحظتها.";
+                    const parts = raw.split(/(لحظتها\.?)/);
+                    if (parts.length >= 2) {
+                      return (
+                        <>
+                          <span className="block">{parts[0]}</span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                            {parts[1]}
+                          </span>
+                        </>
+                      );
+                    }
+                    return raw;
+                  }}
+                </VisualEditable>
 
                 <VisualEditable
                   id="albums-hero-intro"
@@ -405,19 +421,17 @@ export default function AqeeqAlbumsPage() {
                     "رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق، وكل ألبوم يفتح بطريقته المناسبة للذكرى."
                   }
                   as="p"
-                  className={`mt-5 max-w-xl text-sm leading-8 ${
+                  className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${
                     dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"
                   }`}
                 />
 
-                {/* Exact Counters & Pills with Original Colors */}
+                {/* 3 Unified Meta Statistics Pills */}
                 <div
-                  className={`mt-6 flex flex-wrap gap-2 text-[10px] font-bold ${
-                    dark ? "text-slate-400" : "text-slate-600"
-                  }`}
+                  className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold"
                 >
                   <span
-                    className={`rounded-full border px-3 py-2 ${
+                    className={`rounded-full border px-3.5 py-2 ${
                       isNationalDay
                         ? dark
                           ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
@@ -437,7 +451,7 @@ export default function AqeeqAlbumsPage() {
                   </span>
 
                   <span
-                    className={`rounded-full border px-3 py-2 ${
+                    className={`rounded-full border px-3.5 py-2 ${
                       isNationalDay
                         ? dark
                           ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
@@ -455,10 +469,30 @@ export default function AqeeqAlbumsPage() {
                     />
                     {totalMediaCount} صورة وملف
                   </span>
+
+                  <span
+                    className={`rounded-full border px-3.5 py-2 ${
+                      isNationalDay
+                        ? dark
+                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]"
+                          : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
+                        : dark
+                        ? "border-white/[0.1] bg-white/[0.03] text-slate-300"
+                        : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
+                    }`}
+                  >
+                    <FolderCheck
+                      className={`ml-1 inline ${
+                        isNationalDay ? "text-[#f8ca14]" : dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                      }`}
+                      size={13}
+                    />
+                    أرشيف رقمي موثق
+                  </span>
                 </div>
 
-                {/* Exact Buttons with Original Colors */}
-                <div className="mt-7 flex flex-wrap gap-3">
+                {/* Harmonized Single Row Action Buttons Bar */}
+                <div className="mt-7 flex flex-wrap items-center gap-3">
                   <VisualEditable
                     id="albums-hero-action"
                     tag="button"
@@ -482,44 +516,45 @@ export default function AqeeqAlbumsPage() {
 
                   <button
                     onClick={() => setIsWrappedOpen(true)}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black shadow-lg transition active:scale-95 hover:scale-105 ${
+                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
                       dark
-                        ? "border-amber-400/50 bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-transparent text-amber-300 hover:border-amber-400 hover:shadow-[0_0_25px_rgba(248,202,20,0.3)] ring-1 ring-amber-400/20"
-                        : "border-amber-500/40 bg-gradient-to-r from-amber-100 via-amber-50 to-white text-amber-950 hover:border-amber-500 shadow-md"
+                        ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+                        : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
                     }`}
                   >
-                    <Sparkles size={16} className="animate-pulse text-amber-400" />
-                    <span>حصاد العقيق الذكي 🎬</span>
-                    <span className="rounded-md bg-amber-400 px-1.5 py-0.5 text-[9px] font-black text-slate-950">
+                    <Sparkles size={16} className="text-amber-500 dark:text-amber-400" />
+                    <span>حصاد العقيق الذكي</span>
+                    <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-black ${
+                      dark ? "bg-amber-400/20 text-amber-300" : "bg-[#08467d]/15 text-[#08467d]"
+                    }`}>
                       AI VIDEO
                     </span>
                   </button>
 
+                  <button
+                    onClick={() => setIsTvMode(true)}
+                    className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
+                      dark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
+                        : "border-slate-300/80 bg-slate-100/90 text-slate-700 hover:bg-slate-200/90"
+                    }`}
+                  >
+                    <MonitorPlay size={16} />
+                    <span>شاشة العرض المباشر</span>
+                  </button>
+
                   {isAdmin ? (
-                    <>
-                      <button
-                        onClick={() => navigate("/albums/manage")}
-                        className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
-                          dark
-                            ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
-                            : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
-                        }`}
-                      >
-                        <Settings2 size={16} />
-                        إدارة ألبومات المدارس
-                      </button>
-                      <button
-                        onClick={() => setIsTvMode(true)}
-                        className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition ${
-                          dark
-                            ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20"
-                            : "border-emerald-600/20 bg-emerald-600/10 text-emerald-700 hover:bg-emerald-600/20"
-                        }`}
-                      >
-                        <MonitorPlay size={16} />
-                        تشغيل كشاشة عرض 📺
-                      </button>
-                    </>
+                    <button
+                      onClick={() => navigate("/albums/manage")}
+                      className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-black transition active:scale-95 ${
+                        dark
+                          ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14] hover:bg-[#f8ca14]/20"
+                          : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d] hover:bg-[#08467d]/20"
+                      }`}
+                    >
+                      <Settings2 size={16} />
+                      <span>دخول استوديو الألبومات</span>
+                    </button>
                   ) : null}
                 </div>
               </div>

@@ -410,10 +410,26 @@ export default function SchoolNewsPage() {
                     label="عنوان غلاف المجلة"
                     defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبر يُقلب إلى ذكرى."}
                     as="h1"
-                    className={`mt-5 text-4xl font-black leading-[1.12] md:text-6xl ${
+                    className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                       dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                     }`}
-                  />
+                  >
+                    {(text) => {
+                      const raw = text || "خبر يُقلب إلى ذكرى.";
+                      const match = raw.match(/^(.*?)(إلى ذكرى\.?)$/);
+                      if (match) {
+                        return (
+                          <>
+                            <span className="block">{match[1]}</span>
+                            <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                              {match[2]}
+                            </span>
+                          </>
+                        );
+                      }
+                      return raw;
+                    }}
+                  </VisualEditable>
 
                   <VisualEditable
                     id="journal-hero-intro"
@@ -424,11 +440,11 @@ export default function SchoolNewsPage() {
                       "رفوف رقمية تجمع أعداد مجلة ونشرات مدارس العقيق الأهلية، مع كتيبات شهرية مؤرشفة وتجربة تصفح تفاعلية راقية."
                     }
                     as="p"
-                    className={`mt-5 max-w-xl text-sm leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700" : "text-slate-600"}`}
+                    className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"}`}
                   />
 
-                  <div className="mt-6 flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
-                    <span className={`rounded-full border px-3 py-2 ${
+                  <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold">
+                    <span className={`rounded-full border px-3.5 py-2 ${
                       isNationalDay
                         ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                         : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -436,7 +452,7 @@ export default function SchoolNewsPage() {
                       <BookOpen className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                       {issues.length} عدد منشور
                     </span>
-                    <span className={`rounded-full border px-3 py-2 ${
+                    <span className={`rounded-full border px-3.5 py-2 ${
                       isNationalDay
                         ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                         : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -444,7 +460,7 @@ export default function SchoolNewsPage() {
                       <Layers className={`ml-1 inline ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`} size={13} />
                       {totalPages} صفحة
                     </span>
-                    <span className={`rounded-full border px-3 py-2 ${
+                    <span className={`rounded-full border px-3.5 py-2 ${
                       isNationalDay
                         ? dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/5 text-[#08467d]"
                         : dark ? "border-white/[0.1] bg-white/[0.03] text-slate-300" : "border-[#08467d]/15 bg-white text-slate-700 shadow-sm"
@@ -454,7 +470,7 @@ export default function SchoolNewsPage() {
                     </span>
                   </div>
 
-                  <div className="mt-7 flex flex-wrap gap-3">
+                  <div className="mt-7 flex flex-wrap items-center gap-3">
                     <VisualEditable
                       id="journal-hero-action"
                       tag="button"
