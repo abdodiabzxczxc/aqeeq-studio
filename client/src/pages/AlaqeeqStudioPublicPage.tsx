@@ -1055,7 +1055,7 @@ export default function AlaqeeqStudioPublicPage() {
                       } animate-pulse`} />
                     ) : null}
                   </div>
-                  <p className={"max-w-[72px] sm:max-w-[84px] truncate text-[10px] sm:text-[11px] font-black transition " + (
+                  <p className={"max-w-[84px] sm:max-w-[100px] line-clamp-2 text-center text-[10px] sm:text-[11px] font-black leading-snug transition " + (
                     dark ? "text-slate-200 group-hover:text-[#f8ca14]" : "text-slate-800 group-hover:text-[#08467d]"
                   )}>
                     {story.title}
@@ -1114,7 +1114,7 @@ export default function AlaqeeqStudioPublicPage() {
         )}
 
 
-        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 2xl:gap-20 px-4 sm:px-6 md:px-8 pt-3 sm:pt-6 md:pt-7 pb-8 sm:pb-12 md:pb-16 md:grid-cols-[minmax(340px,0.95fr)_minmax(0,1.05fr)] lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)]">
+        <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 2xl:gap-20 px-4 sm:px-6 md:px-8 pt-5 sm:pt-8 md:pt-10 pb-8 sm:pb-12 md:pb-16 md:grid-cols-[minmax(340px,0.95fr)_minmax(0,1.05fr)] lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)]">
           <div>
             {isNationalDay ? (
               <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${

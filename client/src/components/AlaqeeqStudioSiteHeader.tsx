@@ -1510,7 +1510,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     </div>
 
     {/* Static Spacer in DOM so page content starts cleanly below fixed header */}
-    <div className="h-[66px] sm:h-[108px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
+    <div
+      className={`w-full shrink-0 pointer-events-none transition-all duration-300 ${
+        isNationalDay
+          ? "h-[106px] sm:h-[156px]"
+          : "h-[66px] sm:h-[114px]"
+      }`}
+      aria-hidden="true"
+    />
 
       {/* Global AI Face Recognition Modal */}
       {faceSearchOpen && (

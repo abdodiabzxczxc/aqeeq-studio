@@ -141,7 +141,7 @@ export default function AqeeqSchoolAboutPage() {
             direction="right-to-left"
           />
 
-          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-6 sm:py-10">
+          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 pt-10 sm:pt-14 pb-6 sm:pb-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
