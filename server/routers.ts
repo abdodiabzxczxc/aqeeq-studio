@@ -1457,7 +1457,9 @@ export const appRouter = router({
           action: "admin.set_site_orchestration",
           details: JSON.stringify(input),
         });
-        triggerAutoPageCapture("home");
+        for (const page of ["home", "journal", "albums", "podcast", "articles", "showcase", "admissions", "accreditations", "about"]) {
+          triggerAutoPageCapture(page);
+        }
         return updated;
       }),
 
@@ -1492,6 +1494,9 @@ export const appRouter = router({
           action: "admin.set_active_theme",
           details: JSON.stringify(updatedThemeMode),
         });
+        for (const page of ["home", "journal", "albums", "podcast", "articles", "showcase", "admissions", "accreditations", "about"]) {
+          triggerAutoPageCapture(page);
+        }
         return { success: true, themeMode: res.themeMode };
       }),
 
