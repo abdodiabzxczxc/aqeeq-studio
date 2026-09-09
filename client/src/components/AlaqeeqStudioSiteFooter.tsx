@@ -42,11 +42,7 @@ export function AlaqeeqStudioSiteFooter() {
     "السلام عليكم ورحمة الله، أود الاستفسار بخصوص مدارس العقيق."
   )}`;
 
-  const activeLogo = isNationalDay
-    ? dark
-      ? "/alaqeeq-logo-national-dark.png"
-      : "/alaqeeq-logo-national-light.png"
-    : "/alaqeeq-logo.png";
+  const activeLogo = "/alaqeeq-logo.png";
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });

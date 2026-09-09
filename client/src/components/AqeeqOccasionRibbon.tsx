@@ -3,8 +3,8 @@ import { Sparkles, X, Heart } from "lucide-react";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 
-export function AqeeqOccasionRibbon() {
-  const { isNationalDay, showCelebrationRibbon, customBadgeText, remainingHours } = useSiteTheme();
+export function AqeeqOccasionRibbon({ isScrolled = false }: { isScrolled?: boolean }) {
+  const { isNationalDay, showCelebrationRibbon, remainingHours } = useSiteTheme();
   const [dismissed, setDismissed] = useState(false);
 
   if (!isNationalDay || !showCelebrationRibbon || dismissed) {
@@ -20,12 +20,16 @@ export function AqeeqOccasionRibbon() {
   return (
     <aside
       aria-label="شريط المناسبة الوطنية"
-      className="relative z-50 w-full snd-ribbon-bar text-white py-1.5 px-3 sm:px-6 transition-all duration-300"
+      className={`relative z-[150] w-full snd-ribbon-bar text-white transition-all duration-300 ${
+        isScrolled
+          ? "max-h-0 h-0 py-0 opacity-0 overflow-hidden pointer-events-none !border-0 !shadow-none"
+          : "max-h-12 py-1.5 px-3 sm:px-6 opacity-100 overflow-visible"
+      }`}
     >
-      <div className="relative mx-auto flex max-w-[1380px] items-center justify-between text-xs font-black">
+      <div className="relative mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between text-xs font-black">
         {/* Right Content */}
         <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex items-center gap-1.5 rounded-full bg-[#f8ca14]/20 border border-[#f8ca14]/40 px-2.5 py-0.5 text-[#f8ca14] text-[11px] shadow-sm shrink-0">
+          <div className="flex items-center gap-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 px-2.5 py-0.5 text-[#D4AF37] text-[11px] shadow-sm shrink-0">
             <Sparkles size={12} className="animate-spin" style={{ animationDuration: "6s" }} />
             <span>عزّنا بطبعنا 🇸🇦</span>
           </div>
@@ -42,7 +46,7 @@ export function AqeeqOccasionRibbon() {
           <button
             type="button"
             onClick={() => triggerNationalCelebration()}
-            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#f8ca14] to-[#facc15] px-2.5 py-1 text-[11px] font-black text-black shadow-md hover:scale-105 active:scale-95 transition-all"
+            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] px-3 py-1 text-[11px] font-black text-[#002e1b] shadow-md hover:scale-105 active:scale-95 transition-all"
             title="انقر لتطلق قصاصات الاحتفال الوطنية"
           >
             <Sparkles size={12} className="text-[#005A36]" />

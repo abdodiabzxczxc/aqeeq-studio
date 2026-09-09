@@ -54,6 +54,7 @@ import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
+import { AqeeqOccasionRibbon } from "@/components/AqeeqOccasionRibbon";
 
 
 // ⚡ Dynamic lazy modals for heavy modules (Face AI, Studio Creator)
@@ -296,12 +297,17 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       <div className={`fixed top-0 inset-x-0 z-[130] w-full transition-all duration-300 ease-out bg-transparent ${
         isScrolled ? "pointer-events-none" : "pointer-events-auto"
       }`}>
+        {/* 0. Occasion Celebration Ribbon (National Day / Special Events) */}
+        <AqeeqOccasionRibbon isScrolled={isScrolled} />
+
         {/* 1. Top Executive Utility Bar */}
         <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 ${
           isScrolled
             ? "overflow-hidden max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
             : `overflow-visible border-b max-h-12 py-1.5 opacity-100 ${
-                dark ? "border-white/5 bg-[#0c1218]/95 text-slate-400" : "border-black/5 bg-slate-50/95 text-slate-600"
+                dark
+                  ? isNationalDay ? "border-emerald-600/15 bg-[#00130a]/95 text-emerald-100/70" : "border-white/5 bg-[#0c1218]/95 text-slate-400"
+                  : isNationalDay ? "border-emerald-800/10 bg-emerald-50/90 text-emerald-900/80" : "border-black/5 bg-slate-50/95 text-slate-600"
               }`
         }`}>
         <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-4 sm:px-6 md:px-8">
@@ -310,7 +316,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               data-visual-id="header-top-location"
               data-visual-tag="text"
               data-visual-label="موقع المدارس في الشريط العلوي"
-              className={`flex items-center gap-1.5 ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+              className={`flex items-center gap-1.5 ${dark ? (isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]") : (isNationalDay ? "text-[#006C35]" : "text-[#08467d]")}`}
             >
               <MapPin size={12} />
               <span>{topLocationText}</span>
@@ -532,7 +538,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           ? "is-scrolled !bg-transparent !border-transparent !border-0 !shadow-none pointer-events-none"
           : `aq-studio-share-header border-b backdrop-blur-2xl ${
               isNationalDay
-                ? dark ? "border-[#f8ca14]/20 bg-[#0c1218]/95" : "border-[#08467d]/15 bg-white/95"
+                ? dark ? "border-[#D4AF37]/20 bg-[#00170d]/95" : "border-emerald-800/10 bg-white/95"
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
             }`
       }`}>
@@ -542,7 +548,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
             : "px-4 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
           {/* Logo with clean branding — Permanently rounded pill island, zero circle morphing */}
-          <div className="relative shrink-0 lg:justify-self-start">
+          <div className="relative shrink-0 lg:justify-self-start flex items-center gap-2.5">
             <div className={`rounded-full flex items-center transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${
               isScrolled
                 ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-3 sm:px-4 py-1.5 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
@@ -561,13 +567,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 }`}
               >
                 <img
-                  src={
-                    isNationalDay
-                      ? dark
-                        ? "/alaqeeq-logo-national-dark.png"
-                        : "/alaqeeq-logo-national-light.png"
-                      : activeLogo
-                  }
+                  src={activeLogo}
                   alt="شعار مدارس العقيق الأهلية والدولية"
                   data-visual-id="header-logo"
                   data-visual-tag="image"
@@ -578,33 +578,32 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   width={160}
                   height={54}
                   className={`max-h-full max-w-full object-contain transition duration-200 ${
-                    dark
-                      ? "brightness-0 invert opacity-95"
-                      : isNationalDay
-                      ? "drop-shadow-[0_1px_3px_rgba(8,70,125,0.18)]"
-                      : ""
+                    dark ? "brightness-0 invert opacity-95" : ""
                   }`}
                 />
               </button>
-
-              {isNationalDay && (
-                <button
-                  type="button"
-                  onClick={() => triggerNationalCelebration()}
-                  title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
-                  className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3 py-1 rounded-full border shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${
-                    isScrolled ? "max-w-0 opacity-0 overflow-hidden pointer-events-none p-0 border-0" : "max-w-[120px] opacity-100 mr-2"
-                  } ${
-                    dark
-                      ? "bg-gradient-to-r from-[#08467d]/30 to-[#042442]/20 border-[#f8ca14]/40 text-[#f8ca14]"
-                      : "bg-[#08467d]/10 border-[#08467d]/30 text-[#08467d]"
-                  }`}
-                >
-                  <span>🇸🇦</span>
-                  <span className={`font-bold ${dark ? "text-white" : "text-[#08467d]"}`}>عزّنا بطبعنا</span>
-                </button>
-              )}
             </div>
+
+            {/* 🇸🇦 Separate Luxury National Day Pill Badge */}
+            {isNationalDay && (
+              <button
+                type="button"
+                onClick={() => triggerNationalCelebration()}
+                title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
+                className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3.5 py-1.5 rounded-full border shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shrink-0 ${
+                  isScrolled
+                    ? "opacity-0 -translate-x-2 pointer-events-none max-w-0 px-0 overflow-hidden border-0"
+                    : "opacity-100 translate-x-0 pointer-events-auto"
+                } ${
+                  dark
+                    ? "bg-gradient-to-r from-[#005A36]/40 to-[#003822]/40 border-[#D4AF37]/50 text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                    : "bg-emerald-50 border-emerald-600/30 text-emerald-800 shadow-sm"
+                }`}
+              >
+                <span className="text-sm">🇸🇦</span>
+                <span className="font-bold">عزّنا بطبعنا</span>
+              </button>
+            )}
           </div>
 
           {/* Center 9 Core Navigation Links with Dock Magnification & Live Page Hover Preview */}
@@ -719,10 +718,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-label="زر البحث الشامل"
                 className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                   searchOpen
-                    ? "border-[#f8ca14] bg-[#f8ca14]/20 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
+                    ? isNationalDay ? "border-[#D4AF37] bg-[#D4AF37]/20 text-[#D4AF37]" : "border-[#f8ca14] bg-[#f8ca14]/20 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
                     : dark
-                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                    : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                    ? isNationalDay ? "border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black" : "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                    : isNationalDay ? "border-emerald-700/20 bg-emerald-700/[0.08] text-emerald-800 hover:bg-emerald-800 hover:text-white" : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
                 title="البحث الشامل (Ctrl+K)"
                 aria-label="البحث الشامل"
@@ -735,8 +734,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 onClick={toggleTheme}
                 className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                   dark
-                    ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
-                    : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
+                    ? isNationalDay ? "border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black" : "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
+                    : isNationalDay ? "border-emerald-700/20 bg-emerald-700/[0.08] text-emerald-800 hover:bg-emerald-800 hover:text-white" : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
                 title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
               >
@@ -960,13 +959,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-black/[0.08] dark:border-white/10 shrink-0 bg-white/40 dark:bg-black/30 backdrop-blur-md">
                   <div className="flex items-center gap-2.5">
                     <img
-                      src={
-                        isNationalDay
-                          ? dark
-                            ? "/alaqeeq-logo-national-dark.png"
-                            : "/alaqeeq-logo-national-light.png"
-                          : activeLogo
-                      }
+                      src={activeLogo}
                       alt="شعار مدارس العقيق"
                       className={`h-7 sm:h-8 w-auto object-contain ${dark ? "brightness-0 invert opacity-95" : ""}`}
                     />

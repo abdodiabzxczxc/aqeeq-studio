@@ -9,7 +9,6 @@ import VisualGlobalSections from "./components/VisualGlobalSections";
 import { RouteMotion } from "./components/ExperienceMotion";
 import { PublishedHomepageProvider, usePublishedHomepage } from "./contexts/PublishedHomepageContext";
 import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
-import { AqeeqOccasionRibbon } from "./components/AqeeqOccasionRibbon";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
 import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
 // 🚀 Core Public Pages (Directly Loaded for 0ms Instant In-Memory Seamless Navigation)
@@ -250,20 +249,7 @@ function StudioAppShell() {
       {/* 🎞️ Global Cinematic Film Grain Texture */}
       {!isLoginPage && <div className="aqeeq-grain-overlay" aria-hidden />}
       {!isLoginPage && isNationalDay && <AqeeqCelebrationConfetti />}
-      {/* 🌟 Floating Gold & Emerald Stars Particles on ALL Pages */}
-      {!isLoginPage && isNationalDay && (
-        <div className="pointer-events-none fixed inset-0 overflow-hidden z-20">
-          <span className="snd-floating-star text-xs top-[92vh] left-[8%] [animation-duration:14s] [animation-delay:0s]">★</span>
-          <span className="snd-floating-star text-sm top-[96vh] left-[22%] [animation-duration:19s] [animation-delay:3s]">✦</span>
-          <span className="snd-floating-star text-xs top-[94vh] left-[45%] [animation-duration:16s] [animation-delay:7s]">★</span>
-          <span className="snd-floating-star text-base top-[98vh] left-[68%] [animation-duration:22s] [animation-delay:1.5s]">✦</span>
-          <span className="snd-floating-star text-xs top-[90vh] left-[84%] [animation-duration:17s] [animation-delay:5s]">★</span>
-          <span className="snd-floating-star text-sm top-[95vh] left-[93%] [animation-duration:15s] [animation-delay:9s]">✦</span>
-          <span className="snd-floating-star text-xs top-[93vh] left-[35%] [animation-duration:20s] [animation-delay:4s]">★</span>
-        </div>
-      )}
       <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
-        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqOccasionRibbon /></ErrorBoundary>}
         {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>}
         <ErrorBoundary><Router /></ErrorBoundary>
 

@@ -1139,12 +1139,12 @@ export default function AlaqeeqStudioPublicPage() {
 
             <h1 className={"mt-2.5 sm:mt-4 text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-black leading-[1.15] " + (
               isNationalDay
-                ? dark ? "text-white" : "text-[#08467d]"
+                ? dark ? "text-white" : "text-emerald-950"
                 : dark ? "text-white" : "text-black"
             )}>
               <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي" defaultText="ذاكرة العقيق" as="span" />
               <br />
-              <span className={isNationalDay ? (dark ? "text-[#f8ca14]" : "text-[#08467d]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
+              <span className={isNationalDay ? (dark ? "snd-text-gradient" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
                 <VisualEditable
                   id="studio-hero-accent"
                   tag="text"
@@ -1163,7 +1163,7 @@ export default function AlaqeeqStudioPublicPage() {
               as="p"
               className={"mt-3 sm:mt-5 max-w-xl text-xs sm:text-sm leading-6 sm:leading-8 " + (
                 isNationalDay
-                  ? dark ? "text-slate-300" : "text-slate-600"
+                  ? dark ? "text-emerald-100/80" : "text-emerald-900/80"
                   : dark ? "text-slate-300" : "text-slate-600"
               )}
             />
@@ -1179,7 +1179,11 @@ export default function AlaqeeqStudioPublicPage() {
                 data-visual-label="زر القبول والتسجيل في الهيرو"
                 className={`inline-flex items-center gap-2 rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-black shadow-lg transition active:scale-95 ${
                   dark
-                    ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
+                    ? isNationalDay
+                      ? "bg-gradient-to-r from-[#D4AF37] to-amber-500 text-black shadow-[#D4AF37]/20 hover:opacity-95"
+                      : "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
+                    : isNationalDay
+                    ? "bg-gradient-to-r from-[#005A36] to-[#003822] text-white shadow-[#005A36]/30 hover:opacity-95"
                     : "bg-gradient-to-r from-[#08467d] to-[#052c52] text-white shadow-[#08467d]/25 hover:opacity-95"
                 }`}
               >
@@ -1195,11 +1199,15 @@ export default function AlaqeeqStudioPublicPage() {
                 data-visual-label="زر الاعتمادات الدولية في الهيرو"
                 className={`inline-flex items-center gap-2 rounded-2xl border px-4 sm:px-5 py-2.5 sm:py-3 text-xs font-black transition active:scale-95 ${
                   dark
-                    ? "border-white/15 bg-white/5 text-white hover:bg-white/10"
+                    ? isNationalDay
+                      ? "border-emerald-600/30 bg-emerald-950/30 text-white hover:bg-emerald-900/40"
+                      : "border-white/15 bg-white/5 text-white hover:bg-white/10"
+                    : isNationalDay
+                    ? "border-emerald-700/20 bg-emerald-50 text-emerald-900 hover:bg-emerald-100/80"
                     : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
                 }`}
               >
-                <Award size={15} className="text-[#f8ca14]" />
+                <Award size={15} className={isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]"} />
                 <span>الاعتمادات الدولية</span>
               </button>
             </div>
@@ -1209,8 +1217,8 @@ export default function AlaqeeqStudioPublicPage() {
             <div className={"mt-5 sm:mt-8 grid max-w-lg grid-cols-3 divide-x divide-x-reverse border-y py-2.5 sm:py-4 " + (
               isNationalDay
                 ? dark
-                  ? "divide-[#f8ca14]/20 border-[#f8ca14]/20 bg-[#0c1218] rounded-2xl px-3 backdrop-blur-sm"
-                  : "divide-[#08467d]/15 border-[#08467d]/15 bg-slate-50/80 rounded-2xl px-3 backdrop-blur-sm"
+                  ? "divide-[#D4AF37]/20 border-[#D4AF37]/20 bg-[#001f13]/80 rounded-2xl px-3 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+                  : "divide-emerald-700/15 border-emerald-700/20 bg-emerald-50/80 rounded-2xl px-3 backdrop-blur-sm"
                 : dark ? "divide-white/[0.1] border-white/[0.1]" : "divide-black/[0.08] border-black/[0.08]"
             )}>
               <div className="pl-3">

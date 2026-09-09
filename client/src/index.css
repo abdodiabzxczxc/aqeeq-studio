@@ -2428,20 +2428,20 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 /* Saudi National Day Ambient Hero Glow */
 .snd-hero-dark {
-  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.55), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(90, 186, 28, 0.12), transparent),
-              linear-gradient(180deg, #01140c 0%, #021a10 50%, #010d08 100%);
+  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.4), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(212, 175, 55, 0.08), transparent),
+              linear-gradient(180deg, #01140c 0%, #01190f 50%, #010d08 100%);
 }
 
 .snd-hero-light {
-  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(90, 186, 28, 0.2), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(0, 90, 54, 0.1), transparent),
-              linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 50%, #ffffff 100%);
+  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.08), transparent 70%),
+              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(212, 175, 55, 0.05), transparent),
+              linear-gradient(180deg, #f7faf8 0%, #ffffff 100%);
 }
 
 /* Geometric Subtle Sadu Pattern Watermark */
 .snd-pattern-watermark {
-  background-image: radial-gradient(rgba(90, 186, 28, 0.15) 1px, transparent 1px), radial-gradient(rgba(248, 202, 20, 0.1) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 90, 54, 0.12) 1px, transparent 1px), radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: 0 0, 16px 16px;
   pointer-events: none;
@@ -2449,7 +2449,7 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 /* Luxury National Day Gold & Emerald Text Gradient */
 .snd-text-gradient {
-  background: linear-gradient(135deg, #f8ca14 0%, #5aba1c 50%, #f8ca14 100%);
+  background: linear-gradient(135deg, #FDE68A 0%, #D4AF37 35%, #34D399 70%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -2465,36 +2465,19 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 /* National Theme Glassmorphism Cards */
 .snd-glass-card {
-  border-color: rgba(90, 186, 28, 0.3) !important;
-  box-shadow: 0 10px 30px rgba(0, 58, 34, 0.2), inset 0 0 20px rgba(90, 186, 28, 0.05) !important;
+  border-color: rgba(212, 175, 55, 0.25) !important;
+  box-shadow: 0 10px 30px rgba(0, 58, 34, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.04) !important;
 }
 
 .snd-glass-card:hover {
-  border-color: rgba(248, 202, 20, 0.5) !important;
-  box-shadow: 0 15px 40px rgba(0, 90, 54, 0.3), inset 0 0 25px rgba(248, 202, 20, 0.1) !important;
+  border-color: rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 15px 40px rgba(0, 90, 54, 0.3), inset 0 0 25px rgba(212, 175, 55, 0.08) !important;
 }
 
 /* ─────────────────────────────────────────────────────────────
    🇸🇦 NATIONAL DAY ENHANCEMENT LAYER II — Sections, Motion, Depth
    ───────────────────────────────────────────────────────────── */
 
-/* Floating gold star particles */
-@keyframes snd-particle-drift {
-  0%   { transform: translateY(100vh) rotate(0deg) scale(1);   opacity: 0; }
-  8%   { opacity: 0.9; }
-  92%  { opacity: 0.5; }
-  100% { transform: translateY(-10vh) rotate(900deg) scale(0.3); opacity: 0; }
-}
-.snd-floating-star {
-  position: fixed;
-  pointer-events: none;
-  animation: snd-particle-drift linear infinite;
-  color: #f8ca14;
-  text-shadow: 0 0 10px rgba(248,202,20,0.9), 0 0 28px rgba(248,202,20,0.35);
-  z-index: 1;
-  user-select: none;
-  will-change: transform, opacity;
-}
 
 /* Hero card gold glow pulse */
 @keyframes snd-card-glow-pulse {
@@ -2587,17 +2570,9 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   color: #005A36 !important;
 }
 
-/* ── Light Mode Floating Stars ── */
-:root[data-site-theme="saudi-national-day"] .aq-studio-share--light .snd-floating-star {
-  color: #007A48 !important;
-  text-shadow: 0 0 10px rgba(0, 90, 54, 0.35) !important;
-  opacity: 0.35 !important;
-}
-
-
 /* ── Active tabs ── */
 :root[data-site-theme="saudi-national-day"] .snd-tab-active {
-  background: linear-gradient(90deg, #005A36, #5aba1c) !important;
+  background: linear-gradient(90deg, #005A36, #007A48) !important;
   color: white !important;
   box-shadow: 0 4px 18px rgba(0,90,54,0.42) !important;
 }
