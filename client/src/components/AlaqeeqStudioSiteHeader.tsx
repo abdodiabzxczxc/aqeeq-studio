@@ -54,17 +54,16 @@ import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 import { Button } from "@/components/ui/button";
+import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 
-// ⚡ Dynamic lazy modals for zero initial payload impact
-const AlaqeeqSpotlightSearch = lazy(() =>
-  import("@/components/AlaqeeqSpotlightSearch").then((m) => ({ default: m.AlaqeeqSpotlightSearch }))
-);
+// ⚡ Dynamic lazy modals for heavy modules (Face AI, Studio Creator)
 const AqeeqFaceSearchModal = lazy(() =>
   import("@/components/AqeeqFaceSearchModal").then((m) => ({ default: m.AqeeqFaceSearchModal }))
 );
 const AqeeqCreatorStudioModal = lazy(() =>
   import("./AqeeqCreatorStudioModal").then((m) => ({ default: m.AqeeqCreatorStudioModal }))
 );
+
 
 import { HeaderDockNav, NavDockItemConfig } from "./ui/header-dock-preview";
 import {
@@ -1535,11 +1534,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           )}
 
           {/* 🔍 Anchored Spotlight Search Cockpit — Drops down right under Search Island */}
-          {searchOpen && (
-            <Suspense fallback={null}>
-              <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
-            </Suspense>
-          )}
+          <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
         </div>
       </div>
     </header>

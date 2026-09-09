@@ -925,13 +925,21 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
+  const sanitize = (cfg: any) => {
+    if (cfg?.marketingPixels?.ogImageUrl && typeof cfg.marketingPixels.ogImageUrl === "string" && cfg.marketingPixels.ogImageUrl.startsWith("data:image/")) {
+      cfg.marketingPixels.ogImageUrl = "/api/og-image.png";
+    }
+    return cfg;
+  };
+
   const db = await getDb();
   if (db) {
     try {
       const row = await db.select().from(settings).where(eq(settings.key, "site_orchestration_config")).limit(1);
       if (row.length > 0 && row[0].value) {
-        const parsed = JSON.parse(row[0].value);
+        const parsed = sanitize(JSON.parse(row[0].value));
         return {
+
           ...DEFAULT_SITE_ORCHESTRATION,
           ...parsed,
           nav: { ...DEFAULT_SITE_ORCHESTRATION.nav, ...(parsed.nav || {}) },
@@ -962,7 +970,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
   try {
     const raw = localSettings.get("site_orchestration_config");
     if (raw) {
-      const parsed = JSON.parse(raw);
+      const parsed = sanitize(JSON.parse(raw));
       return {
         ...DEFAULT_SITE_ORCHESTRATION,
         ...parsed,

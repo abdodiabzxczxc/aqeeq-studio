@@ -124,21 +124,22 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     staleTime: 5_000,
   });
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
   });
   const { data: aboutOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/about" },
-    { refetchOnWindowFocus: true, staleTime: 5_000 }
+    { refetchOnWindowFocus: false, staleTime: 60_000 }
   );
   const { data: admissionsOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/admissions" },
-    { refetchOnWindowFocus: true, staleTime: 5_000 }
+    { refetchOnWindowFocus: false, staleTime: 60_000 }
   );
 
   const { data: previewVersion, refetch: refetchPreviewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
-    refetchInterval: 1_500,
-    refetchOnWindowFocus: true,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
   });
 
   const cacheKey = useMemo(() => {
