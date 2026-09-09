@@ -82,8 +82,8 @@ export function AtheerVinylCoverflow({
   // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
-  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
-  const opacity = dark ? 0.48 : 0.42;
+  // Constant, elegant subtle opacity throughout scroll
+  const opacity = dark ? 0.30 : 0.24;
   const rawTranslateY = useTransform(
     scrollYProgress,
     [0, 0.35],

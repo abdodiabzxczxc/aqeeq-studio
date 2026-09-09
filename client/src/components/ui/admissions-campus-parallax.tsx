@@ -99,8 +99,8 @@ export function AdmissionsCampusParallax({
     offset: ["start start", "end start"],
   });
 
-  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
-  const opacity = dark ? 0.48 : 0.42;
+  // Constant, elegant subtle opacity throughout scroll
+  const opacity = dark ? 0.30 : 0.24;
   const translateY = useTransform(
     scrollYProgress,
     [0, 0.38],
