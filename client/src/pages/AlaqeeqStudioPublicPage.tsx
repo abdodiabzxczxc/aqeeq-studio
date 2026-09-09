@@ -1043,17 +1043,9 @@ export default function AlaqeeqStudioPublicPage() {
         </section>
       ) : null}
 
-      {/* 2. غلاف واجهة مدارس العقيق الرئيسية مع عمق البعد الثالث وانتقال الستارة الملكية */}
-      <div className="relative z-0 w-full overflow-hidden">
-        <motion.div
-          style={{
-            opacity: isDesktop ? heroOpacity : 1,
-            y: isDesktop ? heroY : 0,
-            transformOrigin: "center top",
-          }}
-          className="w-full will-change-transform"
-        >
-          <VisualEditable
+      {/* 2. غلاف واجهة مدارس العقيق الرئيسية - انسياب طبيعي وسلس 100% بدون أي قص */}
+      <div className="relative z-10 w-full">
+        <VisualEditable
             id="studio-hero-section"
             tag="section"
             label="غلاف واجهة مدارس العقيق"
@@ -1439,36 +1431,10 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </div>
       </VisualEditable>
-        </motion.div>
       </div>
 
-      {/* 3. الستارة الملكية الصاعدة (تغطي الهيرو بسلاسة مع السكرول وبدون أي فراغ أولي) */}
-      <div
-        className={`relative z-20 w-full mt-0 rounded-t-[2.5rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4rem] transition-colors duration-500 overflow-x-clip ${
-          dark
-            ? "bg-black shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t border-white/[0.05]"
-            : "bg-white shadow-[0_-25px_70px_rgba(0,0,0,0.03)] border-t border-black/[0.03]"
-        }`}
-      >
-        {/* خط إضاءة نيون ملكي في أعلى الستارة */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-        />
-
-        {/* مقبض استكشاف بصري فاخر */}
-        <div className="flex flex-col items-center justify-center pt-3 pb-1.5 gap-1">
-          <div
-            className={`h-1 w-12 rounded-full transition ${
-              dark ? "bg-white/20" : "bg-black/15"
-            }`}
-          />
-          <span className={`text-[9px] font-black tracking-widest uppercase ${
-            dark ? "text-[#f8ca14]/80" : "text-[#08467d]/80"
-          }`}>
-            ✦ واحة العقيق الرقمية ✦
-          </span>
-        </div>
+      {/* 3. واحة العقيق الرقمية وشريط الثقة - انسياب طبيعي 100% بدون ستائر أو قص */}
+      <div className="relative z-10 w-full bg-transparent border-0 shadow-none">
 
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية */}
       {/* 🇸🇦 شريط الاعتمادات وشارات الثقة الدولية (محمي من تطفل المحرر المرئي مع تثبيت تلقائي) */}

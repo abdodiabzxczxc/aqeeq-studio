@@ -34,31 +34,31 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
           background: isNationalDay
             ? dark
               ? `
-                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.48) 0%, transparent 72%),
-                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.22) 0%, transparent 65%),
-                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.18) 0%, transparent 65%),
-                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.40) 0%, transparent 70%)
+                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.52) 0%, transparent 72%),
+                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.25) 0%, transparent 65%),
+                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.20) 0%, transparent 65%),
+                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.44) 0%, transparent 70%)
               `
               : `
-                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.09) 0%, transparent 72%),
-                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 65%),
-                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.06) 0%, transparent 65%),
-                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.07) 0%, transparent 70%)
+                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.20) 0%, transparent 72%),
+                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.14) 0%, transparent 65%),
+                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.16) 0%, transparent 70%)
               `
             : dark
             ? `
-              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.42) 0%, transparent 72%),
-              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(248, 202, 20, 0.20) 0%, transparent 65%),
-              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(222, 25, 30, 0.12) 0%, transparent 65%),
-              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.18) 0%, transparent 70%),
-              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.35) 0%, transparent 70%)
+              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.48) 0%, transparent 72%),
+              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(248, 202, 20, 0.24) 0%, transparent 65%),
+              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(222, 25, 30, 0.14) 0%, transparent 65%),
+              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.22) 0%, transparent 70%),
+              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.38) 0%, transparent 70%)
             `
             : `
-              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.09) 0%, transparent 72%),
-              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(248, 202, 20, 0.09) 0%, transparent 65%),
-              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(222, 25, 30, 0.035) 0%, transparent 65%),
-              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.06) 0%, transparent 70%),
-              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.07) 0%, transparent 70%)
+              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.18) 0%, transparent 72%),
+              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(245, 158, 11, 0.18) 0%, transparent 65%),
+              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(225, 29, 72, 0.08) 0%, transparent 65%),
+              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.14) 0%, transparent 70%),
+              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.15) 0%, transparent 70%)
             `,
         }}
       />
@@ -70,11 +70,11 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(0, 90, 54, 0.50) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(0, 90, 54, 0.09) 0%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(0, 90, 54, 0.55) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(0, 90, 54, 0.26) 0%, rgba(5, 150, 105, 0.15) 50%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(8, 70, 125, 0.45) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(8, 70, 125, 0.08) 0%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(8, 70, 125, 0.50) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(2, 132, 199, 0.28) 0%, rgba(8, 70, 125, 0.16) 50%, transparent 70%)",
         }}
       />
 
@@ -84,11 +84,11 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(212, 175, 55, 0.26) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(212, 175, 55, 0.09) 0%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(212, 175, 55, 0.30) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(212, 175, 55, 0.28) 0%, rgba(245, 158, 11, 0.16) 50%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(248, 202, 20, 0.22) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(248, 202, 20, 0.09) 0%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(248, 202, 20, 0.26) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(217, 119, 6, 0.15) 50%, transparent 70%)",
         }}
       />
 
@@ -98,11 +98,11 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(90, 186, 28, 0.22) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(90, 186, 28, 0.07) 0%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(90, 186, 28, 0.25) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(90, 186, 28, 0.22) 0%, rgba(34, 197, 94, 0.12) 50%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(56, 189, 248, 0.07) 0%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(14, 165, 233, 0.26) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(6, 182, 212, 0.24) 0%, rgba(59, 130, 246, 0.14) 50%, transparent 70%)",
         }}
       />
 

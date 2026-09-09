@@ -83,9 +83,6 @@ export function AqeeqLuxuryPageShell({
 function AqeeqCurtainHeroStage({
   hero,
   children,
-  curtainKicker,
-  dark,
-  isNationalDay,
 }: {
   hero: React.ReactNode;
   children: React.ReactNode;
@@ -93,53 +90,16 @@ function AqeeqCurtainHeroStage({
   dark: boolean;
   isNationalDay: boolean;
 }) {
-  const heroPinContainerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: heroPinContainerRef,
-    offset: ["start start", "end start"],
-  });
-
-  const rawScale = useTransform(scrollYProgress, [0, 0.65], [1, 0.92]);
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.35]);
-  const rawY = useTransform(scrollYProgress, [0, 0.65], ["0px", "-35px"]);
-
-  // فحص الشاشات الكبيرة لتفعيل التثبيت السينمائي على الكمبيوتر حصرياً
-  // وتوفير انسياب طبيعي بدون تداخل على الموبايل
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
   return (
     <div className="relative z-10 w-full">
-      {/* تثبيت الهيرو على الكمبيوتر وانسياب طبيعي على الموبايل */}
-      <div ref={heroPinContainerRef} className="relative h-auto lg:h-[115vh] w-full">
-        <div className="relative lg:sticky lg:top-0 z-0 w-full overflow-hidden">
-          <motion.div
-            style={{
-              scale: isDesktop ? rawScale : 1,
-              opacity: isDesktop ? rawOpacity : 1,
-              y: isDesktop ? rawY : 0,
-              transformOrigin: "center top",
-            }}
-            className="w-full will-change-transform"
-          >
-            {hero}
-          </motion.div>
-        </div>
+      {/* غلاف الهيرو: انسياب طبيعي 100% بدون أي تثبيت أو قص للكافرات */}
+      <div className="relative z-10 w-full">
+        {hero}
       </div>
 
       {/* حاوية المحتوى: انسياب سلس 100% بدون أي قص أو فواصل */}
-      <div
-        className="relative z-20 w-full transition-colors duration-500 overflow-x-clip bg-transparent border-0"
-      >
-        {/* محتوى الصفحة */}
-        <div className="relative z-10 w-full">{children}</div>
+      <div className="relative z-10 w-full bg-transparent border-0 shadow-none">
+        {children}
       </div>
     </div>
   );
