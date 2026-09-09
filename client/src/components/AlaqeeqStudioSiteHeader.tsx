@@ -53,8 +53,8 @@ import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
-import { Button } from "@/components/ui/button";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
+
 
 // ⚡ Dynamic lazy modals for heavy modules (Face AI, Studio Creator)
 const AqeeqFaceSearchModal = lazy(() =>
@@ -288,7 +288,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const navPodcastText = editor?.getOverride?.("header-nav-podcast")?.contentText || (orchestration?.nav as any)?.podcastLabel || "أثير";
   const navArticlesText = editor?.getOverride?.("header-nav-articles")?.contentText || (orchestration?.nav as any)?.articlesLabel || "المقالات";
   const navOffersText = editor?.getOverride?.("header-nav-offers")?.contentText || orchestration?.nav?.showcaseLabel || "الأخبار";
-  const ctaButtonText = editor?.getOverride?.("header-cta-button")?.contentText || "سجّل الآن ✦";
+
 
   return (
     <div dir="rtl" className="w-full bg-transparent">
@@ -706,32 +706,8 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   : "border border-transparent bg-transparent px-1 sm:px-1.5 py-1 gap-2 sm:gap-2.5 pointer-events-auto"
               }`}
             >
-              {/* Desktop Collapsible Extra Action Items (Glide away smoothly on scroll without layout snap) */}
-              <div
-                className={`hidden sm:flex items-center gap-2 transition-[max-width,opacity] duration-300 ease-out overflow-hidden ${
-                  isScrolled
-                    ? "max-w-0 opacity-0 pointer-events-none"
-                    : "max-w-[420px] opacity-100 pointer-events-auto"
-                }`}
-              >
-                {/* Primary Executive CTA Button */}
-                <Button
-                  onClick={() => go("/admissions#admission-form-section")}
-                  data-visual-id="header-cta-button"
-                  data-visual-tag="button"
-                  data-visual-label="زر القبول والتسجيل (الهيدر)"
-                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black shadow-md transition active:scale-95 whitespace-nowrap ${
-                    dark
-                      ? "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black hover:opacity-95 shadow-[#f8ca14]/20"
-                      : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
-                  }`}
-                >
-                  <span>{ctaButtonText}</span>
-                </Button>
-
-              </div>
-
               {/* 🔍 زر البحث الشامل (Spotlight Search) — Always visible in Left Island */}
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
