@@ -920,8 +920,8 @@ export default function AlaqeeqStudioPublicPage() {
       )}
       style={{
         background: dark
-          ? "#060608"
-          : "#fafafb",
+          ? (isNationalDay ? "#010e07" : "#060608")
+          : (isNationalDay ? "#f8faf9" : "#fafafb"),
       }}
     >
       {/* Ambient background radial glow — fixed, always present */}
@@ -961,13 +961,9 @@ export default function AlaqeeqStudioPublicPage() {
 
       <AlaqeeqStudioSiteHeader title="مدارس العقيق الأهلية والدولية" active="studio" logoUrl={logoUrl} />
 
-      {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) */}
+      {/* 1. شريط «قصص ولحظات اليوم» (Stories 24H) — عائم بانسيابية تامة وبدون أي تقطيع لوني */}
       {storiesList.length > 0 ? (
-        <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
-          isNationalDay
-            ? dark ? "border-[#f8ca14]/10 bg-[#010f08]/90" : "border-[#005A36]/10 bg-[#f0fdf4]/90"
-            : dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
-        )}>
+        <section data-no-visual-edit="true" className="relative z-10 py-3.5 sm:py-5 transition bg-transparent border-0">
           <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {storiesList.map((story, index) => (
@@ -1066,9 +1062,7 @@ export default function AlaqeeqStudioPublicPage() {
           </div>
         </section>
       ) : isStoriesLoading ? (
-        <section data-no-visual-edit="true" className={"border-b py-3.5 sm:py-4 backdrop-blur-md transition " + (
-          dark ? "border-white/[0.08] bg-[#070707]/90" : "border-black/[0.05] bg-white/90"
-        )}>
+        <section data-no-visual-edit="true" className="relative z-10 py-3.5 sm:py-5 transition bg-transparent border-0">
           <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
             <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden">
               {[1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -1097,10 +1091,8 @@ export default function AlaqeeqStudioPublicPage() {
             tag="section"
             label="غلاف واجهة مدارس العقيق"
             as="section"
-            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 " + (
-              isNationalDay
-                ? dark ? "snd-hero-dark border-[#f8ca14]/20 text-white" : "snd-hero-light border-[#08467d]/20 text-slate-900"
-                : dark ? "border-white/[0.08] bg-black text-white" : "border-black/[0.06] bg-white text-black"
+            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 bg-transparent border-0 " + (
+              dark ? "text-white" : "text-slate-900"
             )}
           >
         {/* Subtle Ambient Background Watermark */}
@@ -1496,11 +1488,11 @@ export default function AlaqeeqStudioPublicPage() {
         className={`relative z-20 w-full mt-0 rounded-t-[2.5rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4rem] transition-colors duration-500 overflow-x-clip ${
           isNationalDay
             ? dark
-              ? "bg-[#020b06] shadow-[0_-35px_90px_rgba(0,0,0,0.95)] border-t-2 border-[#f8ca14]/30"
-              : "bg-[#f8faf8] shadow-[0_-25px_70px_rgba(0,90,54,0.18)] border-t-2 border-emerald-500/30"
+              ? "bg-[#010e07] shadow-[0_-35px_90px_rgba(0,0,0,0.95)] border-t border-[#f8ca14]/20"
+              : "bg-[#f8faf9] shadow-[0_-25px_70px_rgba(0,90,54,0.1)] border-t border-emerald-500/15"
             : dark
-            ? "bg-[#07090e] shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t-2 border-white/15"
-            : "bg-white shadow-[0_-25px_70px_rgba(0,0,0,0.12)] border-t-2 border-black/10"
+            ? "bg-[#060608] shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t border-white/[0.06]"
+            : "bg-[#fafafb] shadow-[0_-25px_70px_rgba(0,0,0,0.06)] border-t border-black/[0.04]"
         }`}
       >
         {/* خط إضاءة نيون ملكي في أعلى الستارة */}
@@ -1528,8 +1520,8 @@ export default function AlaqeeqStudioPublicPage() {
       <section
         data-no-visual-edit="true"
         data-interactive-fx="true"
-        className={`border-b py-3.5 sm:py-4 backdrop-blur-md transition ${
-          dark ? "border-white/10 bg-[#06080d]/90 text-white" : "border-black/5 bg-slate-50/90 text-slate-800"
+        className={`py-3.5 sm:py-4 transition bg-transparent border-0 ${
+          dark ? "text-white" : "text-slate-800"
         }`}
       >
         <div data-no-visual-edit="true" data-interactive-fx="true" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
@@ -1887,11 +1879,7 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="قسم صوت العقيق والكلمة التوجيهية"
         as="section"
-        className={"border-b py-14 md:py-20 transition " + (
-          isNationalDay
-            ? dark ? "border-[#5aba1c]/10 snd-section-dark-alt" : "border-[#005A36]/8 snd-section-light-alt"
-            : dark ? "border-white/[0.05] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.01]"
-        )}
+        className="py-14 md:py-20 transition bg-transparent border-0"
       >
         <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">

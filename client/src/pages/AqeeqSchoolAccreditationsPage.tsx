@@ -162,11 +162,7 @@ export default function AqeeqSchoolAccreditationsPage() {
       hero={
         <section
           ref={accreditationsHeroRef}
-          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 border-b ${
-            isNationalDay
-              ? dark ? "bg-[#001c10] text-white border-emerald-500/20" : "bg-white text-slate-900 border-emerald-500/20"
-              : dark ? "bg-[#05080e] text-white border-white/[0.08]" : "bg-slate-50/70 text-slate-900 border-black/[0.06]"
-          }`}
+          className="relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 bg-transparent border-0 text-slate-900 dark:text-white"
         >
           {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
           <HeroParallaxBackdrop

@@ -424,11 +424,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       hero={
         <section
           ref={articlesHeroRef}
-          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 border-b ${
-            isNationalDay
-              ? dark ? "snd-hero-dark text-white border-emerald-500/20" : "snd-hero-light text-slate-900 border-emerald-500/20"
-              : dark ? "bg-[#05080e] text-white border-white/[0.08]" : "bg-white text-black border-black/[0.06]"
-          }`}
+          className="relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 bg-transparent border-0 text-slate-900 dark:text-white"
         >
           {/* Scroll-driven 3D Article Columns in background with 3D Entrance Spring */}
           <ArticlesScrollParallaxBackdrop

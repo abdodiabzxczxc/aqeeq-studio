@@ -465,11 +465,7 @@ export default function AqeeqPodcastPage() {
         <section
           ref={podcastHeroRef}
           style={{ minHeight: isDesktop ? "74vh" : "auto" }}
-          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 ${
-            isNationalDay
-              ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
-              : dark ? "bg-[#05080e] text-white" : "bg-white text-black"
-          }`}
+          className="relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 bg-transparent border-0 text-slate-900 dark:text-white"
         >
           {/* Scroll-driven 3D Vinyl Backdrop: slides and spins records purely on scroll */}
           <AtheerScrollVinylBackdrop

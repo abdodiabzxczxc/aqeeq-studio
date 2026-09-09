@@ -304,10 +304,10 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 ${
           isScrolled
             ? "overflow-hidden max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
-            : `overflow-visible border-b max-h-12 py-1.5 opacity-100 ${
+            : `overflow-visible border-b border-transparent max-h-12 py-1.5 opacity-100 ${
                 dark
-                  ? isNationalDay ? "border-emerald-600/15 bg-[#00130a]/95 text-emerald-100/70" : "border-white/5 bg-[#0c1218]/95 text-slate-400"
-                  : isNationalDay ? "border-emerald-800/10 bg-emerald-50/90 text-emerald-900/80" : "border-black/5 bg-slate-50/95 text-slate-600"
+                  ? isNationalDay ? "bg-transparent text-emerald-100/70" : "bg-transparent text-slate-400"
+                  : isNationalDay ? "bg-transparent text-emerald-900/80" : "bg-transparent text-slate-600"
               }`
         }`}>
         <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-3 sm:px-4 xl:px-8 min-w-0">
@@ -536,10 +536,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       <header className={`w-full transition-all duration-300 ease-out ${
         isScrolled
           ? "is-scrolled !bg-transparent !border-transparent !border-0 !shadow-none pointer-events-none"
-          : `aq-studio-share-header border-b backdrop-blur-2xl ${
+          : `aq-studio-share-header backdrop-blur-2xl border-b ${
               isNationalDay
-                ? dark ? "border-[#D4AF37]/20 bg-[#00170d]/95" : "border-emerald-800/10 bg-white/95"
-                : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
+                ? dark
+                  ? "border-[#D4AF37]/10 bg-[#021009]/70 shadow-[0_4px_30px_rgba(0,0,0,0.35)]"
+                  : "border-emerald-800/[0.04] bg-white/75 shadow-[0_4px_30px_rgba(0,58,34,0.03)]"
+                : dark
+                ? "border-white/[0.04] bg-[#060a12]/70 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+                : "border-black/[0.03] bg-white/75 shadow-[0_4px_30px_rgba(0,0,0,0.02)]"
             }`
       }`}>
         <div className={`relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] flex items-center justify-between lg:grid lg:grid-cols-[auto_1fr_auto] xl:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
