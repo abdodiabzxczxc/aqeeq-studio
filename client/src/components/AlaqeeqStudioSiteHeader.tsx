@@ -371,214 +371,152 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               {portalsOpen && (
                 <div
                   dir="rtl"
-                  className={`absolute left-0 top-full mt-2 w-[520px] max-w-[calc(100vw-2rem)] p-4 rounded-3xl border shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                  className={`absolute left-0 top-full mt-2 w-72 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 animate-in fade-in duration-150 ${
                     dark
                       ? "bg-[#0c1218]/95 border-white/10 text-white shadow-black/60"
-                      : "bg-white/95 border-slate-200 text-slate-900 shadow-2xl"
+                      : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
                   }`}
                 >
-                  {/* Mega-Menu Header */}
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-current/10">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
-                        dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
-                      }`}>
-                        <Server size={16} />
+                  {/* Category 1: Parents & Students */}
+                  {parentsPortals.length > 0 && (
+                    <div className="space-y-0.5">
+                      <div className={`text-[10px] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-black px-2 py-1 flex items-center gap-1.5`}>
+                        <GraduationCap size={12} />
+                        <span>{PORTAL_CATEGORY_LABELS.parents_students}</span>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-black tracking-tight leading-tight">بوابات الأنظمة والخدمات المدرسية</h4>
-                        <p className="text-[10px] text-slate-400 font-medium">الوصول السريع لمنظومات ومنصات مدارس العقيق</p>
-                      </div>
+                      {parentsPortals.map((portal) => {
+                        const isInternal = portal.url.startsWith("/");
+                        return (
+                          <a
+                            key={portal.id}
+                            href={portal.url}
+                            target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                            rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                            onClick={(e) => {
+                              if (isInternal) {
+                                e.preventDefault();
+                                setPortalsOpen(false);
+                                navigate(portal.url);
+                              } else {
+                                setPortalsOpen(false);
+                              }
+                            }}
+                            className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-bold transition hover:bg-[#f8ca14]/10 ${
+                              portal.id === "portal-daily-plans" ? "text-amber-700 dark:text-amber-300" : ""
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 min-w-0">
+                              <span className="shrink-0 text-current opacity-80">
+                                {renderPortalIcon(portal.iconName, 13)}
+                              </span>
+                              <span className="truncate">{portal.title}</span>
+                              {portal.badge && (
+                                <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                                  {portal.badge}
+                                </span>
+                              )}
+                            </span>
+                            <ExternalLink size={11} className="opacity-40 shrink-0 mr-1" />
+                          </a>
+                        );
+                      })}
                     </div>
-                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                      dark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-700"
-                    }`}>
-                      {systemPortalsList.length} بوابة نشطة
-                    </span>
-                  </div>
+                  )}
 
-                  {/* Portals Content */}
-                  <div className="max-h-[60vh] overflow-y-auto space-y-3.5 pr-1 scrollbar-hide">
-                    {/* Section 1: Parents & Students */}
-                    {parentsPortals.length > 0 && (
-                      <div>
-                        <div className={`text-[11px] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-black mb-2 flex items-center gap-1.5`}>
-                          <GraduationCap size={13} />
-                          <span>{PORTAL_CATEGORY_LABELS.parents_students}</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {parentsPortals.map((portal) => {
-                            const isInternal = portal.url.startsWith("/");
-                            return (
-                              <a
-                                key={portal.id}
-                                href={portal.url}
-                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
-                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
-                                onClick={(e) => {
-                                  if (isInternal) {
-                                    e.preventDefault();
-                                    setPortalsOpen(false);
-                                    navigate(portal.url);
-                                  } else {
-                                    setPortalsOpen(false);
-                                  }
-                                }}
-                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
-                                  dark
-                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-[#f8ca14]/30"
-                                    : "border-slate-100 bg-slate-50/70 hover:bg-amber-50/60 hover:border-amber-200"
-                                }`}
-                              >
-                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-colors ${
-                                  dark
-                                    ? "bg-white/5 text-[#f8ca14] group-hover:bg-[#f8ca14]/20"
-                                    : "bg-white text-[#08467d] group-hover:bg-[#08467d]/10 shadow-xs"
-                                }`}>
-                                  {renderPortalIcon(portal.iconName, 15)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="text-xs font-black truncate group-hover:text-[#f8ca14] transition-colors">
-                                      {portal.title}
-                                    </span>
-                                    {portal.badge && (
-                                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
-                                        {portal.badge}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
-                                    {portal.description}
-                                  </p>
-                                </div>
-                              </a>
-                            );
-                          })}
-                        </div>
+                  {/* Divider */}
+                  {parentsPortals.length > 0 && staffPortals.length > 0 && (
+                    <div className="h-px bg-current/10 my-1" />
+                  )}
+
+                  {/* Category 2: Staff & Admin */}
+                  {staffPortals.length > 0 && (
+                    <div className="space-y-0.5">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-2 py-1 flex items-center gap-1.5">
+                        <Briefcase size={12} />
+                        <span>{PORTAL_CATEGORY_LABELS.staff_admin}</span>
                       </div>
-                    )}
+                      {staffPortals.map((portal) => {
+                        const isInternal = portal.url.startsWith("/");
+                        return (
+                          <a
+                            key={portal.id}
+                            href={portal.url}
+                            target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                            rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                            onClick={(e) => {
+                              if (isInternal) {
+                                e.preventDefault();
+                                setPortalsOpen(false);
+                                navigate(portal.url);
+                              } else {
+                                setPortalsOpen(false);
+                              }
+                            }}
+                            className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-bold transition hover:bg-[#f8ca14]/10 ${
+                              portal.url.includes("admin") || portal.url.includes("login")
+                                ? "text-slate-400 hover:text-white"
+                                : ""
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 min-w-0">
+                              <span className={`shrink-0 ${portal.url.includes("admin") || portal.url.includes("login") ? "text-[#f8ca14]" : "opacity-80"}`}>
+                                {renderPortalIcon(portal.iconName, 13)}
+                              </span>
+                              <span className="truncate">{portal.title}</span>
+                              {portal.badge && (
+                                <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
+                                  {portal.badge}
+                                </span>
+                              )}
+                            </span>
+                            <ExternalLink size={11} className="opacity-40 shrink-0 mr-1" />
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
 
-                    {/* Section 2: Staff & Admin */}
-                    {staffPortals.length > 0 && (
-                      <div>
-                        <div className={`text-[11px] ${dark ? "text-amber-400" : "text-slate-700"} font-black mb-2 flex items-center gap-1.5`}>
-                          <Briefcase size={13} />
-                          <span>{PORTAL_CATEGORY_LABELS.staff_admin}</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {staffPortals.map((portal) => {
-                            const isInternal = portal.url.startsWith("/");
-                            return (
-                              <a
-                                key={portal.id}
-                                href={portal.url}
-                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
-                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
-                                onClick={(e) => {
-                                  if (isInternal) {
-                                    e.preventDefault();
-                                    setPortalsOpen(false);
-                                    navigate(portal.url);
-                                  } else {
-                                    setPortalsOpen(false);
-                                  }
-                                }}
-                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
-                                  dark
-                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-amber-400/30"
-                                    : "border-slate-100 bg-slate-50/70 hover:bg-slate-100 hover:border-slate-300"
-                                }`}
-                              >
-                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-colors ${
-                                  dark
-                                    ? "bg-white/5 text-amber-300 group-hover:bg-amber-400/20"
-                                    : "bg-white text-slate-700 group-hover:bg-slate-200 shadow-xs"
-                                }`}>
-                                  {renderPortalIcon(portal.iconName, 15)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="text-xs font-black truncate group-hover:text-amber-500 transition-colors">
-                                      {portal.title}
-                                    </span>
-                                    {portal.badge && (
-                                      <span className={`text-[9px] font-black px-1.5 py-0.2 rounded-full shrink-0 ${
-                                        portal.badge.toLowerCase().includes("admin")
-                                          ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                                          : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                      }`}>
-                                        {portal.badge}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
-                                    {portal.description}
-                                  </p>
-                                </div>
-                              </a>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Section 3: Public (if any) */}
-                    {publicPortals.length > 0 && (
-                      <div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-black mb-2 flex items-center gap-1.5">
-                          <ExternalLink size={13} />
+                  {/* Category 3: Public (if any) */}
+                  {publicPortals.length > 0 && (
+                    <>
+                      <div className="h-px bg-current/10 my-1" />
+                      <div className="space-y-0.5">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-2 py-1 flex items-center gap-1.5">
+                          <ExternalLink size={12} />
                           <span>{PORTAL_CATEGORY_LABELS.public}</span>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {publicPortals.map((portal) => {
-                            const isInternal = portal.url.startsWith("/");
-                            return (
-                              <a
-                                key={portal.id}
-                                href={portal.url}
-                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
-                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
-                                onClick={(e) => {
-                                  if (isInternal) {
-                                    e.preventDefault();
-                                    setPortalsOpen(false);
-                                    navigate(portal.url);
-                                  } else {
-                                    setPortalsOpen(false);
-                                  }
-                                }}
-                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
-                                  dark
-                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
-                                    : "border-slate-100 bg-slate-50/70 hover:bg-slate-100"
-                                }`}
-                              >
-                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${
-                                  dark ? "bg-white/5 text-slate-300" : "bg-white text-slate-700 shadow-xs"
-                                }`}>
-                                  {renderPortalIcon(portal.iconName, 15)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="text-xs font-black truncate">{portal.title}</span>
-                                    {portal.badge && (
-                                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-slate-500/10 text-slate-600 dark:text-slate-400 shrink-0">
-                                        {portal.badge}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
-                                    {portal.description}
-                                  </p>
-                                </div>
-                              </a>
-                            );
-                          })}
-                        </div>
+                        {publicPortals.map((portal) => {
+                          const isInternal = portal.url.startsWith("/");
+                          return (
+                            <a
+                              key={portal.id}
+                              href={portal.url}
+                              target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                              rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                              onClick={(e) => {
+                                if (isInternal) {
+                                  e.preventDefault();
+                                  setPortalsOpen(false);
+                                  navigate(portal.url);
+                                } else {
+                                  setPortalsOpen(false);
+                                }
+                              }}
+                              className="flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-bold transition hover:bg-[#f8ca14]/10"
+                            >
+                              <span className="flex items-center gap-2 min-w-0">
+                                <span className="shrink-0 opacity-80">
+                                  {renderPortalIcon(portal.iconName, 13)}
+                                </span>
+                                <span className="truncate">{portal.title}</span>
+                              </span>
+                              <ExternalLink size={11} className="opacity-40 shrink-0 mr-1" />
+                            </a>
+                          );
+                        })}
                       </div>
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
