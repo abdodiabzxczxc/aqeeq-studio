@@ -919,23 +919,23 @@ export default function AlaqeeqStudioPublicPage() {
           : "aq-studio-share--light text-black"
       )}
       style={{
-        background: dark
-          ? (isNationalDay ? "#010e07" : "#060608")
-          : (isNationalDay ? "#f8faf9" : "#fafafb"),
+        background: dark ? "#000000" : "#ffffff",
       }}
     >
-      {/* Ambient background radial glow — fixed, always present */}
-      {!isNationalDay && (
-        <div
-          className="pointer-events-none fixed inset-0 z-0 opacity-100"
-          aria-hidden
-          style={{
-            background: dark
-              ? "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(248,202,20,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(8,70,125,0.05) 0%, transparent 55%), radial-gradient(ellipse 40% 30% at 50% 50%, rgba(222,25,30,0.03) 0%, transparent 50%)"
-              : "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(8,70,125,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(248,202,20,0.03) 0%, transparent 55%)",
-          }}
-        />
-      )}
+      {/* Global Unclipped Ambient Lighting Aura — floats smoothly across the entire page with zero borders */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-100 transition-opacity duration-700"
+        aria-hidden
+        style={{
+          background: isNationalDay
+            ? dark
+              ? "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.42) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.16) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.12) 0%, transparent 60%)"
+              : "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.04) 0%, transparent 60%)"
+            : dark
+            ? "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.35) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.16) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.09) 0%, transparent 60%)"
+            : "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.03) 0%, transparent 60%)",
+        }}
+      />
       {/* 🇸🇦 Floating Gold Stars — National Day Ambient Particles */}
       {isNationalDay && (
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
@@ -1095,15 +1095,7 @@ export default function AlaqeeqStudioPublicPage() {
               dark ? "text-white" : "text-slate-900"
             )}
           >
-        {/* Subtle Ambient Background Watermark */}
-        {isNationalDay ? (
-          <>
-            <div className="pointer-events-none absolute inset-0 snd-pattern-watermark opacity-70" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[min(800px,100vw)] rounded-full bg-gradient-to-b from-[#08467d]/30 via-[#f8ca14]/10 to-transparent blur-[120px]" />
-          </>
-        ) : (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(8,70,125,0.12),transparent_30%),radial-gradient(circle_at_10%_90%,rgba(255,255,255,0.02),transparent_35%)]" />
-        )}
+
 
 
         <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 2xl:gap-20 px-4 sm:px-6 md:px-8 pt-5 sm:pt-8 md:pt-10 pb-8 sm:pb-12 md:pb-16 md:grid-cols-[minmax(340px,0.95fr)_minmax(0,1.05fr)] lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)]">
@@ -1486,13 +1478,9 @@ export default function AlaqeeqStudioPublicPage() {
       {/* 3. الستارة الملكية الصاعدة (تغطي الهيرو بسلاسة مع السكرول وبدون أي فراغ أولي) */}
       <div
         className={`relative z-20 w-full mt-0 rounded-t-[2.5rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4rem] transition-colors duration-500 overflow-x-clip ${
-          isNationalDay
-            ? dark
-              ? "bg-[#010e07] shadow-[0_-35px_90px_rgba(0,0,0,0.95)] border-t border-[#f8ca14]/20"
-              : "bg-[#f8faf9] shadow-[0_-25px_70px_rgba(0,90,54,0.1)] border-t border-emerald-500/15"
-            : dark
-            ? "bg-[#060608] shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t border-white/[0.06]"
-            : "bg-[#fafafb] shadow-[0_-25px_70px_rgba(0,0,0,0.06)] border-t border-black/[0.04]"
+          dark
+            ? "bg-black shadow-[0_-35px_90px_rgba(0,0,0,0.98)] border-t border-white/[0.05]"
+            : "bg-white shadow-[0_-25px_70px_rgba(0,0,0,0.03)] border-t border-black/[0.03]"
         }`}
       >
         {/* خط إضاءة نيون ملكي في أعلى الستارة */}

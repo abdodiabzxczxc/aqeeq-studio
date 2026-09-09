@@ -111,12 +111,12 @@ body {
 }
 
 body.dark {
-  background-color: #04070c;
+  background-color: #000000;
   color: #f8fafc;
 }
 
 body.light {
-  background-color: #f8fafc;
+  background-color: #ffffff;
   color: #0f172a;
 }
 
@@ -2025,7 +2025,7 @@ header.is-scrolled {
 }
 
 /* وايت مود نقي تماماً للأرضية الموحدة والبطاقات */
-.aq-studio-share--light { background: #fafafb !important; color: #0f172a !important; }
+.aq-studio-share--light { background: #ffffff !important; color: #0f172a !important; }
 .aq-studio-share--light .aq-studio-share-hero { background: transparent !important; }
 .aq-studio-share--light .aq-studio-share-card { background: #ffffff !important; border-color: rgba(8,70,125,.12) !important; box-shadow: 0 0.75rem 2.5rem rgba(8,70,125,.06) !important; }
 .aq-studio-share--light .aq-studio-share-media { background: #f1f5f9 !important; border-color: rgba(0,0,0,.08) !important; }
@@ -2036,9 +2036,9 @@ header.is-scrolled {
 .aq-studio-share--light .aq-studio-mobile-link:hover, .aq-studio-share--light .aq-studio-mobile-link--active { background: rgba(8,70,125,.08); color: #08467d; }
 
 :root[data-aqeeq-theme="dark"] .aq-public-shell,
-html.dark .aq-public-shell { background: #05070c !important; color: #ffffff !important; }
+html.dark .aq-public-shell { background: #000000 !important; color: #ffffff !important; }
 :root[data-aqeeq-theme="light"] .aq-public-shell,
-html.light .aq-public-shell { background: #f8fafc !important; color: #0f172a !important; }
+html.light .aq-public-shell { background: #ffffff !important; color: #0f172a !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .aq-studio-site,
@@ -2366,12 +2366,12 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 /* 🇸🇦 All-Site Shell Background Metamorphosis — أرضية فاخرة موحدة بالكامل بدون تقطيع لوني */
 :root[data-site-theme="saudi-national-day"] .aq-studio-share {
-  background: #010e07 !important;
+  background: #000000 !important;
   color: #ffffff !important;
 }
 
 :root[data-site-theme="saudi-national-day"] .aq-studio-share--light {
-  background: #f8faf9 !important;
+  background: #ffffff !important;
   color: #032e1d !important;
 }
 

@@ -40,13 +40,7 @@ export function AqeeqLuxuryPageShell({
       className={`relative min-h-screen aq-public-shell ${
         dark ? "aq-studio-share--dark" : "aq-studio-share--light"
       } overflow-x-clip selection:bg-[#f8ca14]/30 ${
-        isNationalDay
-          ? dark
-            ? "bg-[#010e07] text-white"
-            : "bg-[#f8faf9] text-slate-900"
-          : dark
-          ? "bg-[#05070c] text-white"
-          : "bg-[#fafbfd] text-slate-900"
+        dark ? "bg-black text-white" : "bg-white text-slate-900"
       } ${className}`}
     >
       {/* ── خلفيات الهالة المحيطية الحية (Ambient Mesh Glow Orbs) ── */}
@@ -181,13 +175,9 @@ function AqeeqCurtainHeroStage({
       {/* ستارة المحتوى: تبدأ طبيعياً على الموبايل وتصعد فوق الهيرو على الكمبيوتر */}
       <div
         className={`relative z-20 mt-4 sm:mt-6 lg:-mt-[30vh] w-full rounded-t-[2.4rem] sm:rounded-t-[3.2rem] lg:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
-          isNationalDay
-            ? dark
-              ? "bg-[#010e07] shadow-[0_-40px_100px_rgba(0,0,0,0.95)] border-t border-[#f8ca14]/20"
-              : "bg-[#f8faf9] shadow-[0_-30px_80px_rgba(0,90,54,0.1)] border-t border-emerald-500/15"
-            : dark
-            ? "bg-[#05070c] shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t border-white/[0.06]"
-            : "bg-[#fafbfd] shadow-[0_-30px_80px_rgba(0,0,0,0.06)] border-t border-black/[0.04]"
+          dark
+            ? "bg-black shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t border-white/[0.05]"
+            : "bg-white shadow-[0_-30px_80px_rgba(0,0,0,0.03)] border-t border-black/[0.03]"
         }`}
       >
         {/* خط النيون الذهبي المتوهج */}
