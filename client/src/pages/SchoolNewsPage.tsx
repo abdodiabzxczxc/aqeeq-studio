@@ -395,7 +395,7 @@ export default function SchoolNewsPage() {
                       label="شارة غلاف المجلة"
                       defaultText={orchestration?.heroCovers?.journalCustomTag || "موسم العقيق · النشرة الدورية"}
                       as="div"
-                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-black ${
+                      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black ${
                         dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
                       }`}
                     >
@@ -508,7 +508,7 @@ export default function SchoolNewsPage() {
 
                 {/* Left Column: Cover perspective (Second in RTL DOM order -> ends at left guideline 62px) */}
                 {/* Cover perspective on left in RTL */}
-                <div className="relative mx-auto h-[340px] w-full max-w-[540px] md:h-[450px]">
+                <div className="relative mx-auto h-[340px] sm:h-[360px] w-full max-w-[560px] md:h-[460px]">
                   {secondIssue ? (
                     <button
                       onClick={() => navigate(`/journal/${secondIssue.slug}`)}

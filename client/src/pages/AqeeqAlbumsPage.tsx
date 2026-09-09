@@ -560,7 +560,7 @@ export default function AqeeqAlbumsPage() {
               </div>
 
               {/* Left Column: 2 tilted cards */}
-              <div className="relative mx-auto h-[340px] w-full max-w-[540px] md:h-[450px]">
+              <div className="relative mx-auto h-[340px] sm:h-[360px] w-full max-w-[560px] md:h-[460px]">
                 {secondAlbum ? (
                   <button
                     onClick={() => navigate(`/albums/${secondAlbum.slug}`)}

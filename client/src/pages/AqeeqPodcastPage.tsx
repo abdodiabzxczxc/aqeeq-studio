@@ -457,15 +457,15 @@ export default function AqeeqPodcastPage() {
 
   return (
     <AqeeqLuxuryPageShell
-      header={<AlaqeeqStudioSiteHeader title="أثير العقيق 🎙️" active="podcast" />}
+      header={<AlaqeeqStudioSiteHeader title="أثير العقيق" active="podcast" />}
       footer={<AlaqeeqStudioSiteFooter />}
-      useCurtain={true}
+      useCurtain={false}
       curtainKicker="✦ استكشف استوديو أثير الصوتي ✦"
       hero={
         <section
           ref={podcastHeroRef}
           style={{ minHeight: isDesktop ? "124vh" : "105vh" }}
-          className={`relative isolate overflow-hidden min-h-[105vh] lg:min-h-[124vh] flex flex-col justify-between py-6 sm:py-10 transition-colors duration-500 ${
+          className={`relative isolate overflow-hidden min-h-[105vh] lg:min-h-[124vh] flex flex-col justify-between pb-8 sm:pb-12 transition-colors duration-500 ${
             isNationalDay
               ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
               : dark ? "bg-[#05080e] text-white" : "bg-white text-black"
@@ -647,7 +647,7 @@ export default function AqeeqPodcastPage() {
 
             {/* Left Column: 3D Tilted Dual-Cover on left (Second in RTL DOM order -> ends at left guideline 62px) */}
             {/* 3D Tilted Dual-Cover on left (order-2 md:order-1) */}
-            <div className="relative mx-auto h-[280px] sm:h-[340px] w-full max-w-[560px] md:h-[440px]">
+            <div className="relative mx-auto h-[340px] sm:h-[360px] w-full max-w-[560px] md:h-[460px]">
               {secondPodcast ? (
                 <button
                   onClick={() => handlePlayOrOpen(secondPodcast)}

@@ -1067,7 +1067,7 @@ function UnifiedShowcaseHero({
             ) : null}
           </div>
         </div>
-        <div className="relative mx-auto h-[370px] w-full max-w-[580px] md:h-[470px]">
+        <div className="relative mx-auto h-[340px] sm:h-[360px] w-full max-w-[560px] md:h-[460px]">
           {previousPost ? (
             <div className={`absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border p-2 opacity-60 shadow-2xl ${
               isNationalDay

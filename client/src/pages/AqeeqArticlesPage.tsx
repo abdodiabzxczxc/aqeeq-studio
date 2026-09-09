@@ -425,7 +425,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
         <section
           ref={articlesHeroRef}
           style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
-          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between py-8 sm:py-14 transition-colors duration-500 ${
+          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between pb-8 sm:pb-12 transition-colors duration-500 ${
             isNationalDay
               ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
               : dark ? "bg-[#05080e] text-white" : "bg-white text-black"
@@ -594,7 +594,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
           {/* Left Column: 3D Tilted Dual-Cover on left in RTL (Second in RTL DOM order -> ends at left guideline 62px) */}
           {/* 3D Tilted Dual-Cover on right in visual / left in RTL (order-2 md:order-1) */}
-          <div className="relative mx-auto h-[360px] w-full max-w-[580px] md:h-[470px]">
+          <div className="relative mx-auto h-[340px] sm:h-[360px] w-full max-w-[560px] md:h-[460px]">
             {secondArticle ? (
               <button
                 onClick={() => setReadingArticle(secondArticle)}
