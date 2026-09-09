@@ -119,21 +119,17 @@ export const HeroParallax = ({
   return (
     <div
       ref={ref}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-16 [perspective:1200px] [transform-style:preserve-3d] ${
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-10 [perspective:1200px] [transform-style:preserve-3d] ${
         dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
       }`}
       style={{
         minHeight: isDesktop
           ? rowCount === 2
-            ? "104vh"
+            ? "74vh"
             : cardShape === "square"
-            ? "148vh"
-            : "210vh"
-          : rowCount === 2
-          ? "94vh"
-          : cardShape === "square"
-          ? "120vh"
-          : "160vh",
+            ? "78vh"
+            : "82vh"
+          : "auto",
       }}
     >
       {/* Ambient background glow & radial highlights (pure dark, no yellow) */}

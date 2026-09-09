@@ -137,10 +137,10 @@ export function ParallaxUnfurlingGallery({
   return (
     <div
       ref={containerRef}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-12 [perspective:1200px] [transform-style:preserve-3d] ${
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-6 sm:pb-8 [perspective:1200px] [transform-style:preserve-3d] ${
         dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
       } ${className}`}
-      style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
+      style={{ minHeight: isDesktop ? "74vh" : "auto" }}
       dir="rtl"
     >
       {/* Ambient background glow and contrast vignetting */}

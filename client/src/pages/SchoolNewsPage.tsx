@@ -365,7 +365,7 @@ export default function SchoolNewsPage() {
             items={unfurlingGalleryItems}
             dark={dark}
             header={
-              <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
+              <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16">
                 {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
                 {/* Text info */}
                 <div className="text-right relative z-10">

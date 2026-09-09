@@ -486,8 +486,8 @@ export default function AqeeqSchoolAdmissionsPage() {
       hero={
         <section
           ref={admissionsHeroRef}
-          style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
-          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between py-8 sm:py-12 transition-colors duration-500 ${
+          style={{ minHeight: isDesktop ? "74vh" : "auto" }}
+          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 ${
             dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
           }`}
         >
@@ -499,7 +499,7 @@ export default function AqeeqSchoolAdmissionsPage() {
             direction="right-to-left"
           />
 
-          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-8 sm:py-12">
+          <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 py-6 sm:py-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">

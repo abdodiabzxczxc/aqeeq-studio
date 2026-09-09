@@ -424,8 +424,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
       hero={
         <section
           ref={articlesHeroRef}
-          style={{ minHeight: isDesktop ? "106vh" : "96vh" }}
-          className={`relative isolate overflow-hidden min-h-[96vh] lg:min-h-[106vh] flex flex-col justify-between pb-8 sm:pb-12 transition-colors duration-500 ${
+          style={{ minHeight: isDesktop ? "74vh" : "auto" }}
+          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 ${
             isNationalDay
               ? dark ? "snd-hero-dark text-white" : "snd-hero-light text-slate-900"
               : dark ? "bg-[#05080e] text-white" : "bg-white text-black"
@@ -438,7 +438,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             containerRef={articlesHeroRef}
           />
 
-        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
+        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16">
           {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
           <div className="text-right relative z-10">
             {isNationalDay ? (

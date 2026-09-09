@@ -993,7 +993,7 @@ function UnifiedShowcaseHero({
       items={showcaseUnfurlingItems}
       dark={dark}
       header={
-        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16 relative z-10">
+        <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16 relative z-10">
         <div className="text-right relative z-10">
           {isNationalDay ? (
             <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
