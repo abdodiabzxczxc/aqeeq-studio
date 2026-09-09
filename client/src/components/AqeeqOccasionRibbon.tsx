@@ -20,15 +20,15 @@ export function AqeeqOccasionRibbon({ isScrolled = false }: { isScrolled?: boole
   return (
     <aside
       aria-label="شريط المناسبة الوطنية"
-      className={`relative z-[150] w-full snd-ribbon-bar text-white transition-all duration-300 ${
+      className={`relative z-[150] w-full snd-ribbon-bar text-white transition-all duration-300 overflow-hidden ${
         isScrolled
-          ? "max-h-0 h-0 py-0 opacity-0 overflow-hidden pointer-events-none !border-0 !shadow-none"
-          : "max-h-12 py-1.5 px-3 sm:px-6 opacity-100 overflow-visible"
+          ? "max-h-0 h-0 py-0 opacity-0 pointer-events-none !border-0 !shadow-none"
+          : "max-h-12 py-1.5 px-3 sm:px-4 xl:px-6 opacity-100"
       }`}
     >
-      <div className="relative mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between text-xs font-black">
+      <div className="relative mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between text-xs font-black min-w-0">
         {/* Right Content */}
-        <div className="flex items-center gap-2.5 overflow-hidden">
+        <div className="flex items-center gap-2 xl:gap-2.5 overflow-hidden min-w-0">
           <div className="flex items-center gap-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 px-2.5 py-0.5 text-[#D4AF37] text-[11px] shadow-sm shrink-0">
             <Sparkles size={12} className="animate-spin" style={{ animationDuration: "6s" }} />
             <span>عزّنا بطبعنا 🇸🇦</span>

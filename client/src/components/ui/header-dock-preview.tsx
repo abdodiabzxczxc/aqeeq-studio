@@ -474,7 +474,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     <nav
       ref={navRef}
       dir="rtl"
-      className="relative hidden lg:flex items-center justify-self-center gap-1 xl:gap-1.5 whitespace-nowrap text-[13px] font-['Tajawal',sans-serif] pointer-events-auto select-none py-1 px-1 rounded-full"
+      className="relative hidden lg:flex items-center justify-self-center gap-0.5 xl:gap-1.5 whitespace-nowrap text-[11.5px] xl:text-[13px] font-['Tajawal',sans-serif] pointer-events-auto select-none py-0.5 xl:py-1 px-1 rounded-full"
       role="toolbar"
       aria-label="شريط التنقل التفاعلي الذكي"
     >
@@ -501,7 +501,7 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
               data-visual-id={item.visualId}
               data-visual-tag="text"
               data-visual-label={item.visualLabel}
-              className={`relative px-2.5 py-1.5 rounded-full transition-colors duration-150 cursor-pointer select-none text-[13px] font-bold ${
+              className={`relative px-1.5 xl:px-2.5 py-1 xl:py-1.5 rounded-full transition-colors duration-150 cursor-pointer select-none text-[11.5px] xl:text-[13px] font-bold ${
                 item.customClass || ""
               } ${
                 item.active

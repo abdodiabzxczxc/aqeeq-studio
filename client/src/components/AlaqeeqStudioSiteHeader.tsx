@@ -310,7 +310,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   : isNationalDay ? "border-emerald-800/10 bg-emerald-50/90 text-emerald-900/80" : "border-black/5 bg-slate-50/95 text-slate-600"
               }`
         }`}>
-        <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-4 sm:px-6 md:px-8">
+        <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-3 sm:px-4 xl:px-8 min-w-0">
           <div className="flex items-center gap-4">
             <span
               data-visual-id="header-top-location"
@@ -542,13 +542,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 : dark ? "border-white/[0.08] bg-black/90" : "border-black/[0.06] bg-white/95"
             }`
       }`}>
-        <div className={`relative mx-auto max-w-[1380px] 2xl:max-w-[1560px] flex items-center justify-between lg:grid lg:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
+        <div className={`relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] flex items-center justify-between lg:grid lg:grid-cols-[auto_1fr_auto] xl:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
           isScrolled
-            ? "px-4 sm:px-6 md:px-8 h-[54px] sm:h-[62px] pointer-events-none"
-            : "px-4 sm:px-6 md:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
+            ? "px-3 sm:px-6 md:px-8 h-[54px] sm:h-[62px] pointer-events-none"
+            : "px-2.5 sm:px-4 xl:px-8 h-[66px] sm:h-[78px] pointer-events-auto"
         }`}>
           {/* Logo with clean branding — Permanently rounded pill island, zero circle morphing */}
-          <div className="relative shrink-0 lg:justify-self-start flex items-center gap-2.5">
+          <div className="relative shrink-0 lg:justify-self-start flex items-center gap-1.5 xl:gap-2.5">
             <div className={`rounded-full flex items-center transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${
               isScrolled
                 ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-3 sm:px-4 py-1.5 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
@@ -563,7 +563,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 className={`flex items-center transition-[height,max-width,transform] duration-300 ease-out hover:opacity-90 ${
                   isScrolled
                     ? "h-[30px] sm:h-[34px] max-w-[125px] sm:max-w-[170px]"
-                    : "h-[42px] sm:h-[54px] w-auto max-w-[160px] sm:max-w-[220px]"
+                    : "h-[38px] lg:h-[44px] xl:h-[54px] w-auto max-w-[125px] lg:max-w-[150px] xl:max-w-[220px]"
                 }`}
               >
                 <img
@@ -590,7 +590,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 type="button"
                 onClick={() => triggerNationalCelebration()}
                 title="انقر لمشاركتنا بهجة الوطن 🇸🇦"
-                className={`hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-3.5 py-1.5 rounded-full border shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shrink-0 ${
+                className={`hidden lg:inline-flex items-center gap-1 xl:gap-1.5 text-[10px] xl:text-[11px] font-black px-2.5 xl:px-3.5 py-1 xl:py-1.5 rounded-full border shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shrink-0 ${
                   isScrolled
                     ? "opacity-0 -translate-x-2 pointer-events-none max-w-0 px-0 overflow-hidden border-0"
                     : "opacity-100 translate-x-0 pointer-events-auto"
@@ -600,7 +600,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     : "bg-emerald-50 border-emerald-600/30 text-emerald-800 shadow-sm"
                 }`}
               >
-                <span className="text-sm">🇸🇦</span>
+                <span className="text-xs xl:text-sm">🇸🇦</span>
                 <span className="font-bold">عزّنا بطبعنا</span>
               </button>
             )}
@@ -608,7 +608,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
           {/* Center 9 Core Navigation Links with Dock Magnification & Live Page Hover Preview */}
           <div
-            className={`transition-[opacity,transform] duration-250 ease-out ${
+            className={`transition-[opacity,transform] duration-250 ease-out flex justify-center min-w-0 ${
               isScrolled
                 ? "opacity-0 -translate-y-2 pointer-events-none"
                 : "opacity-100 translate-y-0 pointer-events-auto"
@@ -702,7 +702,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               className={`rounded-full flex items-center shrink-0 transition-[background-color,border-color,box-shadow,padding,gap] duration-300 ease-out ${
                 isScrolled
                   ? "pointer-events-auto border backdrop-blur-2xl backdrop-saturate-[180%] px-2 sm:px-2.5 py-1.5 gap-1.5 sm:gap-2 bg-white/60 dark:bg-[#060a12]/70 border-black/10 dark:border-white/15 shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.85),0_8px_25px_-5px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.15),0_12px_30px_-5px_rgba(0,0,0,0.6)]"
-                  : "border border-transparent bg-transparent px-1 sm:px-1.5 py-1 gap-2 sm:gap-2.5 pointer-events-auto"
+                  : "border border-transparent bg-transparent px-1 sm:px-1.5 py-1 gap-1.5 xl:gap-2.5 pointer-events-auto"
               }`}
             >
               {/* 🔍 زر البحث الشامل (Spotlight Search) — Always visible in Left Island */}
@@ -716,7 +716,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 data-visual-id="header-icon-search"
                 data-visual-tag="icon"
                 data-visual-label="زر البحث الشامل"
-                className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-8.5 w-8.5 sm:h-9 sm:w-9 xl:h-10 xl:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                   searchOpen
                     ? isNationalDay ? "border-[#D4AF37] bg-[#D4AF37]/20 text-[#D4AF37]" : "border-[#f8ca14] bg-[#f8ca14]/20 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
                     : dark
@@ -726,20 +726,20 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 title="البحث الشامل (Ctrl+K)"
                 aria-label="البحث الشامل"
               >
-                {searchOpen ? <X size={16} /> : <Search size={16} />}
+                {searchOpen ? <X size={15} /> : <Search size={15} />}
               </button>
 
               {/* ☀️ / 🌙 زر الإضاءة (Theme Toggle) — Always visible, silky smooth */}
               <button
                 onClick={toggleTheme}
-                className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-8.5 w-8.5 sm:h-9 sm:w-9 xl:h-10 xl:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                   dark
                     ? isNationalDay ? "border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black" : "border-[#f8ca14]/30 bg-[#f8ca14]/[0.08] text-[#f8ca14] hover:bg-[#f8ca14] hover:text-black"
                     : isNationalDay ? "border-emerald-700/20 bg-emerald-700/[0.08] text-emerald-800 hover:bg-emerald-800 hover:text-white" : "border-[#08467d]/20 bg-[#08467d]/[0.08] text-[#08467d] hover:bg-[#08467d] hover:text-white"
                 }`}
                 title={dark ? "تفعيل الوضع الفاتح (White Mode)" : "تفعيل الوضع الداكن (Black Mode)"}
               >
-                <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={16} />
+                <VisualIcon id="aqeeq-studio-theme-icon" label="أيقونة مبدّل المظهر" icon={dark ? "sun" : "moon"} size={15} />
               </button>
 
               {/* ⚙️ قائمة المشرف للمسؤولين / 🔑 زر تسجيل الدخول للعامة */}
@@ -752,7 +752,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                       setPortalsOpen(false);
                       setMobileMenuOpen(false);
                     }}
-                    className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                    className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-8.5 w-8.5 sm:h-9 sm:w-9 xl:h-10 xl:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                       optionsOpen
                         ? "border-[#f8ca14] bg-[#f8ca14]/25 text-[#f8ca14] shadow-md shadow-[#f8ca14]/15"
                         : editor.isEditing
@@ -887,7 +887,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
-                  className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
+                  className={`grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-8.5 w-8.5 sm:h-9 sm:w-9 xl:h-10 xl:w-10"} place-items-center rounded-xl border transition-all duration-300 active:scale-95 cursor-pointer ${
                     dark
                       ? "border-white/10 bg-white/5 text-slate-300 hover:bg-[#f8ca14] hover:text-black hover:border-[#f8ca14]"
                       : "border-black/10 bg-black/5 text-slate-700 hover:bg-[#08467d] hover:text-white hover:border-[#08467d]"
@@ -895,7 +895,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                   aria-label="تسجيل الدخول"
                   title="تسجيل الدخول كمسؤول"
                 >
-                  <LogIn size={16} />
+                  <LogIn size={15} />
                 </button>
               )}
 
@@ -913,7 +913,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     setOptionsOpen(false);
                     setMobileMenuOpen((open) => !open);
                   }}
-                  className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-9 w-9 sm:h-10 sm:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
+                  className={`group grid shrink-0 ${isScrolled ? "h-8 w-8 sm:h-8.5 sm:w-8.5" : "h-8.5 w-8.5 sm:h-9 sm:w-9 xl:h-10 xl:w-10"} place-items-center rounded-xl border transition-all duration-200 active:scale-90 cursor-pointer ${
                     mobileMenuOpen
                       ? "border-[#de191e]/50 bg-[#de191e]/15 text-[#de191e]"
                       : dark
