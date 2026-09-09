@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
@@ -1412,6 +1414,38 @@ export const appRouter = router({
     getSiteOrchestration: publicProcedure.query(async () => {
       return getSiteOrchestration();
     }),
+
+    getPreviewsVersion: publicProcedure.query(async () => {
+      try {
+        const previewsDir = path.resolve(process.cwd(), "client/public/previews");
+        if (!fs.existsSync(previewsDir)) return { version: "1" };
+        const files = fs.readdirSync(previewsDir);
+        let maxMtime = 0;
+        for (const file of files) {
+          if (file.endsWith(".webp") || file.endsWith(".png")) {
+            const stat = fs.statSync(path.join(previewsDir, file));
+            if (stat.mtimeMs > maxMtime) maxMtime = stat.mtimeMs;
+          }
+        }
+        return { version: String(Math.round(maxMtime)) };
+      } catch {
+        return { version: "1" };
+      }
+    }),
+
+    regeneratePreviews: adminProcedure
+      .input(z.object({ target: z.string().optional() }).optional())
+      .mutation(async ({ input }) => {
+        const { triggerAutoPageCapture } = await import("./previewCapture");
+        if (input?.target) {
+          triggerAutoPageCapture(input.target);
+        } else {
+          for (const page of ["home", "journal", "albums", "podcast", "articles", "showcase", "admissions", "accreditations", "about"]) {
+            triggerAutoPageCapture(page);
+          }
+        }
+        return { success: true, message: "جاري تحديث لقطات الشاشة في الخلفية..." };
+      }),
 
     setSiteOrchestration: adminProcedure
       .input(z.record(z.string(), z.any()))

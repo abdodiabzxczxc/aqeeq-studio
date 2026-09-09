@@ -48,210 +48,22 @@ interface HeaderDockNavProps {
   onNavigate: (path: string) => void;
 }
 
-function DockLiveMicroViewport({ preview, dark }: { preview: PagePreviewMetadata; dark: boolean }) {
+function DockHeroCover({ preview, dark }: { preview: PagePreviewMetadata; dark: boolean }) {
   return (
-    <div
-      className={`relative h-[180px] w-full rounded-2xl overflow-hidden mb-2.5 border select-none transition-all duration-300 ${
-        dark
-          ? "bg-[#060b13] border-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]"
-          : "bg-slate-900 border-slate-700 shadow-md"
-      }`}
-    >
-      {/* Dynamic Glow Spotlight */}
-      <div
-        className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-2xl pointer-events-none opacity-45 transition-colors duration-500"
-        style={{ backgroundColor: preview.glowColor }}
+    <div className="relative h-[168px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none group/cover">
+      <img
+        src={preview.image}
+        alt={preview.title}
+        loading="eager"
+        className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover/cover:scale-[1.02]"
+        onError={(e) => {
+          const target = e.currentTarget;
+          if (target.src.endsWith(".webp")) {
+            target.src = target.src.replace(".webp", ".png");
+          }
+        }}
       />
-      <div
-        className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full blur-2xl pointer-events-none opacity-30 transition-colors duration-500"
-        style={{ backgroundColor: preview.glowColor }}
-      />
-
-      {/* Live Indicator Badge (Corner) */}
-      <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[8.5px] font-bold text-emerald-400 select-none">
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-        </span>
-        <span>مباشر حي</span>
-      </div>
-
-      {/* Main Content Grid: Text on Right, Live 3D Visual on Left */}
-      <div className="relative z-10 h-full p-3 flex items-center justify-between gap-2.5" dir="rtl">
-        {/* Right: Real-time Page Headings & Live Rhythm */}
-        <div className="flex-1 min-w-0 pr-1 flex flex-col justify-center text-right">
-          {/* Tag / Category Badge */}
-          <div className="inline-flex items-center gap-1 mb-1 self-start">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-            <span className="text-[9px] font-black text-amber-400/95 tracking-wide truncate max-w-[155px]">
-              {preview.heroTag}
-            </span>
-          </div>
-
-          {/* 2-Line Balanced Hero Title (Golden & Crisp) */}
-          <div className="font-black text-[13.5px] leading-[1.28] tracking-tight mb-1 text-right">
-            <div className="text-white">{preview.heroTitleLine1}</div>
-            <div className="text-[#f8ca14]">{preview.heroTitleLine2}</div>
-          </div>
-
-          {/* Micro Description */}
-          <p className="text-[9px] text-slate-300 line-clamp-2 leading-relaxed opacity-80 mb-2 font-medium">
-            {preview.description}
-          </p>
-
-          {/* Mini CTA Action Button */}
-          <div className="self-start inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black bg-[#f8ca14] hover:bg-[#ffe359] text-black shadow-sm transition-all duration-150">
-            <span>{preview.ctaText}</span>
-            <ChevronLeft size={10} />
-          </div>
-        </div>
-
-        {/* Left: Specialized 3D Visual Simulation */}
-        <div className="w-[110px] h-[150px] shrink-0 relative flex items-center justify-center">
-          {preview.type === "journal" && (
-            <div className="relative w-[92px] h-[135px]">
-              {preview.secondaryPhoto && (
-                <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/10 shadow-lg transform -rotate-6 translate-x-3 translate-y-1 opacity-60 scale-95 bg-slate-800">
-                  <img src={preview.secondaryPhoto} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
-              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/20 shadow-2xl transform rotate-2 group-hover:rotate-0 transition-transform duration-300 bg-slate-900">
-                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-y-0 right-0 w-2.5 bg-gradient-to-l from-black/40 to-transparent pointer-events-none" />
-                <div className="absolute bottom-1 right-1 left-1 px-1 py-0.5 rounded bg-black/75 backdrop-blur-sm text-[7.5px] font-black text-amber-300 text-center truncate">
-                  {preview.countBadge || "عدد رسمي"}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {preview.type === "albums" && (
-            <div className="relative w-[95px] h-[130px]">
-              {preview.secondaryPhoto && (
-                <div className="absolute inset-0 rounded-xl overflow-hidden border border-white/10 shadow-lg transform rotate-6 translate-x-2 translate-y-1 opacity-70 bg-slate-800">
-                  <img src={preview.secondaryPhoto} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
-              <div className="absolute inset-0 rounded-xl overflow-hidden border border-white/25 shadow-2xl transform -rotate-3 group-hover:rotate-0 transition-transform duration-300 bg-slate-900">
-                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-                <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-black text-[7px] font-black shadow">
-                  ألبوم معتمد
-                </div>
-                <div className="absolute bottom-1 right-1 left-1 px-1 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[7.5px] font-bold text-white text-center truncate">
-                  {preview.countBadge || "صور 4K"}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {preview.type === "podcast" && (
-            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
-              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-              <div className="absolute bottom-6 inset-x-2 flex items-end justify-center gap-1 h-4">
-                {[35, 75, 100, 60, 90, 45, 80].map((h, i) => (
-                  <span
-                    key={i}
-                    className="w-1 bg-amber-400 rounded-full animate-pulse"
-                    style={{ height: `${h}%`, animationDelay: `${i * 120}ms` }}
-                  />
-                ))}
-              </div>
-              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-black text-white bg-black/60 rounded px-1 py-0.5 truncate">
-                {preview.countBadge || "أثير العقيق"}
-              </div>
-            </div>
-          )}
-
-          {preview.type === "showcase" && (
-            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
-              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20" />
-              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-black text-[7px] font-black flex items-center gap-0.5 shadow">
-                <Camera size={7} />
-                <span>تغطية حية</span>
-              </div>
-              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-black text-white bg-black/60 rounded px-1 py-0.5 truncate">
-                {preview.countBadge || "منشور إعلامي"}
-              </div>
-            </div>
-          )}
-
-          {preview.type === "articles" && (
-            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
-              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-cyan-400 text-black text-[7px] font-black flex items-center gap-0.5 shadow">
-                <FileText size={7} />
-                <span>مقال مميز</span>
-              </div>
-              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-bold text-slate-200 bg-black/70 rounded px-1 py-0.5 truncate">
-                {preview.countBadge || "أقلام العقيق"}
-              </div>
-            </div>
-          )}
-
-          {preview.type === "admissions" && (
-            <div className="relative w-[102px] h-[130px] rounded-xl overflow-hidden border border-amber-400/30 shadow-xl bg-gradient-to-br from-[#0c1829] to-[#040810] p-2 flex flex-col justify-between text-right">
-              <div className="flex items-center justify-between">
-                <GraduationCap size={15} className="text-amber-400" />
-                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[6.5px] font-black border border-emerald-500/30">
-                  متاح الآن
-                </span>
-              </div>
-              <div>
-                <div className="text-[15px] font-black text-amber-400 leading-none mb-0.5">15%</div>
-                <div className="text-[7.5px] text-slate-300 font-bold leading-tight">خصم الأشقاء</div>
-              </div>
-              <div className="pt-1 border-t border-white/10 text-[7px] text-slate-400 font-medium truncate">
-                تقسيط تابي وتمارا
-              </div>
-            </div>
-          )}
-
-          {preview.type === "accreditations" && (
-            <div className="relative w-[102px] h-[130px] rounded-xl overflow-hidden border border-amber-400/30 shadow-xl bg-gradient-to-br from-[#081b33] to-[#030c17] p-2 flex flex-col justify-between items-center text-center">
-              <Award size={24} className="text-amber-400 mt-1" />
-              <div>
-                <div className="text-[10.5px] font-black text-white">Cognia USA</div>
-                <div className="text-[7px] text-amber-300/90 font-bold">اعتماد كوجنيا الدولي</div>
-              </div>
-              <div className="px-1 py-0.5 rounded bg-white/10 text-[6.5px] font-black text-slate-300 border border-white/10 w-full truncate">
-                SAT · ACT · IELTS
-              </div>
-            </div>
-          )}
-
-          {preview.type === "about" && (
-            <div className="relative w-[100px] h-[130px] rounded-xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
-              <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[7px] font-black flex items-center gap-0.5 shadow">
-                <Building2 size={7} />
-                <span>مجمعاتنا</span>
-              </div>
-              <div className="absolute bottom-1.5 inset-x-1.5 text-center text-[7.5px] font-bold text-white bg-black/70 rounded px-1 py-0.5 truncate">
-                بنين وبنات · مسار دولي
-              </div>
-            </div>
-          )}
-
-          {preview.type === "home" && (
-            <div className="relative w-[98px] h-[130px]">
-              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/10 transform rotate-6 translate-x-2 translate-y-1 opacity-60 bg-slate-800">
-                <img src={preview.secondaryPhoto || preview.heroPhoto} alt="" className="w-full h-full object-cover" />
-              </div>
-              <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/25 shadow-2xl transform -rotate-2 bg-slate-900">
-                <img src={preview.heroPhoto} alt={preview.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-1 inset-x-1 text-center text-[7.5px] font-black text-amber-300 bg-black/70 rounded px-1 py-0.5 truncate">
-                  بوابة العقيق 2026
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none opacity-40" />
     </div>
   );
 }
@@ -322,19 +134,14 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     { refetchOnWindowFocus: true, staleTime: 5_000 }
   );
 
+  const { data: previewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
+    refetchInterval: 5_000,
+    refetchOnWindowFocus: true,
+  });
+
   const cacheKey = useMemo(() => {
-    const dates = [
-      (orchestration as any)?.updatedAt || (orchestration as any)?.themeMode?.customBadgeText,
-      issues[0]?.updatedAt || issues[0]?.publishedAt,
-      albums[0]?.updatedAt || albums[0]?.publishedAt,
-      (showcases[0] as any)?.updatedAt || (showcases[0] as any)?.coverUrl,
-      articles[0]?.updatedAt || articles[0]?.publishedAt,
-      (podcasts[0] as any)?.updatedAt || (podcasts[0] as any)?.id,
-      aboutOverrides[0]?.updatedAt,
-      admissionsOverrides[0]?.updatedAt,
-    ].filter(Boolean);
-    return dates.length ? encodeURIComponent(dates.join("_")) : "1";
-  }, [orchestration, issues, albums, showcases, articles, podcasts, aboutOverrides, admissionsOverrides]);
+    return previewVersion?.version || "1788934400";
+  }, [previewVersion]);
 
   // ── 🎯 Compute Live Cover Snapshots & Live Text in Real-Time ──
   const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
@@ -798,12 +605,33 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span>مباشر حي</span>
+                    <span>مباشر</span>
                   </div>
                 </div>
 
-                {/* ── 100% Real-Time Live Micro-Viewport Hero Simulation (Zero Cache, Zero Delay) ── */}
-                <DockLiveMicroViewport preview={preview} dark={dark} />
+                {/* ── Authentic Live Website Screenshot ── */}
+                <DockHeroCover preview={preview} dark={dark} />
+
+                {/* Title & Description */}
+                <div className="mb-2 text-right">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <h4 className={`text-[12.5px] font-black leading-tight truncate ${dark ? "text-white" : "text-slate-900"}`}>
+                      {preview.title}
+                    </h4>
+                    {preview.badge && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/25 text-[8.5px] font-black text-amber-400 shrink-0">
+                        {preview.badge.replace("✦ ", "")}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className={`text-[10.5px] leading-relaxed line-clamp-2 font-medium ${
+                      dark ? "text-slate-300" : "text-slate-600"
+                    }`}
+                  >
+                    {preview.description}
+                  </p>
+                </div>
 
                 {/* Footer */}
                 <div
