@@ -408,21 +408,32 @@ export default function SchoolNewsPage() {
                     id="journal-hero-title"
                     tag="text"
                     label="عنوان غلاف المجلة"
-                    defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبر يُقلب إلى ذكرى."}
+                    defaultText={orchestration?.heroCovers?.journalCustomTitle || "خبرٌ يُقلب ليغدو ذكرى خالدة."}
                     as="h1"
                     className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                       dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                     }`}
                   >
                     {(text) => {
-                      const raw = text || "خبر يُقلب إلى ذكرى.";
-                      const match = raw.match(/^(.*?)(إلى ذكرى\.?)$/);
+                      const raw = text || "خبرٌ يُقلب ليغدو ذكرى خالدة.";
+                      const match = raw.match(/^(.*?)(ليغدو ذكرى خالدة\.?|إلى ذكرى\.?)$/);
                       if (match) {
                         return (
                           <>
-                            <span className="block">{match[1]}</span>
+                            <span className="block">{match[1].trim()}</span>
                             <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                              {match[2]}
+                              {match[2].trim()}
+                            </span>
+                          </>
+                        );
+                      }
+                      const words = raw.trim().split(/\s+/);
+                      if (words.length >= 4) {
+                        return (
+                          <>
+                            <span className="block">{words.slice(0, 2).join(" ")}</span>
+                            <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                              {words.slice(2).join(" ")}
                             </span>
                           </>
                         );

@@ -2129,7 +2129,7 @@ html.light .aq-public-shell { background: #f8fafc !important; color: #0f172a !im
 :root[data-aqeeq-theme="light"] .aqeeq-archive-filter-menu [role="menuitem"][data-highlighted] { background: var(--aq-blue) !important; color: var(--aq-white) !important; }
 
 /* يظل العنوان قابلًا للتحرير، مع الحفاظ على كسره المقصود إلى سطرين في كل المقاسات. */
-[data-visual-id="albums-hero-title"] { display: block; max-width: 15ch; }
+[data-visual-id="albums-hero-title"] { display: block; max-width: none; }
 
 /* أخبار وعروض العقيق تتبع إيقاع عنوان ورف مجلة وألبوم العقيق، بينما تبقى خلاصة المنشورات متعددة الوسائط. */
 #aqeeq-showcase-feed { max-width: 1380px; }

@@ -389,21 +389,32 @@ export default function AqeeqAlbumsPage() {
                   id="albums-hero-title"
                   tag="text"
                   label="عنوان غلاف الألبومات"
-                  defaultText={orchestration?.heroCovers?.albumsCustomTitle || "كل فعالية تحفظ لحظتها."}
+                  defaultText={orchestration?.heroCovers?.albumsCustomTitle || "كل فعالية تخلّد أثمن اللحظات."}
                   as="h1"
                   className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                     dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                   }`}
                 >
                   {(text) => {
-                    const raw = text || "كل فعالية تحفظ لحظتها.";
-                    const parts = raw.split(/(لحظتها\.?)/);
-                    if (parts.length >= 2) {
+                    const raw = text || "كل فعالية تخلّد أثمن اللحظات.";
+                    const match = raw.match(/^(.*?)(تخلّد أثمن اللحظات\.?|تحفظ أثمن اللحظات\.?|لحظتها\.?)$/);
+                    if (match) {
                       return (
                         <>
-                          <span className="block">{parts[0]}</span>
+                          <span className="block">{match[1].trim()}</span>
                           <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                            {parts[1]}
+                            {match[2].trim()}
+                          </span>
+                        </>
+                      );
+                    }
+                    const words = raw.trim().split(/\s+/);
+                    if (words.length >= 4) {
+                      return (
+                        <>
+                          <span className="block">{words.slice(0, 2).join(" ")}</span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                            {words.slice(2).join(" ")}
                           </span>
                         </>
                       );

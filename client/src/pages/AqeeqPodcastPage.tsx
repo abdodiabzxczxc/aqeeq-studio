@@ -513,21 +513,32 @@ export default function AqeeqPodcastPage() {
                 id="podcast-hero-title"
                 tag="text"
                 label="عنوان صفحة البودكاست"
-                defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "صوت ينبض بالحياة والإبداع."}
+                defaultText={orchestration?.heroCovers?.podcastsCustomTitle || "أثير العقيق صوتٌ ينبض بالإبداع."}
                 as="h1"
                 className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
                   dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
                 }`}
               >
                 {(text) => {
-                  const raw = text || "صوت ينبض بالحياة والإبداع.";
-                  const parts = raw.split(/(والإبداع\.?)/);
-                  if (parts.length >= 2) {
+                  const raw = text || "أثير العقيق صوتٌ ينبض بالإبداع.";
+                  const match = raw.match(/^(.*?)(صوتٌ ينبض بالإبداع\.?|صوت ينبض بالإبداع\.?|والإبداع\.?)$/);
+                  if (match) {
                     return (
                       <>
-                        <span className="block">{parts[0]}</span>
+                        <span className="block">{match[1].trim()}</span>
                         <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                          {parts[1]}
+                          {match[2].trim()}
+                        </span>
+                      </>
+                    );
+                  }
+                  const words = raw.trim().split(/\s+/);
+                  if (words.length >= 4) {
+                    return (
+                      <>
+                        <span className="block">{words.slice(0, 2).join(" ")}</span>
+                        <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                          {words.slice(2).join(" ")}
                         </span>
                       </>
                     );

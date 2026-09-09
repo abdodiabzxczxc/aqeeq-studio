@@ -1011,10 +1011,10 @@ function UnifiedShowcaseHero({
               <VisualIcon id="showcase-hero-kicker-icon" label="أيقونة شارة الأخبار" icon="sparkles" size={14} />{customTag || "موسم العقيق · الأخبار والعروض"}
             </VisualEditable>
           )}
-          <VisualEditable id="showcase-hero-title" tag="text" label="السطر الأول لعنوان الأخبار والعروض" defaultText={customTitle || showcase.title} as="h1" className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
+          <VisualEditable id="showcase-hero-title" tag="text" label="السطر الأول لعنوان الأخبار والعروض" defaultText={customTitle || (showcase.title === "أخبار وعروض العقيق" ? "أخبار العقيق" : showcase.title || "أخبار العقيق")} as="h1" className={`mt-5 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
             dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black"
           }`} />
-          <VisualEditable id="showcase-hero-subtitle" tag="text" label="السطر الذهبي لعنوان الأخبار والعروض" defaultText={customSubtitle || "كل جديد، أولًا بأول."} as="h1" className={`text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
+          <VisualEditable id="showcase-hero-subtitle" tag="text" label="السطر الذهبي لعنوان الأخبار والعروض" defaultText={customSubtitle || "تتجدد أولاً بأول."} as="h1" className={`text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.12] ${
             isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#08467d]"
           }`} />
           <VisualEditable id="showcase-hero-intro" tag="text" label="مقدمة الأخبار والعروض" defaultText={customDesc || showcase.intro || "رفوف رقمية تجمع صور وفيديوهات أنشطة مدارس العقيق وعروضها، وكل منشور يفتح في تجربته المناسبة."} as="p" className={`mt-4 sm:mt-5 max-w-xl text-xs sm:text-sm leading-7 sm:leading-8 ${dark ? "text-slate-300" : isNationalDay ? "text-slate-700 font-medium" : "text-slate-600 font-medium"}`} />
