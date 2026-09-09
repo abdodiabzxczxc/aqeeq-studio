@@ -63,48 +63,7 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
         }}
       />
 
-      {/* ── الطبقة 2: كرات الضوء الدائرية الحية العريضة (Breathing Soft Orbs - Zero Hard Edges) ── */}
-      {/* Orb 1: الهالة العلوية الرئيسية */}
-      <div
-        className="aq-aura-orb-1 absolute -top-[15%] -left-[10%] w-[550px] h-[550px] sm:w-[850px] sm:h-[850px] rounded-full blur-[180px] sm:blur-[240px] pointer-events-none"
-        style={{
-          background: isNationalDay
-            ? dark
-              ? "radial-gradient(circle, rgba(0, 90, 54, 0.40) 0%, rgba(0, 56, 32, 0.20) 50%, transparent 70%)"
-              : "radial-gradient(circle, rgba(0, 90, 54, 0.05) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%)"
-            : dark
-            ? "radial-gradient(circle, rgba(8, 70, 125, 0.36) 0%, rgba(6, 46, 82, 0.18) 50%, transparent 70%)"
-            : "radial-gradient(circle, rgba(8, 70, 125, 0.05) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%)",
-        }}
-      />
 
-      {/* Orb 2: الهالة الذهبية الجانبية */}
-      <div
-        className="aq-aura-orb-2 absolute top-[28%] -right-[12%] w-[500px] h-[500px] sm:w-[750px] sm:h-[750px] rounded-full blur-[180px] sm:blur-[240px] pointer-events-none"
-        style={{
-          background: isNationalDay
-            ? dark
-              ? "radial-gradient(circle, rgba(212, 175, 55, 0.20) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%)"
-            : dark
-            ? "radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* Orb 3: الهالة السفلية الحية */}
-      <div
-        className="aq-aura-orb-3 absolute -bottom-[18%] left-[22%] w-[580px] h-[580px] sm:w-[880px] sm:h-[880px] rounded-full blur-[190px] sm:blur-[260px] pointer-events-none"
-        style={{
-          background: isNationalDay
-            ? dark
-              ? "radial-gradient(circle, rgba(0, 56, 32, 0.30) 0%, rgba(0, 90, 54, 0.15) 50%, transparent 70%)"
-              : "radial-gradient(circle, rgba(0, 90, 54, 0.04) 0%, transparent 70%)"
-            : dark
-            ? "radial-gradient(circle, rgba(8, 70, 125, 0.24) 0%, rgba(139, 21, 24, 0.10) 50%, transparent 70%)"
-            : "radial-gradient(circle, rgba(8, 70, 125, 0.04) 0%, rgba(139, 21, 24, 0.02) 50%, transparent 70%)",
-        }}
-      />
 
       {/* ── الطبقة 3: نجوم ذهبية عائمة لليوم الوطني ── */}
       {isNationalDay && (

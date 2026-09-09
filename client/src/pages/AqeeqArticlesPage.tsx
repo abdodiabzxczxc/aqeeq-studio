@@ -89,7 +89,7 @@ function ArticleCard({
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
       }}
-      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-md ${
         index === 0 ? "lg:col-span-2 " : ""
       }${
         isNationalDay

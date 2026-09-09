@@ -309,7 +309,7 @@ function MediaPostCard({
           }}
           data-aqeeq-video="true"
           data-no-visual-edit="true"
-          className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+          className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-md ${
             dark
               ? "border-[#08467d]/40 bg-gradient-to-b from-[#06182e]/90 via-[#030d19]/90 to-[#02070e] text-white shadow-[0_16px_45px_rgba(8,70,125,0.25)] hover:border-[#f8ca14] hover:shadow-[0_22px_65px_rgba(248,202,20,0.25)]"
               : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"
@@ -438,7 +438,7 @@ function MediaPostCard({
           transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
         }}
-        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-md ${
           dark
             ? "border-amber-500/35 bg-gradient-to-b from-[#181300]/90 via-[#0e0c04]/90 to-[#050401] text-white shadow-[0_16px_45px_rgba(245,158,11,0.15)] hover:border-amber-400 hover:shadow-[0_22px_65px_rgba(245,158,11,0.3)]"
             : "border-amber-300/80 bg-gradient-to-b from-amber-50/80 via-white to-slate-50 text-slate-900 shadow-[0_16px_40px_rgba(245,158,11,0.08)] hover:border-amber-500"
@@ -703,7 +703,7 @@ function SocialPostCard({
           transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           transition: "transform 0.15s cubic-bezier(0.2, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
         }}
-        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-2xl will-change-transform ${
+        className={`group/card relative h-full flex flex-col justify-between overflow-hidden rounded-[2.2rem] border p-4 sm:p-5 transition duration-300 backdrop-blur-md ${
           dark
             ? "border-[#08467d]/35 bg-gradient-to-b from-[#051120]/90 via-[#030b14]/90 to-[#010408] text-white shadow-[0_16px_45px_rgba(8,70,125,0.2)] hover:border-[#f8ca14] hover:shadow-[0_22px_60px_rgba(248,202,20,0.25)]"
             : "border-[#08467d]/20 bg-white text-slate-900 shadow-[0_16px_40px_rgba(8,70,125,0.08)] hover:border-[#08467d]"

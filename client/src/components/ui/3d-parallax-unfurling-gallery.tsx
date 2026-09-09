@@ -149,8 +149,6 @@ export function ParallaxUnfurlingGallery({
           translateX,
           translateY,
           opacity,
-          maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
         }}
         className="pointer-events-none absolute -inset-x-12 -top-24 sm:-top-32 h-[190%] flex justify-center gap-3 sm:gap-6 md:gap-7 [transform-style:preserve-3d] will-change-transform select-none"
       >

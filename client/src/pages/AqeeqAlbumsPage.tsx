@@ -37,7 +37,7 @@ function AlbumCard({ album, index, onOpen, dark }: { album: PublicAlbum; index: 
   return (
     <motion.article
       variants={fadeUpSpring}
-      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition-all duration-300 hover:-translate-y-1 md:p-6 backdrop-blur-2xl will-change-transform ${
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition-all duration-300 hover:-translate-y-1 md:p-6 backdrop-blur-md ${
         isNationalDay
           ? dark
             ? "snd-bento-card-dark text-white hover:border-emerald-500/50 hover:shadow-[0_25px_60px_rgba(0,90,54,0.35)]"

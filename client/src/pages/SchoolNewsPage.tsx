@@ -74,7 +74,7 @@ function IssueCard({
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease",
       }}
-      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-2xl will-change-transform ${
+      className={`group relative overflow-hidden rounded-[2.2rem] border p-4 transition duration-300 md:p-6 backdrop-blur-md ${
         isNationalDay
           ? dark ? "snd-bento-card-dark text-white hover:border-[#f8ca14]/50 hover:shadow-[0_24px_60px_rgba(0,0,0,0.5)]" : "snd-bento-card-light text-slate-900 hover:border-[#08467d]/40"
           : dark
