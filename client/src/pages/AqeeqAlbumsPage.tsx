@@ -7,7 +7,7 @@ import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArch
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay, Layers, FolderCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
@@ -17,7 +17,7 @@ import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
-import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
+import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
 
@@ -254,6 +254,7 @@ export default function AqeeqAlbumsPage() {
   const { user, isAuthenticated } = useAuth();
 
   const [, navigate] = useLocation();
+  const albumsHeroRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<AqeeqSortOption>("newest");
   const [isTvMode, setIsTvMode] = useState(false);
@@ -342,12 +343,32 @@ export default function AqeeqAlbumsPage() {
       footer={<AlaqeeqStudioSiteFooter />}
       useCurtain={false}
       hero={
-        <HeroParallax
-          products={parallaxProducts}
-          dark={dark}
-          rowCount={2}
-          header={
-            <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <section
+          ref={albumsHeroRef}
+          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 border-b ${
+            isNationalDay
+              ? dark ? "bg-[#001c10] text-white border-emerald-500/20" : "bg-white text-slate-900 border-emerald-500/20"
+              : dark ? "bg-[#05080e] text-white border-white/[0.08]" : "bg-slate-50/70 text-slate-900 border-black/[0.06]"
+          }`}
+        >
+          {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
+          <HeroParallaxBackdrop products={parallaxProducts} containerRef={albumsHeroRef} dark={dark} />
+
+          {/* Ambient background glow & radial highlights */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
+            <div
+              className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
+                dark
+                  ? "bg-gradient-to-b from-[#08467d] to-transparent"
+                  : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
+              }`}
+            />
+          </div>
+
+          <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16">
               {/* Right Column: Exact original text, colors, badges and buttons */}
               <div className="text-right relative z-10">
                 {/* Ambient soft dark contrast scrim behind text for 100% clarity */}
@@ -653,10 +674,9 @@ export default function AqeeqAlbumsPage() {
                 ) : null}
               </div>
             </div>
-          }
-        />
-      }
-    >
+          </section>
+        }
+      >
       <section id="albums-grid-section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
         <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
           <div className="max-w-2xl text-right">

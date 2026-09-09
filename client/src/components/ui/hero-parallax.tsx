@@ -486,3 +486,170 @@ export const ProductCard = ({
     </motion.div>
   );
 };
+
+export interface HeroParallaxBackdropProps {
+  products: ParallaxProduct[];
+  containerRef: React.RefObject<HTMLElement | null>;
+  dark?: boolean;
+  direction?: "left-to-right" | "right-to-left";
+  cardShape?: "default" | "square";
+}
+
+export function HeroParallaxBackdrop({
+  products,
+  containerRef,
+  dark = true,
+  direction = "left-to-right",
+  cardShape = "default",
+}: HeroParallaxBackdropProps) {
+  const isRightToLeft = direction === "right-to-left";
+
+  const displayProducts = React.useMemo(() => {
+    if (!products || products.length === 0) return [];
+    if (products.length >= 16) return products.slice(0, 16);
+    const repeated = [...products];
+    while (repeated.length < 16) {
+      repeated.push(...products);
+    }
+    return repeated.slice(0, 16);
+  }, [products]);
+
+  const firstRow = displayProducts.slice(0, 8);
+  const secondRow = displayProducts.slice(8, 16);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const smoothConfig = { stiffness: 90, damping: 28, mass: 0.1, restDelta: 0.001 };
+
+  const rawTranslateX = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? 450 : 200]);
+  const rawTranslateXReverse = useTransform(scrollYProgress, [0, 1], [0, isDesktop ? -450 : -200]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.8], [isDesktop ? 12 : 5, 0]);
+  const rawRotateZ = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    [isDesktop ? (isRightToLeft ? -12 : 12) : (isRightToLeft ? -3 : 3), 0]
+  );
+  const rawTranslateY = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    [isDesktop ? -100 : -50, isDesktop ? 60 : 30]
+  );
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.7, 1],
+    [0.35, 0.5, 0.45, 0.15]
+  );
+
+  const translateX = useSpring(rawTranslateX, smoothConfig);
+  const translateXReverse = useSpring(rawTranslateXReverse, smoothConfig);
+  const rotateX = useSpring(rawRotateX, smoothConfig);
+  const rotateZ = useSpring(rawRotateZ, smoothConfig);
+  const translateY = useSpring(rawTranslateY, smoothConfig);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none [perspective:1000px] [transform-style:preserve-3d]"
+    >
+      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
+      <div
+        className={`absolute inset-0 z-10 pointer-events-none ${
+          dark
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+        }`}
+      />
+
+      {/* 3D Moving Perspective Rows */}
+      <motion.div
+        style={{
+          rotateX,
+          rotateZ,
+          translateY,
+          opacity,
+        }}
+        className="relative will-change-transform pt-4"
+      >
+        {/* Row 1 */}
+        <motion.div
+          style={{ x: isRightToLeft ? translateXReverse : translateX }}
+          className="flex flex-row-reverse space-x-reverse space-x-5 sm:space-x-7 mb-4 sm:mb-6"
+        >
+          {firstRow.map((product, idx) => (
+            <div
+              key={product.title + "-b1-" + idx}
+              className={`relative flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl border ${
+                dark ? "border-white/10 bg-black/60" : "border-black/10 bg-white"
+              } ${
+                cardShape === "square"
+                  ? "h-[190px] w-[190px] sm:h-[240px] sm:w-[240px]"
+                  : "h-[180px] w-[260px] sm:h-[220px] sm:w-[320px]"
+              }`}
+            >
+              <img
+                src={product.thumbnail}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {product.category && (
+                <span className="absolute top-2.5 right-2.5 rounded-lg bg-black/60 border border-white/15 px-2 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md">
+                  {product.category}
+                </span>
+              )}
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Row 2 */}
+        <motion.div
+          style={{ x: isRightToLeft ? translateX : translateXReverse }}
+          className="flex flex-row space-x-5 sm:space-x-7"
+        >
+          {secondRow.map((product, idx) => (
+            <div
+              key={product.title + "-b2-" + idx}
+              className={`relative flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl border ${
+                dark ? "border-white/10 bg-black/60" : "border-black/10 bg-white"
+              } ${
+                cardShape === "square"
+                  ? "h-[190px] w-[190px] sm:h-[240px] sm:w-[240px]"
+                  : "h-[180px] w-[260px] sm:h-[220px] sm:w-[320px]"
+              }`}
+            >
+              <img
+                src={product.thumbnail}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {product.category && (
+                <span className="absolute top-2.5 right-2.5 rounded-lg bg-black/60 border border-white/15 px-2 py-0.5 text-[9px] font-black text-[#f8ca14] backdrop-blur-md">
+                  {product.category}
+                </span>
+              )}
+            </div>
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+

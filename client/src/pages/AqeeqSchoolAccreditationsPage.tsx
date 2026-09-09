@@ -11,7 +11,7 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { AccreditationsScrollGlobalBackdrop } from "@/components/ui/accreditations-scroll-global-backdrop";
-import { HeroParallax, type ParallaxProduct } from "@/components/ui/hero-parallax";
+import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -160,14 +160,38 @@ export default function AqeeqSchoolAccreditationsPage() {
       useCurtain={false}
       curtainKicker="✦ استكشف قاعة الاعتمادات ومراكز الاختبارات العالمية ✦"
       hero={
-        <HeroParallax
-          products={dynamicAccreditationsParallaxProducts}
-          dark={dark}
-          direction="right-to-left"
-          cardShape="square"
-          rowCount={2}
-          header={
-            <div className="relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-6 sm:py-10 z-10">
+        <section
+          ref={accreditationsHeroRef}
+          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 border-b ${
+            isNationalDay
+              ? dark ? "bg-[#001c10] text-white border-emerald-500/20" : "bg-white text-slate-900 border-emerald-500/20"
+              : dark ? "bg-[#05080e] text-white border-white/[0.08]" : "bg-slate-50/70 text-slate-900 border-black/[0.06]"
+          }`}
+        >
+          {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
+          <HeroParallaxBackdrop
+            products={dynamicAccreditationsParallaxProducts}
+            containerRef={accreditationsHeroRef}
+            dark={dark}
+            direction="right-to-left"
+            cardShape="square"
+          />
+
+          {/* Ambient background glow & radial highlights */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
+            <div
+              className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
+                dark
+                  ? "bg-gradient-to-b from-[#08467d] to-transparent"
+                  : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
+              }`}
+            />
+          </div>
+
+          <div className="relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-6 sm:py-10 z-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
@@ -443,8 +467,7 @@ export default function AqeeqSchoolAccreditationsPage() {
               </div>
             </div>
           </div>
-        }
-      />
+        </section>
       }
     >
       {/* Kinetic Typographic Ribbon 1 */}
