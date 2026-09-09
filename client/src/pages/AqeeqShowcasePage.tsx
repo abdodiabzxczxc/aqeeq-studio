@@ -1238,39 +1238,40 @@ export default function AqeeqShowcasePage() {
         </div>
       }
     >
-      <section id="aqeeq-showcase-feed" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
-        <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
-          <div className="max-w-2xl text-right">
-            <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
-              dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+      <section id="aqeeq-showcase-feed" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-10 sm:pt-14 pb-14 sm:pb-20">
+        <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-8 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+          <div className="max-w-3xl text-right">
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 text-xs font-black tracking-widest uppercase shadow-sm ${
+              dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14] shadow-[#f8ca14]/5" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
             }`}>
-              <Sparkles size={13} />
+              <Sparkles size={14} />
               <span>THE AQEEQ FEED · المركز الإعلامي والتغطيات</span>
             </div>
 
-            <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black font-cairo leading-tight ${dark ? "text-white" : "text-black"}`}>
+            <h2 className={`text-3xl sm:text-5xl lg:text-6xl font-black font-cairo leading-[1.16] tracking-tight ${dark ? "text-white" : "text-black"}`}>
               آخر الأخبار والفعاليات والعروض
             </h2>
 
             {/* Glowing Golden Accent Line */}
             <div
-              className={`h-1 sm:h-[3.5px] w-40 rounded-full my-3.5 ${
+              className={`h-1.5 w-48 sm:w-60 rounded-full my-4 ${
                 dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
+                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_20px_rgba(248,202,20,0.6)]"
+                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_15px_rgba(8,70,125,0.4)]"
               }`}
             />
 
-            <p className={`mt-2 max-w-xl text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300 font-medium" : "text-slate-600 font-medium"}`}>
-              نافذة حية ومستمرة تنقل جديد مدارس العقيق الأهلية والدولية، مع بطاقات تفاعلية للصور والفيديوهات ومنشورات التواصل الاجتماعي.
+            <p className={`mt-3 max-w-2xl text-sm sm:text-base leading-relaxed ${dark ? "text-slate-300 font-medium" : "text-slate-600 font-medium"}`}>
+              نافذة حية ومستمرة تنقل جديد مدارس العقيق الأهلية والدولية، مع بطاقات تفاعلية للصور والفيديوهات ومنشورات التواصل الاجتماعي الرسمية الموثقة.
             </p>
           </div>
 
-          <span className={`self-start md:self-end rounded-full border px-3.5 py-1.5 text-xs font-black shrink-0 ${
+          <div className={`self-start md:self-end inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs sm:text-sm font-black shrink-0 shadow-sm ${
             dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
           }`}>
-            {visiblePosts.length} من {posts.length} منشور
-          </span>
+            <span className={`h-2 w-2 rounded-full animate-pulse ${dark ? "bg-[#f8ca14]" : "bg-[#08467d]"}`} />
+            <span>{visiblePosts.length} من {posts.length} منشور</span>
+          </div>
         </div>
         <AqeeqArchiveControls id="showcase-archive-controls" label="البحث وترتيب الأخبار والعروض" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} typeOptions={typeOptionsWithCounts} activeType={contentType} onTypeChange={(value) => setContentType(value as ContentType)} />
         {visiblePosts.length ? (
