@@ -42,51 +42,51 @@ export function AqeeqLuxuryPageShell({
       } overflow-x-clip selection:bg-[#f8ca14]/30 ${
         dark ? "bg-black text-white" : "bg-white text-slate-900"
       } ${className}`}
+      style={{
+        background: dark ? "#000000" : "#ffffff",
+      }}
     >
-      {/* ── خلفيات الهالة المحيطية الحية (Ambient Mesh Glow Orbs) ── */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        {/* هالة علوية كحلية ملكية / خضراء */}
-        <div
-          className={`absolute -top-40 right-[-10%] h-[600px] w-[600px] rounded-full blur-[140px] opacity-30 transition-transform duration-1000 ${
-            isNationalDay
-              ? dark
-                ? "bg-gradient-to-br from-[#005A36] to-[#5aba1c]/40"
-                : "bg-gradient-to-br from-emerald-300 to-[#5aba1c]/30"
-              : dark
-              ? "bg-gradient-to-br from-[#08467d]/20 via-[#052342]/10 to-transparent"
-              : "bg-gradient-to-br from-[#08467d]/10 via-blue-400/5 to-transparent"
-          }`}
-        />
-
-        {/* هالة وسطى كحلية هادئة */}
-        <div
-          className={`absolute top-[45%] left-[-15%] h-[550px] w-[550px] rounded-full blur-[150px] opacity-25 transition-transform duration-1000 ${
-            isNationalDay
-              ? dark
-                ? "bg-[#003822]/60"
-                : "bg-emerald-200/50"
-              : dark
-              ? "bg-[#08467d]/15"
-              : "bg-slate-200/40"
-          }`}
-        />
-
-        {/* هالة سفلية عميقة */}
-        <div
-          className={`absolute -bottom-40 right-[20%] h-[500px] w-[500px] rounded-full blur-[160px] opacity-25 ${
-            isNationalDay
-              ? dark
-                ? "bg-[#5aba1c]/20"
-                : "bg-emerald-300/30"
-              : dark
-              ? "bg-[#08467d]/20"
-              : "bg-[#08467d]/08"
-          }`}
-        />
-
-        {/* شبكة ضوئية سائلة دقيقة */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(8,70,125,0.04),transparent_60%)]" />
-      </div>
+      {/* ── خلفية الإضاءة المحيطية العالمية السلسة الممتدة بدون أي حواف أو قطع ── */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-100 transition-opacity duration-700"
+        aria-hidden="true"
+        style={{
+          background: isNationalDay
+            ? dark
+              ? "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.42) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.16) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.12) 0%, transparent 60%)"
+              : "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.04) 0%, transparent 60%)"
+            : dark
+            ? "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.35) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.16) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.09) 0%, transparent 60%)"
+            : "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.03) 0%, transparent 60%)",
+        }}
+      />
+      {/* 🇸🇦 Floating Gold Stars — National Day Ambient Particles */}
+      {isNationalDay && (
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {[
+            { char: "★", left: "5%",  dur: "9s",  delay: "0s",   size: "12px" },
+            { char: "☆", left: "18%", dur: "13s", delay: "2s",   size: "9px"  },
+            { char: "★", left: "32%", dur: "11s", delay: "4.5s", size: "15px" },
+            { char: "☆", left: "48%", dur: "8s",  delay: "1s",   size: "10px" },
+            { char: "★", left: "63%", dur: "14s", delay: "3s",   size: "8px"  },
+            { char: "☆", left: "77%", dur: "10s", delay: "6s",   size: "13px" },
+            { char: "★", left: "91%", dur: "12s", delay: "0.5s", size: "11px" },
+          ].map((p, i) => (
+            <span
+              key={i}
+              className="aq-star"
+              style={{
+                left: p.left,
+                animationDuration: p.dur,
+                animationDelay: p.delay,
+                fontSize: p.size,
+              }}
+            >
+              {p.char}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* ── رأس الصفحة (Header) ── */}
       {header && <div className="relative z-40">{header}</div>}
@@ -172,37 +172,11 @@ function AqeeqCurtainHeroStage({
         </div>
       </div>
 
-      {/* ستارة المحتوى: تبدأ طبيعياً على الموبايل وتصعد فوق الهيرو على الكمبيوتر */}
+      {/* حاوية المحتوى: انسياب سلس 100% بدون أي قص أو فواصل */}
       <div
-        className={`relative z-20 mt-4 sm:mt-6 lg:-mt-[30vh] w-full rounded-t-[2.4rem] sm:rounded-t-[3.2rem] lg:rounded-t-[4.2rem] transition-colors duration-500 overflow-x-clip ${
-          dark
-            ? "bg-black shadow-[0_-40px_100px_rgba(0,0,0,0.98)] border-t border-white/[0.05]"
-            : "bg-white shadow-[0_-30px_80px_rgba(0,0,0,0.03)] border-t border-black/[0.03]"
-        }`}
+        className="relative z-20 w-full transition-colors duration-500 overflow-x-clip bg-transparent border-0"
       >
-        {/* خط النيون الذهبي المتوهج */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-4/5 max-w-4xl h-[2px] bg-gradient-to-r from-transparent via-[#f8ca14] to-transparent z-30 shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-        />
-
-        {/* مقبض الستارة والشارة */}
-        <div className="flex flex-col items-center justify-center pt-5 pb-3 gap-1.5">
-          <div
-            className={`h-1.5 w-14 rounded-full transition ${
-              dark ? "bg-white/25" : "bg-black/20"
-            }`}
-          />
-          <span
-            className={`text-[10px] font-black tracking-widest uppercase ${
-              dark ? "text-[#f8ca14]/90" : "text-[#08467d]/90"
-            }`}
-          >
-            {curtainKicker}
-          </span>
-        </div>
-
-        {/* محتوى الستارة */}
+        {/* محتوى الصفحة */}
         <div className="relative z-10 w-full">{children}</div>
       </div>
     </div>

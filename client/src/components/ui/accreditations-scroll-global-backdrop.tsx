@@ -215,24 +215,12 @@ export function AccreditationsScrollGlobalBackdrop({
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden [perspective:1400px] [transform-style:preserve-3d]"
     >
-      {/* Deep subtle sapphire & emerald aura (pure dark, zero yellow) */}
-      <div
-        className={`absolute -top-32 right-1/4 h-[580px] w-[580px] rounded-full blur-[140px] opacity-15 pointer-events-none ${
-          dark ? "bg-[#08467d]" : "bg-[#08467d]/10"
-        }`}
-      />
-      <div
-        className={`absolute top-1/2 left-1/4 h-[500px] w-[500px] rounded-full blur-[140px] opacity-12 pointer-events-none ${
-          dark ? "bg-[#005A36]" : "bg-emerald-500/10"
-        }`}
-      />
-
       {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
       <div
         className={`absolute inset-0 z-10 pointer-events-none ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
-            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+            ? "bg-gradient-to-t from-black via-black/60 to-transparent"
+            : "bg-gradient-to-t from-white via-white/60 to-transparent"
         }`}
       />
 
@@ -367,8 +355,8 @@ export function AccreditationsScrollGlobalBackdrop({
       <div
         className={`absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10 ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
-            : "bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent"
+            ? "bg-gradient-to-t from-black via-black/85 to-transparent"
+            : "bg-gradient-to-t from-white via-white/85 to-transparent"
         }`}
       />
     </div>

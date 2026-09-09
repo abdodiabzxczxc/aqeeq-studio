@@ -173,19 +173,7 @@ export default function AqeeqSchoolAccreditationsPage() {
             cardShape="square"
           />
 
-          {/* Ambient background glow & radial highlights */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 overflow-hidden"
-          >
-            <div
-              className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
-                dark
-                  ? "bg-gradient-to-b from-[#08467d] to-transparent"
-                  : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
-              }`}
-            />
-          </div>
+
 
           <div className="relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-6 sm:py-10 z-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">

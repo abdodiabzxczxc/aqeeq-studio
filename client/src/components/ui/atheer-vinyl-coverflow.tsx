@@ -118,8 +118,8 @@ export function AtheerVinylCoverflow({
   return (
     <div
       ref={containerRef}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-16 [perspective:1400px] [transform-style:preserve-3d] ${
-        dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-16 [perspective:1400px] [transform-style:preserve-3d] bg-transparent border-0 ${
+        dark ? "text-white" : "text-slate-900"
       } ${className}`}
       style={{ minHeight: isDesktop ? "150vh" : "115vh" }}
       dir="rtl"
@@ -130,20 +130,10 @@ export function AtheerVinylCoverflow({
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
-          className={`absolute -top-32 right-1/4 h-[580px] w-[580px] rounded-full blur-[140px] opacity-30 ${
-            dark ? "bg-[#08467d]" : "bg-[#08467d]/20"
-          }`}
-        />
-        <div
-          className={`absolute top-1/3 left-1/4 h-[520px] w-[520px] rounded-full blur-[130px] opacity-25 ${
-            dark ? "bg-[#f8ca14]" : "bg-[#f8ca14]/20"
-          }`}
-        />
-        <div
           className={`absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10 ${
             dark
-              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/80 to-transparent"
-              : "bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent"
+              ? "bg-gradient-to-t from-black via-black/80 to-transparent"
+              : "bg-gradient-to-t from-white via-white/80 to-transparent"
           }`}
         />
       </div>

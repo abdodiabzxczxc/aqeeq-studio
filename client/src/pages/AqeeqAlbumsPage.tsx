@@ -350,19 +350,7 @@ export default function AqeeqAlbumsPage() {
           {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
           <HeroParallaxBackdrop products={parallaxProducts} containerRef={albumsHeroRef} dark={dark} />
 
-          {/* Ambient background glow & radial highlights */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 overflow-hidden"
-          >
-            <div
-              className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
-                dark
-                  ? "bg-gradient-to-b from-[#08467d] to-transparent"
-                  : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
-              }`}
-            />
-          </div>
+
 
           <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:grid-cols-[1.1fr_1fr] lg:gap-16">
               {/* Right Column: Exact original text, colors, badges and buttons */}

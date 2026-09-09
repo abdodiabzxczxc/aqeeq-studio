@@ -316,7 +316,7 @@ export default function SchoolNewsPage() {
         header={<AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />}
       >
         {/* Skeleton Hero */}
-        <section className={`border-b py-12 px-5 sm:px-8 animate-pulse ${dark ? "border-white/10 bg-[#080808]" : "border-black/5 bg-slate-50"}`}>
+        <section className="border-0 py-12 px-5 sm:px-8 animate-pulse bg-transparent">
           <div className="mx-auto grid max-w-[1440px] items-center gap-8 md:grid-cols-[1fr_1.1fr]">
             <div className={`h-[320px] md:h-[420px] rounded-[2rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
             <div className="space-y-4">
@@ -332,10 +332,10 @@ export default function SchoolNewsPage() {
           </div>
         </section>
         {/* Skeleton Cards Grid */}
-        <section className="mx-auto max-w-[1440px] px-5 sm:px-8 py-12">
+        <section className="mx-auto max-w-[1440px] px-5 sm:px-8 py-12 bg-transparent">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className={`rounded-[2rem] border p-5 animate-pulse space-y-4 ${dark ? "border-white/10 bg-[#0c0c0c]" : "border-black/5 bg-slate-50"}`}>
+              <div key={i} className={`rounded-[2rem] border p-5 animate-pulse space-y-4 ${dark ? "border-white/10 bg-[#0c0c0c]" : "border-black/5 bg-slate-100/60"}`}>
                 <div className={`h-44 rounded-[1.5rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
                 <div className={`h-5 w-3/4 rounded-lg ${dark ? "bg-white/10" : "bg-slate-200"}`} />
                 <div className={`h-3 w-1/2 rounded-md ${dark ? "bg-white/5" : "bg-slate-200"}`} />

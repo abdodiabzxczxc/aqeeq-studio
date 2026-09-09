@@ -9,6 +9,7 @@ import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArch
 import { normalizeJournalCoverScale } from "@/lib/journalCover";
 import { getJournalIssuePath, getJournalIssueShareUrl } from "@/lib/journalRoutes";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, BookOpen, Eye, FolderArchive, LibraryBig, ScanLine, Settings2, Share2, Sparkles } from "lucide-react";
 import { useMemo, useState, useRef } from "react";
@@ -131,6 +132,7 @@ function JournalCard({
 
 export default function JournalArchivePage() {
   const { theme } = useAqeeqStudioTheme();
+  const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
   const { user, isAuthenticated } = useAuth();
   const { snapshot } = usePublishedHomepage();
@@ -168,9 +170,13 @@ export default function JournalArchivePage() {
 
   if (isLoading) {
     return (
-      <main dir="rtl" className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}>
+      <main
+        dir="rtl"
+        className={`min-h-screen aq-public-shell ${dark ? "bg-black text-white" : "bg-white text-black"}`}
+        style={{ background: dark ? "#000000" : "#ffffff" }}
+      >
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" />
-        <section className={`border-b py-12 px-5 sm:px-8 animate-pulse ${dark ? "border-white/10 bg-[#080808]" : "border-black/5 bg-slate-50"}`}>
+        <section className="border-0 py-12 px-5 sm:px-8 animate-pulse bg-transparent">
           <div className="mx-auto grid max-w-[1440px] items-center gap-8 md:grid-cols-[1fr_1.1fr]">
             <div className={`h-[320px] md:h-[420px] rounded-[2rem] ${dark ? "bg-white/5" : "bg-slate-200"}`} />
             <div className="space-y-4">
@@ -186,7 +192,27 @@ export default function JournalArchivePage() {
   }
 
   return (
-    <main dir="rtl" className={`aq-public-shell overflow-x-hidden min-h-screen ${dark ? "bg-black text-slate-100" : "bg-[#fbfaf8] text-slate-900"}`}>
+    <main
+      dir="rtl"
+      className={`relative aq-public-shell overflow-x-hidden min-h-screen ${dark ? "bg-black text-slate-100" : "bg-white text-slate-900"}`}
+      style={{
+        background: dark ? "#000000" : "#ffffff",
+      }}
+    >
+      {/* ── خلفية الإضاءة المحيطية العالمية السلسة الممتدة بدون أي حواف أو قطع ── */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-100 transition-opacity duration-700"
+        aria-hidden="true"
+        style={{
+          background: isNationalDay
+            ? dark
+              ? "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.42) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.16) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.12) 0%, transparent 60%)"
+              : "radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 85% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 15% 75%, rgba(90, 186, 28, 0.04) 0%, transparent 60%)"
+            : dark
+            ? "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.35) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.16) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.09) 0%, transparent 60%)"
+            : "radial-gradient(ellipse 85% 50% at 30% -10%, rgba(8, 70, 125, 0.08) 0%, transparent 70%), radial-gradient(ellipse 65% 45% at 80% 25%, rgba(248, 202, 20, 0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 15% 70%, rgba(222, 25, 30, 0.03) 0%, transparent 60%)",
+        }}
+      />
       <VisualEditable id="journal-header-shell" tag="section" label="شريط هوية المكتبة" as="section">
         <AlaqeeqStudioSiteHeader title="مجلة العقيق" active="journal" logoUrl={journalLogoUrl} />
       </VisualEditable>
@@ -199,12 +225,11 @@ export default function JournalArchivePage() {
       </div>
       {featuredIssue ? (
         <>
-          <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className={`relative isolate overflow-hidden border-b ${dark ? "border-amber-300/15 bg-black" : "border-slate-200 bg-white"}`}>
+          <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className="relative isolate overflow-hidden bg-transparent border-0">
             {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
             <div ref={journalHeroRef} className="absolute inset-0 pointer-events-none">
               <HeroParallaxBackdrop products={journalParallaxProducts} containerRef={journalHeroRef} dark={dark} />
             </div>
-            <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} />
             <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
               {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}
               <div className="text-right relative z-10">

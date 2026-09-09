@@ -133,8 +133,8 @@ export function ParallaxUnfurlingGallery({
   return (
     <div
       ref={containerRef}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-6 sm:pb-8 [perspective:1200px] [transform-style:preserve-3d] ${
-        dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-6 sm:pb-8 [perspective:1200px] [transform-style:preserve-3d] bg-transparent border-0 ${
+        dark ? "text-white" : "text-slate-900"
       } ${className}`}
       style={{ minHeight: isDesktop ? "74vh" : "auto" }}
       dir="rtl"
@@ -144,25 +144,20 @@ export function ParallaxUnfurlingGallery({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div
-          className={`absolute -top-32 ${isRightToLeft ? "left-1/4" : "right-1/4"} h-[560px] w-[560px] rounded-full blur-[140px] opacity-15 pointer-events-none ${
-            dark ? "bg-[#08467d]" : "bg-[#08467d]/10"
-          }`}
-        />
         {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
         <div
           className={`absolute inset-0 z-10 pointer-events-none ${
             dark
-              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
-              : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+              ? "bg-gradient-to-t from-black via-black/60 to-transparent"
+              : "bg-gradient-to-t from-white via-white/60 to-transparent"
           }`}
         />
         {/* Soft bottom edge gradient for seamless transition to content */}
         <div
           className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
             dark
-              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
-              : "bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent"
+              ? "bg-gradient-to-t from-black via-black/85 to-transparent"
+              : "bg-gradient-to-t from-white via-white/85 to-transparent"
           }`}
         />
       </div>

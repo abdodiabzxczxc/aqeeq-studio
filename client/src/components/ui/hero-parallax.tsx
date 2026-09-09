@@ -115,8 +115,8 @@ export const HeroParallax = ({
   return (
     <div
       ref={ref}
-      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-10 [perspective:1200px] [transform-style:preserve-3d] ${
-        dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
+      className={`relative flex flex-col self-auto overflow-hidden antialiased transition-colors duration-500 pb-8 sm:pb-10 [perspective:1200px] [transform-style:preserve-3d] bg-transparent border-0 ${
+        dark ? "text-white" : "text-slate-900"
       }`}
       style={{
         minHeight: isDesktop
@@ -128,19 +128,6 @@ export const HeroParallax = ({
           : "auto",
       }}
     >
-      {/* Ambient background glow & radial highlights (pure dark, no yellow) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div
-          className={`absolute -top-32 left-1/2 -translate-x-1/2 h-[550px] w-[min(1100px,100vw)] rounded-full blur-[140px] opacity-15 pointer-events-none ${
-            dark
-              ? "bg-gradient-to-b from-[#08467d] to-transparent"
-              : "bg-gradient-to-b from-blue-200 to-transparent opacity-30"
-          }`}
-        />
-      </div>
 
       {/* Hero Header with smooth entrance bloom */}
       {header ? (
@@ -231,8 +218,8 @@ export const HeroParallax = ({
       <div
         className={`pointer-events-none absolute bottom-0 inset-x-0 h-36 bg-gradient-to-t ${
           dark
-            ? "from-[#05080e] via-[#05080e]/85 to-transparent"
-            : "from-slate-50 via-slate-50/85 to-transparent"
+            ? "from-black via-black/85 to-transparent"
+            : "from-white via-white/85 to-transparent"
         } z-20`}
       />
     </div>
@@ -563,8 +550,8 @@ export function HeroParallaxBackdrop({
       <div
         className={`absolute inset-0 z-10 pointer-events-none ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
-            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+            ? "bg-gradient-to-t from-black via-black/60 to-transparent"
+            : "bg-gradient-to-t from-white via-white/60 to-transparent"
         }`}
       />
 
