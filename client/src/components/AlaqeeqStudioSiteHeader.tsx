@@ -48,6 +48,7 @@ import {
   Cloud,
   Ticket,
   Video,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -269,6 +270,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const activeLogo = logoOverride?.mediaUrl || logoUrl || "/alaqeeq-logo.png";
 
   const topLocationText = editor?.getOverride?.("header-top-location")?.contentText || orchestration?.topBar?.locationText || "المدينة المنورة — المملكة العربية السعودية";
+  const topLocationLink = orchestration?.topBar?.locationUrl || orchestration?.location?.mapUrl || "https://maps.google.com/?q=Alaqeeq+Schools+Madinah";
   const topPhoneText = editor?.getOverride?.("header-top-phone")?.contentText || orchestration?.topBar?.phone || "+966 53 189 6000";
   const topPhoneLink = editor?.getOverride?.("header-top-phone")?.linkUrl || orchestration?.topBar?.phoneUrl || "tel:+966531896000";
   const topEmailText = editor?.getOverride?.("header-top-email")?.contentText || orchestration?.topBar?.email || "info@alaqeeqholding.com";
@@ -276,6 +278,14 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
   const topPortalsText = editor?.getOverride?.("header-top-portals")?.contentText || "بوابات الأنظمة والخدمات";
   const topJobsText = editor?.getOverride?.("header-top-jobs")?.contentText || orchestration?.topBar?.jobsText || "بوابة التوظيف";
   const topJobsLink = editor?.getOverride?.("header-top-jobs")?.linkUrl || orchestration?.topBar?.jobsUrl || "https://live.aqeeq.edu.sa/jobs";
+  const topWorkingHours = orchestration?.topBar?.workingHours || "أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م";
+
+  const isTopBarEnabled = orchestration?.topBar?.enabled !== false;
+  const isLocationEnabled = orchestration?.topBar?.locationEnabled !== false;
+  const isPhoneEnabled = orchestration?.topBar?.phoneEnabled !== false;
+  const isEmailEnabled = orchestration?.topBar?.emailEnabled !== false;
+  const isJobsEnabled = orchestration?.topBar?.jobsEnabled !== false;
+  const isWorkingHoursEnabled = orchestration?.topBar?.workingHoursEnabled !== false && !!topWorkingHours;
 
   const hiddenNavKeys: string[] = (orchestration?.nav as any)?.hiddenNavKeys || [];
   const isNavHidden = (key: string) => hiddenNavKeys.includes(key);
@@ -301,51 +311,70 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
         <AqeeqOccasionRibbon isScrolled={isScrolled} />
 
         {/* 1. Top Executive Utility Bar */}
-        <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 ${
-          isScrolled
-            ? "overflow-hidden max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
-            : `overflow-visible border-b border-transparent max-h-12 py-1.5 opacity-100 ${
-                dark
-                  ? isNationalDay ? "bg-transparent text-emerald-100/70" : "bg-transparent text-slate-400"
-                  : isNationalDay ? "bg-transparent text-emerald-900/80" : "bg-transparent text-slate-600"
-              }`
-        }`}>
-        <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-3 sm:px-4 xl:px-8 min-w-0">
-          <div className="flex items-center gap-4">
-            <span
-              data-visual-id="header-top-location"
-              data-visual-tag="text"
-              data-visual-label="موقع المدارس في الشريط العلوي"
-              className={`flex items-center gap-1.5 ${dark ? (isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]") : (isNationalDay ? "text-[#006C35]" : "text-[#08467d]")}`}
-            >
-              <MapPin size={12} />
-              <span>{topLocationText}</span>
-            </span>
-            <span className="h-3 w-px bg-current opacity-20" />
-            <a
-              href={topPhoneLink}
-              data-visual-id="header-top-phone"
-              data-visual-tag="text"
-              data-visual-label="هاتف المدارس في الشريط العلوي"
-              className="flex items-center gap-1.5 hover:text-[#f8ca14] transition"
-              dir="ltr"
-            >
-              <PhoneCall size={12} />
-              <span>{topPhoneText}</span>
-            </a>
-            <span className="h-3 w-px bg-current opacity-20 hidden md:inline-block" />
-            <a
-              href={topEmailLink}
-              data-visual-id="header-top-email"
-              data-visual-tag="text"
-              data-visual-label="إيميل المدارس في الشريط العلوي"
-              className="hidden md:flex items-center gap-1.5 hover:text-[#f8ca14] transition"
-              dir="ltr"
-            >
-              <Mail size={12} />
-              <span>{topEmailText}</span>
-            </a>
-          </div>
+        {isTopBarEnabled && (
+          <div className={`hidden sm:block relative z-[140] text-[11px] font-bold transition-all duration-300 ${
+            isScrolled
+              ? "overflow-hidden max-h-0 h-0 py-0 opacity-0 !border-0 !border-transparent pointer-events-none"
+              : `overflow-visible border-b border-transparent max-h-12 py-1.5 opacity-100 ${
+                  dark
+                    ? isNationalDay ? "bg-transparent text-emerald-100/70" : "bg-transparent text-slate-400"
+                    : isNationalDay ? "bg-transparent text-emerald-900/80" : "bg-transparent text-slate-600"
+                }`
+          }`}>
+            <div className="mx-auto flex max-w-[1380px] 2xl:max-w-[1560px] items-center justify-between px-3 sm:px-4 xl:px-8 min-w-0">
+              <div className="flex items-center gap-3.5">
+                {isLocationEnabled && (
+                  <a
+                    href={topLocationLink}
+                    target={topLocationLink.startsWith("http") ? "_blank" : undefined}
+                    rel={topLocationLink.startsWith("http") ? "noreferrer" : undefined}
+                    data-visual-id="header-top-location"
+                    data-visual-tag="text"
+                    data-visual-label="موقع المدارس في الشريط العلوي"
+                    className={`flex items-center gap-1.5 transition hover:underline cursor-pointer ${dark ? (isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]") : (isNationalDay ? "text-[#006C35]" : "text-[#08467d]")}`}
+                  >
+                    <MapPin size={12} />
+                    <span>{topLocationText}</span>
+                  </a>
+                )}
+                {isLocationEnabled && (isPhoneEnabled || isEmailEnabled) && <span className="h-3 w-px bg-current opacity-20" />}
+                {isPhoneEnabled && (
+                  <a
+                    href={topPhoneLink}
+                    data-visual-id="header-top-phone"
+                    data-visual-tag="text"
+                    data-visual-label="هاتف المدارس في الشريط العلوي"
+                    className="flex items-center gap-1.5 hover:text-[#f8ca14] transition"
+                    dir="ltr"
+                  >
+                    <PhoneCall size={12} />
+                    <span>{topPhoneText}</span>
+                  </a>
+                )}
+                {isPhoneEnabled && isEmailEnabled && <span className="h-3 w-px bg-current opacity-20 hidden md:inline-block" />}
+                {isEmailEnabled && (
+                  <a
+                    href={topEmailLink}
+                    data-visual-id="header-top-email"
+                    data-visual-tag="text"
+                    data-visual-label="إيميل المدارس في الشريط العلوي"
+                    className="hidden md:flex items-center gap-1.5 hover:text-[#f8ca14] transition"
+                    dir="ltr"
+                  >
+                    <Mail size={12} />
+                    <span>{topEmailText}</span>
+                  </a>
+                )}
+                {isWorkingHoursEnabled && (
+                  <>
+                    <span className="h-3 w-px bg-current opacity-20 hidden lg:inline-block" />
+                    <span className="hidden lg:flex items-center gap-1.5 opacity-80 text-[10px]">
+                      <Clock size={11} className="shrink-0 text-amber-500" />
+                      <span>{topWorkingHours}</span>
+                    </span>
+                  </>
+                )}
+              </div>
 
           <div className="flex items-center gap-3">
             {/* Portals Dropdown */}
@@ -516,21 +545,26 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               )}
             </div>
 
-            <span className="h-3 w-px bg-current opacity-20" />
-            <a
-              href={topJobsLink}
-              target="_blank"
-              rel="noreferrer"
-              data-visual-id="header-top-jobs"
-              data-visual-tag="text"
-              data-visual-label="رابط بوابة التوظيف"
-              className="hover:text-[#f8ca14] transition"
-            >
-              {topJobsText}
-            </a>
+            {isJobsEnabled && (
+              <>
+                <span className="h-3 w-px bg-current opacity-20" />
+                <a
+                  href={topJobsLink}
+                  target={topJobsLink.startsWith("http") ? "_blank" : undefined}
+                  rel={topJobsLink.startsWith("http") ? "noreferrer" : undefined}
+                  data-visual-id="header-top-jobs"
+                  data-visual-tag="text"
+                  data-visual-label="رابط بوابة التوظيف"
+                  className="hover:text-[#f8ca14] transition"
+                >
+                  {topJobsText}
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
+    )}
 
       {/* 2. Main Executive Header — Collapses into Twin Corner Floating Islands on Scroll */}
       <header className={`w-full transition-all duration-300 ease-out ${

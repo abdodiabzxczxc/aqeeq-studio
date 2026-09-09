@@ -658,30 +658,57 @@ export type SiteOrchestrationConfig = {
     youtubeUrl?: string | null;
     snapchatUrl?: string | null;
     facebookUrl?: string | null;
+    telegramUrl?: string | null;
     whatsappNumber?: string | null;
   };
   topBar?: {
+    enabled?: boolean;
     phone?: string | null;
     phoneUrl?: string | null;
+    phoneEnabled?: boolean;
     email?: string | null;
     emailUrl?: string | null;
+    emailEnabled?: boolean;
     locationText?: string | null;
+    locationUrl?: string | null;
+    locationEnabled?: boolean;
     jobsText?: string | null;
     jobsUrl?: string | null;
+    jobsEnabled?: boolean;
+    workingHours?: string | null;
+    workingHoursEnabled?: boolean;
   };
   footer: {
     copyrightText?: string | null;
     subText?: string | null;
     badge1Text?: string | null;
     badge1Url?: string | null;
+    badge1Enabled?: boolean;
     badge2Text?: string | null;
     badge2Url?: string | null;
+    badge2Enabled?: boolean;
     quickLink1Text?: string | null;
     quickLink1Url?: string | null;
+    quickLink1Enabled?: boolean;
     quickLink2Text?: string | null;
     quickLink2Url?: string | null;
+    quickLink2Enabled?: boolean;
     quickLink3Text?: string | null;
     quickLink3Url?: string | null;
+    quickLink3Enabled?: boolean;
+    preFooterEnabled?: boolean;
+    preFooterTitle?: string | null;
+    preFooterDesc?: string | null;
+    preFooterCta1Text?: string | null;
+    preFooterCta1Url?: string | null;
+    preFooterCta2Text?: string | null;
+    preFooterCta2Url?: string | null;
+    preFooterCta3Text?: string | null;
+    preFooterCta3Url?: string | null;
+    privacyPolicyText?: string | null;
+    privacyPolicyUrl?: string | null;
+    termsText?: string | null;
+    termsUrl?: string | null;
   };
   location: {
     enabled?: boolean;
@@ -889,30 +916,57 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
     facebookUrl: "https://facebook.com/alaqeeqschools",
+    telegramUrl: "https://t.me/alaqeeqschools",
     whatsappNumber: "966500000000",
   },
   topBar: {
+    enabled: true,
     phone: "+966 53 189 6000",
     phoneUrl: "tel:+966531896000",
+    phoneEnabled: true,
     email: "info@alaqeeqholding.com",
     emailUrl: "mailto:info@alaqeeqholding.com",
+    emailEnabled: true,
     locationText: "المدينة المنورة — المملكة العربية السعودية",
+    locationUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
+    locationEnabled: true,
     jobsText: "بوابة التوظيف",
     jobsUrl: "https://live.aqeeq.edu.sa/jobs",
+    jobsEnabled: true,
+    workingHours: "أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م",
+    workingHoursEnabled: true,
   },
   footer: {
     copyrightText: "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026",
     subText: "صُنعت المنصة الرقمية بأحدث التقنيات لخدمة الطلاب وأولياء الأمور والمعلمين",
     badge1Text: "اعتماد Cognia",
     badge1Url: "/accreditations",
+    badge1Enabled: true,
     badge2Text: "مركز اختبارات SAT & IELTS",
     badge2Url: "/accreditations",
+    badge2Enabled: true,
     quickLink1Text: "القبول والتسجيل ✦",
     quickLink1Url: "/admissions",
+    quickLink1Enabled: true,
     quickLink2Text: "الاعتمادات",
     quickLink2Url: "/accreditations",
+    quickLink2Enabled: true,
     quickLink3Text: "المجمعات 🏫",
     quickLink3Url: "/about",
+    quickLink3Enabled: true,
+    preFooterEnabled: true,
+    preFooterTitle: "ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦",
+    preFooterDesc: "بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.",
+    preFooterCta1Text: "حجز مقعد دراسي",
+    preFooterCta1Url: "/admissions",
+    preFooterCta2Text: "مستشار القبول",
+    preFooterCta2Url: "https://wa.me/966500000000",
+    preFooterCta3Text: "جدول الرسوم المعتمد",
+    preFooterCta3Url: "/admissions#fees-table-section",
+    privacyPolicyText: "سياسة الخصوصية وحماية بيانات الطلاب",
+    privacyPolicyUrl: "/about#privacy",
+    termsText: "لائحة القبول والتسجيل المعتمدة",
+    termsUrl: "/admissions#terms",
   },
   location: {
     enabled: true,

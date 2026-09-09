@@ -69,6 +69,7 @@ import {
   FileText,
   Mail,
   PhoneCall,
+  MapPin,
   Award,
   Cloud,
   Ticket,
@@ -381,27 +382,53 @@ const DEFAULT_ORCHESTRATION = {
     whatsappNumber: "966500000000",
   },
   topBar: {
+    enabled: true,
     phone: "+966 53 189 6000",
     phoneUrl: "tel:+966531896000",
+    phoneEnabled: true,
     email: "info@alaqeeqholding.com",
     emailUrl: "mailto:info@alaqeeqholding.com",
+    emailEnabled: true,
     locationText: "المدينة المنورة — المملكة العربية السعودية",
+    locationUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
+    locationEnabled: true,
     jobsText: "بوابة التوظيف",
     jobsUrl: "https://live.aqeeq.edu.sa/jobs",
+    jobsEnabled: true,
+    workingHours: "أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م",
+    workingHoursEnabled: true,
   },
   footer: {
     copyrightText: "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026",
     subText: "صُنعت المنصة الرقمية بأحدث التقنيات لخدمة الطلاب وأولياء الأمور والمعلمين",
     badge1Text: "اعتماد Cognia",
     badge1Url: "/accreditations",
+    badge1Enabled: true,
     badge2Text: "مركز اختبارات SAT & IELTS",
     badge2Url: "/accreditations",
+    badge2Enabled: true,
     quickLink1Text: "القبول والتسجيل ✦",
     quickLink1Url: "/admissions",
+    quickLink1Enabled: true,
     quickLink2Text: "الاعتمادات",
     quickLink2Url: "/accreditations",
+    quickLink2Enabled: true,
     quickLink3Text: "المجمعات 🏫",
     quickLink3Url: "/about",
+    quickLink3Enabled: true,
+    preFooterEnabled: true,
+    preFooterTitle: "ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦",
+    preFooterDesc: "بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.",
+    preFooterCta1Text: "حجز مقعد دراسي",
+    preFooterCta1Url: "/admissions",
+    preFooterCta2Text: "مستشار القبول",
+    preFooterCta2Url: "https://wa.me/966500000000",
+    preFooterCta3Text: "جدول الرسوم المعتمد",
+    preFooterCta3Url: "/admissions#fees-table-section",
+    privacyPolicyText: "سياسة الخصوصية وحماية بيانات الطلاب",
+    privacyPolicyUrl: "/about#privacy",
+    termsText: "لائحة القبول والتسجيل المعتمدة",
+    termsUrl: "/admissions#terms",
   },
   location: {
     enabled: true,
@@ -4489,12 +4516,12 @@ export default function AqeeqAdminDashboardPage() {
                           🔗
                         </span>
                         <div>
-                          <h2 className="text-xl sm:text-2xl font-black tracking-tight">إدارة روابط وشارات الشريط العلوي والفوتر</h2>
-                          <p className="text-xs font-bold text-slate-400">تعديل نصوص وروابط الهاتف، البريد، بوابة التوظيف، شارات الاعتماد، وكبسولات الفوتر</p>
+                          <h2 className="text-xl sm:text-2xl font-black tracking-tight">إدارة روابط وشارات الشريط العلوي والفوتر بالكامل</h2>
+                          <p className="text-xs font-bold text-slate-400">تحكم شامل في النصوص، الروابط، قنوات التواصل، بانر القبول، الشارات، ومفاتيح التفعيل والإخفاء</p>
                         </div>
                       </div>
                       <p className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                        تحكم مباشر في جميع معلومات الاتصال والروابط المباشرة وشارات الاعتماد الظاهرة في الشريط الرئاسي العلوي وقاع الموقع (الفوتر)، مع إمكانية توجيه أي زر لصفحة داخلية أو رابط خارجي.
+                        مركز القيادة الموحد لكافة عناصر الاتصال والروابط المباشرة والشارات وبانرات القبول. يمكنك تعديل النصوص، توجيه الروابط داخلياً أو خارجياً، وتفعيل أو إخفاء أي عنصر بضغطة زر واحدة.
                       </p>
                     </div>
 
@@ -4503,6 +4530,7 @@ export default function AqeeqAdminDashboardPage() {
                       onClick={() => {
                         setOrchestrationMutation.mutate({
                           topBar: orchestrationForm.topBar,
+                          social: orchestrationForm.social,
                           footer: orchestrationForm.footer,
                           location: orchestrationForm.location,
                         }, {
@@ -4518,7 +4546,7 @@ export default function AqeeqAdminDashboardPage() {
                       className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2 cursor-pointer shrink-0"
                     >
                       <Save size={16} className={setOrchestrationMutation.isPending ? "animate-spin" : ""} />
-                      <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ كافة الروابط والشارات 💾"}</span>
+                      <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ كافة التعديلات 💾"}</span>
                     </Button>
                   </div>
                 </div>
@@ -4526,106 +4554,438 @@ export default function AqeeqAdminDashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Card 1: Top Utility Bar (الشريط العلوي الرئاسي) */}
                   <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-blue-500/20 bg-[#0c141d]" : "border-blue-700/15 bg-white shadow-sm"}`}>
-                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-500/10 text-blue-400">
-                        <PhoneCall size={20} />
+                    <div className="flex items-center justify-between border-b pb-3 border-current/10">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-500/10 text-blue-400">
+                          <PhoneCall size={20} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black">الشريط العلوي الرئاسي (Top Utility Bar)</h4>
+                          <p className="text-[11px] text-slate-400">الهاتف، البريد، الموقع، ساعات الدوام، ورابط التوظيف</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-black">الشريط العلوي الرئاسي (Top Utility Bar)</h4>
-                        <p className="text-[11px] text-slate-400">هاتف المدارس، البريد الإلكتروني، المدينة، وبوابة التوظيف</p>
-                      </div>
+
+                      {/* Main Top Bar Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setOrchestrationForm({
+                          ...orchestrationForm,
+                          topBar: { ...orchestrationForm.topBar, enabled: orchestrationForm.topBar?.enabled === false ? true : false },
+                        })}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 border ${
+                          orchestrationForm.topBar?.enabled !== false
+                            ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-500"
+                            : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${orchestrationForm.topBar?.enabled !== false ? "bg-emerald-500" : "bg-slate-400"}`} />
+                        <span>{orchestrationForm.topBar?.enabled !== false ? "الشريط مفعّل" : "الشريط مخفي"}</span>
+                      </button>
                     </div>
 
-                    <div className="space-y-3.5">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رقم الهاتف (نص العرض)</label>
+                    <div className="space-y-4">
+                      {/* Phone */}
+                      <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black text-blue-400 flex items-center gap-1.5">
+                            <PhoneCall size={12} />
+                            <span>رقم الهاتف المباشر</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, phoneEnabled: orchestrationForm.topBar?.phoneEnabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.topBar?.phoneEnabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.topBar?.phoneEnabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <input
                             type="text"
+                            placeholder="نص الهاتف"
                             value={orchestrationForm.topBar?.phone ?? "+966 53 189 6000"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               topBar: { ...orchestrationForm.topBar, phone: e.target.value },
                             })}
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
-                        </div>
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رابط الاتصال المباشر (Link URL)</label>
                           <input
                             type="text"
+                            placeholder="رابط tel:"
                             value={orchestrationForm.topBar?.phoneUrl ?? "tel:+966531896000"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               topBar: { ...orchestrationForm.topBar, phoneUrl: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">البريد الإلكتروني (نص العرض)</label>
+                      {/* Email */}
+                      <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black text-blue-400 flex items-center gap-1.5">
+                            <Mail size={12} />
+                            <span>البريد الإلكتروني الرسمي</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, emailEnabled: orchestrationForm.topBar?.emailEnabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.topBar?.emailEnabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.topBar?.emailEnabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <input
                             type="text"
+                            placeholder="البريد الإلكتروني"
                             value={orchestrationForm.topBar?.email ?? "info@alaqeeqholding.com"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               topBar: { ...orchestrationForm.topBar, email: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
-                        </div>
-                        <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رابط البريد المباشر (Link URL)</label>
                           <input
                             type="text"
+                            placeholder="رابط mailto:"
                             value={orchestrationForm.topBar?.emailUrl ?? "mailto:info@alaqeeqholding.com"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               topBar: { ...orchestrationForm.topBar, emailUrl: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
                         </div>
                       </div>
 
+                      {/* Location & Google Maps Link */}
+                      <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black text-amber-400 flex items-center gap-1.5">
+                            <MapPin size={12} />
+                            <span>الموقع الجغرافي ورابط خرائط جوجل (Google Maps)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, locationEnabled: orchestrationForm.topBar?.locationEnabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.topBar?.locationEnabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.topBar?.locationEnabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <input
+                            type="text"
+                            placeholder="نص العنوان"
+                            value={orchestrationForm.topBar?.locationText ?? "المدينة المنورة — المملكة العربية السعودية"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, locationText: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            placeholder="رابط خرائط جوجل (https://maps.google.com/...)"
+                            value={orchestrationForm.topBar?.locationUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, locationUrl: e.target.value.trim() },
+                            })}
+                            dir="ltr"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Working Hours & Jobs */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-black text-amber-400 flex items-center gap-1">
+                              <Clock size={12} />
+                              <span>أوقات الاستقبال</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setOrchestrationForm({
+                                ...orchestrationForm,
+                                topBar: { ...orchestrationForm.topBar, workingHoursEnabled: orchestrationForm.topBar?.workingHoursEnabled === false ? true : false },
+                              })}
+                              className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                                orchestrationForm.topBar?.workingHoursEnabled !== false
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                  : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                              }`}
+                            >
+                              {orchestrationForm.topBar?.workingHoursEnabled !== false ? "ظاهر" : "مخفي"}
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="مثال: الأحد - الخميس 7:00 ص - 2:30 م"
+                            value={orchestrationForm.topBar?.workingHours ?? "أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              topBar: { ...orchestrationForm.topBar, workingHours: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                        </div>
+
+                        <div className={`p-3.5 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-black text-emerald-400 flex items-center gap-1">
+                              <Briefcase size={12} />
+                              <span>زر بوابة التوظيف</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setOrchestrationForm({
+                                ...orchestrationForm,
+                                topBar: { ...orchestrationForm.topBar, jobsEnabled: orchestrationForm.topBar?.jobsEnabled === false ? true : false },
+                              })}
+                              className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                                orchestrationForm.topBar?.jobsEnabled !== false
+                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                  : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                              }`}
+                            >
+                              {orchestrationForm.topBar?.jobsEnabled !== false ? "ظاهر" : "مخفي"}
+                            </button>
+                          </div>
+                          <div className="space-y-1.5">
+                            <input
+                              type="text"
+                              placeholder="مسمى الزر"
+                              value={orchestrationForm.topBar?.jobsText ?? "بوابة التوظيف"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                topBar: { ...orchestrationForm.topBar, jobsText: e.target.value },
+                              })}
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                              }`}
+                            />
+                            <input
+                              type="text"
+                              placeholder="رابط بوابة التوظيف"
+                              value={orchestrationForm.topBar?.jobsUrl ?? "https://live.aqeeq.edu.sa/jobs"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                topBar: { ...orchestrationForm.topBar, jobsUrl: e.target.value.trim() },
+                              })}
+                              dir="ltr"
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Social Media Links (روابط شبكات التواصل الاجتماعي) */}
+                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-emerald-500/20 bg-[#0c1713]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
+                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
+                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
+                        <Share2 size={20} />
+                      </div>
                       <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1">نص المدينة والعنوان بالشريط العلوي</label>
+                        <h4 className="text-sm font-black">حسابات التواصل الاجتماعي (Social Media Channels)</h4>
+                        <p className="text-[11px] text-slate-400">الأيقونات الدائرية الموحدة الظاهرة في الفوتر</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {/* X (Twitter) */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">منصة 𝕏 (تويتر سابقاً)</label>
                         <input
                           type="text"
-                          value={orchestrationForm.topBar?.locationText ?? "المدينة المنورة — المملكة العربية السعودية"}
+                          value={orchestrationForm.social?.xUrl ?? "https://x.com/alaqeeq_schools"}
                           onChange={(e) => setOrchestrationForm({
                             ...orchestrationForm,
-                            topBar: { ...orchestrationForm.topBar, locationText: e.target.value },
+                            social: { ...orchestrationForm.social, xUrl: e.target.value.trim() },
                           })}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
                             dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
                           }`}
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-current/10">
+                      {/* Instagram */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">إنستغرام (Instagram)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.instagramUrl ?? "https://instagram.com/alaqeeq_schools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, instagramUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Snapchat */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">سناب شات (Snapchat)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.snapchatUrl ?? "https://snapchat.com/add/alaqeeq_schools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, snapchatUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* YouTube */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">يوتيوب (YouTube)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.youtubeUrl ?? "https://youtube.com/@alaqeeq_schools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, youtubeUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Telegram */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">قناة تليجرام (Telegram)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.telegramUrl ?? "https://t.me/alaqeeqschools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, telegramUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* WhatsApp */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">رقم واتساب المعتمد (مع كود الدولة)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.whatsappNumber ?? "966500000000"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, whatsappNumber: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          placeholder="مثال: 966500000000"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Pre-Footer Call to Excellence (شريط القبول والتسجيل قبل الفوتر) */}
+                  <div className={`p-6 rounded-3xl border space-y-4 lg:col-span-2 ${dark ? "border-amber-500/20 bg-[#141209]" : "border-amber-700/15 bg-white shadow-sm"}`}>
+                    <div className="flex items-center justify-between border-b pb-3 border-current/10">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-500/10 text-amber-400">
+                          <Sparkles size={20} />
+                        </div>
                         <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">مسمى زر التوظيف</label>
+                          <h4 className="text-sm font-black">شريط القبول والتسجيل السريع قبل الفوتر (Pre-Footer Strip)</h4>
+                          <p className="text-[11px] text-slate-400">البانر الفخم ذو الأزرار التفاعلية الثلاثة الواقع مباشرة فوق الفوتر</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setOrchestrationForm({
+                          ...orchestrationForm,
+                          footer: { ...orchestrationForm.footer, preFooterEnabled: orchestrationForm.footer?.preFooterEnabled === false ? true : false },
+                        })}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 border ${
+                          orchestrationForm.footer?.preFooterEnabled !== false
+                            ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-500"
+                            : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${orchestrationForm.footer?.preFooterEnabled !== false ? "bg-emerald-500" : "bg-slate-400"}`} />
+                        <span>{orchestrationForm.footer?.preFooterEnabled !== false ? "البانر مفعّل" : "البانر مخفي"}</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3.5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-black text-slate-300 block mb-1">عنوان البانر الرئيسي</label>
                           <input
                             type="text"
-                            value={orchestrationForm.topBar?.jobsText ?? "بوابة التوظيف"}
+                            value={orchestrationForm.footer?.preFooterTitle ?? "ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
-                              topBar: { ...orchestrationForm.topBar, jobsText: e.target.value },
+                              footer: { ...orchestrationForm.footer, preFooterTitle: e.target.value },
                             })}
                             className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
                               dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
@@ -4633,17 +4993,109 @@ export default function AqeeqAdminDashboardPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-black text-slate-300 block mb-1">رابط بوابة التوظيف (Link URL)</label>
+                          <label className="text-[11px] font-black text-slate-300 block mb-1">وصف البانر</label>
                           <input
                             type="text"
-                            value={orchestrationForm.topBar?.jobsUrl ?? "https://live.aqeeq.edu.sa/jobs"}
+                            value={orchestrationForm.footer?.preFooterDesc ?? "بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي..."}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
-                              topBar: { ...orchestrationForm.topBar, jobsUrl: e.target.value.trim() },
+                              footer: { ...orchestrationForm.footer, preFooterDesc: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* 3 Buttons */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                        {/* Button 1 */}
+                        <div className={`p-3 rounded-2xl border space-y-2 ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50"}`}>
+                          <span className="text-[11px] font-black text-amber-400 block">الزر الأول (الذهبي المميز)</span>
+                          <input
+                            type="text"
+                            placeholder="نص الزر الأول"
+                            value={orchestrationForm.footer?.preFooterCta1Text ?? "حجز مقعد دراسي"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta1Text: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            placeholder="الرابط الموجه"
+                            value={orchestrationForm.footer?.preFooterCta1Url ?? "/admissions"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta1Url: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                        </div>
+
+                        {/* Button 2 */}
+                        <div className={`p-3 rounded-2xl border space-y-2 ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50"}`}>
+                          <span className="text-[11px] font-black text-[#25D366] block">الزر الثاني (واتساب مستشار القبول)</span>
+                          <input
+                            type="text"
+                            placeholder="نص الزر الثاني"
+                            value={orchestrationForm.footer?.preFooterCta2Text ?? "مستشار القبول"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta2Text: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            placeholder="رابط واتساب أو صفحة"
+                            value={orchestrationForm.footer?.preFooterCta2Url ?? "https://wa.me/966500000000"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta2Url: e.target.value.trim() },
+                            })}
+                            dir="ltr"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                        </div>
+
+                        {/* Button 3 */}
+                        <div className={`p-3 rounded-2xl border space-y-2 ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50"}`}>
+                          <span className="text-[11px] font-black text-blue-400 block">الزر الثالث (جدول الرسوم)</span>
+                          <input
+                            type="text"
+                            placeholder="نص الزر الثالث"
+                            value={orchestrationForm.footer?.preFooterCta3Text ?? "جدول الرسوم المعتمد"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta3Text: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            placeholder="الرابط الموجه"
+                            value={orchestrationForm.footer?.preFooterCta3Url ?? "/admissions#fees-table-section"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, preFooterCta3Url: e.target.value.trim() },
+                            })}
+                            dir="ltr"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
                         </div>
@@ -4651,7 +5103,7 @@ export default function AqeeqAdminDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Card 2: Footer Badges (شارات الاعتماد والتميز بالفوتر) */}
+                  {/* Card 4: Footer Badges (شارات الاعتماد والتميز بالفوتر) */}
                   <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-amber-500/20 bg-[#14120c]" : "border-amber-700/15 bg-white shadow-sm"}`}>
                     <div className="flex items-center gap-3 border-b pb-3 border-current/10">
                       <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-500/10 text-amber-400">
@@ -4659,14 +5111,30 @@ export default function AqeeqAdminDashboardPage() {
                       </div>
                       <div>
                         <h4 className="text-sm font-black">شارات الاعتماد في الفوتر (Footer Badges)</h4>
-                        <p className="text-[11px] text-slate-400">الشارات المعروضة أسفل اسم المدارس وروابطها المباشرة</p>
+                        <p className="text-[11px] text-slate-400">الشارات المعروضة أسفل اسم المدارس وروابطها ومفاتيح إظهارها</p>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       {/* Badge 1 */}
                       <div className={`p-4 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/50"}`}>
-                        <span className="text-[11px] font-black text-[#f8ca14] block mb-2">🏅 الشارة الأولى (Cognia أو الاعتماد الرئيسي)</span>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black text-[#f8ca14]">🏅 الشارة الأولى (Cognia أو الاعتماد الرئيسي)</span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, badge1Enabled: orchestrationForm.footer?.badge1Enabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.footer?.badge1Enabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.footer?.badge1Enabled !== false ? "ظاهرة" : "مخفية"}
+                          </button>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <label className="text-[11px] font-black text-slate-400 block mb-1">نص الشارة</label>
@@ -4702,7 +5170,23 @@ export default function AqeeqAdminDashboardPage() {
 
                       {/* Badge 2 */}
                       <div className={`p-4 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/50"}`}>
-                        <span className="text-[11px] font-black text-blue-400 block mb-2">🎓 الشارة الثانية (الاختبارات الدولية أو الاعتماد الثانوي)</span>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black text-blue-400">🎓 الشارة الثانية (الاختبارات الدولية أو الاعتماد الثانوي)</span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, badge2Enabled: orchestrationForm.footer?.badge2Enabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.footer?.badge2Enabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.footer?.badge2Enabled !== false ? "ظاهرة" : "مخفية"}
+                          </button>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <label className="text-[11px] font-black text-slate-400 block mb-1">نص الشارة</label>
@@ -4738,7 +5222,7 @@ export default function AqeeqAdminDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Card 3: Footer Quick Links (كبسولات التنقل السريع بالفوتر) */}
+                  {/* Card 5: Footer Quick Links (كبسولات التنقل السريع بالفوتر) */}
                   <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-emerald-500/20 bg-[#0c1613]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
                     <div className="flex items-center gap-3 border-b pb-3 border-current/10">
                       <div className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
@@ -4752,95 +5236,203 @@ export default function AqeeqAdminDashboardPage() {
 
                     <div className="space-y-3.5">
                       {/* Link 1 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الزر الأول (مسمى الزر)</label>
+                      <div className={`p-3 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-black text-slate-300">الزر الأول</span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, quickLink1Enabled: orchestrationForm.footer?.quickLink1Enabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.footer?.quickLink1Enabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.footer?.quickLink1Enabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <input
                             type="text"
+                            placeholder="مسمى الزر الأول"
                             value={orchestrationForm.footer?.quickLink1Text ?? "القبول والتسجيل ✦"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               footer: { ...orchestrationForm.footer, quickLink1Text: e.target.value },
                             })}
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الرابط الموجه للزر الأول</label>
                           <input
                             type="text"
+                            placeholder="الرابط الموجه"
                             value={orchestrationForm.footer?.quickLink1Url ?? "/admissions"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               footer: { ...orchestrationForm.footer, quickLink1Url: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
                         </div>
                       </div>
 
                       {/* Link 2 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الزر الثاني (مسمى الزر)</label>
+                      <div className={`p-3 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-black text-slate-300">الزر الثاني</span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, quickLink2Enabled: orchestrationForm.footer?.quickLink2Enabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.footer?.quickLink2Enabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.footer?.quickLink2Enabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <input
                             type="text"
+                            placeholder="مسمى الزر الثاني"
                             value={orchestrationForm.footer?.quickLink2Text ?? "الاعتمادات"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               footer: { ...orchestrationForm.footer, quickLink2Text: e.target.value },
                             })}
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الرابط الموجه للزر الثاني</label>
                           <input
                             type="text"
+                            placeholder="الرابط الموجه"
                             value={orchestrationForm.footer?.quickLink2Url ?? "/accreditations"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               footer: { ...orchestrationForm.footer, quickLink2Url: e.target.value.trim() },
                             })}
                             dir="ltr"
-                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
-                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
                             }`}
                           />
                         </div>
                       </div>
 
                       {/* Link 3 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الزر الثالث (مسمى الزر)</label>
+                      <div className={`p-3 rounded-2xl border ${dark ? "border-white/5 bg-white/[0.02]" : "border-slate-100 bg-slate-50/60"}`}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-black text-slate-300">الزر الثالث</span>
+                          <button
+                            type="button"
+                            onClick={() => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, quickLink3Enabled: orchestrationForm.footer?.quickLink3Enabled === false ? true : false },
+                            })}
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                              orchestrationForm.footer?.quickLink3Enabled !== false
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                : "bg-black/5 dark:bg-white/5 border-current/10 text-slate-400"
+                            }`}
+                          >
+                            {orchestrationForm.footer?.quickLink3Enabled !== false ? "ظاهر" : "مخفي"}
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <input
                             type="text"
+                            placeholder="مسمى الزر الثالث"
                             value={orchestrationForm.footer?.quickLink3Text ?? "المجمعات 🏫"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
                               footer: { ...orchestrationForm.footer, quickLink3Text: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                          <input
+                            type="text"
+                            placeholder="الرابط الموجه"
+                            value={orchestrationForm.footer?.quickLink3Url ?? "/about"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, quickLink3Url: e.target.value.trim() },
+                            })}
+                            dir="ltr"
+                            className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 6: Footer Copyright & Policies (حقوق الملكية والسياسات الرسمية) */}
+                  <div className={`p-6 rounded-3xl border space-y-4 lg:col-span-2 ${dark ? "border-purple-500/20 bg-[#130e19]" : "border-purple-700/15 bg-white shadow-sm"}`}>
+                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
+                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-purple-500/10 text-purple-400">
+                        <FileText size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black">حقوق الملكية وروابط السياسات الرسمية (Copyright & Legal)</h4>
+                        <p className="text-[11px] text-slate-400">الجملة المتمركزة في أسفل الموقع، روابط سياسة الخصوصية، ولائحة القبول</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-black text-slate-300 block mb-1">نص حقوق الملكية (يظهر متمركزاً في أسفل الفوتر)</label>
+                          <input
+                            type="text"
+                            value={orchestrationForm.footer?.copyrightText ?? "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, copyrightText: e.target.value },
                             })}
                             className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
                               dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
                             }`}
                           />
                         </div>
+
                         <div>
-                          <label className="text-[11px] font-black text-slate-300 block mb-1">الرابط الموجه للزر الثالث</label>
+                          <label className="text-xs font-black text-slate-300 block mb-1">نص المدينة والمملكة التابع لجملة الحقوق</label>
                           <input
                             type="text"
-                            value={orchestrationForm.footer?.quickLink3Url ?? "/about"}
+                            value={orchestrationForm.location?.text ?? "المدينة المنورة · المملكة العربية السعودية"}
                             onChange={(e) => setOrchestrationForm({
                               ...orchestrationForm,
-                              footer: { ...orchestrationForm.footer, quickLink3Url: e.target.value.trim() },
+                              location: { ...orchestrationForm.location, text: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            }`}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-black text-slate-300 block mb-1">رابط خرائط جوجل للعنوان (Google Maps Link)</label>
+                          <input
+                            type="text"
+                            value={orchestrationForm.location?.mapUrl ?? "https://maps.google.com/?q=Alaqeeq+Schools+Madinah"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              location: { ...orchestrationForm.location, mapUrl: e.target.value.trim() },
                             })}
                             dir="ltr"
                             className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none font-mono ${
@@ -4849,68 +5441,123 @@ export default function AqeeqAdminDashboardPage() {
                           />
                         </div>
                       </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-black text-slate-300 block mb-1">الوصف الفرعي بالفوتر (Subtext)</label>
+                          <input
+                            type="text"
+                            value={orchestrationForm.footer?.subText ?? "صُنعت المنصة الرقمية بأحدث التقنيات لخدمة الطلاب وأولياء الأمور والمعلمين"}
+                            onChange={(e) => setOrchestrationForm({
+                              ...orchestrationForm,
+                              footer: { ...orchestrationForm.footer, subText: e.target.value },
+                            })}
+                            className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
+                              dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                            }`}
+                          />
+                        </div>
+
+                        {/* Privacy Policy */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="text-[11px] font-black text-purple-400 block mb-1">مسمى رابط الخصوصية</label>
+                            <input
+                              type="text"
+                              value={orchestrationForm.footer?.privacyPolicyText ?? "سياسة الخصوصية وحماية بيانات الطلاب"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                footer: { ...orchestrationForm.footer, privacyPolicyText: e.target.value },
+                              })}
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-black text-purple-400 block mb-1">الرابط الموجه للخصوصية</label>
+                            <input
+                              type="text"
+                              value={orchestrationForm.footer?.privacyPolicyUrl ?? "/about#privacy"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                footer: { ...orchestrationForm.footer, privacyPolicyUrl: e.target.value.trim() },
+                              })}
+                              dir="ltr"
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Terms & Regulations */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="text-[11px] font-black text-purple-400 block mb-1">مسمى لائحة القبول</label>
+                            <input
+                              type="text"
+                              value={orchestrationForm.footer?.termsText ?? "لائحة القبول والتسجيل المعتمدة"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                footer: { ...orchestrationForm.footer, termsText: e.target.value },
+                              })}
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-black text-purple-400 block mb-1">الرابط الموجه للائحة</label>
+                            <input
+                              type="text"
+                              value={orchestrationForm.footer?.termsUrl ?? "/admissions#terms"}
+                              onChange={(e) => setOrchestrationForm({
+                                ...orchestrationForm,
+                                footer: { ...orchestrationForm.footer, termsUrl: e.target.value.trim() },
+                              })}
+                              dir="ltr"
+                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Card 4: Footer Copyright & Location (حقوق الملكية والموقع) */}
-                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-purple-500/20 bg-[#130e19]" : "border-purple-700/15 bg-white shadow-sm"}`}>
-                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-purple-500/10 text-purple-400">
-                        <FileText size={20} />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black">حقوق الملكية ونصوص أسفل الفوتر (Copyright)</h4>
-                        <p className="text-[11px] text-slate-400">الجملة المتمركزة في أسفل الموقع</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3.5">
-                      <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1">نص حقوق الملكية (يظهر متمركزاً في أسفل الفوتر)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.footer?.copyrightText ?? "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            footer: { ...orchestrationForm.footer, copyrightText: e.target.value },
-                          })}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1">نص المدينة والمملكة التابع لجملة الحقوق</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.location?.text ?? "المدينة المنورة · المملكة العربية السعودية"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            location: { ...orchestrationForm.location, text: e.target.value },
-                          })}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-black text-slate-300 block mb-1">الوصف الفرعي بالفوتر (Subtext)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.footer?.subText ?? "صُنعت المنصة الرقمية بأحدث التقنيات لخدمة الطلاب وأولياء الأمور والمعلمين"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            footer: { ...orchestrationForm.footer, subText: e.target.value },
-                          })}
-                          className={`w-full rounded-xl border p-2.5 text-xs font-bold outline-none ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                {/* Bottom Sticky Save Bar */}
+                <div className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${
+                  dark ? "bg-white/[0.03] border-white/10" : "bg-slate-100 border-slate-200"
+                }`}>
+                  <p className="text-xs font-bold text-slate-400">
+                    💡 يتم تطبيق كافة التعديلات فور الحفظ، وتظهر لجميع الزوار على الواجهة العامة مباشرة.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setOrchestrationMutation.mutate({
+                        topBar: orchestrationForm.topBar,
+                        social: orchestrationForm.social,
+                        footer: orchestrationForm.footer,
+                        location: orchestrationForm.location,
+                      }, {
+                        onSuccess: () => {
+                          toast.success("تم حفظ كافة إعدادات الهيدر والفوتر بنجاح ✅");
+                        },
+                        onError: (err) => {
+                          toast.error("حدث خطأ أثناء الحفظ: " + err.message);
+                        }
+                      });
+                    }}
+                    disabled={setOrchestrationMutation.isPending}
+                    className="rounded-xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2 shadow-md gap-2 cursor-pointer shrink-0"
+                  >
+                    <Save size={15} className={setOrchestrationMutation.isPending ? "animate-spin" : ""} />
+                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ التعديلات 💾"}</span>
+                  </Button>
                 </div>
               </div>
             )}
