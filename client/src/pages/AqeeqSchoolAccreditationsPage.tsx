@@ -167,8 +167,8 @@ export default function AqeeqSchoolAccreditationsPage() {
           cardShape="square"
           rowCount={2}
           header={
-            <div className="w-full relative z-10 py-4 sm:py-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-6 sm:py-10 z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
               {/* Right Column: Hero Content & CTAs (7 cols) */}
               <div className="lg:col-span-7 text-right">
                 <div
@@ -198,12 +198,44 @@ export default function AqeeqSchoolAccreditationsPage() {
                   id="accreditations-hero-title"
                   tag="text"
                   label="عنوان هيرو الاعتمادات"
-                  defaultText="اعتمادات دولية مرموقة ومراكز اختبارات عالمية معتمدة"
+                  defaultText="اعتمادات دولية مرموقة ومراكز اختبارات معتمدة."
                   as="h1"
-                  className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.2] mb-6 ${
-                    dark ? "text-white" : "text-[#0a192f]"
+                  className={`text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.18] mb-6 ${
+                    dark ? "text-white" : "text-[#08467d]"
                   }`}
-                />
+                >
+                  {(text) => {
+                    const raw = text || "اعتمادات دولية مرموقة ومراكز اختبارات معتمدة.";
+                    const match = raw.match(/^(اعتمادات دولية مرموقة)(.*)$/);
+                    if (match) {
+                      return (
+                        <>
+                          <span className={`block ${dark ? "text-white" : "text-[#08467d]"}`}>
+                            {match[1].trim()}
+                          </span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                            {match[2].trim()}
+                          </span>
+                        </>
+                      );
+                    }
+                    const words = raw.trim().split(/\s+/);
+                    if (words.length >= 4) {
+                      const mid = Math.floor(words.length / 2);
+                      return (
+                        <>
+                          <span className={`block ${dark ? "text-white" : "text-[#08467d]"}`}>
+                            {words.slice(0, mid).join(" ")}
+                          </span>
+                          <span className={`block ${isNationalDay ? "snd-text-gradient" : dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                            {words.slice(mid).join(" ")}
+                          </span>
+                        </>
+                      );
+                    }
+                    return <span>{raw}</span>;
+                  }}
+                </VisualEditable>
 
                 <VisualEditable
                   id="accreditations-hero-desc"
