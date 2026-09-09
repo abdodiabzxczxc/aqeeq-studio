@@ -51,8 +51,8 @@ export function NewsScrollPortalBackdrop({
   // Damping ratio > 1: ZERO bounce, ZERO oscillation, pure silky organic gliding inertia
   const smoothConfig = { stiffness: 100, damping: 30, mass: 0.1, restDelta: 0.001 };
 
-  // Direct linear opacity — zero flicker
-  const opacity = useTransform(scrollYProgress, [0, 0.20], [0.12, 0.94]);
+  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
+  const opacity = dark ? 0.48 : 0.42;
 
   // 3D perspective tilt with critically damped inertia
   const rawRotateX = useTransform(scrollYProgress, [0, 0.5], [12, 2]);

@@ -129,9 +129,8 @@ export default function AqeeqSchoolAboutPage() {
       hero={
         <section
           ref={aboutHeroRef}
-          style={{ minHeight: isDesktop ? "74vh" : "auto" }}
-          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 ${
-            dark ? "bg-[#05080e] text-white" : "bg-slate-50/70 text-slate-900"
+          className={`relative isolate overflow-hidden flex flex-col justify-between pb-6 sm:pb-8 transition-colors duration-500 border-b ${
+            dark ? "bg-[#05080e] text-white border-white/[0.08]" : "bg-slate-50/70 text-slate-900 border-black/[0.06]"
           }`}
         >
           {/* Scroll-driven 3D Columns Backdrop from Right to Left (Articles Style) */}

@@ -94,12 +94,8 @@ export function ParallaxUnfurlingGallery({
     [isDesktop ? -180 : -80, isDesktop ? 140 : 60]
   );
 
-  // Smooth entrance bloom (0.08 -> 0.88), and dissolves gracefully on scroll down (0.88 -> 0)
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.62, 0.95],
-    [0.08, 0.88, 0.88, 0]
-  );
+  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
+  const opacity = dark ? 0.48 : 0.42;
 
   const rotateX = useSpring(rawRotateX, smoothConfig);
   const rotateY = useSpring(rawRotateY, smoothConfig);

@@ -77,8 +77,8 @@ export function ArticlesParallaxScroll({
   const rawRotateZ = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -5 : -2, 0]);
   const rawTranslateY = useTransform(scrollYProgress, [0, 0.35], [isDesktop ? -440 : -140, isDesktop ? 220 : 60]);
   
-  // Direct linear opacity — zero flicker
-  const opacity = useTransform(scrollYProgress, [0, 0.24], [0.14, 0.98]);
+  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
+  const opacity = dark ? 0.48 : 0.42;
 
   const rotateX = useSpring(rawRotateX, smoothConfig);
   const rotateZ = useSpring(rawRotateZ, smoothConfig);

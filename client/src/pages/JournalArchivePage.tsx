@@ -11,9 +11,10 @@ import { getJournalIssuePath, getJournalIssueShareUrl } from "@/lib/journalRoute
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, BookOpen, Eye, FolderArchive, LibraryBig, ScanLine, Settings2, Share2, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
 
 function JournalCover({ issueCoverUrl, fillFrame = false }: { issueCoverUrl?: string | null; fillFrame?: boolean }) {
   const { getOverride } = useVisualEditorState();
@@ -144,6 +145,17 @@ export default function JournalArchivePage() {
   const journalLogoUrl = issues[0]?.headerLogoUrl || snapshot?.settings.school_logo || null;
   const featuredIssue = issues[0];
   const secondIssue = issues[1];
+  const journalHeroRef = useRef<HTMLDivElement>(null);
+
+  const journalParallaxProducts: ParallaxProduct[] = useMemo(() => {
+    return issues.map((issue) => ({
+      title: issue.title,
+      link: getJournalIssuePath(issue.slug),
+      thumbnail: issue.coverUrl || "/covers/cover-about.jpg",
+      category: `${issue.pageCount || 16} صفحة`,
+      date: issue.issueDate || "موسم العقيق",
+    }));
+  }, [issues]);
 
   const copyIssue = async (slug: string) => {
     try {
@@ -188,6 +200,10 @@ export default function JournalArchivePage() {
       {featuredIssue ? (
         <>
           <VisualEditable id="journal-hero-shell" tag="section" label="واجهة مكتبة المجلة" as="section" className={`relative isolate overflow-hidden border-b ${dark ? "border-amber-300/15 bg-black" : "border-slate-200 bg-white"}`}>
+            {/* 3D Gliding Parallax Backdrop (Zero layout shift, unified height) */}
+            <div ref={journalHeroRef} className="absolute inset-0 pointer-events-none">
+              <HeroParallaxBackdrop products={journalParallaxProducts} containerRef={journalHeroRef} dark={dark} />
+            </div>
             <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 86% 18%,rgba(217,189,38,.22),transparent 23%),radial-gradient(circle at 6% 80%,rgba(255,255,255,.03),transparent 30%),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.035) 42.1% 42.4%,transparent 42.5%)" }} />
             <div className="relative mx-auto grid w-full max-w-[1380px] 2xl:max-w-[1560px] items-center gap-8 px-4 sm:px-6 md:px-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12 lg:gap-16">
               {/* Right Column: Text & actions (First in RTL DOM order -> starts at right guideline 1378px) */}

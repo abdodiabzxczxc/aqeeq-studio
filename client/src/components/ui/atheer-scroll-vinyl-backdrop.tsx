@@ -233,8 +233,8 @@ export function AtheerScrollVinylBackdrop({
     offset: ["start start", "end start"],
   });
 
-  // Ultra-subtle starting opacity at 0.08 (pure dark luxury), blooms smoothly to 0.88 on scroll
-  const opacity = useTransform(scrollYProgress, [0, 0.35], [0.08, 0.88]);
+  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
+  const opacity = dark ? 0.48 : 0.42;
 
   // Critically damped spring physics: mass: 0.1, stiffness: 100, damping: 30
   // ZERO bounce, ZERO lag, ultra-silky glide identical to other pages

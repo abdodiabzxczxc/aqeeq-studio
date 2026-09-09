@@ -102,12 +102,8 @@ export const HeroParallax = ({
     [isDesktop ? (rowCount === 2 ? -240 : -440) : -140, isDesktop ? (rowCount === 2 ? 80 : 180) : 50]
   );
 
-  // Direct linear opacity — atmospheric fade in and out as user scrolls
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.15, rowCount === 2 ? 0.55 : 0.7, rowCount === 2 ? 0.85 : 0.95],
-    [0.08, 0.88, 0.88, 0]
-  );
+  // Constant, steady opacity throughout scroll — never starts dim or dissolves on scroll down
+  const opacity = dark ? 0.48 : 0.42;
 
   // Organic gliding inertia with ZERO bounce (The magnet that smooths out wheel ticks!)
   const translateX = useSpring(rawTranslateX, smoothConfig);
