@@ -34,14 +34,14 @@ export function AqeeqGrandFinaleCta({
   return (
     <div className="relative mx-auto my-16 sm:my-28 max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
       <div
-        className={`relative overflow-hidden rounded-[2.5rem] sm:rounded-[3.5rem] border p-8 sm:p-14 md:p-16 text-center shadow-2xl backdrop-blur-2xl transition-all duration-500 ${
+        className={`relative overflow-hidden rounded-[2.5rem] sm:rounded-[3.5rem] border p-8 sm:p-14 md:p-16 text-center backdrop-blur-2xl transition-all duration-500 ${
           isNationalDay
             ? dark
-              ? "border-[#5aba1c]/30 bg-gradient-to-br from-[#011a10] via-[#022416] to-[#01140c] shadow-[0_20px_80px_rgba(0,90,54,0.3)]"
-              : "border-emerald-600/20 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 shadow-[0_20px_80px_rgba(0,90,54,0.1)]"
+              ? "border-[#5aba1c]/30 bg-gradient-to-br from-[#011a10] via-[#022416] to-[#01140c] shadow-[0_16px_40px_rgba(0,90,54,0.25)]"
+              : "border-emerald-600/20 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/40 shadow-[0_10px_30px_rgba(0,90,54,0.05)]"
             : dark
-            ? "border-white/10 bg-gradient-to-br from-[#0a0d16] via-[#080b12] to-[#05070a] shadow-[0_20px_80px_rgba(0,0,0,0.8)]"
-            : "border-black/10 bg-gradient-to-br from-slate-50 via-white to-[#08467d]/5 shadow-[0_20px_80px_rgba(8,70,125,0.08)]"
+            ? "border-white/10 bg-gradient-to-br from-[#0a0d16] via-[#080b12] to-[#05070a] shadow-[0_16px_40px_rgba(0,0,0,0.5)]"
+            : "border-slate-200/80 bg-gradient-to-br from-white via-white to-[#08467d]/5 shadow-[0_10px_30px_rgba(8,70,125,0.05)]"
         }`}
       >
         {/* هالة ضوئية خلفية نيونية */}
