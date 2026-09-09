@@ -148,7 +148,19 @@ export function serveStatic(app: Express) {
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
   app.get("/api/og-image.png", serveOgImage);
   app.use(serveDynamicSocialPreview);
-  app.use(express.static(distPath));
+  // ⚡ High-speed immutable caching for hashed production assets (/assets/*)
+  app.use(
+    express.static(distPath, {
+      maxAge: "1y",
+      immutable: true,
+      setHeaders(res, filePath) {
+        // Ensure index.html and root metadata never get cached indefinitely
+        if (filePath.endsWith(".html") || !filePath.includes("/assets/")) {
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+      },
+    })
+  );
 
   // fall through to index.html if the file doesn't exist (with no-cache so Chrome always loads fresh bundle)
   app.use("*", (_req, res) => {

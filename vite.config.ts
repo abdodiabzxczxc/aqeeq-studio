@@ -23,14 +23,26 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
+            if (id.includes("@vladmandic/face-api") || id.includes("face-api")) {
+              return "vendor-face-api";
+            }
+            if (id.includes("jspdf") || id.includes("html2canvas") || id.includes("pdfjs-dist") || id.includes("pdfkit")) {
+              return "vendor-pdf-tools";
+            }
+            if (id.includes("recharts") || id.includes("d3-")) {
+              return "vendor-charts";
+            }
             if (id.includes("framer-motion")) {
               return "vendor-motion";
             }
             if (id.includes("lucide-react")) {
               return "vendor-lucide";
             }
-            if (id.includes("@radix-ui")) {
-              return "vendor-radix";
+            if (id.includes("@radix-ui") || id.includes("cmdk") || id.includes("embla-carousel")) {
+              return "vendor-ui";
+            }
+            if (id.includes("@tanstack") || id.includes("@trpc") || id.includes("superjson")) {
+              return "vendor-query";
             }
           }
         },

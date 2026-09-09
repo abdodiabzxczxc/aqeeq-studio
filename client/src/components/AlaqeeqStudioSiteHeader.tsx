@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, lazy, Suspense } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { useVisualEditorState, VisualEditable, VisualIcon } from "@/components/VisualEditor";
-import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
-import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
+
 import {
   Search,
   LayoutDashboard,
@@ -54,8 +53,19 @@ import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
-import { AqeeqCreatorStudioModal } from "./AqeeqCreatorStudioModal";
 import { Button } from "@/components/ui/button";
+
+// ⚡ Dynamic lazy modals for zero initial payload impact
+const AlaqeeqSpotlightSearch = lazy(() =>
+  import("@/components/AlaqeeqSpotlightSearch").then((m) => ({ default: m.AlaqeeqSpotlightSearch }))
+);
+const AqeeqFaceSearchModal = lazy(() =>
+  import("@/components/AqeeqFaceSearchModal").then((m) => ({ default: m.AqeeqFaceSearchModal }))
+);
+const AqeeqCreatorStudioModal = lazy(() =>
+  import("./AqeeqCreatorStudioModal").then((m) => ({ default: m.AqeeqCreatorStudioModal }))
+);
+
 import { HeaderDockNav, NavDockItemConfig } from "./ui/header-dock-preview";
 import {
   DEFAULT_SYSTEM_PORTALS,
@@ -1525,7 +1535,11 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
           )}
 
           {/* 🔍 Anchored Spotlight Search Cockpit — Drops down right under Search Island */}
-          <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
+          {searchOpen && (
+            <Suspense fallback={null}>
+              <AlaqeeqSpotlightSearch open={searchOpen} onOpenChange={setSearchOpen} dark={dark} />
+            </Suspense>
+          )}
         </div>
       </div>
     </header>
@@ -1535,8 +1549,16 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     <div className="h-[66px] sm:h-[108px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
 
       {/* Global AI Face Recognition Modal */}
-      <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
-      <AqeeqCreatorStudioModal open={creatorModalOpen} onOpenChange={setCreatorModalOpen} />
+      {faceSearchOpen && (
+        <Suspense fallback={null}>
+          <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
+        </Suspense>
+      )}
+      {creatorModalOpen && (
+        <Suspense fallback={null}>
+          <AqeeqCreatorStudioModal open={creatorModalOpen} onOpenChange={setCreatorModalOpen} />
+        </Suspense>
+      )}
 
     </div>
   );

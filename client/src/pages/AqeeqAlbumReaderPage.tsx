@@ -7,7 +7,6 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import SchoolNewsFlipbook from "@/components/SchoolNewsFlipbook";
 import { VisualEditable, VisualIcon, VisualImage } from "@/components/VisualEditor";
 import { AqeeqReaderAudioController } from "@/components/AqeeqReaderAudioController";
-import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
 import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { getAqeeqDefaultBackgroundAudio } from "@/lib/aqeeqAudioPresets";
 import { getAqeeqAlbumImageSource } from "@/lib/aqeeqAlbumMedia";
@@ -16,8 +15,13 @@ import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
 import { Archive, BookOpen, ChevronLeft, ChevronRight, Download, ImageIcon, LayoutGrid, Loader2, Maximize2, MonitorPlay, Moon, Printer, RotateCcw, ScanFace, Settings2, Share2, Sparkles, Sun, Video, Volume2, ZoomIn, ZoomOut } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { useLocation } from "wouter";
+
+const AqeeqFaceSearchModal = lazy(() =>
+  import("@/components/AqeeqFaceSearchModal").then((m) => ({ default: m.AqeeqFaceSearchModal }))
+);
+
 import { useSiteTheme } from "@/lib/useSiteTheme";
 
 type AlbumMode = "spread" | "scroll" | "gallery";
@@ -895,19 +899,21 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
         <VisualEditable id="album-rail-fullscreen-action" tag="button" label="أيقونة ملء الشاشة للألبوم" defaultText="ملء الشاشة" as="button" onAction={() => void toggleReaderFullscreen()} className="aq-dark-reader-rail-button"><VisualIcon id="album-rail-fullscreen-icon" label="أيقونة ملء الشاشة الجانبية" icon="fullscreen" size={16} /></VisualEditable>
       </aside>
 
-      {album ? (
-        <AqeeqFaceSearchModal
-          open={faceSearchOpen}
-          onOpenChange={setFaceSearchOpen}
-          albumTitle={album.title}
-          photos={album.media.map((m) => ({
-            id: m.id,
-            imageUrl: getAqeeqAlbumImageSource(m),
-            caption: m.caption,
-            fileName: m.fileName,
-          }))}
-          dark={dark}
-        />
+      {album && faceSearchOpen ? (
+        <Suspense fallback={null}>
+          <AqeeqFaceSearchModal
+            open={faceSearchOpen}
+            onOpenChange={setFaceSearchOpen}
+            albumTitle={album.title}
+            photos={album.media.map((m) => ({
+              id: m.id,
+              imageUrl: getAqeeqAlbumImageSource(m),
+              caption: m.caption,
+              fileName: m.fileName,
+            }))}
+            dark={dark}
+          />
+        </Suspense>
       ) : null}
 
       {isTvMode && album && (

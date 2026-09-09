@@ -140,6 +140,22 @@ button, a, input, select, textarea, [role="button"] {
   perspective: 1000px;
 }
 
+.gpu-accelerated {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-content {
+  contain: content;
+}
+
+
 /* ── Smooth hardware rendering on low-spec displays ────────── */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

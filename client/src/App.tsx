@@ -12,18 +12,23 @@ import { AqeeqBroadcastBanner } from "./components/AqeeqBroadcastBanner";
 import { AqeeqOccasionRibbon } from "./components/AqeeqOccasionRibbon";
 import { PwaInstallBanner } from "./components/PwaInstallBanner";
 import { PodcastPlayerProvider, usePodcastPlayer } from "./components/AqeeqFloatingPodcastPlayer";
-import { AqeeqAiAssistantWidget } from "./components/AqeeqAiAssistantWidget";
-
-// 🚀 Core Public Pages (Directly Loaded for 0ms Instant Seamless Navigation)
+// 🚀 Core Homepage (Directly Loaded for Instant 0ms First Paint)
 import AlaqeeqStudioPage from "./pages/AlaqeeqStudioPage";
-import AqeeqSchoolAboutPage from "./pages/AqeeqSchoolAboutPage";
-import AqeeqSchoolAdmissionsPage from "./pages/AqeeqSchoolAdmissionsPage";
-import AqeeqSchoolAccreditationsPage from "./pages/AqeeqSchoolAccreditationsPage";
-import AqeeqArticlesPage from "./pages/AqeeqArticlesPage";
-import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
-import SchoolNewsPage from "./pages/SchoolNewsPage";
-import AqeeqAlbumsPage from "./pages/AqeeqAlbumsPage";
-import AqeeqShowcasePage from "./pages/AqeeqShowcasePage";
+
+// 📦 Core Secondary Pages (Lazily loaded with background idle prefetch for instant navigation)
+const AqeeqSchoolAboutPage = lazy(() => import("./pages/AqeeqSchoolAboutPage"));
+const AqeeqSchoolAdmissionsPage = lazy(() => import("./pages/AqeeqSchoolAdmissionsPage"));
+const AqeeqSchoolAccreditationsPage = lazy(() => import("./pages/AqeeqSchoolAccreditationsPage"));
+const AqeeqArticlesPage = lazy(() => import("./pages/AqeeqArticlesPage"));
+const AqeeqPodcastPage = lazy(() => import("./pages/AqeeqPodcastPage"));
+const SchoolNewsPage = lazy(() => import("./pages/SchoolNewsPage"));
+const AqeeqAlbumsPage = lazy(() => import("./pages/AqeeqAlbumsPage"));
+const AqeeqShowcasePage = lazy(() => import("./pages/AqeeqShowcasePage"));
+
+// 🤖 Lazy-loaded Assistant Widget (Isolated chunk)
+const AqeeqAiAssistantWidget = lazy(() =>
+  import("./components/AqeeqAiAssistantWidget").then((m) => ({ default: m.AqeeqAiAssistantWidget }))
+);
 
 // 📦 Heavy Admin & Studio Chunks (Lazily loaded on demand)
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -95,6 +100,28 @@ function ScrollToTopOnNavigation() {
 
 function Router() {
   const [location] = useLocation();
+
+  // ⚡ Seamless Idle Prefetcher: Silently preloads popular subpages in background
+  useEffect(() => {
+    const prefetchPages = () => {
+      import("./pages/AqeeqSchoolAdmissionsPage");
+      import("./pages/AqeeqAlbumsPage");
+      import("./pages/AqeeqArticlesPage");
+      import("./pages/SchoolNewsPage");
+      import("./pages/AqeeqSchoolAboutPage");
+    };
+
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        const id = (window as any).requestIdleCallback(prefetchPages, { timeout: 2500 });
+        return () => (window as any).cancelIdleCallback(id);
+      } else {
+        const timer = setTimeout(prefetchPages, 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
   return (
     <>
       <ScrollToTopOnNavigation />
@@ -264,7 +291,13 @@ function StudioAppShell() {
 
         {!isLoginPage && <ErrorBoundary fallback={null}><VisualGlobalSections /></ErrorBoundary>}
         {!isLoginPage && <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>}
-        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqAiAssistantWidget /></ErrorBoundary>}
+        {!isLoginPage && (
+          <ErrorBoundary fallback={null}>
+            <Suspense fallback={null}>
+              <AqeeqAiAssistantWidget />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </div>
 
     </div>

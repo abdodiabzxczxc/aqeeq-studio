@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 function directDriveImage(url: string | null | undefined) {
@@ -18,7 +18,11 @@ import {
   FileText,
   ScanFace,
 } from "lucide-react";
-import { AqeeqFaceSearchModal } from "@/components/AqeeqFaceSearchModal";
+
+const AqeeqFaceSearchModal = lazy(() =>
+  import("@/components/AqeeqFaceSearchModal").then((m) => ({ default: m.AqeeqFaceSearchModal }))
+);
+
 
 type SearchCategory = "all" | "journal" | "albums" | "showcase" | "articles";
 
@@ -491,7 +495,11 @@ export function AlaqeeqSpotlightSearch({
         </>
       ) : null}
 
-      <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
+      {faceSearchOpen && (
+        <Suspense fallback={null}>
+          <AqeeqFaceSearchModal open={faceSearchOpen} onOpenChange={setFaceSearchOpen} dark={dark} />
+        </Suspense>
+      )}
     </>
   );
 }
