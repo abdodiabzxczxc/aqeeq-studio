@@ -1091,7 +1091,7 @@ export default function AlaqeeqStudioPublicPage() {
             tag="section"
             label="غلاف واجهة مدارس العقيق"
             as="section"
-            className={"aq-studio-share-hero relative isolate overflow-hidden transition-colors duration-500 bg-transparent border-0 " + (
+            className={"relative isolate overflow-hidden transition-colors duration-500 bg-transparent border-0 " + (
               dark ? "text-white" : "text-slate-900"
             )}
           >

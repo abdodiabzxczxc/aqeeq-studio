@@ -536,15 +536,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
       <header className={`w-full transition-all duration-300 ease-out ${
         isScrolled
           ? "is-scrolled !bg-transparent !border-transparent !border-0 !shadow-none pointer-events-none"
-          : `aq-studio-share-header backdrop-blur-2xl border-b ${
-              isNationalDay
-                ? dark
-                  ? "border-[#D4AF37]/10 bg-[#021009]/70 shadow-[0_4px_30px_rgba(0,0,0,0.35)]"
-                  : "border-emerald-800/[0.04] bg-white/75 shadow-[0_4px_30px_rgba(0,58,34,0.03)]"
-                : dark
-                ? "border-white/[0.04] bg-[#060a12]/70 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
-                : "border-black/[0.03] bg-white/75 shadow-[0_4px_30px_rgba(0,0,0,0.02)]"
-            }`
+          : "aq-studio-share-header !bg-transparent !border-0 !border-transparent !shadow-none"
       }`}>
         <div className={`relative mx-auto w-full max-w-[1380px] 2xl:max-w-[1560px] flex items-center justify-between lg:grid lg:grid-cols-[auto_1fr_auto] xl:grid-cols-[1fr_auto_1fr] transition-[height] duration-300 ease-out ${
           isScrolled

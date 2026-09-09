@@ -1947,26 +1947,28 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald-300"] { background-colo
 /* واجهة المشاركة والاستوديو: بلاك مود نقي ووايت مود نقي بألوان الهوية المعتمدة */
 .aq-studio-share { background: #000000; color: #ffffff; }
 
-/* الوضع الداكن للهيدر */
+/* الهيدر الانسيابي الموحد قبل السكرول — يندمج تماماً مع الأرضية بدون أي خطوط أو تقطيع لوني */
 .aq-studio-share-header:not(.is-scrolled),
 html.dark .aq-studio-share-header:not(.is-scrolled),
 :root[data-aqeeq-theme="dark"] .aq-studio-share-header:not(.is-scrolled) {
-  background: rgba(10, 15, 24, 0.94);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
   color: #ffffff;
 }
 
-/* الوضع الفاتح للهيدر — يطبق على جميع الصفحات بدون استثناء */
+/* الوضع الفاتح للهيدر — شفاف وانسيابي بدون أي تقطيع لوني */
 html.light .aq-studio-share-header:not(.is-scrolled),
 html:not(.dark) .aq-studio-share-header:not(.is-scrolled),
 :root[data-aqeeq-theme="light"] .aq-studio-share-header:not(.is-scrolled),
 .aq-studio-share--light .aq-studio-share-header:not(.is-scrolled) {
-  background: rgba(255, 255, 255, 0.96) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: transparent !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
   color: #0f172a !important;
 }
 
-.aq-studio-share-hero { background: #000000; }
+.aq-studio-share-hero { background: transparent !important; }
 .aq-studio-share-link { color: rgba(255,255,255,.75); transition: color 160ms cubic-bezier(.23,1,.32,1); }
 .aq-studio-share-link:hover { color: #f8ca14; }
 .aq-studio-share-link--active { background: rgba(248,202,20,.12); color: #f8ca14; }
@@ -2022,9 +2024,9 @@ header.is-scrolled {
   pointer-events: none !important;
 }
 
-/* وايت مود نقي تماماً للبطاقات */
-.aq-studio-share--light { background: #f8fafc !important; color: #0f172a !important; }
-.aq-studio-share--light .aq-studio-share-hero { background: #ffffff !important; }
+/* وايت مود نقي تماماً للأرضية الموحدة والبطاقات */
+.aq-studio-share--light { background: #fafafb !important; color: #0f172a !important; }
+.aq-studio-share--light .aq-studio-share-hero { background: transparent !important; }
 .aq-studio-share--light .aq-studio-share-card { background: #ffffff !important; border-color: rgba(8,70,125,.12) !important; box-shadow: 0 0.75rem 2.5rem rgba(8,70,125,.06) !important; }
 .aq-studio-share--light .aq-studio-share-media { background: #f1f5f9 !important; border-color: rgba(0,0,0,.08) !important; }
 .aq-studio-share--light .aq-studio-share-link { color: #334155; }
@@ -2362,18 +2364,14 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   animation: nationalAuraBreathing 7s ease-in-out infinite;
 }
 
-/* 🇸🇦 All-Site Shell Background Metamorphosis */
+/* 🇸🇦 All-Site Shell Background Metamorphosis — أرضية فاخرة موحدة بالكامل بدون تقطيع لوني */
 :root[data-site-theme="saudi-national-day"] .aq-studio-share {
-  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(0, 90, 54, 0.28), transparent 75%),
-              radial-gradient(ellipse 80% 50% at 90% 90%, rgba(90, 186, 28, 0.08), transparent 60%),
-              #01140c !important;
+  background: #010e07 !important;
   color: #ffffff !important;
 }
 
-
 :root[data-site-theme="saudi-national-day"] .aq-studio-share--light {
-  background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(90, 186, 28, 0.12), transparent 75%),
-              #f7fbf9 !important;
+  background: #f8faf9 !important;
   color: #032e1d !important;
 }
 
@@ -2426,25 +2424,20 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   box-shadow: 0 4px 25px rgba(0, 58, 34, 0.4);
 }
 
-/* Saudi National Day Ambient Hero Glow */
-.snd-hero-dark {
-  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.4), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(212, 175, 55, 0.08), transparent),
-              linear-gradient(180deg, #01140c 0%, #01190f 50%, #010d08 100%);
-}
-
+/* Saudi National Day Ambient Hero Glow — شفاف تماماً يمتزج بالأرضية */
+.snd-hero-dark,
 .snd-hero-light {
-  background: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(0, 90, 54, 0.08), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 85% 85%, rgba(212, 175, 55, 0.05), transparent),
-              linear-gradient(180deg, #f7faf8 0%, #ffffff 100%);
+  background: transparent !important;
 }
 
-/* Geometric Subtle Sadu Pattern Watermark */
+/* Geometric Subtle Sadu Pattern Watermark — انسيابي متلاشي الحواف بدون أي خط قطع */
 .snd-pattern-watermark {
-  background-image: radial-gradient(rgba(0, 90, 54, 0.12) 1px, transparent 1px), radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 90, 54, 0.09) 1px, transparent 1px), radial-gradient(rgba(212, 175, 55, 0.06) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: 0 0, 16px 16px;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 15%, rgba(0,0,0,0.85) 80%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 15%, rgba(0,0,0,0.85) 80%, transparent 100%);
 }
 
 /* Luxury National Day Gold & Emerald Text Gradient */
@@ -2496,24 +2489,13 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
   animation: snd-counter-up 0.85s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
-/* ── Dark mode section backgrounds ── */
-:root[data-site-theme="saudi-national-day"] .snd-section-dark {
-  background: linear-gradient(180deg, #010f08 0%, #020d07 100%) !important;
-  border-color: rgba(248,202,20,0.09) !important;
-}
-:root[data-site-theme="saudi-national-day"] .snd-section-dark-alt {
-  background: linear-gradient(180deg, #020d07 0%, #010c06 100%) !important;
-  border-color: rgba(90,186,28,0.09) !important;
-}
-
-/* ── Light mode section backgrounds (warm green-cream heritage) ── */
-:root[data-site-theme="saudi-national-day"] .snd-section-light {
-  background: linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 100%) !important;
-  border-color: rgba(0,90,54,0.11) !important;
-}
+/* ── الأقسام الانسيابية الموحدة في اليوم الوطني — إلغاء التقطيع اللوني والخطوط الأفقية ── */
+:root[data-site-theme="saudi-national-day"] .snd-section-dark,
+:root[data-site-theme="saudi-national-day"] .snd-section-dark-alt,
+:root[data-site-theme="saudi-national-day"] .snd-section-light,
 :root[data-site-theme="saudi-national-day"] .snd-section-light-alt {
-  background: linear-gradient(180deg, #fafffe 0%, #f0fdf4 100%) !important;
-  border-color: rgba(90,186,28,0.09) !important;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 /* ── National day bento / feature cards ── */
