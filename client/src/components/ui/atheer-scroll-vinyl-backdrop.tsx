@@ -285,6 +285,15 @@ export function AtheerScrollVinylBackdrop({
         }`}
       />
 
+      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
+      <div
+        className={`absolute inset-0 z-10 pointer-events-none ${
+          dark
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+        }`}
+      />
+
       {/* 3D Vinyl Stage:
           Positioned from the VERY TOP (-top-10 sm:-top-16) just like News & Articles!
           Starts moving immediately on the very first pixel of scroll! */}
@@ -337,8 +346,8 @@ export function AtheerScrollVinylBackdrop({
       <div
         className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/80 to-transparent"
-            : "bg-gradient-to-t from-white via-white/80 to-transparent"
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent"
         }`}
       />
     </div>

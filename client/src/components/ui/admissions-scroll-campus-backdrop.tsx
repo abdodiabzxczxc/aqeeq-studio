@@ -179,6 +179,15 @@ export function AdmissionsScrollCampusBackdrop({
         }`}
       />
 
+      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
+      <div
+        className={`absolute inset-0 z-10 pointer-events-none ${
+          dark
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+        }`}
+      />
+
       {/* 3D Moving Two Rows Stage (like Atheer without vinyl discs, pure photo cards) */}
       <motion.div
         style={{

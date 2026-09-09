@@ -149,6 +149,14 @@ export function ParallaxUnfurlingGallery({
             dark ? "bg-[#08467d]" : "bg-[#08467d]/10"
           }`}
         />
+        {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
+        <div
+          className={`absolute inset-0 z-10 pointer-events-none ${
+            dark
+              ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
+              : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
+          }`}
+        />
         {/* Soft bottom edge gradient for seamless transition to content */}
         <div
           className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
@@ -214,7 +222,7 @@ export function ParallaxUnfurlingGallery({
       </motion.div>
 
       {/* Foreground Hero Stage (Header, Tilted Issue Covers, and Text) */}
-      <div className="relative z-10 w-full">
+      <div className="relative z-20 w-full">
         {header}
       </div>
     </div>

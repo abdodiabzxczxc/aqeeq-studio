@@ -113,12 +113,12 @@ export function ArticlesScrollParallaxBackdrop({
         }`}
       />
 
-      {/* Soft bottom edge gradient for seamless transition to feed */}
+      {/* Subtle vignette scrim overlay so foreground title & 3D cards stay 100% readable */}
       <div
-        className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
+        className={`absolute inset-0 z-10 pointer-events-none ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
-            : "bg-gradient-to-t from-white via-white/85 to-transparent"
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/65 to-[#05080e]/40"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/70 to-slate-50/40"
         }`}
       />
 
@@ -135,7 +135,7 @@ export function ArticlesScrollParallaxBackdrop({
           backfaceVisibility: "hidden",
           willChange: "transform, opacity",
         }}
-        className="absolute -inset-x-12 -inset-y-24 grid grid-cols-3 gap-6 sm:gap-8 px-4 opacity-70"
+        className="absolute -inset-x-12 -inset-y-24 grid grid-cols-3 gap-6 sm:gap-8 px-4"
       >
         {/* Column 1: moves Up */}
         <motion.div
@@ -275,10 +275,10 @@ export function ArticlesScrollParallaxBackdrop({
 
       {/* Soft bottom edge gradient for smooth transition */}
       <div
-        className={`absolute inset-x-0 bottom-0 h-28 pointer-events-none z-10 ${
+        className={`absolute inset-x-0 bottom-0 h-36 pointer-events-none z-10 ${
           dark
-            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/80 to-transparent"
-            : "bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent"
+            ? "bg-gradient-to-t from-[#05080e] via-[#05080e]/85 to-transparent"
+            : "bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent"
         }`}
       />
     </div>
