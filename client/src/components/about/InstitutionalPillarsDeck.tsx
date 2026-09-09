@@ -240,9 +240,7 @@ export function InstitutionalPillarsDeck({ dark = true }: InstitutionalPillarsDe
   return (
     <section
       id="pillars-section"
-      className={`py-20 border-y transition-colors ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-[#08467d]/15 bg-white"
-      }`}
+      className="py-20 transition-colors bg-transparent border-0"
     >
       <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         {/* 1. Unified Section Header */}

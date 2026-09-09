@@ -124,6 +124,15 @@ button, a, input, select, textarea, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Architectural Root Solution: Zero Full-Width Section Cuts & Unified Canvas ── */
+/* Prevent any section or full-width boundary from drawing horizontal cuts or lines across the screen */
+section:not([class*="rounded-"]),
+[data-aq-shell-content] > section,
+[data-aq-shell-content] > div:not([class*="rounded-"]) {
+  border-top-width: 0px !important;
+  border-bottom-width: 0px !important;
+}
+
 /* ── Hardware Acceleration & Zero-Stutter Offscreen Rendering ── */
 .aq-perf-section {
   content-visibility: auto;

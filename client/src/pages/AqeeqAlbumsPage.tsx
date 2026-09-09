@@ -662,7 +662,7 @@ export default function AqeeqAlbumsPage() {
         }
       >
       <section id="albums-grid-section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
-        <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${dark ? "border-white/[0.08]" : "border-black/[0.08]"}`}>
+        <div className="mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
           <div className="max-w-2xl text-right">
             <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full border mb-3 text-[10px] font-black tracking-widest uppercase ${
               dark ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"

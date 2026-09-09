@@ -703,12 +703,8 @@ export default function AqeeqSchoolAdmissionsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Kinetic Admissions Ticker Bar */}
-      <div className={`py-3.5 border-y overflow-hidden relative backdrop-blur-md z-20 ${
-        isNationalDay
-          ? dark ? "bg-[#00140a] border-[#f8ca14]/20" : "bg-[#f8fafc] border-[#08467d]/20"
-          : dark ? "bg-[#060a10] border-white/10" : "bg-slate-50 border-slate-200"
-      }`}>
+      {/* Kinetic Admissions Ticker Bar — انسيابي شفاف بدون خطوط أو قطع لوني */}
+      <div className="py-3.5 overflow-hidden relative z-20 bg-transparent border-0">
         <div className="flex w-max animate-marquee-rtl gap-8 items-center text-xs font-black">
           {[...marqueeItems, ...marqueeItems].map((item, i) => (
             <div key={i} className="flex items-center gap-3 shrink-0">
@@ -1246,9 +1242,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       </section>
 
       {/* Interactive Admission Steps & Journey Roadmap */}
-      <section ref={roadmapRef} className={`py-20 border-y relative overflow-hidden ${
-        dark ? "border-white/10 bg-[#06080d]" : "border-[#08467d]/15 bg-[#f8fafc]"
-      }`}>
+      <section ref={roadmapRef} className="py-20 relative overflow-hidden bg-transparent border-0">
         <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>

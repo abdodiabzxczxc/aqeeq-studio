@@ -366,11 +366,11 @@ export default function AqeeqSchoolAboutPage() {
         </section>
       }
     >
-      {/* Quick Jump Anchor Command Bar — ثابت في مكانه الطبيعي ولا ينزل مع السكرول */}
-      <div className={`relative z-20 border-b py-2.5 px-3 sm:px-4 backdrop-blur-xl transition ${
-        dark ? "bg-black/80 border-white/10" : "bg-white/85 border-slate-200 shadow-sm"
-      }`}>
-        <div className="container mx-auto max-w-5xl flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-nowrap sm:flex-wrap text-xs font-black py-1">
+      {/* Quick Jump Anchor Command Bar — جزيرة عائمة بدون خطوط أفقية كاملة العرض */}
+      <div className="relative z-20 py-3 px-3 sm:px-4 bg-transparent border-0">
+        <div className={`container mx-auto max-w-5xl flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-nowrap sm:flex-wrap text-xs font-black py-2 px-3 rounded-2xl border ${
+          dark ? "bg-white/[0.03] border-white/10" : "bg-black/[0.02] border-black/5"
+        }`}>
           <a
             href="#timeline-section"
             className={`shrink-0 px-3.5 py-2 rounded-xl border transition active:scale-95 ${

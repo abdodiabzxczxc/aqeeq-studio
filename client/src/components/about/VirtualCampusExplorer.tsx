@@ -208,13 +208,8 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
   return (
     <section
       id="campuses-section"
-      className={`py-20 border-y relative overflow-hidden transition-colors ${
-        dark ? "border-white/10 bg-[#05080c]" : "border-[#08467d]/15 bg-white"
-      }`}
+      className="py-20 relative overflow-hidden bg-transparent border-0"
     >
-      {/* Ambient Lighting Orbs */}
-      <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#08467d]" />
-      <div className="pointer-events-none absolute -bottom-40 left-1/4 h-96 w-96 rounded-full blur-3xl opacity-15 bg-[#f8ca14]" />
 
       <div className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         {/* 1. Unified Section Header */}

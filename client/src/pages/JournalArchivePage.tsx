@@ -281,10 +281,8 @@ export default function JournalArchivePage() {
               </div>
             </div>
           </VisualEditable>
-          <VisualSections pagePath="/journal" anchorId="journal-after-hero" />
-          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
-            <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section">
-              <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-amber-300/15" : "border-slate-200"}`}>
+          <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
+              <div className="mb-8 flex items-end justify-between gap-4 pb-2">
                 <div>
                   <p className="aq-kicker">THE JOURNAL SHELF</p>
                   <h2 className={`mt-2 text-2xl font-black ${dark ? "text-amber-50" : "text-slate-900"}`}>أعداد العقيق</h2>
@@ -302,7 +300,6 @@ export default function JournalArchivePage() {
                 <VisualEditable id="journal-search-empty" tag="text" label="رسالة عدم وجود نتائج للمجلة" defaultText="لا توجد أعداد مطابقة للبحث." as="p" className="rounded-2xl border border-dashed border-amber-300/30 p-8 text-center text-sm font-black text-amber-100" />
               )}
             </VisualEditable>
-          </section>
         </>
       ) : (
         <section className="mx-auto max-w-[900px] px-5 py-28 text-center">
