@@ -62,7 +62,25 @@ import {
   Smartphone,
   Laptop,
   CloudDownload,
+  ArrowUp,
+  ArrowDown,
+  Pencil,
+  Briefcase,
+  FileText,
+  Mail,
+  Cloud,
+  Ticket,
+  Video,
+  Server,
 } from "lucide-react";
+
+import {
+  DEFAULT_SYSTEM_PORTALS,
+  SystemPortalItem,
+  SystemPortalCategory,
+  PORTAL_CATEGORY_LABELS,
+  AVAILABLE_PORTAL_ICONS,
+} from "@shared/portals";
 
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
 import { DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
@@ -87,7 +105,7 @@ export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system"
 export type AdmissionsSubTab = "inbox" | "fees" | "settings";
 export type ContentSubTab = "master" | "articles" | "backdrops";
 export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
-export type SystemSubTab = "pages" | "theme" | "users" | "campuses" | "marketing" | "backup";
+export type SystemSubTab = "pages" | "portals" | "theme" | "users" | "campuses" | "marketing" | "backup";
 
 export interface CorePageItem {
   key: string;
@@ -213,6 +231,7 @@ const DEFAULT_ORCHESTRATION = {
     linkUrl: "",
     linkText: "",
   },
+  systemPortals: DEFAULT_SYSTEM_PORTALS,
   interactiveFx: {
     wellingtonHoverItems: DEFAULT_WELLINGTON_HOVER_ITEMS,
   },
@@ -607,6 +626,7 @@ export default function AqeeqAdminDashboardPage() {
         schoolCampuses: (orchestrationData as any).schoolCampuses || DEFAULT_ORCHESTRATION.schoolCampuses,
         admissionsSettings: (orchestrationData as any).admissionsSettings || DEFAULT_ORCHESTRATION.admissionsSettings,
         interactiveFx: (orchestrationData as any).interactiveFx || DEFAULT_ORCHESTRATION.interactiveFx,
+        systemPortals: (orchestrationData as any).systemPortals || DEFAULT_SYSTEM_PORTALS,
       });
     }
   }, [orchestrationData]);
@@ -865,6 +885,227 @@ export default function AqeeqAdminDashboardPage() {
       );
     });
   }, [pagesFilter, pagesSearchQuery, currentHiddenKeys, orchestrationForm.nav]);
+
+  // =========================================================================
+  // 🌐 System Portals & Services Management State & Handlers
+  // =========================================================================
+  const [portalsCategoryFilter, setPortalsCategoryFilter] = useState<"all" | SystemPortalCategory>("all");
+  const [portalsSearchQuery, setPortalsSearchQuery] = useState("");
+  const [editingPortal, setEditingPortal] = useState<SystemPortalItem | null>(null);
+  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
+  const [deleteConfirmPortalId, setDeleteConfirmPortalId] = useState<string | null>(null);
+  const [portalForm, setPortalForm] = useState<{
+    id?: string;
+    title: string;
+    description: string;
+    url: string;
+    category: SystemPortalCategory;
+    iconName: string;
+    badge: string;
+    visible: boolean;
+    order: number;
+    openInNewTab: boolean;
+  }>({
+    title: "",
+    description: "",
+    url: "",
+    category: "parents_students",
+    iconName: "file-text",
+    badge: "",
+    visible: true,
+    order: 1,
+    openInNewTab: true,
+  });
+
+  const currentSystemPortals: SystemPortalItem[] = useMemo(() => {
+    return ((orchestrationForm?.systemPortals || DEFAULT_SYSTEM_PORTALS) as SystemPortalItem[])
+      .slice()
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [orchestrationForm?.systemPortals]);
+
+  const hasPortalsChanges = useMemo(() => {
+    const saved = JSON.stringify((orchestrationData as any)?.systemPortals || DEFAULT_SYSTEM_PORTALS);
+    const current = JSON.stringify(orchestrationForm?.systemPortals || DEFAULT_SYSTEM_PORTALS);
+    return saved !== current;
+  }, [orchestrationData, orchestrationForm?.systemPortals]);
+
+  const filteredSystemPortals = useMemo(() => {
+    return currentSystemPortals.filter((portal) => {
+      if (portalsCategoryFilter !== "all" && portal.category !== portalsCategoryFilter) return false;
+      if (!portalsSearchQuery.trim()) return true;
+      const q = portalsSearchQuery.toLowerCase().trim();
+      return (
+        portal.title.toLowerCase().includes(q) ||
+        portal.description.toLowerCase().includes(q) ||
+        portal.url.toLowerCase().includes(q) ||
+        (portal.badge || "").toLowerCase().includes(q)
+      );
+    });
+  }, [currentSystemPortals, portalsCategoryFilter, portalsSearchQuery]);
+
+  const handleTogglePortalVisibility = (id: string) => {
+    const updated = currentSystemPortals.map((p) =>
+      p.id === id ? { ...p, visible: !p.visible } : p
+    );
+    setOrchestrationForm((prev: any) => ({ ...prev, systemPortals: updated }));
+  };
+
+  const handleMovePortal = (id: string, direction: "up" | "down") => {
+    const list = [...currentSystemPortals];
+    const index = list.findIndex((p) => p.id === id);
+    if (index === -1) return;
+    if (direction === "up" && index > 0) {
+      const temp = list[index];
+      list[index] = list[index - 1];
+      list[index - 1] = temp;
+    } else if (direction === "down" && index < list.length - 1) {
+      const temp = list[index];
+      list[index] = list[index + 1];
+      list[index + 1] = temp;
+    }
+    const reordered = list.map((p, idx) => ({ ...p, order: idx + 1 }));
+    setOrchestrationForm((prev: any) => ({ ...prev, systemPortals: reordered }));
+  };
+
+  const handleDeletePortal = (id: string) => {
+    const updated = currentSystemPortals
+      .filter((p) => p.id !== id)
+      .map((p, idx) => ({ ...p, order: idx + 1 }));
+    setOrchestrationForm((prev: any) => ({ ...prev, systemPortals: updated }));
+    setDeleteConfirmPortalId(null);
+    toast.success("تم حذف البوابة من القائمة بنجاح");
+  };
+
+  const handleResetPortalsToDefault = () => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      systemPortals: DEFAULT_SYSTEM_PORTALS,
+    }));
+    toast.info("تمت استعادة القائمة الرسمية الافتراضية للبوابات 🔄");
+  };
+
+  const handleSavePortals = () => {
+    setOrchestrationMutation.mutate({
+      ...orchestrationForm,
+      systemPortals: currentSystemPortals,
+    });
+  };
+
+  const handleDiscardPortalsChanges = () => {
+    setOrchestrationForm((prev: any) => ({
+      ...prev,
+      systemPortals: (orchestrationData as any)?.systemPortals || DEFAULT_SYSTEM_PORTALS,
+    }));
+    toast.info("تم التراجع عن التعديلات غير المحفوظة في البوابات");
+  };
+
+  const handleOpenAddPortalModal = () => {
+    setEditingPortal(null);
+    setPortalForm({
+      title: "",
+      description: "",
+      url: "",
+      category: "parents_students",
+      iconName: "file-text",
+      badge: "",
+      visible: true,
+      order: currentSystemPortals.length + 1,
+      openInNewTab: true,
+    });
+    setIsPortalModalOpen(true);
+  };
+
+  const handleOpenEditPortalModal = (portal: SystemPortalItem) => {
+    setEditingPortal(portal);
+    setPortalForm({
+      id: portal.id,
+      title: portal.title,
+      description: portal.description,
+      url: portal.url,
+      category: portal.category,
+      iconName: portal.iconName,
+      badge: portal.badge || "",
+      visible: portal.visible,
+      order: portal.order,
+      openInNewTab: portal.openInNewTab !== false,
+    });
+    setIsPortalModalOpen(true);
+  };
+
+  const handleSavePortalForm = () => {
+    if (!portalForm.title.trim()) {
+      toast.error("يرجى كتابة عنوان البوابة");
+      return;
+    }
+    if (!portalForm.url.trim()) {
+      toast.error("يرجى كتابة رابط البوابة");
+      return;
+    }
+
+    if (editingPortal) {
+      const updated = currentSystemPortals.map((p) =>
+        p.id === editingPortal.id
+          ? {
+              ...p,
+              title: portalForm.title.trim(),
+              description: portalForm.description.trim(),
+              url: portalForm.url.trim(),
+              category: portalForm.category,
+              iconName: portalForm.iconName,
+              badge: portalForm.badge.trim() || undefined,
+              visible: portalForm.visible,
+              order: portalForm.order,
+              openInNewTab: portalForm.openInNewTab,
+            }
+          : p
+      );
+      setOrchestrationForm((prev: any) => ({ ...prev, systemPortals: updated }));
+      toast.success("تم تحديث بيانات البوابة بنجاح! ✏️");
+    } else {
+      const newPortal: SystemPortalItem = {
+        id: `portal-${Date.now()}`,
+        title: portalForm.title.trim(),
+        description: portalForm.description.trim(),
+        url: portalForm.url.trim(),
+        category: portalForm.category,
+        iconName: portalForm.iconName,
+        badge: portalForm.badge.trim() || undefined,
+        visible: portalForm.visible,
+        order: currentSystemPortals.length + 1,
+        openInNewTab: portalForm.openInNewTab,
+      };
+      setOrchestrationForm((prev: any) => ({
+        ...prev,
+        systemPortals: [...currentSystemPortals, newPortal],
+      }));
+      toast.success("تمت إضافة البوابة بنجاح! ➕");
+    }
+
+    setIsPortalModalOpen(false);
+  };
+
+  const renderDashboardPortalIcon = (iconName: string, size = 16, className = "") => {
+    switch (iconName) {
+      case "file-text":
+        return <FileText size={size} className={className} />;
+      case "smartphone":
+        return <Smartphone size={size} className={className} />;
+      case "briefcase":
+        return <Briefcase size={size} className={className} />;
+      case "mail":
+        return <Mail size={size} className={className} />;
+      case "cloud":
+        return <Cloud size={size} className={className} />;
+      case "ticket":
+        return <Ticket size={size} className={className} />;
+      case "video":
+        return <Video size={size} className={className} />;
+      case "shield":
+        return <Shield size={size} className={className} />;
+      default:
+        return <ExternalLink size={size} className={className} />;
+    }
+  };
 
   // Media Picker state
   const [mediaPickerConfig, setMediaPickerConfig] = useState<{
@@ -3377,6 +3618,20 @@ export default function AqeeqAdminDashboardPage() {
 
               <button
                 type="button"
+                onClick={() => setSystemSubTab("portals")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "portals"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Server size={15} />
+                <span>بوابات الأنظمة والخدمات 🌐</span>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">{currentSystemPortals.length}</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setSystemSubTab("theme")}
                 className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   systemSubTab === "theme"
@@ -3805,6 +4060,376 @@ export default function AqeeqAdminDashboardPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* SUBTAB: SYSTEM PORTALS & SERVICES MANAGEMENT */}
+            {systemSubTab === "portals" && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* 1. Header Banner & Action Bar */}
+                <div
+                  className={`relative overflow-hidden rounded-3xl border p-6 sm:p-7 shadow-md transition-all ${
+                    dark
+                      ? "border-white/10 bg-gradient-to-br from-[#131922] via-[#0d1218] to-[#080d12]"
+                      : "border-black/5 bg-gradient-to-br from-slate-50 via-white to-amber-50/40"
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <div className="space-y-2 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-400 text-black shadow-md font-black text-lg">
+                          🌐
+                        </span>
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                            إدارة بوابات الأنظمة والخدمات المدرسية
+                          </h2>
+                          <p className="text-xs font-bold text-slate-400">
+                            التحكم الكامل في روابط، أسماء، تصنيفات، وترتيب بوابات الأنظمة في شريط الخدمات والقائمة المنسدلة
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                      <Button
+                        type="button"
+                        onClick={handleResetPortalsToDefault}
+                        variant="outline"
+                        className="text-xs font-bold gap-1.5 rounded-xl border-dashed cursor-pointer"
+                      >
+                        <RotateCcw size={14} />
+                        <span>استعادة الافتراضيات</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={handleOpenAddPortalModal}
+                        className="bg-amber-400 hover:bg-amber-500 text-black font-black text-xs gap-1.5 rounded-xl shadow-md cursor-pointer"
+                      >
+                        <Plus size={15} />
+                        <span>إضافة بوابة جديدة ➕</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={handleSavePortals}
+                        disabled={setOrchestrationMutation.isPending}
+                        className={`text-xs font-black gap-1.5 rounded-xl shadow-md cursor-pointer ${
+                          hasPortalsChanges
+                            ? "bg-emerald-500 hover:bg-emerald-600 text-white animate-pulse"
+                            : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        }`}
+                      >
+                        <Save size={14} className={setOrchestrationMutation.isPending ? "animate-spin" : ""} />
+                        <span>{setOrchestrationMutation.isPending ? "جارِ الحفظ..." : "حفظ التغييرات 💾"}</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Summary Metric Chips */}
+                  <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-current/10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="grid h-7 w-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500 font-bold text-xs">
+                        {currentSystemPortals.length}
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-400">إجمالي البوابات</div>
+                        <div className="text-xs font-black">{currentSystemPortals.length} بوابة</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-500 font-bold text-xs">
+                        {currentSystemPortals.filter((p) => p.visible !== false).length}
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-400">البوابات النشطة</div>
+                        <div className="text-xs font-black text-emerald-500">
+                          {currentSystemPortals.filter((p) => p.visible !== false).length} ظاهرة للزوار
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="grid h-7 w-7 place-items-center rounded-lg bg-amber-500/10 text-amber-500 font-bold text-xs">
+                        {currentSystemPortals.filter((p) => p.category === "parents_students").length}
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-400">أولياء الأمور والطلاب</div>
+                        <div className="text-xs font-black">
+                          {currentSystemPortals.filter((p) => p.category === "parents_students").length} بوابات
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="grid h-7 w-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500 font-bold text-xs">
+                        {currentSystemPortals.filter((p) => p.category === "staff_admin").length}
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-400">الأنظمة الإدارية</div>
+                        <div className="text-xs font-black">
+                          {currentSystemPortals.filter((p) => p.category === "staff_admin").length} أنظمة
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Search & Category Filters */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  {/* Category Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+                    <button
+                      type="button"
+                      onClick={() => setPortalsCategoryFilter("all")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer shrink-0 ${
+                        portalsCategoryFilter === "all"
+                          ? dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+                          : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                      }`}
+                    >
+                      الكل ({currentSystemPortals.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPortalsCategoryFilter("parents_students")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer shrink-0 ${
+                        portalsCategoryFilter === "parents_students"
+                          ? dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+                          : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                      }`}
+                    >
+                      🎓 {PORTAL_CATEGORY_LABELS.parents_students} ({currentSystemPortals.filter((p) => p.category === "parents_students").length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPortalsCategoryFilter("staff_admin")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer shrink-0 ${
+                        portalsCategoryFilter === "staff_admin"
+                          ? dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+                          : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                      }`}
+                    >
+                      💼 {PORTAL_CATEGORY_LABELS.staff_admin} ({currentSystemPortals.filter((p) => p.category === "staff_admin").length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPortalsCategoryFilter("public")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer shrink-0 ${
+                        portalsCategoryFilter === "public"
+                          ? dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white"
+                          : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                      }`}
+                    >
+                      🌐 {PORTAL_CATEGORY_LABELS.public} ({currentSystemPortals.filter((p) => p.category === "public").length})
+                    </button>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="relative w-full sm:w-64 shrink-0">
+                    <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={portalsSearchQuery}
+                      onChange={(e) => setPortalsSearchQuery(e.target.value)}
+                      placeholder="بحث في البوابات والروابط..."
+                      className={`w-full pr-9 pl-3 py-2 rounded-xl text-xs font-bold border transition outline-none ${
+                        dark
+                          ? "bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-amber-400"
+                          : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Unsaved Changes Notification Banner */}
+                {hasPortalsChanges && (
+                  <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                    dark ? "bg-amber-400/10 border-amber-400/30 text-amber-300" : "bg-amber-50 border-amber-300 text-amber-900"
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <AlertCircle size={18} className="shrink-0 text-amber-500" />
+                      <div className="text-xs font-bold">
+                        توجد تعديلات غير محفوظة في بوابات الأنظمة. اضغط "حفظ التغييرات" لتطبيقها على الموقع مباشرة.
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleDiscardPortalsChanges}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg border border-current/20 hover:bg-black/5 transition cursor-pointer"
+                      >
+                        تراجع
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSavePortals}
+                        className="text-xs font-black px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition cursor-pointer"
+                      >
+                        حفظ التعديلات الآن 💾
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Portals Grid */}
+                <div className="space-y-3">
+                  {filteredSystemPortals.length === 0 ? (
+                    <div className={`p-12 text-center rounded-3xl border ${dark ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-slate-50"}`}>
+                      <div className="text-4xl mb-3">🔍</div>
+                      <h4 className="text-sm font-black mb-1">لا توجد بوابات تطابق معايير البحث</h4>
+                      <p className="text-xs text-slate-400">جرّب تغيير التصنيف المختار أو عبارة البحث</p>
+                    </div>
+                  ) : (
+                    filteredSystemPortals.map((portal, index) => {
+                      const isFirst = index === 0;
+                      const isLast = index === filteredSystemPortals.length - 1;
+                      return (
+                        <div
+                          key={portal.id}
+                          className={`group rounded-2xl border p-4 transition-all duration-200 ${
+                            portal.visible
+                              ? dark
+                                ? "border-white/10 bg-[#121820] hover:border-amber-400/40 shadow-sm"
+                                : "border-slate-200 bg-white hover:border-amber-400 shadow-xs"
+                              : dark
+                              ? "border-white/5 bg-white/[0.02] opacity-60"
+                              : "border-slate-100 bg-slate-50 opacity-60"
+                          }`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            {/* Portal Info */}
+                            <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                              {/* Order Badge */}
+                              <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-black ${
+                                dark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-600"
+                              }`}>
+                                {portal.order}
+                              </span>
+
+                              {/* Icon */}
+                              <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
+                                portal.category === "parents_students"
+                                  ? "bg-amber-400/15 text-amber-500"
+                                  : portal.category === "staff_admin"
+                                  ? "bg-blue-500/15 text-blue-500"
+                                  : "bg-emerald-500/15 text-emerald-500"
+                              }`}>
+                                {renderDashboardPortalIcon(portal.iconName, 20)}
+                              </div>
+
+                              {/* Text & URL */}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                                  <h4 className="text-sm font-black truncate">{portal.title}</h4>
+                                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                    portal.category === "parents_students"
+                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                      : portal.category === "staff_admin"
+                                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                  }`}>
+                                    {PORTAL_CATEGORY_LABELS[portal.category] || portal.category}
+                                  </span>
+                                  {portal.badge && (
+                                    <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                      {portal.badge}
+                                    </span>
+                                  )}
+                                  {!portal.visible && (
+                                    <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-500">
+                                      مخفي من القائمة
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-slate-400 truncate mb-1">
+                                  {portal.description}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href={portal.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:underline dir-ltr"
+                                  >
+                                    <span className="truncate max-w-[280px] sm:max-w-[420px]">{portal.url}</span>
+                                    <ExternalLink size={11} className="shrink-0" />
+                                  </a>
+                                  {portal.openInNewTab ? (
+                                    <span className="text-[9px] text-slate-400">· نافذة جديدة</span>
+                                  ) : (
+                                    <span className="text-[9px] text-slate-400">· نفس الصفحة</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Actions Toolbar */}
+                            <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                              {/* Move Up / Down */}
+                              <div className="flex items-center rounded-xl border border-current/10 p-0.5 bg-black/5 dark:bg-white/5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMovePortal(portal.id, "up")}
+                                  disabled={isFirst}
+                                  title="تقديم للأعلى"
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-current disabled:opacity-20 transition cursor-pointer disabled:cursor-not-allowed"
+                                >
+                                  <ArrowUp size={14} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMovePortal(portal.id, "down")}
+                                  disabled={isLast}
+                                  title="تأخير للأسفل"
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-current disabled:opacity-20 transition cursor-pointer disabled:cursor-not-allowed"
+                                >
+                                  <ArrowDown size={14} />
+                                </button>
+                              </div>
+
+                              {/* Toggle Visibility */}
+                              <button
+                                type="button"
+                                onClick={() => handleTogglePortalVisibility(portal.id)}
+                                title={portal.visible ? "إخفاء البوابة" : "إظهار البوابة"}
+                                className={`p-2 rounded-xl border transition cursor-pointer ${
+                                  portal.visible
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                    : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
+                                }`}
+                              >
+                                {portal.visible ? <Eye size={15} /> : <EyeOff size={15} />}
+                              </button>
+
+                              {/* Edit Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditPortalModal(portal)}
+                                title="تعديل بيانات البوابة"
+                                className="p-2 rounded-xl border border-current/10 bg-black/5 dark:bg-white/5 hover:bg-amber-400/20 hover:text-amber-500 transition cursor-pointer text-slate-400"
+                              >
+                                <Pencil size={15} />
+                              </button>
+
+                              {/* Delete Button */}
+                              <button
+                                type="button"
+                                onClick={() => setDeleteConfirmPortalId(portal.id)}
+                                title="حذف البوابة"
+                                className="p-2 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-500 hover:bg-rose-500/15 transition cursor-pointer"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             )}
 
@@ -5341,6 +5966,230 @@ export default function AqeeqAdminDashboardPage() {
               variant="outline"
               onClick={() => setBulkDeleteConfirmOpen(false)}
               className="rounded-2xl text-xs font-bold"
+            >
+              إلغاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL: ADD / EDIT SYSTEM PORTAL */}
+      <Dialog open={isPortalModalOpen} onOpenChange={setIsPortalModalOpen}>
+        <DialogContent
+          dir="rtl"
+          className={"sm:max-w-[540px] max-h-[90vh] overflow-y-auto rounded-3xl " + (
+            dark ? "bg-[#121820] text-white border-white/15" : "bg-white text-slate-900 border-black/10"
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black flex items-center gap-2">
+              <Server size={20} className="text-[#f8ca14]" />
+              <span>{editingPortal ? "تعديل بيانات بوابة النظام" : "إضافة بوابة نظام وخدمة جديدة"}</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              حدد اسم البوابة، رابطها، وتصنيفها ليتم عرضها في شريط الخدمات والقائمة المنسدلة للزوار
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            {/* Title */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1">
+                عنوان أو اسم البوابة *
+              </label>
+              <input
+                type="text"
+                value={portalForm.title}
+                onChange={(e) => setPortalForm({ ...portalForm, title: e.target.value })}
+                placeholder="مثال: نظام Odoo الإداري، الخطط الأسبوعية..."
+                className={`w-full p-2.5 rounded-xl border text-xs font-bold outline-none ${
+                  dark ? "bg-black/30 border-white/10 text-white focus:border-amber-400" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-600"
+                }`}
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1">
+                وصف موجز للبوابة
+              </label>
+              <input
+                type="text"
+                value={portalForm.description}
+                onChange={(e) => setPortalForm({ ...portalForm, description: e.target.value })}
+                placeholder="مثال: المنظومة الإدارية والمالية وشؤون الموظفين..."
+                className={`w-full p-2.5 rounded-xl border text-xs font-bold outline-none ${
+                  dark ? "bg-black/30 border-white/10 text-white focus:border-amber-400" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-600"
+                }`}
+              />
+            </div>
+
+            {/* URL */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1">
+                رابط البوابة (URL) *
+              </label>
+              <input
+                type="text"
+                value={portalForm.url}
+                onChange={(e) => setPortalForm({ ...portalForm, url: e.target.value })}
+                placeholder="https://example.com أو /login"
+                dir="ltr"
+                className={`w-full p-2.5 rounded-xl border text-xs font-bold outline-none ${
+                  dark ? "bg-black/30 border-white/10 text-white focus:border-amber-400" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-600"
+                }`}
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                يمكن وضع رابط خارجي يبدأ بـ https:// أو مسار داخلي يبدأ بـ /
+              </p>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1.5">
+                تصنيف البوابة
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {[
+                  { key: "parents_students", label: "🎓 أولياء الأمور والطلاب" },
+                  { key: "staff_admin", label: "💼 الأنظمة والموظفين" },
+                  { key: "public", label: "🌐 خدمات عامة" },
+                ].map((cat) => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => setPortalForm({ ...portalForm, category: cat.key as SystemPortalCategory })}
+                    className={`p-2 rounded-xl text-xs font-bold border transition text-center cursor-pointer ${
+                      portalForm.category === cat.key
+                        ? dark ? "bg-amber-400/20 border-amber-400 text-amber-400" : "bg-amber-50 border-amber-500 text-amber-900"
+                        : dark ? "bg-white/5 border-white/10 text-slate-300" : "bg-slate-50 border-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Icon Picker */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1.5">
+                أيقونة البوابة
+              </label>
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {AVAILABLE_PORTAL_ICONS.map((ic) => (
+                  <button
+                    key={ic.id}
+                    type="button"
+                    onClick={() => setPortalForm({ ...portalForm, iconName: ic.id })}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition cursor-pointer ${
+                      portalForm.iconName === ic.id
+                        ? dark ? "bg-amber-400/20 border-amber-400 text-amber-400" : "bg-amber-50 border-amber-500 text-amber-900"
+                        : dark ? "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10" : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    {renderDashboardPortalIcon(ic.id, 16)}
+                    <span className="text-[10px] font-bold truncate max-w-full">{ic.label.split("/")[0]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Badge */}
+            <div>
+              <label className="text-xs font-black text-slate-300 block mb-1">
+                نص الشارة التمييزية (اختياري)
+              </label>
+              <input
+                type="text"
+                value={portalForm.badge}
+                onChange={(e) => setPortalForm({ ...portalForm, badge: e.target.value })}
+                placeholder="مثال: ERP، iOS & Android، جديد، مباشر..."
+                className={`w-full p-2.5 rounded-xl border text-xs font-bold outline-none ${
+                  dark ? "bg-black/30 border-white/10 text-white focus:border-amber-400" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-600"
+                }`}
+              />
+            </div>
+
+            {/* Toggles */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-current/10">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={portalForm.openInNewTab}
+                  onChange={(e) => setPortalForm({ ...portalForm, openInNewTab: e.target.checked })}
+                  className="rounded border-white/20 accent-amber-400 h-4 w-4"
+                />
+                <span className="text-xs font-bold">فتح الرابط في علامة تبويب جديدة</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={portalForm.visible}
+                  onChange={(e) => setPortalForm({ ...portalForm, visible: e.target.checked })}
+                  className="rounded border-white/20 accent-emerald-500 h-4 w-4"
+                />
+                <span className="text-xs font-bold text-emerald-500">إظهار البوابة في القائمة</span>
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-3">
+            <Button
+              type="button"
+              onClick={handleSavePortalForm}
+              className="rounded-2xl bg-amber-400 hover:bg-amber-500 text-black font-black text-xs px-5 py-2.5 cursor-pointer shadow-md"
+            >
+              {editingPortal ? "حفظ التعديلات ✏️" : "إضافة البوابة ➕"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsPortalModalOpen(false)}
+              className="rounded-2xl text-xs font-bold cursor-pointer"
+            >
+              إلغاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL: DELETE PORTAL CONFIRMATION */}
+      <Dialog
+        open={deleteConfirmPortalId !== null}
+        onOpenChange={(open) => !open && setDeleteConfirmPortalId(null)}
+      >
+        <DialogContent
+          dir="rtl"
+          className={"sm:max-w-[400px] rounded-3xl " + (
+            dark ? "bg-[#121212] text-white border-white/15" : "bg-white text-slate-900 border-black/10"
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black text-red-400">⚠️ تأكيد حذف البوابة</DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              هل أنت متأكد من حذف هذه البوابة من قائمة الأنظمة والخدمات؟ لن تظهر للزوار بعد حفظ التعديلات.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                if (deleteConfirmPortalId) {
+                  handleDeletePortal(deleteConfirmPortalId);
+                }
+              }}
+              className="rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs px-5 py-2.5 cursor-pointer"
+            >
+              نعم، احذف البوابة
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteConfirmPortalId(null)}
+              className="rounded-2xl text-xs font-bold cursor-pointer"
             >
               إلغاء
             </Button>

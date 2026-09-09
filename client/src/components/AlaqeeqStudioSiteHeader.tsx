@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -46,6 +46,9 @@ import {
   LogIn,
   ChevronLeft,
   CloudDownload,
+  Cloud,
+  Ticket,
+  Video,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
@@ -54,6 +57,11 @@ import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 import { AqeeqCreatorStudioModal } from "./AqeeqCreatorStudioModal";
 import { Button } from "@/components/ui/button";
 import { HeaderDockNav, NavDockItemConfig } from "./ui/header-dock-preview";
+import {
+  DEFAULT_SYSTEM_PORTALS,
+  SystemPortalItem,
+  PORTAL_CATEGORY_LABELS,
+} from "@shared/portals";
 
 export type Section =
   | "studio"
@@ -104,6 +112,51 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const [mobilePortalsOpen, setMobilePortalsOpen] = useState(false);
+
+  const systemPortalsList: SystemPortalItem[] = useMemo(() => {
+    const rawList: SystemPortalItem[] = (orchestration as any)?.systemPortals || DEFAULT_SYSTEM_PORTALS;
+    return rawList
+      .filter((p) => p.visible !== false)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [orchestration]);
+
+  const parentsPortals = useMemo(
+    () => systemPortalsList.filter((p) => p.category === "parents_students"),
+    [systemPortalsList]
+  );
+  const staffPortals = useMemo(
+    () => systemPortalsList.filter((p) => p.category === "staff_admin"),
+    [systemPortalsList]
+  );
+  const publicPortals = useMemo(
+    () => systemPortalsList.filter((p) => p.category === "public"),
+    [systemPortalsList]
+  );
+
+  const renderPortalIcon = (iconName: string, size = 16, className = "") => {
+    switch (iconName) {
+      case "file-text":
+        return <FileText size={size} className={className} />;
+      case "smartphone":
+        return <Smartphone size={size} className={className} />;
+      case "briefcase":
+        return <Briefcase size={size} className={className} />;
+      case "mail":
+        return <Mail size={size} className={className} />;
+      case "cloud":
+        return <Cloud size={size} className={className} />;
+      case "ticket":
+        return <Ticket size={size} className={className} />;
+      case "video":
+        return <Video size={size} className={className} />;
+      case "shield":
+        return <Shield size={size} className={className} />;
+      default:
+        return <ExternalLink size={size} className={className} />;
+    }
+  };
 
   const dark = theme === "dark";
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("manus.space"));
@@ -318,109 +371,214 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               {portalsOpen && (
                 <div
                   dir="rtl"
-                  className={`absolute left-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl backdrop-blur-xl z-50 ${
-                    dark ? "bg-[#0c1218]/95 border-white/10 text-white" : "bg-white/95 border-slate-200 text-slate-900 shadow-xl"
+                  className={`absolute left-0 top-full mt-2 w-[520px] max-w-[calc(100vw-2rem)] p-4 rounded-3xl border shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    dark
+                      ? "bg-[#0c1218]/95 border-white/10 text-white shadow-black/60"
+                      : "bg-white/95 border-slate-200 text-slate-900 shadow-2xl"
                   }`}
                 >
-                  <div className={`text-[10px] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-black px-2 py-1 flex items-center gap-1.5`}>
-                    <GraduationCap size={12} />
-                    <span>خدمات أولياء الأمور والطلاب</span>
+                  {/* Mega-Menu Header */}
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-current/10">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
+                        dark ? "bg-[#f8ca14]/15 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                      }`}>
+                        <Server size={16} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black tracking-tight leading-tight">بوابات الأنظمة والخدمات المدرسية</h4>
+                        <p className="text-[10px] text-slate-400 font-medium">الوصول السريع لمنظومات ومنصات مدارس العقيق</p>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                      dark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-700"
+                    }`}>
+                      {systemPortalsList.length} بوابة نشطة
+                    </span>
                   </div>
-                  <a
-                    href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10 text-amber-700 dark:text-amber-300"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <FileText size={12} />
-                      <span>الخطط الدراسية الأسبوعية</span>
-                    </span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href="https://qr-codes.io/LQMip0"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Smartphone size={12} />
-                      <span>تحميل تطبيق أولياء الأمور</span>
-                    </span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
 
-                  <div className="h-px bg-current/10 my-1" />
+                  {/* Portals Content */}
+                  <div className="max-h-[60vh] overflow-y-auto space-y-3.5 pr-1 scrollbar-hide">
+                    {/* Section 1: Parents & Students */}
+                    {parentsPortals.length > 0 && (
+                      <div>
+                        <div className={`text-[11px] ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} font-black mb-2 flex items-center gap-1.5`}>
+                          <GraduationCap size={13} />
+                          <span>{PORTAL_CATEGORY_LABELS.parents_students}</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {parentsPortals.map((portal) => {
+                            const isInternal = portal.url.startsWith("/");
+                            return (
+                              <a
+                                key={portal.id}
+                                href={portal.url}
+                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                                onClick={(e) => {
+                                  if (isInternal) {
+                                    e.preventDefault();
+                                    setPortalsOpen(false);
+                                    navigate(portal.url);
+                                  } else {
+                                    setPortalsOpen(false);
+                                  }
+                                }}
+                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
+                                  dark
+                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-[#f8ca14]/30"
+                                    : "border-slate-100 bg-slate-50/70 hover:bg-amber-50/60 hover:border-amber-200"
+                                }`}
+                              >
+                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-colors ${
+                                  dark
+                                    ? "bg-white/5 text-[#f8ca14] group-hover:bg-[#f8ca14]/20"
+                                    : "bg-white text-[#08467d] group-hover:bg-[#08467d]/10 shadow-xs"
+                                }`}>
+                                  {renderPortalIcon(portal.iconName, 15)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="text-xs font-black truncate group-hover:text-[#f8ca14] transition-colors">
+                                      {portal.title}
+                                    </span>
+                                    {portal.badge && (
+                                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                                        {portal.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
+                                    {portal.description}
+                                  </p>
+                                </div>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-2 py-1">الأنظمة الإدارية والموظفين</div>
-                  <a
-                    href="https://live.aqeeq.edu.sa"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span>نظام Odoo الإداري</span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href="https://email.aqeeqholding.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span>البريد الإلكتروني الرسمي</span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href="https://next.aqeeq.app"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span>سحابة العقيق الرقمية</span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href="https://portal.aqeeq.app"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span>بوابة التذاكر والصيانة</span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href="https://aqeeq.live"
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setPortalsOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10"
-                  >
-                    <span>اجتماعات العقيق المرئية</span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
-                  <a
-                    href={isAdmin ? "/admin" : "/login"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPortalsOpen(false);
-                      navigate(isAdmin ? "/admin" : "/login");
-                    }}
-                    className="flex items-center justify-between p-2 rounded-lg text-xs font-bold hover:bg-[#f8ca14]/10 text-slate-400 hover:text-white transition cursor-pointer"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Shield size={12} className="text-[#f8ca14]" />
-                      <span>{isAdmin ? "لوحة الإدارة والتحكم" : "بوابة دخول المشرفين"}</span>
-                    </span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
+                    {/* Section 2: Staff & Admin */}
+                    {staffPortals.length > 0 && (
+                      <div>
+                        <div className={`text-[11px] ${dark ? "text-amber-400" : "text-slate-700"} font-black mb-2 flex items-center gap-1.5`}>
+                          <Briefcase size={13} />
+                          <span>{PORTAL_CATEGORY_LABELS.staff_admin}</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {staffPortals.map((portal) => {
+                            const isInternal = portal.url.startsWith("/");
+                            return (
+                              <a
+                                key={portal.id}
+                                href={portal.url}
+                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                                onClick={(e) => {
+                                  if (isInternal) {
+                                    e.preventDefault();
+                                    setPortalsOpen(false);
+                                    navigate(portal.url);
+                                  } else {
+                                    setPortalsOpen(false);
+                                  }
+                                }}
+                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
+                                  dark
+                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08] hover:border-amber-400/30"
+                                    : "border-slate-100 bg-slate-50/70 hover:bg-slate-100 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-colors ${
+                                  dark
+                                    ? "bg-white/5 text-amber-300 group-hover:bg-amber-400/20"
+                                    : "bg-white text-slate-700 group-hover:bg-slate-200 shadow-xs"
+                                }`}>
+                                  {renderPortalIcon(portal.iconName, 15)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="text-xs font-black truncate group-hover:text-amber-500 transition-colors">
+                                      {portal.title}
+                                    </span>
+                                    {portal.badge && (
+                                      <span className={`text-[9px] font-black px-1.5 py-0.2 rounded-full shrink-0 ${
+                                        portal.badge.toLowerCase().includes("admin")
+                                          ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                          : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                      }`}>
+                                        {portal.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
+                                    {portal.description}
+                                  </p>
+                                </div>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Section 3: Public (if any) */}
+                    {publicPortals.length > 0 && (
+                      <div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-black mb-2 flex items-center gap-1.5">
+                          <ExternalLink size={13} />
+                          <span>{PORTAL_CATEGORY_LABELS.public}</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {publicPortals.map((portal) => {
+                            const isInternal = portal.url.startsWith("/");
+                            return (
+                              <a
+                                key={portal.id}
+                                href={portal.url}
+                                target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                                rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                                onClick={(e) => {
+                                  if (isInternal) {
+                                    e.preventDefault();
+                                    setPortalsOpen(false);
+                                    navigate(portal.url);
+                                  } else {
+                                    setPortalsOpen(false);
+                                  }
+                                }}
+                                className={`group flex items-start gap-2.5 p-2.5 rounded-2xl border transition-all text-right ${
+                                  dark
+                                    ? "border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
+                                    : "border-slate-100 bg-slate-50/70 hover:bg-slate-100"
+                                }`}
+                              >
+                                <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${
+                                  dark ? "bg-white/5 text-slate-300" : "bg-white text-slate-700 shadow-xs"
+                                }`}>
+                                  {renderPortalIcon(portal.iconName, 15)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="text-xs font-black truncate">{portal.title}</span>
+                                    {portal.badge && (
+                                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-slate-500/10 text-slate-600 dark:text-slate-400 shrink-0">
+                                        {portal.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 leading-snug">
+                                    {portal.description}
+                                  </p>
+                                </div>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1191,21 +1349,99 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     )}
                   </div>
 
-                  {/* 4. 📑 رابعاً: الخدمات الطلابية والخطط الدراسية */}
-                  <a
-                    href="https://portal.aqeeq.app/pages/daily_plans/parent_lookup.php"
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition ${
-                      dark ? "bg-amber-400/10 border-amber-400/20 text-amber-300 hover:bg-amber-400/20" : "bg-amber-50 border-amber-200 text-amber-900 hover:bg-amber-100"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText size={14} />
-                      <span>الخطط الدراسية الأسبوعية للطلاب (متابعة ولي الأمر)</span>
-                    </span>
-                    <ExternalLink size={12} className="opacity-60" />
-                  </a>
+                  {/* 4. 🌐 رابعاً: بوابات الأنظمة والخدمات المدرسية */}
+                  <div className={`rounded-2xl border overflow-hidden transition-all ${
+                    dark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 bg-slate-50/70"
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => setMobilePortalsOpen((prev) => !prev)}
+                      className={`w-full flex items-center justify-between p-3 text-right transition cursor-pointer min-h-[44px] ${
+                        mobilePortalsOpen
+                          ? dark ? "bg-[#f8ca14]/10 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                          : dark ? "text-slate-200 hover:bg-white/5" : "text-slate-800 hover:bg-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className={`grid h-7 w-7 place-items-center rounded-lg ${
+                          dark ? "bg-[#f8ca14]/20 text-[#f8ca14]" : "bg-[#08467d]/15 text-[#08467d]"
+                        }`}>
+                          <Server size={14} />
+                        </div>
+                        <div>
+                          <div className="text-xs font-black leading-tight flex items-center gap-2">
+                            <span>بوابات الأنظمة والخدمات</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black">
+                              {systemPortalsList.length} بوابة
+                            </span>
+                          </div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400">
+                            الخطط الأسبوعية، التطبيق، ERP، والبريد
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`opacity-60 transition-transform duration-200 ${
+                          mobilePortalsOpen ? "rotate-180 text-current" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {mobilePortalsOpen && (
+                      <div className="p-2 space-y-1.5 border-t border-current/10 animate-in fade-in duration-150">
+                        {systemPortalsList.map((portal) => {
+                          const isInternal = portal.url.startsWith("/");
+                          return (
+                            <a
+                              key={portal.id}
+                              href={portal.url}
+                              target={portal.openInNewTab && !isInternal ? "_blank" : undefined}
+                              rel={portal.openInNewTab && !isInternal ? "noreferrer" : undefined}
+                              onClick={(e) => {
+                                if (isInternal) {
+                                  e.preventDefault();
+                                  setMobileMenuOpen(false);
+                                  navigate(portal.url);
+                                } else {
+                                  setMobileMenuOpen(false);
+                                }
+                              }}
+                              className={`flex items-center justify-between p-2.5 rounded-xl border transition min-h-[44px] ${
+                                dark
+                                  ? "border-white/5 bg-white/5 hover:bg-white/10 text-white"
+                                  : "border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${
+                                  portal.category === "parents_students"
+                                    ? "bg-amber-400/15 text-amber-500"
+                                    : dark ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-700"
+                                }`}>
+                                  {renderPortalIcon(portal.iconName, 14)}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-bold truncate">{portal.title}</span>
+                                    {portal.badge && (
+                                      <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                                        {portal.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                                    {portal.description}
+                                  </p>
+                                </div>
+                              </div>
+                              <ExternalLink size={12} className="opacity-50 shrink-0 mr-2" />
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   {/* 5. 👑 خامساً: أجنحة المشرف أو 🔑 تسجيل الدخول للمشرفين */}
                   {isAdmin ? (

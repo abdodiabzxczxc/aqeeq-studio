@@ -9,6 +9,7 @@ import { resolveAqeeqAlbumCover } from "./aqeeqAlbumCover";
 import { parseAqeeqSocialPostUrl, type AqeeqSocialPostSource } from "./socialPostEmbed";
 import { fetchAqeeqXTweetMeta } from "./xPostEmbed";
 import { localSchoolNews, localAlbums, localShowcases, localMediaAssets, localSettings, getLocalDb, saveLocalDb } from "./localStore";
+import { DEFAULT_SYSTEM_PORTALS, type SystemPortalItem } from "@shared/portals";
 
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -752,6 +753,7 @@ export type SiteOrchestrationConfig = {
       imageUrl?: string;
     }>;
   };
+  systemPortals?: SystemPortalItem[];
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -919,6 +921,7 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
       { gradeLevel: "المرحلة الثانوية مسارات (صفوف 10 - 12)", nationalAnnual: 22000, internationalAnnual: 27500 },
     ],
   },
+  systemPortals: DEFAULT_SYSTEM_PORTALS,
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -947,6 +950,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
           admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
           marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
+          systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
         };
       }
     } catch (err) {
@@ -979,6 +983,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
         marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
         interactiveFx: { ...DEFAULT_SITE_ORCHESTRATION.interactiveFx, ...(parsed.interactiveFx || {}) },
+        systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
       };
     }
   } catch (err) {
