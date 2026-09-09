@@ -58,11 +58,15 @@ export function useSiteTheme() {
   const themeMode = orchestration?.themeMode;
 
   const { isNationalDay, activeTheme, remainingHours, isExpired } = useMemo(() => {
-    if (!themeMode || themeMode.activeTheme !== "saudi-national-day") {
+    const urlParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("siteTheme") : null;
+    const localOverride = typeof window !== "undefined" ? window.localStorage.getItem("aqeeq-site-theme") : null;
+    const effectiveTheme = urlParam || (localOverride && localOverride !== "default" ? localOverride : null) || themeMode?.activeTheme;
+
+    if (effectiveTheme !== "saudi-national-day") {
       return { isNationalDay: false, activeTheme: "default" as ThemeType, remainingHours: null, isExpired: false };
     }
 
-    if (themeMode.expiresAt) {
+    if (themeMode?.expiresAt && !urlParam && !localOverride) {
       const now = Date.now();
       if (now >= themeMode.expiresAt) {
         return { isNationalDay: false, activeTheme: "default" as ThemeType, remainingHours: 0, isExpired: true };

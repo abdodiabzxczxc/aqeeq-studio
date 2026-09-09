@@ -34,31 +34,31 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
           background: isNationalDay
             ? dark
               ? `
-                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.52) 0%, transparent 72%),
-                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.25) 0%, transparent 65%),
-                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.20) 0%, transparent 65%),
-                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.44) 0%, transparent 70%)
+                radial-gradient(ellipse 90% 50% at 50% -10%, rgba(0, 90, 54, 0.38) 0%, transparent 72%),
+                radial-gradient(ellipse 70% 50% at 88% 22%, rgba(212, 175, 55, 0.16) 0%, transparent 65%),
+                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(0, 56, 32, 0.28) 0%, transparent 65%),
+                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.28) 0%, transparent 70%)
               `
               : `
-                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(0, 90, 54, 0.20) 0%, transparent 72%),
-                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.18) 0%, transparent 65%),
-                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(90, 186, 28, 0.14) 0%, transparent 65%),
-                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.16) 0%, transparent 70%)
+                radial-gradient(ellipse 90% 45% at 50% -10%, rgba(0, 90, 54, 0.05) 0%, transparent 70%),
+                radial-gradient(ellipse 70% 50% at 88% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 65%),
+                radial-gradient(ellipse 75% 55% at 12% 75%, rgba(0, 90, 54, 0.03) 0%, transparent 65%),
+                radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0, 90, 54, 0.03) 0%, transparent 70%)
               `
             : dark
             ? `
-              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.48) 0%, transparent 72%),
-              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(248, 202, 20, 0.24) 0%, transparent 65%),
-              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(222, 25, 30, 0.14) 0%, transparent 65%),
-              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.22) 0%, transparent 70%),
-              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.38) 0%, transparent 70%)
+              radial-gradient(ellipse 90% 55% at 35% -10%, rgba(8, 70, 125, 0.36) 0%, transparent 72%),
+              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(212, 175, 55, 0.16) 0%, transparent 65%),
+              radial-gradient(ellipse 65% 50% at 12% 70%, rgba(139, 21, 24, 0.12) 0%, transparent 65%),
+              radial-gradient(ellipse 75% 50% at 88% 85%, rgba(8, 70, 125, 0.20) 0%, transparent 70%),
+              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(6, 46, 82, 0.28) 0%, transparent 70%)
             `
             : `
-              radial-gradient(ellipse 90% 55% at 28% -10%, rgba(8, 70, 125, 0.18) 0%, transparent 72%),
-              radial-gradient(ellipse 70% 50% at 85% 25%, rgba(245, 158, 11, 0.18) 0%, transparent 65%),
-              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(225, 29, 72, 0.08) 0%, transparent 65%),
-              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(14, 165, 233, 0.14) 0%, transparent 70%),
-              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.15) 0%, transparent 70%)
+              radial-gradient(ellipse 90% 45% at 35% -10%, rgba(8, 70, 125, 0.05) 0%, transparent 70%),
+              radial-gradient(ellipse 70% 50% at 85% 22%, rgba(212, 175, 55, 0.05) 0%, transparent 65%),
+              radial-gradient(ellipse 60% 45% at 12% 70%, rgba(139, 21, 24, 0.03) 0%, transparent 65%),
+              radial-gradient(ellipse 65% 50% at 88% 85%, rgba(8, 70, 125, 0.04) 0%, transparent 70%),
+              radial-gradient(ellipse 80% 50% at 50% 110%, rgba(8, 70, 125, 0.04) 0%, transparent 70%)
             `,
         }}
       />
@@ -66,43 +66,43 @@ export function AqeeqAmbientLighting({ className = "" }: AqeeqAmbientLightingPro
       {/* ── الطبقة 2: كرات الضوء الدائرية الحية العريضة (Breathing Soft Orbs - Zero Hard Edges) ── */}
       {/* Orb 1: الهالة العلوية الرئيسية */}
       <div
-        className="aq-aura-orb-1 absolute -top-[12%] -left-[10%] w-[520px] h-[520px] sm:w-[750px] sm:h-[750px] rounded-full blur-[140px] sm:blur-[180px] pointer-events-none"
+        className="aq-aura-orb-1 absolute -top-[15%] -left-[10%] w-[550px] h-[550px] sm:w-[850px] sm:h-[850px] rounded-full blur-[180px] sm:blur-[240px] pointer-events-none"
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(0, 90, 54, 0.55) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(0, 90, 54, 0.26) 0%, rgba(5, 150, 105, 0.15) 50%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(0, 90, 54, 0.40) 0%, rgba(0, 56, 32, 0.20) 50%, transparent 70%)"
+              : "radial-gradient(circle, rgba(0, 90, 54, 0.05) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(8, 70, 125, 0.50) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(2, 132, 199, 0.28) 0%, rgba(8, 70, 125, 0.16) 50%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(8, 70, 125, 0.36) 0%, rgba(6, 46, 82, 0.18) 50%, transparent 70%)"
+            : "radial-gradient(circle, rgba(8, 70, 125, 0.05) 0%, rgba(212, 175, 55, 0.03) 50%, transparent 70%)",
         }}
       />
 
       {/* Orb 2: الهالة الذهبية الجانبية */}
       <div
-        className="aq-aura-orb-2 absolute top-[28%] -right-[12%] w-[480px] h-[480px] sm:w-[680px] sm:h-[680px] rounded-full blur-[140px] sm:blur-[180px] pointer-events-none"
+        className="aq-aura-orb-2 absolute top-[28%] -right-[12%] w-[500px] h-[500px] sm:w-[750px] sm:h-[750px] rounded-full blur-[180px] sm:blur-[240px] pointer-events-none"
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(212, 175, 55, 0.30) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(212, 175, 55, 0.28) 0%, rgba(245, 158, 11, 0.16) 50%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(212, 175, 55, 0.20) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(248, 202, 20, 0.26) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(217, 119, 6, 0.15) 50%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, transparent 70%)",
         }}
       />
 
       {/* Orb 3: الهالة السفلية الحية */}
       <div
-        className="aq-aura-orb-3 absolute -bottom-[15%] left-[25%] w-[550px] h-[550px] sm:w-[800px] sm:h-[800px] rounded-full blur-[150px] sm:blur-[200px] pointer-events-none"
+        className="aq-aura-orb-3 absolute -bottom-[18%] left-[22%] w-[580px] h-[580px] sm:w-[880px] sm:h-[880px] rounded-full blur-[190px] sm:blur-[260px] pointer-events-none"
         style={{
           background: isNationalDay
             ? dark
-              ? "radial-gradient(circle, rgba(90, 186, 28, 0.25) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(90, 186, 28, 0.22) 0%, rgba(34, 197, 94, 0.12) 50%, transparent 70%)"
+              ? "radial-gradient(circle, rgba(0, 56, 32, 0.30) 0%, rgba(0, 90, 54, 0.15) 50%, transparent 70%)"
+              : "radial-gradient(circle, rgba(0, 90, 54, 0.04) 0%, transparent 70%)"
             : dark
-            ? "radial-gradient(circle, rgba(14, 165, 233, 0.26) 0%, transparent 70%)"
-            : "radial-gradient(circle, rgba(6, 182, 212, 0.24) 0%, rgba(59, 130, 246, 0.14) 50%, transparent 70%)",
+            ? "radial-gradient(circle, rgba(8, 70, 125, 0.24) 0%, rgba(139, 21, 24, 0.10) 50%, transparent 70%)"
+            : "radial-gradient(circle, rgba(8, 70, 125, 0.04) 0%, rgba(139, 21, 24, 0.02) 50%, transparent 70%)",
         }}
       />
 

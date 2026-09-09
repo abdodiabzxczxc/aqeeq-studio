@@ -2510,41 +2510,41 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 /* ── National day bento / feature cards ── */
 :root[data-site-theme="saudi-national-day"] .snd-bento-card-dark {
   background: rgba(1,16,10,0.92) !important;
-  border-color: rgba(90,186,28,0.35) !important;
-  box-shadow: 0 10px 30px rgba(0,58,34,0.5), inset 0 1px 0 rgba(90,186,28,0.14) !important;
+  border-color: rgba(0,90,54,0.38) !important;
+  box-shadow: 0 10px 30px rgba(0,58,34,0.4), inset 0 1px 0 rgba(212,175,55,0.18) !important;
   backdrop-filter: blur(20px);
   transition: all 0.35s cubic-bezier(0.23,1,0.32,1) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-bento-card-dark:hover {
-  border-color: rgba(248,202,20,0.6) !important;
-  box-shadow: 0 22px 55px rgba(0,90,54,0.55), inset 0 1px 0 rgba(248,202,20,0.18) !important;
+  border-color: rgba(212,175,55,0.6) !important;
+  box-shadow: 0 22px 55px rgba(0,90,54,0.45), inset 0 1px 0 rgba(212,175,55,0.25) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-bento-card-light {
-  background: rgba(240,253,244,0.96) !important;
-  border-color: rgba(0,90,54,0.2) !important;
-  box-shadow: 0 8px 24px rgba(0,90,54,0.12), inset 0 1px 0 rgba(255,255,255,0.85) !important;
+  background: #ffffff !important;
+  border-color: rgba(0,90,54,0.14) !important;
+  box-shadow: 0 10px 30px rgba(0,90,54,0.06), 0 2px 6px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.9) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-bento-card-light:hover {
-  border-color: rgba(0,90,54,0.4) !important;
-  box-shadow: 0 16px 40px rgba(0,90,54,0.2) !important;
+  border-color: rgba(0,90,54,0.28) !important;
+  box-shadow: 0 18px 45px rgba(0,90,54,0.10) !important;
 }
 
 /* ── Editorial quote card ── */
 :root[data-site-theme="saudi-national-day"] .snd-editorial-card-dark {
-  border-color: rgba(90,186,28,0.38) !important;
+  border-color: rgba(0,90,54,0.38) !important;
   background: linear-gradient(135deg, #010f08 0%, #002617 55%, #010c06 100%) !important;
-  box-shadow: 0 22px 65px rgba(0,90,54,0.48) !important;
+  box-shadow: 0 22px 65px rgba(0,90,54,0.42) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-editorial-card-light {
-  border-color: rgba(0,90,54,0.24) !important;
-  background: linear-gradient(135deg, #f0fdf4 0%, #fafffe 55%, #f0fdf4 100%) !important;
-  box-shadow: 0 12px 42px rgba(0,90,54,0.14) !important;
+  border-color: rgba(0,90,54,0.18) !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 42px rgba(0,90,54,0.08) !important;
 }
 
 /* ── Story bubbles national ring ── */
 :root[data-site-theme="saudi-national-day"] .snd-story-ring {
-  background: linear-gradient(135deg, #f8ca14 0%, #5aba1c 45%, #005A36 100%) !important;
-  box-shadow: 0 0 16px rgba(248,202,20,0.4) !important;
+  background: linear-gradient(135deg, #d4af37 0%, #007A48 45%, #005A36 100%) !important;
+  box-shadow: 0 0 16px rgba(212,175,55,0.35) !important;
 }
 
 /* ── Section kicker badge ── */
@@ -2577,13 +2577,14 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 
 /* ── Memory cards ── */
 :root[data-site-theme="saudi-national-day"] .snd-memory-card-dark {
-  border-color: rgba(90,186,28,0.28) !important;
+  border-color: rgba(0,90,54,0.32) !important;
   background: rgba(1,18,11,0.82) !important;
-  box-shadow: 0 8px 25px rgba(0,58,34,0.42) !important;
+  box-shadow: 0 8px 25px rgba(0,58,34,0.35) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-memory-card-light {
-  border-color: rgba(0,90,54,0.2) !important;
-  background: rgba(240,253,244,0.92) !important;
+  border-color: rgba(0,90,54,0.14) !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 25px rgba(0,90,54,0.06) !important;
 }
 
 /* ── Library section ── */
@@ -2596,11 +2597,11 @@ main:has(.aq-journal-studio-preview) [class*="bg-emerald"] { background-color: v
 /* ── Tab bar ── */
 :root[data-site-theme="saudi-national-day"] .snd-tab-bar-dark {
   background: rgba(1,20,12,0.8) !important;
-  border-color: rgba(90,186,28,0.25) !important;
+  border-color: rgba(0,90,54,0.28) !important;
 }
 :root[data-site-theme="saudi-national-day"] .snd-tab-bar-light {
-  background: rgba(240,253,244,0.9) !important;
-  border-color: rgba(0,90,54,0.18) !important;
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(0,90,54,0.14) !important;
 }
 
 /* ── Fluid Ambient Lighting Aura Drift Keyframes (Zero Repaint, Zero Clipping) ── */
