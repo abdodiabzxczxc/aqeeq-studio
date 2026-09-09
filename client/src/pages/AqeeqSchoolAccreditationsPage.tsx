@@ -457,7 +457,7 @@ export default function AqeeqSchoolAccreditationsPage() {
           STAGE 2: 3D CREDENTIALS PAVILION (قاعة الاعتمادات والمراكز الدولية)
           مغلفة بـ AqeeqScrollRevealSection لترتفع كستارة ملكية مع السكرول
       ======================================================== */}
-      <AqeeqScrollRevealSection scrollVh={70} neonLine={true} className="py-14 sm:py-20">
+      <AqeeqScrollRevealSection scrollVh={70} neonLine={true} className="pt-8 sm:pt-10 pb-14 sm:pb-20">
         <section ref={hubSectionRef} id="cognia-section" className="w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8 relative">
           <div className="mb-12 text-right">
             <div

@@ -241,7 +241,7 @@ export default function JournalArchivePage() {
             </div>
           </VisualEditable>
           <VisualSections pagePath="/journal" anchorId="journal-after-hero" />
-          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
             <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section">
               <div className={`mb-8 flex items-end justify-between gap-4 border-b pb-5 ${dark ? "border-amber-300/15" : "border-slate-200"}`}>
                 <div>

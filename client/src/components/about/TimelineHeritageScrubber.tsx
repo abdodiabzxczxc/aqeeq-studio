@@ -121,7 +121,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
   const activeEra = TIMELINE_ERAS[activeIndex];
 
   return (
-    <section id="timeline-section" className="py-16 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
+    <section id="timeline-section" className="pt-8 sm:pt-10 pb-14 sm:pb-16 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
       {/* 1. Unified Section Header (Clean Institutional Luxury - No Emojis) */}
       <AqeeqSectionHeader
         id="about-timeline"

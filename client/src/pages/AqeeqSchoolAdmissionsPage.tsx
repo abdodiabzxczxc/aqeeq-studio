@@ -726,7 +726,7 @@ export default function AqeeqSchoolAdmissionsPage() {
       <AqeeqAdmissionsScrubReel onSelectStage={handleSelectReelStage} />
 
       {/* Tuition Fees & Calculator Section */}
-      <section id="tuition-fees-section" className="py-20 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
+      <section id="tuition-fees-section" className="pt-8 sm:pt-10 pb-14 sm:pb-16 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="mb-12 text-right">
           <div className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${dark ? "text-[#f8ca14]" : "text-[#08467d]"} mb-2`}>
             <Calculator size={14} />

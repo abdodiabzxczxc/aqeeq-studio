@@ -664,7 +664,7 @@ export default function SchoolNewsPage() {
           ) : null}
 
           {/* Issues Archive Grid Section */}
-          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 py-12 md:py-16">
+          <section className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
             <div className={`mb-10 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-6 ${
               isNationalDay ? (dark ? "border-[#f8ca14]/20" : "border-[#08467d]/15") : (dark ? "border-white/[0.08]" : "border-black/[0.08]")
             }`}>
