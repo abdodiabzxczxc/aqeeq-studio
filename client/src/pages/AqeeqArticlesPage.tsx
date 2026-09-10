@@ -262,7 +262,7 @@ function ArticleCard({
               <button
                 type="button"
                 onClick={(e) => onShare(article, e)}
-                className={`grid h-8 w-8 place-items-center rounded-xl border transition ${
+                className={`grid h-11 w-11 place-items-center rounded-xl border transition ${
                   dark ? "border-white/10 hover:bg-emerald-600 hover:text-white text-slate-400" : "border-black/10 hover:bg-emerald-600 hover:text-white text-slate-600"
                 }`}
                 title="مشاركة"

@@ -958,7 +958,8 @@ export default function AqeeqAlbumStudioPage() {
         <button
           type="button"
           onClick={() => setAlbumMediaLibraryOpen(true)}
-          className={"fixed bottom-5 left-5 z-30 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-black shadow-2xl transition active:scale-95 hover:opacity-90 " + (
+          style={{ bottom: "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem))" }}
+          className={"fixed left-5 z-30 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-black shadow-2xl transition active:scale-95 hover:opacity-90 " + (
             dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
           )}
         >

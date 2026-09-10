@@ -1747,6 +1747,14 @@ export default function AqeeqAdminDashboardPage() {
           pendingArticlesCount={pendingArticlesCount}
           user={user}
           onLogout={() => void logout()}
+          kpiData={{
+            totalAdmissions: admissionsList.length,
+            pendingAdmissions: pendingLeadsCount,
+            totalArticles: allAdminArticles.length,
+            pendingArticles: pendingArticlesCount,
+            totalIssues: (masterContent as any[]).filter((c) => c.type === "journal").length,
+            totalAlbums: (masterContent as any[]).filter((c) => c.type === "album").length,
+          }}
         />
 
         {/* Dynamic Pillar Workspace Canvas (7 Specialized Hubs) */}

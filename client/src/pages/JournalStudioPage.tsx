@@ -40,6 +40,7 @@ import { Reorder, useDragControls } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { autoSaveLabel, useAutoSave } from "@/hooks/useAutoSave";
 
 type MediaChoice = { url: string; fileName: string; storageKey?: string };
 type Target = "cover" | "add" | "replace" | "watermark" | "headerLogo" | "audio" | null;
@@ -272,6 +273,12 @@ export default function JournalStudioPage() {
   const [watermarkTint, setWatermarkTint] = useState("#f8ca14");
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
+  // ─── FEAT-1: Auto-save draft to localStorage ───────────────────────────────
+  const draftKey = slug ? `journal-draft-${slug}` : "journal-draft-new";
+  const draftData = { title, date, description, driveFolderUrl, seasonLabel };
+  const { autoSaveStatus, hasDraft, clearDraft } = useAutoSave(draftKey, draftData, 2000);
+  // ────────────────────────────────────────────────────────────────────────────
+
   const refresh = () => {
     void utils.schoolNews.list.invalidate();
     void utils.schoolNews.issue.invalidate();
@@ -332,6 +339,7 @@ export default function JournalStudioPage() {
   const update = trpc.schoolNews.update.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ إعدادات العدد");
+      clearDraft(); // مسح المسودة المحلية بعد الحفظ للسيرفر ✅
       refresh();
     },
     onError: (error) => toast.error(error.message),
@@ -640,6 +648,7 @@ export default function JournalStudioPage() {
             <article className={"rounded-[1.6rem] border p-5 sm:p-6 transition " + (
               dark ? "border-white/[0.08] bg-[#080808] text-white shadow-xl" : "border-black/[0.08] bg-white text-black shadow-md"
             )}>
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <Settings2 className={dark ? "text-[#f8ca14]" : "text-[#08467d]"} size={20} />
                 <div>
@@ -649,6 +658,18 @@ export default function JournalStudioPage() {
                   </p>
                 </div>
               </div>
+              {/* Auto-save indicator */}
+              {autoSaveLabel(autoSaveStatus, hasDraft) && (
+                <span className={`text-[10px] font-bold shrink-0 ${
+                  autoSaveStatus === "saved" ? "text-emerald-400" :
+                  autoSaveStatus === "saving" ? "text-amber-400" :
+                  autoSaveStatus === "error" ? "text-rose-400" :
+                  "text-slate-400"
+                }`}>
+                  {autoSaveLabel(autoSaveStatus, hasDraft)}
+                </span>
+              )}
+            </div>
 
               <div className="mt-6 space-y-4">
                 <div>
@@ -970,7 +991,8 @@ export default function JournalStudioPage() {
         <button
           type="button"
           onClick={() => setTarget("add")}
-          className={"fixed bottom-5 left-5 z-30 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-black shadow-2xl transition active:scale-95 hover:opacity-90 " + (
+          style={{ bottom: "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem))" }}
+          className={"fixed left-5 z-30 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-black shadow-2xl transition active:scale-95 hover:opacity-90 " + (
             dark ? "!bg-[#f8ca14] !text-black shadow-[0_0_20px_rgba(248,202,20,0.3)]" : "!bg-[#08467d] !text-white shadow-[0_0_20px_rgba(8,70,125,0.2)]"
           )}
         >

@@ -9,7 +9,23 @@ import {
   HelpCircle,
   Share2,
   Megaphone,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
+
+/** Mini KPI badge rendered at the top of the sidebar */
+function KpiMini({ label, value, trend, color }: { label: string; value: number | string; trend?: "up" | "down" | "flat"; color: string }) {
+  return (
+    <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+      <span className="text-[10px] font-bold text-slate-400 truncate">{label}</span>
+      <div className="flex items-center gap-1">
+        <span className={`text-xs font-black ${color}`}>{value}</span>
+        {trend === "up" && <TrendingUp size={10} className="text-emerald-400 shrink-0" />}
+        {trend === "down" && <TrendingDown size={10} className="text-rose-400 shrink-0" />}
+      </div>
+    </div>
+  );
+}
 
 export type ExecutivePillar =
   | "admissions"
@@ -32,6 +48,14 @@ interface ExecutiveSidebarProps {
   pendingArticlesCount?: number;
   user?: any;
   onLogout?: () => void;
+  kpiData?: {
+    totalAdmissions?: number;
+    pendingAdmissions?: number;
+    totalArticles?: number;
+    pendingArticles?: number;
+    totalIssues?: number;
+    totalAlbums?: number;
+  };
 }
 
 export function ExecutiveSidebar({
@@ -42,7 +66,9 @@ export function ExecutiveSidebar({
   pendingArticlesCount = 0,
   user,
   onLogout,
+  kpiData,
 }: ExecutiveSidebarProps) {
+
   const PILLARS: Array<{
     id: ExecutivePillar;
     title: string;
@@ -108,6 +134,39 @@ export function ExecutiveSidebar({
       }`}
     >
       <div className="space-y-4">
+        {/* Live KPI Mini-Stats */}
+        {kpiData && (
+          <div>
+            <p className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">
+              نبض المنصة الآن 📊
+            </p>
+            <div className="space-y-1.5">
+              {kpiData.totalAdmissions !== undefined && (
+                <KpiMini
+                  label="طلبات القبول"
+                  value={kpiData.totalAdmissions}
+                  trend={kpiData.pendingAdmissions && kpiData.pendingAdmissions > 0 ? "up" : "flat"}
+                  color="text-amber-300"
+                />
+              )}
+              {kpiData.totalArticles !== undefined && (
+                <KpiMini
+                  label="المقالات"
+                  value={kpiData.totalArticles}
+                  trend={kpiData.pendingArticles && kpiData.pendingArticles > 0 ? "up" : "flat"}
+                  color="text-sky-300"
+                />
+              )}
+              {kpiData.totalIssues !== undefined && (
+                <KpiMini label="أعداد المجلة" value={kpiData.totalIssues} color="text-emerald-300" />
+              )}
+              {kpiData.totalAlbums !== undefined && (
+                <KpiMini label="الألبومات" value={kpiData.totalAlbums} color="text-purple-300" />
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Pillar Selection Rail */}
         <div>
           <p className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">
