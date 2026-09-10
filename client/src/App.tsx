@@ -41,6 +41,7 @@ const JournalStudioPage = lazy(() => import("./pages/JournalStudioPage"));
 const AqeeqAlbumReaderPage = lazy(() => import("./pages/AqeeqAlbumReaderPage"));
 const AqeeqAlbumStudioPage = lazy(() => import("./pages/AqeeqAlbumStudioPage"));
 const AqeeqShowcaseStudioPage = lazy(() => import("./pages/AqeeqShowcaseStudioPage"));
+const AqeeqProStudioPage = lazy(() => import("./pages/AqeeqProStudioPage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 function ArticleDetailRoute({ params }: { params: { slug: string } }) {
@@ -87,7 +88,7 @@ function Router() {
         <Suspense fallback={null}>
           <Switch>
             <Route path="/" component={AlaqeeqStudioPage} />
-            <Route path="/studio" component={AlaqeeqStudioPage} />
+            <Route path="/studio" component={AqeeqProStudioPage} />
             <Route path="/about" component={AqeeqSchoolAboutPage} />
             <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
             {/* Alias routes for SEO & external links — canonical is /admissions */}

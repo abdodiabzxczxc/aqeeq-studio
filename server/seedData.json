@@ -2430,7 +2430,7 @@
       "publishedAt": "2026-09-10T11:10:21.190Z"
     },
     "/::studio-hero-kicker": {
-      "id": 1789039664154,
+      "id": 1789039685725,
       "pagePath": "/",
       "elementId": "studio-hero-kicker",
       "elementTag": "text",
@@ -2455,13 +2455,13 @@
       "backgroundPositionX": 50,
       "backgroundPositionY": 50,
       "backgroundOverlay": 0,
-      "customCss": "{\"revealOnScroll\":true}",
+      "customCss": "{\"revealOnScroll\":false}",
       "isLocked": false,
       "isHidden": false,
       "updatedBy": 1,
       "status": "published",
-      "updatedAt": "2026-09-10T11:27:44.154Z",
-      "publishedAt": "2026-09-10T11:27:44.203Z"
+      "updatedAt": "2026-09-10T11:28:05.725Z",
+      "publishedAt": "2026-09-10T11:28:05.780Z"
     }
   },
   "nextId": {

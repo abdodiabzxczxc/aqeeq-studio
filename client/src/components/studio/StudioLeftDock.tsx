@@ -1,0 +1,244 @@
+import React, { useState } from "react";
+import {
+  Plus,
+  LayoutTemplate,
+  GraduationCap,
+  Layers3,
+  Palette,
+  Sparkles,
+  History,
+  X,
+  Type,
+  Square,
+  ImageIcon,
+  Video,
+  Smile,
+  Minus,
+  Check,
+  RotateCcw,
+} from "lucide-react";
+import { StudioSchoolBlocks, type SchoolBlock } from "./StudioSchoolBlocks";
+import { StudioAiCopilot } from "./StudioAiCopilot";
+import VisualDesignTokensPanel from "../VisualDesignTokensPanel";
+import VisualHistoryDrawer from "../VisualHistoryDrawer";
+import { toast } from "sonner";
+
+export type StudioDockTab = "elements" | "sections" | "schoolCms" | "layers" | "tokens" | "ai" | "history" | null;
+
+const BASIC_ELEMENTS = [
+  { tag: "text", label: "عنوان رئيسي", icon: Type, preview: "H1", hint: "عنوان بخط عريض يلفت الانتباه" },
+  { tag: "text", label: "نص فقرة", icon: Type, preview: "P", hint: "وصف أو محتوى توضيحي" },
+  { tag: "button", label: "زر إجراء (CTA)", icon: Square, preview: "BTN", hint: "زر تفاعلي يقود لصفحة أو واتساب" },
+  { tag: "image", label: "صورة", icon: ImageIcon, preview: "IMG", hint: "صورة من المكتبة أو الجهاز" },
+  { tag: "video", label: "مقطع فيديو", icon: Video, preview: "VID", hint: "فيديو مرفوع أو رابط YouTube" },
+  { tag: "icon", label: "أيقونة أو شارة", icon: Smile, preview: "ICO", hint: "رمز توضيحي أو شارة تميز" },
+  { tag: "divider", label: "خط فاصل زخرفي", icon: Minus, preview: "HR", hint: "فاصل أنيق بين الأقسام" },
+];
+
+const SECTION_TEMPLATES = [
+  { type: "hero", title: "واجهة افتتاحية (Hero)", hint: "عنوان كبير، وصف، أزرار وصورة غلاف رئيسية", emoji: "🎯" },
+  { type: "features", title: "بطاقات المزايا والخدمات", hint: "شبكة كروت لعرض مميزات التعليم أو الأنشطة", emoji: "⭐" },
+  { type: "gallery", title: "معرض الصور التفاعلي", hint: "ألبوم صور منظم ومتجاوب لتوثيق الفعاليات", emoji: "📸" },
+  { type: "video", title: "قسم الفيديو الإعلاني", hint: "مساحة لعرض فيديو المدرسة الترويجي أو التوثيقي", emoji: "🎬" },
+  { type: "cta", title: "دعوة للتسجيل والاتصال", hint: "قسم ختامي بارز بروابط التسجيل والتواصل الفوري", emoji: "📞" },
+  { type: "custom", title: "مساحة حرة مخصصة", hint: "قسم مرن لإضافة محتوى خاص بحرية تامة", emoji: "✨" },
+];
+
+export function StudioLeftDock({
+  activeTab,
+  onSelectTab,
+  onInsertElement,
+  onInsertSection,
+  onInsertSchoolBlock,
+  onApplyAiText,
+  pagePath,
+}: {
+  activeTab: StudioDockTab;
+  onSelectTab: (tab: StudioDockTab) => void;
+  onInsertElement?: (tag: string, label: string) => void;
+  onInsertSection?: (type: string) => void;
+  onInsertSchoolBlock?: (block: SchoolBlock) => void;
+  onApplyAiText?: (text: { headline: string; body: string; cta: string }) => void;
+  pagePath: string;
+}) {
+  const [personalTemplates] = useState<Array<{ id: string; name: string; type: string }>>(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem("alaqeeq-personal-section-templates") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  const TABS = [
+    { id: "elements" as const, label: "عناصر", icon: Plus, tooltip: "إضافة عنصر جديد" },
+    { id: "sections" as const, label: "أقسام", icon: LayoutTemplate, tooltip: "منشئ الأقسام والقوالب" },
+    { id: "schoolCms" as const, label: "بيانات حية", icon: GraduationCap, tooltip: "كتل المدرسة الحية (CMS)" },
+    { id: "tokens" as const, label: "الهوية", icon: Palette, tooltip: "ألوان الموقع وثيمات المناسبات" },
+    { id: "ai" as const, label: "ذكاء اصطناعي", icon: Sparkles, tooltip: "مساعد العقيق الذكي" },
+    { id: "history" as const, label: "التاريخ", icon: History, tooltip: "سجل النسخ السابقة" },
+  ];
+
+  return (
+    <div className="relative flex z-40 h-full select-none" dir="rtl">
+      {/* ── Icon Command Rail (Always visible) ──────────────────── */}
+      <aside className="flex w-16 flex-col items-center justify-between border-l border-white/10 bg-[#07090e]/98 py-3 text-white shadow-2xl backdrop-blur-2xl">
+        <div className="flex flex-col items-center gap-1.5 w-full px-1.5">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => onSelectTab(isActive ? null : tab.id)}
+                className={`group relative flex flex-col items-center justify-center gap-1 w-full rounded-2xl py-2.5 transition cursor-pointer ${
+                  isActive
+                    ? "bg-amber-400 text-black font-black shadow-[0_0_15px_rgba(251,191,36,0.35)]"
+                    : "text-slate-400 hover:bg-white/10 hover:text-white"
+                }`}
+                title={tab.tooltip}
+              >
+                <Icon size={18} />
+                <span className="text-[9px] font-bold tracking-tight">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </aside>
+
+      {/* ── Expandable Flyout Panel ─────────────────────────────── */}
+      {activeTab && (
+        <div
+          data-aq-studio-flyout
+          className="flex w-80 sm:w-96 flex-col border-l border-white/10 bg-[#0c1018]/98 text-white shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-right-3 duration-200"
+        >
+          {/* Panel Header */}
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
+            <h3 className="text-xs font-black text-amber-300">
+              {activeTab === "elements" && "إضافة عنصر جديد (+)"}
+              {activeTab === "sections" && "الأقسام والقوالب الجاهزة"}
+              {activeTab === "schoolCms" && "كتل المدرسة الحية"}
+              {activeTab === "tokens" && "هوية الموقع والألوان"}
+              {activeTab === "ai" && "مساعد العقيق الذكي"}
+              {activeTab === "history" && "سجل التعديلات الزمني"}
+            </h3>
+            <button
+              type="button"
+              onClick={() => onSelectTab(null)}
+              className="rounded-xl p-1.5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Panel Content Scrollable */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* 1. ELEMENTS TAB */}
+            {activeTab === "elements" && (
+              <div className="space-y-2">
+                <div className="text-[10px] font-black text-slate-400 mb-2">اختر عنصراً للإدراج في الصفحة:</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {BASIC_ELEMENTS.map((el) => {
+                    const Icon = el.icon;
+                    return (
+                      <button
+                        key={el.label}
+                        type="button"
+                        onClick={() => {
+                          onInsertElement?.(el.tag, el.label);
+                          toast.success(`✓ تمت إضافة «${el.label}»`);
+                        }}
+                        className="flex flex-col items-start rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-right transition hover:border-amber-400/50 hover:bg-amber-400/10 cursor-pointer"
+                      >
+                        <span className="grid h-8 w-8 place-items-center rounded-xl bg-amber-400/15 text-amber-300 mb-2">
+                          <Icon size={16} />
+                        </span>
+                        <div className="text-xs font-black text-white">{el.label}</div>
+                        <div className="mt-1 text-[10px] text-slate-400 leading-tight">{el.hint}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 2. SECTIONS TAB */}
+            {activeTab === "sections" && (
+              <div className="space-y-4">
+                {/* Saved Blocks */}
+                {personalTemplates.length > 0 && (
+                  <div>
+                    <div className="text-[10px] font-black text-amber-300 mb-2">قوالبي المحفوظة (Saved Blocks):</div>
+                    <div className="space-y-2">
+                      {personalTemplates.map((pt) => (
+                        <button
+                          key={pt.id}
+                          type="button"
+                          onClick={() => {
+                            onInsertSection?.(pt.type);
+                            toast.success(`✓ تم إدراج القالب «${pt.name}»`);
+                          }}
+                          className="flex w-full items-center justify-between rounded-xl border border-amber-400/30 bg-amber-400/[0.06] p-3 text-right transition hover:border-amber-400 hover:bg-amber-400/15"
+                        >
+                          <div>
+                            <div className="text-xs font-black text-white">{pt.name}</div>
+                            <div className="text-[10px] text-amber-300">قالب مخصص محفوظ</div>
+                          </div>
+                          <Plus size={14} className="text-amber-400" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Templates List */}
+                <div>
+                  <div className="text-[10px] font-black text-slate-400 mb-2">قوالب الأقسام الجاهزة:</div>
+                  <div className="space-y-2">
+                    {SECTION_TEMPLATES.map((tmpl) => (
+                      <button
+                        key={tmpl.type}
+                        type="button"
+                        onClick={() => {
+                          onInsertSection?.(tmpl.type);
+                          toast.success(`✓ تمت إضافة قسم «${tmpl.title}»`);
+                        }}
+                        className="flex w-full items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 text-right transition hover:border-amber-400/40 hover:bg-amber-400/5 cursor-pointer"
+                      >
+                        <span className="text-2xl">{tmpl.emoji}</span>
+                        <div>
+                          <div className="text-xs font-black text-white">{tmpl.title}</div>
+                          <div className="mt-1 text-[10px] text-slate-400 leading-4">{tmpl.hint}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3. SCHOOL CMS TAB */}
+            {activeTab === "schoolCms" && (
+              <StudioSchoolBlocks onInsertBlock={onInsertSchoolBlock} />
+            )}
+
+            {/* 4. DESIGN TOKENS TAB */}
+            {activeTab === "tokens" && (
+              <VisualDesignTokensPanel open={true} onClose={() => onSelectTab(null)} />
+            )}
+
+            {/* 5. AI COPILOT TAB */}
+            {activeTab === "ai" && (
+              <StudioAiCopilot onApplyText={onApplyAiText} />
+            )}
+
+            {/* 6. HISTORY TAB */}
+            {activeTab === "history" && (
+              <VisualHistoryDrawer open={true} onClose={() => onSelectTab(null)} />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

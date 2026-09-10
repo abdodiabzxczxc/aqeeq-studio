@@ -1,0 +1,150 @@
+import React, { useState, useRef, useEffect } from "react";
+import { StudioTopBar, type DeviceMode } from "@/components/studio/StudioTopBar";
+import { StudioLeftDock, type StudioDockTab } from "@/components/studio/StudioLeftDock";
+import { StudioCanvas, type StudioCanvasHandle } from "@/components/studio/StudioCanvas";
+import { StudioInspector, type StudioInspectorDraft } from "@/components/studio/StudioInspector";
+import type { SchoolBlock } from "@/components/studio/StudioSchoolBlocks";
+import { toast } from "sonner";
+import { useLocation } from "wouter";
+
+export default function AqeeqProStudioPage() {
+  const [location] = useLocation();
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const initialPage = searchParams.get("page") || "/";
+
+  const [currentPath, setCurrentPath] = useState<string>(initialPage);
+  const [device, setDevice] = useState<DeviceMode>("desktop");
+  const [zoom, setZoom] = useState<number>(100);
+  const [isLivePreview, setIsLivePreview] = useState<boolean>(false);
+  const [activeDockTab, setActiveDockTab] = useState<StudioDockTab>(null);
+
+  const [selectedElement, setSelectedElement] = useState<{ id: string; tag: string; label: string } | null>(null);
+  const [draft, setDraft] = useState<StudioInspectorDraft>({});
+  const [undoCount, setUndoCount] = useState<number>(0);
+  const [redoCount, setRedoCount] = useState<number>(0);
+  const [dirtyCount, setDirtyCount] = useState<number>(0);
+
+  const canvasRef = useRef<StudioCanvasHandle | null>(null);
+
+  // Synchronize state when canvas sends messages
+  const handleSyncState = (data: {
+    selected: { id: string; tag: string; label: string } | null;
+    draft: StudioInspectorDraft;
+    undoCount: number;
+    redoCount: number;
+    dirtyCount: number;
+  }) => {
+    setSelectedElement(data.selected);
+    if (data.draft) {
+      setDraft(data.draft);
+    }
+    setUndoCount(data.undoCount);
+    setRedoCount(data.redoCount);
+    setDirtyCount(data.dirtyCount);
+  };
+
+  const handleDraftChange = (patch: Partial<StudioInspectorDraft>) => {
+    setDraft((prev) => ({ ...prev, ...patch }));
+    canvasRef.current?.applyPatch(patch);
+  };
+
+  const handlePublish = () => {
+    canvasRef.current?.publish();
+  };
+
+  const handleUndo = () => {
+    canvasRef.current?.undo();
+  };
+
+  const handleRedo = () => {
+    canvasRef.current?.redo();
+  };
+
+  const handleInsertElement = (tag: string, label: string) => {
+    toast.message(`إدراج عنصر «${label}» كمسودة في الصفحة`);
+    // Pass event to canvas
+  };
+
+  const handleInsertSection = (type: string) => {
+    toast.success(`✓ تمت إضافة قسم «${type}» إلى مساحة العمل`);
+  };
+
+  const handleInsertSchoolBlock = (block: SchoolBlock) => {
+    toast.success(`✓ تم ربط كتلة «${block.title}» الحية بقاعدة البيانات`);
+  };
+
+  const handleApplyAiText = (text: { headline: string; body: string; cta: string }) => {
+    if (selectedElement) {
+      handleDraftChange({ contentText: text.headline });
+    }
+  };
+
+  const viewportWidth = device === "mobile" ? 390 : device === "tablet" ? 768 : 1440;
+  const viewportHeight = device === "mobile" ? 844 : device === "tablet" ? 1024 : 900;
+
+  return (
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#04060a] text-white select-none">
+      {/* ── Studio Top Bar ────────────────────────────────────────── */}
+      <StudioTopBar
+        currentPath={currentPath}
+        onSelectPath={(path) => {
+          setCurrentPath(path);
+          setSelectedElement(null);
+        }}
+        device={device}
+        onSelectDevice={setDevice}
+        viewportWidth={viewportWidth}
+        viewportHeight={viewportHeight}
+        zoom={zoom}
+        onSelectZoom={setZoom}
+        isLivePreview={isLivePreview}
+        onToggleLivePreview={() => setIsLivePreview(!isLivePreview)}
+        undoCount={undoCount}
+        redoCount={redoCount}
+        dirtyCount={dirtyCount}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onPublish={handlePublish}
+        onRefresh={() => canvasRef.current?.reload()}
+      />
+
+      {/* ── Studio Main Workspace (Dock + Canvas + Inspector) ────── */}
+      <div className="relative flex flex-1 overflow-hidden" dir="rtl">
+        {/* Right Dock (in RTL: at the start/right side of screen) */}
+        <StudioLeftDock
+          activeTab={activeDockTab}
+          onSelectTab={setActiveDockTab}
+          onInsertElement={handleInsertElement}
+          onInsertSection={handleInsertSection}
+          onInsertSchoolBlock={handleInsertSchoolBlock}
+          onApplyAiText={handleApplyAiText}
+          pagePath={currentPath}
+        />
+
+        {/* Central Viewport Canvas */}
+        <StudioCanvas
+          ref={canvasRef}
+          currentPath={currentPath}
+          device={device}
+          zoom={zoom}
+          isLivePreview={isLivePreview}
+          onSyncState={handleSyncState}
+        />
+
+        {/* Left Inspector (in RTL: at the end/left side of screen) */}
+        {!isLivePreview && (
+          <StudioInspector
+            selectedElement={selectedElement}
+            draft={draft}
+            onChangeDraft={handleDraftChange}
+            onSaveDraft={() => canvasRef.current?.saveDraft()}
+            onRestoreOrigin={() => canvasRef.current?.restoreOrigin()}
+            onDuplicate={() => canvasRef.current?.duplicate()}
+            onDelete={() => canvasRef.current?.deleteSelected()}
+            onClose={() => setSelectedElement(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}

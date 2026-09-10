@@ -847,6 +847,25 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                           type="button"
                           onClick={() => {
                             setOptionsOpen(false);
+                            navigate("/studio");
+                          }}
+                          className={`w-full flex items-center justify-between py-2.5 px-3 cursor-pointer font-black text-xs ${
+                            dark ? "hover:bg-amber-400/10 text-amber-300" : "hover:bg-amber-50 text-amber-700"
+                          } rounded-xl transition text-right`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Sparkles size={15} className="text-amber-400 shrink-0" />
+                            <span>استوديو العقيق الإبداعي (Pro Studio)</span>
+                          </div>
+                          <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[9px] font-black text-amber-300">
+                            جديد 🚀
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOptionsOpen(false);
                             navigate("/admin");
                           }}
                           className={`w-full flex items-center gap-3 py-2.5 px-3 cursor-pointer font-black text-xs ${
@@ -1415,6 +1434,21 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
 
                       {/* زر الداشبورد والتحكم */}
                       <div className="flex flex-col gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            go("/studio");
+                          }}
+                          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black border transition cursor-pointer ${
+                            dark
+                              ? "border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+                              : "border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                          }`}
+                        >
+                          <Sparkles size={14} className="text-amber-400" />
+                          <span>استوديو العقيق الإبداعي (Pro Studio) 🚀</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => {

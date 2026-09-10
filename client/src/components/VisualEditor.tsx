@@ -426,6 +426,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [builderTab, setBuilderTab] = useState<"sections" | "pages">("sections");
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string; tag: ElementTag; label: string } | null>(null);
+  const isStudioCanvasMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("studiomode") === "1";
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuides>({});
   const [groupTranslation, setGroupTranslation] = useState<GroupTranslation>(null);
@@ -1845,6 +1846,49 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", handler, true);
   }, [isEditing, previewMode, selected, layerMode, undoSession, redoSession, runPrePublishCheck, deleteLayer, saveLayer, localOverrides, overrideMap, pagePath]);
 
+  // ── Two-Way Pro Studio Sync ──────────────────────────────
+  useEffect(() => {
+    if (!isStudioCanvasMode || typeof window === "undefined" || window.parent === window) return;
+    window.parent.postMessage({
+      type: "AQEEQ_STUDIO_SYNC",
+      selected,
+      draft,
+      undoCount: undoStack.length,
+      redoCount: redoStack.length,
+      dirtyCount: Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length,
+      pagePath,
+    }, "*");
+  }, [isStudioCanvasMode, selected, draft, undoStack.length, redoStack.length, localOverrides, pagePath]);
+
+  useEffect(() => {
+    if (!isStudioCanvasMode || typeof window === "undefined") return;
+    const handleStudioMessage = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || typeof data !== "object") return;
+      if (data.type === "AQEEQ_STUDIO_APPLY_DRAFT") {
+        draftPreviewEnabled.current = true;
+        setDraft((prev) => ({ ...prev, ...data.patch }));
+      } else if (data.type === "AQEEQ_STUDIO_UNDO") {
+        undoSession();
+      } else if (data.type === "AQEEQ_STUDIO_REDO") {
+        redoSession();
+      } else if (data.type === "AQEEQ_STUDIO_PUBLISH") {
+        runPrePublishCheck();
+      } else if (data.type === "AQEEQ_STUDIO_SAVE_DRAFT") {
+        saveSelected();
+      } else if (data.type === "AQEEQ_STUDIO_DELETE_SELECTED") {
+        if (selected) deleteLayer(selected.id, selected.label);
+      } else if (data.type === "AQEEQ_STUDIO_DUPLICATE_SELECTED") {
+        duplicateSelected();
+      } else if (data.type === "AQEEQ_STUDIO_RESTORE_ORIGIN") {
+        if (isSelectedBackground) restoreSavedBackgroundOrigin();
+        else restoreSelectedOrigin();
+      }
+    };
+    window.addEventListener("message", handleStudioMessage);
+    return () => window.removeEventListener("message", handleStudioMessage);
+  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected]);
+
   const fitSelectedBackground = (axis: "width" | "height" | "fill" | "contain") => {
     if (!selected) return;
     const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
@@ -1898,7 +1942,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const editorToolbar = pagePath && isEditing && !previewMode ? (
+  const editorToolbar = pagePath && isEditing && !previewMode && !isStudioCanvasMode ? (
     <nav className="aq-editor-toolbar aq-key-toolbar" aria-label="شريط أدوات التحرير" dir="rtl">
       <div className="aq-key-toolbar-core">
         <WorkspaceButton
@@ -1955,7 +1999,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, workspaceMediaOpen)} onClose={() => setWorkspaceMediaOpen(false)} workspace onSelect={selected ? selectMediaForDraft : undefined} accept={selected?.tag === "video" ? "video" : "image"} />
     <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, mediaLibraryOpen)} onClose={() => setMediaLibraryOpen(false)} accept={selected?.tag === "video" ? "video" : "image"} onSelect={selectMediaForDraft} />
     {pendingMediaAsset ? <div className="fixed inset-0 z-[430] grid place-items-center bg-black/65 p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-labelledby="replace-media-title" dir="rtl"><section className="w-full max-w-md rounded-3xl border border-amber-300/35 bg-[#111521] p-5 shadow-2xl"><div className="text-[11px] font-black tracking-[.14em] text-amber-300">استبدال الصورة</div><h2 id="replace-media-title" className="mt-2 text-lg font-black text-amber-50">تطبيق الصورة الجديدة كمعاينة؟</h2><p className="mt-2 text-sm leading-6 text-slate-300">ستُستبدل الصورة داخل القماش فورًا كمسودة محلية فقط. يمكنك استعادة الأصل أو تجاهل التعديل قبل الحفظ والنشر.</p><div className="mt-5 grid grid-cols-2 gap-2"><button onClick={() => setPendingMediaAsset(null)} className="rounded-xl border border-white/15 px-3 py-3 text-xs font-black text-slate-200 transition hover:bg-white/[0.06]">إلغاء</button><button onClick={confirmMediaReplacement} className="rounded-xl bg-amber-300 px-3 py-3 text-xs font-black text-amber-950 transition hover:bg-amber-200">تطبيق كمعاينة</button></div></section></div> : null}
-    {selected && shouldShowPropertiesPanel(isEditing, true, previewMode, mobilePreview) ? (
+    {selected && shouldShowPropertiesPanel(isEditing, true, previewMode, mobilePreview) && !isStudioCanvasMode ? (
       <aside
         ref={inspectorRef}
         data-aq-editor-properties
