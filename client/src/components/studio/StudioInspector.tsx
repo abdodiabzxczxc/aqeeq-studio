@@ -17,6 +17,9 @@ import {
   Type,
   Palette,
   Image as ImageIcon,
+  Pin,
+  Sliders,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -39,6 +42,8 @@ export type StudioInspectorDraft = {
   revealOnScroll?: boolean;
   buttonHover?: "none" | "lift" | "glow" | "shimmer";
   glass?: boolean;
+  isFloating?: boolean;
+  floatingPin?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 };
 
 export function StudioInspector({
@@ -525,7 +530,56 @@ export function StudioInspector({
 
         {/* TAB 4: RESPONSIVE */}
         {activeSubTab === "responsive" && (
-          <div className="space-y-3.5">
+          <div className="space-y-4">
+            {/* Layout Mode: Smart Flow vs Floating Pin */}
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-amber-300 flex items-center gap-1.5">
+                  <Sliders size={12} />
+                  <span>نمط التموضع والتنسيق</span>
+                </span>
+                <span
+                  className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                    draft.isFloating
+                      ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
+                      : "bg-sky-400/20 text-sky-300 border border-sky-400/30"
+                  }`}
+                >
+                  {draft.isFloating ? "عنصر عائم حر" : "تدفق متجاوب ذكي"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onChangeDraft({ isFloating: false })}
+                  className={`flex items-center justify-center gap-1.5 rounded-xl border p-2 text-xs font-black transition ${
+                    !draft.isFloating
+                      ? "border-sky-400 bg-sky-400/20 text-sky-200 shadow"
+                      : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <span>تدفق متجاوب</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeDraft({ isFloating: true })}
+                  className={`flex items-center justify-center gap-1.5 rounded-xl border p-2 text-xs font-black transition ${
+                    draft.isFloating
+                      ? "border-amber-400 bg-amber-400/20 text-amber-300 shadow"
+                      : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Pin size={12} className="rotate-45" />
+                  <span>عائم حر (Pin)</span>
+                </button>
+              </div>
+              <p className="text-[9px] leading-4 text-slate-400">
+                {!draft.isFloating
+                  ? "✓ التدفق الذكي يضمن تناسق العنصر تلقائياً على كل الشاشات دون تداخل أو خروج عن الإطار."
+                  : "⚡ الوضع العائم يسمح بتحريك العنصر بحرية كاملة بالبكسل مع طبقة z-index عليا (مناسب للشارات والملصقات)."}
+              </p>
+            </div>
+
             <div className="text-[10px] font-bold text-slate-400 mb-1.5">الظهور بحسب نوع الجهاز:</div>
             <div className="grid grid-cols-3 gap-1.5">
               {[

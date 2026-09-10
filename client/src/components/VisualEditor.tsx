@@ -14,7 +14,7 @@ import { extractCopyableStyle, isBackgroundLikeLayer, type CopyableLayerStyle } 
 import { backgroundSizeCss, isBackgroundLayer, isBackgroundSurface, isCoreBackgroundLayer, lowerLayerZIndex, resolveBackgroundOrigin, type BackgroundOrigin } from "@/lib/layerBackground";
 import { resolveEditorToolbarSide, toggleEditorToolbarSide, type EditorToolbarSide } from "@/lib/editorToolbarSide";
 import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImageWrapperClassName } from "@/lib/visualEditorLayout";
-import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowDown, ArrowLeftRight, ArrowUp, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Edit3, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowDown, ArrowLeftRight, ArrowUp, ArrowUpDown, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Edit3, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Pin, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -145,6 +145,8 @@ type LayerBehavior = {
   buttonHover?: "none" | "lift" | "glow" | "shimmer";
   openInNewTab?: boolean;
   backgroundOriginal?: BackgroundOrigin;
+  isFloating?: boolean;
+  floatingPin?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 };
 
 function parseLayerBehavior(raw?: string | null): LayerBehavior {
@@ -154,8 +156,9 @@ function parseLayerBehavior(raw?: string | null): LayerBehavior {
       ...value,
       device: ["all", "mobile", "desktop"].includes(value.device || "all") ? value.device : "all",
       animation: ["none", "fade", "rise", "slide"].includes(value.animation || "none") ? value.animation : "none",
+      isFloating: Boolean(value.isFloating),
     };
-  } catch { return { device: "all", animation: "none" }; }
+  } catch { return { device: "all", animation: "none", isFloating: false }; }
 }
 
 function serializeLayerBehavior(current: string, patch: Partial<LayerBehavior>) {
@@ -222,6 +225,7 @@ type VisualEditorContextValue = {
   deleteLayer: (elementId: string, label: string) => void;
   duplicateSelected?: () => void;
   updateTextContent?: (elementId: string, newText: string) => void;
+  updateElementOverride?: (elementId: string, patch: Partial<VisualOverride>) => void;
   isStudioCanvasMode?: boolean;
   getOverride: (elementId: string) => VisualOverride | undefined;
   getOwnOverride: (elementId: string) => VisualOverride | undefined;
@@ -259,6 +263,7 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
   deleteLayer: () => undefined,
   duplicateSelected: () => undefined,
   updateTextContent: () => undefined,
+  updateElementOverride: () => undefined,
   isStudioCanvasMode: false,
   getOverride: () => undefined,
   getOwnOverride: () => undefined,
@@ -381,13 +386,13 @@ function toStyle(override?: VisualOverride): React.CSSProperties {
     ...(behavior.innerShadow || designEffects.boxShadow ? { boxShadow: [behavior.innerShadow ? "inset 0 1px 0 rgba(255,255,255,.16), inset 0 -12px 28px rgba(0,0,0,.22)" : "", designEffects.boxShadow || ""].filter(Boolean).join(",") } : {}),
     ...(behavior.gradientBorder ? { border: "1px solid transparent", borderImage: "linear-gradient(135deg,#fff2bd,#e5b84f 45%,#6e4210) 1" } : {}),
     ...(buttonStyle === "filled" ? { border: "1px solid #e5b84f" } : buttonStyle === "outline" ? { border: "1px solid rgba(229,184,79,.72)" } : buttonStyle === "ghost" ? { border: "1px solid rgba(255,255,255,.16)" } : {}),
-    transform: hasGeometry ? `translate3d(${override.layerX}px, ${override.layerY}px, 0)` : undefined,
+    transform: behavior.isFloating && (override.layerX || override.layerY) ? `translate3d(${override.layerX}px, ${override.layerY}px, 0)` : undefined,
     width: override.layerWidth ? `${override.layerWidth}px` : undefined,
     height: override.layerHeight ? `${override.layerHeight}px` : undefined,
     minHeight: isCroppedSection ? 0 : undefined,
     overflow: isCroppedSection ? "hidden" : undefined,
-    position: hasGeometry ? "relative" : undefined,
-    zIndex: hasGeometry ? safeZIndex : undefined,
+    position: behavior.isFloating ? "absolute" : (hasGeometry ? "relative" : undefined),
+    zIndex: behavior.isFloating ? Math.max(25, safeZIndex || 25) : (hasGeometry ? safeZIndex : undefined),
     opacity: override.layerOpacity / 100,
     display: override.isHidden ? "none" : undefined,
   };
@@ -747,9 +752,44 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       Object.entries(localOverrides).forEach(([key, override]) => {
         if (key.startsWith(`${pagePath}::`)) map.set(override.elementId, override);
       });
+      if (selected && draftPreviewEnabled.current) {
+        const existing = map.get(selected.id);
+        const optimistic: VisualOverride = {
+          id: existing?.id ?? -1,
+          pagePath,
+          elementId: selected.id,
+          elementTag: selected.tag,
+          contentText: draft.contentText || (existing?.contentText ?? null),
+          mediaUrl: draft.mediaUrl || (existing?.mediaUrl ?? null),
+          altText: draft.altText || (existing?.altText ?? null),
+          linkUrl: draft.linkUrl || (existing?.linkUrl ?? null),
+          alignment: draft.alignment || (existing?.alignment ?? "center"),
+          textColor: draft.textColor || (existing?.textColor ?? null),
+          bgColor: draft.bgColor || (existing?.bgColor ?? null),
+          fontSize: draft.fontSize || (existing?.fontSize ?? null),
+          padding: draft.padding || (existing?.padding ?? null),
+          margin: draft.margin || (existing?.margin ?? null),
+          borderRadius: draft.borderRadius || (existing?.borderRadius ?? null),
+          layerX: draft.layerX,
+          layerY: draft.layerY,
+          layerWidth: draft.layerWidth,
+          layerHeight: draft.layerHeight,
+          layerZIndex: draft.layerZIndex,
+          layerOpacity: draft.layerOpacity,
+          backgroundSize: draft.backgroundSize,
+          backgroundPositionX: draft.backgroundPositionX,
+          backgroundPositionY: draft.backgroundPositionY,
+          backgroundOverlay: draft.backgroundOverlay,
+          customCss: draft.customCss || (existing?.customCss ?? null),
+          isLocked: draft.isLocked,
+          isHidden: draft.isHidden,
+          status: "draft",
+        };
+        map.set(selected.id, optimistic);
+      }
     }
     return map;
-  }, [overrides, pagePath, localOverrides]);
+  }, [overrides, pagePath, localOverrides, selected, draft]);
   const currentOverride = selected ? overrideMap.get(selected.id) : undefined;
   const selectedHistory = selected ? history.filter((item) => item.elementId === selected.id).slice(0, 4) : [];
   const isSelectedBackground = Boolean(selected && isBackgroundSurface(selected.id, selected.label, selected.tag));
@@ -1723,6 +1763,83 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         isHidden: current?.isHidden ?? false,
       });
     },
+    updateElementOverride: (elementId: string, patch: Partial<VisualOverride>) => {
+      if (!pagePath) return;
+      const key = `${pagePath}::${elementId}`;
+      const current = overrideMap.get(elementId);
+      const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(elementId)}"]`);
+      const elementTag = (node?.dataset.visualTag as ElementTag) || current?.elementTag || "text";
+      const updatedOverride: VisualOverride = {
+        id: current?.id ?? -1,
+        pagePath,
+        elementId,
+        elementTag,
+        contentText: patch.contentText !== undefined ? patch.contentText : (current?.contentText ?? null),
+        mediaUrl: patch.mediaUrl !== undefined ? patch.mediaUrl : (current?.mediaUrl ?? null),
+        altText: patch.altText !== undefined ? patch.altText : (current?.altText ?? null),
+        linkUrl: patch.linkUrl !== undefined ? patch.linkUrl : (current?.linkUrl ?? null),
+        alignment: patch.alignment !== undefined ? patch.alignment : (current?.alignment ?? "center"),
+        textColor: patch.textColor !== undefined ? patch.textColor : (current?.textColor ?? null),
+        bgColor: patch.bgColor !== undefined ? patch.bgColor : (current?.bgColor ?? null),
+        fontSize: patch.fontSize !== undefined ? patch.fontSize : (current?.fontSize ?? null),
+        padding: patch.padding !== undefined ? patch.padding : (current?.padding ?? null),
+        margin: patch.margin !== undefined ? patch.margin : (current?.margin ?? null),
+        borderRadius: patch.borderRadius !== undefined ? patch.borderRadius : (current?.borderRadius ?? null),
+        layerX: patch.layerX !== undefined ? patch.layerX : (current?.layerX ?? 0),
+        layerY: patch.layerY !== undefined ? patch.layerY : (current?.layerY ?? 0),
+        layerWidth: patch.layerWidth !== undefined ? patch.layerWidth : (current?.layerWidth ?? null),
+        layerHeight: patch.layerHeight !== undefined ? patch.layerHeight : (current?.layerHeight ?? null),
+        layerZIndex: patch.layerZIndex !== undefined ? patch.layerZIndex : (current?.layerZIndex ?? 0),
+        layerOpacity: patch.layerOpacity !== undefined ? patch.layerOpacity : (current?.layerOpacity ?? 100),
+        backgroundSize: patch.backgroundSize !== undefined ? patch.backgroundSize : (current?.backgroundSize ?? 100),
+        backgroundPositionX: patch.backgroundPositionX !== undefined ? patch.backgroundPositionX : (current?.backgroundPositionX ?? 50),
+        backgroundPositionY: patch.backgroundPositionY !== undefined ? patch.backgroundPositionY : (current?.backgroundPositionY ?? 50),
+        backgroundOverlay: patch.backgroundOverlay !== undefined ? patch.backgroundOverlay : (current?.backgroundOverlay ?? 0),
+        customCss: patch.customCss !== undefined ? patch.customCss : (current?.customCss ?? null),
+        isLocked: patch.isLocked !== undefined ? patch.isLocked : (current?.isLocked ?? false),
+        isHidden: patch.isHidden !== undefined ? patch.isHidden : (current?.isHidden ?? false),
+        status: "draft",
+      };
+      setLocalOverrides((prev) => ({ ...prev, [key]: updatedOverride }));
+      if (selected?.id === elementId) {
+        setDraft((draftPrev) => ({
+          ...draftPrev,
+          ...(patch.contentText !== undefined ? { contentText: patch.contentText || "" } : {}),
+          ...(patch.mediaUrl !== undefined ? { mediaUrl: patch.mediaUrl || "" } : {}),
+          ...(patch.textColor !== undefined ? { textColor: patch.textColor || "" } : {}),
+          ...(patch.bgColor !== undefined ? { bgColor: patch.bgColor || "" } : {}),
+          ...(patch.fontSize !== undefined ? { fontSize: patch.fontSize || "" } : {}),
+          ...(patch.padding !== undefined ? { padding: patch.padding || "" } : {}),
+          ...(patch.margin !== undefined ? { margin: patch.margin || "" } : {}),
+          ...(patch.borderRadius !== undefined ? { borderRadius: patch.borderRadius || "" } : {}),
+          ...(patch.customCss !== undefined ? { customCss: patch.customCss || "" } : {}),
+        }));
+      }
+      save.mutate({
+        elementId,
+        pagePath,
+        elementTag,
+        contentText: updatedOverride.contentText ?? undefined,
+        mediaUrl: updatedOverride.mediaUrl ?? undefined,
+        altText: updatedOverride.altText ?? undefined,
+        textColor: updatedOverride.textColor ?? undefined,
+        bgColor: updatedOverride.bgColor ?? undefined,
+        fontSize: updatedOverride.fontSize ?? undefined,
+        alignment: updatedOverride.alignment ?? undefined,
+        linkUrl: updatedOverride.linkUrl ?? undefined,
+        borderRadius: updatedOverride.borderRadius ?? undefined,
+        padding: updatedOverride.padding ?? undefined,
+        margin: updatedOverride.margin ?? undefined,
+        customCss: updatedOverride.customCss ?? undefined,
+        layerX: updatedOverride.layerX,
+        layerY: updatedOverride.layerY,
+        layerWidth: updatedOverride.layerWidth,
+        layerHeight: updatedOverride.layerHeight,
+        layerZIndex: updatedOverride.layerZIndex,
+        layerOpacity: updatedOverride.layerOpacity,
+        isHidden: updatedOverride.isHidden,
+      });
+    },
     alignSelected,
     alignSelectedVertically,
     distributeSelected,
@@ -2059,10 +2176,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   // ── Two-Way Pro Studio Sync ──────────────────────────────
   useEffect(() => {
     if (!isStudioCanvasMode || typeof window === "undefined" || window.parent === window) return;
+    const currentBehavior = parseLayerBehavior(draft.customCss);
     window.parent.postMessage({
       type: "AQEEQ_STUDIO_SYNC",
       selected,
-      draft,
+      draft: {
+        ...draft,
+        isFloating: currentBehavior.isFloating ?? false,
+        device: currentBehavior.device ?? "all",
+        animation: currentBehavior.animation ?? "none",
+        revealOnScroll: currentBehavior.revealOnScroll ?? false,
+        buttonHover: currentBehavior.buttonHover ?? "none",
+      },
       undoCount: undoStack.length,
       redoCount: redoStack.length,
       dirtyCount: Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length,
@@ -2078,7 +2203,43 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (!data || typeof data !== "object") return;
       if (data.type === "AQEEQ_STUDIO_APPLY_DRAFT") {
         draftPreviewEnabled.current = true;
-        setDraft((prev) => ({ ...prev, ...data.patch }));
+        const patch = data.patch;
+        setDraft((prev) => {
+          let nextCss = prev.customCss;
+          if (patch.isFloating !== undefined || patch.device !== undefined || patch.animation !== undefined || patch.revealOnScroll !== undefined || patch.buttonHover !== undefined) {
+            nextCss = serializeLayerBehavior(prev.customCss, {
+              ...(patch.isFloating !== undefined ? { isFloating: patch.isFloating } : {}),
+              ...(patch.device !== undefined ? { device: patch.device } : {}),
+              ...(patch.animation !== undefined ? { animation: patch.animation } : {}),
+              ...(patch.revealOnScroll !== undefined ? { revealOnScroll: patch.revealOnScroll } : {}),
+              ...(patch.buttonHover !== undefined ? { buttonHover: patch.buttonHover } : {}),
+            });
+          }
+          const next = { ...prev, ...patch, customCss: nextCss };
+          if (selected && pagePath) {
+            const key = `${pagePath}::${selected.id}`;
+            setLocalOverrides((curr) => {
+              const existing = curr[key] || overrideMap.get(selected.id);
+              if (!existing) return curr;
+              return {
+                ...curr,
+                [key]: {
+                  ...existing,
+                  contentText: next.contentText || existing.contentText,
+                  mediaUrl: next.mediaUrl || existing.mediaUrl,
+                  textColor: next.textColor || existing.textColor,
+                  bgColor: next.bgColor || existing.bgColor,
+                  fontSize: next.fontSize || existing.fontSize,
+                  padding: next.padding || existing.padding,
+                  margin: next.margin || existing.margin,
+                  borderRadius: next.borderRadius || existing.borderRadius,
+                  customCss: nextCss,
+                },
+              };
+            });
+          }
+          return next;
+        });
       } else if (data.type === "AQEEQ_STUDIO_UNDO") {
         undoSession();
       } else if (data.type === "AQEEQ_STUDIO_REDO") {
@@ -3141,7 +3302,7 @@ function BackgroundSizingControls({ aspectLocked, autoArrange, onFit, onToggleAs
 }
 
 export function VisualEditable({ id, htmlId, tag, label, defaultText, children, className = "", as: Tag = "div", onAction, onClick, title, style }: { id: string; htmlId?: string; tag: ElementTag; label: string; defaultText?: string; children?: ReactNode | ((text: string) => ReactNode); className?: string; as?: "article" | "div" | "span" | "small" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "button" | "section" | "footer" | "header" | "aside" | "nav"; onAction?: () => void; onClick?: () => void; title?: string; style?: React.CSSProperties }) {
-  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, updateTextContent, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
+  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, updateTextContent, updateElementOverride, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
   const isInteractiveTransform = layerMode || Boolean(isStudioCanvasMode);
   const override = getOverride(id);
   const content = override?.contentText ?? defaultText ?? "";
@@ -3152,6 +3313,55 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   const [isInView, setIsInView] = useState(!behavior.revealOnScroll);
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const isTextLike = tag === "text" || tag === "button" || ["h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "button"].includes(Tag);
+
+  const [spacingDrag, setSpacingDrag] = useState<{ isDragging: boolean; startY: number; startMargin: number; currentMargin: number } | null>(null);
+
+  const parseMarginBottom = (marginStr?: string | null): number => {
+    if (!marginStr) return 0;
+    const parts = marginStr.trim().split(/\s+/);
+    if (parts.length === 1) {
+      const val = parseInt(parts[0], 10);
+      return isNaN(val) ? 0 : val;
+    }
+    if (parts.length >= 3) {
+      const val = parseInt(parts[2], 10);
+      return isNaN(val) ? 0 : val;
+    }
+    return 0;
+  };
+
+  const startSpacingDrag = (e: React.PointerEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    const initialMargin = parseMarginBottom(override?.margin);
+    setSpacingDrag({
+      isDragging: true,
+      startY: e.clientY,
+      startMargin: initialMargin,
+      currentMargin: initialMargin,
+    });
+  };
+
+  const onSpacingPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (!spacingDrag?.isDragging) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const dy = e.clientY - spacingDrag.startY;
+    const newMargin = Math.max(0, Math.min(260, Math.round(spacingDrag.startMargin + dy)));
+    setSpacingDrag((prev) => prev ? { ...prev, currentMargin: newMargin } : null);
+  };
+
+  const endSpacingDrag = (e: React.PointerEvent<HTMLElement>) => {
+    if (!spacingDrag?.isDragging) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const finalMargin = spacingDrag.currentMargin;
+    setSpacingDrag(null);
+    const formattedMargin = `0px 0px ${finalMargin}px 0px`;
+    updateElementOverride?.(id, { margin: formattedMargin });
+    toast.success(`تم ضبط المسافة السفلية: ${finalMargin} بكسل`);
+  };
 
   const finishInlineEdit = () => {
     setIsInlineEditing(false);
@@ -3253,7 +3463,18 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     const frame = liveFrame ?? { x: override?.layerX ?? 0, y: override?.layerY ?? 0, width: override?.layerWidth ?? null, height: override?.layerHeight ?? null };
     const isStructuralSection = tag === "section" || tag === "section-block";
     const savedFrame = active.mode === "resize" && isStructuralSection ? { ...frame, y: active.baseY } : frame;
-    saveLayer(id, { layerX: savedFrame.x, layerY: savedFrame.y, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: override?.layerZIndex ?? 0, layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
+    const movedFar = active.mode === "move" && (Math.abs(savedFrame.x) > 6 || Math.abs(savedFrame.y) > 6);
+    const shouldFloat = behavior.isFloating || movedFar;
+    const nextCustomCss = shouldFloat && !behavior.isFloating
+      ? serializeLayerBehavior(override?.customCss || "", { isFloating: true })
+      : override?.customCss;
+    if (shouldFloat && !behavior.isFloating) {
+      toast.info("تم تفعيل وضع التموضع الحر (Floating Pin) لهذا العنصر");
+    }
+    saveLayer(id, { layerX: savedFrame.x, layerY: savedFrame.y, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: override?.layerZIndex ?? (shouldFloat ? 25 : 0), layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
+    if (nextCustomCss !== override?.customCss) {
+      updateElementOverride?.(id, { customCss: nextCustomCss });
+    }
     const containingSection = isDirectBackground ? layerRef.current?.parentElement?.closest<HTMLElement>("[data-visual-id]") : null;
     const containingSectionId = containingSection?.dataset.visualId;
     const containingSectionTag = containingSection?.dataset.visualTag as ElementTag | undefined;
@@ -3293,6 +3514,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       backgroundColor: customBgColor,
     } as React.CSSProperties : {}),
     ...(groupOffset ? { transform: `translate3d(${(override?.layerX ?? 0) + groupOffset.dx}px, ${(override?.layerY ?? 0) + groupOffset.dy}px, 0)` } : liveFrame ? { transform: `translate3d(${liveFrame.x}px, ${liveFrame.y}px, 0)`, width: liveFrame.width ? `${liveFrame.width}px` : undefined, height: liveFrame.height ? `${liveFrame.height}px` : undefined } : {}),
+    ...(spacingDrag?.isDragging ? { marginBottom: `${spacingDrag.currentMargin}px` } : {}),
     ...(behavior.revealOnScroll && !isEditing && !isInView ? { opacity: 0 } : {}),
     ...(style?.position ? { position: style.position } : {}),
   };
@@ -3464,6 +3686,24 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         ) : null}
         <button
           type="button"
+          title={behavior.isFloating ? "تحويل إلى تدفق متجاوب ذكي (Smart Flow)" : "تحويل إلى عنصر عائم حر (Floating Pin)"}
+          onClick={() => {
+            const nextFloating = !behavior.isFloating;
+            const nextCss = serializeLayerBehavior(override?.customCss || "", { isFloating: nextFloating });
+            updateElementOverride?.(id, { customCss: nextCss });
+            toast.success(nextFloating ? "تم تفعيل التموضع الحر (Floating Pin)" : "تمت العودة للتدفق المتجاوب الذكي (Smart Flow)");
+          }}
+          className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-bold transition ${
+            behavior.isFloating
+              ? "bg-amber-400 text-amber-950 font-black shadow-lg"
+              : "text-slate-300 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          <Pin size={11} className={behavior.isFloating ? "rotate-45" : ""} />
+          <span>{behavior.isFloating ? "عائم حر" : "متجاوب"}</span>
+        </button>
+        <button
+          type="button"
           title="تكرار العنصر كمسودة"
           onClick={() => duplicateSelected?.()}
           className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
@@ -3501,6 +3741,37 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         { handle: "s" as const, label: "قص القسم من الأسفل مع التصاق القسم التالي", className: "-bottom-2 left-1/2 -translate-x-1/2 cursor-ns-resize" },
       ] : []),
     ] as const).map(({ handle, label: handleLabel, className: handleClass }) => <button key={handle} type="button" aria-label={handleLabel} title={handleLabel} onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize", handle); }} className={`absolute z-[83] grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-[#08467d] shadow-[0_0_0_3px_rgba(7,9,13,.45)] ${handleClass}`}><span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14]" /></button>) : null}
+    {/* Visual Spacing Handle & Live Sculpting Guide */}
+    {spacingDrag?.isDragging && (
+      <div
+        style={{ height: `${spacingDrag.currentMargin}px` }}
+        className="pointer-events-none absolute top-full left-0 right-0 z-[84] bg-amber-400/20 border-x border-b border-dashed border-amber-400/70 flex items-center justify-center animate-in fade-in duration-100"
+      >
+        <span className="rounded-full bg-black/90 px-2.5 py-0.5 text-[10px] font-mono font-black text-amber-300 shadow-xl border border-amber-400/50">
+          ↕ {spacingDrag.currentMargin}px هامش
+        </span>
+      </div>
+    )}
+    {isEditing && selected && !isLocked && !isInlineEditing && (
+      <div
+        data-aq-spacing-handle
+        onPointerDown={startSpacingDrag}
+        onPointerMove={onSpacingPointerMove}
+        onPointerUp={endSpacingDrag}
+        onPointerCancel={endSpacingDrag}
+        className="pointer-events-auto absolute -bottom-3 left-1/2 -translate-x-1/2 z-[85] cursor-ns-resize select-none touch-none group/spacing"
+        title="اسحب بالماوس لضبط وتوسيع المسافة السفلية (Margin Bottom)"
+      >
+        <div className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-black shadow-xl backdrop-blur-md transition ${
+          spacingDrag?.isDragging
+            ? "border-amber-400 bg-amber-400 text-amber-950 scale-110 ring-2 ring-amber-400/50"
+            : "border-amber-400/50 bg-[#090d14]/95 text-amber-300 hover:bg-amber-400 hover:text-amber-950 hover:scale-105"
+        }`}>
+          <ArrowUpDown size={10} />
+          <span>{spacingDrag?.isDragging ? `${spacingDrag.currentMargin}px` : "مسافة ↕"}</span>
+        </div>
+      </div>
+    )}
     {typeof children === "function" ? children(content) : children ?? content}
   </Tag>;
 }

@@ -215,6 +215,29 @@ export default function VisualSections({ pagePath, anchorId = "page-end" }: { pa
   const onDrop = (event: React.DragEvent<HTMLElement>, index: number) => {
     event.preventDefault();
     setActiveDropIndex(null);
+
+    const draggedSectionId = event.dataTransfer.getData("application/x-site-builder-section-id");
+    if (draggedSectionId) {
+      const currentAnchorIds = anchored.map((s) => s.sectionId);
+      const fromIndex = currentAnchorIds.indexOf(draggedSectionId);
+      if (fromIndex === -1) return;
+      if (fromIndex === index || fromIndex === index - 1) return;
+
+      const nextAnchorIds = [...currentAnchorIds];
+      nextAnchorIds.splice(fromIndex, 1);
+      const insertIdx = index > fromIndex ? index - 1 : index;
+      nextAnchorIds.splice(insertIdx, 0, draggedSectionId);
+
+      const sectionIds = sections.map((s) => s.sectionId);
+      const firstAnchorPosition = currentAnchorIds.length ? sectionIds.indexOf(currentAnchorIds[0]) : 0;
+      const nextOrder = sectionIds.filter((id) => !currentAnchorIds.includes(id));
+      nextOrder.splice(firstAnchorPosition < 0 ? 0 : firstAnchorPosition, 0, ...nextAnchorIds);
+
+      reorder.mutate({ pagePath, sectionIds: nextOrder });
+      toast.success("تم تغيير ترتيب القسم بالسحب والإفلات");
+      return;
+    }
+
     const raw = event.dataTransfer.getData("application/x-site-builder-block");
     if (!raw) return;
     try {
@@ -229,16 +252,53 @@ export default function VisualSections({ pagePath, anchorId = "page-end" }: { pa
     save.mutate({ pagePath, sectionId: `section-${section.sectionType}-${Date.now().toString(36)}`, sectionType: section.sectionType, orderIndex: sections.length, config }, { onSuccess: () => toast.success("تم تكرار القسم كمسودة") });
   };
 
-  const dropZone = (index: number) => isEditing ? <div key={`drop-${index}`} onDragEnter={(event) => { event.preventDefault(); setActiveDropIndex(index); }} onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setActiveDropIndex(index); }} onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveDropIndex(null); }} onDrop={(event) => onDrop(event, index)} className={`relative mx-auto flex h-12 w-[min(100%-2rem,1180px)] items-center justify-center transition-all ${activeDropIndex === index ? "my-3 h-16" : ""}`}>
-    <div className={`absolute inset-x-5 h-px transition ${activeDropIndex === index ? "bg-amber-300 shadow-[0_0_18px_rgba(251,191,36,.85)]" : "bg-transparent"}`} />
-    <span className={`relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-black transition ${activeDropIndex === index ? "border-amber-300 bg-amber-300 text-amber-950" : "border-dashed border-[#08467d]/60 bg-[#101825] text-amber-200 shadow-[0_6px_22px_rgba(8,70,125,.1)]"}`}><Plus size={12} />{activeDropIndex === index ? "أفلت القالب هنا" : "اسحب قالباً إلى هنا"}</span>
-  </div> : null;
+  const dropZone = (index: number) => isEditing ? (
+    <div
+      key={`drop-${index}`}
+      onDragEnter={(event) => {
+        event.preventDefault();
+        setActiveDropIndex(index);
+      }}
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        setActiveDropIndex(index);
+      }}
+      onDragLeave={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setActiveDropIndex(null);
+        }
+      }}
+      onDrop={(event) => onDrop(event, index)}
+      className={`relative mx-auto flex w-[min(100%-2rem,1180px)] items-center justify-center transition-all duration-200 ${
+        activeDropIndex === index ? "my-6 h-20" : "h-12"
+      }`}
+    >
+      <div
+        className={`absolute inset-x-0 transition-all duration-200 ${
+          activeDropIndex === index
+            ? "h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_25px_rgba(251,191,36,1)] animate-pulse"
+            : "h-px bg-transparent"
+        }`}
+      />
+      <span
+        className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black transition-all duration-200 ${
+          activeDropIndex === index
+            ? "border-amber-300 bg-amber-400 text-amber-950 scale-110 shadow-[0_0_24px_rgba(251,191,36,.6)]"
+            : "border-dashed border-[#08467d]/60 bg-[#101825] text-amber-200 shadow-[0_6px_22px_rgba(8,70,125,.1)]"
+        }`}
+      >
+        <Plus size={14} />
+        {activeDropIndex === index ? "🎯 أفلت القسم أو القالب هنا" : "اسحب قسماً أو قالباً إلى هنا"}
+      </span>
+    </div>
+  ) : null;
 
   if (!anchored.length && !isEditing) return null;
   return <section className={isEditing ? "relative" : ""} data-page-anchor={anchorId}>
     {dropZone(0)}
     {anchored.map((section, index) => <div key={section.sectionId} className="group/section relative">
-      {isEditing ? <div className="pointer-events-none absolute right-5 top-5 z-[84] flex items-center gap-1 opacity-0 transition group-hover/section:opacity-100"><span className="pointer-events-auto inline-flex items-center gap-1 rounded-lg bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-amber-100 shadow-xl"><GripVertical size={13} />قسم</span><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "up"); }} disabled={index === 0} title="تحريك القسم للأعلى" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowUp size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "down"); }} disabled={index === anchored.length - 1} title="تحريك القسم للأسفل" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowDown size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); setEditingSection(section); }} title="تعديل محتوى القسم" className="pointer-events-auto inline-flex items-center gap-1 rounded-lg border border-[#08467d]/50 bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-[#f8ca14] shadow-xl transition hover:bg-[#08467d] hover:text-white"><Save size={13} />تعديل</button><button type="button" onClick={(event) => { event.stopPropagation(); duplicate(section); }} title="تكرار القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200"><Copy size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); remove.mutate({ pagePath, sectionId: section.sectionId }); }} title="حذف القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/40 bg-[#111521]/95 text-[#de191e] shadow-xl transition hover:bg-[#de191e]/15"><Trash2 size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); publish.mutate({ pagePath, sectionId: section.sectionId }); }} title="نشر القسم" className="pointer-events-auto rounded-lg bg-emerald-400 px-2 py-1.5 text-[10px] font-black text-emerald-950 shadow-xl">نشر</button></div> : null}
+      {isEditing ? <div className="pointer-events-none absolute right-5 top-5 z-[84] flex items-center gap-1 opacity-0 transition group-hover/section:opacity-100"><div draggable={true} onDragStart={(event) => { event.dataTransfer.setData("application/x-site-builder-section-id", section.sectionId); event.dataTransfer.effectAllowed = "move"; }} className="pointer-events-auto inline-flex items-center gap-1.5 rounded-lg bg-[#111521]/95 px-2.5 py-1.5 text-[10px] font-black text-amber-100 shadow-xl cursor-grab active:cursor-grabbing hover:bg-amber-400 hover:text-amber-950 transition border border-white/10" title="اسحب هذا القسم بالماوس لنقله لموضع آخر"><GripVertical size={13} /><span>اسحب للترتيب</span></div><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "up"); }} disabled={index === 0} title="تحريك القسم للأعلى" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowUp size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "down"); }} disabled={index === anchored.length - 1} title="تحريك القسم للأسفل" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowDown size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); setEditingSection(section); }} title="تعديل محتوى القسم" className="pointer-events-auto inline-flex items-center gap-1 rounded-lg border border-[#08467d]/50 bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-[#f8ca14] shadow-xl transition hover:bg-[#08467d] hover:text-white"><Save size={13} />تعديل</button><button type="button" onClick={(event) => { event.stopPropagation(); duplicate(section); }} title="تكرار القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200"><Copy size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); remove.mutate({ pagePath, sectionId: section.sectionId }); }} title="حذف القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/40 bg-[#111521]/95 text-[#de191e] shadow-xl transition hover:bg-[#de191e]/15"><Trash2 size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); publish.mutate({ pagePath, sectionId: section.sectionId }); }} title="نشر القسم" className="pointer-events-auto rounded-lg bg-emerald-400 px-2 py-1.5 text-[10px] font-black text-emerald-950 shadow-xl">نشر</button></div> : null}
       <BuilderSectionView section={section} pagePath={pagePath} />
       {dropZone(index + 1)}
     </div>)}

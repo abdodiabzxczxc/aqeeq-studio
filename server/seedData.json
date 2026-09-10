@@ -2462,6 +2462,24 @@
       "status": "published",
       "updatedAt": "2026-09-10T11:28:05.725Z",
       "publishedAt": "2026-09-10T11:28:05.780Z"
+    },
+    "/::studio-hero-title": {
+      "id": 1789043324643,
+      "pagePath": "/",
+      "elementId": "studio-hero-title",
+      "elementTag": "text",
+      "alignment": "center",
+      "layerX": 0,
+      "layerY": 0,
+      "layerWidth": null,
+      "layerHeight": null,
+      "layerZIndex": 0,
+      "layerOpacity": 100,
+      "customCss": "{\"isFloating\":true}",
+      "isHidden": false,
+      "updatedBy": 1,
+      "status": "draft",
+      "updatedAt": "2026-09-10T12:28:44.643Z"
     }
   },
   "nextId": {
