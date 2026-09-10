@@ -55,7 +55,7 @@ export function StudioTopBar({
   undoCount = 0,
   redoCount = 0,
   dirtyCount = 0,
-  smartAutoDetect = true,
+  smartAutoDetect = false,
   onToggleSmartAutoDetect,
   onOpenSnapshots,
   onUndo,

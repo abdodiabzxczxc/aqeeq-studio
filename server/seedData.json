@@ -2430,7 +2430,7 @@
       "publishedAt": "2026-09-10T11:10:21.190Z"
     },
     "/::studio-hero-kicker": {
-      "id": 1789039685725,
+      "id": 1789045450996,
       "pagePath": "/",
       "elementId": "studio-hero-kicker",
       "elementTag": "text",
@@ -2460,8 +2460,8 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "published",
-      "updatedAt": "2026-09-10T11:28:05.725Z",
-      "publishedAt": "2026-09-10T11:28:05.780Z"
+      "updatedAt": "2026-09-10T13:04:10.996Z",
+      "publishedAt": "2026-09-10T13:04:11.051Z"
     },
     "/::studio-hero-title": {
       "id": 1789045339064,
@@ -2608,7 +2608,7 @@
       "updatedAt": "2026-09-10T12:38:01.572Z"
     },
     "/::stack-order-hero-headline": {
-      "id": 1789045366477,
+      "id": 1789045712168,
       "pagePath": "/",
       "elementId": "stack-order-hero-headline",
       "elementTag": "text",
@@ -2623,7 +2623,7 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "draft",
-      "updatedAt": "2026-09-10T13:02:46.477Z"
+      "updatedAt": "2026-09-10T13:08:32.168Z"
     }
   },
   "nextId": {

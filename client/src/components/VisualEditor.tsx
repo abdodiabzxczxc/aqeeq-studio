@@ -269,7 +269,7 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
   updateTextContent: () => undefined,
   updateElementOverride: () => undefined,
   isStudioCanvasMode: false,
-  smartAutoDetect: true,
+  smartAutoDetect: false,
   toggleSmartAutoDetect: () => undefined,
   getOverride: () => undefined,
   getOwnOverride: () => undefined,
@@ -469,9 +469,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [smartAutoDetect, setSmartAutoDetect] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("aqeeq_smart_auto_detect");
-      return saved !== null ? saved === "true" : true;
+      return saved === "true";
     }
-    return true;
+    return false;
   });
 
   const toggleSmartAutoDetect = () => {
@@ -1151,12 +1151,17 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         node.closest(".aq-editor-toolbar") ||
         node.closest(".aq-editor-drawer") ||
         node.closest("[data-aq-editor-properties]") ||
+        node.closest("[data-aq-editor-panel]") ||
+        node.closest("[data-aq-studio-inspector]") ||
+        node.closest(".aq-studio-inspector") ||
         node.closest("[data-radix-popper-content-wrapper]") ||
+        node.closest("[data-radix-dialog-content]") ||
         node.closest("[role='dialog']") ||
         node.closest("[role='menu']") ||
         node.closest("[role='listbox']") ||
         node.closest("[role='tooltip']") ||
         node.closest("[data-no-visual-edit]") ||
+        node.closest(".media-library-modal") ||
         node.closest("[data-interactive-fx]") ||
         node.closest("[data-hover-preview]") ||
         node.closest("[data-aqeeq-video]") ||
@@ -1171,7 +1176,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       );
     };
 
-    if (isEditing && !previewMode) {
+    if (isEditing && !previewMode && smartAutoDetect) {
       document.body.classList.add("aq-smart-editable-active");
     } else {
       document.body.classList.remove("aq-smart-editable-active");
@@ -1349,6 +1354,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 1. First priority: explicit visual element
       const visualEl = targetEl.closest<HTMLElement>("[data-visual-id]");
       if (visualEl && !isEditorSystemUi(visualEl)) {
+        // When smartAutoDetect is disabled, completely ignore any auto-detected tags
+        if (!smartAutoDetect && visualEl.dataset.visualAuto === "true") {
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         const id = visualEl.dataset.visualId!;
@@ -1358,7 +1367,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // 2. Second priority: auto-tagged element
+      // If smartAutoDetect is OFF, STOP HERE. Do not intercept or hijack any other clicks!
+      if (!smartAutoDetect) {
+        return;
+      }
+
+      // 2. Second priority: auto-tagged element (ONLY when smartAutoDetect is active)
       const autoTarget = targetEl.closest<HTMLElement>("[data-visual-auto='true']");
       if (autoTarget && !isEditorSystemUi(autoTarget)) {
         e.preventDefault();
@@ -1372,7 +1386,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // 3. Third priority: direct image or svg or text click
+      // 3. Third priority: direct image or svg click (ONLY when smartAutoDetect is active)
       if (targetEl.tagName === "IMG") {
         const img = targetEl as HTMLImageElement;
         e.preventDefault();
@@ -1404,6 +1418,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const targetEl = e.target as HTMLElement | null;
       if (!targetEl || isEditorSystemUi(targetEl)) return;
       const textEl = targetEl.closest<HTMLElement>("[data-visual-tag='text'], [data-visual-auto='true']");
+      if (!textEl) return;
+      if (!smartAutoDetect && textEl.dataset.visualAuto === "true") return;
       if (textEl && !textEl.isContentEditable) {
         textEl.contentEditable = "true";
         textEl.focus();
@@ -1475,26 +1491,33 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     }
 
     let scanTimer: ReturnType<typeof setTimeout> | null = null;
-    const debouncedScan = () => {
-      if (scanTimer) clearTimeout(scanTimer);
-      scanTimer = setTimeout(() => {
-        scanAndTag();
-        if (isStudioCanvasMode) {
-          setStudioLayers(collectStudioLayers());
-        }
-      }, 300);
-    };
+    let observer: MutationObserver | null = null;
 
-    const observer = new MutationObserver(() => {
-      debouncedScan();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    if (smartAutoDetect) {
+      const debouncedScan = () => {
+        if (scanTimer) clearTimeout(scanTimer);
+        scanTimer = setTimeout(() => {
+          scanAndTag();
+          if (isStudioCanvasMode) {
+            setStudioLayers(collectStudioLayers());
+          }
+        }, 300);
+      };
+
+      observer = new MutationObserver(() => {
+        debouncedScan();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    } else {
+      // Clean up any stale auto attributes and remove classes
+      scanAndTag();
+    }
 
     return () => {
       if (scanTimer) clearTimeout(scanTimer);
       window.removeEventListener("click", handleCaptureClick, true);
       window.removeEventListener("dblclick", handleCaptureDblClick, true);
-      observer.disconnect();
+      if (observer) observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
   }, [isEditing, previewMode, overrideMap, pagePath, isAdmin, isStudioCanvasMode, smartAutoDetect]);

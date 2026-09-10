@@ -137,6 +137,7 @@ export function StudioInspector({
     return (
       <aside
         data-aq-studio-inspector
+        data-no-visual-edit="true"
         className="flex w-72 sm:w-80 flex-col border-r border-white/10 bg-[#07090e]/98 text-white shadow-2xl backdrop-blur-2xl p-6 items-center justify-center text-center select-none"
         dir="rtl"
       >
@@ -154,6 +155,7 @@ export function StudioInspector({
   return (
     <aside
       data-aq-studio-inspector
+      data-no-visual-edit="true"
       className="flex w-80 sm:w-88 flex-col border-r border-white/10 bg-[#07090e]/98 text-white shadow-2xl backdrop-blur-2xl select-none"
       dir="rtl"
     >

@@ -19,7 +19,7 @@ export default function AqeeqProStudioPage() {
   const [isLivePreview, setIsLivePreview] = useState<boolean>(false);
   const [activeDockTab, setActiveDockTab] = useState<StudioDockTab>(null);
   const [snapshotsOpen, setSnapshotsOpen] = useState<boolean>(false);
-  const [smartAutoDetect, setSmartAutoDetect] = useState<boolean>(true);
+  const [smartAutoDetect, setSmartAutoDetect] = useState<boolean>(false);
 
   const [selectedElement, setSelectedElement] = useState<{ id: string; tag: string; label: string } | null>(null);
   const [draft, setDraft] = useState<StudioInspectorDraft>({});
