@@ -14,9 +14,37 @@ import {
   Mail,
   MapPin,
   Flame,
+  Plus,
+  Trash2,
+  Eye,
+  EyeOff,
+  ArrowUp,
+  ArrowDown,
+  RotateCcw,
+  ExternalLink,
+  Briefcase,
+  PhoneCall,
+  Video,
+  Ticket,
+  Cloud,
+  Server,
+  Shield,
+  Clock,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  DEFAULT_SYSTEM_PORTALS,
+  SystemPortalItem,
+  SystemPortalCategory,
+  PORTAL_CATEGORY_LABELS,
+  AVAILABLE_PORTAL_ICONS,
+  PORTAL_ICON_CATEGORY_LABELS,
+  PortalIconCategory,
+} from "@shared/portals";
+import { renderPortalIcon } from "@/components/PortalIconRenderer";
 
 interface SystemBrandHubProps {
   dark: boolean;
@@ -33,23 +61,68 @@ export function SystemBrandHub({
 }: SystemBrandHubProps) {
   const [subTab, setSubTab] = useState<"header_footer" | "emergency" | "portals" | "marketing" | "seasons">("header_footer");
 
-  // Nav & Header Form
+  // 1. Top Utility Bar Form (بوابة التوظيف وأرقام الاستقبال)
+  const currentTopBar = orchestration?.topBar || {
+    enabled: true,
+    locationText: "المدينة المنورة — المملكة العربية السعودية",
+    locationUrl: "https://maps.google.com/?q=Alaqeeq+Schools+Madinah",
+    locationEnabled: true,
+    phone: "+966 53 189 6000",
+    phoneUrl: "tel:+966531896000",
+    phoneEnabled: true,
+    email: "info@alaqeeqholding.com",
+    emailUrl: "mailto:info@alaqeeqholding.com",
+    emailEnabled: true,
+    jobsText: "بوابة التوظيف",
+    jobsUrl: "https://live.aqeeq.edu.sa/jobs",
+    jobsEnabled: true,
+    workingHours: "أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م",
+    workingHoursEnabled: true,
+  };
+  const [topBarForm, setTopBarForm] = useState(currentTopBar);
+
+  // 2. Nav & Header Form
   const currentNav = orchestration?.nav || {};
   const [navForm, setNavForm] = useState(currentNav);
 
-  // Social Form
+  // 3. Social Form (10 Platforms)
   const currentSocial = orchestration?.social || {};
-  const [socialForm, setSocialForm] = useState(currentSocial);
+  const [socialForm, setSocialForm] = useState({
+    xUrl: currentSocial.xUrl || "",
+    instagramUrl: currentSocial.instagramUrl || "",
+    youtubeUrl: currentSocial.youtubeUrl || "",
+    snapchatUrl: currentSocial.snapchatUrl || "",
+    tiktokUrl: currentSocial.tiktokUrl || "",
+    facebookUrl: currentSocial.facebookUrl || "",
+    linkedinUrl: currentSocial.linkedinUrl || "",
+    telegramUrl: currentSocial.telegramUrl || "",
+    whatsappUrl: currentSocial.whatsappUrl || "",
+    phoneUrl: currentSocial.phoneUrl || "",
+  });
 
-  // Emergency Banner Form
+  // 4. System Portals Form
+  const [portalsList, setPortalsList] = useState<SystemPortalItem[]>(
+    orchestration?.systemPortals && orchestration.systemPortals.length > 0
+      ? orchestration.systemPortals
+      : DEFAULT_SYSTEM_PORTALS
+  );
+  const [isAddingPortal, setIsAddingPortal] = useState(false);
+  const [newPortalTitle, setNewPortalTitle] = useState("");
+  const [newPortalDesc, setNewPortalDesc] = useState("");
+  const [newPortalUrl, setNewPortalUrl] = useState("");
+  const [newPortalCategory, setNewPortalCategory] = useState<SystemPortalCategory>("parents_students");
+  const [newPortalIcon, setNewPortalIcon] = useState("file-text");
+  const [newPortalBadge, setNewPortalBadge] = useState("");
+
+  // 5. Emergency Banner Form
   const currentBanner = orchestration?.emergencyBanner || {};
   const [bannerForm, setBannerForm] = useState(currentBanner);
 
-  // Marketing Pixels Form
+  // 6. Marketing Pixels Form
   const currentPixels = orchestration?.marketingPixels || {};
   const [pixelsForm, setPixelsForm] = useState(currentPixels);
 
-  // Seasons Form (Theme overrides)
+  // 7. Seasons Form
   const currentTheme = orchestration?.theme || {};
   const [selectedSeason, setSelectedSeason] = useState<string>(currentTheme?.season || "default");
 
@@ -60,6 +133,68 @@ export function SystemBrandHub({
     { id: "ramadan", name: "شهر رمضان المبارك 🌙", desc: "ثيم الشهر الفضيل، أوقات الدوام، والتهاني" },
     { id: "exams", name: "موسم الاختبارات النهائية 📝", desc: "أدعية التوفيق ونصائح وإرشادات اللجان" },
   ];
+
+  // Portals Helper Functions
+  const handleTogglePortalVisibility = (id: string) => {
+    setPortalsList((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p))
+    );
+  };
+
+  const handleMovePortal = (id: string, direction: "up" | "down") => {
+    const list = [...portalsList];
+    const index = list.findIndex((p) => p.id === id);
+    if (index === -1) return;
+    if (direction === "up" && index > 0) {
+      const temp = list[index];
+      list[index] = list[index - 1];
+      list[index - 1] = temp;
+    } else if (direction === "down" && index < list.length - 1) {
+      const temp = list[index];
+      list[index] = list[index + 1];
+      list[index + 1] = temp;
+    }
+    const reordered = list.map((p, idx) => ({ ...p, order: idx + 1 }));
+    setPortalsList(reordered);
+  };
+
+  const handleDeletePortal = (id: string) => {
+    setPortalsList((prev) =>
+      prev.filter((p) => p.id !== id).map((p, idx) => ({ ...p, order: idx + 1 }))
+    );
+    toast.success("تم حذف البوابة من القائمة");
+  };
+
+  const handleAddPortal = () => {
+    if (!newPortalTitle.trim() || !newPortalUrl.trim()) {
+      toast.error("يرجى إدخال اسم البوابة ورابط التوجيه");
+      return;
+    }
+    const newP: SystemPortalItem = {
+      id: "portal-" + Date.now(),
+      title: newPortalTitle.trim(),
+      description: newPortalDesc.trim(),
+      url: newPortalUrl.trim(),
+      category: newPortalCategory,
+      iconName: newPortalIcon,
+      badge: newPortalBadge.trim() || undefined,
+      visible: true,
+      order: portalsList.length + 1,
+      openInNewTab: true,
+    };
+    setPortalsList([...portalsList, newP]);
+    setNewPortalTitle("");
+    setNewPortalDesc("");
+    setNewPortalUrl("");
+    setNewPortalBadge("");
+    setIsAddingPortal(false);
+    toast.success("تمت إضافة البوابة بنجاح ➕");
+  };
+
+  const handleResetPortalsToDefault = () => {
+    setPortalsList(DEFAULT_SYSTEM_PORTALS);
+    toast.info("تمت استعادة بوابات المدارس الافتراضية 🔄");
+  };
 
   return (
     <div className="space-y-6">
@@ -74,7 +209,7 @@ export function SystemBrandHub({
           <div>
             <h2 className="text-base font-black">هوية المنظومة والتقنية والحوكمة</h2>
             <p className="text-xs text-slate-400 font-bold">
-              إدارة الهيدر والفوتر، السوشيال ميديا، بوابات الدخول، بكسلات التسويق، والمواسم الوطنية
+              إدارة الهيدر والفوتر، بوابة التوظيف، شبكات التواصل الـ 10، بوابات المدارس، وبكسلات التسويق
             </p>
           </div>
         </div>
@@ -84,13 +219,25 @@ export function SystemBrandHub({
           <button
             type="button"
             onClick={() => setSubTab("header_footer")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
               subTab === "header_footer"
                 ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            الهيدر والفوتر 🌐
+            <span>الهيدر والتوظيف والسوشيال 📱</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("portals")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              subTab === "portals"
+                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Server size={13} />
+            <span>بوابات الأنظمة والخدمات ({portalsList.length}) 🚪</span>
           </button>
           <button
             type="button"
@@ -102,17 +249,6 @@ export function SystemBrandHub({
             }`}
           >
             البانر العاجل 🚨
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("portals")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-              subTab === "portals"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            بوابات المدارس 🚪
           </button>
           <button
             type="button"
@@ -139,111 +275,298 @@ export function SystemBrandHub({
         </div>
       </div>
 
-      {/* SUBTAB 1: HEADER & FOOTER & SOCIAL NETWORKS */}
+      {/* SUBTAB 1: HEADER & FOOTER & JOBS & 10 SOCIAL CHANNELS */}
       {subTab === "header_footer" && (
-        <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
-          <div className="flex items-center justify-between gap-4 pb-4 border-b border-current/10">
-            <div>
-              <h3 className="text-base font-black">إعدادات الترويسة وأزرار التواصل وشبكات التواصل الـ 10</h3>
-              <p className="text-xs text-slate-400 font-bold mt-0.5">
-                تعديل نصوص وأرقام الهيدر والفوتر، وروابط قنوات التواصل الرسمية
-              </p>
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Section 1A: Top Utility Bar & Employment Portal (بوابة التوظيف) */}
+          <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <div className="flex items-center justify-between gap-4 pb-4 border-b border-current/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Briefcase size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black">الشريط العلوي الرئاسي وبوابة التوظيف (Top Utility Bar)</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">
+                    التحكم في زر بوابة التوظيف، أوقات الاستقبال والدوام، وأرقام التواصل الرسمية بأعلى الموقع
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({
+                    topBar: topBarForm,
+                    nav: navForm,
+                    social: socialForm,
+                  });
+                  toast.success("تم حفظ إعدادات الهيدر وبوابة التوظيف بنجاح ✅");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer"
+              >
+                <Save size={13} />
+                <span>{isSaving ? "جاري الحفظ..." : "حفظ التعديلات 💾"}</span>
+              </Button>
             </div>
-            <Button
-              type="button"
-              onClick={async () => {
-                await onSaveOrchestration({ nav: navForm, social: socialForm });
-                toast.success("تم حفظ إعدادات الهيدر والفوتر بنجاح");
-              }}
-              disabled={isSaving}
-              className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
-            >
-              <Save size={13} />
-              <span>{isSaving ? "جاري الحفظ..." : "حفظ التعديلات 💾"}</span>
-            </Button>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <label className="text-xs font-black text-slate-300 block">رقم الهاتف الموحد</label>
-              <input
-                type="text"
-                value={navForm.phone || ""}
-                onChange={(e) => setNavForm({ ...navForm, phone: e.target.value })}
-                className="w-full rounded-xl border p-3 text-xs font-bold outline-none bg-white/5"
-              />
-            </div>
-            <div className="space-y-3">
-              <label className="text-xs font-black text-slate-300 block">رقم الواتساب الرسمي (بدون +)</label>
-              <input
-                type="text"
-                value={navForm.whatsapp || ""}
-                onChange={(e) => setNavForm({ ...navForm, whatsapp: e.target.value })}
-                className="w-full rounded-xl border p-3 text-xs font-bold outline-none bg-white/5"
-              />
-            </div>
-            <div className="space-y-3">
-              <label className="text-xs font-black text-slate-300 block">البريد الإلكتروني الرسمي</label>
-              <input
-                type="email"
-                value={navForm.email || ""}
-                onChange={(e) => setNavForm({ ...navForm, email: e.target.value })}
-                className="w-full rounded-xl border p-3 text-xs font-bold outline-none bg-white/5"
-              />
-            </div>
-            <div className="space-y-3">
-              <label className="text-xs font-black text-slate-300 block">نص زر الإجراء بالهيدر (CTA Button)</label>
-              <input
-                type="text"
-                value={navForm.ctaButtonText || ""}
-                onChange={(e) => setNavForm({ ...navForm, ctaButtonText: e.target.value })}
-                className="w-full rounded-xl border p-3 text-xs font-bold outline-none bg-white/5"
-              />
-            </div>
-          </div>
+            {/* Employment Portal Box (بوابة التوظيف) */}
+            <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Briefcase size={16} className="text-amber-400" />
+                  <h4 className="text-xs font-black text-amber-400">إعدادات بوابة التوظيف الرسمية</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-slate-400">
+                    {topBarForm.jobsEnabled ? "مفعلة وتظهر بالهيدر 🟢" : "مخفية مؤقتاً ⚪"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTopBarForm({ ...topBarForm, jobsEnabled: !topBarForm.jobsEnabled })}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                      topBarForm.jobsEnabled ? "bg-amber-500" : "bg-slate-700"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        topBarForm.jobsEnabled ? "translate-x-0" : "-translate-x-5"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
 
-          {/* Social Networks List */}
-          <div className="pt-4 border-t border-current/10 space-y-3">
-            <h4 className="text-xs font-black text-amber-400">حسابات التواصل الاجتماعي الرسمية</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-current/5 space-y-1.5">
-                <span className="text-[11px] font-black block">حساب منصة إكس (تويتر)</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">نص زر بوابة التوظيف</label>
+                  <input
+                    type="text"
+                    value={topBarForm.jobsText || ""}
+                    onChange={(e) => setTopBarForm({ ...topBarForm, jobsText: e.target.value })}
+                    placeholder="بوابة التوظيف"
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">رابط بوابة التقديم والوظائف (URL)</label>
+                  <input
+                    type="text"
+                    value={topBarForm.jobsUrl || ""}
+                    onChange={(e) => setTopBarForm({ ...topBarForm, jobsUrl: e.target.value })}
+                    placeholder="https://live.aqeeq.edu.sa/jobs"
+                    className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Other Top Bar Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-300 block">ساعات الدوام وأوقات الاستقبال</label>
                 <input
                   type="text"
-                  value={socialForm.xUrl || ""}
+                  value={topBarForm.workingHours || ""}
+                  onChange={(e) => setTopBarForm({ ...topBarForm, workingHours: e.target.value })}
+                  placeholder="أوقات الاستقبال: الأحد - الخميس 7:00 ص - 2:30 م"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-300 block">نص الموقع الجغرافي بالهيدر</label>
+                <input
+                  type="text"
+                  value={topBarForm.locationText || ""}
+                  onChange={(e) => setTopBarForm({ ...topBarForm, locationText: e.target.value })}
+                  placeholder="المدينة المنورة — المملكة العربية السعودية"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-300 block">رابط خرائط جوجل للمدارس</label>
+                <input
+                  type="text"
+                  value={topBarForm.locationUrl || ""}
+                  onChange={(e) => setTopBarForm({ ...topBarForm, locationUrl: e.target.value })}
+                  placeholder="https://maps.google.com/?q=..."
+                  className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-300 block">نص زر الإجراء بالهيدر (CTA Button)</label>
+                <input
+                  type="text"
+                  value={navForm.ctaButtonText || "القبول والتسجيل 🎓"}
+                  onChange={(e) => setNavForm({ ...navForm, ctaButtonText: e.target.value })}
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 1B: The 10 Official Social Media Platforms (شبكات التواصل الاجتماعي الـ 10) */}
+          <div className={`p-6 rounded-3xl border space-y-5 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <div className="flex items-center justify-between pb-3 border-b border-current/10">
+              <div>
+                <h3 className="text-base font-black">شبكات التواصل الاجتماعي الرسمية (10 قنوات معتمدة) 📱🔗</h3>
+                <p className="text-xs text-slate-400 font-bold mt-0.5">
+                  تظهر في الترويسة والفوتر وشريط الاتصال السريع، وتغذي شارات التواصل بالموقع
+                </p>
+              </div>
+              <span className="text-xs font-black text-amber-400 bg-amber-400/10 px-3 py-1 rounded-xl border border-amber-400/20">
+                10 قنوات كاملة
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {/* 1. X (Twitter) */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">1. منصة إكس (تويتر)</span>
+                  <span className="text-[10px] text-slate-400">X / Twitter</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.xUrl}
                   onChange={(e) => setSocialForm({ ...socialForm, xUrl: e.target.value })}
-                  placeholder="https://x.com/..."
-                  className="w-full rounded-lg border p-2 text-xs font-bold outline-none bg-white/5"
+                  placeholder="https://x.com/alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
                 />
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-current/5 space-y-1.5">
-                <span className="text-[11px] font-black block">حساب إنستغرام</span>
+
+              {/* 2. Instagram */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">2. إنستغرام</span>
+                  <span className="text-[10px] text-slate-400">Instagram</span>
+                </div>
                 <input
                   type="text"
-                  value={socialForm.instagramUrl || ""}
+                  value={socialForm.instagramUrl}
                   onChange={(e) => setSocialForm({ ...socialForm, instagramUrl: e.target.value })}
-                  placeholder="https://instagram.com/..."
-                  className="w-full rounded-lg border p-2 text-xs font-bold outline-none bg-white/5"
+                  placeholder="https://instagram.com/alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
                 />
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-current/5 space-y-1.5">
-                <span className="text-[11px] font-black block">قناة يوتيوب</span>
+
+              {/* 3. YouTube */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">3. قناة يوتيوب</span>
+                  <span className="text-[10px] text-slate-400">YouTube</span>
+                </div>
                 <input
                   type="text"
-                  value={socialForm.youtubeUrl || ""}
+                  value={socialForm.youtubeUrl}
                   onChange={(e) => setSocialForm({ ...socialForm, youtubeUrl: e.target.value })}
-                  placeholder="https://youtube.com/..."
-                  className="w-full rounded-lg border p-2 text-xs font-bold outline-none bg-white/5"
+                  placeholder="https://youtube.com/@alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
                 />
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-current/5 space-y-1.5">
-                <span className="text-[11px] font-black block">حساب سناب شات</span>
+
+              {/* 4. Snapchat */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">4. سناب شات</span>
+                  <span className="text-[10px] text-slate-400">Snapchat</span>
+                </div>
                 <input
                   type="text"
-                  value={socialForm.snapchatUrl || ""}
+                  value={socialForm.snapchatUrl}
                   onChange={(e) => setSocialForm({ ...socialForm, snapchatUrl: e.target.value })}
                   placeholder="https://snapchat.com/add/..."
-                  className="w-full rounded-lg border p-2 text-xs font-bold outline-none bg-white/5"
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 5. TikTok */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">5. تيك توك</span>
+                  <span className="text-[10px] text-slate-400">TikTok</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.tiktokUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, tiktokUrl: e.target.value })}
+                  placeholder="https://tiktok.com/@alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 6. Facebook */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">6. فيسبوك</span>
+                  <span className="text-[10px] text-slate-400">Facebook</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.facebookUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, facebookUrl: e.target.value })}
+                  placeholder="https://facebook.com/alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 7. LinkedIn */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">7. لينكد إن</span>
+                  <span className="text-[10px] text-slate-400">LinkedIn</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.linkedinUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, linkedinUrl: e.target.value })}
+                  placeholder="https://linkedin.com/company/alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 8. Telegram */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">8. قناة تيليجرام</span>
+                  <span className="text-[10px] text-slate-400">Telegram</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.telegramUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, telegramUrl: e.target.value })}
+                  placeholder="https://t.me/alaqeeq..."
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 9. WhatsApp */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">9. واتساب الموحد</span>
+                  <span className="text-[10px] text-slate-400">WhatsApp (+966)</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.whatsappUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, whatsappUrl: e.target.value })}
+                  placeholder="https://wa.me/966531896000"
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              {/* 10. Phone Call */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black">10. الهاتف الموحد / الاتصال</span>
+                  <span className="text-[10px] text-slate-400">Phone Call</span>
+                </div>
+                <input
+                  type="text"
+                  value={socialForm.phoneUrl}
+                  onChange={(e) => setSocialForm({ ...socialForm, phoneUrl: e.target.value })}
+                  placeholder="tel:+966531896000"
+                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
                 />
               </div>
             </div>
@@ -251,27 +574,265 @@ export function SystemBrandHub({
         </div>
       )}
 
-      {/* SUBTAB 2: EMERGENCY TOP BANNER */}
+      {/* SUBTAB 2: INTERACTIVE SYSTEM PORTALS MANAGER (بوابات الأنظمة والخدمات) */}
+      {subTab === "portals" && (
+        <div className={`p-6 rounded-3xl border space-y-6 animate-in fade-in duration-200 ${
+          dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"
+        }`}>
+          {/* Header & Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-current/10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <Server size={20} />
+              </div>
+              <div>
+                <h3 className="text-base font-black">مدير بوابات الأنظمة والخدمات المدرسية ({portalsList.length} بوابة)</h3>
+                <p className="text-xs text-slate-400 font-bold mt-0.5">
+                  إضافة وتعديل وترتيب بوابات الدخول السريع في القائمة المنسدلة وشريط الخدمات بالموقع
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                onClick={handleResetPortalsToDefault}
+                variant="outline"
+                className="text-xs font-bold gap-1.5 rounded-xl border-dashed cursor-pointer"
+              >
+                <RotateCcw size={13} />
+                <span>استعادة الافتراضيات</span>
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => setIsAddingPortal(!isAddingPortal)}
+                className="bg-amber-400 hover:bg-amber-500 text-black font-black text-xs gap-1.5 rounded-xl cursor-pointer"
+              >
+                <Plus size={14} />
+                <span>إضافة بوابة جديدة ➕</span>
+              </Button>
+
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({ systemPortals: portalsList });
+                  toast.success("تم حفظ بوابات المدارس بنجاح ✅");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-5 bg-emerald-600 hover:bg-emerald-500 text-white gap-1.5 cursor-pointer"
+              >
+                <Save size={13} />
+                <span>{isSaving ? "جارِ الحفظ..." : "حفظ التغييرات 💾"}</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Add Portal Inline Box */}
+          {isAddingPortal && (
+            <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-4 animate-in slide-in-from-top-2 duration-200">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-black text-amber-400">إضافة بوابة نظام أو خدمة جديدة</h4>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingPortal(false)}
+                  className="text-xs text-slate-400 hover:text-white"
+                >
+                  إلغاء ✕
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">اسم البوابة</label>
+                  <input
+                    type="text"
+                    value={newPortalTitle}
+                    onChange={(e) => setNewPortalTitle(e.target.value)}
+                    placeholder="مثال: نظام كلاسيرا الذكي"
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">وصف مختصر للبوابة</label>
+                  <input
+                    type="text"
+                    value={newPortalDesc}
+                    onChange={(e) => setNewPortalDesc(e.target.value)}
+                    placeholder="مثال: إدارة التعلم التفاعلي والواجبات"
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">رابط الدخول (URL)</label>
+                  <input
+                    type="text"
+                    value={newPortalUrl}
+                    onChange={(e) => setNewPortalUrl(e.target.value)}
+                    placeholder="https://me.classera.com"
+                    className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">تصنيف البوابة</label>
+                  <select
+                    value={newPortalCategory}
+                    onChange={(e) => setNewPortalCategory(e.target.value as any)}
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  >
+                    <option value="parents_students">خدمات أولياء الأمور والطلاب</option>
+                    <option value="staff_admin">الأنظمة الإدارية والموظفين</option>
+                    <option value="public">خدمات ومنصات عامة</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">شارة البوابة (Badge اختياري)</label>
+                  <input
+                    type="text"
+                    value={newPortalBadge}
+                    onChange={(e) => setNewPortalBadge(e.target.value)}
+                    placeholder="مثال: جديد أو LMS"
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">أيقونة البوابة</label>
+                  <select
+                    value={newPortalIcon}
+                    onChange={(e) => setNewPortalIcon(e.target.value)}
+                    className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                  >
+                    {AVAILABLE_PORTAL_ICONS.slice(0, 25).map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label} ({opt.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <Button
+                  type="button"
+                  onClick={handleAddPortal}
+                  className="bg-amber-400 hover:bg-amber-500 text-black font-black text-xs px-6 rounded-xl cursor-pointer"
+                >
+                  إضافة البوابة للقائمة ➕
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Portals List Cards */}
+          <div className="space-y-3">
+            {portalsList.map((portal, idx) => (
+              <div
+                key={portal.id}
+                className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                  portal.visible
+                    ? dark ? "bg-white/[0.02] border-white/10 hover:border-white/20" : "bg-slate-50/70 border-black/10 hover:border-black/20"
+                    : "opacity-40 bg-black/20 border-dashed border-current/10"
+                }`}
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 text-amber-400 border border-amber-400/20 shrink-0">
+                    {renderPortalIcon(portal.iconName, 18)}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-black">{portal.title}</h4>
+                      {portal.badge && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-400/15 text-amber-400 border border-amber-400/20">
+                          {portal.badge}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">
+                        {PORTAL_CATEGORY_LABELS[portal.category] || portal.category}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-bold mt-0.5">{portal.description}</p>
+                    <a
+                      href={portal.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-blue-400 hover:underline inline-flex items-center gap-1 mt-1 font-mono"
+                    >
+                      <span>{portal.url}</span>
+                      <ExternalLink size={10} />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Move Up/Down */}
+                  <button
+                    type="button"
+                    onClick={() => handleMovePortal(portal.id, "up")}
+                    disabled={idx === 0}
+                    className="p-1.5 rounded-lg border text-slate-300 hover:text-white disabled:opacity-20 cursor-pointer"
+                    title="تحريك لأعلى"
+                  >
+                    <ArrowUp size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleMovePortal(portal.id, "down")}
+                    disabled={idx === portalsList.length - 1}
+                    className="p-1.5 rounded-lg border text-slate-300 hover:text-white disabled:opacity-20 cursor-pointer"
+                    title="تحريك لأسفل"
+                  >
+                    <ArrowDown size={14} />
+                  </button>
+
+                  {/* Toggle Visibility */}
+                  <button
+                    type="button"
+                    onClick={() => handleTogglePortalVisibility(portal.id)}
+                    className={`p-1.5 rounded-lg border transition cursor-pointer ${
+                      portal.visible ? "text-emerald-400 hover:bg-emerald-400/10" : "text-slate-500 hover:bg-white/5"
+                    }`}
+                    title={portal.visible ? "إخفاء من الموقع" : "إظهار في الموقع"}
+                  >
+                    {portal.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                  </button>
+
+                  {/* Delete */}
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePortal(portal.id)}
+                    className="p-1.5 rounded-lg border border-rose-500/20 text-rose-400 hover:bg-rose-500/10 cursor-pointer"
+                    title="حذف البوابة"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SUBTAB 3: EMERGENCY TOP BANNER */}
       {subTab === "emergency" && (
         <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
           <div className="flex items-center justify-between gap-4 pb-4 border-b border-current/10">
             <div>
               <h3 className="text-base font-black">شريط التنبيهات والقرارات العاجلة بأعلى الموقع</h3>
               <p className="text-xs text-slate-400 font-bold mt-0.5">
-                يظهر كشريط علوي بارز للزوار (مثلاً: تعليق الدراسة الحضورية، إعلان بدء القبول، إجازة مطولة)
+                تفعيل شريط أحمر أو أزرق أو ذهبي في قمة صفحات الموقع لبث خبر عاجل أو تعليق دراسة أو تهنئة
               </p>
             </div>
             <Button
               type="button"
               onClick={async () => {
                 await onSaveOrchestration({ emergencyBanner: bannerForm });
-                toast.success("تم تحديث البانر العاجل بنجاح");
+                toast.success("تم حفظ إعدادات البانر العاجل بنجاح");
               }}
               disabled={isSaving}
-              className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
+              className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer"
             >
               <Save size={13} />
-              <span>{isSaving ? "جاري الحفظ..." : "حفظ البانر 💾"}</span>
+              <span>{isSaving ? "جاري الحفظ..." : "حفظ التعديلات 💾"}</span>
             </Button>
           </div>
 
@@ -374,48 +935,6 @@ export function SystemBrandHub({
         </div>
       )}
 
-      {/* SUBTAB 3: SYSTEM PORTALS */}
-      {subTab === "portals" && (
-        <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
-          <div className="pb-4 border-b border-current/10">
-            <h3 className="text-base font-black">بوابات الدخول السريع للمدارس</h3>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">
-              روابط المنصات التعليمية الرسمية (نظام نور، مدرستي، كلاسيرا، فارس، وبوابات الموظفين وأولياء الأمور)
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-current/10 flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-black">منصة مدرستي</h4>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5">التعليم الرقمي والواجبات</p>
-              </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400">نشط</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-current/10 flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-black">نظام نور الوزاري</h4>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5">النتائج وسجلات الطلاب</p>
-              </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400">نشط</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-current/10 flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-black">نظام كلاسيرا الذكي</h4>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5">إدارة التعلم التفاعلي</p>
-              </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400">نشط</span>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-current/10 flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-black">نظام فارس للخدمات الذاتية</h4>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5">شؤون المعلمين والموظفين</p>
-              </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400">نشط</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* SUBTAB 4: MARKETING PIXELS & SEO */}
       {subTab === "marketing" && (
         <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
@@ -433,7 +952,7 @@ export function SystemBrandHub({
                 toast.success("تم حفظ إعدادات التسويق وبكسلات التتبع بنجاح");
               }}
               disabled={isSaving}
-              className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
+              className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer"
             >
               <Save size={13} />
               <span>{isSaving ? "جاري الحفظ..." : "حفظ الإعدادات 💾"}</span>
@@ -528,7 +1047,7 @@ export function SystemBrandHub({
                 toast.success(`تم تفعيل (${SEASONS.find((s) => s.id === selectedSeason)?.name}) بنجاح`);
               }}
               disabled={isSaving}
-              className="rounded-xl font-black text-xs px-6 bg-amber-500 hover:bg-amber-400 text-black gap-2"
+              className="rounded-xl font-black text-xs px-6 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer"
             >
               <Sparkles size={14} />
               <span>تطبيق الموسم على الموقع الحي 🚀</span>
