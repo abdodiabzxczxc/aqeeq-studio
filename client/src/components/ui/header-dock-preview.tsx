@@ -49,16 +49,27 @@ interface HeaderDockNavProps {
 }
 
 function DockHeroCover({ preview, dark }: { preview: PagePreviewMetadata; dark: boolean }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <div className="relative h-[168px] w-full rounded-xl overflow-hidden mb-2.5 border border-black/10 dark:border-white/10 bg-slate-950 shadow-inner select-none group/cover">
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 animate-pulse flex items-center justify-center">
+          <div className="h-5 w-5 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
+        </div>
+      )}
       <img
         src={preview.image}
         alt={preview.title}
         loading="eager"
-        decoding="sync"
+        decoding="async"
         fetchPriority="high"
-        className="w-full h-full object-cover object-top select-none transition-transform duration-500 group-hover/cover:scale-[1.02]"
+        onLoad={() => setIsLoaded(true)}
+        className={`w-full h-full object-cover object-top select-none transition-all duration-300 group-hover/cover:scale-[1.02] ${
+          isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[0.98]"
+        }`}
         onError={(e) => {
+          setIsLoaded(true);
           const target = e.currentTarget;
           if (target.src.includes(".webp")) {
             target.src = target.src.replace(".webp", ".png");
@@ -102,49 +113,71 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     }
   }, [hoveredKey, navX]);
 
-  // ── 📡 Live Real-Time Queries: Fresh from Database & Orchestration ──
+  // ── 📡 High-Performance Cached Queries (10m stale time to preserve Render performance) ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 600_000,
   });
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 600_000,
   });
   const { data: albums = [] } = trpc.aqeeqAlbums.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 600_000,
   });
   const { data: showcases = [] } = trpc.aqeeqShowcases.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 600_000,
   });
   const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, {
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: false,
+    staleTime: 600_000,
   });
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, {
     refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    staleTime: 600_000,
   });
   const { data: aboutOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/about" },
-    { refetchOnWindowFocus: false, staleTime: 60_000 }
+    { refetchOnWindowFocus: false, staleTime: 600_000 }
   );
   const { data: admissionsOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/admissions" },
-    { refetchOnWindowFocus: false, staleTime: 60_000 }
+    { refetchOnWindowFocus: false, staleTime: 600_000 }
   );
 
-  const { data: previewVersion, refetch: refetchPreviewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
+  const { data: previewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    staleTime: 600_000,
   });
 
   const cacheKey = useMemo(() => {
     return previewVersion?.version || "1788934400";
   }, [previewVersion]);
+
+  // ⚡ Instant 0ms Preloader: Preload all 9 preview WebP images in background on idle
+  useEffect(() => {
+    const preload = () => {
+      const routes = ["home", "about", "accreditations", "admissions", "journal", "albums", "podcast", "articles", "showcase"];
+      const v = cacheKey;
+      routes.forEach((route) => {
+        const imgDark = new Image();
+        imgDark.src = `/previews/${route}_dark.webp?v=${v}`;
+        const imgLight = new Image();
+        imgLight.src = `/previews/${route}_light.webp?v=${v}`;
+      });
+    };
+
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(preload);
+      } else {
+        setTimeout(preload, 350);
+      }
+    }
+  }, [cacheKey]);
 
   // ── 🎯 Compute Live Cover Snapshots & Live Text in Real-Time ──
   const livePreviews = useMemo<Record<string, PagePreviewMetadata>>(() => {
@@ -420,7 +453,6 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
   }, [orchestration, issues, albums, podcasts, articles, showcases, aboutOverrides, admissionsOverrides, cacheKey, dark]);
 
   const handleMouseEnterItem = (key: string) => {
-    refetchPreviewVersion();
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;

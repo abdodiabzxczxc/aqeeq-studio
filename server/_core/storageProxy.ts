@@ -13,7 +13,15 @@ function ensureUploadsDir() {
 
 // Lightweight ephemeral RAM cache (0 bytes disk storage)
 const ephemeralMemoryCache = new Map<string, { buffer: Buffer; contentType: string; etag: string }>();
-const MAX_RAM_ITEMS = 200; // increased from 60
+const imageFetchingPromise = new Map<string, Promise<{ buffer: Buffer; contentType: string; etag: string } | null>>();
+const MAX_RAM_ITEMS = 300;
+
+const DRIVE_DISK_CACHE_DIR = path.resolve(process.cwd(), ".cache", "drive_images");
+function ensureDriveDiskCacheDir() {
+  if (!fs.existsSync(DRIVE_DISK_CACHE_DIR)) {
+    fs.mkdirSync(DRIVE_DISK_CACHE_DIR, { recursive: true });
+  }
+}
 
 /** Evict oldest entry when cache is full */
 function evictOldest() {
@@ -38,12 +46,13 @@ async function fetchWithTimeout(url: string, options: RequestInit & { timeoutMs?
 
 export function registerStorageProxy(app: Express) {
   ensureUploadsDir();
+  ensureDriveDiskCacheDir();
 
   // Serve static uploads for both /uploads and legacy /manus-storage paths
   app.use("/uploads", express.static(UPLOADS_DIR, { maxAge: "30d" }));
   app.use("/manus-storage", express.static(UPLOADS_DIR, { maxAge: "30d" }));
 
-  // Zero-Disk-Space High-Speed Google Drive Image Streamer & Browser Edge Cacher with full CORS support
+  // High-Speed Google Drive Image Streamer with RAM + Disk Cache & In-Flight Deduplication
   app.get("/api/drive-proxy/:fileId", async (req, res) => {
     const { fileId } = req.params;
     if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
@@ -54,10 +63,9 @@ export function registerStorageProxy(app: Express) {
     res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
-    // 1. Check RAM memory cache (0ms, 0 disk space)
+    // 1. Check RAM memory cache (0ms instant response)
     const memCached = ephemeralMemoryCache.get(fileId);
     if (memCached) {
-      // Support conditional GET (304 Not Modified)
       if (req.headers["if-none-match"] === memCached.etag) {
         return res.status(304).end();
       }
@@ -67,57 +75,104 @@ export function registerStorageProxy(app: Express) {
       return res.send(memCached.buffer);
     }
 
+    // 2. Check local SSD disk cache (1ms response, survives server restarts)
+    const diskFile = path.join(DRIVE_DISK_CACHE_DIR, `${fileId}.bin`);
+    const metaFile = path.join(DRIVE_DISK_CACHE_DIR, `${fileId}.meta`);
+    if (fs.existsSync(diskFile) && fs.existsSync(metaFile)) {
+      try {
+        const buffer = fs.readFileSync(diskFile);
+        const contentType = fs.readFileSync(metaFile, "utf-8").trim() || "image/jpeg";
+        const etag = `"${fileId}-${buffer.length}"`;
+        if (ephemeralMemoryCache.size >= MAX_RAM_ITEMS) evictOldest();
+        ephemeralMemoryCache.set(fileId, { buffer, contentType, etag });
+
+        if (req.headers["if-none-match"] === etag) {
+          return res.status(304).end();
+        }
+        res.setHeader("Content-Type", contentType);
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        res.setHeader("ETag", etag);
+        return res.send(buffer);
+      } catch (err) {
+        // Fall back to network fetch if disk read fails
+      }
+    }
+
+    // 3. Deduplicate in-flight requests (never fetch the same file concurrently)
+    let fetchPromise = imageFetchingPromise.get(fileId);
+    if (!fetchPromise) {
+      fetchPromise = (async () => {
+        try {
+          const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+          const cdnUrl = `https://lh3.googleusercontent.com/d/${fileId}=w800`;
+          let driveRes = await fetchWithTimeout(cdnUrl, {
+            headers: { "User-Agent": UA },
+            timeoutMs: 8000,
+          });
+
+          // Fallback 1: thumbnail URL
+          if (!driveRes.ok) {
+            const thumbUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+            driveRes = await fetchWithTimeout(thumbUrl, {
+              headers: { "User-Agent": UA },
+              timeoutMs: 6000,
+            });
+          }
+
+          // Fallback 2: download URL
+          if (!driveRes.ok) {
+            const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            driveRes = await fetchWithTimeout(downloadUrl, {
+              headers: { "User-Agent": UA },
+              timeoutMs: 6000,
+            });
+          }
+
+          if (!driveRes.ok) return null;
+
+          const contentType = driveRes.headers.get("content-type") || "image/jpeg";
+          if (contentType.includes("text/html")) return null;
+
+          const arrayBuf = await driveRes.arrayBuffer();
+          const buffer = Buffer.from(arrayBuf);
+          const etag = `"${fileId}-${buffer.length}"`;
+
+          // Persist to local disk cache (survives memory evictions)
+          try {
+            ensureDriveDiskCacheDir();
+            fs.writeFileSync(diskFile, buffer);
+            fs.writeFileSync(metaFile, contentType);
+          } catch (e) {
+            // non-fatal
+          }
+
+          if (ephemeralMemoryCache.size >= MAX_RAM_ITEMS) evictOldest();
+          ephemeralMemoryCache.set(fileId, { buffer, contentType, etag });
+
+          return { buffer, contentType, etag };
+        } catch (err) {
+          console.warn("[DriveProxy] Fetch error:", err);
+          return null;
+        } finally {
+          imageFetchingPromise.delete(fileId);
+        }
+      })();
+      imageFetchingPromise.set(fileId, fetchPromise);
+    }
+
     try {
-      const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
-
-      // 2. Fetch from Google CDN Edge — w800 is enough for thumbnails and faster than w1200
-      const cdnUrl = `https://lh3.googleusercontent.com/d/${fileId}=w800`;
-      let driveRes = await fetchWithTimeout(cdnUrl, {
-        headers: { "User-Agent": UA },
-        timeoutMs: 8000,
-      });
-
-      // Fallback 1: thumbnail URL
-      if (!driveRes.ok) {
-        const thumbUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
-        driveRes = await fetchWithTimeout(thumbUrl, {
-          headers: { "User-Agent": UA },
-          timeoutMs: 6000,
-        });
-      }
-
-      // Fallback 2: download URL
-      if (!driveRes.ok) {
-        const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-        driveRes = await fetchWithTimeout(downloadUrl, {
-          headers: { "User-Agent": UA },
-          timeoutMs: 6000,
-        });
-      }
-
-      if (!driveRes.ok) {
+      const result = await fetchPromise;
+      if (!result) {
         return res.status(404).send("Image not found");
       }
 
-      const contentType = driveRes.headers.get("content-type") || "image/jpeg";
-      // Only cache actual images (not HTML error pages from Drive)
-      if (contentType.includes("text/html")) {
-        return res.status(404).send("Image not found");
+      if (req.headers["if-none-match"] === result.etag) {
+        return res.status(304).end();
       }
-
-      const arrayBuf = await driveRes.arrayBuffer();
-      const buffer = Buffer.from(arrayBuf);
-      const etag = `"${fileId}-${buffer.length}"`;
-
-      // Keep only in temporary RAM, 0 disk space used
-      if (ephemeralMemoryCache.size >= MAX_RAM_ITEMS) evictOldest();
-      ephemeralMemoryCache.set(fileId, { buffer, contentType, etag });
-
-      // Tell the browser to cache it on the user device for 1 year (0 server space)
-      res.setHeader("Content-Type", contentType);
+      res.setHeader("Content-Type", result.contentType);
       res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-      res.setHeader("ETag", etag);
-      return res.send(buffer);
+      res.setHeader("ETag", result.etag);
+      return res.send(result.buffer);
     } catch (err) {
       console.warn("[DriveProxy] Streaming image fallback error:", err);
       return res.status(504).send("Timeout or error fetching image");

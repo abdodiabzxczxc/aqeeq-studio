@@ -154,8 +154,13 @@ export function serveStatic(app: Express) {
       maxAge: "1y",
       immutable: true,
       setHeaders(res, filePath) {
-        // Ensure index.html and root metadata never get cached indefinitely
-        if (filePath.endsWith(".html") || !filePath.includes("/assets/")) {
+        // Ensure index.html never gets cached indefinitely
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        } else if (/\.(?:webp|png|jpe?g|gif|svg|ico|avif|woff2?|ttf|eot|mp3|wav|ogg|mp4|webm)$/i.test(filePath)) {
+          // ⚡ High-performance browser caching for static images, previews, covers, fonts & media
+          res.setHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
+        } else if (!filePath.includes("/assets/")) {
           res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         }
       },
