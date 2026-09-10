@@ -1141,6 +1141,8 @@ export const appRouter = router({
         totalPosts,
         totalMediaFiles,
         totalViews,
+        // NOTE: usersList is fetched only for .length here.
+        // TODO: Replace with a COUNT() query once the DB layer supports it (PERF-1)
         totalUsers: usersList.length,
         activeStoriesCount: visibleStories.length,
         activeStories: visibleStories,

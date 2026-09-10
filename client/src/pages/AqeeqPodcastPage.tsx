@@ -1069,7 +1069,7 @@ export default function AqeeqPodcastPage() {
                               }`}
                             >
                               {podcast.coverUrl ? (
-                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                                <img loading="lazy" src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 <Mic size={20} className="text-[#f8ca14]" />
                               )}
@@ -1177,7 +1177,7 @@ export default function AqeeqPodcastPage() {
 
                             <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden bg-[#08467d]/20 grid place-items-center">
                               {podcast.coverUrl ? (
-                                <img src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
+                                <img loading="lazy" src={directDriveImage(podcast.coverUrl) || podcast.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 <Mic size={15} className="text-[#f8ca14]" />
                               )}
@@ -1477,7 +1477,7 @@ export default function AqeeqPodcastPage() {
                               }`}
                             >
                               {video.coverUrl ? (
-                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
+                                <img loading="lazy" src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 <div className="grid h-full place-items-center bg-[#06182e]">
                                   <Video size={16} className="text-[#f8ca14]" />
@@ -1586,7 +1586,7 @@ export default function AqeeqPodcastPage() {
 
                             <div className="relative h-10 w-14 shrink-0 rounded-lg overflow-hidden bg-black">
                               {video.coverUrl ? (
-                                <img src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
+                                <img loading="lazy" src={directDriveImage(video.coverUrl) || video.coverUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 <div className="grid h-full place-items-center bg-[#06182e]">
                                   <Video size={13} className="text-[#f8ca14]" />

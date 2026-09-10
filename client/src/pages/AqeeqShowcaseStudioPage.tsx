@@ -77,7 +77,7 @@ function PostPreview({ post }: { post: ShowcasePost }) {
   if (displaySrc) {
     return (
       <div className="relative h-full w-full overflow-hidden">
-        <img src={displaySrc} alt={post.title || post.fileName} className="h-full w-full object-cover" />
+        <img loading="lazy" src={displaySrc} alt={post.title || post.fileName} className="h-full w-full object-cover" />
         {isXPost(post) ? (
           <span className="absolute top-2 right-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-black/80 border border-white/20 text-xs font-black text-white shadow-md">𝕏</span>
         ) : post.sourceType === "instagram" ? (
@@ -113,7 +113,7 @@ function PostPreview({ post }: { post: ShowcasePost }) {
     );
   }
 
-  if (post.mediaType === "image") return <img src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className="h-full w-full object-cover" />;
+  if (post.mediaType === "image") return <img loading="lazy" src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className="h-full w-full object-cover" />;
   return (
     <AqeeqVideoPoster
       sourceUrl={post.mediaUrl}

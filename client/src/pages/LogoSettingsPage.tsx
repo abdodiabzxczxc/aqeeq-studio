@@ -175,7 +175,7 @@ export default function LogoSettingsPage() {
               style={{ borderColor: "oklch(28% 0.025 250)" }}
             >
               {ceremonyLogo ? (
-                <img src={ceremonyLogo} alt="شعار الفعالية" className="max-h-32 object-contain" />
+                <img loading="lazy" src={ceremonyLogo} alt="شعار الفعالية" className="max-h-32 object-contain" />
               ) : (
                 <ImageIcon className="text-slate-600" size={48} />
               )}
@@ -213,7 +213,7 @@ export default function LogoSettingsPage() {
               style={{ borderColor: "oklch(28% 0.025 250)" }}
             >
               {schoolLogo ? (
-                <img src={schoolLogo} alt="شعار المدرسة" className="max-h-24 object-contain" />
+                <img loading="lazy" src={schoolLogo} alt="شعار المدرسة" className="max-h-24 object-contain" />
               ) : (
                 <ImageIcon className="text-slate-600" size={48} />
               )}

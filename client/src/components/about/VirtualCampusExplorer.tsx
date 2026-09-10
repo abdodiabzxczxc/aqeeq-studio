@@ -535,7 +535,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       }`}
                     >
                       <div className="rounded-2xl overflow-hidden aspect-video relative">
-                        <img src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
+                        <img loading="lazy" src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
                       </div>
                       <p className={`text-xs leading-relaxed font-medium ${
                         dark ? "text-slate-300" : "text-slate-600"

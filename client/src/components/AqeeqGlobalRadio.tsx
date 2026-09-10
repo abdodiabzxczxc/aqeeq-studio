@@ -103,7 +103,7 @@ export function AqeeqGlobalRadio() {
             <div className="relative h-24 overflow-hidden bg-gradient-to-r from-[#08467d] to-[#0e6cbd]">
               <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
               {currentTrack.coverUrl && (
-                <img src={currentTrack.coverUrl} className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay blur-sm" alt="" />
+                <img loading="lazy" src={currentTrack.coverUrl} className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay blur-sm" alt="" />
               )}
               
               <button onClick={() => setIsOpen(false)} className="absolute top-3 left-3 text-white/70 hover:text-white p-1 rounded-full bg-black/20">

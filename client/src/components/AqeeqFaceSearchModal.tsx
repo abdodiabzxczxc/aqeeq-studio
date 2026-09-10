@@ -397,7 +397,7 @@ export function AqeeqFaceSearchModal({
                     }`}
                   >
                     <div className="relative h-24 w-24 overflow-hidden rounded-2xl ring-4 ring-emerald-500 shadow-xl">
-                      <img src={selfieSrc} alt="Uploaded Face" className="h-full w-full object-cover" />
+                      <img loading="lazy" src={selfieSrc} alt="Uploaded Face" className="h-full w-full object-cover" />
                       <span className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-emerald-500 text-white font-black text-xs shadow-md">
                         ✓
                       </span>

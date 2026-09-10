@@ -113,7 +113,7 @@ function StudioCardImage({
   const resolvedAlt = override?.altText || alt;
   return (
     <VisualEditable id={id} tag="image" label={label} as="span" className="absolute inset-0 block overflow-hidden">
-      <img src={resolvedSrc} alt={resolvedAlt} className={"h-full w-full " + imageClassName} />
+      <img loading="lazy" src={resolvedSrc} alt={resolvedAlt} className={"h-full w-full " + imageClassName} />
     </VisualEditable>
   );
 }
@@ -986,7 +986,7 @@ export default function AlaqeeqStudioPublicPage() {
                       dark ? "border-black bg-[#121212]" : "border-white bg-slate-100"
                     )}>
                       {story.imageUrl ? (
-                        <img src={directDriveImage(story.imageUrl) || story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                        <img loading="lazy" src={directDriveImage(story.imageUrl) || story.imageUrl} alt={story.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
                       ) : story.sourceType === "instagram" ? (
                         <div className="grid h-full w-full place-items-center bg-gradient-to-tr from-[#f8ca14] via-[#de191e] to-[#08467d] text-white">
                           <Instagram size={24} />
@@ -2182,7 +2182,7 @@ export default function AlaqeeqStudioPublicPage() {
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 overflow-hidden rounded-full border border-white/30 bg-black flex items-center justify-center shadow-md">
                         {activeStory.imageUrl ? (
-                          <img src={directDriveImage(activeStory.imageUrl) || activeStory.imageUrl || ""} alt="" className="h-full w-full object-cover" />
+                          <img loading="lazy" src={directDriveImage(activeStory.imageUrl) || activeStory.imageUrl || ""} alt="" className="h-full w-full object-cover" />
                         ) : activeStory.sourceType === "instagram" ? (
                           <Instagram size={16} className="text-[#f8ca14]" />
                         ) : activeStory.sourceType === "x" ? (

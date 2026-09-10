@@ -229,7 +229,7 @@ function ArticleCard({
           <div className="mt-3 flex items-center gap-2">
             <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-[10px]">
               {article.authorAvatar ? (
-                <img src={article.authorAvatar} alt="" className="h-full w-full rounded-lg object-cover" />
+                <img loading="lazy" src={article.authorAvatar} alt="" className="h-full w-full rounded-lg object-cover" />
               ) : (
                 article.authorName.charAt(0)
               )}
@@ -939,7 +939,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                 <div className="flex items-center gap-3">
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-[#f8ca14] to-[#08467d] text-black font-black text-base">
                     {readingArticle.authorAvatar ? (
-                      <img src={readingArticle.authorAvatar} alt="" className="h-full w-full rounded-2xl object-cover" />
+                      <img loading="lazy" src={readingArticle.authorAvatar} alt="" className="h-full w-full rounded-2xl object-cover" />
                     ) : (
                       readingArticle.authorName.charAt(0)
                     )}

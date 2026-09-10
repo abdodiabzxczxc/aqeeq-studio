@@ -1271,7 +1271,7 @@ export function SystemBrandHub({
                   <div className="h-1 bg-gradient-to-r from-amber-500 via-[#f8ca14] to-yellow-300" />
                   {eventModalForm.imageUrl && (
                     <div className="aspect-[16/9] w-full overflow-hidden bg-black/40">
-                      <img src={eventModalForm.imageUrl} alt="معاينة البوستر" className="h-full w-full object-cover" />
+                      <img loading="lazy" src={eventModalForm.imageUrl} alt="معاينة البوستر" className="h-full w-full object-cover" />
                     </div>
                   )}
                   <div className="p-4 space-y-2 text-right">

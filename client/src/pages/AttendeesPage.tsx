@@ -168,7 +168,7 @@ function QrModal({
       <div class="card">
         <h2>مدارس العقيق</h2>
         <p>الفعالية الحالية</p>
-        <img src="${dataUrl}" width="200" height="200" />
+        <img loading="lazy" src="${dataUrl}" width="200" height="200" />
         <div style="font-size:18px;font-weight:bold;color:#f5f0e8;margin-top:8px">${attendee.fullName}</div>
         <p>رقم الهوية: ${attendee.idNumber}</p>
         <div class="badge">${TICKET_TYPE_LABELS[attendee.ticketType as TicketType] ?? attendee.ticketType}</div>
@@ -561,7 +561,7 @@ export default function AttendeesPage({ ceremonyId, invitationTool, onStatsChang
     const cards = canvases.map(({ canvas, name, id, ticket, qr }) => `
       <div class="card">
         <div class="school">مدارس العقيق - الفعالية الحالية</div>
-        <img src="${canvas.toDataURL()}" width="160" height="160" />
+        <img loading="lazy" src="${canvas.toDataURL()}" width="160" height="160" />
         <div class="name">${name}</div>
         <div class="info">${id}</div>
         <div class="badge">${TICKET_TYPE_LABELS[ticket as TicketType] ?? ticket}</div>

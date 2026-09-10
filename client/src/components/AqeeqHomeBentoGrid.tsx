@@ -203,7 +203,7 @@ export function AqeeqHomeBentoGrid({
                   transition={{ type: "spring", stiffness: 200, damping: 16 }}
                   className="pointer-events-none absolute -top-5 -right-3 z-30 hidden sm:block w-28 bg-white p-2 rounded-xl shadow-2xl border border-white/40 rotate-12"
                 >
-                  <img src={latestAlbum.coverUrl || "/covers/student-excellence-about.jpg"} alt="" className="h-20 w-full object-cover rounded-lg" />
+                  <img loading="lazy" src={latestAlbum.coverUrl || "/covers/student-excellence-about.jpg"} alt="" className="h-20 w-full object-cover rounded-lg" />
                   <p className="text-[8px] font-black text-slate-800 text-center mt-1">لحظات التتويج 📸</p>
                 </motion.div>
 
@@ -213,7 +213,7 @@ export function AqeeqHomeBentoGrid({
                   transition={{ type: "spring", stiffness: 200, damping: 16, delay: 0.05 }}
                   className="pointer-events-none absolute -top-2 -left-4 z-30 hidden sm:block w-28 bg-white p-2 rounded-xl shadow-2xl border border-white/40 -rotate-10"
                 >
-                  <img src="/covers/student-excellence-about.jpg" alt="" className="h-20 w-full object-cover rounded-lg" />
+                  <img loading="lazy" src="/covers/student-excellence-about.jpg" alt="" className="h-20 w-full object-cover rounded-lg" />
                   <p className="text-[8px] font-black text-slate-800 text-center mt-1">الأسبوع العلمي 🔬</p>
                 </motion.div>
 

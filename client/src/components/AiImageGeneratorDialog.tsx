@@ -1842,7 +1842,7 @@ export default function AiImageGeneratorDialog({
                 {selectedPhotoUrl && (
                   <div className="shrink-0 pt-3 border-t border-white/10 flex items-center justify-between gap-4 bg-black/60 p-3 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <img src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
+                      <img loading="lazy" src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
                       <span className="text-xs text-slate-300 font-bold">تم تحديد الصورة: اختر طريقة استخدامها</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -2011,7 +2011,7 @@ export default function AiImageGeneratorDialog({
                 {selectedPhotoUrl && (
                   <div className="shrink-0 pt-3 border-t border-white/10 flex items-center justify-between gap-4 bg-black/60 p-3 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <img src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
+                      <img loading="lazy" src={selectedPhotoUrl} alt="Selected" className="h-10 w-14 object-cover rounded-lg border border-white/20" />
                       <span className="text-xs text-slate-300 font-bold">تم تحديد الصورة: اختر طريقة استخدامها</span>
                     </div>
                     <div className="flex items-center gap-2">

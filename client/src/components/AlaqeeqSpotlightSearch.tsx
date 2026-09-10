@@ -387,7 +387,7 @@ export function AlaqeeqSpotlightSearch({
                           dark ? "border-white/10 bg-[#161616]" : "border-black/10 bg-slate-100"
                         }`}>
                           {item.imageUrl ? (
-                            <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                            <img loading="lazy" src={item.imageUrl} alt="" className="h-full w-full object-cover" />
                           ) : (
                             <div className="grid h-full w-full place-items-center text-slate-400">
                               {item.type === "journal" ? (

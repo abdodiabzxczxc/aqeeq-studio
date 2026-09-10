@@ -425,7 +425,7 @@ export default function AqeeqPodcastStudioPage() {
                       >
                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-white/10">
                           {cover ? (
-                            <img src={cover} alt="" className="h-full w-full object-cover" />
+                            <img loading="lazy" src={cover} alt="" className="h-full w-full object-cover" />
                           ) : (
                             <div className="grid h-full place-items-center text-[#f8ca14] font-black text-xs">
                               {p.mediaType === "video" ? <Video size={18} /> : <Mic size={18} />}
@@ -622,7 +622,7 @@ export default function AqeeqPodcastStudioPage() {
                     <div className="flex items-center gap-4">
                       <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-black/40 border border-white/10">
                         {editCoverUrl ? (
-                          <img src={directDriveImage(editCoverUrl) || editCoverUrl} alt="" className="h-full w-full object-cover" />
+                          <img loading="lazy" src={directDriveImage(editCoverUrl) || editCoverUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <div className="grid h-full place-items-center text-xs text-[#f8ca14] font-bold">بدون غلاف</div>
                         )}

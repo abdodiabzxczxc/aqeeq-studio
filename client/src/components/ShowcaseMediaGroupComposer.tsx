@@ -68,7 +68,7 @@ export default function ShowcaseMediaGroupComposer({
                 <article key={`${item.mediaUrl}-${index}`} className="flex gap-3 rounded-xl border border-white/[.1] bg-black/20 p-2">
                   <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-black">
                     {item.mediaType === "image" ? (
-                      <img src={item.thumbnailUrl || item.mediaUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" src={item.thumbnailUrl || item.mediaUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <>
                         <video src={item.mediaUrl} className="h-full w-full object-cover" muted preload="metadata" />

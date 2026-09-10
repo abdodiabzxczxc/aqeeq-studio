@@ -867,13 +867,13 @@ export default function AqeeqAlbumReaderPage({ slug }: { slug: string }) {
                   >
                     {item.mediaType === "video" ? (
                       <>
-                        <img src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover" />
+                        <img loading="lazy" src={getAqeeqAlbumImageSource(item)} alt="" className="h-full w-full object-cover" />
                         <span className="absolute inset-0 grid place-items-center bg-black/30">
                           <Video size={15} className="text-white" />
                         </span>
                       </>
                     ) : (
-                      <img src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover" />
+                      <img loading="lazy" src={getAqeeqAlbumImageSource(item)} alt={item.caption || item.fileName} className="h-full w-full object-cover" />
                     )}
                   </button>
                 ))}

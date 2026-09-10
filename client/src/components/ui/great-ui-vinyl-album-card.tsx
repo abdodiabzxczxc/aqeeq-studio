@@ -144,7 +144,7 @@ export function VinylAlbumCard({
               }`}
             >
               {coverUrl ? (
-                <img src={coverUrl} alt="" className="h-full w-full object-cover opacity-85" />
+                <img loading="lazy" src={coverUrl} alt="" className="h-full w-full object-cover opacity-85" />
               ) : (
                 <div
                   className={`h-full w-full flex items-center justify-center ${
@@ -442,7 +442,7 @@ export function GrandVinylDeck({
               }`}
             >
               {coverUrl ? (
-                <img src={coverUrl} alt="" className="h-full w-full object-cover opacity-90" />
+                <img loading="lazy" src={coverUrl} alt="" className="h-full w-full object-cover opacity-90" />
               ) : (
                 <div
                   className={`h-full w-full flex items-center justify-center ${

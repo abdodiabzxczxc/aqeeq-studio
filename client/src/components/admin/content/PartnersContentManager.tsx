@@ -250,7 +250,7 @@ export function PartnersContentManager({
             <div className="flex items-center gap-3 min-w-0">
               <div className="h-12 w-12 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
                 {partner.logoUrl ? (
-                  <img src={partner.logoUrl} alt={partner.name} className="h-full w-full object-contain filter brightness-105" />
+                  <img loading="lazy" src={partner.logoUrl} alt={partner.name} className="h-full w-full object-contain filter brightness-105" />
                 ) : (
                   <ImageIcon size={18} className="text-slate-400" />
                 )}

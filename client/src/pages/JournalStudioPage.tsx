@@ -148,7 +148,7 @@ function JournalPageReorderCard({
       </div>
 
       <div className="relative aspect-[1/1.4] overflow-hidden rounded-xl bg-slate-900 border border-white/10">
-        <img src={page.imageUrl} alt={page.caption || ""} className="h-full w-full object-cover pointer-events-none select-none" />
+        <img loading="lazy" src={page.imageUrl} alt={page.caption || ""} className="h-full w-full object-cover pointer-events-none select-none" />
         {index === 0 ? (
           <span className="absolute bottom-1 right-1 rounded bg-[#f8ca14] px-1.5 py-0.5 text-[8px] font-black text-black">
             الغلاف

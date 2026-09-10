@@ -531,7 +531,7 @@ export function AqeeqAiYearbookGenerator({ open, onOpenChange }: { open: boolean
                   ) : (
                     <div className="w-full flex flex-col sm:flex-row gap-3">
                       <div className="relative h-16 w-16 sm:w-20 rounded-2xl overflow-hidden shrink-0 border-2 border-[#e5b84f]">
-                        <img src={studentPhoto} className="w-full h-full object-cover" alt="Student" />
+                        <img loading="lazy" src={studentPhoto} className="w-full h-full object-cover" alt="Student" />
                         <button 
                           onClick={() => setStudentPhoto(null)} 
                           className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1"

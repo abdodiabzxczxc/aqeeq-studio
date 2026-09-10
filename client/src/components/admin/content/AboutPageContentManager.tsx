@@ -329,7 +329,7 @@ export function AboutPageContentManager({
             >
               <div className="flex items-start sm:items-center gap-3">
                 <div className="h-12 w-12 shrink-0 rounded-2xl overflow-hidden bg-black/40 border border-white/10">
-                  <img src={leader.photoUrl || "/covers/cover-about.jpg"} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" src={leader.photoUrl || "/covers/cover-about.jpg"} alt="" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h5 className="text-xs font-black">{leader.name}</h5>

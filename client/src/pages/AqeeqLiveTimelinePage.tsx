@@ -217,7 +217,7 @@ export default function AqeeqLiveTimelinePage({ slug }: { slug?: string }) {
 
                 {m.mediaUrl && (
                   <div className="overflow-hidden rounded-2xl border border-white/10 bg-black max-h-80">
-                    <img src={m.mediaUrl} alt="" className="h-full w-full object-cover" />
+                    <img loading="lazy" src={m.mediaUrl} alt="" className="h-full w-full object-cover" />
                   </div>
                 )}
 

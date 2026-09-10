@@ -264,7 +264,7 @@ export function HomepageContentManager({
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="relative h-12 w-12 shrink-0 rounded-xl overflow-hidden bg-black/40 border border-white/10">
-                  <img src={story.imageUrl} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" src={story.imageUrl} alt="" className="h-full w-full object-cover" />
                   {story.isPinned && (
                     <span className="absolute top-1 right-1 grid h-4 w-4 place-items-center rounded-full bg-amber-400 text-black text-[9px]">
                       <Pin size={9} />

@@ -1579,8 +1579,14 @@ export default function AqeeqSchoolAdmissionsPage() {
                   <>
                     <div className={`rounded-2xl border p-4 text-sm text-right space-y-2 mb-4 ${dark ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}>
                        <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>اسم الطالب:</strong> {formData.studentName}</div>
-                       <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المرحلة:</strong> {formData.gradeLevel}</div>
-                       <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المسار:</strong> {formData.track}</div>
+                       <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المرحلة:</strong> {
+                         formData.gradeLevel === 'kindergarten' ? 'رياض الأطفال (KG)' :
+                         formData.gradeLevel === 'primary' ? 'المرحلة الابتدائية' :
+                         formData.gradeLevel === 'middle' ? 'المرحلة المتوسطة' :
+                         formData.gradeLevel === 'high' ? 'المرحلة الثانوية' : formData.gradeLevel
+                       }</div>
+                       <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>المسار:</strong> {formData.track === 'national' ? 'المدارس الأهلية' : 'المدارس الدولية'}</div>
+                       <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>الفرع:</strong> {formData.gender === 'boys' ? 'مجمع البنين' : 'مجمع البنات'}</div>
                        <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>اسم ولي الأمر:</strong> {formData.guardianName}</div>
                        <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>رقم الجوال:</strong> {formData.phone}</div>
                        {formData.email && <div><strong className={dark ? "text-[#f8ca14]" : "text-[#08467d]"}>البريد الإلكتروني:</strong> {formData.email}</div>}

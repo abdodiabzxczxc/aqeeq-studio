@@ -72,7 +72,7 @@ export default function SchoolNewsEditorialPage() {
               <div className={`absolute inset-5 -rotate-6 rounded-[1.6rem] border ${dark ? "border-white/[.12] bg-white/[.035]" : "border-black/[.08] bg-slate-100"}`} />
               <div className="relative aspect-[3/4] w-[min(65vw,280px)] rotate-[4deg] overflow-hidden rounded-xl border border-amber-100/55 bg-[linear-gradient(155deg,#f7e8b3,#cc9930_56%,#5d390b)] p-5 text-[#291a05] shadow-[22px_26px_0_rgba(234,190,72,.13),0_30px_70px_rgba(0,0,0,.48)] transition duration-500 hover:rotate-[1deg]">
                 {latest?.coverUrl ? (
-                  <img src={latest.coverUrl} alt={`غلاف ${latest.title}`} className="absolute inset-0 h-full w-full object-cover" />
+                  <img loading="lazy" src={latest.coverUrl} alt={`غلاف ${latest.title}`} className="absolute inset-0 h-full w-full object-cover" />
                 ) : (
                   <>
                     <div className="text-[9px] font-black tracking-[.25em]">AL-AQEEQ JOURNAL</div>
@@ -154,7 +154,7 @@ export default function SchoolNewsEditorialPage() {
             <div className="mt-5 grid gap-5 xl:grid-cols-[.72fr_1.28fr]">
               <button onClick={() => setMediaTarget("cover")} className={`group relative aspect-[3/4] overflow-hidden rounded-2xl border border-dashed ${dark ? "border-amber-300/35 bg-black/20 text-amber-200" : "border-slate-300 bg-slate-50 text-slate-700"}`}>
                 {selected.coverUrl ? (
-                  <img src={selected.coverUrl} alt="غلاف العدد" className="h-full w-full object-cover transition group-hover:scale-105" />
+                  <img loading="lazy" src={selected.coverUrl} alt="غلاف العدد" className="h-full w-full object-cover transition group-hover:scale-105" />
                 ) : (
                   <span className="flex h-full flex-col items-center justify-center gap-2 text-xs font-black">
                     <ImagePlus size={20} />اختيار غلاف
@@ -170,7 +170,7 @@ export default function SchoolNewsEditorialPage() {
                   <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                     {selected.pages.map((page, index) => (
                       <article key={page.id} className={`group overflow-hidden rounded-xl border ${dark ? "border-white/[.08] bg-black/20" : "border-slate-200 bg-slate-50 shadow-sm"}`}>
-                        <img src={page.imageUrl} alt={page.caption || `صفحة ${index + 1}`} className="aspect-[3/4] w-full object-cover" />
+                        <img loading="lazy" src={page.imageUrl} alt={page.caption || `صفحة ${index + 1}`} className="aspect-[3/4] w-full object-cover" />
                         <div className="flex items-center justify-between gap-2 p-2">
                           <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ص {index + 1}</span>
                           <button onClick={() => removePage.mutate({ id: page.id })} className="text-[10px] font-bold text-[#de191e] sm:opacity-0 sm:transition sm:group-hover:opacity-100">حذف</button>
@@ -228,7 +228,7 @@ export default function SchoolNewsEditorialPage() {
                       <button key={issue.id} onClick={() => navigate(`/news/${issue.slug}`)} className={`group relative overflow-hidden rounded-2xl border text-right transition hover:-translate-y-1 ${dark ? "border-white/[.07] bg-black/20 hover:border-amber-300/45" : "border-slate-200 bg-slate-50 hover:border-[#08467d]/40 shadow-sm"}`}>
                         <div className="relative aspect-[16/10] overflow-hidden">
                           {issue.coverUrl ? (
-                            <img src={issue.coverUrl} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                            <img loading="lazy" src={issue.coverUrl} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                           ) : (
                             <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#1d2432,#090b11)] text-amber-200">
                               <Newspaper size={28} />
@@ -296,7 +296,7 @@ export default function SchoolNewsEditorialPage() {
                     {coverUrl ? "تغيير الغلاف" : "اختيار الغلاف"}
                   </button>
                 </div>
-                {coverUrl ? <img src={coverUrl} alt="معاينة الغلاف" className="mt-3 h-28 w-full rounded-xl object-cover" /> : null}
+                {coverUrl ? <img loading="lazy" src={coverUrl} alt="معاينة الغلاف" className="mt-3 h-28 w-full rounded-xl object-cover" /> : null}
               </div>
               <button onClick={submit} disabled={!title.trim() || create.isPending} className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-50 ${dark ? "bg-amber-300 text-slate-950" : "bg-[#08467d] text-white shadow-md hover:bg-[#063560]"}`}>
                 <Plus size={16} />{create.isPending ? "جارٍ إنشاء العدد…" : "إنشاء العدد وفتح الاستوديو"}

@@ -371,7 +371,7 @@ export default function ScanGate() {
       >
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <img src={schoolLogo} alt="شعار المنصة" className="h-9 w-auto object-contain" />
+            <img loading="lazy" src={schoolLogo} alt="شعار المنصة" className="h-9 w-auto object-contain" />
             <div className="hidden sm:block">
               <VisualEditable id="scan-brand-title" tag="text" label="عنوان بوابة المسح" as="div" defaultText={ceremony?.title || "بوابة الدخول"} className="text-sm font-bold text-amber-100" />
               <VisualEditable id="scan-brand-subtitle" tag="text" label="وصف بوابة المسح" as="div" defaultText={ceremony ? "بوابة مسح هذه الفعالية" : "بوابة دخول الفعالية"} className="text-xs text-slate-500" />

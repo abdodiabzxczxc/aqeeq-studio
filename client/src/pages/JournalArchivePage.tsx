@@ -36,7 +36,7 @@ function JournalCover({ issueCoverUrl, fillFrame = false }: { issueCoverUrl?: st
       <div className="absolute inset-0 border-[10px] border-white opacity-65" />
       <div className="relative h-full w-full transition-transform duration-300" style={{ transform: `scale(${scale})` }}>
         {imageUrl ? (
-          <img src={imageUrl} alt="غلاف نشرة العقيق" className="h-full w-full object-cover" />
+          <img loading="lazy" src={imageUrl} alt="غلاف نشرة العقيق" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full flex-col justify-between bg-[linear-gradient(155deg,#ffffff,#d9bd26_56%,#085187)] p-7 text-black">
             <div className="text-[10px] font-black tracking-[.26em]">AL-AQEEQ JOURNAL</div>
@@ -83,12 +83,12 @@ function JournalCard({
           <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 shadow-[0_14px_25px_rgba(0,0,0,.35)] transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
             dark ? "border-amber-100/25 bg-black" : "border-slate-300 bg-slate-200"
           }`} style={{ transform: "rotate(-7deg)" }}>
-            {issue.coverUrl ? <img src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
+            {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
           </div>
           <div className={`absolute bottom-[6%] right-[10%] top-[6%] w-[54%] overflow-hidden rounded-[1rem] border p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)] transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
             dark ? "border-amber-100/70 bg-black" : "border-slate-300 bg-white"
           }`} style={{ transform: "rotate(2deg)" }}>
-            {issue.coverUrl ? <img src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className={dark ? "text-amber-200" : "text-[#08467d]"} size={34} /></div>}
+            {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className={dark ? "text-amber-200" : "text-[#08467d]"} size={34} /></div>}
           </div>
         </button>
         <div className="flex min-w-0 flex-1 flex-col">
@@ -255,7 +255,7 @@ export default function JournalArchivePage() {
               <div className="relative mx-auto h-[370px] w-full max-w-[580px] md:h-[470px]">
                 {secondIssue ? (
                   <button onClick={() => navigate(getJournalIssuePath(secondIssue.slug))} className="absolute left-[8%] top-[9%] h-[75%] w-[56%] overflow-hidden rounded-[1.6rem] border border-amber-100/15 bg-black p-2 opacity-60 shadow-[0_25px_50px_rgba(0,0,0,.35)]" style={{ transform: "rotate(-7deg)" }}>
-                    <img src={secondIssue.coverUrl || ""} alt="" className="h-full w-full rounded-[1.12rem] object-cover" />
+                    <img loading="lazy" src={secondIssue.coverUrl || ""} alt="" className="h-full w-full rounded-[1.12rem] object-cover" />
                   </button>
                 ) : null}
                 <button onClick={() => navigate(getJournalIssuePath(featuredIssue.slug))} className="group absolute bottom-1 right-[8%] aspect-[3/4] w-[56%] overflow-hidden rounded-[1.85rem] border border-amber-100/30 bg-black p-2 shadow-[0_30px_70px_rgba(0,0,0,.5)]" style={{ transform: "rotate(3deg)" }}>

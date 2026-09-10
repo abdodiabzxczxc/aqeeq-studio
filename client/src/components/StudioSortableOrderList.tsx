@@ -10,13 +10,13 @@ function SortableRow({ item, selected, onSelect, renderActions }: { item: Studio
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   return <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={`flex items-center gap-2 rounded-xl border p-2 transition ${isDragging ? "opacity-30" : ""} ${selected ? "border-amber-300/65 bg-amber-300/[.08]" : "border-white/[.08] bg-black/15"}`}>
     <button ref={setActivatorNodeRef} {...attributes} {...listeners} type="button" aria-label={`اسحب لترتيب ${item.label}`} title="اسحب لإعادة الترتيب" className="touch-none cursor-grab rounded-lg border border-slate-700 bg-black/20 p-1.5 text-slate-400 active:cursor-grabbing"><GripVertical size={15} /></button>
-    <button type="button" onClick={() => onSelect?.(item.id)} className="flex min-w-0 flex-1 items-center gap-2 text-right"><img src={item.imageUrl} alt="" className="h-10 w-10 rounded-lg border border-white/10 object-cover" /><span className="min-w-0"><span className="block truncate text-[10px] font-black text-slate-100">{item.label}</span>{item.note ? <span className="mt-0.5 block truncate text-[9px] text-slate-500">{item.note}</span> : null}</span></button>
+    <button type="button" onClick={() => onSelect?.(item.id)} className="flex min-w-0 flex-1 items-center gap-2 text-right"><img loading="lazy" src={item.imageUrl} alt="" className="h-10 w-10 rounded-lg border border-white/10 object-cover" /><span className="min-w-0"><span className="block truncate text-[10px] font-black text-slate-100">{item.label}</span>{item.note ? <span className="mt-0.5 block truncate text-[9px] text-slate-500">{item.note}</span> : null}</span></button>
     {renderActions ? <div className="shrink-0">{renderActions(item)}</div> : null}
   </div>;
 }
 
 function DragCard({ item }: { item: StudioSortableItem }) {
-  return <div className="flex w-[min(340px,82vw)] items-center gap-2 rounded-xl border border-amber-300 bg-[#151923] p-2 shadow-2xl" dir="rtl"><GripVertical size={16} className="text-amber-300" /><img src={item.imageUrl} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="truncate text-xs font-black text-amber-50">{item.label}</span></div>;
+  return <div className="flex w-[min(340px,82vw)] items-center gap-2 rounded-xl border border-amber-300 bg-[#151923] p-2 shadow-2xl" dir="rtl"><GripVertical size={16} className="text-amber-300" /><img loading="lazy" src={item.imageUrl} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="truncate text-xs font-black text-amber-50">{item.label}</span></div>;
 }
 
 export default function StudioSortableOrderList({ items, selectedId, onSelect, onReorder, renderActions }: { items: StudioSortableItem[]; selectedId?: number | null; onSelect?: (id: number) => void; onReorder: (ids: number[]) => void; renderActions?: (item: StudioSortableItem) => ReactNode }) {

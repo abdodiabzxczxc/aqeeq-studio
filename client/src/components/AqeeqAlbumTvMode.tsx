@@ -118,7 +118,7 @@ export function AqeeqAlbumTvMode({ albumTitle, images, onClose }: AqeeqAlbumTvMo
           transition={{ duration: 2 }}
           className="absolute inset-0 z-0"
         >
-          <img 
+          <img loading="lazy" 
             src={currentImage.url} 
             alt="" 
             className="w-full h-full object-cover blur-3xl scale-110 saturate-150 opacity-40"
@@ -169,7 +169,7 @@ export function AqeeqAlbumTvMode({ albumTitle, images, onClose }: AqeeqAlbumTvMo
       <div className="absolute top-6 left-8 right-8 z-50 flex justify-between items-start pointer-events-none">
         {/* Right side: Logo & Event Name */}
         <div className="flex items-center gap-4">
-          <img src="/alaqeeq-logo.png" alt="العقيق" className="h-12 w-auto object-contain brightness-0 invert drop-shadow-md" />
+          <img loading="lazy" src="/alaqeeq-logo.png" alt="العقيق" className="h-12 w-auto object-contain brightness-0 invert drop-shadow-md" />
           <div>
             <span className="text-[10px] font-black tracking-widest text-[#e5b84f] uppercase drop-shadow-md">بث مباشر - حصاد الفعاليات</span>
             <h1 className="text-2xl font-black drop-shadow-lg max-w-xl truncate">{albumTitle}</h1>
@@ -213,7 +213,7 @@ export function AqeeqAlbumTvMode({ albumTitle, images, onClose }: AqeeqAlbumTvMo
         <div className="flex flex-col items-center gap-3 bg-black/40 backdrop-blur-xl p-4 rounded-3xl border border-white/10 shadow-2xl pointer-events-auto">
           <div className="bg-white p-2 rounded-2xl shadow-inner">
             {qrCodeDataUrl ? (
-              <img src={qrCodeDataUrl} alt="QR Code" className="w-24 h-24 object-contain" />
+              <img loading="lazy" src={qrCodeDataUrl} alt="QR Code" className="w-24 h-24 object-contain" />
             ) : (
               <div className="w-24 h-24 bg-slate-200 animate-pulse rounded-xl" />
             )}
