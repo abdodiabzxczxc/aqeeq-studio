@@ -653,6 +653,773 @@ export function SystemBrandHub({
         </div>
       )}
 
+      {/* SUBTAB: FOOTER CONTENT & QUICK LINKS MANAGER (روابط وبطاقة الفوتر) */}
+      {subTab === "footer" && (
+        <div className="space-y-5 animate-in fade-in duration-200">
+          {/* Card 1: Pre-Footer Call to Action Banner */}
+          <div className={`p-6 rounded-3xl border space-y-5 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-current/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black">شريط الدعوة للتسجيل المسبق (Pre-Footer Banner) 📣</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">
+                    البطاقة الترويجية الفاخرة التي تسبق الفوتر في كافة صفحات الموقع وتدعو للتسجيل المباشر
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    await onSaveOrchestration({ footer: footerForm });
+                    toast.success("تم حفظ إعدادات بطاقة الفوتر بنجاح 💾");
+                  }}
+                  disabled={isSaving}
+                  className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Save size={13} />
+                  <span>{isSaving ? "جاري الحفظ..." : "حفظ إعدادات الفوتر 💾"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Toggle Active */}
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-current/10">
+              <div>
+                <span className="text-xs font-black block">تفعيل ظهور بطاقة ما قبل الفوتر (Pre-Footer)</span>
+                <span className="text-[10px] text-slate-400 font-bold">عند التعطيل، يظهر الفوتر مباشرة دون شريط النداء الترويجي</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-400">
+                  {footerForm.preFooterEnabled !== false ? "مفعل 🟢" : "معطل ⚪"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFooterForm((prev: any) => ({ ...prev, preFooterEnabled: !(prev.preFooterEnabled !== false) }))}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                    footerForm.preFooterEnabled !== false ? "bg-amber-400" : "bg-slate-700"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                      footerForm.preFooterEnabled !== false ? "translate-x-0" : "-translate-x-5"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Title & Description */}
+            <div className="space-y-3.5">
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">عنوان الشريط الترويجي الرئيسي</label>
+                <input
+                  type="text"
+                  value={footerForm.preFooterTitle || ""}
+                  onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterTitle: e.target.value }))}
+                  placeholder="ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">النص التعريفي والتسويقي للشريط</label>
+                <textarea
+                  rows={2}
+                  value={footerForm.preFooterDesc || ""}
+                  onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterDesc: e.target.value }))}
+                  placeholder="بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي..."
+                  className="w-full rounded-xl border p-2.5 text-xs font-medium outline-none bg-white/5 resize-none"
+                />
+              </div>
+            </div>
+
+            {/* 3 Call to Action Buttons */}
+            <div className="pt-2 border-t border-current/10 space-y-3">
+              <span className="text-xs font-black block text-amber-400">أزرار الإجراء السريع الثلاثة بالبطاقة (CTAs) 🚀</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* CTA 1 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <span className="text-[11px] font-black block">الزر الأول (الأساسي)</span>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">نص الزر</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta1Text || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta1Text: e.target.value }))}
+                      placeholder="حجز مقعد دراسي"
+                      className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">رابط الزر (URL)</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta1Url || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta1Url: e.target.value }))}
+                      placeholder="/admissions"
+                      className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                    />
+                  </div>
+                </div>
+
+                {/* CTA 2 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <span className="text-[11px] font-black block">الزر الثاني (المستشار / واتساب)</span>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">نص الزر</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta2Text || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta2Text: e.target.value }))}
+                      placeholder="مستشار القبول"
+                      className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">رابط الزر (URL)</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta2Url || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta2Url: e.target.value }))}
+                      placeholder="https://wa.me/966531896000"
+                      className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                    />
+                  </div>
+                </div>
+
+                {/* CTA 3 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <span className="text-[11px] font-black block">الزر الثالث (الرسوم والمعلومات)</span>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">نص الزر</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta3Text || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta3Text: e.target.value }))}
+                      placeholder="جدول الرسوم المعتمد"
+                      className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5">رابط الزر (URL)</label>
+                    <input
+                      type="text"
+                      value={footerForm.preFooterCta3Url || ""}
+                      onChange={(e) => setFooterForm((prev: any) => ({ ...prev, preFooterCta3Url: e.target.value }))}
+                      placeholder="/admissions#fees-table-section"
+                      className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Badges & Quick Links */}
+          <div className={`p-6 rounded-3xl border space-y-5 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <div>
+              <h3 className="text-base font-black">شارات الاعتماد والروابط السريعة بالفوتر 🏆🔗</h3>
+              <p className="text-xs text-slate-400 font-bold mt-0.5">
+                تخصيص شارات الاعتمادين الرسميين والروابط الثلاثة في الفوتر السفلي
+              </p>
+            </div>
+
+            {/* Accreditations Badges */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {/* Badge 1 */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black flex items-center gap-1.5">
+                    <Award size={14} className="text-amber-400" />
+                    <span>شارة الاعتماد الأولى (Cognia)</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFooterForm((prev: any) => ({ ...prev, badge1Enabled: !(prev.badge1Enabled !== false) }))}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                      footerForm.badge1Enabled !== false ? "bg-amber-400" : "bg-slate-700"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ${
+                        footerForm.badge1Enabled !== false ? "translate-x-0" : "-translate-x-4"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={footerForm.badge1Text || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, badge1Text: e.target.value }))}
+                    placeholder="اعتماد Cognia"
+                    className="rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                  />
+                  <input
+                    type="text"
+                    value={footerForm.badge1Url || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, badge1Url: e.target.value }))}
+                    placeholder="/accreditations"
+                    className="rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+              </div>
+
+              {/* Badge 2 */}
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black flex items-center gap-1.5">
+                    <Award size={14} className="text-amber-400" />
+                    <span>شارة الاعتماد الثانية (SAT & IELTS)</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFooterForm((prev: any) => ({ ...prev, badge2Enabled: !(prev.badge2Enabled !== false) }))}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                      footerForm.badge2Enabled !== false ? "bg-amber-400" : "bg-slate-700"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ${
+                        footerForm.badge2Enabled !== false ? "translate-x-0" : "-translate-x-4"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={footerForm.badge2Text || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, badge2Text: e.target.value }))}
+                    placeholder="مركز اختبارات SAT & IELTS"
+                    className="rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                  />
+                  <input
+                    type="text"
+                    value={footerForm.badge2Url || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, badge2Url: e.target.value }))}
+                    placeholder="/accreditations"
+                    className="rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="pt-2 border-t border-current/10 space-y-3">
+              <span className="text-xs font-black block text-amber-400">الروابط السريعة بالفوتر (Quick Links) 🔗</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Link 1 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black">رابط سريع 1</span>
+                    <button
+                      type="button"
+                      onClick={() => setFooterForm((prev: any) => ({ ...prev, quickLink1Enabled: !(prev.quickLink1Enabled !== false) }))}
+                      className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                        footerForm.quickLink1Enabled !== false ? "bg-amber-400" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow transition duration-200 ${
+                          footerForm.quickLink1Enabled !== false ? "translate-x-0" : "-translate-x-3"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={footerForm.quickLink1Text || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink1Text: e.target.value }))}
+                    placeholder="القبول والتسجيل ✦"
+                    className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                  />
+                  <input
+                    type="text"
+                    value={footerForm.quickLink1Url || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink1Url: e.target.value }))}
+                    placeholder="/admissions"
+                    className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+
+                {/* Link 2 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black">رابط سريع 2</span>
+                    <button
+                      type="button"
+                      onClick={() => setFooterForm((prev: any) => ({ ...prev, quickLink2Enabled: !(prev.quickLink2Enabled !== false) }))}
+                      className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                        footerForm.quickLink2Enabled !== false ? "bg-amber-400" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow transition duration-200 ${
+                          footerForm.quickLink2Enabled !== false ? "translate-x-0" : "-translate-x-3"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={footerForm.quickLink2Text || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink2Text: e.target.value }))}
+                    placeholder="الاعتمادات"
+                    className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                  />
+                  <input
+                    type="text"
+                    value={footerForm.quickLink2Url || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink2Url: e.target.value }))}
+                    placeholder="/accreditations"
+                    className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+
+                {/* Link 3 */}
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black">رابط سريع 3</span>
+                    <button
+                      type="button"
+                      onClick={() => setFooterForm((prev: any) => ({ ...prev, quickLink3Enabled: !(prev.quickLink3Enabled !== false) }))}
+                      className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                        footerForm.quickLink3Enabled !== false ? "bg-amber-400" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow transition duration-200 ${
+                          footerForm.quickLink3Enabled !== false ? "translate-x-0" : "-translate-x-3"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={footerForm.quickLink3Text || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink3Text: e.target.value }))}
+                    placeholder="المجمعات 🏫"
+                    className="w-full rounded-xl border p-2 text-xs font-bold outline-none bg-white/5"
+                  />
+                  <input
+                    type="text"
+                    value={footerForm.quickLink3Url || ""}
+                    onChange={(e) => setFooterForm((prev: any) => ({ ...prev, quickLink3Url: e.target.value }))}
+                    placeholder="/about"
+                    className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Copyright Line */}
+            <div className="pt-2 border-t border-current/10">
+              <label className="text-xs font-bold text-slate-300 block mb-1.5">سطر حقوق الملكية الفكرية المعتمد أسفل الموقع</label>
+              <input
+                type="text"
+                value={footerForm.copyrightText || ""}
+                onChange={(e) => setFooterForm((prev: any) => ({ ...prev, copyrightText: e.target.value }))}
+                placeholder="جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026"
+                className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+              />
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-3 border-t border-current/10 flex justify-end">
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({ footer: footerForm });
+                  toast.success("تم حفظ وتحديث إعدادات بطاقة الفوتر بنجاح 💾");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer shadow-lg"
+              >
+                <Save size={14} />
+                <span>{isSaving ? "جاري الحفظ..." : "حفظ إعدادات وبطاقة الفوتر بالكامل 💾"}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBTAB: EVENT POPUP MODAL MANAGER (النافذة الإعلانية المنبثقة) */}
+      {subTab === "popup" && (
+        <div className="space-y-5 animate-in fade-in duration-200">
+          <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-current/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                  <Megaphone size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black">النافذة الإعلانية المنبثقة للزوار (Event Pop-up Modal) 📣</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">
+                    نافذة إعلانية فاخرة تظهر للزوار عند الدخول للإعلان عن فتح التسجيل، الفعاليات الكبرى، أو قرارات الإدارة
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    await onSaveOrchestration({ eventModal: eventModalForm });
+                    toast.success("تم حفظ إعدادات النافذة الإعلانية المنبثقة بنجاح 💾");
+                  }}
+                  disabled={isSaving}
+                  className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Save size={13} />
+                  <span>{isSaving ? "جاري الحفظ..." : "حفظ النافذة الإعلانية 💾"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Master Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-current/10">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{eventModalForm.enabled ? "🟢" : "⚪"}</span>
+                <div>
+                  <span className="text-sm font-black block">
+                    {eventModalForm.enabled ? "النافذة الإعلانية نشطة وتظهر لزوار الموقع الآن 🚀" : "النافذة الإعلانية متوقفة حالياً (لا تظهر للزوار)"}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-bold">
+                    يمكنك تشغيلها في مواسم التسجيل أو الفعاليات وإيقافها في أي وقت بنقرة واحدة
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setEventModalForm((prev: any) => ({ ...prev, enabled: !prev.enabled }))}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                  eventModalForm.enabled ? "bg-amber-400" : "bg-slate-700"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                    eventModalForm.enabled ? "translate-x-0" : "-translate-x-5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Grid of Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">شارة الإعلان العلوية (Badge)</label>
+                <input
+                  type="text"
+                  value={eventModalForm.badge || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, badge: e.target.value }))}
+                  placeholder="إعلان هام ✦ 2026/2027"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">عنوان الإعلان الرئيسي</label>
+                <input
+                  type="text"
+                  value={eventModalForm.title || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, title: e.target.value }))}
+                  placeholder="فتح باب القبول والتسجيل للعام الدراسي الجديد"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">نص وتفاصيل الإعلان (Subtitle)</label>
+                <textarea
+                  rows={2}
+                  value={eventModalForm.subtitle || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, subtitle: e.target.value }))}
+                  placeholder="يسر مدارس العقيق الأهلية والدولية الإعلان عن بدء استقبال طلبات الالتحاق..."
+                  className="w-full rounded-xl border p-2.5 text-xs font-medium outline-none bg-white/5 resize-none"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">رابط بوستر / صورة الإعلان (Image URL)</label>
+                <input
+                  type="text"
+                  value={eventModalForm.imageUrl || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, imageUrl: e.target.value }))}
+                  placeholder="https://images.unsplash.com/... أو رابط مباشر للصورة"
+                  className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">نص زر الإجراء (CTA Button)</label>
+                <input
+                  type="text"
+                  value={eventModalForm.ctaText || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, ctaText: e.target.value }))}
+                  placeholder="حجز مقعد دراسي الآن 🚀"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">رابط زر الإجراء (URL)</label>
+                <input
+                  type="text"
+                  value={eventModalForm.ctaUrl || ""}
+                  onChange={(e) => setEventModalForm((prev: any) => ({ ...prev, ctaUrl: e.target.value }))}
+                  placeholder="/admissions أو رابط خارجي"
+                  className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+            </div>
+
+            {/* Live Interactive Preview Box */}
+            <div className="pt-4 border-t border-current/10 space-y-3">
+              <span className="text-xs font-black block text-amber-400 flex items-center gap-1.5">
+                <Sparkles size={14} />
+                <span>المعاينة الحية الفورية للنافذة الإعلانية (Live Visual Preview)</span>
+              </span>
+
+              <div className="p-4 sm:p-6 rounded-3xl bg-black/60 border border-white/10 flex items-center justify-center">
+                <div className="w-full max-w-sm rounded-[2rem] border border-amber-400/40 bg-[#0a0f16] text-white shadow-2xl overflow-hidden">
+                  <div className="h-1 bg-gradient-to-r from-amber-500 via-[#f8ca14] to-yellow-300" />
+                  {eventModalForm.imageUrl && (
+                    <div className="aspect-[16/9] w-full overflow-hidden bg-black/40">
+                      <img src={eventModalForm.imageUrl} alt="معاينة البوستر" className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                  <div className="p-4 space-y-2 text-right">
+                    {eventModalForm.badge && (
+                      <span className="inline-block text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-400 border border-amber-400/30">
+                        {eventModalForm.badge}
+                      </span>
+                    )}
+                    <h4 className="text-sm font-black text-white">{eventModalForm.title || "عنوان الإعلان"}</h4>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">{eventModalForm.subtitle || "نص الإعلان التوضيحي..."}</p>
+                    <div className="pt-2">
+                      <div className="w-full py-2 rounded-xl bg-amber-400 text-black text-xs font-black text-center shadow">
+                        {eventModalForm.ctaText || "زر الإجراء"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-3 border-t border-current/10 flex justify-end">
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({ eventModal: eventModalForm });
+                  toast.success("تم حفظ وتفعيل النافذة الإعلانية المنبثقة بنجاح 💾");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer shadow-lg"
+              >
+                <Save size={14} />
+                <span>{isSaving ? "جاري الحفظ..." : "حفظ وتفعيل النافذة الإعلانية 💾"}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBTAB: VACATION & MAINTENANCE MODE MANAGER (وضع العطلات والصيانة) */}
+      {subTab === "vacation" && (
+        <div className="space-y-5 animate-in fade-in duration-200">
+          <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-current/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                  <Palmtree size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black">وضع العطلات الرسمية والصيانة المجدولة 🌴🛠️</h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">
+                    شريط تنبيه عاجل وبارز يظهر بأعلى صفحات الموقع لإشعار أولياء الأمور والزوار بالعطلات أو أعمال التحديث
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    await onSaveOrchestration({ vacationMode: vacationForm });
+                    toast.success("تم حفظ وضع العطلات والصيانة بنجاح 💾");
+                  }}
+                  disabled={isSaving}
+                  className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Save size={13} />
+                  <span>{isSaving ? "جاري الحفظ..." : "حفظ وضع العطلات 💾"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Master Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-current/10">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{vacationForm.enabled ? "🌴" : "⚪"}</span>
+                <div>
+                  <span className="text-sm font-black block">
+                    {vacationForm.enabled ? "شريط التنبيه نشط وظاهر في أعلى الموقع الآن 🟢" : "وضع العطلات معطل حالياً (الوضع الطبيعي للمدارس)"}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-bold">
+                    عند التفعيل، يظهر شريط عريض في أعلى كل الصفحات بالرسالة المحددة وزر الإجراء السريع
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setVacationForm((prev: any) => ({ ...prev, enabled: !prev.enabled }))}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                  vacationForm.enabled ? "bg-amber-400" : "bg-slate-700"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                    vacationForm.enabled ? "translate-x-0" : "-translate-x-5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Mode Type Selection */}
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-2">نوع ونمط التنبيه (Alert Type)</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {[
+                  { id: "vacation", name: "إجازة مدرسية وعطلة رسمية 🌴", desc: "أجواء مريحة، تهاني، واستمرار التسجيل الإلكتروني" },
+                  { id: "maintenance", name: "صيانة وتحديث مجدول 🛠️", desc: "إشعار بأعمال التطوير مع توجيه لقنوات التواصل" },
+                  { id: "alert", name: "إشعار وتنبيه هام 📢", desc: "تنبيه رسمي لأولياء الأمور والطلاب" },
+                ].map((type) => (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => setVacationForm((prev: any) => ({ ...prev, type: type.id }))}
+                    className={`p-3 rounded-2xl border text-right transition cursor-pointer ${
+                      vacationForm.type === type.id
+                        ? "bg-amber-400/15 border-amber-400/40 text-amber-400"
+                        : "bg-white/[0.02] border-current/10 text-slate-300 hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="text-xs font-black block">{type.name}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">{type.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">عنوان التنبيه أو الإجازة</label>
+                <input
+                  type="text"
+                  value={vacationForm.title || ""}
+                  onChange={(e) => setVacationForm((prev: any) => ({ ...prev, title: e.target.value }))}
+                  placeholder="إجازة نهاية الفصل الدراسي الثاني"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">نص زر التوجيه السريع</label>
+                <input
+                  type="text"
+                  value={vacationForm.linkText || ""}
+                  onChange={(e) => setVacationForm((prev: any) => ({ ...prev, linkText: e.target.value }))}
+                  placeholder="التقديم الإلكتروني 24/7"
+                  className="w-full rounded-xl border p-2.5 text-xs font-bold outline-none bg-white/5"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">الرسالة الموجهة للزوار وأولياء الأمور</label>
+                <textarea
+                  rows={2}
+                  value={vacationForm.message || ""}
+                  onChange={(e) => setVacationForm((prev: any) => ({ ...prev, message: e.target.value }))}
+                  placeholder="نتمنى لطلابنا وأولياء أمورنا إجازة سعيدة ومباركة. يُستأنف استقبال طلبات التسجيل الإلكتروني على مدار الساعة..."
+                  className="w-full rounded-xl border p-2.5 text-xs font-medium outline-none bg-white/5 resize-none"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-slate-300 block mb-1.5">رابط زر التوجيه السريع (URL)</label>
+                <input
+                  type="text"
+                  value={vacationForm.linkUrl || ""}
+                  onChange={(e) => setVacationForm((prev: any) => ({ ...prev, linkUrl: e.target.value }))}
+                  placeholder="/admissions"
+                  className="w-full rounded-xl border p-2.5 text-xs font-mono outline-none bg-white/5"
+                />
+              </div>
+            </div>
+
+            {/* Live Interactive Preview */}
+            <div className="pt-4 border-t border-current/10 space-y-3">
+              <span className="text-xs font-black block text-amber-400 flex items-center gap-1.5">
+                <Sparkles size={14} />
+                <span>المعاينة الحية لشريط العطلة بأعلى الموقع (Live Banner Preview)</span>
+              </span>
+
+              <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs ${
+                vacationForm.type === "maintenance"
+                  ? "bg-rose-950/40 border-rose-500/30 text-rose-200"
+                  : vacationForm.type === "alert"
+                  ? "bg-amber-950/40 border-amber-500/30 text-amber-200"
+                  : "bg-emerald-950/40 border-emerald-500/30 text-emerald-200"
+              }`}>
+                <div className="flex items-center gap-2.5 text-right">
+                  <span className="text-lg">
+                    {vacationForm.type === "maintenance" ? "🛠️" : vacationForm.type === "alert" ? "📢" : "🌴"}
+                  </span>
+                  <div>
+                    <span className="font-black block">{vacationForm.title || "عنوان التنبيه"}</span>
+                    <span className="text-[11px] opacity-80">{vacationForm.message || "نص الرسالة الموجهة للجمهور..."}</span>
+                  </div>
+                </div>
+
+                {vacationForm.linkText && (
+                  <div className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 font-black text-[11px] shrink-0 text-center">
+                    {vacationForm.linkText} ←
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-3 border-t border-current/10 flex justify-end">
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({ vacationMode: vacationForm });
+                  toast.success("تم حفظ وتفعيل وضع العطلات والصيانة بنجاح 💾");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer shadow-lg"
+              >
+                <Save size={14} />
+                <span>{isSaving ? "جاري الحفظ..." : "حفظ وتفعيل وضع العطلات والصيانة 💾"}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SUBTAB 2: INTERACTIVE SYSTEM PORTALS MANAGER (بوابات الأنظمة والخدمات) */}
       {subTab === "portals" && (
         <div className={`p-6 rounded-3xl border space-y-6 animate-in fade-in duration-200 ${
