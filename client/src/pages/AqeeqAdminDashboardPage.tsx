@@ -101,6 +101,8 @@ import { OperationsHub } from "@/components/admin/executive/OperationsHub";
 import { SiteContentStudio } from "@/components/admin/executive/SiteContentStudio";
 import { PublishingStudio } from "@/components/admin/executive/PublishingStudio";
 import { SystemBrandHub } from "@/components/admin/executive/SystemBrandHub";
+import { LiveStudioCanvas } from "@/components/admin/executive/LiveStudioCanvas";
+import { SiteHealthCopilot } from "@/components/admin/executive/SiteHealthCopilot";
 
 import {
   Dialog,
@@ -677,6 +679,19 @@ export default function AqeeqAdminDashboardPage() {
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [isCanvasOpen, setIsCanvasOpen] = useState(false);
+  const [isHealthOpen, setIsHealthOpen] = useState(false);
+
+  // Sync pillar from URL search params (e.g. from InContextHUDBridge)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const pillarParam = params.get("pillar") as ExecutivePillar;
+      if (pillarParam && ["operations", "content", "publishing", "system"].includes(pillarParam)) {
+        setActivePillar(pillarParam);
+      }
+    }
+  }, []);
 
   const utils = trpc.useUtils();
 
@@ -1648,7 +1663,52 @@ export default function AqeeqAdminDashboardPage() {
         }}
         isSaving={setOrchestrationMutation.isPending}
         hasUnsavedChanges={false}
+        isCanvasOpen={isCanvasOpen}
+        onToggleCanvas={() => setIsCanvasOpen((prev) => !prev)}
+        isHealthOpen={isHealthOpen}
+        onToggleHealth={() => setIsHealthOpen((prev) => !prev)}
       />
+
+      {/* 🩺 Site Health Copilot Drawer */}
+      {isHealthOpen && (
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 pt-4 animate-in slide-in-from-top-3 duration-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-black text-emerald-400">🛡️ فاحص سلامة وجودة الموقع الاستباقي (Site Health Copilot)</span>
+            <button
+              type="button"
+              onClick={() => setIsHealthOpen(false)}
+              className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 rounded-lg bg-white/5 cursor-pointer"
+            >
+              إغلاق ✕
+            </button>
+          </div>
+          <SiteHealthCopilot
+            orchestration={orchestrationForm}
+            onUpdateOrchestration={async (updated) => {
+              setOrchestrationForm((prev: any) => ({ ...prev, ...updated }));
+              await setOrchestrationMutation.mutateAsync({ ...orchestrationForm, ...updated });
+            }}
+            dark={dark}
+          />
+        </div>
+      )}
+
+      {/* 📱 Live Studio Multi-Device Canvas */}
+      {isCanvasOpen && (
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 pt-4 animate-in slide-in-from-top-3 duration-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-black text-amber-400">📱 الكانفاس الحي متعدد الشاشات (Live Studio Multi-Device Canvas)</span>
+            <button
+              type="button"
+              onClick={() => setIsCanvasOpen(false)}
+              className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 rounded-lg bg-white/5 cursor-pointer"
+            >
+              إغلاق الكانفاس ✕
+            </button>
+          </div>
+          <LiveStudioCanvas dark={dark} onClose={() => setIsCanvasOpen(false)} />
+        </div>
+      )}
 
       {/* 2-Column Command Workspace */}
       <div className="flex-1 flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto">

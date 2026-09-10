@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Search,
   ExternalLink,
@@ -6,6 +5,8 @@ import {
   Sun,
   Save,
   Command,
+  Smartphone,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,10 @@ interface ExecutiveTopBarProps {
   onSaveAll: () => Promise<void> | void;
   isSaving: boolean;
   hasUnsavedChanges?: boolean;
+  isCanvasOpen?: boolean;
+  onToggleCanvas?: () => void;
+  isHealthOpen?: boolean;
+  onToggleHealth?: () => void;
 }
 
 export function ExecutiveTopBar({
@@ -25,6 +30,10 @@ export function ExecutiveTopBar({
   onSaveAll,
   isSaving,
   hasUnsavedChanges = false,
+  isCanvasOpen = false,
+  onToggleCanvas,
+  isHealthOpen = false,
+  onToggleHealth,
 }: ExecutiveTopBarProps) {
   return (
     <header
@@ -81,6 +90,44 @@ export function ExecutiveTopBar({
 
       {/* Left Quick Action Controls */}
       <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Toggle Live Studio Canvas */}
+        {onToggleCanvas && (
+          <button
+            type="button"
+            onClick={onToggleCanvas}
+            className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+              isCanvasOpen
+                ? "border-amber-400 bg-amber-400 text-black shadow-md shadow-amber-400/20"
+                : dark
+                ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-xs"
+            }`}
+            title="فتح/إغلاق الكانفاس الحي متعدد الشاشات"
+          >
+            <Smartphone size={13} />
+            <span className="hidden md:inline">الكانفاس الحي</span>
+          </button>
+        )}
+
+        {/* Toggle Site Health Copilot */}
+        {onToggleHealth && (
+          <button
+            type="button"
+            onClick={onToggleHealth}
+            className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+              isHealthOpen
+                ? "border-emerald-500 bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                : dark
+                ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                : "border-black/10 bg-white text-slate-700 hover:bg-slate-50 shadow-xs"
+            }`}
+            title="فاحص سلامة وجودة الموقع الاستباقي"
+          >
+            <ShieldCheck size={13} className={isHealthOpen ? "text-white" : "text-emerald-400"} />
+            <span className="hidden md:inline">فاحص الجودة</span>
+          </button>
+        )}
+
         {/* Open Live Portal */}
         <a
           href="/"
