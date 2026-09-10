@@ -113,44 +113,44 @@ export function HeaderDockNav({ items, dark, onNavigate }: HeaderDockNavProps) {
     }
   }, [hoveredKey, navX]);
 
-  // ── 📡 High-Performance Cached Queries (10m stale time to preserve Render performance) ──
+  // ── 📡 High-Performance Live Queries (60s smart cache + window focus refresh) ──
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: albums = [] } = trpc.aqeeqAlbums.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: showcases = [] } = trpc.aqeeqShowcases.publicList.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: articles = [] } = trpc.articles.listPublished.useQuery({}, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: podcasts = [] } = trpc.podcasts.list.useQuery({}, {
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
   const { data: aboutOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/about" },
-    { refetchOnWindowFocus: false, staleTime: 600_000 }
+    { refetchOnWindowFocus: true, staleTime: 60_000 }
   );
   const { data: admissionsOverrides = [] } = trpc.visualEditor.publicList.useQuery(
     { pagePath: "/admissions" },
-    { refetchOnWindowFocus: false, staleTime: 600_000 }
+    { refetchOnWindowFocus: true, staleTime: 60_000 }
   );
 
   const { data: previewVersion } = trpc.executiveAdmin.getPreviewsVersion.useQuery(undefined, {
     refetchInterval: false,
-    refetchOnWindowFocus: false,
-    staleTime: 600_000,
+    refetchOnWindowFocus: true,
+    staleTime: 60_000,
   });
 
   const cacheKey = useMemo(() => {
