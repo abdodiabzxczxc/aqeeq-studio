@@ -1048,7 +1048,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       {/* ========================================================================= */}
       {/* LUXURY FLOATING VINYL ORB & COMPACT ATTACHED DOCK */}
       {/* ========================================================================= */}
-      {!location.startsWith("/admin") && location !== "/login" && (
+      {!location.startsWith("/admin") && !location.startsWith("/studio") && location !== "/login" && (typeof window === "undefined" || new URLSearchParams(window.location.search).get("studiomode") !== "1") && (
       <>
       <div
         dir="rtl"

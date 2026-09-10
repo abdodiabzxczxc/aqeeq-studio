@@ -23,7 +23,8 @@ export function SectionCommanderBar({
   onMoveUp,
   onMoveDown,
 }: SectionCommanderBarProps) {
-  if (!isEditing) return null;
+  const isStudioCanvasMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("studiomode") === "1";
+  if (!isEditing || isStudioCanvasMode) return null;
 
   const handleMove = (direction: "up" | "down") => {
     if (direction === "up" && onMoveUp) {

@@ -356,7 +356,8 @@ function toStyle(override?: VisualOverride): React.CSSProperties {
   if (!override) return {};
   const behavior = parseLayerBehavior(override.customCss);
   const isSection = override.elementTag === "section" || override.elementTag === "section-block" || override.elementId.startsWith("section-");
-  const isFloating = behavior.isFloating === true && !isSection;
+  const hasExplicitFloatingCoords = Boolean(override.layerX || override.layerY || override.layerWidth);
+  const isFloating = behavior.isFloating === true && !isSection && hasExplicitFloatingCoords;
   const safeZIndex = isBackgroundLayer(override.elementId) ? Math.max(0, override.layerZIndex) : override.layerZIndex;
   const hasGeometry = Boolean(override.layerX || override.layerY || override.layerWidth || override.layerHeight || safeZIndex);
   const isCroppedSection = Boolean(override.layerHeight && isSection);
@@ -4336,7 +4337,11 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         </button>
       </div>
     ) : null}
-    {isEditing ? <span className={`pointer-events-none absolute -top-5 right-0 z-[82] inline-flex items-center gap-1 rounded-t-lg bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 transition-opacity duration-200 ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>{isLocked ? <Lock size={10} /> : null}{label}</span> : null}
+    {isEditing && selected ? (
+      <span className="pointer-events-none absolute -top-6 right-0 z-[85] inline-flex items-center gap-1 rounded-md bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 shadow-md">
+        {isLocked ? <Lock size={10} /> : null}{label}
+      </span>
+    ) : null}
     {isEditing && isInteractiveTransform && selected ? <span className="pointer-events-none absolute -bottom-6 right-0 z-[82] rounded-lg bg-[#08467d] px-2 py-1 text-[10px] font-black text-white shadow-lg">X {Math.round(inspectorFrame.x)} · Y {Math.round(inspectorFrame.y)} · {inspectorFrame.width ? `${Math.round(inspectorFrame.width)}×${Math.round(inspectorFrame.height ?? 0)}` : "حجم تلقائي"}</span> : null}
     {isEditing && selected && isDirectBackground && liveFrame ? <><span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 z-[82] border-t border-dashed border-[#f8ca14]/90" /><span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-1/2 z-[82] border-l border-dashed border-[#f8ca14]/90" /><span className="pointer-events-none absolute left-1/2 top-1/2 z-[83] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f8ca14]/60 bg-[#111521]/95 px-2.5 py-1 text-[10px] font-black text-[#f8ca14] shadow-xl">{Math.round(liveFrame.width ?? 0)} × {Math.round(liveFrame.height ?? 0)} بكسل</span><span className="pointer-events-none absolute -top-7 left-1/2 z-[83] -translate-x-1/2 whitespace-nowrap rounded-lg border border-[#f8ca14]/45 bg-[#111521]/95 px-2 py-1 text-[9px] font-black text-[#f8ca14]">منتصف الخلفية · {backgroundAspectLocked ? "النسبة مقفلة" : "نسبة حرة"}</span></> : null}
     {isEditing && selected && !isLocked && isDirectBackground ? ([
