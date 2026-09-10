@@ -85,20 +85,43 @@ export function SystemBrandHub({
   const currentNav = orchestration?.nav || {};
   const [navForm, setNavForm] = useState(currentNav);
 
-  // 3. Social Form (10 Platforms)
+  // 3. Social Form (10 Platforms with URLs and Show/Hide Toggles)
   const currentSocial = orchestration?.social || {};
-  const [socialForm, setSocialForm] = useState({
+  const [socialForm, setSocialForm] = useState<Record<string, any>>({
     xUrl: currentSocial.xUrl || "",
+    xEnabled: currentSocial.xEnabled !== false,
     instagramUrl: currentSocial.instagramUrl || "",
+    instagramEnabled: currentSocial.instagramEnabled !== false,
     youtubeUrl: currentSocial.youtubeUrl || "",
+    youtubeEnabled: currentSocial.youtubeEnabled !== false,
     snapchatUrl: currentSocial.snapchatUrl || "",
+    snapchatEnabled: currentSocial.snapchatEnabled !== false,
     tiktokUrl: currentSocial.tiktokUrl || "",
+    tiktokEnabled: currentSocial.tiktokEnabled !== false,
     facebookUrl: currentSocial.facebookUrl || "",
+    facebookEnabled: currentSocial.facebookEnabled !== false,
     linkedinUrl: currentSocial.linkedinUrl || "",
+    linkedinEnabled: currentSocial.linkedinEnabled !== false,
     telegramUrl: currentSocial.telegramUrl || "",
+    telegramEnabled: currentSocial.telegramEnabled !== false,
     whatsappUrl: currentSocial.whatsappUrl || "",
+    whatsappEnabled: currentSocial.whatsappEnabled !== false,
     phoneUrl: currentSocial.phoneUrl || "",
+    phoneEnabled: currentSocial.phoneEnabled !== false,
   });
+
+  const SOCIAL_NETWORKS_CONFIG = [
+    { key: "x", name: "1. منصة إكس (تويتر)", sub: "X / Twitter", placeholder: "https://x.com/alaqeeq..." },
+    { key: "instagram", name: "2. إنستغرام", sub: "Instagram", placeholder: "https://instagram.com/alaqeeq..." },
+    { key: "youtube", name: "3. قناة يوتيوب", sub: "YouTube", placeholder: "https://youtube.com/@alaqeeq..." },
+    { key: "snapchat", name: "4. سناب شات", sub: "Snapchat", placeholder: "https://snapchat.com/add/..." },
+    { key: "tiktok", name: "5. تيك توك", sub: "TikTok", placeholder: "https://tiktok.com/@alaqeeq..." },
+    { key: "facebook", name: "6. فيسبوك", sub: "Facebook", placeholder: "https://facebook.com/alaqeeq..." },
+    { key: "linkedin", name: "7. لينكد إن", sub: "LinkedIn", placeholder: "https://linkedin.com/company/alaqeeq..." },
+    { key: "telegram", name: "8. قناة تيليجرام", sub: "Telegram", placeholder: "https://t.me/alaqeeq..." },
+    { key: "whatsapp", name: "9. واتساب الموحد", sub: "WhatsApp (+966)", placeholder: "https://wa.me/966531896000" },
+    { key: "phone", name: "10. الهاتف الموحد / الاتصال", sub: "Phone Call", placeholder: "tel:+966531896000" },
+  ];
 
   // 4. System Portals Form
   const [portalsList, setPortalsList] = useState<SystemPortalItem[]>(
@@ -420,155 +443,48 @@ export function SystemBrandHub({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {/* 1. X (Twitter) */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">1. منصة إكس (تويتر)</span>
-                  <span className="text-[10px] text-slate-400">X / Twitter</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.xUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, xUrl: e.target.value })}
-                  placeholder="https://x.com/alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
+              {SOCIAL_NETWORKS_CONFIG.map((net) => {
+                const urlKey = `${net.key}Url`;
+                const enabledKey = `${net.key}Enabled`;
+                const isEnabled = socialForm[enabledKey] !== false;
+                const urlValue = socialForm[urlKey] || "";
 
-              {/* 2. Instagram */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">2. إنستغرام</span>
-                  <span className="text-[10px] text-slate-400">Instagram</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.instagramUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, instagramUrl: e.target.value })}
-                  placeholder="https://instagram.com/alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 3. YouTube */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">3. قناة يوتيوب</span>
-                  <span className="text-[10px] text-slate-400">YouTube</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.youtubeUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, youtubeUrl: e.target.value })}
-                  placeholder="https://youtube.com/@alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 4. Snapchat */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">4. سناب شات</span>
-                  <span className="text-[10px] text-slate-400">Snapchat</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.snapchatUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, snapchatUrl: e.target.value })}
-                  placeholder="https://snapchat.com/add/..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 5. TikTok */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">5. تيك توك</span>
-                  <span className="text-[10px] text-slate-400">TikTok</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.tiktokUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, tiktokUrl: e.target.value })}
-                  placeholder="https://tiktok.com/@alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 6. Facebook */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">6. فيسبوك</span>
-                  <span className="text-[10px] text-slate-400">Facebook</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.facebookUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, facebookUrl: e.target.value })}
-                  placeholder="https://facebook.com/alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 7. LinkedIn */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">7. لينكد إن</span>
-                  <span className="text-[10px] text-slate-400">LinkedIn</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.linkedinUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, linkedinUrl: e.target.value })}
-                  placeholder="https://linkedin.com/company/alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 8. Telegram */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">8. قناة تيليجرام</span>
-                  <span className="text-[10px] text-slate-400">Telegram</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.telegramUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, telegramUrl: e.target.value })}
-                  placeholder="https://t.me/alaqeeq..."
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 9. WhatsApp */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">9. واتساب الموحد</span>
-                  <span className="text-[10px] text-slate-400">WhatsApp (+966)</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.whatsappUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, whatsappUrl: e.target.value })}
-                  placeholder="https://wa.me/966531896000"
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
-
-              {/* 10. Phone Call */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black">10. الهاتف الموحد / الاتصال</span>
-                  <span className="text-[10px] text-slate-400">Phone Call</span>
-                </div>
-                <input
-                  type="text"
-                  value={socialForm.phoneUrl}
-                  onChange={(e) => setSocialForm({ ...socialForm, phoneUrl: e.target.value })}
-                  placeholder="tel:+966531896000"
-                  className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
-                />
-              </div>
+                return (
+                  <div key={net.key} className="p-3.5 rounded-2xl bg-white/[0.02] border border-current/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-black block">{net.name}</span>
+                        <span className="text-[10px] text-slate-400 font-bold">{net.sub}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {isEnabled ? "ظاهر 🟢" : "مخفي ⚪"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSocialForm((prev) => ({ ...prev, [enabledKey]: !isEnabled }))}
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                            isEnabled ? "bg-amber-400" : "bg-slate-700"
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ${
+                              isEnabled ? "translate-x-0" : "-translate-x-4"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      value={urlValue}
+                      onChange={(e) => setSocialForm((prev) => ({ ...prev, [urlKey]: e.target.value }))}
+                      placeholder={net.placeholder}
+                      className="w-full rounded-xl border p-2 text-xs font-mono outline-none bg-white/5"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -64,10 +64,7 @@ export function AlaqeeqStudioSiteFooter() {
     if (!url || !url.trim()) return false;
     const rawEnabled = (orchestration?.social as any)?.[`${key}Enabled`];
     if (rawEnabled === false) return false;
-    if (rawEnabled === true) return true;
-    // Core platforms default to enabled if URL is set; optional ones default to hidden
-    const corePlatforms = ["x", "instagram", "snapchat", "youtube", "whatsapp"];
-    return corePlatforms.includes(key);
+    return true;
   };
 
   const isWhatsappVisible = () => {
