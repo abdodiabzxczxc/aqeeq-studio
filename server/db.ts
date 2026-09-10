@@ -654,15 +654,25 @@ export type SiteOrchestrationConfig = {
   };
   social: {
     xUrl?: string | null;
+    xEnabled?: boolean;
     instagramUrl?: string | null;
+    instagramEnabled?: boolean;
     youtubeUrl?: string | null;
+    youtubeEnabled?: boolean;
     snapchatUrl?: string | null;
+    snapchatEnabled?: boolean;
     facebookUrl?: string | null;
+    facebookEnabled?: boolean;
     tiktokUrl?: string | null;
+    tiktokEnabled?: boolean;
     linkedinUrl?: string | null;
+    linkedinEnabled?: boolean;
     threadsUrl?: string | null;
+    threadsEnabled?: boolean;
     telegramUrl?: string | null;
+    telegramEnabled?: boolean;
     whatsappNumber?: string | null;
+    whatsappEnabled?: boolean;
   };
   topBar?: {
     enabled?: boolean;
@@ -915,15 +925,25 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
   },
   social: {
     xUrl: "https://x.com/alaqeeq_schools",
+    xEnabled: true,
     instagramUrl: "https://instagram.com/alaqeeq_schools",
+    instagramEnabled: true,
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
+    youtubeEnabled: true,
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
-    facebookUrl: "https://facebook.com/alaqeeqschools",
-    tiktokUrl: "https://tiktok.com/@alaqeeqschools",
-    linkedinUrl: "https://linkedin.com/company/alaqeeqschools",
-    threadsUrl: "https://threads.net/@alaqeeq_schools",
-    telegramUrl: "https://t.me/alaqeeqschools",
-    whatsappNumber: "966500000000",
+    snapchatEnabled: true,
+    whatsappNumber: "966531896000",
+    whatsappEnabled: true,
+    tiktokUrl: "",
+    tiktokEnabled: false,
+    facebookUrl: "",
+    facebookEnabled: false,
+    linkedinUrl: "",
+    linkedinEnabled: false,
+    threadsUrl: "",
+    threadsEnabled: false,
+    telegramUrl: "",
+    telegramEnabled: false,
   },
   topBar: {
     enabled: true,

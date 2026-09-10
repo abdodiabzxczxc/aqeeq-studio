@@ -374,15 +374,25 @@ const DEFAULT_ORCHESTRATION = {
   ],
   social: {
     xUrl: "https://x.com/alaqeeq_schools",
+    xEnabled: true,
     instagramUrl: "https://instagram.com/alaqeeq_schools",
+    instagramEnabled: true,
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
+    youtubeEnabled: true,
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
-    facebookUrl: "https://facebook.com/alaqeeqschools",
-    tiktokUrl: "https://tiktok.com/@alaqeeqschools",
-    linkedinUrl: "https://linkedin.com/company/alaqeeqschools",
-    threadsUrl: "https://threads.net/@alaqeeq_schools",
-    telegramUrl: "https://t.me/alaqeeqschools",
-    whatsappNumber: "966500000000",
+    snapchatEnabled: true,
+    whatsappNumber: "966531896000",
+    whatsappEnabled: true,
+    tiktokUrl: "",
+    tiktokEnabled: false,
+    facebookUrl: "",
+    facebookEnabled: false,
+    linkedinUrl: "",
+    linkedinEnabled: false,
+    threadsUrl: "",
+    threadsEnabled: false,
+    telegramUrl: "",
+    telegramEnabled: false,
   },
   topBar: {
     enabled: true,
@@ -4829,188 +4839,344 @@ export default function AqeeqAdminDashboardPage() {
                   </div>
 
                   {/* Card 2: Social Media Links (روابط شبكات التواصل الاجتماعي) */}
-                  <div className={`p-6 rounded-3xl border space-y-4 ${dark ? "border-emerald-500/20 bg-[#0c1713]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
-                    <div className="flex items-center gap-3 border-b pb-3 border-current/10">
-                      <div className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-                        <Share2 size={20} />
+                  <div className={`p-6 rounded-3xl border space-y-5 ${dark ? "border-emerald-500/20 bg-[#0c1713]" : "border-emerald-700/15 bg-white shadow-sm"}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-current/10">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-400">
+                          <Share2 size={22} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-black">إدارة قنوات وحسابات التواصل الاجتماعي (10 منصات)</h4>
+                            <span className="rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-bold">
+                              تحكم حي ومباشر
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            يمكنك تفعيل أو إخفاء أي منصة بضغطة زر واحدة (زر إظهار / إخفاء)، ولن تظهر في الفوتر إلا المنصات المفعّلة فقط
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-black">حسابات التواصل الاجتماعي (Social Media Channels)</h4>
-                        <p className="text-[11px] text-slate-400">الأيقونات الدائرية الموحدة الظاهرة في الفوتر</p>
+
+                      {/* Quick Presets Buttons */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              social: {
+                                ...orchestrationForm.social,
+                                xEnabled: true,
+                                instagramEnabled: true,
+                                snapchatEnabled: true,
+                                youtubeEnabled: true,
+                                whatsappEnabled: true,
+                                tiktokEnabled: false,
+                                facebookEnabled: false,
+                                linkedinEnabled: false,
+                                threadsEnabled: false,
+                                telegramEnabled: false,
+                              },
+                            });
+                            toast.success("تم ضبط الظهور: الحسابات الأساسية فقط (تويتر، إنستغرام، سناب، يوتيوب، واتساب)");
+                          }}
+                          className={`rounded-xl px-3 py-1.5 text-[11px] font-black transition border cursor-pointer ${
+                            dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          ⭐️ الأساسية فقط (5 حسابات)
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOrchestrationForm({
+                              ...orchestrationForm,
+                              social: {
+                                ...orchestrationForm.social,
+                                xEnabled: true,
+                                instagramEnabled: true,
+                                snapchatEnabled: true,
+                                youtubeEnabled: true,
+                                whatsappEnabled: true,
+                                tiktokEnabled: true,
+                                facebookEnabled: true,
+                                linkedinEnabled: true,
+                                threadsEnabled: true,
+                                telegramEnabled: true,
+                              },
+                            });
+                            toast.success("تم تفعيل إظهار جميع الـ 10 منصات");
+                          }}
+                          className={`rounded-xl px-3 py-1.5 text-[11px] font-black transition border cursor-pointer ${
+                            dark ? "border-amber-400/20 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20" : "border-amber-500/20 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                          }`}
+                        >
+                          👁️ إظهار الكل (10)
+                        </button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      {/* X (Twitter) */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">منصة 𝕏 (تويتر سابقاً)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.xUrl ?? "https://x.com/alaqeeq_schools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, xUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                    {/* Platforms Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        {
+                          key: "x",
+                          label: "منصة 𝕏 (تويتر سابقاً)",
+                          icon: "𝕏",
+                          urlProp: "xUrl",
+                          enabledProp: "xEnabled",
+                          defaultUrl: "https://x.com/alaqeeq_schools",
+                          isCore: true,
+                          placeholder: "https://x.com/username",
+                        },
+                        {
+                          key: "instagram",
+                          label: "إنستغرام (Instagram)",
+                          icon: "📸",
+                          urlProp: "instagramUrl",
+                          enabledProp: "instagramEnabled",
+                          defaultUrl: "https://instagram.com/alaqeeq_schools",
+                          isCore: true,
+                          placeholder: "https://instagram.com/username",
+                        },
+                        {
+                          key: "snapchat",
+                          label: "سناب شات (Snapchat)",
+                          icon: "👻",
+                          urlProp: "snapchatUrl",
+                          enabledProp: "snapchatEnabled",
+                          defaultUrl: "https://snapchat.com/add/alaqeeq_schools",
+                          isCore: true,
+                          placeholder: "https://snapchat.com/add/username",
+                        },
+                        {
+                          key: "youtube",
+                          label: "يوتيوب (YouTube)",
+                          icon: "▶️",
+                          urlProp: "youtubeUrl",
+                          enabledProp: "youtubeEnabled",
+                          defaultUrl: "https://youtube.com/@alaqeeq_schools",
+                          isCore: true,
+                          placeholder: "https://youtube.com/@channel",
+                        },
+                        {
+                          key: "whatsapp",
+                          label: "واتساب المعتمد (WhatsApp)",
+                          icon: "💬",
+                          urlProp: "whatsappNumber",
+                          enabledProp: "whatsappEnabled",
+                          defaultUrl: "966531896000",
+                          isCore: true,
+                          placeholder: "مثال: 966531896000",
+                        },
+                        {
+                          key: "tiktok",
+                          label: "تيك توك (TikTok)",
+                          icon: "🎵",
+                          urlProp: "tiktokUrl",
+                          enabledProp: "tiktokEnabled",
+                          defaultUrl: "https://tiktok.com/@alaqeeqschools",
+                          isCore: false,
+                          placeholder: "https://tiktok.com/@username",
+                        },
+                        {
+                          key: "facebook",
+                          label: "فيسبوك (Facebook)",
+                          icon: "📘",
+                          urlProp: "facebookUrl",
+                          enabledProp: "facebookEnabled",
+                          defaultUrl: "https://facebook.com/alaqeeqschools",
+                          isCore: false,
+                          placeholder: "https://facebook.com/page",
+                        },
+                        {
+                          key: "telegram",
+                          label: "قناة تليجرام (Telegram)",
+                          icon: "✈️",
+                          urlProp: "telegramUrl",
+                          enabledProp: "telegramEnabled",
+                          defaultUrl: "https://t.me/alaqeeqschools",
+                          isCore: false,
+                          placeholder: "https://t.me/channel",
+                        },
+                        {
+                          key: "linkedin",
+                          label: "لينكد إن (LinkedIn)",
+                          icon: "💼",
+                          urlProp: "linkedinUrl",
+                          enabledProp: "linkedinEnabled",
+                          defaultUrl: "https://linkedin.com/company/alaqeeqschools",
+                          isCore: false,
+                          placeholder: "https://linkedin.com/company/school",
+                        },
+                        {
+                          key: "threads",
+                          label: "ثريدز (Threads)",
+                          icon: "🧵",
+                          urlProp: "threadsUrl",
+                          enabledProp: "threadsEnabled",
+                          defaultUrl: "https://threads.net/@alaqeeq_schools",
+                          isCore: false,
+                          placeholder: "https://threads.net/@username",
+                        },
+                      ].map((platform) => {
+                        const rawEnabled = (orchestrationForm.social as any)?.[platform.enabledProp];
+                        const isEnabled = typeof rawEnabled === "boolean" ? rawEnabled : platform.isCore;
+                        const currentUrl = (orchestrationForm.social as any)?.[platform.urlProp] ?? (platform.isCore ? platform.defaultUrl : "");
 
-                      {/* Instagram */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">إنستغرام (Instagram)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.instagramUrl ?? "https://instagram.com/alaqeeq_schools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, instagramUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                        return (
+                          <div
+                            key={platform.key}
+                            className={`rounded-2xl border p-3.5 transition space-y-2.5 ${
+                              isEnabled
+                                ? dark
+                                  ? "border-emerald-500/30 bg-emerald-950/10"
+                                  : "border-emerald-500/25 bg-emerald-50/40 shadow-xs"
+                                : dark
+                                ? "border-white/5 bg-white/[0.02] opacity-75"
+                                : "border-slate-200 bg-slate-50/60 opacity-75"
+                            }`}
+                          >
+                            {/* Header: Platform Name + Toggle Switch Button */}
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="text-base shrink-0">{platform.icon}</span>
+                                <span className="text-xs font-black truncate">{platform.label}</span>
+                                {platform.isCore && (
+                                  <span className="rounded-full bg-amber-400/20 text-amber-400 px-1.5 py-0.2 text-[9px] font-bold shrink-0">
+                                    أساسي
+                                  </span>
+                                )}
+                              </div>
 
-                      {/* Snapchat */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">سناب شات (Snapchat)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.snapchatUrl ?? "https://snapchat.com/add/alaqeeq_schools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, snapchatUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                              {/* Toggle Button: Show / Hide */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const nextState = !isEnabled;
+                                  setOrchestrationForm({
+                                    ...orchestrationForm,
+                                    social: {
+                                      ...orchestrationForm.social,
+                                      [platform.enabledProp]: nextState,
+                                    },
+                                  });
+                                  if (nextState) {
+                                    toast.success(`تم إظهار منصة ${platform.label} 🟢`);
+                                  } else {
+                                    toast.info(`تم إخفاء منصة ${platform.label} من الموقع ⚪`);
+                                  }
+                                }}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black transition cursor-pointer shrink-0 border ${
+                                  isEnabled
+                                    ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30"
+                                    : dark
+                                    ? "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white"
+                                    : "bg-slate-200 text-slate-600 border-slate-300 hover:bg-slate-300 hover:text-slate-900"
+                                }`}
+                                title={isEnabled ? "اضغط لإخفاء الحساب من الموقع" : "اضغط لإظهار الحساب في الموقع"}
+                              >
+                                {isEnabled ? (
+                                  <>
+                                    <Eye size={12} />
+                                    <span>ظاهر 🟢</span>
+                                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                                  </>
+                                ) : (
+                                  <>
+                                    <EyeOff size={12} />
+                                    <span>مخفي ⚪</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
 
-                      {/* TikTok */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">تيك توك (TikTok)</label>
-                        <input
-                          type="text"
-                          value={(orchestrationForm.social as any)?.tiktokUrl ?? "https://tiktok.com/@alaqeeqschools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, tiktokUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                            {/* Input row + test link */}
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={currentUrl}
+                                placeholder={platform.placeholder}
+                                onChange={(e) =>
+                                  setOrchestrationForm({
+                                    ...orchestrationForm,
+                                    social: {
+                                      ...orchestrationForm.social,
+                                      [platform.urlProp]: e.target.value.trim(),
+                                    },
+                                  })
+                                }
+                                dir="ltr"
+                                className={`flex-1 rounded-xl border p-2 text-xs font-bold outline-none font-mono transition ${
+                                  isEnabled
+                                    ? dark
+                                      ? "border-white/10 bg-white/5 text-white focus:border-emerald-500"
+                                      : "border-slate-300 bg-white text-slate-900 focus:border-emerald-500"
+                                    : dark
+                                    ? "border-white/5 bg-white/[0.02] text-slate-400"
+                                    : "border-slate-200 bg-slate-100/70 text-slate-500"
+                                }`}
+                              />
 
-                      {/* Facebook */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">فيسبوك (Facebook)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.facebookUrl ?? "https://facebook.com/alaqeeqschools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, facebookUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                              {currentUrl && currentUrl.startsWith("http") && (
+                                <a
+                                  href={currentUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className={`shrink-0 grid h-8 w-8 place-items-center rounded-xl border transition ${
+                                    dark
+                                      ? "border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
+                                      : "border-slate-200 bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
+                                  }`}
+                                  title="اختبار الرابط في نافذة جديدة"
+                                >
+                                  <ExternalLink size={13} />
+                                </a>
+                              )}
+                            </div>
 
-                      {/* LinkedIn */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">لينكد إن (LinkedIn)</label>
-                        <input
-                          type="text"
-                          value={(orchestrationForm.social as any)?.linkedinUrl ?? "https://linkedin.com/company/alaqeeqschools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, linkedinUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                            {/* Status text */}
+                            <div className="flex items-center justify-between text-[10px] text-slate-400">
+                              <span>
+                                {isEnabled
+                                  ? currentUrl
+                                    ? "✅ الحساب معروض حالياً في الفوتر للزوار"
+                                    : "⚠️ الحساب مفعّل لكن الرابط فارغ (لن يظهر حتى يتم إدخال الرابط)"
+                                  : "🚫 هذا الحساب مخفي ولن يظهر للزوار في الموقع"}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                      {/* Threads */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">ثريدز (Threads)</label>
-                        <input
-                          type="text"
-                          value={(orchestrationForm.social as any)?.threadsUrl ?? "https://threads.net/@alaqeeq_schools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, threadsUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
+                    {/* Summary Banner & Save Reminder */}
+                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                      dark ? "bg-emerald-500/5 border-emerald-500/20" : "bg-emerald-50 border-emerald-200"
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                        <p className="text-xs font-black">
+                          الحسابات التي تم إخفاؤها أصبحت مخفية فوراً عن الفوتر، والأساسية فقط هي الظاهرة.
+                        </p>
                       </div>
-
-                      {/* YouTube */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">يوتيوب (YouTube)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.youtubeUrl ?? "https://youtube.com/@alaqeeq_schools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, youtubeUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
-
-                      {/* Telegram */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">قناة تليجرام (Telegram)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.telegramUrl ?? "https://t.me/alaqeeqschools"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, telegramUrl: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
-
-                      {/* WhatsApp */}
-                      <div>
-                        <label className="text-[11px] font-black text-slate-300 block mb-1">رقم واتساب المعتمد (مع كود الدولة)</label>
-                        <input
-                          type="text"
-                          value={orchestrationForm.social?.whatsappNumber ?? "966500000000"}
-                          onChange={(e) => setOrchestrationForm({
-                            ...orchestrationForm,
-                            social: { ...orchestrationForm.social, whatsappNumber: e.target.value.trim() },
-                          })}
-                          dir="ltr"
-                          placeholder="مثال: 966500000000"
-                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                          }`}
-                        />
-                      </div>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setOrchestrationMutation.mutate({
+                            social: orchestrationForm.social,
+                            footer: orchestrationForm.footer,
+                            nav: orchestrationForm.nav,
+                          });
+                        }}
+                        disabled={setOrchestrationMutation.isPending}
+                        className="shrink-0 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-5 py-2 cursor-pointer shadow-md gap-1.5"
+                      >
+                        <Save size={14} />
+                        <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ إعدادات السوشيل ميديا 💾"}</span>
+                      </Button>
                     </div>
                   </div>
 

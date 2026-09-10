@@ -59,6 +59,23 @@ export function AlaqeeqStudioSiteFooter() {
     "السلام عليكم ورحمة الله، أود الاستفسار بخصوص مدارس العقيق."
   )}`;
 
+  // Helper to determine if a social media channel is enabled and visible
+  const isSocialVisible = (key: string, url?: string | null) => {
+    if (!url || !url.trim()) return false;
+    const rawEnabled = (orchestration?.social as any)?.[`${key}Enabled`];
+    if (rawEnabled === false) return false;
+    if (rawEnabled === true) return true;
+    // Core platforms default to enabled if URL is set; optional ones default to hidden
+    const corePlatforms = ["x", "instagram", "snapchat", "youtube", "whatsapp"];
+    return corePlatforms.includes(key);
+  };
+
+  const isWhatsappVisible = () => {
+    const rawEnabled = (orchestration?.social as any)?.whatsappEnabled;
+    if (rawEnabled === false) return false;
+    return Boolean(orchestration?.social?.whatsappNumber || whatsappNumber);
+  };
+
   const activeLogo = "/alaqeeq-logo.png";
 
   const isPreFooterEnabled = orchestration?.footer?.preFooterEnabled !== false;
@@ -364,9 +381,9 @@ export function AlaqeeqStudioSiteFooter() {
 
             {/* Clean Uniform Social Media Circles (Including WhatsApp) */}
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {orchestration?.social?.xUrl && (
+              {isSocialVisible("x", orchestration?.social?.xUrl) && (
                 <a
-                  href={orchestration.social.xUrl}
+                  href={orchestration!.social.xUrl!}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs font-black transition hover:scale-110 active:scale-95 ${
@@ -380,9 +397,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {orchestration?.social?.instagramUrl && (
+              {isSocialVisible("instagram", orchestration?.social?.instagramUrl) && (
                 <a
-                  href={orchestration.social.instagramUrl}
+                  href={orchestration!.social.instagramUrl!}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -396,9 +413,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {orchestration?.social?.snapchatUrl && (
+              {isSocialVisible("snapchat", orchestration?.social?.snapchatUrl) && (
                 <a
-                  href={orchestration.social.snapchatUrl}
+                  href={orchestration!.social.snapchatUrl!}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -412,9 +429,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {((orchestration?.social as any)?.tiktokUrl || "https://tiktok.com/@alaqeeqschools") && (
+              {isSocialVisible("tiktok", (orchestration?.social as any)?.tiktokUrl) && (
                 <a
-                  href={(orchestration?.social as any)?.tiktokUrl || "https://tiktok.com/@alaqeeqschools"}
+                  href={(orchestration?.social as any).tiktokUrl}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -428,9 +445,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {(orchestration?.social?.facebookUrl || "https://facebook.com/alaqeeqschools") && (
+              {isSocialVisible("facebook", orchestration?.social?.facebookUrl) && (
                 <a
-                  href={orchestration?.social?.facebookUrl || "https://facebook.com/alaqeeqschools"}
+                  href={orchestration!.social.facebookUrl!}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -444,9 +461,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {((orchestration?.social as any)?.linkedinUrl || "https://linkedin.com/company/alaqeeqschools") && (
+              {isSocialVisible("linkedin", (orchestration?.social as any)?.linkedinUrl) && (
                 <a
-                  href={(orchestration?.social as any)?.linkedinUrl || "https://linkedin.com/company/alaqeeqschools"}
+                  href={(orchestration?.social as any).linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -460,9 +477,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {(orchestration?.social as any)?.threadsUrl && (
+              {isSocialVisible("threads", (orchestration?.social as any)?.threadsUrl) && (
                 <a
-                  href={(orchestration?.social as any)?.threadsUrl}
+                  href={(orchestration?.social as any).threadsUrl}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -476,9 +493,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {orchestration?.social?.youtubeUrl && (
+              {isSocialVisible("youtube", orchestration?.social?.youtubeUrl) && (
                 <a
-                  href={orchestration.social.youtubeUrl}
+                  href={orchestration!.social.youtubeUrl!}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -492,9 +509,9 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {((orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools") && (
+              {isSocialVisible("telegram", (orchestration?.social as any)?.telegramUrl) && (
                 <a
-                  href={(orchestration?.social as any)?.telegramUrl || "https://t.me/alaqeeqschools"}
+                  href={(orchestration?.social as any).telegramUrl}
                   target="_blank"
                   rel="noreferrer"
                   className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
@@ -510,7 +527,7 @@ export function AlaqeeqStudioSiteFooter() {
                 </a>
               )}
 
-              {orchestration?.social?.whatsappNumber && (
+              {isWhatsappVisible() && (
                 <a
                   href={whatsappUrl}
                   target="_blank"
