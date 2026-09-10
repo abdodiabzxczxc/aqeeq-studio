@@ -378,6 +378,9 @@ const DEFAULT_ORCHESTRATION = {
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
     facebookUrl: "https://facebook.com/alaqeeqschools",
+    tiktokUrl: "https://tiktok.com/@alaqeeqschools",
+    linkedinUrl: "https://linkedin.com/company/alaqeeqschools",
+    threadsUrl: "https://threads.net/@alaqeeq_schools",
     telegramUrl: "https://t.me/alaqeeqschools",
     whatsappNumber: "966500000000",
   },
@@ -425,10 +428,6 @@ const DEFAULT_ORCHESTRATION = {
     preFooterCta2Url: "https://wa.me/966500000000",
     preFooterCta3Text: "جدول الرسوم المعتمد",
     preFooterCta3Url: "/admissions#fees-table-section",
-    privacyPolicyText: "سياسة الخصوصية وحماية بيانات الطلاب",
-    privacyPolicyUrl: "/about#privacy",
-    termsText: "لائحة القبول والتسجيل المعتمدة",
-    termsUrl: "/admissions#terms",
   },
   location: {
     enabled: true,
@@ -4892,6 +4891,74 @@ export default function AqeeqAdminDashboardPage() {
                         />
                       </div>
 
+                      {/* TikTok */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">تيك توك (TikTok)</label>
+                        <input
+                          type="text"
+                          value={(orchestrationForm.social as any)?.tiktokUrl ?? "https://tiktok.com/@alaqeeqschools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, tiktokUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Facebook */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">فيسبوك (Facebook)</label>
+                        <input
+                          type="text"
+                          value={orchestrationForm.social?.facebookUrl ?? "https://facebook.com/alaqeeqschools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, facebookUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* LinkedIn */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">لينكد إن (LinkedIn)</label>
+                        <input
+                          type="text"
+                          value={(orchestrationForm.social as any)?.linkedinUrl ?? "https://linkedin.com/company/alaqeeqschools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, linkedinUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Threads */}
+                      <div>
+                        <label className="text-[11px] font-black text-slate-300 block mb-1">ثريدز (Threads)</label>
+                        <input
+                          type="text"
+                          value={(orchestrationForm.social as any)?.threadsUrl ?? "https://threads.net/@alaqeeq_schools"}
+                          onChange={(e) => setOrchestrationForm({
+                            ...orchestrationForm,
+                            social: { ...orchestrationForm.social, threadsUrl: e.target.value.trim() },
+                          })}
+                          dir="ltr"
+                          className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
+                            dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
+                          }`}
+                        />
+                      </div>
+
                       {/* YouTube */}
                       <div>
                         <label className="text-[11px] font-black text-slate-300 block mb-1">يوتيوب (YouTube)</label>
@@ -5456,72 +5523,6 @@ export default function AqeeqAdminDashboardPage() {
                               dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
                             }`}
                           />
-                        </div>
-
-                        {/* Privacy Policy */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="text-[11px] font-black text-purple-400 block mb-1">مسمى رابط الخصوصية</label>
-                            <input
-                              type="text"
-                              value={orchestrationForm.footer?.privacyPolicyText ?? "سياسة الخصوصية وحماية بيانات الطلاب"}
-                              onChange={(e) => setOrchestrationForm({
-                                ...orchestrationForm,
-                                footer: { ...orchestrationForm.footer, privacyPolicyText: e.target.value },
-                              })}
-                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
-                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                              }`}
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[11px] font-black text-purple-400 block mb-1">الرابط الموجه للخصوصية</label>
-                            <input
-                              type="text"
-                              value={orchestrationForm.footer?.privacyPolicyUrl ?? "/about#privacy"}
-                              onChange={(e) => setOrchestrationForm({
-                                ...orchestrationForm,
-                                footer: { ...orchestrationForm.footer, privacyPolicyUrl: e.target.value.trim() },
-                              })}
-                              dir="ltr"
-                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                              }`}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Terms & Regulations */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="text-[11px] font-black text-purple-400 block mb-1">مسمى لائحة القبول</label>
-                            <input
-                              type="text"
-                              value={orchestrationForm.footer?.termsText ?? "لائحة القبول والتسجيل المعتمدة"}
-                              onChange={(e) => setOrchestrationForm({
-                                ...orchestrationForm,
-                                footer: { ...orchestrationForm.footer, termsText: e.target.value },
-                              })}
-                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none ${
-                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                              }`}
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[11px] font-black text-purple-400 block mb-1">الرابط الموجه للائحة</label>
-                            <input
-                              type="text"
-                              value={orchestrationForm.footer?.termsUrl ?? "/admissions#terms"}
-                              onChange={(e) => setOrchestrationForm({
-                                ...orchestrationForm,
-                                footer: { ...orchestrationForm.footer, termsUrl: e.target.value.trim() },
-                              })}
-                              dir="ltr"
-                              className={`w-full rounded-xl border p-2 text-xs font-bold outline-none font-mono ${
-                                dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                              }`}
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>

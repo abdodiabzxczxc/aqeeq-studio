@@ -658,6 +658,9 @@ export type SiteOrchestrationConfig = {
     youtubeUrl?: string | null;
     snapchatUrl?: string | null;
     facebookUrl?: string | null;
+    tiktokUrl?: string | null;
+    linkedinUrl?: string | null;
+    threadsUrl?: string | null;
     telegramUrl?: string | null;
     whatsappNumber?: string | null;
   };
@@ -916,6 +919,9 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     youtubeUrl: "https://youtube.com/@alaqeeq_schools",
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
     facebookUrl: "https://facebook.com/alaqeeqschools",
+    tiktokUrl: "https://tiktok.com/@alaqeeqschools",
+    linkedinUrl: "https://linkedin.com/company/alaqeeqschools",
+    threadsUrl: "https://threads.net/@alaqeeq_schools",
     telegramUrl: "https://t.me/alaqeeqschools",
     whatsappNumber: "966500000000",
   },
@@ -963,10 +969,6 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     preFooterCta2Url: "https://wa.me/966500000000",
     preFooterCta3Text: "جدول الرسوم المعتمد",
     preFooterCta3Url: "/admissions#fees-table-section",
-    privacyPolicyText: "سياسة الخصوصية وحماية بيانات الطلاب",
-    privacyPolicyUrl: "/about#privacy",
-    termsText: "لائحة القبول والتسجيل المعتمدة",
-    termsUrl: "/admissions#terms",
   },
   location: {
     enabled: true,
