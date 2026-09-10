@@ -4,7 +4,6 @@ import { resolveStudioCardCovers } from "@/lib/studioCardCovers";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
-import { PartnersMarquee } from "@/components/PartnersMarquee";
 import { AqeeqAmbientLighting } from "@/components/AqeeqAmbientLighting";
 import { AqeeqUnifiedVideoFrame } from "@/components/AqeeqVideoPlayer";
 import { isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
@@ -2014,9 +2013,6 @@ export default function AlaqeeqStudioPublicPage() {
         totalPages={totalPages}
         totalMedia={totalFiles + totalPosts}
       />
-
-      {/* 9. شريط الشركاء والاعتمادات والرعاة الرسمي المتحرك */}
-      <PartnersMarquee dark={dark} />
 
       {/* Unified Luxury Site Footer */}
       <AlaqeeqStudioSiteFooter />
