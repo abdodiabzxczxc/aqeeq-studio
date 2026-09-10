@@ -173,7 +173,7 @@ export default function SchoolNewsEditorialPage() {
                         <img loading="lazy" src={page.imageUrl} alt={page.caption || `صفحة ${index + 1}`} className="aspect-[3/4] w-full object-cover" />
                         <div className="flex items-center justify-between gap-2 p-2">
                           <span className={`text-[10px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>ص {index + 1}</span>
-                          <button onClick={() => removePage.mutate({ id: page.id })} className="text-[10px] font-bold text-[#de191e] sm:opacity-0 sm:transition sm:group-hover:opacity-100">حذف</button>
+                          <button onClick={() => { if (window.confirm("هل أنت متأكد من حذف هذه الصفحة؟")) removePage.mutate({ id: page.id }); }} className="text-[10px] font-bold text-[#de191e] sm:opacity-0 sm:transition sm:group-hover:opacity-100">حذف</button>
                         </div>
                       </article>
                     ))}

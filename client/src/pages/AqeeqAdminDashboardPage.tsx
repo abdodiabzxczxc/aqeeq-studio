@@ -1823,6 +1823,7 @@ export default function AqeeqAdminDashboardPage() {
               }}
               onDeleteContentItem={async (type, id) => {
                 if (type === "article") {
+                  if (!window.confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟ لا يمكن التراجع عن هذا الإجراء.")) return;
                   await deleteArticleMutation.mutateAsync({ id: Number(id) } as any);
                   refetchAdminArticles();
                 }

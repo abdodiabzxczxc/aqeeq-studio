@@ -280,7 +280,7 @@ function ShowcasePostReorderCard({
         <Button
           size="icon"
           variant="ghost"
-          onClick={onDelete}
+          onClick={() => { if (window.confirm("هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.")) onDelete(); }}
           className="text-[#de191e] hover:bg-[#de191e]/10 cursor-pointer"
           title="حذف المنشور"
         >
