@@ -342,6 +342,18 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
     return list;
   }, [rawArticles, sortBy]);
 
+  // ─── FEAT-3: Client-side pagination ────────────────────────────────────────
+  const ARTICLES_PER_PAGE = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(articles.length / ARTICLES_PER_PAGE));
+  const paginatedArticles = useMemo(
+    () => articles.slice((currentPage - 1) * ARTICLES_PER_PAGE, currentPage * ARTICLES_PER_PAGE),
+    [articles, currentPage],
+  );
+  // Reset to page 1 when query/category/sort changes
+  useEffect(() => { setCurrentPage(1); }, [rawArticles, sortBy]);
+  // ────────────────────────────────────────────────────────────────────────────
+
   const featuredArticle = useMemo(() => {
     if (orchestration?.heroCovers?.articlesMode === "custom" && orchestration?.heroCovers?.customArticleId) {
       const found = rawArticles.find((a) => a.id === orchestration.heroCovers.customArticleId);
@@ -871,24 +883,74 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
             </button>
           </div>
         ) : (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-          >
-            {articles.map((art, idx) => (
-              <ArticleCard
-                key={art.id}
-                article={art}
-                index={idx}
-                dark={dark}
-                onOpen={() => setReadingArticle(art)}
-                onShare={handleShare}
-              />
-            ))}
-          </motion.div>
+          <>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-40px" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+            >
+              {paginatedArticles.map((art, idx) => (
+                <ArticleCard
+                  key={art.id}
+                  article={art}
+                  index={idx}
+                  dark={dark}
+                  onOpen={() => setReadingArticle(art)}
+                  onShare={handleShare}
+                />
+              ))}
+            </motion.div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8" dir="rtl">
+                <button
+                  type="button"
+                  aria-label="الصفحة السابقة"
+                  onClick={() => { setCurrentPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  disabled={currentPage === 1}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer ${
+                    dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  ›
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    aria-label={`الصفحة ${page}`}
+                    aria-current={currentPage === page ? "page" : undefined}
+                    onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition cursor-pointer ${
+                      currentPage === page
+                        ? dark
+                          ? "border-[#f8ca14] bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
+                          : "border-[#08467d] bg-[#08467d] text-white shadow-md"
+                        : dark
+                        ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                        : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  aria-label="الصفحة التالية"
+                  onClick={() => { setCurrentPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  disabled={currentPage === totalPages}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer ${
+                    dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  ‹
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
 
