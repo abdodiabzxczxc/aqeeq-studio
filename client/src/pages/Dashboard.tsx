@@ -48,25 +48,26 @@ export default function Dashboard() {
   const metricByCeremony = useMemo(() => new Map((metrics ?? []).map((item) => [item.ceremonyId, item])), [metrics]);
   const totals = useMemo(() => (metrics ?? []).reduce((sum, item) => ({ guests: sum.guests + Number(item.total ?? 0), attended: sum.attended + Number(item.attended ?? 0), paid: sum.paid + Number(item.paid ?? 0) }), { guests: 0, attended: 0, paid: 0 }), [metrics]);
   const tabs = [
-    { id: "overview" as const, label: "لوحة التحكم", icon: BarChart3, visible: true },
-    { id: "events" as const, label: "إدارة الفعاليات", icon: Sparkles, visible: isAdmin },
-    { id: "activity" as const, label: "سجل النشاط", icon: Activity, visible: isAdmin || user?.role === "auditor" },
-    { id: "users" as const, label: "الفريق والصلاحيات", icon: Users, visible: isAdmin },
-    { id: "operations" as const, label: "الإشعارات والنسخ", icon: BellRing, visible: canCoordinate },
-    { id: "platform" as const, label: "إعدادات المنصة", icon: Settings2, visible: isAdmin },
+    { id: "overview" as const, label: "التحكم", icon: BarChart3, visible: true },
+    { id: "events" as const, label: "الفعاليات", icon: Sparkles, visible: isAdmin },
+    { id: "activity" as const, label: "النشاط", icon: Activity, visible: isAdmin || user?.role === "auditor" },
+    { id: "users" as const, label: "الفريق", icon: Users, visible: isAdmin },
+    { id: "operations" as const, label: "الإشعارات", icon: BellRing, visible: canCoordinate },
+    { id: "platform" as const, label: "الإعدادات", icon: Settings2, visible: isAdmin },
   ].filter((tab) => tab.visible);
 
   if (loading || ceremoniesLoading) return <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--dark-gradient)" }}><Loader2 className="animate-spin text-amber-400" size={30} /></div>;
   if (!hasAccess) return null;
 
-  return <main dir="rtl" className="aq-admin-surface min-h-screen w-full overflow-x-hidden text-slate-100">
+  return <main dir="rtl" className="aq-admin-surface min-h-screen w-full overflow-x-hidden text-slate-100 pb-20 md:pb-0">
     <header className="sticky top-0 z-40 border-b border-white/[.08] bg-[#0b0e15]/90 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between gap-3">
         <button onClick={() => navigate("/")} className="flex items-center gap-2 text-sm text-slate-400 hover:text-amber-200"><ArrowRight size={17} /><span className="hidden sm:inline">الرئيسية</span></button>
         <div className="flex items-center gap-3"><img loading="lazy" src={branding?.school_logo || "/manus-storage/logo_school_b7348eaa.png"} alt="شعار المنصة" className="h-9 w-9 object-contain" /><div><VisualEditable id="dashboard-brand-title" tag="text" label="عنوان شريط لوحة الإدارة" as="div" defaultText="لوحة تحكم المنصة" className="text-sm font-black text-amber-100" /><div className="text-[11px] text-slate-500">{user?.name || "فريق العمل"}</div></div></div>
         <button onClick={() => logout()} className="rounded-lg border border-slate-700 p-2 text-slate-400 hover:border-[#de191e]/40 hover:text-[#de191e]" aria-label="تسجيل الخروج"><LogOut size={16} /></button>
       </div>
-      <div className="border-t border-white/[.07]"><nav className="container flex gap-1 overflow-x-auto py-2" aria-label="أقسام لوحة التحكم">{tabs.map((tab) => { const Icon = tab.icon; const active = activeTab === tab.id; return <button key={tab.id} onClick={() => selectTab(tab.id)} className={`whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-bold transition-all ${active ? "bg-amber-400 text-amber-950" : "text-slate-400 hover:bg-white/5 hover:text-amber-200"}`}><span className="inline-flex items-center gap-1.5"><Icon size={15} />{tab.label}</span></button>; })}</nav></div>
+      {/* Desktop horizontal tabs — hidden on mobile */}
+      <div className="hidden md:block border-t border-white/[.07]"><nav className="container flex gap-1 overflow-x-auto py-2" aria-label="أقسام لوحة التحكم">{tabs.map((tab) => { const Icon = tab.icon; const active = activeTab === tab.id; return <button key={tab.id} onClick={() => selectTab(tab.id)} className={`whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-bold transition-all ${active ? "bg-amber-400 text-amber-950" : "text-slate-400 hover:bg-white/5 hover:text-amber-200"}`}><span className="inline-flex items-center gap-1.5"><Icon size={15} />{tab.label}</span></button>; })}</nav></div>
     </header>
 
     <div className="container py-8 md:py-10">
@@ -85,5 +86,37 @@ export default function Dashboard() {
       {activeTab === "platform" && isAdmin && <LogoSettingsPage />}
       <VisualSections pagePath="/dashboard" />
     </div>
+
+    {/* ─── Mobile Bottom Navigation Bar ─── */}
+    <nav
+      dir="rtl"
+      aria-label="تنقل الموبايل"
+      className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-white/[.08] bg-[#0b0e15]/95 backdrop-blur-xl"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="flex items-center justify-around">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => selectTab(tab.id)}
+              className={`flex flex-1 flex-col items-center gap-1 py-3 transition-colors ${
+                active ? "text-amber-400" : "text-slate-500"
+              }`}
+              aria-label={tab.label}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+              <span className="text-[10px] font-bold leading-none">{tab.label}</span>
+              {active && <span className="mt-0.5 h-1 w-4 rounded-full bg-amber-400" />}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   </main>;
 }
+
+
