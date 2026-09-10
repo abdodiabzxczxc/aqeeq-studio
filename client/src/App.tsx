@@ -198,13 +198,22 @@ import { AqeeqEventModal } from "./components/AqeeqEventModal";
 function StudioAppShell() {
   const [location] = useLocation();
   const isLoginPage = location === "/login";
-  const isDockPreview = typeof window !== "undefined" && (window.self !== window.top || new URLSearchParams(window.location.search).get("dockpreview") === "1");
+  const isDockPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dockpreview") === "1";
+  const isStudioCanvasMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("studiomode") === "1";
 
   useEffect(() => {
     if (isDockPreview) {
       document.documentElement.dataset.dockPreview = "true";
+    } else {
+      delete document.documentElement.dataset.dockPreview;
     }
-  }, [isDockPreview]);
+
+    if (isStudioCanvasMode) {
+      document.documentElement.dataset.studioCanvas = "true";
+    } else {
+      delete document.documentElement.dataset.studioCanvas;
+    }
+  }, [isDockPreview, isStudioCanvasMode]);
 
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
@@ -232,22 +241,22 @@ function StudioAppShell() {
   return (
     <div style={brandStyle} className={`aq-brand-shell ${isNationalDay ? "theme-saudi-national-day" : ""}`}>
       {/* 🎞️ Global Cinematic Film Grain Texture */}
-      {!isLoginPage && <div className="aqeeq-grain-overlay" aria-hidden />}
-      {!isLoginPage && isNationalDay && <AqeeqCelebrationConfetti />}
-      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
-        {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>}
+      {!isLoginPage && !isStudioCanvasMode && <div className="aqeeq-grain-overlay" aria-hidden />}
+      {!isLoginPage && !isStudioCanvasMode && isNationalDay && <AqeeqCelebrationConfetti />}
+      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem && !isStudioCanvasMode ? "pb-[100px] sm:pb-[120px]" : ""}`}>
+        {!isLoginPage && !isStudioCanvasMode && <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>}
         <ErrorBoundary><Router /></ErrorBoundary>
 
         {!isLoginPage && <ErrorBoundary fallback={null}><VisualGlobalSections /></ErrorBoundary>}
-        {!isLoginPage && <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>}
-        {!isLoginPage && (
+        {!isLoginPage && !isStudioCanvasMode && <ErrorBoundary fallback={null}><PwaInstallBanner /></ErrorBoundary>}
+        {!isLoginPage && !isStudioCanvasMode && (
           <ErrorBoundary fallback={null}>
             <Suspense fallback={null}>
               <AqeeqAiAssistantWidget />
             </Suspense>
           </ErrorBoundary>
         )}
-        {!isLoginPage && (
+        {!isLoginPage && !isStudioCanvasMode && (
           <ErrorBoundary fallback={null}>
             <AqeeqEventModal />
           </ErrorBoundary>

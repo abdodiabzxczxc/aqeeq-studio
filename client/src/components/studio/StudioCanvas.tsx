@@ -161,7 +161,7 @@ export const StudioCanvas = React.forwardRef<
   return (
     <main
       data-aq-studio-canvas
-      className="relative flex-1 overflow-auto bg-[#06080e] p-4 sm:p-8 flex items-start justify-center select-none"
+      className="relative flex-1 overflow-auto bg-[#06080e] p-4 sm:p-8 flex items-start justify-center"
       style={{
         backgroundImage: `radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)`,
         backgroundSize: "24px 24px",
@@ -189,7 +189,7 @@ export const StudioCanvas = React.forwardRef<
         >
           {/* Dynamic Island for Mobile */}
           {device === "mobile" && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-black z-30 flex items-center justify-end px-2 shadow-inner">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-black z-30 flex items-center justify-end px-2 shadow-inner pointer-events-none">
               <span className="h-2.5 w-2.5 rounded-full bg-[#111] border border-white/10" />
             </div>
           )}
@@ -199,6 +199,7 @@ export const StudioCanvas = React.forwardRef<
             ref={iframeRef}
             src={iframeSrc}
             title="Aqeeq Pro Studio Canvas"
+            style={{ pointerEvents: "auto" }}
             className={`w-full h-full border-0 bg-white transition duration-150 ${
               device === "mobile"
                 ? "rounded-[2.25rem]"

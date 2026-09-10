@@ -2692,4 +2692,20 @@ html[data-dock-preview="true"] video {
   pointer-events: none !important;
 }
 
+/* ── Pro Studio Canvas Workspace Mode ────────────────────────── */
+html[data-studio-canvas="true"],
+html[data-studio-canvas="true"] body {
+  overflow-y: auto !important;
+  pointer-events: auto !important;
+  user-select: auto !important;
+  scroll-behavior: smooth;
+}
+
+html[data-studio-canvas="true"] .aq-editor-toolbar,
+html[data-studio-canvas="true"] [data-aq-editor-properties],
+html[data-studio-canvas="true"] #aqeeq-ai-assistant-button,
+html[data-studio-canvas="true"] .aqeeq-grain-overlay {
+  display: none !important;
+}
+
 

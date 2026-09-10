@@ -391,19 +391,24 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth();
   const [pathname, navigate] = useLocation();
   const pagePath = normalizedPath(pathname);
-  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("manus.space"));
-  const isAdmin = Boolean(isAuthenticated && (user?.role === "admin" || user?.openId === "admin"));
-  const [isEditing, setIsEditing] = useState(false);
+  const isStudioCanvasMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("studiomode") === "1";
+  const hasAdminStorage = typeof window !== "undefined" && (localStorage.getItem("aqeeq-admin-mode") === "true" || sessionStorage.getItem("aqeeq-admin-mode") === "true");
+  const isAdmin = Boolean(isStudioCanvasMode || hasAdminStorage || (isAuthenticated && (user?.role === "admin" || user?.openId === "admin")));
+  const [isEditing, setIsEditing] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const search = new URLSearchParams(window.location.search);
+    return search.get("studiomode") === "1" || search.get("visual") === "1" || search.get("editor") === "1";
+  });
   const [layerMode, setLayerMode] = useState(false);
 
   useEffect(() => {
-    if (!isAdmin && isEditing) {
+    if (!isAdmin && isEditing && !isStudioCanvasMode) {
       setIsEditing(false);
       setSelected(null);
       setSelectedIds([]);
       setLayerMode(false);
     }
-  }, [isAdmin, isEditing]);
+  }, [isAdmin, isEditing, isStudioCanvasMode]);
   const [gridEnabled, setGridEnabled] = useState(true);
   const [magnetEnabled, setMagnetEnabled] = useState(true);
   const [backgroundPreferences, setBackgroundPreferences] = useState<Record<string, BackgroundEditorPreferences>>(() => {
@@ -426,7 +431,6 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [builderTab, setBuilderTab] = useState<"sections" | "pages">("sections");
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string; tag: ElementTag; label: string } | null>(null);
-  const isStudioCanvasMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("studiomode") === "1";
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuides>({});
   const [groupTranslation, setGroupTranslation] = useState<GroupTranslation>(null);
@@ -814,30 +818,34 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const search = new URLSearchParams(window.location.search);
-    setIsEditing(Boolean(isAdmin && (search.get("visual") === "1" || search.get("editor") === "1")));
-    setLayerMode(false);
-    setSelected(null);
-    setSelectedIds([]);
-    setMobilePreview(false);
-    setOperationsOpen(false);
-    setBuilderOpen(false);
-    setAddPanelOpen(false);
-    setLayersOpen(false);
-    setWorkspaceMediaOpen(false);
-    setPageMapOpen(false);
-    setHistoryOpen(false);
-    setDesignTokensOpen(false);
-    setLocalOverrides({});
-    setUndoStack([]);
-    setRedoStack([]);
-    setStyleClipboard(null);
-    setGroupedIds([]);
-    setPreviewMode(false);
-    setSidebarsCollapsed(false);
-    setRightNavHidden(false);
-    setTopbarHidden(false);
-    setPanelAnchorTop(null);
-  }, [pathname, isAdmin]);
+    const isVisitor = search.get("visitor") === "1";
+    const shouldEdit = !isVisitor && (search.get("studiomode") === "1" || ((isAdmin || isStudioCanvasMode) && (search.get("visual") === "1" || search.get("editor") === "1")));
+    setIsEditing(Boolean(shouldEdit));
+    setPreviewMode(Boolean(isVisitor));
+    if (!isStudioCanvasMode) {
+      setLayerMode(false);
+      setSelected(null);
+      setSelectedIds([]);
+      setMobilePreview(false);
+      setOperationsOpen(false);
+      setBuilderOpen(false);
+      setAddPanelOpen(false);
+      setLayersOpen(false);
+      setWorkspaceMediaOpen(false);
+      setPageMapOpen(false);
+      setHistoryOpen(false);
+      setDesignTokensOpen(false);
+      setLocalOverrides({});
+      setUndoStack([]);
+      setRedoStack([]);
+      setStyleClipboard(null);
+      setGroupedIds([]);
+      setSidebarsCollapsed(false);
+      setRightNavHidden(false);
+      setTopbarHidden(false);
+      setPanelAnchorTop(null);
+    }
+  }, [pathname, isAdmin, isStudioCanvasMode]);
 
   useEffect(() => {
     if (!isEditing) return;
@@ -1086,6 +1094,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         if (override?.altText && img.alt !== override.altText) {
           img.alt = override.altText;
         }
+        if (override?.borderRadius && img.style.borderRadius !== override.borderRadius) {
+          img.style.borderRadius = override.borderRadius;
+        }
+        if (override?.layerOpacity !== undefined && override.layerOpacity !== 100) {
+          img.style.opacity = `${override.layerOpacity / 100}`;
+        }
       });
 
       // 2. Scan Text Elements (headings, paragraphs, spans, buttons, links, labels, badges)
@@ -1128,6 +1142,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
         if (override?.fontSize && node.style.fontSize !== override.fontSize) {
           node.style.fontSize = override.fontSize;
+        }
+        if (override?.bgColor && node.style.backgroundColor !== override.bgColor) {
+          node.style.backgroundColor = override.bgColor;
+        }
+        if (override?.borderRadius && node.style.borderRadius !== override.borderRadius) {
+          node.style.borderRadius = override.borderRadius;
+        }
+        if (override?.padding && node.style.padding !== override.padding) {
+          node.style.padding = override.padding;
+        }
+        if (override?.layerOpacity !== undefined && override.layerOpacity !== 100) {
+          node.style.opacity = `${override.layerOpacity / 100}`;
         }
       });
 
@@ -1220,8 +1246,37 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    const handleCaptureDblClick = (e: globalThis.MouseEvent) => {
+      if (!isEditing || previewMode) return;
+      const targetEl = e.target as HTMLElement | null;
+      if (!targetEl || isEditorSystemUi(targetEl)) return;
+      const textEl = targetEl.closest<HTMLElement>("[data-visual-tag='text'], [data-visual-auto='true']");
+      if (textEl && !textEl.isContentEditable) {
+        textEl.contentEditable = "true";
+        textEl.focus();
+        const finishEdit = () => {
+          textEl.contentEditable = "false";
+          const newText = textEl.innerText.trim();
+          const elId = textEl.dataset.visualId;
+          if (elId && newText) {
+            draftPreviewEnabled.current = true;
+            setDraft((d) => ({ ...d, contentText: newText }));
+          }
+          textEl.removeEventListener("blur", finishEdit);
+        };
+        textEl.addEventListener("blur", finishEdit);
+        textEl.addEventListener("keydown", (ke) => {
+          if (ke.key === "Enter" && !ke.shiftKey) {
+            ke.preventDefault();
+            textEl.blur();
+          }
+        });
+      }
+    };
+
     if (isEditing && !previewMode) {
       window.addEventListener("click", handleCaptureClick, true);
+      window.addEventListener("dblclick", handleCaptureDblClick, true);
     }
 
     let scanTimer: ReturnType<typeof setTimeout> | null = null;
@@ -1240,10 +1295,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     return () => {
       if (scanTimer) clearTimeout(scanTimer);
       window.removeEventListener("click", handleCaptureClick, true);
+      window.removeEventListener("dblclick", handleCaptureDblClick, true);
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
-  }, [isEditing, previewMode, overrideMap, pagePath, isAdmin]);
+  }, [isEditing, previewMode, overrideMap, pagePath, isAdmin, isStudioCanvasMode]);
 
 
   const saveLayer = (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => {

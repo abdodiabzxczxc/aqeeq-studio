@@ -22,6 +22,8 @@ import { toast } from "sonner";
 
 export type StudioInspectorDraft = {
   contentText?: string;
+  mediaUrl?: string;
+  altText?: string;
   textColor?: string;
   bgColor?: string;
   fontSize?: string;
@@ -29,6 +31,9 @@ export type StudioInspectorDraft = {
   linkUrl?: string;
   borderRadius?: string;
   padding?: string;
+  margin?: string;
+  layerOpacity?: number;
+  layerZIndex?: number;
   device?: "all" | "desktop" | "mobile";
   animation?: "none" | "fade" | "rise" | "slide";
   revealOnScroll?: boolean;
@@ -154,6 +159,41 @@ export function StudioInspector({
         {/* TAB 1: CONTENT */}
         {activeSubTab === "content" && (
           <div className="space-y-3.5">
+            {/* Image Media Controls */}
+            {selectedElement.tag === "image" && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1.5 flex items-center gap-1">
+                    <ImageIcon size={13} className="text-amber-400" />
+                    <span>رابط الصورة (Image URL):</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={draft.mediaUrl ?? ""}
+                    onChange={(e) => onChangeDraft({ mediaUrl: e.target.value })}
+                    placeholder="https://... أو /manus-storage/..."
+                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-amber-400 font-mono"
+                    dir="ltr"
+                  />
+                </div>
+                {draft.mediaUrl && (
+                  <div className="rounded-xl border border-white/10 overflow-hidden bg-black/30 p-2 flex items-center justify-center">
+                    <img src={draft.mediaUrl} alt="معاينة الصورة" className="max-h-28 rounded-lg object-contain" />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1.5">النص البديل (Alt text):</label>
+                  <input
+                    type="text"
+                    value={draft.altText ?? ""}
+                    onChange={(e) => onChangeDraft({ altText: e.target.value })}
+                    placeholder="وصف محتوى الصورة..."
+                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Text Content */}
             {selectedElement.tag !== "image" && selectedElement.tag !== "video" && (
               <div>
@@ -217,6 +257,62 @@ export function StudioInspector({
         {/* TAB 2: DESIGN */}
         {activeSubTab === "design" && (
           <div className="space-y-3.5">
+            {/* Font Size Preset Buttons */}
+            {selectedElement.tag !== "image" && (
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 mb-1.5">حجم الخط (Font Size):</label>
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { label: "صغير", size: "13px" },
+                    { label: "عادي", size: "16px" },
+                    { label: "متوسط", size: "20px" },
+                    { label: "كبير", size: "28px" },
+                    { label: "ضخم", size: "38px" },
+                    { label: "عملاق", size: "52px" },
+                  ].map((fs) => (
+                    <button
+                      key={fs.size}
+                      type="button"
+                      onClick={() => onChangeDraft({ fontSize: fs.size })}
+                      className={`rounded-lg border px-2 py-1 text-[10px] font-bold transition ${
+                        draft.fontSize === fs.size
+                          ? "border-amber-400 bg-amber-400/20 text-amber-300"
+                          : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      {fs.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Border Radius */}
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 mb-1.5">استدارة الحواف (Border Radius):</label>
+              <div className="grid grid-cols-4 gap-1">
+                {[
+                  { label: "حادة", rad: "0px" },
+                  { label: "خفيفة", rad: "8px" },
+                  { label: "دائرية", rad: "16px" },
+                  { label: "كبسولة", rad: "9999px" },
+                ].map((b) => (
+                  <button
+                    key={b.rad}
+                    type="button"
+                    onClick={() => onChangeDraft({ borderRadius: b.rad })}
+                    className={`rounded-lg border px-2 py-1 text-[10px] font-bold transition ${
+                      draft.borderRadius === b.rad
+                        ? "border-amber-400 bg-amber-400/20 text-amber-300"
+                        : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Colors */}
             <div className="grid grid-cols-2 gap-2.5">
               <div>
