@@ -39,6 +39,7 @@ export default function AqeeqProStudioPage() {
     dirtyCount: number;
     smartAutoDetect?: boolean;
     layers?: StudioLayerItem[];
+    pagePath?: string;
   }) => {
     setSelectedElement(data.selected);
     if (data.draft) {
@@ -52,6 +53,9 @@ export default function AqeeqProStudioPage() {
     }
     if (data.layers) {
       setLayers(data.layers);
+    }
+    if (data.pagePath && data.pagePath !== currentPath) {
+      setCurrentPath(data.pagePath);
     }
   };
 

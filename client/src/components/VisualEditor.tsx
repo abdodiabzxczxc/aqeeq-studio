@@ -374,7 +374,16 @@ function toStyle(override?: VisualOverride): React.CSSProperties {
   const resolvedBackgroundColor = behavior.glass ? "rgba(18,23,33,.38)" : buttonStyle === "filled" ? "#e5b84f" : buttonStyle === "outline" ? "transparent" : buttonStyle === "ghost" ? "rgba(255,255,255,.07)" : usesGradient ? undefined : override.bgColor || undefined;
   const resolvedLetterSpacing = behavior.headingStyle === "display" ? "-.04em" : behavior.headingStyle === "heading" ? "-.02em" : behavior.letterSpacing === "wide" ? ".055em" : behavior.letterSpacing === "wider" ? ".12em" : undefined;
   const resolvedLineHeight = behavior.headingStyle === "display" ? "1" : behavior.headingStyle === "heading" ? "1.16" : behavior.headingStyle === "body" ? "1.7" : behavior.lineHeight === "relaxed" ? "1.55" : behavior.lineHeight === "loose" ? "1.8" : undefined;
+  const resolvedTextAlign =
+    override.alignment === "start" || (override.alignment as any) === "right"
+      ? "right"
+      : override.alignment === "end" || (override.alignment as any) === "left"
+      ? "left"
+      : override.alignment === "center"
+      ? "center"
+      : undefined;
   return {
+    textAlign: resolvedTextAlign,
     color: resolvedColor,
     backgroundColor: resolvedBackgroundColor,
     ...(imageBase || texture ? { backgroundImage: [texture, imageBase].filter(Boolean).join(","), backgroundSize: texture ? `7px 7px,${backgroundSizeCss(override.backgroundSize)}` : backgroundSizeCss(override.backgroundSize), backgroundPosition: texture ? `0 0,${override.backgroundPositionX ?? 50}% ${override.backgroundPositionY ?? 50}%` : `${override.backgroundPositionX ?? 50}% ${override.backgroundPositionY ?? 50}%`, backgroundRepeat: texture ? "repeat,no-repeat" : "no-repeat", backgroundBlendMode: texture ? "soft-light,normal" : undefined } : {}),
@@ -1390,8 +1399,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // If smartAutoDetect is OFF, STOP HERE. Do not intercept or hijack any other clicks!
+      // If smartAutoDetect is OFF, deselect if an element was selected, then stop.
       if (!smartAutoDetect) {
+        if (selected) {
+          setSelected(null);
+          setSelectedIds([]);
+        }
         return;
       }
 
@@ -1433,6 +1446,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         svg.dataset.visualAuto = "true";
         selectElement(id, "icon", "أيقونة");
         return;
+      }
+
+      // 4. Clicked on blank space outside any interactive element: deselect!
+      if (selected) {
+        setSelected(null);
+        setSelectedIds([]);
       }
     };
 
@@ -1761,13 +1780,82 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
   const duplicateSelected = () => {
     if (!pagePath || !selected) return;
-    const sectionId = `section-custom-${Date.now().toString(36)}`;
+
+    // 1. If it's a dynamic builder section, duplicate immediately after it
+    const existingSectionIndex = builderSections.findIndex((s) => s.sectionId === selected.id);
+    if (existingSectionIndex >= 0) {
+      const existing = builderSections[existingSectionIndex];
+      const newSectionId = `section-${existing.sectionType || "custom"}-${Date.now().toString(36)}`;
+      const parsedConfig: Record<string, any> =
+        typeof existing.config === "string"
+          ? (() => {
+              try {
+                return JSON.parse(existing.config);
+              } catch {
+                return {};
+              }
+            })()
+          : (existing.config as any) || {};
+      saveDuplicatedSection.mutate({
+        pagePath,
+        sectionId: newSectionId,
+        sectionType: (existing.sectionType || "custom") as any,
+        orderIndex: existingSectionIndex + 1,
+        config: {
+          ...parsedConfig,
+          title: parsedConfig.title ? `${parsedConfig.title} (نسخة)` : undefined,
+        },
+      });
+      return;
+    }
+
+    // 2. If it's a structural section or section-block on the page
+    if (selected.tag === "section" || selected.tag === "section-block") {
+      const sectionId = `section-custom-${Date.now().toString(36)}`;
+      const config = {
+        builderElement: "text" as const,
+        title: draft.contentText || selected.label || "قسم مكرر",
+        body: "نسخة جديدة من هذا القسم",
+        anchorId: selected.id,
+      };
+      saveDuplicatedSection.mutate({
+        pagePath,
+        sectionId,
+        sectionType: "custom",
+        orderIndex: builderSections.length,
+        config,
+      });
+      return;
+    }
+
+    // 3. If it's an element (image, button, text, video), anchor adjacent to parent section
+    const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+    const parentSection = el?.closest<HTMLElement>("[data-visual-tag='section'], [data-visual-tag='section-block'], section");
+    const anchorId = parentSection?.dataset.visualId || selected.id;
+
     const isVideo = selected.tag === "video";
     const builderElement: "image" | "button" | "text" = selected.tag === "image" ? "image" : selected.tag === "button" ? "button" : "text";
+    const sectionId = `elem-${builderElement}-${Date.now().toString(36)}`;
     const config = isVideo
-      ? { title: draft.contentText || selected.label, body: "نسخة مكررة من الفيديو", videoUrl: draft.mediaUrl, videoHref: draft.linkUrl, anchorId: "global-page-end" }
-      : { builderElement, title: draft.contentText || selected.label, body: selected.tag === "text" ? draft.contentText || "" : "", imageUrl: draft.mediaUrl, imageAlt: draft.altText, imageHref: draft.linkUrl, buttonText: draft.contentText || selected.label, buttonHref: draft.linkUrl, anchorId: "global-page-end" };
-    saveDuplicatedSection.mutate({ pagePath, sectionId, sectionType: isVideo ? "video" : "custom", orderIndex: builderSections.length, config });
+      ? { title: draft.contentText || selected.label, body: "نسخة مكررة", videoUrl: draft.mediaUrl, videoHref: draft.linkUrl, anchorId }
+      : {
+          builderElement,
+          title: draft.contentText || selected.label,
+          body: selected.tag === "text" ? draft.contentText || "" : "",
+          imageUrl: draft.mediaUrl,
+          imageAlt: draft.altText,
+          imageHref: draft.linkUrl,
+          buttonText: draft.contentText || selected.label,
+          buttonHref: draft.linkUrl,
+          anchorId,
+        };
+    saveDuplicatedSection.mutate({
+      pagePath,
+      sectionId,
+      sectionType: isVideo ? "video" : "custom",
+      orderIndex: builderSections.length,
+      config,
+    });
   };
 
   const contextValue = useMemo<VisualEditorContextValue>(() => ({
@@ -2373,6 +2461,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         toggleSmartAutoDetect();
       } else if (data.type === "AQEEQ_STUDIO_APPLY_DRAFT") {
         draftPreviewEnabled.current = true;
+        setUndoStack((stack) => [...stack, localOverrides].slice(-40));
+        setRedoStack([]);
         const patch = data.patch;
         setDraft((prev) => {
           let nextCss = prev.customCss;
@@ -3530,6 +3620,7 @@ function BackgroundSizingControls({ aspectLocked, autoArrange, onFit, onToggleAs
 
 export function VisualEditable({ id, htmlId, tag, label, defaultText, children, className = "", as: Tag = "div", onAction, onClick, title, style }: { id: string; htmlId?: string; tag: ElementTag; label: string; defaultText?: string; children?: ReactNode | ((text: string) => ReactNode); className?: string; as?: "article" | "div" | "span" | "small" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "button" | "section" | "footer" | "header" | "aside" | "nav"; onAction?: () => void; onClick?: () => void; title?: string; style?: React.CSSProperties }) {
   const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, updateTextContent, updateElementOverride, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
+  const [, navigate] = useLocation();
   const isInteractiveTransform = layerMode || Boolean(isStudioCanvasMode);
   const override = getOverride(id);
   const content = override?.contentText ?? defaultText ?? "";
@@ -3593,7 +3684,9 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   const finishInlineEdit = () => {
     setIsInlineEditing(false);
     if (!layerRef.current) return;
-    const newText = (layerRef.current.innerText || layerRef.current.textContent || "").trim();
+    const clone = layerRef.current.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll("[data-aq-inline-toolbar], [data-aq-layer-toolbar], [data-no-visual-edit], [data-resize-handle], button, svg").forEach((el) => el.remove());
+    const newText = (clone.innerText || clone.textContent || "").trim();
     if (newText && newText !== content) {
       updateTextContent?.(id, newText);
       toast.success("تم تحديث النص مباشرة كمسودة");
@@ -3651,15 +3744,9 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     return () => observer.disconnect();
   }, [behavior.revealOnScroll, isEditing]);
 
+  // flexOrder effect preserved without mutating parent display/direction
   useEffect(() => {
-    if (behavior.flexOrder !== undefined && layerRef.current?.parentElement) {
-      const parent = layerRef.current.parentElement;
-      const computed = window.getComputedStyle(parent);
-      if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
-        parent.style.display = "flex";
-        parent.style.flexDirection = "column";
-      }
-    }
+    // Keep parent container styles natural (no forced flex-direction mutation)
   }, [behavior.flexOrder]);
 
   const clearLongPress = () => {
@@ -3685,12 +3772,6 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     const el = layerRef.current;
     if (!el || !el.parentElement) return;
     const parent = el.parentElement;
-
-    const computed = window.getComputedStyle(parent);
-    if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
-      parent.style.display = "flex";
-      parent.style.flexDirection = "column";
-    }
 
     const allChildren = Array.from(parent.children) as HTMLElement[];
     const currentIndex = allChildren.indexOf(el);
@@ -3814,11 +3895,6 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       const el = layerRef.current;
       const parent = el?.parentElement;
       if (el && parent && Math.abs(dy) > 15) {
-        const computed = window.getComputedStyle(parent);
-        if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
-          parent.style.display = "flex";
-          parent.style.flexDirection = "column";
-        }
         const allChildren = Array.from(parent.children) as HTMLElement[];
         const currentIndex = allChildren.indexOf(el);
         let targetIndex = -1;
@@ -3979,8 +4055,13 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       if (override?.linkUrl) {
         event.preventDefault();
         event.stopPropagation();
-        if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer");
-        else window.location.assign(override.linkUrl);
+        if (behavior.openInNewTab) {
+          window.open(override.linkUrl, "_blank", "noopener,noreferrer");
+        } else if (override.linkUrl.startsWith("/")) {
+          navigate(override.linkUrl);
+        } else {
+          window.location.assign(override.linkUrl);
+        }
         return;
       }
       onAction?.();
@@ -4334,7 +4415,14 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   const resolvedAlt = activeOverride?.altText || alt;
   const resolvedLink = activeOverride?.linkUrl || linkUrl;
   const opensInNewTab = parseLayerBehavior(activeOverride?.customCss).openInNewTab;
-  const alignmentClass = activeOverride?.alignment === "start" ? "mr-0 ml-auto" : activeOverride?.alignment === "end" ? "ml-0 mr-auto" : activeOverride?.alignment === "stretch" ? "w-full" : "mx-auto";
+  const alignmentClass =
+    activeOverride?.alignment === "start" || (activeOverride?.alignment as any) === "right"
+      ? "mr-0 ml-auto"
+      : activeOverride?.alignment === "end" || (activeOverride?.alignment as any) === "left"
+      ? "ml-0 mr-auto"
+      : activeOverride?.alignment === "stretch"
+      ? "w-full"
+      : "mx-auto";
   const isBrandMark = /(?:logo|شعار|brand)/i.test(`${id} ${label}`);
   const imageTransform = !isBrandMark && activeOverride?.backgroundSize && activeOverride.backgroundSize !== 100 ? `scale(${activeOverride.backgroundSize / 100})` : undefined;
   const fillHeight = /(?:^|\s)h-full(?:\s|$)/.test(className);

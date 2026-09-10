@@ -66,7 +66,11 @@ export const visualEditorRouter = router({
     mediaUrl: z.string().max(1024).nullable().optional(),
     altText: z.string().max(300).nullable().optional(),
     linkUrl: z.string().max(1024).nullable().optional(),
-    alignment: z.enum(["start", "center", "end", "stretch"]).nullable().optional(),
+    alignment: z.union([
+      z.enum(["start", "center", "end", "stretch"]),
+      z.literal("right").transform(() => "start" as const),
+      z.literal("left").transform(() => "end" as const),
+    ]).nullable().optional(),
     textColor: cssTokenSchema,
     bgColor: cssTokenSchema,
     fontSize: cssTokenSchema,

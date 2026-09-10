@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   X,
   Copy,
@@ -37,7 +37,7 @@ export type StudioInspectorDraft = {
   textColor?: string;
   bgColor?: string;
   fontSize?: string;
-  alignment?: "right" | "center" | "left";
+  alignment?: "start" | "center" | "end" | "right" | "left" | "stretch" | null;
   linkUrl?: string;
   borderRadius?: string;
   padding?: string;
@@ -78,6 +78,16 @@ export function StudioInspector({
   const [showAdvancedUrl, setShowAdvancedUrl] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [localContentText, setLocalContentText] = useState(draft.contentText ?? "");
+  const activeElementIdRef = useRef(selectedElement?.id);
+
+  useEffect(() => {
+    if (activeElementIdRef.current !== selectedElement?.id) {
+      activeElementIdRef.current = selectedElement?.id;
+      setLocalContentText(draft.contentText ?? "");
+    }
+  }, [selectedElement?.id, draft.contentText]);
 
   const uploadMutation = trpc.visualEditor.media.upload.useMutation();
 
@@ -232,9 +242,23 @@ export function StudioInspector({
         {/* TAB 1: CONTENT */}
         {activeSubTab === "content" && (
           <div className="space-y-3.5">
-            {/* Image Media Controls */}
-            {selectedElement.tag === "image" && (
+            {/* Image / Media Controls */}
+            {(selectedElement.tag === "image" || selectedElement.tag === "section" || selectedElement.tag === "section-block" || selectedElement.tag === "div" || selectedElement.id.startsWith("section-") || Boolean(draft.mediaUrl)) && (
               <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-300">
+                    {selectedElement.tag === "image" ? "صورة العنصر:" : "صورة الخلفية / الغلاف:"}
+                  </span>
+                  {draft.mediaUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => onChangeDraft({ mediaUrl: "" })}
+                      className="text-[10px] font-bold text-red-400 hover:text-red-300 transition"
+                    >
+                      إزالة الصورة
+                    </button>
+                  ) : null}
+                </div>
                 {/* Hidden File Input */}
                 <input
                   ref={fileInputRef}
@@ -399,8 +423,12 @@ export function StudioInspector({
               <div>
                 <label className="block text-[11px] font-bold text-slate-300 mb-1.5">محتوى النص:</label>
                 <textarea
-                  value={draft.contentText ?? ""}
-                  onChange={(e) => onChangeDraft({ contentText: e.target.value })}
+                  value={localContentText}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setLocalContentText(val);
+                    onChangeDraft({ contentText: val });
+                  }}
                   placeholder="اكتب النص هنا..."
                   className="w-full rounded-xl border border-white/10 bg-black/40 p-3 text-xs leading-5 text-white outline-none focus:border-amber-400 min-h-[90px]"
                 />
@@ -428,18 +456,23 @@ export function StudioInspector({
               <label className="block text-[11px] font-bold text-slate-300 mb-1.5">محاذاة النص:</label>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
-                  { value: "right" as const, label: "يمين", icon: AlignRight },
+                  { value: "start" as const, label: "يمين", icon: AlignRight },
                   { value: "center" as const, label: "وسط", icon: AlignCenter },
-                  { value: "left" as const, label: "يسار", icon: AlignLeft },
+                  { value: "end" as const, label: "يسار", icon: AlignLeft },
                 ].map((al) => {
                   const Icon = al.icon;
+                  const isSelected =
+                    draft.alignment === al.value ||
+                    (draft.alignment === "right" && al.value === "start") ||
+                    (draft.alignment === "left" && al.value === "end") ||
+                    (!draft.alignment && al.value === "start");
                   return (
                     <button
                       key={al.value}
                       type="button"
                       onClick={() => onChangeDraft({ alignment: al.value })}
                       className={`flex items-center justify-center gap-1 rounded-xl border p-2 text-xs font-bold transition ${
-                        (draft.alignment ?? "right") === al.value
+                        isSelected
                           ? "border-amber-400 bg-amber-400/15 text-amber-300 shadow"
                           : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
                       }`}
@@ -587,40 +620,78 @@ export function StudioInspector({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 mb-1">لون الخلفية:</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold text-slate-400">لون الخلفية:</label>
+                  {draft.bgColor ? (
+                    <button
+                      type="button"
+                      onClick={() => onChangeDraft({ bgColor: "" })}
+                      className="text-[9px] font-bold text-red-400 hover:text-red-300 transition"
+                    >
+                      شفاف
+                    </button>
+                  ) : null}
+                </div>
                 <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 p-1.5">
                   <input
                     type="color"
-                    value={draft.bgColor ?? "#000000"}
+                    value={draft.bgColor && draft.bgColor.startsWith("#") ? draft.bgColor : "#085187"}
                     onChange={(e) => onChangeDraft({ bgColor: e.target.value })}
                     className="h-6 w-6 cursor-pointer rounded-lg border-0 bg-transparent p-0"
                   />
-                  <span className="text-[10px] font-mono text-slate-300">{draft.bgColor || "شفاف"}</span>
+                  <span className="text-[10px] font-mono text-slate-300">{draft.bgColor || "شفاف (تلقائي)"}</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Palette Swatches */}
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 mb-1.5">ألوان هوية العقيق السريعة:</div>
-              <div className="flex items-center gap-2">
-                {[
-                  { color: "#085187", name: "أزرق ملكي" },
-                  { color: "#ab1d22", name: "أحمر العقيق" },
-                  { color: "#d9bd26", name: "ذهبي" },
-                  { color: "#155439", name: "أخضر" },
-                  { color: "#ffffff", name: "أبيض" },
-                  { color: "#000000", name: "أسود" },
-                ].map((s) => (
-                  <button
-                    key={s.color}
-                    type="button"
-                    onClick={() => onChangeDraft({ textColor: s.color })}
-                    className="h-6 w-6 rounded-full border border-white/20 transition hover:scale-110"
-                    style={{ backgroundColor: s.color }}
-                    title={s.name}
-                  />
-                ))}
+            <div className="space-y-2">
+              <div>
+                <div className="text-[10px] font-bold text-slate-400 mb-1.5">ألوان النص السريعة:</div>
+                <div className="flex items-center gap-2">
+                  {[
+                    { color: "#ffffff", name: "أبيض" },
+                    { color: "#d9bd26", name: "ذهبي" },
+                    { color: "#085187", name: "أزرق ملكي" },
+                    { color: "#ab1d22", name: "أحمر العقيق" },
+                    { color: "#155439", name: "أخضر" },
+                    { color: "#000000", name: "أسود" },
+                  ].map((s) => (
+                    <button
+                      key={`text-${s.color}`}
+                      type="button"
+                      onClick={() => onChangeDraft({ textColor: s.color })}
+                      className="h-6 w-6 rounded-full border border-white/20 transition hover:scale-110"
+                      style={{ backgroundColor: s.color }}
+                      title={`نص: ${s.name}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-bold text-slate-400 mb-1.5">ألوان الخلفية السريعة:</div>
+                <div className="flex items-center gap-2">
+                  {[
+                    { color: "", name: "بدون خلفية (شفاف)" },
+                    { color: "#085187", name: "أزرق ملكي" },
+                    { color: "#ab1d22", name: "أحمر العقيق" },
+                    { color: "#d9bd26", name: "ذهبي" },
+                    { color: "#155439", name: "أخضر" },
+                    { color: "#111827", name: "داكن" },
+                  ].map((s) => (
+                    <button
+                      key={`bg-${s.color || "clear"}`}
+                      type="button"
+                      onClick={() => onChangeDraft({ bgColor: s.color })}
+                      className="h-6 w-6 rounded-full border border-white/20 transition hover:scale-110 flex items-center justify-center text-[8px] font-bold"
+                      style={{ backgroundColor: s.color || "transparent" }}
+                      title={`خلفية: ${s.name}`}
+                    >
+                      {!s.color && "⊘"}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
