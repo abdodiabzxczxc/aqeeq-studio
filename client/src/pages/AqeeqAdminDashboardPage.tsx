@@ -114,6 +114,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import AuditLogsPage from "@/pages/AuditLogsPage";
 
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
@@ -1863,15 +1864,22 @@ export default function AqeeqAdminDashboardPage() {
 
           {/* 7. الإعلانات والتنبيهات والمواسم */}
           {activePillar === "alerts" && (
-            <SystemBrandHub
-              dark={dark}
-              mode="alerts"
-              orchestration={orchestrationForm}
-              onSaveOrchestration={async (updated) => {
-                await setOrchestrationMutation.mutateAsync(updated);
-              }}
-              isSaving={setOrchestrationMutation.isPending}
-            />
+            <>
+              <SystemBrandHub
+                dark={dark}
+                mode="alerts"
+                orchestration={orchestrationForm}
+                onSaveOrchestration={async (updated) => {
+                  await setOrchestrationMutation.mutateAsync(updated);
+                }}
+                isSaving={setOrchestrationMutation.isPending}
+              />
+
+              {/* DB-5: سجل النشاط الإداري */}
+              <div className={`mt-6 rounded-[2rem] border p-6 ${dark ? "border-white/10 bg-[#0b0e15]" : "border-black/10 bg-white"}`}>
+                <AuditLogsPage />
+              </div>
+            </>
           )}
         </main>
       </div>
