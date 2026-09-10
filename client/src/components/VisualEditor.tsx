@@ -492,8 +492,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     return { width: 400, height: 640 };
   });
 
-  const [inspectorDocked, setInspectorDocked] = useState<boolean>(false);
-  const [inspectorMinimized, setInspectorMinimized] = useState<boolean>(false);
+  const [inspectorDocked, setInspectorDocked] = useState<boolean>(() => {
+    try { return window.localStorage.getItem("alaqeeq-inspector-docked") === "1"; } catch { return false; }
+  });
+  const [inspectorMinimized, setInspectorMinimized] = useState<boolean>(() => {
+    try { return window.localStorage.getItem("alaqeeq-inspector-minimized") === "1"; } catch { return false; }
+  });
   const inspectorRef = useRef<HTMLElement | null>(null);
 
   const startInspectorDrag = (event: React.PointerEvent) => {
@@ -905,6 +909,14 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     return () => root.classList.remove("aq-editor-toolbar-right");
   }, [toolbarSide]);
 
+  // E-6: persist docked / minimized across page navigations
+  useEffect(() => {
+    try { window.localStorage.setItem("alaqeeq-inspector-docked", inspectorDocked ? "1" : "0"); } catch {}
+  }, [inspectorDocked]);
+  useEffect(() => {
+    try { window.localStorage.setItem("alaqeeq-inspector-minimized", inspectorMinimized ? "1" : "0"); } catch {}
+  }, [inspectorMinimized]);
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("aq-editor-right-nav-hidden", rightNavHidden);
@@ -926,6 +938,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem("alaqeeq-background-editor-preferences", JSON.stringify(backgroundPreferences));
   }, [backgroundPreferences]);
+
 
   useEffect(() => {
     if (!isEditing || !layerMode) {
@@ -1764,6 +1777,68 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     if (issues.length) toast.warning(`فحص قبل النشر: ${issues.slice(0, 3).join(" · ")}${issues.length > 3 ? ` +${issues.length - 3}` : ""}`); else toast.success("فحص قبل النشر: لا توجد مشكلات ظاهرة في عناصر الصفحة");
   };
 
+  // ── E-1,2,3,4,17: Global Keyboard Shortcuts ─────────────────────────
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (!isEditing) return;
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping = target && (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable ||
+        !!target.closest("[contenteditable]")
+      );
+      // Ctrl+Z / Cmd+Z — تراجع
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
+        e.preventDefault(); undoSession(); return;
+      }
+      // Ctrl+Y / Ctrl+Shift+Z — إعادة
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (e.shiftKey && e.key.toLowerCase() === "z"))) {
+        e.preventDefault(); redoSession(); return;
+      }
+      // Ctrl+S / Cmd+S — حفظ ونشر
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        if (!previewMode) runPrePublishCheck();
+        return;
+      }
+      // Escape — إلغاء التحديد أو خروج من المعاينة
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (previewMode) { setPreviewMode(false); return; }
+        if (selected) { setSelected(null); setSelectedIds([]); return; }
+        return;
+      }
+      // Delete / Backspace — حذف الطبقة المحددة
+      if (!isTyping && (e.key === "Delete" || e.key === "Backspace") && selected && !previewMode) {
+        const locked = localOverrides[`${pagePath}::${selected.id}`]?.isLocked ?? false;
+        if (!locked) { e.preventDefault(); deleteLayer(selected.id, selected.label); }
+        return;
+      }
+      // Arrow Keys — تحريك الطبقة في Layer Mode (1px أو Shift+Arrow = 10px)
+      if (!isTyping && layerMode && selected && !previewMode && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        const cur = overrideMap.get(selected.id);
+        const dx = e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0;
+        const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+        saveLayer(selected.id, {
+          layerX: (cur?.layerX ?? 0) + dx,
+          layerY: (cur?.layerY ?? 0) + dy,
+          layerWidth: cur?.layerWidth ?? null,
+          layerHeight: cur?.layerHeight ?? null,
+          layerZIndex: cur?.layerZIndex ?? 0,
+          layerOpacity: cur?.layerOpacity ?? 100,
+          isHidden: cur?.isHidden ?? false,
+        });
+        return;
+      }
+    };
+    window.addEventListener("keydown", handler, true);
+    return () => window.removeEventListener("keydown", handler, true);
+  }, [isEditing, previewMode, selected, layerMode, undoSession, redoSession, runPrePublishCheck, deleteLayer, saveLayer, localOverrides, overrideMap, pagePath]);
+
   const fitSelectedBackground = (axis: "width" | "height" | "fill" | "contain") => {
     if (!selected) return;
     const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
@@ -1842,10 +1917,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span>المحرر الذكي نشط (يتعرف على كل عنصر)</span>
+          <span>المحرر الذكي نشط</span>
         </div>
-        <WorkspaceButton active={false} label="حفظ ونشر" icon={<Check size={17} />} onClick={runPrePublishCheck} />
-        <WorkspaceButton active={false} label="خروج" icon={<X size={17} />} onClick={() => { closeWorkspacePanels(); setIsEditing(false); setSelected(null); setSelectedIds([]); setLayerMode(false); setToolGroup(null); }} />
+        {/* E-15: Dirty count badge — كم عنصر معدّل */}
+        {Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length > 0 ? (
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[11px] font-black pointer-events-none" title="عناصر معدّلة غير منشورة">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+            </span>
+            <span>{Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length} تعديل</span>
+          </div>
+        ) : null}
+        <WorkspaceButton active={false} label="حفظ ونشر (Ctrl+S)" icon={<Check size={17} />} onClick={runPrePublishCheck} />
+        <WorkspaceButton active={false} label="خروج (Escape)" icon={<X size={17} />} onClick={() => { closeWorkspacePanels(); setIsEditing(false); setSelected(null); setSelectedIds([]); setLayerMode(false); setToolGroup(null); }} />
       </div>
     </nav>
   ) : null;
@@ -1935,7 +2020,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
             >
               {inspectorDocked ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
             </button>
-            <button type="button" onClick={() => deleteLayer(selected.id, selected.label)} className="rounded-lg p-1.5 text-[#de191e] hover:bg-[#de191e]/15 transition" title="مسح العنصر">
+            <button type="button" onClick={duplicateSelected} className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.08] hover:text-sky-300 transition" title="نسخ العنصر (Duplicate)">
+              <Copy size={14} />
+            </button>
+            <button type="button" onClick={() => deleteLayer(selected.id, selected.label)} className="rounded-lg p-1.5 text-[#de191e] hover:bg-[#de191e]/15 transition" title="مسح العنصر (Delete)">
               <Trash2 size={15} />
             </button>
             <button type="button" onClick={() => setSelected(null)} className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.08] hover:text-white transition" title="إغلاق">

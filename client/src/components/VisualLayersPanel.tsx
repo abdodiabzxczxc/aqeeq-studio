@@ -161,7 +161,10 @@ export default function VisualLayersPanel({ open, onClose, onOpenTrash }: { open
                         {override?.isLocked ? <Lock size={13} /> : <Layers3 size={13} />}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <span className="block truncate text-xs font-black text-slate-100">{layer.label}</span>
+                        <span className="flex items-center gap-1 truncate text-xs font-black text-slate-100">
+                          {layer.label}
+                          {override && <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0" title="يوجد تعديل غير منشور" />}
+                        </span>
                         <span className="block text-[10px] text-slate-500">
                           {typeLabel[layer.tag]} · مستوى {override?.layerZIndex ?? 0}
                         </span>
