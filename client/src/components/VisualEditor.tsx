@@ -14,7 +14,7 @@ import { extractCopyableStyle, isBackgroundLikeLayer, type CopyableLayerStyle } 
 import { backgroundSizeCss, isBackgroundLayer, isBackgroundSurface, isCoreBackgroundLayer, lowerLayerZIndex, resolveBackgroundOrigin, type BackgroundOrigin } from "@/lib/layerBackground";
 import { resolveEditorToolbarSide, toggleEditorToolbarSide, type EditorToolbarSide } from "@/lib/editorToolbarSide";
 import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImageWrapperClassName } from "@/lib/visualEditorLayout";
-import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowLeftRight, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowLeftRight, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -26,6 +26,8 @@ import LayerTrashPanel from "./LayerTrashPanel";
 import MediaLibrary from "./MediaLibrary";
 import PageMapDrawer from "./PageMapDrawer";
 import VisualAddPanel from "./VisualAddPanel";
+import VisualHistoryDrawer from "./VisualHistoryDrawer";
+import VisualDesignTokensPanel from "./VisualDesignTokensPanel";
 import VisualLayersPanel from "./VisualLayersPanel";
 import SiteBuilderDrawer from "./SiteBuilderDrawer";
 
@@ -419,6 +421,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [trashOpen, setTrashOpen] = useState(false);
   const [workspaceMediaOpen, setWorkspaceMediaOpen] = useState(false);
   const [pageMapOpen, setPageMapOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);          // Phase 3
+  const [designTokensOpen, setDesignTokensOpen] = useState(false); // Phase 4
   const [builderTab, setBuilderTab] = useState<"sections" | "pages">("sections");
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string; tag: ElementTag; label: string } | null>(null);
@@ -820,6 +824,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setLayersOpen(false);
     setWorkspaceMediaOpen(false);
     setPageMapOpen(false);
+    setHistoryOpen(false);
+    setDesignTokensOpen(false);
     setLocalOverrides({});
     setUndoStack([]);
     setRedoStack([]);
@@ -1911,6 +1917,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         <WorkspaceButton active={false} label="إعادة" icon={<Redo2 size={16} />} onClick={redoSession} disabled={!redoStack.length} />
         <WorkspaceButton active={mobilePreview} label="معاينة الهاتف" icon={<Smartphone size={16} />} onClick={() => setMobilePreview((current) => !current)} />
         <WorkspaceButton active={false} label="معاينة كزائر" icon={<Eye size={16} />} onClick={() => setPreviewMode(true)} />
+        <WorkspaceButton active={historyOpen} label="سجل التعديلات" icon={<History size={16} />} onClick={() => { setHistoryOpen((p) => !p); setDesignTokensOpen(false); }} />
+        <WorkspaceButton active={designTokensOpen} label="هوية الموقع والألوان" icon={<Palette size={16} />} onClick={() => { setDesignTokensOpen((p) => !p); setHistoryOpen(false); }} />
         <span className="aq-key-divider" aria-hidden="true" />
         <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-black pointer-events-none">
           <span className="relative flex h-2 w-2">
@@ -1942,6 +1950,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     <LayerTrashPanel open={shouldShowWorkspacePanel(isEditing, previewMode, trashOpen)} onClose={() => setTrashOpen(false)} pagePath={pagePath} />
     <DesignToolsPanel open={shouldShowWorkspacePanel(isEditing && Boolean(selected), previewMode, designToolsOpen)} onClose={() => setDesignToolsOpen(false)} label={selected?.label || "الطبقة"} effects={{ filterPreset: layerBehavior.filterPreset || "original", blurAmount: layerBehavior.blurAmount || 0, shadowPreset: layerBehavior.shadowPreset || "none", blendMode: layerBehavior.blendMode || "normal", glass: layerBehavior.glass, innerShadow: layerBehavior.innerShadow, gradientBorder: layerBehavior.gradientBorder, texture: layerBehavior.texture }} onPatch={updateDesignEffects} />
     <PageMapDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, pageMapOpen)} onClose={() => setPageMapOpen(false)} currentLocation={`${window.location.pathname}${window.location.search}`} />
+    <VisualHistoryDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, historyOpen)} onClose={() => setHistoryOpen(false)} />
+    <VisualDesignTokensPanel open={shouldShowWorkspacePanel(isEditing, previewMode, designTokensOpen)} onClose={() => setDesignTokensOpen(false)} />
     <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, workspaceMediaOpen)} onClose={() => setWorkspaceMediaOpen(false)} workspace onSelect={selected ? selectMediaForDraft : undefined} accept={selected?.tag === "video" ? "video" : "image"} />
     <MediaLibrary open={shouldShowWorkspacePanel(isEditing, previewMode, mediaLibraryOpen)} onClose={() => setMediaLibraryOpen(false)} accept={selected?.tag === "video" ? "video" : "image"} onSelect={selectMediaForDraft} />
     {pendingMediaAsset ? <div className="fixed inset-0 z-[430] grid place-items-center bg-black/65 p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-labelledby="replace-media-title" dir="rtl"><section className="w-full max-w-md rounded-3xl border border-amber-300/35 bg-[#111521] p-5 shadow-2xl"><div className="text-[11px] font-black tracking-[.14em] text-amber-300">استبدال الصورة</div><h2 id="replace-media-title" className="mt-2 text-lg font-black text-amber-50">تطبيق الصورة الجديدة كمعاينة؟</h2><p className="mt-2 text-sm leading-6 text-slate-300">ستُستبدل الصورة داخل القماش فورًا كمسودة محلية فقط. يمكنك استعادة الأصل أو تجاهل التعديل قبل الحفظ والنشر.</p><div className="mt-5 grid grid-cols-2 gap-2"><button onClick={() => setPendingMediaAsset(null)} className="rounded-xl border border-white/15 px-3 py-3 text-xs font-black text-slate-200 transition hover:bg-white/[0.06]">إلغاء</button><button onClick={confirmMediaReplacement} className="rounded-xl bg-amber-300 px-3 py-3 text-xs font-black text-amber-950 transition hover:bg-amber-200">تطبيق كمعاينة</button></div></section></div> : null}
@@ -2399,6 +2409,121 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
               ) : null}
             </div>
           ) : null}
+          </div>
+        </div>
+
+        {/* ── Phase 1: RESPONSIVE VISIBILITY ─────────────────────── */}
+        <div className="mx-4 mb-3 rounded-2xl border border-sky-400/20 bg-sky-400/[0.04] p-3.5">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-lg bg-sky-400/15 text-sky-300">
+              <Monitor size={13} />
+            </span>
+            <span className="text-[11px] font-black tracking-wider text-sky-300">إظهار على الأجهزة</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {([
+              { value: "all", label: "الكل", icon: <Monitor size={13} />, sub: "موبايل + كمبيوتر" },
+              { value: "desktop", label: "كمبيوتر فقط", icon: <Monitor size={13} />, sub: "يُخفى على الهاتف" },
+              { value: "mobile", label: "هاتف فقط", icon: <Smartphone size={13} />, sub: "يُخفى على الكمبيوتر" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => updateLayerBehavior({ device: opt.value })}
+                className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-center text-[10px] font-black transition duration-200 ${
+                  (layerBehavior.device ?? "all") === opt.value
+                    ? "border-sky-400/60 bg-sky-400/15 text-sky-200 shadow-[0_0_12px_rgba(56,189,248,.15)]"
+                    : "border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-sky-400/30 hover:text-slate-200"
+                }`}
+              >
+                {opt.icon}
+                <span className="leading-tight">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+          {(layerBehavior.device ?? "all") !== "all" && (
+            <p className="mt-2 rounded-lg bg-sky-400/10 px-2.5 py-1.5 text-[10px] leading-4 text-sky-300">
+              {layerBehavior.device === "desktop" ? "🖥️ هذا العنصر سيُخفى على شاشات الهاتف (عرض أقل من 768px)" : "📱 هذا العنصر سيُخفى على شاشات الكمبيوتر (عرض أكبر من 768px)"}
+            </p>
+          )}
+        </div>
+
+        {/* ── Phase 2: ANIMATION STUDIO ─────────────────────────── */}
+        <div className="mx-4 mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.04] p-3.5">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-lg bg-violet-400/15 text-violet-300">
+              <Zap size={13} />
+            </span>
+            <span className="text-[11px] font-black tracking-wider text-violet-300">استوديو الحركة</span>
+          </div>
+
+          {/* Scroll Reveal Toggle */}
+          <button
+            type="button"
+            onClick={() => updateLayerBehavior({ revealOnScroll: !layerBehavior.revealOnScroll })}
+            className={`mb-3 flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition ${
+              layerBehavior.revealOnScroll
+                ? "border-violet-400/50 bg-violet-400/10 text-violet-200"
+                : "border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-violet-400/30 hover:text-slate-200"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Eye size={14} />
+              <span className="text-[11px] font-black">ظهور عند التمرير (Scroll Reveal)</span>
+            </div>
+            <span className={`h-4 w-7 rounded-full transition-colors ${layerBehavior.revealOnScroll ? "bg-violet-400" : "bg-slate-700"}`}>
+              <span className={`mt-0.5 block h-3 w-3 rounded-full bg-white shadow transition-transform ${layerBehavior.revealOnScroll ? "translate-x-3.5 ms-0.5" : "translate-x-0.5"}`} />
+            </span>
+          </button>
+
+          {/* Animation Type */}
+          <div className="mb-2 text-[10px] font-black text-slate-400">نوع الحركة</div>
+          <div className="mb-3 grid grid-cols-4 gap-1.5">
+            {([
+              { value: "none", label: "بدون", emoji: "⏹️" },
+              { value: "fade", label: "تلاشي", emoji: "🌫️" },
+              { value: "rise", label: "صعود", emoji: "⬆️" },
+              { value: "slide", label: "انزلاق", emoji: "➡️" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => updateLayerBehavior({ animation: opt.value })}
+                className={`flex flex-col items-center gap-0.5 rounded-xl border py-2 text-[10px] font-black transition ${
+                  (layerBehavior.animation ?? "none") === opt.value
+                    ? "border-violet-400/60 bg-violet-400/15 text-violet-200"
+                    : "border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-violet-400/30 hover:text-white"
+                }`}
+              >
+                <span>{opt.emoji}</span>
+                <span>{opt.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Hover Effect */}
+          <div className="mb-2 text-[10px] font-black text-slate-400">تأثير Hover</div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {([
+              { value: "none", label: "بدون", emoji: "–" },
+              { value: "lift", label: "ارتفاع", emoji: "🚀" },
+              { value: "glow", label: "توهج", emoji: "✨" },
+              { value: "shimmer", label: "بريق", emoji: "💫" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => updateLayerBehavior({ buttonHover: opt.value })}
+                className={`flex flex-col items-center gap-0.5 rounded-xl border py-2 text-[10px] font-black transition ${
+                  (layerBehavior.buttonHover ?? "none") === opt.value
+                    ? "border-violet-400/60 bg-violet-400/15 text-violet-200"
+                    : "border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-violet-400/30 hover:text-white"
+                }`}
+              >
+                <span>{opt.emoji}</span>
+                <span>{opt.label}</span>
+              </button>
+            ))}
           </div>
         </div>
 

@@ -92,6 +92,10 @@
 
 :root {
   --mobile-sticky-bar-offset: 0px;
+  --aq-primary: #085187;
+  --aq-secondary: #ab1d22;
+  --aq-accent: #d9bd26;
+  --aq-green: #155439;
 }
 @media (min-width: 1024px) {
   :root {
