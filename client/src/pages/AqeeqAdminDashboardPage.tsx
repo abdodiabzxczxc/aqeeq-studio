@@ -98,6 +98,8 @@ import { TuitionFeesContentManager } from "@/components/admin/content/TuitionFee
 import { ExecutiveTopBar } from "@/components/admin/executive/ExecutiveTopBar";
 import { ExecutiveSidebar, ExecutivePillar } from "@/components/admin/executive/ExecutiveSidebar";
 import { OperationsHub } from "@/components/admin/executive/OperationsHub";
+import { TuitionFinanceHub } from "@/components/admin/executive/TuitionFinanceHub";
+import { CommunityHub } from "@/components/admin/executive/CommunityHub";
 import { SiteContentStudio } from "@/components/admin/executive/SiteContentStudio";
 import { PublishingStudio } from "@/components/admin/executive/PublishingStudio";
 import { SystemBrandHub } from "@/components/admin/executive/SystemBrandHub";
@@ -664,7 +666,7 @@ export default function AqeeqAdminDashboardPage() {
 
   // 🏛️ The 5 Pillars Master State
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
-  const [activePillar, setActivePillar] = useState<ExecutivePillar>("operations");
+  const [activePillar, setActivePillar] = useState<ExecutivePillar>("admissions");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<AdmissionsSubTab>("inbox");
   const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("pages_content");
   const [pageContentSection, setPageContentSection] = useState<"homepage" | "about" | "accreditations" | "fees">("homepage");
@@ -691,8 +693,18 @@ export default function AqeeqAdminDashboardPage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const pillarParam = params.get("pillar") as ExecutivePillar;
-      if (pillarParam && ["operations", "content", "publishing", "system"].includes(pillarParam)) {
-        setActivePillar(pillarParam);
+      if (pillarParam) {
+        if (["admissions", "finance", "pages", "media", "community", "channels", "alerts"].includes(pillarParam)) {
+          setActivePillar(pillarParam);
+        } else if (pillarParam === "operations") {
+          setActivePillar("admissions");
+        } else if (pillarParam === "content") {
+          setActivePillar("pages");
+        } else if (pillarParam === "publishing") {
+          setActivePillar("media");
+        } else if (pillarParam === "system") {
+          setActivePillar("channels");
+        }
       }
     }
   }, []);
@@ -1592,13 +1604,19 @@ export default function AqeeqAdminDashboardPage() {
   // Intelligent navigation router for shortcuts & command palette
   const handleNavigateTab = (tab: any, subTab?: string) => {
     if (tab === "admissions" || tab === "radar" || tab === "operations") {
-      setActivePillar("operations");
-    } else if (tab === "content" || tab === "pages_content") {
-      setActivePillar("content");
-    } else if (tab === "campaigns" || tab === "publishing" || tab === "articles" || tab === "journal" || tab === "albums") {
-      setActivePillar("publishing");
-    } else if (tab === "system" || tab === "settings" || tab === "orchestration") {
-      setActivePillar("system");
+      setActivePillar("admissions");
+    } else if (tab === "finance" || tab === "fees" || tab === "prices") {
+      setActivePillar("finance");
+    } else if (tab === "content" || tab === "pages_content" || tab === "pages") {
+      setActivePillar("pages");
+    } else if (tab === "campaigns" || tab === "publishing" || tab === "articles" || tab === "journal" || tab === "albums" || tab === "media") {
+      setActivePillar("media");
+    } else if (tab === "community" || tab === "faqs" || tab === "partners") {
+      setActivePillar("community");
+    } else if (tab === "channels" || tab === "social" || tab === "portals" || tab === "footer") {
+      setActivePillar("channels");
+    } else if (tab === "alerts" || tab === "popup" || tab === "vacation" || tab === "system" || tab === "settings" || tab === "orchestration") {
+      setActivePillar("alerts");
     }
   };
 
@@ -1731,9 +1749,10 @@ export default function AqeeqAdminDashboardPage() {
           onLogout={() => void logout()}
         />
 
-        {/* Dynamic Pillar Workspace Canvas */}
+        {/* Dynamic Pillar Workspace Canvas (7 Specialized Hubs) */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
-          {activePillar === "operations" && (
+          {/* 1. شؤون القبول والتسجيل */}
+          {(activePillar === "admissions" || activePillar === "operations") && (
             <OperationsHub
               dark={dark}
               leads={admissionsList as any}
@@ -1754,7 +1773,20 @@ export default function AqeeqAdminDashboardPage() {
             />
           )}
 
-          {activePillar === "content" && (
+          {/* 2. الرسوم الدراسية والمالية */}
+          {activePillar === "finance" && (
+            <TuitionFinanceHub
+              dark={dark}
+              orchestration={orchestrationForm}
+              onSaveOrchestration={async (updated) => {
+                await setOrchestrationMutation.mutateAsync(updated);
+              }}
+              isSaving={setOrchestrationMutation.isPending}
+            />
+          )}
+
+          {/* 3. صفحات الموقع والتعريف */}
+          {(activePillar === "pages" || activePillar === "content") && (
             <SiteContentStudio
               dark={dark}
               orchestration={orchestrationForm}
@@ -1765,7 +1797,8 @@ export default function AqeeqAdminDashboardPage() {
             />
           )}
 
-          {activePillar === "publishing" && (
+          {/* 4. المركز الإعلامي والنشر */}
+          {(activePillar === "media" || activePillar === "publishing") && (
             <PublishingStudio
               dark={dark}
               masterContent={masterContent as any}
@@ -1794,9 +1827,36 @@ export default function AqeeqAdminDashboardPage() {
             />
           )}
 
-          {activePillar === "system" && (
+          {/* 5. الأسئلة الشائعة والشركاء */}
+          {activePillar === "community" && (
+            <CommunityHub
+              dark={dark}
+              orchestration={orchestrationForm}
+              onSaveOrchestration={async (updated) => {
+                await setOrchestrationMutation.mutateAsync(updated);
+              }}
+              isSaving={setOrchestrationMutation.isPending}
+            />
+          )}
+
+          {/* 6. القنوات والربط الرقمي */}
+          {(activePillar === "channels" || activePillar === "system") && (
             <SystemBrandHub
               dark={dark}
+              mode="channels"
+              orchestration={orchestrationForm}
+              onSaveOrchestration={async (updated) => {
+                await setOrchestrationMutation.mutateAsync(updated);
+              }}
+              isSaving={setOrchestrationMutation.isPending}
+            />
+          )}
+
+          {/* 7. الإعلانات والتنبيهات والمواسم */}
+          {activePillar === "alerts" && (
+            <SystemBrandHub
+              dark={dark}
+              mode="alerts"
               orchestration={orchestrationForm}
               onSaveOrchestration={async (updated) => {
                 await setOrchestrationMutation.mutateAsync(updated);

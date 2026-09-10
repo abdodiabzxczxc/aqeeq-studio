@@ -26,13 +26,14 @@ export function InContextHUDBridge() {
 
   // Determine current context
   const getContextInfo = () => {
-    if (location === "/") return { label: "تعديل محتوى الرئيسية", pillar: "content", section: "homepage" };
-    if (location.startsWith("/about")) return { label: "تعديل محتوى مدارسنا", pillar: "content", section: "about" };
-    if (location.startsWith("/admissions")) return { label: "تعديل الرسوم والقبول", pillar: "operations", section: "fees" };
-    if (location.startsWith("/accreditations")) return { label: "تعديل الاعتمادات والجوائز", pillar: "content", section: "accreditations" };
-    if (location.startsWith("/journal")) return { label: "استوديو المجلات 3D", pillar: "publishing", section: "master" };
-    if (location.startsWith("/albums")) return { label: "استوديو ألبومات الفعاليات", pillar: "publishing", section: "master" };
-    return { label: "غرفة القيادة التنفيذية", pillar: "operations", section: "inbox" };
+    if (location === "/") return { label: "تعديل محتوى الرئيسية", pillar: "pages", section: "homepage" };
+    if (location.startsWith("/about")) return { label: "تعديل محتوى مدارسنا", pillar: "pages", section: "about" };
+    if (location.startsWith("/admissions")) return { label: "إدارة القبول والتسجيل", pillar: "admissions", section: "inbox" };
+    if (location.startsWith("/accreditations")) return { label: "تعديل الاعتمادات والجوائز", pillar: "pages", section: "accreditations" };
+    if (location.startsWith("/journal")) return { label: "استوديو المجلات 3D", pillar: "media", section: "master" };
+    if (location.startsWith("/albums")) return { label: "استوديو ألبومات الفعاليات", pillar: "media", section: "master" };
+    if (location.startsWith("/podcasts") || location.startsWith("/podcast")) return { label: "بودكاست العقيق", pillar: "media", section: "master" };
+    return { label: "غرفة القيادة التنفيذية", pillar: "admissions", section: "inbox" };
   };
 
   const ctx = getContextInfo();
@@ -79,35 +80,59 @@ export function InContextHUDBridge() {
           <div className="space-y-1 pt-1 border-t border-white/10 text-xs font-bold">
             <button
               type="button"
-              onClick={() => navigate("/admin?pillar=content")}
-              className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
-            >
-              <Globe size={13} className="text-blue-400" />
-              <span>محتوى الصفحات الحية (ستوريات، بنتو، مقاييس)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/admin?pillar=operations")}
+              onClick={() => navigate("/admin?pillar=admissions")}
               className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
             >
               <GraduationCap size={13} className="text-emerald-400" />
-              <span>طلبات التسجيل وإدارة الرسوم</span>
+              <span>1. القبول والتسجيل (الطلبات والتواصل)</span>
             </button>
             <button
               type="button"
-              onClick={() => navigate("/admin?pillar=publishing")}
+              onClick={() => navigate("/admin?pillar=finance")}
+              className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
+            >
+              <Building2 size={13} className="text-amber-400" />
+              <span>2. الرسوم الدراسية وحاسبة الأقساط</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin?pillar=pages")}
+              className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
+            >
+              <Globe size={13} className="text-blue-400" />
+              <span>3. صفحات الموقع (الرئيسية، مدارسنا، الاعتمادات)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin?pillar=media")}
               className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
             >
               <Layers size={13} className="text-indigo-400" />
-              <span>المجلة والألبومات والمقالات المعتمدة</span>
+              <span>4. المركز الإعلامي (المجلات، الألبومات، المقالات)</span>
             </button>
             <button
               type="button"
-              onClick={() => navigate("/admin?pillar=system")}
+              onClick={() => navigate("/admin?pillar=community")}
               className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
             >
-              <ShieldCheck size={13} className="text-amber-400" />
-              <span>الهوية والمواسم الوطنية وفاحص الجودة</span>
+              <Sparkles size={13} className="text-violet-400" />
+              <span>5. الأسئلة الشائعة والشركاء</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin?pillar=channels")}
+              className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
+            >
+              <Globe size={13} className="text-cyan-400" />
+              <span>6. القنوات وبوابات الوزارة وروابط الفوتر</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin?pillar=alerts")}
+              className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition text-right cursor-pointer"
+            >
+              <ShieldCheck size={13} className="text-rose-400" />
+              <span>7. الإعلانات والمواسم ووضع الصيانة</span>
             </button>
           </div>
         )}

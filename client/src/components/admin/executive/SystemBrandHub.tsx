@@ -57,6 +57,7 @@ interface SystemBrandHubProps {
   orchestration: any;
   onSaveOrchestration: (updated: any) => Promise<void>;
   isSaving: boolean;
+  mode?: "channels" | "alerts" | "all";
 }
 
 export function SystemBrandHub({
@@ -64,8 +65,18 @@ export function SystemBrandHub({
   orchestration,
   onSaveOrchestration,
   isSaving,
+  mode = "all",
 }: SystemBrandHubProps) {
-  const [subTab, setSubTab] = useState<"header_footer" | "footer" | "popup" | "vacation" | "portals" | "emergency" | "marketing" | "seasons">("header_footer");
+  const defaultTab = mode === "alerts" ? "popup" : "header_footer";
+  const [subTab, setSubTab] = useState<"header_footer" | "footer" | "popup" | "vacation" | "portals" | "emergency" | "marketing" | "seasons">(defaultTab);
+
+  useEffect(() => {
+    if (mode === "alerts" && (subTab === "header_footer" || subTab === "portals" || subTab === "footer")) {
+      setSubTab("popup");
+    } else if (mode === "channels" && (subTab === "popup" || subTab === "emergency" || subTab === "vacation" || subTab === "seasons" || subTab === "marketing")) {
+      setSubTab("header_footer");
+    }
+  }, [mode]);
 
   // 1. Top Utility Bar Form (بوابة التوظيف وأرقام الاستقبال)
   const currentTopBar = orchestration?.topBar || {
@@ -328,110 +339,129 @@ export function SystemBrandHub({
       }`}>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-            <Sliders size={20} />
+            {mode === "channels" ? <Share2 size={20} /> : mode === "alerts" ? <Megaphone size={20} /> : <Sliders size={20} />}
           </div>
           <div>
-            <h2 className="text-base font-black">هوية المنظومة والتقنية والحوكمة</h2>
+            <h2 className="text-base font-black">
+              {mode === "channels"
+                ? "القنوات والربط الرقمي وبوابات الخدمات 📱🚪"
+                : mode === "alerts"
+                ? "الإعلانات والتنبيهات والمواسم الوطنية 📣🇸🇦"
+                : "هوية المنظومة والتقنية والحوكمة"}
+            </h2>
             <p className="text-xs text-slate-400 font-bold">
-              إدارة الهيدر والفوتر، بوابة التوظيف، شبكات التواصل الـ 10، بوابات المدارس، وبكسلات التسويق
+              {mode === "channels"
+                ? "إدارة شبكات التواصل الاجتماعي الـ 10، بوابات الأنظمة (مدرستي/نور)، وبطاقة وروابط الفوتر"
+                : mode === "alerts"
+                ? "إدارة النافذة الإعلانية المنبثقة، البانر العاجل، وضع العطلات، وثيمات المناسبات الوطنية"
+                : "إدارة الهيدر والفوتر، بوابة التوظيف، شبكات التواصل الـ 10، بوابات المدارس، وبكسلات التسويق"}
             </p>
           </div>
         </div>
 
-        {/* Sub-tab Pills */}
+        {/* Sub-tab Pills (Filtered by Mode) */}
         <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-black/5 dark:bg-white/5 border border-current/10">
-          <button
-            type="button"
-            onClick={() => setSubTab("header_footer")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-              subTab === "header_footer"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <span>الهيدر والتوظيف والسوشيال 📱</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("footer")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-              subTab === "footer"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <FileText size={13} />
-            <span>روابط وبطاقة الفوتر 📄</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("popup")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-              subTab === "popup"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <Megaphone size={13} />
-            <span>النافذة الإعلانية المنبثقة 📣</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("vacation")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-              subTab === "vacation"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <Palmtree size={13} />
-            <span>وضع العطلات والصيانة 🌴</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("portals")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-              subTab === "portals"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <Server size={13} />
-            <span>بوابات الأنظمة والخدمات ({portalsList.length}) 🚪</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("emergency")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-              subTab === "emergency"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            البانر العاجل 🚨
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("marketing")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-              subTab === "marketing"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            التسويق و SEO 📈
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("seasons")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-              subTab === "seasons"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            المواسم الوطنية 🇸🇦
-          </button>
+          {(mode === "channels" || mode === "all") && (
+            <>
+              <button
+                type="button"
+                onClick={() => setSubTab("header_footer")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                  subTab === "header_footer"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <span>شبكات التواصل والتوظيف 📱</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("portals")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                  subTab === "portals"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Server size={13} />
+                <span>بوابات الأنظمة ({portalsList.length}) 🚪</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("footer")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                  subTab === "footer"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <FileText size={13} />
+                <span>روابط وبطاقة الفوتر 📄</span>
+              </button>
+            </>
+          )}
+
+          {(mode === "alerts" || mode === "all") && (
+            <>
+              <button
+                type="button"
+                onClick={() => setSubTab("popup")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                  subTab === "popup"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Megaphone size={13} />
+                <span>النافذة الإعلانية المنبثقة 📣</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("emergency")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                  subTab === "emergency"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                البانر العاجل 🚨
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("vacation")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                  subTab === "vacation"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Palmtree size={13} />
+                <span>وضع العطلات والصيانة 🌴</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("seasons")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                  subTab === "seasons"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                المواسم الوطنية 🇸🇦
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab("marketing")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                  subTab === "marketing"
+                    ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                التسويق و SEO 📈
+              </button>
+            </>
+          )}
         </div>
       </div>
 

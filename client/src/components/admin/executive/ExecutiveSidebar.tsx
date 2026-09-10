@@ -1,18 +1,28 @@
 import React from "react";
 import {
-  Users,
   Globe,
   BookOpen,
-  Sliders,
   LogOut,
-  Sparkles,
   ChevronLeft,
   GraduationCap,
-  Layers,
-  ShieldAlert,
+  Calculator,
+  HelpCircle,
+  Share2,
+  Megaphone,
 } from "lucide-react";
 
-export type ExecutivePillar = "operations" | "content" | "publishing" | "system";
+export type ExecutivePillar =
+  | "admissions"
+  | "finance"
+  | "pages"
+  | "media"
+  | "community"
+  | "channels"
+  | "alerts"
+  | "operations"
+  | "content"
+  | "publishing"
+  | "system";
 
 interface ExecutiveSidebarProps {
   dark: boolean;
@@ -42,32 +52,50 @@ export function ExecutiveSidebar({
     badgeColor?: string;
   }> = [
     {
-      id: "operations",
-      title: "العمليات والقبول",
-      subtitle: "طلبات التسجيل وحاسبة الرسوم",
+      id: "admissions",
+      title: "1. القبول والتسجيل",
+      subtitle: "طلبات أولياء الأمور وواتساب",
       icon: GraduationCap,
       badge: pendingLeadsCount > 0 ? pendingLeadsCount : undefined,
       badgeColor: "bg-amber-500 text-black",
     },
     {
-      id: "content",
-      title: "محتوى صفحات الموقع",
+      id: "finance",
+      title: "2. الرسوم الدراسية",
+      subtitle: "مصفوفة الرسوم وحاسبة الأقساط",
+      icon: Calculator,
+    },
+    {
+      id: "pages",
+      title: "3. صفحات الموقع",
       subtitle: "الرئيسية · مدارسنا · الاعتمادات",
       icon: Globe,
     },
     {
-      id: "publishing",
-      title: "أجنحة النشر والمكتبة",
+      id: "media",
+      title: "4. المركز الإعلامي",
       subtitle: "المجلات · الألبومات · المقالات",
       icon: BookOpen,
       badge: pendingArticlesCount > 0 ? pendingArticlesCount : undefined,
       badgeColor: "bg-blue-500 text-white",
     },
     {
-      id: "system",
-      title: "الهوية والمنظومة",
-      subtitle: "الهيدر · البوابات · التسويق",
-      icon: Sliders,
+      id: "community",
+      title: "5. الأسئلة والشركاء",
+      subtitle: "بنك FAQs · شركاء النجاح",
+      icon: HelpCircle,
+    },
+    {
+      id: "channels",
+      title: "6. القنوات والربط",
+      subtitle: "السوشيال ميديا · البوابات · الفوتر",
+      icon: Share2,
+    },
+    {
+      id: "alerts",
+      title: "7. الإعلانات والمواسم",
+      subtitle: "النافذة المنبثقة · العطلات · اليوم الوطني",
+      icon: Megaphone,
     },
   ];
 
@@ -79,23 +107,28 @@ export function ExecutiveSidebar({
           : "border-black/[0.06] bg-slate-50/70 text-slate-900"
       }`}
     >
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Pillar Selection Rail */}
         <div>
           <p className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">
-            مراكز القيادة والمحاور الأربعة
+            مراكز الإدارة والتنظيم (7 أقسام تخصصية) 🏛️
           </p>
-          <nav className="space-y-1.5">
+          <nav className="space-y-1">
             {PILLARS.map((pillar) => {
               const Icon = pillar.icon;
-              const isActive = activePillar === pillar.id;
+              const isActive =
+                activePillar === pillar.id ||
+                (pillar.id === "admissions" && activePillar === "operations") ||
+                (pillar.id === "pages" && activePillar === "content") ||
+                (pillar.id === "media" && activePillar === "publishing") ||
+                (pillar.id === "channels" && activePillar === "system");
 
               return (
                 <button
                   key={pillar.id}
                   type="button"
                   onClick={() => setActivePillar(pillar.id)}
-                  className={`w-full group flex items-center justify-between rounded-2xl p-3 text-right transition-all duration-200 cursor-pointer ${
+                  className={`w-full group flex items-center justify-between rounded-2xl p-2.5 text-right transition-all duration-200 cursor-pointer ${
                     isActive
                       ? dark
                         ? "bg-gradient-to-r from-amber-500/15 via-white/[0.04] to-transparent text-white border border-amber-500/30 shadow-md shadow-amber-500/5"
@@ -105,9 +138,9 @@ export function ExecutiveSidebar({
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
                         isActive
                           ? dark
                             ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
@@ -117,20 +150,20 @@ export function ExecutiveSidebar({
                           : "bg-slate-200/60 text-slate-600 group-hover:text-slate-900"
                       }`}
                     >
-                      <Icon size={18} />
+                      <Icon size={16} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-black tracking-tight">{pillar.title}</h4>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="text-xs font-black tracking-tight truncate">{pillar.title}</h4>
                         {pillar.badge !== undefined && (
                           <span
-                            className={`rounded-full px-1.5 py-0.2 text-[9px] font-black ${pillar.badgeColor}`}
+                            className={`rounded-full px-1.5 py-0.2 text-[8px] font-black shrink-0 ${pillar.badgeColor}`}
                           >
                             {pillar.badge}
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-400 font-bold mt-0.5 line-clamp-1">
+                      <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
                         {pillar.subtitle}
                       </p>
                     </div>
@@ -138,7 +171,7 @@ export function ExecutiveSidebar({
 
                   <ChevronLeft
                     size={14}
-                    className={`transition-transform duration-200 ${
+                    className={`shrink-0 transition-transform duration-200 ${
                       isActive ? "text-amber-400 -translate-x-1" : "text-transparent group-hover:text-slate-400"
                     }`}
                   />

@@ -127,9 +127,9 @@ export function OperationsHub({
             <GraduationCap size={20} />
           </div>
           <div>
-            <h2 className="text-base font-black">مركز العمليات والقبول والتسجيل</h2>
+            <h2 className="text-base font-black">شؤون القبول والتسجيل (Admissions CRM) 📥</h2>
             <p className="text-xs text-slate-400 font-bold">
-              متابعة وفرز طلبات أولياء الأمور، إدارة مصفوفة الرسوم، وضوابط التسجيل
+              متابعة وفرز طلبات أولياء الأمور، التواصل الفوري عبر واتساب، وضوابط استقبال الطلبات
             </p>
           </div>
         </div>
@@ -147,17 +147,6 @@ export function OperationsHub({
           >
             <span>طلبات التسجيل الواردة 📥</span>
             <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[10px]">{leads.length}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubTab("fees")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-              subTab === "fees"
-                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            مصفوفة الرسوم والأقساط 💰
           </button>
           <button
             type="button"
