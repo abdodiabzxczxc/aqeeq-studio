@@ -3622,65 +3622,17 @@ function BackgroundSizingControls({ aspectLocked, autoArrange, onFit, onToggleAs
 export function VisualEditable({ id, htmlId, tag, label, defaultText, children, className = "", as: Tag = "div", onAction, onClick, title, style }: { id: string; htmlId?: string; tag: ElementTag; label: string; defaultText?: string; children?: ReactNode | ((text: string) => ReactNode); className?: string; as?: "article" | "div" | "span" | "small" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "button" | "section" | "footer" | "header" | "aside" | "nav"; onAction?: () => void; onClick?: () => void; title?: string; style?: React.CSSProperties }) {
   const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, updateTextContent, updateElementOverride, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
   const [, navigate] = useLocation();
-  const isInteractiveTransform = layerMode || Boolean(isStudioCanvasMode);
   const override = getOverride(id);
   const content = override?.contentText ?? defaultText ?? "";
   const selected = selectedIds.includes(id) || selectedId === id;
   const isLocked = override?.isLocked ?? false;
   const behavior = parseLayerBehavior(override?.customCss);
+  const isResizable = tag === "image" || tag === "video" || tag === "section" || tag === "section-block" || Boolean(behavior.isFloating);
+  const isInteractiveTransform = (layerMode || Boolean(isStudioCanvasMode)) && isResizable;
   const layerRef = useRef<HTMLElement | null>(null);
   const [isInView, setIsInView] = useState(!behavior.revealOnScroll);
   const [isInlineEditing, setIsInlineEditing] = useState(false);
   const isTextLike = tag === "text" || tag === "button" || ["h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "button"].includes(Tag);
-
-  const [spacingDrag, setSpacingDrag] = useState<{ isDragging: boolean; startY: number; startMargin: number; currentMargin: number } | null>(null);
-
-  const parseMarginBottom = (marginStr?: string | null): number => {
-    if (!marginStr) return 0;
-    const parts = marginStr.trim().split(/\s+/);
-    if (parts.length === 1) {
-      const val = parseInt(parts[0], 10);
-      return isNaN(val) ? 0 : val;
-    }
-    if (parts.length >= 3) {
-      const val = parseInt(parts[2], 10);
-      return isNaN(val) ? 0 : val;
-    }
-    return 0;
-  };
-
-  const startSpacingDrag = (e: React.PointerEvent<HTMLElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    const initialMargin = parseMarginBottom(override?.margin);
-    setSpacingDrag({
-      isDragging: true,
-      startY: e.clientY,
-      startMargin: initialMargin,
-      currentMargin: initialMargin,
-    });
-  };
-
-  const onSpacingPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    if (!spacingDrag?.isDragging) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const dy = e.clientY - spacingDrag.startY;
-    const newMargin = Math.max(0, Math.min(260, Math.round(spacingDrag.startMargin + dy)));
-    setSpacingDrag((prev) => prev ? { ...prev, currentMargin: newMargin } : null);
-  };
-
-  const endSpacingDrag = (e: React.PointerEvent<HTMLElement>) => {
-    if (!spacingDrag?.isDragging) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const finalMargin = spacingDrag.currentMargin;
-    setSpacingDrag(null);
-    const formattedMargin = `0px 0px ${finalMargin}px 0px`;
-    updateElementOverride?.(id, { margin: formattedMargin });
-    toast.success(`تم ضبط المسافة السفلية: ${finalMargin} بكسل`);
-  };
 
   const finishInlineEdit = () => {
     setIsInlineEditing(false);
@@ -3990,7 +3942,6 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       height: liveFrame.height ? `${liveFrame.height}px` : undefined,
       opacity: !behavior.isFloating && interaction.current?.mode === "move" ? 0.75 : undefined,
     } : {}),
-    ...(spacingDrag?.isDragging ? { marginBottom: `${spacingDrag.currentMargin}px` } : {}),
     ...(behavior.revealOnScroll && !isEditing && !isInView ? { opacity: 0 } : {}),
     ...(style?.position ? { position: style.position } : {}),
   };
@@ -4143,203 +4094,8 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       </div>
     ) : null}
     {isEditing && selected ? (
-      <div
-        data-aq-quick-actions
-        className="pointer-events-auto absolute -top-10 left-1/2 -translate-x-1/2 z-[86] flex items-center gap-1 rounded-xl border border-amber-400/40 bg-[#090d14]/95 px-2 py-1 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 select-none"
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <span className="text-[10px] font-black text-amber-300 px-1 border-l border-white/15 whitespace-nowrap">{label}</span>
-        {tag === "image" ? (
-          <>
-            <input
-              ref={canvasFileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handleCanvasFileUpload(file);
-                e.target.value = "";
-              }}
-            />
-            <button
-              type="button"
-              title="رفع صورة بديلة من جهازك"
-              onClick={() => canvasFileInputRef.current?.click()}
-              className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-2 py-0.5 text-[10px] font-black text-amber-950 hover:from-amber-300 hover:to-amber-400 transition cursor-pointer"
-            >
-              <Upload size={11} className="stroke-[3]" />
-              <span>استبدال</span>
-            </button>
-            <button
-              type="button"
-              title="تبديل استدارة الحواف (0px / 16px / دائرية)"
-              onClick={() => {
-                const current = override?.borderRadius || "0px";
-                const next = current === "0px" ? "16px" : current === "16px" ? "9999px" : "0px";
-                updateElementOverride?.(id, { borderRadius: next });
-                toast.success(`استدارة الحواف: ${next}`);
-              }}
-              className="flex items-center gap-1 rounded-lg bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-slate-200 hover:bg-white/20 transition cursor-pointer"
-            >
-              <span className="h-2 w-2 rounded-full border border-amber-300" />
-              <span>حواف</span>
-            </button>
-          </>
-        ) : null}
-        {isTextLike ? (
-          <>
-            <button
-              type="button"
-              title="كتابة مباشرة على الشاشة (انقر نقرتين)"
-              onClick={() => {
-                setIsInlineEditing(true);
-                setTimeout(() => layerRef.current?.focus(), 50);
-              }}
-              className="flex items-center gap-1 rounded-lg bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-200 hover:bg-amber-400/30 transition"
-            >
-              <Edit3 size={11} />
-              <span>اكتب</span>
-            </button>
-            <button
-              type="button"
-              title="تغليظ الخط (Bold)"
-              onClick={() => {
-                const isBold = (override?.customCss || "").includes("font-weight: 800") || (override?.customCss || "").includes("font-bold");
-                const cleanCss = (override?.customCss || "").replace(/font-weight:\s*\d+;?/g, "").trim();
-                const nextCss = `${cleanCss} font-weight: ${isBold ? "400" : "800"};`;
-                updateElementOverride?.(id, { customCss: nextCss });
-                toast.success(isBold ? "خط عادي" : "خط عريض (Bold)");
-              }}
-              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-black text-xs hover:bg-white/20 transition"
-            >
-              B
-            </button>
-            <button
-              type="button"
-              title="تكبير حجم الخط"
-              onClick={() => {
-                const currentSize = parseInt(override?.fontSize || "16", 10) || 16;
-                const nextSize = `${currentSize + 2}px`;
-                updateElementOverride?.(id, { fontSize: nextSize });
-              }}
-              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition"
-            >
-              A+
-            </button>
-            <button
-              type="button"
-              title="تصغير حجم الخط"
-              onClick={() => {
-                const currentSize = parseInt(override?.fontSize || "16", 10) || 16;
-                const nextSize = `${Math.max(10, currentSize - 2)}px`;
-                updateElementOverride?.(id, { fontSize: nextSize });
-              }}
-              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition"
-            >
-              A-
-            </button>
-            <div className="flex items-center gap-1 px-1 border-x border-white/15">
-              {[
-                { color: "#e5b84f", label: "ذهبي" },
-                { color: "#ffffff", label: "أبيض" },
-                { color: "#10b981", label: "زمردي" },
-                { color: "#38bdf8", label: "سماوي" },
-              ].map((c) => (
-                <button
-                  key={c.color}
-                  type="button"
-                  title={c.label}
-                  onClick={() => {
-                    updateElementOverride?.(id, { textColor: c.color });
-                    toast.success(`لون النص: ${c.label}`);
-                  }}
-                  className="h-3.5 w-3.5 rounded-full border border-white/30 hover:scale-125 transition"
-                  style={{ backgroundColor: c.color }}
-                />
-              ))}
-            </div>
-          </>
-        ) : null}
-        {(tag === "section" || tag === "section-block" || id.startsWith("section-")) ? (
-          <>
-            <button
-              type="button"
-              title="تحريك القسم للأعلى في ترتيب الصفحة"
-              onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "up" }, "*")}
-              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
-            >
-              <ArrowUp size={12} />
-            </button>
-            <button
-              type="button"
-              title="تحريك القسم للأسفل في ترتيب الصفحة"
-              onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "down" }, "*")}
-              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
-            >
-              <ArrowDown size={12} />
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              title="تحريك العنصر للأعلى في الهيكل وتبديل موضعه مع العنصر السابق"
-              onClick={() => moveSibling("up")}
-              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
-            >
-              <ArrowUp size={12} />
-            </button>
-            <button
-              type="button"
-              title="تحريك العنصر للأسفل في الهيكل وتبديل موضعه مع العنصر التالي"
-              onClick={() => moveSibling("down")}
-              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
-            >
-              <ArrowDown size={12} />
-            </button>
-          </>
-        )}
-        <button
-          type="button"
-          title={behavior.isFloating ? "تحويل إلى تدفق متجاوب ذكي (Smart Flow)" : "تحويل إلى عنصر عائم حر (Floating Pin)"}
-          onClick={() => {
-            const nextFloating = !behavior.isFloating;
-            const nextCss = serializeLayerBehavior(override?.customCss || "", { isFloating: nextFloating });
-            updateElementOverride?.(id, { customCss: nextCss, layerX: 0, layerY: 0 });
-            toast.success(nextFloating ? "تم تفعيل التموضع الحر (Floating Pin)" : "تمت العودة للتدفق المتجاوب الذكي (Smart Flow)");
-          }}
-          className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-bold transition ${
-            behavior.isFloating
-              ? "bg-amber-400 text-amber-950 font-black shadow-lg"
-              : "text-slate-300 hover:bg-white/10 hover:text-white"
-          }`}
-        >
-          <Pin size={11} className={behavior.isFloating ? "rotate-45" : ""} />
-          <span>{behavior.isFloating ? "عائم حر" : "متجاوب"}</span>
-        </button>
-        <button
-          type="button"
-          title="تكرار العنصر كمسودة"
-          onClick={() => duplicateSelected?.()}
-          className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
-        >
-          <Copy size={12} />
-        </button>
-        <button
-          type="button"
-          title="حذف العنصر"
-          onClick={() => deleteLayer?.(id, label)}
-          className="grid h-6 w-6 place-items-center rounded-lg text-red-400 hover:bg-red-500/20 hover:text-red-300 transition"
-        >
-          <Trash2 size={12} />
-        </button>
-      </div>
-    ) : null}
-    {isEditing && selected ? (
-      <span className="pointer-events-none absolute -top-6 right-0 z-[85] inline-flex items-center gap-1 rounded-md bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 shadow-md">
-        {isLocked ? <Lock size={10} /> : null}{label}
+      <span className="pointer-events-none absolute -top-5 right-0 z-[85] inline-flex items-center gap-1 rounded-t-md bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 shadow-sm leading-none select-none">
+        {isLocked ? <Lock size={9} /> : null}{label}
       </span>
     ) : null}
     {isEditing && isInteractiveTransform && selected ? <span className="pointer-events-none absolute -bottom-6 right-0 z-[82] rounded-lg bg-[#08467d] px-2 py-1 text-[10px] font-black text-white shadow-lg">X {Math.round(inspectorFrame.x)} · Y {Math.round(inspectorFrame.y)} · {inspectorFrame.width ? `${Math.round(inspectorFrame.width)}×${Math.round(inspectorFrame.height ?? 0)}` : "حجم تلقائي"}</span> : null}
@@ -4362,37 +4118,6 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         { handle: "s" as const, label: "قص القسم من الأسفل مع التصاق القسم التالي", className: "-bottom-2 left-1/2 -translate-x-1/2 cursor-ns-resize" },
       ] : []),
     ] as const).map(({ handle, label: handleLabel, className: handleClass }) => <button key={handle} type="button" aria-label={handleLabel} title={handleLabel} onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize", handle); }} className={`absolute z-[83] grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-[#08467d] shadow-[0_0_0_3px_rgba(7,9,13,.45)] ${handleClass}`}><span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14]" /></button>) : null}
-    {/* Visual Spacing Handle & Live Sculpting Guide */}
-    {spacingDrag?.isDragging && (
-      <div
-        style={{ height: `${spacingDrag.currentMargin}px` }}
-        className="pointer-events-none absolute top-full left-0 right-0 z-[84] bg-amber-400/20 border-x border-b border-dashed border-amber-400/70 flex items-center justify-center animate-in fade-in duration-100"
-      >
-        <span className="rounded-full bg-black/90 px-2.5 py-0.5 text-[10px] font-mono font-black text-amber-300 shadow-xl border border-amber-400/50">
-          ↕ {spacingDrag.currentMargin}px هامش
-        </span>
-      </div>
-    )}
-    {isEditing && selected && !isLocked && !isInlineEditing && (
-      <div
-        data-aq-spacing-handle
-        onPointerDown={startSpacingDrag}
-        onPointerMove={onSpacingPointerMove}
-        onPointerUp={endSpacingDrag}
-        onPointerCancel={endSpacingDrag}
-        className="pointer-events-auto absolute -bottom-3 left-1/2 -translate-x-1/2 z-[85] cursor-ns-resize select-none touch-none group/spacing"
-        title="اسحب بالماوس لضبط وتوسيع المسافة السفلية (Margin Bottom)"
-      >
-        <div className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-black shadow-xl backdrop-blur-md transition ${
-          spacingDrag?.isDragging
-            ? "border-amber-400 bg-amber-400 text-amber-950 scale-110 ring-2 ring-amber-400/50"
-            : "border-amber-400/50 bg-[#090d14]/95 text-amber-300 hover:bg-amber-400 hover:text-amber-950 hover:scale-105"
-        }`}>
-          <ArrowUpDown size={10} />
-          <span>{spacingDrag?.isDragging ? `${spacingDrag.currentMargin}px` : "مسافة ↕"}</span>
-        </div>
-      </div>
-    )}
     {typeof children === "function" ? children(content) : children ?? content}
   </Tag>;
 }
