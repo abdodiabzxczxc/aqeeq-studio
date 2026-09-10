@@ -32,6 +32,8 @@ import { useLocation } from "wouter";
 
 export type AudioTrackType = "song" | "podcast" | "video" | "reader";
 
+export const SEEK_SECONDS = 15;
+
 export type ReaderAudioTrack = {
   id: string | number;
   title: string;
@@ -1378,15 +1380,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        skipTime(15);
+                        skipTime(SEEK_SECONDS);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
-                      title="تقديم 15 ثانية ⏩"
+                      title={`تقديم ${SEEK_SECONDS} ثانية ⏩`}
                     >
                       <RotateCw size={14} />
-                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">{SEEK_SECONDS}</span>
                     </button>
 
                     {/* VIDEO: Play / Pause Button in Cyan to Indigo Gradient */}
@@ -1407,15 +1409,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        skipTime(-15);
+                        skipTime(-SEEK_SECONDS);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
-                      title="تأخير 15 ثانية ⏪"
+                      title={`تأخير ${SEEK_SECONDS} ثانية ⏪`}
                     >
                       <RotateCcw size={14} />
-                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">{SEEK_SECONDS}</span>
                     </button>
 
                     {/* VIDEO: Prev Video Track */}
@@ -1440,15 +1442,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        skipTime(15);
+                        skipTime(SEEK_SECONDS);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
-                      title="تقديم 15 ثانية ⏩"
+                      title={`تقديم ${SEEK_SECONDS} ثانية ⏩`}
                     >
                       <RotateCw size={14} />
-                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">{SEEK_SECONDS}</span>
                     </button>
 
                     {/* PODCAST: Play / Pause Button in Studio Indigo */}
@@ -1470,15 +1472,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        skipTime(-15);
+                        skipTime(-SEEK_SECONDS);
                       }}
                       className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
-                      title="تأخير 15 ثانية ⏪"
+                      title={`تأخير ${SEEK_SECONDS} ثانية ⏪`}
                     >
                       <RotateCcw size={14} />
-                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">{SEEK_SECONDS}</span>
                     </button>
                   </>
                 ) : (
