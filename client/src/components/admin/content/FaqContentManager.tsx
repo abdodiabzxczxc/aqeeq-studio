@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Eye, EyeOff, ArrowUp, ArrowDown, HelpCircle, Save, CheckCircle2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,12 @@ export function FaqContentManager({
   const [faqs, setFaqs] = useState<FaqItem[]>(
     orchestration?.faqs && orchestration.faqs.length > 0 ? orchestration.faqs : DEFAULT_FAQS
   );
+
+  useEffect(() => {
+    if (orchestration?.faqs && Array.isArray(orchestration.faqs) && orchestration.faqs.length > 0) {
+      setFaqs(orchestration.faqs);
+    }
+  }, [orchestration?.faqs]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");

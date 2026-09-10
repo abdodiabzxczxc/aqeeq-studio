@@ -672,7 +672,10 @@ export type SiteOrchestrationConfig = {
     telegramUrl?: string | null;
     telegramEnabled?: boolean;
     whatsappNumber?: string | null;
+    whatsappUrl?: string | null;
     whatsappEnabled?: boolean;
+    phoneUrl?: string | null;
+    phoneEnabled?: boolean;
   };
   topBar?: {
     enabled?: boolean;
@@ -1032,7 +1035,10 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     snapchatUrl: "https://snapchat.com/add/alaqeeq_schools",
     snapchatEnabled: true,
     whatsappNumber: "966531896000",
+    whatsappUrl: "https://wa.me/966531896000",
     whatsappEnabled: true,
+    phoneUrl: "tel:+966531896000",
+    phoneEnabled: true,
     tiktokUrl: "",
     tiktokEnabled: false,
     facebookUrl: "",

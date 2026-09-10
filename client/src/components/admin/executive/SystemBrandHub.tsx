@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Sliders,
   Share2,
@@ -216,6 +216,47 @@ export function SystemBrandHub({
     { id: "ramadan", name: "شهر رمضان المبارك 🌙", desc: "ثيم الشهر الفضيل، أوقات الدوام، والتهاني" },
     { id: "exams", name: "موسم الاختبارات النهائية 📝", desc: "أدعية التوفيق ونصائح وإرشادات اللجان" },
   ];
+
+  // Synchronize form states when orchestration prop updates
+  useEffect(() => {
+    if (orchestration) {
+      if (orchestration.topBar) setTopBarForm(orchestration.topBar);
+      if (orchestration.nav) setNavForm(orchestration.nav);
+      if (orchestration.social) {
+        setSocialForm({
+          xUrl: orchestration.social.xUrl || "",
+          xEnabled: orchestration.social.xEnabled !== false,
+          instagramUrl: orchestration.social.instagramUrl || "",
+          instagramEnabled: orchestration.social.instagramEnabled !== false,
+          youtubeUrl: orchestration.social.youtubeUrl || "",
+          youtubeEnabled: orchestration.social.youtubeEnabled !== false,
+          snapchatUrl: orchestration.social.snapchatUrl || "",
+          snapchatEnabled: orchestration.social.snapchatEnabled !== false,
+          tiktokUrl: orchestration.social.tiktokUrl || "",
+          tiktokEnabled: orchestration.social.tiktokEnabled !== false,
+          facebookUrl: orchestration.social.facebookUrl || "",
+          facebookEnabled: orchestration.social.facebookEnabled !== false,
+          linkedinUrl: orchestration.social.linkedinUrl || "",
+          linkedinEnabled: orchestration.social.linkedinEnabled !== false,
+          telegramUrl: orchestration.social.telegramUrl || "",
+          telegramEnabled: orchestration.social.telegramEnabled !== false,
+          whatsappUrl: orchestration.social.whatsappUrl || "",
+          whatsappEnabled: orchestration.social.whatsappEnabled !== false,
+          phoneUrl: orchestration.social.phoneUrl || "",
+          phoneEnabled: orchestration.social.phoneEnabled !== false,
+        });
+      }
+      if (orchestration.systemPortals && orchestration.systemPortals.length > 0) {
+        setPortalsList(orchestration.systemPortals);
+      }
+      if (orchestration.emergencyBanner) setBannerForm(orchestration.emergencyBanner);
+      if (orchestration.marketingPixels) setPixelsForm(orchestration.marketingPixels);
+      if (orchestration.theme?.season) setSelectedSeason(orchestration.theme.season);
+      if (orchestration.footer) setFooterForm((prev: any) => ({ ...prev, ...orchestration.footer }));
+      if (orchestration.eventModal) setEventModalForm((prev: any) => ({ ...prev, ...orchestration.eventModal }));
+      if (orchestration.vacationMode) setVacationForm((prev: any) => ({ ...prev, ...orchestration.vacationMode }));
+    }
+  }, [orchestration]);
 
   // Portals Helper Functions
   const handleTogglePortalVisibility = (id: string) => {
@@ -533,9 +574,20 @@ export function SystemBrandHub({
                   تظهر في الترويسة والفوتر وشريط الاتصال السريع، وتغذي شارات التواصل بالموقع
                 </p>
               </div>
-              <span className="text-xs font-black text-amber-400 bg-amber-400/10 px-3 py-1 rounded-xl border border-amber-400/20">
-                10 قنوات كاملة
-              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    await onSaveOrchestration({ social: socialForm });
+                    toast.success("تم حفظ روابط وقنوات التواصل الاجتماعي الـ 10 بنجاح 💾");
+                  }}
+                  disabled={isSaving}
+                  className="rounded-xl font-black text-xs px-5 bg-amber-500 hover:bg-amber-400 text-black gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Save size={13} />
+                  <span>{isSaving ? "جاري الحفظ..." : "حفظ شبكات التواصل 💾"}</span>
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -581,6 +633,21 @@ export function SystemBrandHub({
                   </div>
                 );
               })}
+            </div>
+
+            <div className="pt-3 border-t border-current/10 flex justify-end">
+              <Button
+                type="button"
+                onClick={async () => {
+                  await onSaveOrchestration({ social: socialForm });
+                  toast.success("تم حفظ روابط وقنوات التواصل الاجتماعي الـ 10 بنجاح 💾");
+                }}
+                disabled={isSaving}
+                className="rounded-xl font-black text-xs px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer shadow-lg"
+              >
+                <Save size={14} />
+                <span>{isSaving ? "جاري الحفظ..." : "حفظ وتفعيل شبكات التواصل الـ 10 💾"}</span>
+              </Button>
             </div>
           </div>
         </div>

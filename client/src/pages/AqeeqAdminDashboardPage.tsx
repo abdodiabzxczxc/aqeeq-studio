@@ -549,6 +549,10 @@ const DEFAULT_ORCHESTRATION = {
       }
     ]
   },
+  faqs: [],
+  partners: [],
+  eventModal: { enabled: false, title: "", subtitle: "", badge: "", imageUrl: "", ctaText: "", ctaUrl: "" },
+  vacationMode: { enabled: false, title: "", message: "", type: "vacation" as const, linkText: "", linkUrl: "" },
   accreditationsConfig: {
     cogniaScore: "99.2%",
     cogniaValidUntil: "2028",
@@ -801,6 +805,10 @@ export default function AqeeqAdminDashboardPage() {
         schoolMetrics: (orchestrationData as any).schoolMetrics || DEFAULT_ORCHESTRATION.schoolMetrics,
         aboutPageConfig: (orchestrationData as any).aboutPageConfig || DEFAULT_ORCHESTRATION.aboutPageConfig,
         accreditationsConfig: (orchestrationData as any).accreditationsConfig || DEFAULT_ORCHESTRATION.accreditationsConfig,
+        faqs: (orchestrationData as any).faqs || [],
+        partners: (orchestrationData as any).partners || [],
+        eventModal: (orchestrationData as any).eventModal || {},
+        vacationMode: (orchestrationData as any).vacationMode || {},
       });
     }
   }, [orchestrationData]);

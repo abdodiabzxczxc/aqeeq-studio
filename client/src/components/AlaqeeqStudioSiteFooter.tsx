@@ -16,6 +16,7 @@ import {
   Facebook,
   Youtube,
   Linkedin,
+  PhoneCall,
 } from "lucide-react";
 
 function SnapchatIcon({ size = 14, className = "" }: { size?: number; className?: string }) {
@@ -58,6 +59,9 @@ export function AlaqeeqStudioSiteFooter() {
   const whatsappUrl = `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
     "السلام عليكم ورحمة الله، أود الاستفسار بخصوص مدارس العقيق."
   )}`;
+
+  const rawPhone = (orchestration?.social as any)?.phoneUrl || orchestration?.topBar?.phone || "+966531896000";
+  const cleanPhone = rawPhone.replace(/[^0-9]/g, "");
 
   // Helper to determine if a social media channel is enabled and visible
   const isSocialVisible = (key: string, url?: string | null) => {
@@ -537,6 +541,20 @@ export function AlaqeeqStudioSiteFooter() {
                   title="واتساب مدارس العقيق"
                 >
                   <MessageCircle size={15} />
+                </a>
+              )}
+
+              {isSocialVisible("phone", (orchestration?.social as any)?.phoneUrl || orchestration?.topBar?.phoneUrl) && (
+                <a
+                  href={(orchestration?.social as any)?.phoneUrl || orchestration?.topBar?.phoneUrl || `tel:${cleanPhone}`}
+                  className={`grid h-9 w-9 min-h-[36px] min-w-[36px] place-items-center rounded-full border text-xs transition hover:scale-110 active:scale-95 ${
+                    dark
+                      ? "border-amber-400/30 bg-amber-400/10 text-amber-400 hover:bg-amber-400/20"
+                      : "border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 shadow-sm"
+                  }`}
+                  title="الاتصال المباشر"
+                >
+                  <PhoneCall size={15} />
                 </a>
               )}
             </div>
