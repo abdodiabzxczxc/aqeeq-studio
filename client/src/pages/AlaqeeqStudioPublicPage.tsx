@@ -241,7 +241,7 @@ type StoryItem = {
   category: string;
   imageUrl?: string | null;
   time: string;
-  sourceType: "journal" | "album" | "post" | "x" | "instagram" | "youtube" | "article" | "showcase" | "podcast";
+  sourceType: "journal" | "album" | "post" | "x" | "instagram" | "youtube" | "article" | "showcase" | "podcast" | "custom";
   targetUrl: string;
   buttonLabel: string;
   youtubeId?: string | null;
@@ -682,6 +682,26 @@ export default function AlaqeeqStudioPublicPage() {
         isPinned,
         timestamp: ts,
       });
+    }
+
+    // 7. Custom Direct Site Stories (from Site Content Engine)
+    if (orchestration?.siteStories && Array.isArray(orchestration.siteStories)) {
+      for (const cs of orchestration.siteStories) {
+        if (!cs.active) continue;
+        if (hiddenSet.has(cs.id)) continue;
+        items.push({
+          id: cs.id,
+          title: cs.title,
+          category: cs.category || "إعلان هام 📢",
+          imageUrl: directDriveImage(cs.imageUrl) || cs.imageUrl || null,
+          time: "الآن",
+          sourceType: "custom",
+          targetUrl: cs.targetUrl || "/admissions",
+          buttonLabel: cs.buttonLabel || "عرض التفاصيل",
+          isPinned: cs.isPinned ?? true,
+          timestamp: cs.isPinned ? Date.now() + 100000000 : (new Date(cs.createdAt || 0).getTime() || Date.now()),
+        });
+      }
     }
 
     // Sort: Pinned first, then newest timestamp first

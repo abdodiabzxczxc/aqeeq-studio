@@ -97,6 +97,15 @@ export function AqeeqHomeBentoGrid({
     select: (data) => data[0]
   });
 
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    staleTime: 60000,
+  });
+
+  const isAlbumEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "albums")?.enabled !== false;
+  const isJournalEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "journal")?.enabled !== false;
+  const isPodcastEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "podcast")?.enabled !== false;
+  const isArticleEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "articles")?.enabled !== false;
+
   return (
     <div ref={sectionRef} className="relative w-full">
       <VisualEditable
@@ -171,7 +180,7 @@ export function AqeeqHomeBentoGrid({
           {/* ========================================================================= */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-7">
             {/* 📸 CARD 1: ALBUM HERO CARD WITH 3D FLOATING POLAROID SPILL */}
-            {latestAlbum && (
+            {latestAlbum && isAlbumEnabled && (
               <motion.div
                 ref={c1.ref}
                 onMouseMove={(e) => { if (isDesktop) { c1.onMove(e); setIsAlbumHovered(true); } }}
@@ -287,10 +296,10 @@ export function AqeeqHomeBentoGrid({
             )}
 
             {/* CARDS 2, 3, 4 */}
-            {(latestIssue || latestPodcast || latestArticle) && (
+            {((latestIssue && isJournalEnabled) || (latestPodcast && isPodcastEnabled) || (latestArticle && isArticleEnabled)) && (
               <div className="grid grid-cols-1 sm:grid-cols-3 md:contents gap-5 sm:gap-7">
                 {/* 📖 CARD 2: LATEST JOURNAL WITH 3D UNFOLDING MAGAZINE COVER */}
-                {latestIssue && (
+                {latestIssue && isJournalEnabled && (
                   <motion.div
                     ref={c2.ref}
                     onMouseMove={(e) => { if (isDesktop) { c2.onMove(e); setIsJournalHovered(true); } }}
@@ -375,7 +384,7 @@ export function AqeeqHomeBentoGrid({
                 )}
 
                 {/* 🎙️ CARD 3: LATEST PODCAST WITH 3D SPINNING VINYL RECORD SLIDE-OUT */}
-                {latestPodcast && (
+                {latestPodcast && isPodcastEnabled && (
                   <motion.div
                     ref={c3.ref}
                     onMouseMove={(e) => { if (isDesktop) { c3.onMove(e); setIsPodcastHovered(true); } }}
@@ -476,7 +485,7 @@ export function AqeeqHomeBentoGrid({
                 )}
 
                 {/* ✍️ CARD 4: LATEST ARTICLE WITH KINETIC READING BADGE */}
-                {latestArticle && (
+                {latestArticle && isArticleEnabled && (
                   <motion.div
                     ref={c4.ref}
                     onMouseMove={(e) => { if (isDesktop) { c4.onMove(e); setIsArticleHovered(true); } }}

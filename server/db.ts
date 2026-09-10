@@ -813,6 +813,71 @@ export type SiteOrchestrationConfig = {
     }>;
   };
   systemPortals?: SystemPortalItem[];
+  siteStories?: Array<{
+    id: string;
+    title: string;
+    category?: string;
+    imageUrl: string;
+    targetUrl?: string;
+    buttonLabel?: string;
+    active: boolean;
+    isPinned?: boolean;
+    createdAt?: string;
+    expiresAt?: number | null;
+  }>;
+  bentoCards?: Array<{
+    id: string;
+    title: string;
+    subtitle: string;
+    badge: string;
+    route: string;
+    enabled: boolean;
+  }>;
+  schoolMetrics?: {
+    studentsCount: number;
+    teachersCount: number;
+    successRate: number;
+    graduatesCount: number;
+    campusesCount: number;
+    experienceYears: number;
+  };
+  aboutPageConfig?: {
+    statYears: string;
+    statCampuses: string;
+    statAccreditation: string;
+    statGrades: string;
+    visionTitle: string;
+    visionText: string;
+    missionTitle: string;
+    missionText: string;
+    leadership: Array<{
+      id: string;
+      name: string;
+      role: string;
+      speech: string;
+      photoUrl?: string;
+    }>;
+  };
+  accreditationsConfig?: {
+    cogniaScore: string;
+    cogniaValidUntil: string;
+    ieltsVenueCode: string;
+    satCenterCode: string;
+    accreditationsList: Array<{
+      id: string;
+      title: string;
+      org: string;
+      badge: string;
+      desc: string;
+    }>;
+    awardsList: Array<{
+      id: string;
+      title: string;
+      rank: string;
+      year: string;
+      awardingBody: string;
+    }>;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -1036,6 +1101,134 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
     ],
   },
   systemPortals: DEFAULT_SYSTEM_PORTALS,
+  siteStories: [
+    {
+      id: "story-welcome-2026",
+      title: "فتح باب القبول والتسجيل للعام الدراسي الجديد",
+      category: "إعلان هام 📢",
+      imageUrl: "/covers/cover-admissions.jpg",
+      targetUrl: "/admissions",
+      buttonLabel: "سجّل مقعدك الآن",
+      active: true,
+      isPinned: true,
+    },
+    {
+      id: "story-stem-robotics",
+      title: "أبطال العقيق في أولمبياد الروبوت WRO",
+      category: "إنجاز عالمي 🌐",
+      imageUrl: "/covers/student-robotics-accreditations.jpg",
+      targetUrl: "/accreditations",
+      buttonLabel: "تفاصيل الإنجاز",
+      active: true,
+      isPinned: false,
+    },
+  ],
+  bentoCards: [
+    {
+      id: "albums",
+      title: "ألبوم فعاليات العقيق",
+      subtitle: "أكثر من 500 صورة موثقة للأنشطة والمسيرات",
+      badge: "توثيق حي 📸",
+      route: "/albums",
+      enabled: true,
+    },
+    {
+      id: "journal",
+      title: "مجلة العقيق الدورية 3D",
+      subtitle: "تصفح الأعداد الدورية بتقنية التقليب ثلاثي الأبعاد",
+      badge: "العدد الدوري 📖",
+      route: "/journal",
+      enabled: true,
+    },
+    {
+      id: "podcast",
+      title: "أثير العقيق الصوتي",
+      subtitle: "حوارات تربوية ملهمة وتجارب طلابية رائدة",
+      badge: "بودكاست 🎙️",
+      route: "/podcast",
+      enabled: true,
+    },
+    {
+      id: "articles",
+      title: "مقالات ومدونة العقيق",
+      subtitle: "كتابات إثرائية وفكرية بأقلام المعلمين والطلاب",
+      badge: "مدونة ✍️",
+      route: "/articles",
+      enabled: true,
+    },
+  ],
+  schoolMetrics: {
+    studentsCount: 1500,
+    teachersCount: 180,
+    successRate: 100,
+    graduatesCount: 8500,
+    campusesCount: 2,
+    experienceYears: 30,
+  },
+  aboutPageConfig: {
+    statYears: "منذ 1994",
+    statCampuses: "مجمعين للبنين والبنات",
+    statAccreditation: "Cognia أمريكي",
+    statGrades: "KG - 12 كافة المراحل",
+    visionTitle: "رؤيتنا 2030",
+    visionText: "الريادة في تقديم تعليم استثنائي يجمع بين أصالة القيم والتقنيات الرقمية المتقدمة لبناء جيل يقود المستقبل.",
+    missionTitle: "رسالتنا التربوية",
+    missionText: "توفير بيئة تعليمية محفزة ومبتكرة تُمكّن الطالب من استكشاف شغفه وصقل مهاراته الأكاديمية والقيادية بأعلى المعايير العالمية.",
+    leadership: [
+      {
+        id: "leader-1",
+        name: "أ. عبد الله الساعدي",
+        role: "المشرف العام على مدارس العقيق",
+        speech: "نؤمن في مدارس العقيق بأن التعليم ليس مجرد تلقين، بل صناعة هوية وبناء جيل ملهم يقود المستقبل بالمعرفة والقيم.",
+        photoUrl: "/covers/cover-about.jpg",
+      },
+    ],
+  },
+  accreditationsConfig: {
+    cogniaScore: "99.2%",
+    cogniaValidUntil: "2028",
+    ieltsVenueCode: "IDP Venue Madinah",
+    satCenterCode: "#68412",
+    accreditationsList: [
+      {
+        id: "acc-cognia",
+        title: "اعتماد كوجنيا الأمريكية Cognia",
+        org: "Cognia Global Commission - USA",
+        badge: "تقييم امتياز 99.2%",
+        desc: "أعلى اعتماد أمريكي لجودة التعليم ومخرجات المناهج الدولية المعتمدة عالمياً.",
+      },
+      {
+        id: "acc-ielts",
+        title: "مركز اختبارات آيلتس IELTS المعتمد",
+        org: "IDP Education Australia",
+        badge: "مقر رسمي وحاسوبي",
+        desc: "المركز الرسمي المعتمد بالمدينة المنورة لإجراء اختبارات IELTS الحاسوبية والورقية.",
+      },
+      {
+        id: "acc-sat",
+        title: "مركز اختبارات السات SAT و ACT",
+        org: "College Board USA",
+        badge: "كود رسمي #68412",
+        desc: "مركز معتمد لاختبارات القبول الجامعي الدولي والمسارات الأكاديمية الأمريكية.",
+      },
+    ],
+    awardsList: [
+      {
+        id: "award-fll",
+        title: "كأس بطولة فيرست ليجو للروبوت بالمملكة",
+        rank: "المركز الأول وبطل المملكة 🥇",
+        year: "2025 - 2026",
+        awardingBody: "الاتحاد السعودي للأمن السيبراني والبرمجة والروبوت",
+      },
+      {
+        id: "award-wro",
+        title: "أولمبياد الروبوت العالمي WRO",
+        rank: "المركز الخامس على مستوى العالم 🌐",
+        year: "2024",
+        awardingBody: "World Robot Olympiad International",
+      },
+    ],
+  },
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -1073,6 +1266,11 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           schoolCampuses: { ...DEFAULT_SITE_ORCHESTRATION.schoolCampuses, ...(parsed.schoolCampuses || {}) },
           admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
           marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
+          siteStories: Array.isArray(parsed.siteStories) && parsed.siteStories.length > 0 ? parsed.siteStories : DEFAULT_SITE_ORCHESTRATION.siteStories,
+          bentoCards: Array.isArray(parsed.bentoCards) && parsed.bentoCards.length > 0 ? parsed.bentoCards : DEFAULT_SITE_ORCHESTRATION.bentoCards,
+          schoolMetrics: { ...DEFAULT_SITE_ORCHESTRATION.schoolMetrics, ...(parsed.schoolMetrics || {}) },
+          aboutPageConfig: { ...DEFAULT_SITE_ORCHESTRATION.aboutPageConfig, ...(parsed.aboutPageConfig || {}) },
+          accreditationsConfig: { ...DEFAULT_SITE_ORCHESTRATION.accreditationsConfig, ...(parsed.accreditationsConfig || {}) },
           systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
         };
       }
@@ -1107,6 +1305,11 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         admissionsSettings: { ...DEFAULT_SITE_ORCHESTRATION.admissionsSettings, ...(parsed.admissionsSettings || {}) },
         marketingPixels: { ...DEFAULT_SITE_ORCHESTRATION.marketingPixels, ...(parsed.marketingPixels || {}) },
         interactiveFx: { ...DEFAULT_SITE_ORCHESTRATION.interactiveFx, ...(parsed.interactiveFx || {}) },
+        siteStories: Array.isArray(parsed.siteStories) && parsed.siteStories.length > 0 ? parsed.siteStories : DEFAULT_SITE_ORCHESTRATION.siteStories,
+        bentoCards: Array.isArray(parsed.bentoCards) && parsed.bentoCards.length > 0 ? parsed.bentoCards : DEFAULT_SITE_ORCHESTRATION.bentoCards,
+        schoolMetrics: { ...DEFAULT_SITE_ORCHESTRATION.schoolMetrics, ...(parsed.schoolMetrics || {}) },
+        aboutPageConfig: { ...DEFAULT_SITE_ORCHESTRATION.aboutPageConfig, ...(parsed.aboutPageConfig || {}) },
+        accreditationsConfig: { ...DEFAULT_SITE_ORCHESTRATION.accreditationsConfig, ...(parsed.accreditationsConfig || {}) },
         systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
       };
     }

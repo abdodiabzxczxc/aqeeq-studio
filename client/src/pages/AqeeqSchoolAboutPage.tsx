@@ -246,19 +246,27 @@ export default function AqeeqSchoolAboutPage() {
                   }`}
                 >
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>منذ 1994</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                      {(orchestration as any)?.aboutPageConfig?.statYears || "منذ 1994"}
+                    </span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>+30 عاماً من الريادة</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>مجمعين</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                      {(orchestration as any)?.aboutPageConfig?.statCampuses || "مجمعين"}
+                    </span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>للبنين والبنات</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>Cognia</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
+                      {(orchestration as any)?.aboutPageConfig?.statAccreditation || "Cognia"}
+                    </span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>KG - 12</span>
+                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                      {(orchestration as any)?.aboutPageConfig?.statGrades || "KG - 12"}
+                    </span>
                     <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>كافة المراحل</span>
                   </div>
                 </div>

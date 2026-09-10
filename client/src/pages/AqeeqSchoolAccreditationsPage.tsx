@@ -372,7 +372,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                         </div>
                         <div className="text-right">
                           <h4 className={`text-[10px] sm:text-xs font-black truncate ${dark ? "text-white" : "text-[#08467d]"}`}>كوجنيا الأمريكية</h4>
-                          <span className={`text-[9px] sm:text-[10px] font-mono font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>SCORE: 99.2%</span>
+                          <span className={`text-[9px] sm:text-[10px] font-mono font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                            SCORE: {(orchestration as any)?.accreditationsConfig?.cogniaScore || "99.2%"}
+                          </span>
                         </div>
                       </div>
                       <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-black border ${
@@ -395,7 +397,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                             ? "bg-black/60 border-[#f8ca14]/30"
                             : "bg-[#08467d]/[0.04] border-[#08467d]/15 shadow-sm"
                         }`}>
-                          <span className="block text-sm sm:text-base font-black text-[#f8ca14]">99.2%</span>
+                          <span className="block text-sm sm:text-base font-black text-[#f8ca14]">
+                            {(orchestration as any)?.accreditationsConfig?.cogniaScore || "99.2%"}
+                          </span>
                           <span className={`block text-[8px] sm:text-[9px] font-bold mt-0.5 ${dark ? "text-slate-400" : "text-[#08467d]"}`}>كفاءة الأكاديميا</span>
                         </div>
                         <div className={`p-1.5 rounded-xl border text-center transition ${

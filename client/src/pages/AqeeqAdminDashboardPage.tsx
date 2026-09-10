@@ -91,6 +91,10 @@ import { renderPortalIcon } from "@/components/PortalIconRenderer";
 import { AqeeqAdminCommandPalette } from "@/components/AqeeqAdminCommandPalette";
 import { DEFAULT_WELLINGTON_HOVER_ITEMS } from "@/components/AqeeqInteractiveFxModal";
 import { BackdropsManager } from "@/components/BackdropsManager";
+import { HomepageContentManager } from "@/components/admin/content/HomepageContentManager";
+import { AboutPageContentManager } from "@/components/admin/content/AboutPageContentManager";
+import { AccreditationsContentManager } from "@/components/admin/content/AccreditationsContentManager";
+import { TuitionFeesContentManager } from "@/components/admin/content/TuitionFeesContentManager";
 
 import {
   Dialog,
@@ -109,7 +113,7 @@ function directDriveImage(url: string | null | undefined) {
 
 export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system";
 export type AdmissionsSubTab = "inbox" | "fees" | "settings";
-export type ContentSubTab = "master" | "articles" | "backdrops";
+export type ContentSubTab = "pages_content" | "master" | "articles" | "backdrops";
 export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
 export type SystemSubTab = "pages" | "portals" | "header_footer" | "theme" | "users" | "campuses" | "marketing" | "backup";
 
@@ -473,6 +477,87 @@ const DEFAULT_ORCHESTRATION = {
       { gradeLevel: "المرحلة الثانوية مسارات (صفوف 10 - 12)", nationalAnnual: 22000, internationalAnnual: 27500 },
     ],
   },
+  siteStories: [
+    {
+      id: "story-welcome-2026",
+      title: "فتح باب القبول والتسجيل للعام الدراسي الجديد",
+      category: "إعلان هام 📢",
+      imageUrl: "/covers/cover-admissions.jpg",
+      targetUrl: "/admissions",
+      buttonLabel: "سجّل مقعدك الآن",
+      active: true,
+      isPinned: true,
+    },
+    {
+      id: "story-stem-robotics",
+      title: "أبطال العقيق في أولمبياد الروبوت WRO",
+      category: "إنجاز عالمي 🌐",
+      imageUrl: "/covers/student-robotics-accreditations.jpg",
+      targetUrl: "/accreditations",
+      buttonLabel: "تفاصيل الإنجاز",
+      active: true,
+      isPinned: false,
+    },
+  ],
+  bentoCards: [
+    { id: "journal", key: "journal", title: "مجلة العقيق 3D", badge: "إصدار رقمي", enabled: true, linkUrl: "/journal" },
+    { id: "albums", key: "albums", title: "ألبوم الفعاليات", badge: "معرض الصور", enabled: true, linkUrl: "/albums" },
+    { id: "podcast", key: "podcast", title: "أثير العقيق", badge: "بودكاست صوتي", enabled: true, linkUrl: "/podcast" },
+    { id: "articles", key: "articles", title: "مدونة ومقالات", badge: "أقلام العقيق", enabled: true, linkUrl: "/articles" },
+  ],
+  schoolMetrics: {
+    studentsCount: 1500,
+    teachersCount: 180,
+    successRate: 100,
+    graduatesCount: 25000,
+    campusesCount: 2,
+    yearsOfExperience: 30,
+  },
+  aboutPageConfig: {
+    vision: "أن نكون الصرح التعليمي والتربوي الرائد في المملكة العربية السعودية الذي يصنع قادة الغد بتعليم نوعي وقيم أصيلة تواكب رؤية 2030.",
+    mission: "تقديم بيئة تعليمية ملهمة ومحفزة للابتكار والتميز الأكاديمي، وبناء الشخصية المتوازنة والمتمسكة بهويتها الوطنية والإسلامية.",
+    statYears: "منذ 1994",
+    statCampuses: "مجمعين للبنين والبنات",
+    statAccreditation: "Cognia أمريكي",
+    statGrades: "KG - 12 كافة المراحل",
+    leadershipTeam: [
+      {
+        name: "أ. عبد الله بن عبد العزيز الساعدي",
+        role: "المشرف العام على مدارس العقيق",
+        image: "/team/saadi.jpg",
+        speech: "نسعى لتقديم تجربة تعليمية فريدة ترتقي بمهارات أبنائنا الطلاب وتعدهم للمستقبل بثقة واقتدار."
+      },
+      {
+        name: "د. عبد الرحمن الأحمدي",
+        role: "مدير المجمع التعليمي (بنين)",
+        image: "/team/ahmadi.jpg",
+        speech: "نحرص على خلق بيئة تربوية رائدة تجمع بين التحصيل العلمي وبناء المهارات القيادية."
+      },
+      {
+        name: "أ. منيرة الحربي",
+        role: "مديرة المجمع التعليمي (بنات)",
+        image: "/team/harbi.jpg",
+        speech: "بناتنا هن أمل المستقبل، ونعمل جاهدين لتمكينهن بالمعرفة والإبداع في بيئة متكاملة."
+      }
+    ]
+  },
+  accreditationsConfig: {
+    cogniaScore: "99.2%",
+    cogniaValidUntil: "2028",
+    ieltsVenueCode: "IDP Venue Madinah",
+    satCenterCode: "#68412",
+    accreditationsList: [
+      { id: "cognia", title: "اعتماد كوجنيا الأمريكي (Cognia)", subtitle: "الاعتماد الدولي الأرفع للتعليم المدرسي بدرجة 99.2%", badge: "اعتماد دولي", icon: "shield" },
+      { id: "ministry", title: "ترخيص وتصنيف وزارة التعليم الفئة الأولى (A)", subtitle: "أعلى تصنيف للمدارس الأهلية في المدينة المنورة", badge: "تصنيف وزاري", icon: "award" },
+      { id: "cambridge", title: "مركز تدريب واختبارات كامبريدج المعتمد", subtitle: "إعداد واختبار شهادات اللغة والمسار الدولي", badge: "شراكة دولية", icon: "check" },
+      { id: "idp-ielts", title: "المقر الرسمي لاختبارات آيلتس (IELTS Venue)", subtitle: "قاعات اختبارات معتمدة دولياً ومجهزة بأحدث التقنيات", badge: "مركز رسمي", icon: "book" }
+    ],
+    awardsList: [
+      { id: "award-1", title: "درع التميز والريادة لتعليم المدينة", year: "2025", authority: "الإدارة العامة للتعليم بمنطقة المدينة المنورة", category: "تفوق مؤسسي" },
+      { id: "award-2", title: "المركز الأول في أولمبياد الروبوت WRO", year: "2024", authority: "الاتحاد السعودي للرياضات اللاسلكية والتحكم", category: "ابتكار وتقنية" },
+      { id: "award-3", title: "الوسام الذهبي لجائزة موهبة للإبداع", year: "2024", authority: "مؤسسة الملك عبد العزيز ورجاله للموهبة والإبداع", category: "موهبة ورعاية" }
+    ]
+  },
 };
 
 const SOCIAL_SHARE_PAGES: Array<{
@@ -568,7 +653,8 @@ export default function AqeeqAdminDashboardPage() {
   // 🏛️ The 5 Pillars Master State
   const [activeTab, setActiveTab] = useState<TabKey>("radar");
   const [admissionsSubTab, setAdmissionsSubTab] = useState<AdmissionsSubTab>("inbox");
-  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("master");
+  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("pages_content");
+  const [pageContentSection, setPageContentSection] = useState<"homepage" | "about" | "accreditations" | "fees">("homepage");
   const [campaignsSubTab, setCampaignsSubTab] = useState<CampaignsSubTab>("broadcast");
   const [systemSubTab, setSystemSubTab] = useState<SystemSubTab>("pages");
 
@@ -688,6 +774,11 @@ export default function AqeeqAdminDashboardPage() {
         admissionsSettings: (orchestrationData as any).admissionsSettings || DEFAULT_ORCHESTRATION.admissionsSettings,
         interactiveFx: (orchestrationData as any).interactiveFx || DEFAULT_ORCHESTRATION.interactiveFx,
         systemPortals: (orchestrationData as any).systemPortals || DEFAULT_SYSTEM_PORTALS,
+        siteStories: (orchestrationData as any).siteStories || DEFAULT_ORCHESTRATION.siteStories,
+        bentoCards: (orchestrationData as any).bentoCards || DEFAULT_ORCHESTRATION.bentoCards,
+        schoolMetrics: (orchestrationData as any).schoolMetrics || DEFAULT_ORCHESTRATION.schoolMetrics,
+        aboutPageConfig: (orchestrationData as any).aboutPageConfig || DEFAULT_ORCHESTRATION.aboutPageConfig,
+        accreditationsConfig: (orchestrationData as any).accreditationsConfig || DEFAULT_ORCHESTRATION.accreditationsConfig,
       });
     }
   }, [orchestrationData]);
@@ -2543,187 +2634,14 @@ export default function AqeeqAdminDashboardPage() {
 
             {/* SUBTAB 2: TUITION FEES & DISCOUNTS */}
             {admissionsSubTab === "fees" && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-current/10">
-                  <div>
-                    <h3 className="text-lg font-black flex items-center gap-2">
-                      <FileSpreadsheet size={20} className="text-[#f8ca14]" />
-                      <span>إدارة جدول الرسوم الدراسية وحاسبة الأقساط</span>
-                    </h3>
-                    <p className="text-xs font-bold text-slate-400 mt-1">
-                      تعديل الرسوم السنوية لكل مرحلة دراسية، ونسب خصومات الإخوة والسداد المبكر، وتنعكس مباشرة على حاسبة الموقع.
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setOrchestrationMutation.mutate({
-                        admissionsSettings: orchestrationForm.admissionsSettings,
-                      });
-                    }}
-                    disabled={setOrchestrationMutation.isPending}
-                    className="rounded-2xl bg-[#f8ca14] hover:bg-yellow-400 text-black font-black text-xs px-6 py-2.5 shadow-lg shadow-[#f8ca14]/20 gap-2 cursor-pointer"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ جدول الرسوم والخصومات"}</span>
-                  </Button>
-                </div>
-
-                {/* Discounts Settings Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className={`p-5 rounded-2xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                    <label className="text-xs font-black text-slate-300 block mb-2">نسبة خصم الابن الثاني (%)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={orchestrationForm.admissionsSettings?.siblingDiscountFirst ?? 10}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setOrchestrationForm({
-                          ...orchestrationForm,
-                          admissionsSettings: {
-                            ...orchestrationForm.admissionsSettings,
-                            siblingDiscountFirst: val,
-                          },
-                        });
-                      }}
-                      className={`w-full rounded-xl border px-3.5 py-2 text-sm font-bold outline-none ${
-                        dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                      }`}
-                    />
-                    <p className="text-[10px] font-bold text-slate-400 mt-1.5">يطبق تلقائياً عند اختيار "طالبين" بالحاسبة</p>
-                  </div>
-
-                  <div className={`p-5 rounded-2xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                    <label className="text-xs font-black text-slate-300 block mb-2">نسبة خصم الابن الثالث فأكثر (%)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={orchestrationForm.admissionsSettings?.siblingDiscountSecond ?? 15}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setOrchestrationForm({
-                          ...orchestrationForm,
-                          admissionsSettings: {
-                            ...orchestrationForm.admissionsSettings,
-                            siblingDiscountSecond: val,
-                          },
-                        });
-                      }}
-                      className={`w-full rounded-xl border px-3.5 py-2 text-sm font-bold outline-none ${
-                        dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                      }`}
-                    />
-                    <p className="text-[10px] font-bold text-slate-400 mt-1.5">يطبق على الابن الثالث فما فوق</p>
-                  </div>
-
-                  <div className={`p-5 rounded-2xl border ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                    <label className="text-xs font-black text-slate-300 block mb-2">خصم السداد المبكر دفعة واحدة (%)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={orchestrationForm.admissionsSettings?.earlyPaymentDiscount ?? 5}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setOrchestrationForm({
-                          ...orchestrationForm,
-                          admissionsSettings: {
-                            ...orchestrationForm.admissionsSettings,
-                            earlyPaymentDiscount: val,
-                          },
-                        });
-                      }}
-                      className={`w-full rounded-xl border px-3.5 py-2 text-sm font-bold outline-none ${
-                        dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-slate-50 text-slate-900"
-                      }`}
-                    />
-                    <p className="text-[10px] font-bold text-slate-400 mt-1.5">يُمنح عند سداد كامل الرسوم السنوية كاش</p>
-                  </div>
-                </div>
-
-                {/* Grade Tuition Fees Table */}
-                <div className={`rounded-2xl border overflow-hidden ${dark ? "border-white/10 bg-[#121212]" : "border-black/5 bg-white shadow-sm"}`}>
-                  <div className="p-4 border-b border-current/10 flex items-center justify-between">
-                    <span className="text-xs font-black">الرسوم السنوية لكل مرحلة دراسية (ريال سعودي / سنوي)</span>
-                    <span className="text-[11px] text-slate-400 font-bold">يتم حساب القسط الفصلي تلقائياً (السنوي ÷ 3)</span>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-right text-xs">
-                      <thead>
-                        <tr className={dark ? "border-b border-white/5 bg-white/[0.02]" : "border-b border-black/5 bg-slate-50"}>
-                          <th className="p-4 font-black">المرحلة الدراسية</th>
-                          <th className="p-4 font-black">رسوم المسار الأهلي (ريال)</th>
-                          <th className="p-4 font-black">رسوم المسار الدولي (ريال)</th>
-                          <th className="p-4 font-black text-center">القسط الفصلي التقريبي (أهلي)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-current/5">
-                        {(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!).map((feeItem: any, idx: number) => (
-                          <tr key={idx} className={dark ? "hover:bg-white/5" : "hover:bg-slate-50"}>
-                            <td className="p-4 font-black text-sm">{feeItem.gradeLevel}</td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="number"
-                                  value={feeItem.nationalAnnual}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
-                                    updatedList[idx] = { ...updatedList[idx], nationalAnnual: val };
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      admissionsSettings: {
-                                        ...orchestrationForm.admissionsSettings,
-                                        tuitionFees: updatedList,
-                                      },
-                                    });
-                                  }}
-                                  className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
-                                    dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
-                                  }`}
-                                />
-                                <span className="text-[11px] text-slate-400 font-bold">ريال</span>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="number"
-                                  value={feeItem.internationalAnnual}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedList = [...(orchestrationForm.admissionsSettings?.tuitionFees || DEFAULT_ORCHESTRATION.admissionsSettings!.tuitionFees!)];
-                                    updatedList[idx] = { ...updatedList[idx], internationalAnnual: val };
-                                    setOrchestrationForm({
-                                      ...orchestrationForm,
-                                      admissionsSettings: {
-                                        ...orchestrationForm.admissionsSettings,
-                                        tuitionFees: updatedList,
-                                      },
-                                    });
-                                  }}
-                                  className={`w-36 rounded-xl border px-3 py-1.5 text-xs font-black outline-none ${
-                                    dark ? "border-white/10 bg-white/5 text-white" : "border-slate-300 bg-white text-slate-900"
-                                  }`}
-                                />
-                                <span className="text-[11px] text-slate-400 font-bold">ريال</span>
-                              </div>
-                            </td>
-                            <td className="p-4 text-center font-bold text-emerald-400 font-mono">
-                              {Math.round(feeItem.nationalAnnual / 3).toLocaleString()} ريال
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+              <TuitionFeesContentManager
+                dark={dark}
+                orchestration={orchestrationForm}
+                onSave={async (updated) => {
+                  await setOrchestrationMutation.mutateAsync(updated);
+                }}
+                isSaving={setOrchestrationMutation.isPending}
+              />
             )}
 
             {/* SUBTAB 3: REGISTRATION STATUS & SWITCHES */}
@@ -2878,6 +2796,19 @@ export default function AqeeqAdminDashboardPage() {
             <div className="flex items-center gap-2 border-b border-current/10 pb-3 overflow-x-auto scrollbar-hide">
               <button
                 type="button"
+                onClick={() => setContentSubTab("pages_content")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "pages_content"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Globe size={15} />
+                <span>محتوى صفحات الموقع الشامل 🌐</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setContentSubTab("master")}
                 className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
                   contentSubTab === "master"
@@ -2921,6 +2852,115 @@ export default function AqeeqAdminDashboardPage() {
                 <span>صور الخلفيات المتحركة (مدارسنا · الاعتمادات · القبول) 🖼️✨</span>
               </button>
             </div>
+
+            {/* SUBTAB 0: SITE PAGES CONTENT MANAGER */}
+            {contentSubTab === "pages_content" && (
+              <div className="space-y-6">
+                <div className={`p-4 sm:p-6 rounded-3xl border ${dark ? "border-white/10 bg-[#0e131a]" : "border-black/5 bg-white shadow-sm"}`}>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-current/10">
+                    <div>
+                      <h2 className="text-xl font-black flex items-center gap-2">
+                        <Globe size={22} className="text-[#f8ca14]" />
+                        <span>محرك محتوى الصفحات والمواقع الحية</span>
+                      </h2>
+                      <p className="text-xs font-bold text-slate-400 mt-1">
+                        تعديل كافة العناصر التفاعلية والبيانات المؤسسية لصفحات الموقع (الرئيسية، مدارسنا، الاعتمادات، والرسوم) مع حفظ وانعكاس فوري على الموقع الحي.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-black/5 dark:bg-white/5 border border-current/10">
+                      <button
+                        type="button"
+                        onClick={() => setPageContentSection("homepage")}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                          pageContentSection === "homepage"
+                            ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        الرئيسية 🏠
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPageContentSection("about")}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                          pageContentSection === "about"
+                            ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        مدارسنا 🏛️
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPageContentSection("accreditations")}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                          pageContentSection === "accreditations"
+                            ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        الاعتمادات 🛡️
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPageContentSection("fees")}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                          pageContentSection === "fees"
+                            ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        الرسوم والدراسة 💰
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-6">
+                    {pageContentSection === "homepage" && (
+                      <HomepageContentManager
+                        dark={dark}
+                        orchestration={orchestrationForm}
+                        onSave={async (updated) => {
+                          await setOrchestrationMutation.mutateAsync(updated);
+                        }}
+                        isSaving={setOrchestrationMutation.isPending}
+                      />
+                    )}
+                    {pageContentSection === "about" && (
+                      <AboutPageContentManager
+                        dark={dark}
+                        orchestration={orchestrationForm}
+                        onSave={async (updated) => {
+                          await setOrchestrationMutation.mutateAsync(updated);
+                        }}
+                        isSaving={setOrchestrationMutation.isPending}
+                      />
+                    )}
+                    {pageContentSection === "accreditations" && (
+                      <AccreditationsContentManager
+                        dark={dark}
+                        orchestration={orchestrationForm}
+                        onSave={async (updated) => {
+                          await setOrchestrationMutation.mutateAsync(updated);
+                        }}
+                        isSaving={setOrchestrationMutation.isPending}
+                      />
+                    )}
+                    {pageContentSection === "fees" && (
+                      <TuitionFeesContentManager
+                        dark={dark}
+                        orchestration={orchestrationForm}
+                        onSave={async (updated) => {
+                          await setOrchestrationMutation.mutateAsync(updated);
+                        }}
+                        isSaving={setOrchestrationMutation.isPending}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* SUBTAB 1: UNIFIED MASTER CONTENT TABLE */}
             {contentSubTab === "master" && (
