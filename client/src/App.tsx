@@ -90,6 +90,7 @@ function Router() {
             <Route path="/studio" component={AlaqeeqStudioPage} />
             <Route path="/about" component={AqeeqSchoolAboutPage} />
             <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
+            {/* Alias routes for SEO & external links — canonical is /admissions */}
             <Route path="/admission" component={AqeeqSchoolAdmissionsPage} />
             <Route path="/fees" component={AqeeqSchoolAdmissionsPage} />
             <Route path="/prices" component={AqeeqSchoolAdmissionsPage} />
@@ -103,6 +104,7 @@ function Router() {
             <Route path="/articles/:slug" component={ArticleDetailRoute} />
             <Route path="/atheer/manage" component={AqeeqPodcastStudioPage} />
             <Route path="/atheer" component={AqeeqPodcastPage} />
+            {/* Alias: /podcast mirrors /atheer — canonical is /atheer */}
             <Route path="/podcast/manage" component={AqeeqPodcastStudioPage} />
             <Route path="/podcast" component={AqeeqPodcastPage} />
             <Route path="/journal" component={SchoolNewsPage} />

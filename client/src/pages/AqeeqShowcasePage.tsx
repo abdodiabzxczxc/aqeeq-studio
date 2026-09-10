@@ -1153,6 +1153,17 @@ export default function AqeeqShowcasePage() {
     const filtered = posts.filter((post) => matchesContentType(post, contentType));
     return searchAndSortAqeeqContent(filtered, searchQuery, sort);
   }, [posts, contentType, searchQuery, sort]);
+
+  const SHOWCASE_PER_PAGE = 9;
+  const [showcasePage, setShowcasePage] = useState(1);
+  const totalShowcasePages = Math.ceil(visiblePosts.length / SHOWCASE_PER_PAGE);
+  const paginatedPosts = useMemo(
+    () => visiblePosts.slice((showcasePage - 1) * SHOWCASE_PER_PAGE, showcasePage * SHOWCASE_PER_PAGE),
+    [visiblePosts, showcasePage]
+  );
+
+  useEffect(() => { setShowcasePage(1); }, [searchQuery, contentType, sort]);
+
   const typeOptionsWithCounts = useMemo(() => {
     return SHOWCASE_TYPE_OPTIONS.map((opt) => ({
       ...opt,
@@ -1281,7 +1292,7 @@ export default function AqeeqShowcasePage() {
             viewport={{ once: true, margin: "-40px" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
           >
-            {visiblePosts.map((post) =>
+            {paginatedPosts.map((post) =>
               isSocialPost(post) ? (
                 <SocialPostCard
                   key={`post-${post.id}-${post.sourceType}`}
@@ -1307,6 +1318,33 @@ export default function AqeeqShowcasePage() {
           <VisualEditable id="showcase-search-empty" tag="text" label="رسالة عدم وجود نتائج للأخبار" defaultText="لا توجد أخبار أو عروض مطابقة للبحث أو الفلتر." as="p" className={`rounded-2xl border border-dashed p-10 text-center text-sm font-black ${
             dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/30 text-[#08467d]"
           }`} />
+        )}
+
+        {/* Pagination Controls */}
+        {totalShowcasePages > 1 && (
+          <div dir="rtl" className="mt-10 flex items-center justify-center gap-2 flex-wrap" aria-label="تنقل بين صفحات المنشورات">
+            <button
+              onClick={() => setShowcasePage((p) => Math.max(1, p - 1))}
+              disabled={showcasePage === 1}
+              className={`rounded-xl px-4 py-2 text-sm font-black transition ${dark ? "bg-white/10 text-white hover:bg-white/20 disabled:opacity-30" : "bg-black/10 text-black hover:bg-black/20 disabled:opacity-30"}`}
+            >السابق</button>
+            {Array.from({ length: totalShowcasePages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setShowcasePage(page)}
+                aria-current={showcasePage === page ? "page" : undefined}
+                className={`rounded-xl w-9 h-9 text-sm font-black transition ${showcasePage === page
+                  ? (dark ? "bg-[#f8ca14] text-black" : "bg-[#08467d] text-white")
+                  : (dark ? "bg-white/10 text-white hover:bg-white/20" : "bg-black/10 text-black hover:bg-black/20")
+                }`}
+              >{page}</button>
+            ))}
+            <button
+              onClick={() => setShowcasePage((p) => Math.min(totalShowcasePages, p + 1))}
+              disabled={showcasePage === totalShowcasePages}
+              className={`rounded-xl px-4 py-2 text-sm font-black transition ${dark ? "bg-white/10 text-white hover:bg-white/20 disabled:opacity-30" : "bg-black/10 text-black hover:bg-black/20 disabled:opacity-30"}`}
+            >التالي</button>
+          </div>
         )}
       </section>
       <Dialog open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelected(null); }}>

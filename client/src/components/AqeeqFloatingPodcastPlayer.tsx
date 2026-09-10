@@ -1259,7 +1259,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#de191e] border-2 border-white animate-ping" />
                     <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#de191e] border-2 border-white" />
                     {/* Live On-Air Pill */}
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-[#de191e] text-[7px] font-black text-white tracking-wider shadow-md uppercase">
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-[#de191e] text-[9px] font-black text-white tracking-wider shadow-md uppercase">
                       LIVE
                     </span>
                   </>
@@ -1386,7 +1386,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       title="تقديم 15 ثانية ⏩"
                     >
                       <RotateCw size={14} />
-                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
                     </button>
 
                     {/* VIDEO: Play / Pause Button in Cyan to Indigo Gradient */}
@@ -1415,7 +1415,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       title="تأخير 15 ثانية ⏪"
                     >
                       <RotateCcw size={14} />
-                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
                     </button>
 
                     {/* VIDEO: Prev Video Track */}
@@ -1448,7 +1448,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       title="تقديم 15 ثانية ⏩"
                     >
                       <RotateCw size={14} />
-                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
                     </button>
 
                     {/* PODCAST: Play / Pause Button in Studio Indigo */}
@@ -1478,7 +1478,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                       title="تأخير 15 ثانية ⏪"
                     >
                       <RotateCcw size={14} />
-                      <span className="absolute -bottom-0.5 text-[7px] font-black font-mono leading-none">15</span>
+                      <span className="absolute -bottom-0.5 text-[9px] font-black font-mono leading-none">15</span>
                     </button>
                   </>
                 ) : (
