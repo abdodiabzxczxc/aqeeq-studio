@@ -87,7 +87,6 @@ function Router() {
         <Suspense fallback={null}>
           <Switch>
             <Route path="/" component={AlaqeeqStudioPage} />
-            <Route path="/studio" component={AlaqeeqStudioPage} />
             <Route path="/about" component={AqeeqSchoolAboutPage} />
             <Route path="/admissions" component={AqeeqSchoolAdmissionsPage} />
             {/* Alias routes for SEO & external links — canonical is /admissions */}

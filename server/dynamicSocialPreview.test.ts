@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   isSocialCrawler,
   resolveSocialImageUrl,
@@ -69,6 +69,19 @@ describe("Dynamic Social Preview Engine", () => {
   });
 
   describe("Route-Specific Social Previews", () => {
+    beforeEach(async () => {
+      const { setSiteOrchestration } = await import("./db");
+      await setSiteOrchestration({
+        marketingPixels: {
+          pageShareOverrides: {
+            "/admissions": {
+              mode: "auto",
+            },
+          },
+        },
+      });
+    });
+
     it("resolves social preview for admissions and fees", async () => {
       const preview = await resolveSocialPreviewForPath("/admissions", origin);
       expect(preview.title).toContain("القبول والتسجيل");

@@ -308,7 +308,7 @@ export function getElementPath(el: Element): string {
 
 function normalizedPath(pathname: string) {
   const path = pathname.split("?")[0];
-  if (path === "/" || path === "/studio") return "/";
+  if (path === "/") return "/";
   return isAqeeqStudioVisualPath(path) || /^\/(?:dashboard|control|scan|live|live\/ideas|news|maison)$/.test(path) || /^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$/.test(path) || /^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|page\/[a-z0-9-]{3,96})$/.test(path) ? path : null;
 }
 

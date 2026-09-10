@@ -3,9 +3,9 @@ import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImag
 
 describe("visual editor studio routing and image layout", () => {
   it("opens edit mode only when visual=1 is explicitly requested", () => {
-    expect(shouldOpenVisualEditorFromLocation("/studio?visual=1")).toBe(true);
-    expect(shouldOpenVisualEditorFromLocation("/studio", "?visual=1")).toBe(true);
-    expect(shouldOpenVisualEditorFromLocation("/studio?tab=archive")).toBe(false);
+    expect(shouldOpenVisualEditorFromLocation("/?visual=1")).toBe(true);
+    expect(shouldOpenVisualEditorFromLocation("/", "?visual=1")).toBe(true);
+    expect(shouldOpenVisualEditorFromLocation("/?tab=archive")).toBe(false);
   });
 
   it("keeps image editor wrappers sized to their full card container", () => {
@@ -24,7 +24,6 @@ describe("visual editor studio routing and image layout", () => {
   it("recognizes every public studio archive and reader route", () => {
     expect([
       "/",
-      "/studio",
       "/journal",
       "/journal/issue/weekly-2026",
       "/journal/month/2026-08",
