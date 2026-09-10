@@ -22,6 +22,7 @@ export interface StudioCanvasHandle {
   toggleLayerLock: (id: string) => void;
   deleteLayer: (id: string) => void;
   reorderSection: (sectionId: string, direction: "up" | "down") => void;
+  toggleSmartAuto: () => void;
 }
 
 export const StudioCanvas = React.forwardRef<
@@ -37,6 +38,7 @@ export const StudioCanvas = React.forwardRef<
       undoCount: number;
       redoCount: number;
       dirtyCount: number;
+      smartAutoDetect?: boolean;
       layers?: StudioLayerItem[];
     }) => void;
   }
@@ -169,6 +171,12 @@ export const StudioCanvas = React.forwardRef<
         "*"
       );
     },
+    toggleSmartAuto: () => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_TOGGLE_SMART_AUTO" },
+        "*"
+      );
+    },
   }));
 
   // Listen to iframe postMessages
@@ -183,6 +191,7 @@ export const StudioCanvas = React.forwardRef<
           undoCount: data.undoCount || 0,
           redoCount: data.redoCount || 0,
           dirtyCount: data.dirtyCount || 0,
+          smartAutoDetect: data.smartAutoDetect,
           layers: data.layers || [],
         });
       }

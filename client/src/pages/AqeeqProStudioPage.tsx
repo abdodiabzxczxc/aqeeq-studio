@@ -3,6 +3,7 @@ import { StudioTopBar, type DeviceMode } from "@/components/studio/StudioTopBar"
 import { StudioLeftDock, type StudioDockTab, type StudioLayerItem } from "@/components/studio/StudioLeftDock";
 import { StudioCanvas, type StudioCanvasHandle } from "@/components/studio/StudioCanvas";
 import { StudioInspector, type StudioInspectorDraft } from "@/components/studio/StudioInspector";
+import { StudioSnapshotManager, type DesignSnapshot } from "@/components/studio/StudioSnapshotManager";
 import type { SchoolBlock } from "@/components/studio/StudioSchoolBlocks";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -17,6 +18,8 @@ export default function AqeeqProStudioPage() {
   const [zoom, setZoom] = useState<number>(100);
   const [isLivePreview, setIsLivePreview] = useState<boolean>(false);
   const [activeDockTab, setActiveDockTab] = useState<StudioDockTab>(null);
+  const [snapshotsOpen, setSnapshotsOpen] = useState<boolean>(false);
+  const [smartAutoDetect, setSmartAutoDetect] = useState<boolean>(true);
 
   const [selectedElement, setSelectedElement] = useState<{ id: string; tag: string; label: string } | null>(null);
   const [draft, setDraft] = useState<StudioInspectorDraft>({});
@@ -34,6 +37,7 @@ export default function AqeeqProStudioPage() {
     undoCount: number;
     redoCount: number;
     dirtyCount: number;
+    smartAutoDetect?: boolean;
     layers?: StudioLayerItem[];
   }) => {
     setSelectedElement(data.selected);
@@ -43,8 +47,21 @@ export default function AqeeqProStudioPage() {
     setUndoCount(data.undoCount);
     setRedoCount(data.redoCount);
     setDirtyCount(data.dirtyCount);
+    if (data.smartAutoDetect !== undefined) {
+      setSmartAutoDetect(data.smartAutoDetect);
+    }
     if (data.layers) {
       setLayers(data.layers);
+    }
+  };
+
+  const handleRestoreSnapshot = (snapshot: DesignSnapshot) => {
+    try {
+      localStorage.setItem(`aqeeq-overrides-${snapshot.pagePath}`, JSON.stringify(snapshot.data));
+      canvasRef.current?.reload();
+      toast.success(`✓ تمت استعادة لقطة «${snapshot.name}» بنجاح`);
+    } catch {
+      toast.error("تعذر استعادة لقطة التصميم");
     }
   };
 
@@ -126,6 +143,9 @@ export default function AqeeqProStudioPage() {
         undoCount={undoCount}
         redoCount={redoCount}
         dirtyCount={dirtyCount}
+        smartAutoDetect={smartAutoDetect}
+        onToggleSmartAutoDetect={() => canvasRef.current?.toggleSmartAuto()}
+        onOpenSnapshots={() => setSnapshotsOpen(true)}
         onUndo={handleUndo}
         onRedo={handleRedo}
         onPublish={handlePublish}
@@ -176,6 +196,14 @@ export default function AqeeqProStudioPage() {
           />
         )}
       </div>
+
+      {/* ── Design Snapshots Manager Modal ──────────────────────── */}
+      <StudioSnapshotManager
+        open={snapshotsOpen}
+        onClose={() => setSnapshotsOpen(false)}
+        pagePath={currentPath}
+        onRestoreSnapshot={handleRestoreSnapshot}
+      />
     </div>
   );
 }

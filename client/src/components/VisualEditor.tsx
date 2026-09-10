@@ -14,7 +14,7 @@ import { extractCopyableStyle, isBackgroundLikeLayer, type CopyableLayerStyle } 
 import { backgroundSizeCss, isBackgroundLayer, isBackgroundSurface, isCoreBackgroundLayer, lowerLayerZIndex, resolveBackgroundOrigin, type BackgroundOrigin } from "@/lib/layerBackground";
 import { resolveEditorToolbarSide, toggleEditorToolbarSide, type EditorToolbarSide } from "@/lib/editorToolbarSide";
 import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImageWrapperClassName } from "@/lib/visualEditorLayout";
-import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowDown, ArrowLeftRight, ArrowUp, ArrowUpDown, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Edit3, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Pin, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowDown, ArrowLeftRight, ArrowUp, ArrowUpDown, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Edit3, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Pin, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Upload, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -229,6 +229,8 @@ type VisualEditorContextValue = {
   updateTextContent?: (elementId: string, newText: string) => void;
   updateElementOverride?: (elementId: string, patch: Partial<VisualOverride>) => void;
   isStudioCanvasMode?: boolean;
+  smartAutoDetect?: boolean;
+  toggleSmartAutoDetect?: () => void;
   getOverride: (elementId: string) => VisualOverride | undefined;
   getOwnOverride: (elementId: string) => VisualOverride | undefined;
 };
@@ -267,6 +269,8 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
   updateTextContent: () => undefined,
   updateElementOverride: () => undefined,
   isStudioCanvasMode: false,
+  smartAutoDetect: true,
+  toggleSmartAutoDetect: () => undefined,
   getOverride: () => undefined,
   getOwnOverride: () => undefined,
 });
@@ -462,6 +466,24 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [groupedIds, setGroupedIds] = useState<string[]>([]);
   const [studioLayers, setStudioLayers] = useState<Array<{ id: string; tag: string; label: string; type?: string; isHidden?: boolean; isLocked?: boolean }>>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  const [smartAutoDetect, setSmartAutoDetect] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("aqeeq_smart_auto_detect");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
+
+  const toggleSmartAutoDetect = () => {
+    setSmartAutoDetect((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("aqeeq_smart_auto_detect", String(next));
+      }
+      toast.message(next ? "⚡ تم تفعيل المحرر الذكي الشامل" : "💤 تم تعطيل المحرر الذكي (استقرار تام للعناصر المخصصة)");
+      return next;
+    });
+  };
   const draftPreviewEnabled = useRef(false);
   const [toolGroup, setToolGroup] = useState<"design" | "arrange" | "publish" | null>(null);
   const [showAdvancedProperties, setShowAdvancedProperties] = useState(false);
@@ -1159,20 +1181,46 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const root = document.getElementById("root") || document.body;
       if (!root) return;
 
+      if (!smartAutoDetect) {
+        // If disabled, strip auto-detection tags to give user clean native control
+        root.querySelectorAll<HTMLElement>("[data-visual-auto='true']").forEach((el) => {
+          delete el.dataset.visualAuto;
+          delete el.dataset.visualId;
+          delete el.dataset.visualTag;
+          delete el.dataset.visualLabel;
+        });
+        return;
+      }
+
+      // Helper to find a stable semantic scope/key for any element (independent of dynamic arrays)
+      const getStableScope = (el: Element): string => {
+        const container = el.closest<HTMLElement>("section, [data-section-id], header, footer, article, main, aside, [id]");
+        if (container) {
+          const idAttr = container.id;
+          const secAttr = container.getAttribute("data-section-id");
+          if (idAttr) return `sec-${idAttr}`;
+          if (secAttr) return `sec-${secAttr}`;
+          return container.tagName.toLowerCase();
+        }
+        return "page";
+      };
+
       // 1. Scan Images anywhere on the page (except editor UI and video players)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
-      images.forEach((img, idx) => {
+      images.forEach((img) => {
         if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
         if (!id) {
-          const srcPath = img.getAttribute("src") || "";
-          const altText = img.alt || "";
-          id = `auto-img-${hashString(srcPath + altText + idx)}`;
+          const scope = getStableScope(img);
+          const srcPath = (img.getAttribute("src") || "").split("?")[0].slice(-50);
+          const altText = (img.alt || "").trim().slice(0, 30);
+          // Deterministic hash based on scope, src, and alt — NO volatile idx!
+          id = `auto-img-${hashString(`${pagePath || "/"}::${scope}::${srcPath}::${altText}`)}`;
           img.dataset.visualId = id;
           img.dataset.visualTag = "image";
-          img.dataset.visualLabel = altText || `صورة ${idx + 1}`;
+          img.dataset.visualLabel = altText || "صورة ذكية";
           img.dataset.visualAuto = "true";
         }
 
@@ -1191,13 +1239,16 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      // 2. Scan Text Elements (headings, paragraphs, spans, buttons, links, labels, badges)
+      // 2. Scan Text Elements (headings, paragraphs, blockquote, figcaption, standalone buttons/labels)
       const textNodes = Array.from(root.querySelectorAll<HTMLElement>(
-        "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, span, a, button, label, li, td, th"
+        "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, label, button, a, li"
       ));
-      textNodes.forEach((node, idx) => {
+      textNodes.forEach((node) => {
         if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
+
+        // Anti over-tagging: If node is inside an already tagged visual container, skip
+        if (node.parentElement?.closest("[data-visual-id]")) return;
 
         // Extract direct text content
         const directText = Array.from(node.childNodes)
@@ -1210,7 +1261,14 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
         let id = node.dataset.visualId;
         if (!id) {
-          id = `auto-txt-${hashString(directText.slice(0, 30) + idx)}`;
+          const scope = getStableScope(node);
+          const tag = node.tagName.toLowerCase();
+          const cleanText = directText.replace(/\s+/g, " ").trim().slice(0, 40);
+          // Sibling index relative to immediate parent only (stable locally, not affected by outer tabs)
+          const siblingIndex = Array.from(node.parentElement?.children || []).filter(
+            (c) => c.tagName === node.tagName
+          ).indexOf(node);
+          id = `auto-txt-${hashString(`${pagePath || "/"}::${scope}::${tag}::${cleanText}::${siblingIndex >= 0 ? siblingIndex : 0}`)}`;
           node.dataset.visualId = id;
           node.dataset.visualTag = "text";
           node.dataset.visualLabel = directText.slice(0, 24);
@@ -1219,11 +1277,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
         const override = overrideMap.get(id);
         if (override?.contentText) {
+          // SAFE DOM MUTATION: Only update text nodes, NEVER destroy React fiber children or SVGs!
           const textChild = Array.from(node.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
           if (textChild) {
             if (textChild.textContent !== override.contentText) textChild.textContent = override.contentText;
-          } else {
+          } else if (node.children.length === 0) {
             node.textContent = override.contentText;
+          } else {
+            // Has child elements (icons, badges), insert text cleanly without blowing away children
+            node.insertBefore(document.createTextNode(override.contentText), node.firstChild);
           }
         }
         if (override?.textColor && node.style.color !== override.textColor) {
@@ -1246,19 +1308,21 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      // 3. Scan SVG Icons anywhere on the page
+      // 3. Scan SVG Icons (only standalone icons, not inside buttons or existing visual components)
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
-      svgs.forEach((svg, idx) => {
-        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
+      svgs.forEach((svg) => {
+        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen, button, [data-visual-id]")) return;
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
         let id = htmlSvg.dataset?.visualId;
         if (!id) {
-          id = `auto-icon-${hashString((svg.getAttribute("class") || "") + idx)}`;
+          const scope = getStableScope(svg);
+          const cls = svg.getAttribute("class") || "icon";
+          id = `auto-icon-${hashString(`${pagePath || "/"}::${scope}::${cls}`)}`;
           htmlSvg.dataset.visualId = id;
           htmlSvg.dataset.visualTag = "icon";
-          htmlSvg.dataset.visualLabel = `أيقونة ${idx + 1}`;
+          htmlSvg.dataset.visualLabel = "أيقونة ذكية";
           htmlSvg.dataset.visualAuto = "true";
         }
 
@@ -1433,7 +1497,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
-  }, [isEditing, previewMode, overrideMap, pagePath, isAdmin, isStudioCanvasMode]);
+  }, [isEditing, previewMode, overrideMap, pagePath, isAdmin, isStudioCanvasMode, smartAutoDetect]);
 
 
   const saveLayer = (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => {
@@ -1850,9 +1914,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     distributeSelected,
     showAlignmentGuides: setAlignmentGuides,
     setGroupTranslation,
+    smartAutoDetect,
+    toggleSmartAutoDetect,
     getOverride: (elementId) => resolveHeroOverrideForPreview(overrideMap, elementId),
     getOwnOverride: (elementId) => overrideMap.get(elementId),
-  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, isStudioCanvasMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap, setDraft, save]);
+  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, isStudioCanvasMode, smartAutoDetect, toggleSmartAutoDetect, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap, setDraft, save]);
 
   const saveSelected = () => {
     if (!pagePath || !selected) return;
@@ -2197,16 +2263,19 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       redoCount: redoStack.length,
       dirtyCount: Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length,
       layers: studioLayers,
+      smartAutoDetect,
       pagePath,
     }, "*");
-  }, [isStudioCanvasMode, selected, draft, undoStack.length, redoStack.length, localOverrides, pagePath, studioLayers]);
+  }, [isStudioCanvasMode, selected, draft, undoStack.length, redoStack.length, localOverrides, pagePath, studioLayers, smartAutoDetect]);
 
   useEffect(() => {
     if (!isStudioCanvasMode || typeof window === "undefined") return;
     const handleStudioMessage = (event: MessageEvent) => {
       const data = event.data;
       if (!data || typeof data !== "object") return;
-      if (data.type === "AQEEQ_STUDIO_APPLY_DRAFT") {
+      if (data.type === "AQEEQ_STUDIO_TOGGLE_SMART_AUTO") {
+        toggleSmartAutoDetect();
+      } else if (data.type === "AQEEQ_STUDIO_APPLY_DRAFT") {
         draftPreviewEnabled.current = true;
         const patch = data.patch;
         setDraft((prev) => {
@@ -2594,13 +2663,24 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         <WorkspaceButton active={historyOpen} label="سجل التعديلات" icon={<History size={16} />} onClick={() => { setHistoryOpen((p) => !p); setDesignTokensOpen(false); }} />
         <WorkspaceButton active={designTokensOpen} label="هوية الموقع والألوان" icon={<Palette size={16} />} onClick={() => { setDesignTokensOpen((p) => !p); setHistoryOpen(false); }} />
         <span className="aq-key-divider" aria-hidden="true" />
-        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-black pointer-events-none">
+        <button
+          type="button"
+          onClick={toggleSmartAutoDetect}
+          className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl border text-[11px] font-black transition cursor-pointer ${
+            smartAutoDetect
+              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25"
+              : "bg-slate-800/60 border-white/10 text-slate-400 hover:text-white"
+          }`}
+          title={smartAutoDetect ? "المحرر الذكي مفعل (اضغط للإيقاف والتركيز على العناصر الأساسية فقط)" : "المحرر الذكي معطل (اضغط لتفعيل التقاط أي عنصر حر)"}
+        >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            {smartAutoDetect && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            )}
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${smartAutoDetect ? "bg-emerald-400" : "bg-slate-500"}`} />
           </span>
-          <span>المحرر الذكي نشط</span>
-        </div>
+          <span>{smartAutoDetect ? "⚡ المحرر الذكي: مفعل" : "💤 المحرر الذكي: معطل"}</span>
+        </button>
         {/* E-15: Dirty count badge — كم عنصر معدّل */}
         {Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length > 0 ? (
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[11px] font-black pointer-events-none" title="عناصر معدّلة غير منشورة">
@@ -3377,6 +3457,45 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       toast.success("تم تحديث النص مباشرة كمسودة");
     }
   };
+
+  const canvasFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
+  const uploadMutation = trpc.visualEditor.media.upload.useMutation();
+
+  const handleCanvasFileUpload = async (file: File) => {
+    if (!file) return;
+    const allowed = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"];
+    if (!allowed.includes(file.type)) {
+      toast.error("يرجى اختيار ملف صورة صالح (PNG, JPEG, WebP, GIF, SVG)");
+      return;
+    }
+    const toastId = toast.loading("جارٍ رفع وضغط الصورة على الكانفاس...");
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const base64Str = await base64Promise;
+
+      const asset = await uploadMutation.mutateAsync({
+        fileName: file.name,
+        mimeType: file.type,
+        base64: base64Str,
+        altText: file.name.replace(/\.[^/.]+$/, ""),
+      });
+
+      updateElementOverride?.(id, {
+        mediaUrl: asset.url,
+        altText: asset.altText || file.name.replace(/\.[^/.]+$/, ""),
+      });
+      toast.success("تم استبدال الصورة مباشرة على الكانفاس بنجاح! 🖼️", { id: toastId });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "تعذر رفع الصورة";
+      toast.error(msg, { id: toastId });
+    }
+  };
   const interaction = useRef<{ mode: "move" | "resize"; resizeHandle?: ResizeHandle; startX: number; startY: number; lastClientX?: number; lastClientY?: number; startLeft: number; startTop: number; baseX: number; baseY: number; baseWidth: number; baseHeight: number; groupIds: string[]; translationX: number; translationY: number } | null>(null);
   const longPress = useRef<{ timer: number | null; startX: number; startY: number; selected: boolean }>({ timer: null, startX: 0, startY: 0, selected: false });
   const [liveFrame, setLiveFrame] = useState<{ x: number; y: number; width: number | null; height: number | null } | null>(null);
@@ -3725,8 +3844,27 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       onAction?.();
       onClick?.();
     }}
+    onDragOver={(event) => {
+      if (!isEditing) return;
+      if (tag === "image" && event.dataTransfer.types.includes("Files")) {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsCanvasDragOver(true);
+      }
+    }}
+    onDragLeave={() => setIsCanvasDragOver(false)}
+    onDrop={(event) => {
+      if (!isEditing) return;
+      const file = event.dataTransfer.files?.[0];
+      if (file && tag === "image" && file.type.startsWith("image/")) {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsCanvasDragOver(false);
+        void handleCanvasFileUpload(file);
+      }
+    }}
     style={visualStyle}
-    className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${isInteractiveTransform && !isLocked && !isInlineEditing ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""} ${isInlineEditing ? "ring-2 ring-amber-400 bg-amber-400/10 cursor-text !outline-none" : ""}`}
+    className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${isInteractiveTransform && !isLocked && !isInlineEditing ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""} ${isInlineEditing ? "ring-2 ring-amber-400 bg-amber-400/10 cursor-text !outline-none" : ""} ${isCanvasDragOver ? "!ring-4 !ring-emerald-400 !bg-emerald-500/10 !scale-[1.01] !shadow-[0_0_40px_rgba(52,211,153,0.6)]" : ""}`}
   >
     {isEditing && isInlineEditing ? (
       <div
@@ -3780,7 +3918,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         </button>
       </div>
     ) : null}
-    {isEditing && isStudioCanvasMode && selected ? (
+    {isEditing && selected ? (
       <div
         data-aq-quick-actions
         className="pointer-events-auto absolute -top-10 left-1/2 -translate-x-1/2 z-[86] flex items-center gap-1 rounded-xl border border-amber-400/40 bg-[#090d14]/95 px-2 py-1 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 select-none"
@@ -3788,19 +3926,117 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         onPointerDown={(e) => e.stopPropagation()}
       >
         <span className="text-[10px] font-black text-amber-300 px-1 border-l border-white/15 whitespace-nowrap">{label}</span>
+        {tag === "image" ? (
+          <>
+            <input
+              ref={canvasFileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleCanvasFileUpload(file);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              title="رفع صورة بديلة من جهازك"
+              onClick={() => canvasFileInputRef.current?.click()}
+              className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-2 py-0.5 text-[10px] font-black text-amber-950 hover:from-amber-300 hover:to-amber-400 transition cursor-pointer"
+            >
+              <Upload size={11} className="stroke-[3]" />
+              <span>استبدال</span>
+            </button>
+            <button
+              type="button"
+              title="تبديل استدارة الحواف (0px / 16px / دائرية)"
+              onClick={() => {
+                const current = override?.borderRadius || "0px";
+                const next = current === "0px" ? "16px" : current === "16px" ? "9999px" : "0px";
+                updateElementOverride?.(id, { borderRadius: next });
+                toast.success(`استدارة الحواف: ${next}`);
+              }}
+              className="flex items-center gap-1 rounded-lg bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-slate-200 hover:bg-white/20 transition cursor-pointer"
+            >
+              <span className="h-2 w-2 rounded-full border border-amber-300" />
+              <span>حواف</span>
+            </button>
+          </>
+        ) : null}
         {isTextLike ? (
-          <button
-            type="button"
-            title="كتابة مباشرة على الشاشة (انقر نقرتين)"
-            onClick={() => {
-              setIsInlineEditing(true);
-              setTimeout(() => layerRef.current?.focus(), 50);
-            }}
-            className="flex items-center gap-1 rounded-lg bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-200 hover:bg-amber-400/30 transition"
-          >
-            <Edit3 size={11} />
-            <span>اكتب</span>
-          </button>
+          <>
+            <button
+              type="button"
+              title="كتابة مباشرة على الشاشة (انقر نقرتين)"
+              onClick={() => {
+                setIsInlineEditing(true);
+                setTimeout(() => layerRef.current?.focus(), 50);
+              }}
+              className="flex items-center gap-1 rounded-lg bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-200 hover:bg-amber-400/30 transition"
+            >
+              <Edit3 size={11} />
+              <span>اكتب</span>
+            </button>
+            <button
+              type="button"
+              title="تغليظ الخط (Bold)"
+              onClick={() => {
+                const isBold = (override?.customCss || "").includes("font-weight: 800") || (override?.customCss || "").includes("font-bold");
+                const cleanCss = (override?.customCss || "").replace(/font-weight:\s*\d+;?/g, "").trim();
+                const nextCss = `${cleanCss} font-weight: ${isBold ? "400" : "800"};`;
+                updateElementOverride?.(id, { customCss: nextCss });
+                toast.success(isBold ? "خط عادي" : "خط عريض (Bold)");
+              }}
+              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-black text-xs hover:bg-white/20 transition"
+            >
+              B
+            </button>
+            <button
+              type="button"
+              title="تكبير حجم الخط"
+              onClick={() => {
+                const currentSize = parseInt(override?.fontSize || "16", 10) || 16;
+                const nextSize = `${currentSize + 2}px`;
+                updateElementOverride?.(id, { fontSize: nextSize });
+              }}
+              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition"
+            >
+              A+
+            </button>
+            <button
+              type="button"
+              title="تصغير حجم الخط"
+              onClick={() => {
+                const currentSize = parseInt(override?.fontSize || "16", 10) || 16;
+                const nextSize = `${Math.max(10, currentSize - 2)}px`;
+                updateElementOverride?.(id, { fontSize: nextSize });
+              }}
+              className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition"
+            >
+              A-
+            </button>
+            <div className="flex items-center gap-1 px-1 border-x border-white/15">
+              {[
+                { color: "#e5b84f", label: "ذهبي" },
+                { color: "#ffffff", label: "أبيض" },
+                { color: "#10b981", label: "زمردي" },
+                { color: "#38bdf8", label: "سماوي" },
+              ].map((c) => (
+                <button
+                  key={c.color}
+                  type="button"
+                  title={c.label}
+                  onClick={() => {
+                    updateElementOverride?.(id, { textColor: c.color });
+                    toast.success(`لون النص: ${c.label}`);
+                  }}
+                  className="h-3.5 w-3.5 rounded-full border border-white/30 hover:scale-125 transition"
+                  style={{ backgroundColor: c.color }}
+                />
+              ))}
+            </div>
+          </>
         ) : null}
         {(tag === "section" || tag === "section-block" || id.startsWith("section-")) ? (
           <>

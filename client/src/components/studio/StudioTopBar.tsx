@@ -17,6 +17,7 @@ import {
   Layers,
   FilePlus,
   Sliders,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -54,6 +55,9 @@ export function StudioTopBar({
   undoCount = 0,
   redoCount = 0,
   dirtyCount = 0,
+  smartAutoDetect = true,
+  onToggleSmartAutoDetect,
+  onOpenSnapshots,
   onUndo,
   onRedo,
   onPublish,
@@ -72,6 +76,9 @@ export function StudioTopBar({
   undoCount?: number;
   redoCount?: number;
   dirtyCount?: number;
+  smartAutoDetect?: boolean;
+  onToggleSmartAutoDetect?: () => void;
+  onOpenSnapshots?: () => void;
   onUndo?: () => void;
   onRedo?: () => void;
   onPublish?: () => void;
@@ -277,6 +284,41 @@ export function StudioTopBar({
         >
           <ExternalLink size={15} />
         </a>
+
+        {/* Smart Auto-Detect Toggle Button */}
+        {onToggleSmartAutoDetect && (
+          <button
+            type="button"
+            onClick={onToggleSmartAutoDetect}
+            className={`hidden md:flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+              smartAutoDetect
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+            }`}
+            title={smartAutoDetect ? "المحرر الذكي مفعل (اضغط للإيقاف والتركيز على العناصر الأساسية)" : "المحرر الذكي معطل (اضغط للتفعيل لالتقاط أي نص أو صورة)"}
+          >
+            <span className="relative flex h-2 w-2">
+              {smartAutoDetect && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              )}
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${smartAutoDetect ? "bg-emerald-400" : "bg-slate-500"}`} />
+            </span>
+            <span>{smartAutoDetect ? "⚡ ذكي: مفعل" : "💤 ذكي: معطل"}</span>
+          </button>
+        )}
+
+        {/* Snapshots Button */}
+        {onOpenSnapshots && (
+          <button
+            type="button"
+            onClick={onOpenSnapshots}
+            className="hidden lg:flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+            title="حفظ واستعادة نسخ التصميم الاحتياطية (Design Snapshots)"
+          >
+            <Camera size={14} className="text-amber-300" />
+            <span>لقطة تصميم</span>
+          </button>
+        )}
 
         {/* Live Visitor Preview Toggle */}
         <button

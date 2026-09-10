@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   X,
   Copy,
@@ -20,8 +20,15 @@ import {
   Pin,
   Sliders,
   ArrowUpDown,
+  Upload,
+  FolderOpen,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
+import MediaLibrary, { type MediaAsset } from "@/components/MediaLibrary";
 
 export type StudioInspectorDraft = {
   contentText?: string;
@@ -66,6 +73,65 @@ export function StudioInspector({
   onClose: () => void;
 }) {
   const [activeSubTab, setActiveSubTab] = useState<"content" | "design" | "motion" | "responsive">("content");
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showAdvancedUrl, setShowAdvancedUrl] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const uploadMutation = trpc.visualEditor.media.upload.useMutation();
+
+  const handleProcessFile = async (file: File) => {
+    if (!file) return;
+    const allowed = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"];
+    if (!allowed.includes(file.type)) {
+      toast.error("يرجى اختيار ملف صورة صالح (PNG, JPEG, WebP, GIF, SVG)");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("الحد الأقصى لحجم الصورة 8 ميجابايت");
+      return;
+    }
+
+    setIsUploading(true);
+    const toastId = toast.loading("جارٍ رفع وضغط الصورة...");
+
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const base64Str = await base64Promise;
+
+      const asset = await uploadMutation.mutateAsync({
+        fileName: file.name,
+        mimeType: file.type,
+        base64: base64Str,
+        altText: file.name.replace(/\.[^/.]+$/, ""),
+      });
+
+      onChangeDraft({
+        mediaUrl: asset.url,
+        altText: asset.altText || file.name.replace(/\.[^/.]+$/, ""),
+      });
+      toast.success("تم رفع واستبدال الصورة بنجاح! 🖼️", { id: toastId });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "تعذر رفع الصورة";
+      toast.error(msg, { id: toastId });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      void handleProcessFile(file);
+    }
+    e.target.value = "";
+  };
 
   if (!selectedElement) {
     return (
@@ -166,35 +232,162 @@ export function StudioInspector({
           <div className="space-y-3.5">
             {/* Image Media Controls */}
             {selectedElement.tag === "image" && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-300 mb-1.5 flex items-center gap-1">
-                    <ImageIcon size={13} className="text-amber-400" />
-                    <span>رابط الصورة (Image URL):</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={draft.mediaUrl ?? ""}
-                    onChange={(e) => onChangeDraft({ mediaUrl: e.target.value })}
-                    placeholder="https://... أو /manus-storage/..."
-                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-amber-400 font-mono"
-                    dir="ltr"
-                  />
+              <div className="space-y-4">
+                {/* Hidden File Input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                  className="hidden"
+                  onChange={handleFileInputChange}
+                />
+
+                {/* Primary Media Buttons: Upload from Device & Media Library */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-2.5 px-2 text-xs font-black text-amber-950 shadow-lg hover:from-amber-300 hover:to-amber-400 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isUploading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} className="stroke-[2.5]" />}
+                    <span>{isUploading ? "جارٍ الرفع..." : "رفع من جهازك"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMediaLibraryOpen(true)}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/10 py-2.5 px-2 text-xs font-bold text-white hover:bg-white/15 transition active:scale-95 cursor-pointer"
+                  >
+                    <FolderOpen size={15} className="text-amber-300" />
+                    <span>مكتبة الوسائط</span>
+                  </button>
                 </div>
-                {draft.mediaUrl && (
-                  <div className="rounded-xl border border-white/10 overflow-hidden bg-black/30 p-2 flex items-center justify-center">
-                    <img src={draft.mediaUrl} alt="معاينة الصورة" className="max-h-28 rounded-lg object-contain" />
+
+                {/* Drag & Drop Visual Canvas Target */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDraggingOver(true);
+                  }}
+                  onDragLeave={() => setIsDraggingOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDraggingOver(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) void handleProcessFile(file);
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`group relative rounded-2xl border-2 border-dashed p-3 transition-all flex flex-col items-center justify-center cursor-pointer text-center ${
+                    isDraggingOver
+                      ? "border-emerald-400 bg-emerald-500/15 shadow-[0_0_25px_rgba(52,211,153,0.3)] scale-[1.02]"
+                      : isUploading
+                      ? "border-amber-400 bg-amber-400/10 animate-pulse"
+                      : draft.mediaUrl
+                      ? "border-white/15 bg-black/40 hover:border-amber-400/50"
+                      : "border-amber-400/40 bg-amber-400/5 hover:border-amber-400 hover:bg-amber-400/10"
+                  }`}
+                >
+                  {draft.mediaUrl ? (
+                    <div className="relative w-full overflow-hidden rounded-xl bg-black/60 flex items-center justify-center p-1">
+                      <img
+                        src={draft.mediaUrl}
+                        alt={draft.altText || "معاينة الصورة"}
+                        className="max-h-36 w-full rounded-lg object-cover transition duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition backdrop-blur-xs">
+                        <span className="flex items-center gap-1 text-[11px] font-black text-amber-300 bg-black/80 px-2.5 py-1 rounded-lg border border-amber-400/30">
+                          <Upload size={13} />
+                          <span>انقر أو اسحب لاستبدال الصورة</span>
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-5 flex flex-col items-center">
+                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-400/10 text-amber-400 mb-2">
+                        <Upload size={18} />
+                      </div>
+                      <p className="text-xs font-black text-slate-200">اسحب صورة وأفلتها هنا</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">أو انقر للاختيار من جهازك مباشرة</p>
+                    </div>
+                  )}
+                  {isUploading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 rounded-2xl backdrop-blur-sm z-10">
+                      <Loader2 size={24} className="animate-spin text-amber-400 mb-2" />
+                      <span className="text-xs font-bold text-amber-300">جارٍ المعالجة والرفع...</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Shape & Radius Control */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                    <span>استدارة الحواف (Border Radius):</span>
+                    <span className="text-[10px] text-amber-300 font-mono">{draft.borderRadius || "0px"}</span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { label: "حادة", val: "0px" },
+                      { label: "ناعمة", val: "12px" },
+                      { label: "عصرية", val: "24px" },
+                      { label: "دائرية", val: "9999px" },
+                    ].map((item) => (
+                      <button
+                        key={item.val}
+                        type="button"
+                        onClick={() => onChangeDraft({ borderRadius: item.val })}
+                        className={`py-1.5 rounded-xl text-[10px] font-bold border transition ${
+                          (draft.borderRadius || "0px") === item.val
+                            ? "border-amber-400 bg-amber-400/20 text-amber-300 font-black"
+                            : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
+
+                {/* Alt Text (SEO & Accessibility) */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-300 mb-1.5">النص البديل (Alt text):</label>
                   <input
                     type="text"
                     value={draft.altText ?? ""}
                     onChange={(e) => onChangeDraft({ altText: e.target.value })}
-                    placeholder="وصف محتوى الصورة..."
+                    placeholder="وصف محتوى الصورة لمحركات البحث..."
                     className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
                   />
+                </div>
+
+                {/* Collapsible Direct URL (Advanced) */}
+                <div className="border-t border-white/10 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvancedUrl(!showAdvancedUrl)}
+                    className="flex items-center justify-between w-full text-[11px] font-bold text-slate-400 hover:text-slate-200 transition py-1"
+                  >
+                    <span className="flex items-center gap-1">
+                      <Link2 size={12} className="text-amber-400" />
+                      <span>خيارات متقدمة: إدخال رابط يدوي</span>
+                    </span>
+                    {showAdvancedUrl ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  </button>
+                  {showAdvancedUrl && (
+                    <div className="mt-2 space-y-1 animate-in fade-in duration-150">
+                      <input
+                        type="text"
+                        value={draft.mediaUrl ?? ""}
+                        onChange={(e) => onChangeDraft({ mediaUrl: e.target.value })}
+                        placeholder="https://... أو /covers/..."
+                        className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-amber-400 font-mono"
+                        dir="ltr"
+                      />
+                      <p className="text-[10px] text-slate-500 leading-4">
+                        يمكنك لصق رابط خارجي مباشر إذا كنت تفضل عدم رفع الملف.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -637,6 +830,21 @@ export function StudioInspector({
           </button>
         </div>
       </div>
+
+      {/* Media Library Modal */}
+      <MediaLibrary
+        open={mediaLibraryOpen}
+        onClose={() => setMediaLibraryOpen(false)}
+        accept="image"
+        onSelect={(asset: MediaAsset) => {
+          onChangeDraft({
+            mediaUrl: asset.url,
+            altText: asset.altText || draft.altText,
+          });
+          setMediaLibraryOpen(false);
+          toast.success("تم اختيار الصورة من المكتبة بنجاح 🖼️");
+        }}
+      />
     </aside>
   );
 }
