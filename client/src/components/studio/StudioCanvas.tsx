@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import type { DeviceMode } from "./StudioTopBar";
 import type { StudioInspectorDraft } from "./StudioInspector";
+import type { StudioLayerItem } from "./StudioLeftDock";
+import type { SchoolBlock } from "./StudioSchoolBlocks";
 
 export interface StudioCanvasHandle {
   reload: () => void;
@@ -12,6 +14,13 @@ export interface StudioCanvasHandle {
   duplicate: () => void;
   deleteSelected: () => void;
   restoreOrigin: () => void;
+  insertElement: (tag: string, label: string) => void;
+  insertSection: (sectionType: string, title?: string) => void;
+  insertSchoolBlock: (block: SchoolBlock) => void;
+  selectLayer: (id: string) => void;
+  toggleLayerVisibility: (id: string) => void;
+  toggleLayerLock: (id: string) => void;
+  deleteLayer: (id: string) => void;
 }
 
 export const StudioCanvas = React.forwardRef<
@@ -27,6 +36,7 @@ export const StudioCanvas = React.forwardRef<
       undoCount: number;
       redoCount: number;
       dirtyCount: number;
+      layers?: StudioLayerItem[];
     }) => void;
   }
 >(function StudioCanvas(
@@ -110,6 +120,48 @@ export const StudioCanvas = React.forwardRef<
         "*"
       );
     },
+    insertElement: (tag, label) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_INSERT_ELEMENT", tag, label },
+        "*"
+      );
+    },
+    insertSection: (sectionType, title) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_INSERT_SECTION", sectionType, title },
+        "*"
+      );
+    },
+    insertSchoolBlock: (block) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_INSERT_SCHOOL_BLOCK", block },
+        "*"
+      );
+    },
+    selectLayer: (id) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_SELECT_LAYER", id },
+        "*"
+      );
+    },
+    toggleLayerVisibility: (id) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_TOGGLE_LAYER_VISIBILITY", id },
+        "*"
+      );
+    },
+    toggleLayerLock: (id) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_TOGGLE_LAYER_LOCK", id },
+        "*"
+      );
+    },
+    deleteLayer: (id) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_DELETE_LAYER", id },
+        "*"
+      );
+    },
   }));
 
   // Listen to iframe postMessages
@@ -124,6 +176,7 @@ export const StudioCanvas = React.forwardRef<
           undoCount: data.undoCount || 0,
           redoCount: data.redoCount || 0,
           dirtyCount: data.dirtyCount || 0,
+          layers: data.layers || [],
         });
       }
     };

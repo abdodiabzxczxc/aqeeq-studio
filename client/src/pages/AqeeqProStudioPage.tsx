@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { StudioTopBar, type DeviceMode } from "@/components/studio/StudioTopBar";
-import { StudioLeftDock, type StudioDockTab } from "@/components/studio/StudioLeftDock";
+import { StudioLeftDock, type StudioDockTab, type StudioLayerItem } from "@/components/studio/StudioLeftDock";
 import { StudioCanvas, type StudioCanvasHandle } from "@/components/studio/StudioCanvas";
 import { StudioInspector, type StudioInspectorDraft } from "@/components/studio/StudioInspector";
 import type { SchoolBlock } from "@/components/studio/StudioSchoolBlocks";
@@ -23,6 +23,7 @@ export default function AqeeqProStudioPage() {
   const [undoCount, setUndoCount] = useState<number>(0);
   const [redoCount, setRedoCount] = useState<number>(0);
   const [dirtyCount, setDirtyCount] = useState<number>(0);
+  const [layers, setLayers] = useState<StudioLayerItem[]>([]);
 
   const canvasRef = useRef<StudioCanvasHandle | null>(null);
 
@@ -33,6 +34,7 @@ export default function AqeeqProStudioPage() {
     undoCount: number;
     redoCount: number;
     dirtyCount: number;
+    layers?: StudioLayerItem[];
   }) => {
     setSelectedElement(data.selected);
     if (data.draft) {
@@ -41,6 +43,9 @@ export default function AqeeqProStudioPage() {
     setUndoCount(data.undoCount);
     setRedoCount(data.redoCount);
     setDirtyCount(data.dirtyCount);
+    if (data.layers) {
+      setLayers(data.layers);
+    }
   };
 
   const handleDraftChange = (patch: Partial<StudioInspectorDraft>) => {
@@ -61,16 +66,31 @@ export default function AqeeqProStudioPage() {
   };
 
   const handleInsertElement = (tag: string, label: string) => {
-    toast.message(`إدراج عنصر «${label}» كمسودة في الصفحة`);
-    // Pass event to canvas
+    canvasRef.current?.insertElement(tag, label);
   };
 
-  const handleInsertSection = (type: string) => {
-    toast.success(`✓ تمت إضافة قسم «${type}» إلى مساحة العمل`);
+  const handleInsertSection = (type: string, title?: string) => {
+    canvasRef.current?.insertSection(type, title);
   };
 
   const handleInsertSchoolBlock = (block: SchoolBlock) => {
-    toast.success(`✓ تم ربط كتلة «${block.title}» الحية بقاعدة البيانات`);
+    canvasRef.current?.insertSchoolBlock(block);
+  };
+
+  const handleSelectLayer = (id: string) => {
+    canvasRef.current?.selectLayer(id);
+  };
+
+  const handleToggleLayerVisibility = (id: string) => {
+    canvasRef.current?.toggleLayerVisibility(id);
+  };
+
+  const handleToggleLayerLock = (id: string) => {
+    canvasRef.current?.toggleLayerLock(id);
+  };
+
+  const handleDeleteLayer = (id: string) => {
+    canvasRef.current?.deleteLayer(id);
   };
 
   const handleApplyAiText = (text: { headline: string; body: string; cta: string }) => {
@@ -118,6 +138,12 @@ export default function AqeeqProStudioPage() {
           onInsertSection={handleInsertSection}
           onInsertSchoolBlock={handleInsertSchoolBlock}
           onApplyAiText={handleApplyAiText}
+          layers={layers}
+          selectedLayerId={selectedElement?.id}
+          onSelectLayer={handleSelectLayer}
+          onToggleLayerVisibility={handleToggleLayerVisibility}
+          onToggleLayerLock={handleToggleLayerLock}
+          onDeleteLayer={handleDeleteLayer}
           pagePath={currentPath}
         />
 

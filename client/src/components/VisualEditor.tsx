@@ -220,6 +220,8 @@ type VisualEditorContextValue = {
   setGroupTranslation: (translation: GroupTranslation) => void;
   saveLayer: (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => void;
   deleteLayer: (elementId: string, label: string) => void;
+  duplicateSelected?: () => void;
+  isStudioCanvasMode?: boolean;
   getOverride: (elementId: string) => VisualOverride | undefined;
   getOwnOverride: (elementId: string) => VisualOverride | undefined;
 };
@@ -254,6 +256,8 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
   setGroupTranslation: () => undefined,
   saveLayer: () => undefined,
   deleteLayer: () => undefined,
+  duplicateSelected: () => undefined,
+  isStudioCanvasMode: false,
   getOverride: () => undefined,
   getOwnOverride: () => undefined,
 });
@@ -444,6 +448,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [redoStack, setRedoStack] = useState<Record<string, VisualOverride>[]>([]);
   const [styleClipboard, setStyleClipboard] = useState<CopyableLayerStyle | null>(null);
   const [groupedIds, setGroupedIds] = useState<string[]>([]);
+  const [studioLayers, setStudioLayers] = useState<Array<{ id: string; tag: string; label: string; type?: string; isHidden?: boolean; isLocked?: boolean }>>([]);
   const [previewMode, setPreviewMode] = useState(false);
   const draftPreviewEnabled = useRef(false);
   const [toolGroup, setToolGroup] = useState<"design" | "arrange" | "publish" | null>(null);
@@ -690,11 +695,37 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     onError: (error) => toast.error(error.message || "تعذر استعادة النسخة"),
   });
   const saveDuplicatedSection = trpc.visualEditor.sections.save.useMutation({
-    onSuccess: () => {
-      if (pagePath) { void utils.visualEditor.sections.list.invalidate({ pagePath }); void utils.visualEditor.sections.publicList.invalidate({ pagePath }); }
-      toast.success("تمت إضافة نسخة قابلة للتحرير في نهاية الصفحة كمسودة");
+    onSuccess: (savedSection) => {
+      if (pagePath) {
+        void utils.visualEditor.sections.list.invalidate({ pagePath });
+        void utils.visualEditor.sections.publicList.invalidate({ pagePath });
+      }
+      toast.success("✓ تم إدراج القسم/العنصر في الصفحة بنجاح");
+      setTimeout(() => {
+        const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(savedSection.sectionId)}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setSelected({
+            id: savedSection.sectionId,
+            tag: "section-block",
+            label: el.dataset.visualLabel || savedSection.sectionId,
+          });
+        }
+      }, 350);
     },
-    onError: (error) => toast.error(error.message || "تعذر تكرار العنصر"),
+    onError: (error) => toast.error(error.message || "تعذر حفظ وإدراج القسم"),
+  });
+
+  const deleteSection = trpc.visualEditor.sections.delete.useMutation({
+    onSuccess: () => {
+      if (pagePath) {
+        void utils.visualEditor.sections.list.invalidate({ pagePath });
+        void utils.visualEditor.sections.publicList.invalidate({ pagePath });
+      }
+      toast.success("تم حذف القسم بنجاح");
+      setSelected(null);
+    },
+    onError: (error) => toast.error(error.message || "تعذر حذف القسم"),
   });
 
   const overrideMap = useMemo(() => {
@@ -1279,11 +1310,56 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       window.addEventListener("dblclick", handleCaptureDblClick, true);
     }
 
+    const collectStudioLayers = () => {
+      const root = document.getElementById("root") || document.body;
+      if (!root) return [];
+      const nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-visual-id]"));
+      const seen = new Set<string>();
+      const items: Array<{ id: string; tag: string; label: string; type?: string; isHidden?: boolean; isLocked?: boolean }> = [];
+
+      for (const node of nodes) {
+        if (isEditorSystemUi(node)) continue;
+        const id = node.dataset.visualId;
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+
+        const tag = node.dataset.visualTag || "text";
+        let label = node.dataset.visualLabel || node.getAttribute("aria-label") || "";
+        if (!label) {
+          const text = (node.textContent || "").trim();
+          label = text.slice(0, 30) || id;
+        }
+
+        const override = overrideMap.get(id);
+        const isHidden = override?.isHidden ?? (node.style.display === "none");
+        const isLocked = override?.isLocked ?? false;
+
+        items.push({
+          id,
+          tag,
+          label: label.slice(0, 40),
+          type: tag.includes("section") ? "section" : tag,
+          isHidden: Boolean(isHidden),
+          isLocked: Boolean(isLocked),
+        });
+      }
+      return items;
+    };
+
+    if (isStudioCanvasMode) {
+      setTimeout(() => {
+        setStudioLayers(collectStudioLayers());
+      }, 400);
+    }
+
     let scanTimer: ReturnType<typeof setTimeout> | null = null;
     const debouncedScan = () => {
       if (scanTimer) clearTimeout(scanTimer);
       scanTimer = setTimeout(() => {
         scanAndTag();
+        if (isStudioCanvasMode) {
+          setStudioLayers(collectStudioLayers());
+        }
       }, 300);
     };
 
@@ -1515,6 +1591,17 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     toast.message(axis === "horizontal" ? "تم توزيع المسافات الأفقية بالتساوي" : "تم توزيع المسافات الرأسية بالتساوي");
   };
 
+  const duplicateSelected = () => {
+    if (!pagePath || !selected) return;
+    const sectionId = `section-custom-${Date.now().toString(36)}`;
+    const isVideo = selected.tag === "video";
+    const builderElement: "image" | "button" | "text" = selected.tag === "image" ? "image" : selected.tag === "button" ? "button" : "text";
+    const config = isVideo
+      ? { title: draft.contentText || selected.label, body: "نسخة مكررة من الفيديو", videoUrl: draft.mediaUrl, videoHref: draft.linkUrl, anchorId: "global-page-end" }
+      : { builderElement, title: draft.contentText || selected.label, body: selected.tag === "text" ? draft.contentText || "" : "", imageUrl: draft.mediaUrl, imageAlt: draft.altText, imageHref: draft.linkUrl, buttonText: draft.contentText || selected.label, buttonHref: draft.linkUrl, anchorId: "global-page-end" };
+    saveDuplicatedSection.mutate({ pagePath, sectionId, sectionType: isVideo ? "video" : "custom", orderIndex: builderSections.length, config });
+  };
+
   const contextValue = useMemo<VisualEditorContextValue>(() => ({
     isEditing: isEditing && !previewMode && Boolean(pagePath),
     isPreviewing: previewMode,
@@ -1525,6 +1612,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     selectedTag: selected?.tag ?? null,
     pagePath,
     layerMode,
+    isStudioCanvasMode,
     gridEnabled,
     magnetEnabled,
     backgroundAspectLocked,
@@ -1558,6 +1646,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     toggleBackgroundAutoArrange: () => { if (pagePath) setBackgroundPreferences((current) => ({ ...current, [pagePath]: { ...(current[pagePath] || DEFAULT_BACKGROUND_EDITOR_PREFERENCES), autoArrange: !backgroundAutoArrange } })); },
     saveLayer,
     deleteLayer,
+    duplicateSelected,
     alignSelected,
     alignSelectedVertically,
     distributeSelected,
@@ -1565,7 +1654,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setGroupTranslation,
     getOverride: (elementId) => resolveHeroOverrideForPreview(overrideMap, elementId),
     getOwnOverride: (elementId) => overrideMap.get(elementId),
-  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap]);
+  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, isStudioCanvasMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap]);
 
   const saveSelected = () => {
     if (!pagePath || !selected) return;
@@ -1695,17 +1784,6 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       return next;
     });
     toast.success("تم حفظ العنصر في مفضلات هذا الجهاز");
-  };
-
-  const duplicateSelected = () => {
-    if (!pagePath || !selected) return;
-    const sectionId = `section-custom-${Date.now().toString(36)}`;
-    const isVideo = selected.tag === "video";
-    const builderElement: "image" | "button" | "text" = selected.tag === "image" ? "image" : selected.tag === "button" ? "button" : "text";
-    const config = isVideo
-      ? { title: draft.contentText || selected.label, body: "نسخة مكررة من الفيديو", videoUrl: draft.mediaUrl, videoHref: draft.linkUrl, anchorId: "page-end" }
-      : { builderElement, title: draft.contentText || selected.label, body: selected.tag === "text" ? draft.contentText || "" : "", imageUrl: draft.mediaUrl, imageAlt: draft.altText, imageHref: draft.linkUrl, buttonText: draft.contentText || selected.label, buttonHref: draft.linkUrl, anchorId: "page-end" };
-    saveDuplicatedSection.mutate({ pagePath, sectionId, sectionType: isVideo ? "video" : "custom", orderIndex: builderSections.length, config });
   };
 
   const undoLastSave = () => {
@@ -1912,9 +1990,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       undoCount: undoStack.length,
       redoCount: redoStack.length,
       dirtyCount: Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length,
+      layers: studioLayers,
       pagePath,
     }, "*");
-  }, [isStudioCanvasMode, selected, draft, undoStack.length, redoStack.length, localOverrides, pagePath]);
+  }, [isStudioCanvasMode, selected, draft, undoStack.length, redoStack.length, localOverrides, pagePath, studioLayers]);
 
   useEffect(() => {
     if (!isStudioCanvasMode || typeof window === "undefined") return;
@@ -1939,11 +2018,262 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       } else if (data.type === "AQEEQ_STUDIO_RESTORE_ORIGIN") {
         if (isSelectedBackground) restoreSavedBackgroundOrigin();
         else restoreSelectedOrigin();
+      } else if (data.type === "AQEEQ_STUDIO_INSERT_SECTION") {
+        const { sectionType = "custom", title } = data;
+        const sectionId = `section-${sectionType}-${Date.now().toString(36)}`;
+        let config: Record<string, unknown> = { anchorId: "global-page-end" };
+
+        if (sectionType === "hero") {
+          config = {
+            anchorId: "global-page-end",
+            title: title || "واجهة افتتاحية رئيسية لمدارس العقيق",
+            subtitle: "بيئة تعليمية دولية متطورة تلهم أجيال المستقبل وتصنع قادة الغد.",
+            buttonText: "ابدأ التسجيل والقبول",
+            buttonHref: "/admissions",
+            imageUrl: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
+            imageAlt: "واجهة مدارس العقيق الأهلية والدولية",
+          };
+        } else if (sectionType === "features") {
+          config = {
+            anchorId: "global-page-end",
+            title: title || "أبرز مزايا وخدمات مدارس العقيق",
+            subtitle: "نقدم منظومة متكاملة من البرامج الأكاديمية والأنشطة الإثرائية.",
+            items: [
+              { title: "اعتمادات دولية معتمدة", body: "برامج أكاديمية تطابق أعلى معايير الجودة العالمية." },
+              { title: "صالات ومرافق رياضية متطورة", body: "بيئة رياضية وصحية متكاملة ومسابح مجهزة." },
+              { title: "معامل ذكاء اصطناعي وروبوت", body: "مختبرات حاسوب وتقنية حديثة لإعداد المبرمجين الصغار." },
+            ],
+          };
+        } else if (sectionType === "gallery") {
+          config = {
+            anchorId: "global-page-end",
+            title: title || "معرض الأنشطة والفعاليات المدرسية",
+            subtitle: "لحظات لا تُنسى من إبداعات وتفوق طلابنا في مختلف الأنشطة.",
+            items: [
+              { title: "اليوم الوطني السعودي", imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" },
+              { title: "معرض العلوم والابتكار", imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" },
+              { title: "حفل تكريم الأوائل", imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80" },
+            ],
+          };
+        } else if (sectionType === "video") {
+          config = {
+            anchorId: "global-page-end",
+            title: title || "جولة وثائقية داخل مدارس العقيق",
+            body: "استكشف بيئتنا التعليمية ومرافقنا المتطورة في هذه الجولة المرئية الحصرية.",
+            videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          };
+        } else if (sectionType === "cta") {
+          config = {
+            anchorId: "global-page-end",
+            title: title || "انضم الآن إلى مجتمع مدارس العقيق",
+            subtitle: "التسجيل مفتوح للعام الدراسي الجديد لكافة المراحل — مقاعد محدودة.",
+            buttonText: "تقديم طلب القبول الآن",
+            buttonHref: "/admissions",
+          };
+        } else {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "text",
+            title: title || "قسم مخصص جديد",
+            body: "مساحة مرنة لإضافة محتوى ونصوص خاصة بك بحرية تامة.",
+          };
+        }
+
+        saveDuplicatedSection.mutate({
+          pagePath: pagePath || "/",
+          sectionId,
+          sectionType: (["hero", "features", "gallery", "video", "cta", "custom"].includes(sectionType) ? sectionType : "custom") as any,
+          orderIndex: builderSections.length,
+          config,
+        });
+      } else if (data.type === "AQEEQ_STUDIO_INSERT_ELEMENT") {
+        const { tag = "text", label = "عنصر جديد" } = data;
+        const sectionId = `section-custom-${Date.now().toString(36)}`;
+        let config: Record<string, unknown> = { anchorId: "global-page-end" };
+
+        if (tag === "text") {
+          const isHeadline = label.includes("عنوان");
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "text",
+            title: isHeadline ? label : "",
+            body: isHeadline ? "" : "نص فقرة جديد يوضح تفاصيل المحتوى والخدمات...",
+          };
+        } else if (tag === "button") {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "button",
+            buttonText: "زر إجراء جديد",
+            buttonHref: "/admissions",
+          };
+        } else if (tag === "image") {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "image",
+            title: "صورة توضيحية",
+            imageUrl: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80",
+            imageAlt: "صورة جديدة",
+          };
+        } else if (tag === "video") {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "text",
+            title: "مقطع فيديو مدرسي",
+            body: "يمكنك ربط رابط الفيديو من شريط الإعدادات.",
+          };
+        } else if (tag === "icon") {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "icon",
+            title: "أيقونة تميز",
+            iconName: "sparkles",
+          };
+        } else if (tag === "divider") {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "shape",
+            shapeType: "line",
+            shapeColor: "#fbbf24",
+            shapeLabel: "فاصل زخرفي",
+          };
+        } else {
+          config = {
+            anchorId: "global-page-end",
+            builderElement: "text",
+            title: label,
+            body: "محتوى عنصر جديد",
+          };
+        }
+
+        saveDuplicatedSection.mutate({
+          pagePath: pagePath || "/",
+          sectionId,
+          sectionType: "custom",
+          orderIndex: builderSections.length,
+          config,
+        });
+      } else if (data.type === "AQEEQ_STUDIO_INSERT_SCHOOL_BLOCK") {
+        const block = data.block;
+        const sType = block.category === "media" ? "gallery" : block.category === "admissions" ? "cta" : "features";
+        const sectionId = `section-${sType}-${Date.now().toString(36)}`;
+        let config: Record<string, unknown> = { anchorId: "global-page-end" };
+
+        if (block.id === "block-honors") {
+          config = {
+            anchorId: "global-page-end",
+            title: "لوحة الشرف — أوائل الطلبة المتفوقين",
+            subtitle: "نعتز بنخبة طلابنا وطالباتنا الحاصلين على أعلى المراتب الأكاديمية لهذا العام.",
+            items: [
+              { title: "عبدالرحمن الشريف — 99.8%", body: "المسار العلمي والرياضيات المتقدمة" },
+              { title: "سارة الأحمدي — 99.5%", body: "مسار الحاسب والهندسة الرقمية" },
+              { title: "فيصل الجهني — 99.2%", body: "المسار العام واللغات الحية" },
+            ],
+          };
+        } else if (block.id === "block-latest-album") {
+          config = {
+            anchorId: "global-page-end",
+            title: "ألبوم الفعاليات والأنشطة الحديثة",
+            subtitle: "توثيق حي لأبرز اللحظات والمشاركات المدرسية في مدارس العقيق.",
+            items: [
+              { title: "المعرض الفني السنوي", imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" },
+              { title: "دوري كرة القدم المدرسي", imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" },
+              { title: "حفل التفوق والتميز", imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80" },
+            ],
+          };
+        } else if (block.id === "block-journal-feed") {
+          config = {
+            anchorId: "global-page-end",
+            title: "نشرة مجلة العقيق الأسبوعية",
+            subtitle: "العدد الأخير من مجلة العقيق الطلابية — مقالات وإبداعات وقصص نجاح ملهمة.",
+            buttonText: "تصفح المجلة والبودكاست",
+            buttonHref: "/journal",
+          };
+        } else if (block.id === "block-admissions-calculator") {
+          config = {
+            anchorId: "global-page-end",
+            title: "بوابة القبول وحاسبة الخصومات الفورية",
+            subtitle: "احسب قسطك الدراسي بخصومات الأشقاء والتسجيل المبكر وقدم طلبك في دقيقة واحدة.",
+            buttonText: "احسب القسط وقدم الطلب الآن",
+            buttonHref: "/admissions",
+          };
+        } else if (block.id === "block-events-timeline") {
+          config = {
+            anchorId: "global-page-end",
+            title: "تقويم الفعاليات والأنشطة القادمة",
+            subtitle: "مواعيد المناسبات المدرسية، المسابقات، واللقاءات التعريفية لأولياء الأمور.",
+            items: [
+              { title: "معرض العلوم والروبوتكس", body: "الأربعاء القادم — الصالة الرياضية الكبرى" },
+              { title: "الملتقى السنوي لأولياء الأمور", body: "الأحد القادم — مسرح المدرسة الرئيسي" },
+              { title: "اليوم الرياضي والماراثون المدرسي", body: "الخميس 15 أكتوبر — الملاعب الخارجية" },
+            ],
+          };
+        } else {
+          config = {
+            anchorId: "global-page-end",
+            title: block.title,
+            subtitle: block.description,
+          };
+        }
+
+        saveDuplicatedSection.mutate({
+          pagePath: pagePath || "/",
+          sectionId,
+          sectionType: sType as any,
+          orderIndex: builderSections.length,
+          config,
+        });
+      } else if (data.type === "AQEEQ_STUDIO_SELECT_LAYER") {
+        const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(data.id)}"]`);
+        if (node) {
+          node.scrollIntoView({ behavior: "smooth", block: "center" });
+          setSelected({
+            id: data.id,
+            tag: (node.dataset.visualTag || "text") as ElementTag,
+            label: node.dataset.visualLabel || data.id,
+          });
+        }
+      } else if (data.type === "AQEEQ_STUDIO_TOGGLE_LAYER_VISIBILITY") {
+        const cur = overrideMap.get(data.id);
+        const node = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(data.id)}"]`);
+        const newHidden = !(cur?.isHidden ?? (node ? node.style.display === "none" : false));
+        saveLayer(data.id, {
+          layerX: cur?.layerX ?? 0,
+          layerY: cur?.layerY ?? 0,
+          layerWidth: cur?.layerWidth ?? null,
+          layerHeight: cur?.layerHeight ?? null,
+          layerZIndex: cur?.layerZIndex ?? 0,
+          layerOpacity: cur?.layerOpacity ?? 100,
+          isHidden: newHidden,
+        });
+        if (node) {
+          node.style.display = newHidden ? "none" : "";
+        }
+        toast.message(newHidden ? `تم إخفاء العنصر «${data.id}»` : `تم إظهار العنصر «${data.id}»`);
+      } else if (data.type === "AQEEQ_STUDIO_TOGGLE_LAYER_LOCK") {
+        const cur = overrideMap.get(data.id);
+        const newLocked = !(cur?.isLocked ?? false);
+        saveLayer(data.id, {
+          layerX: cur?.layerX ?? 0,
+          layerY: cur?.layerY ?? 0,
+          layerWidth: cur?.layerWidth ?? null,
+          layerHeight: cur?.layerHeight ?? null,
+          layerZIndex: cur?.layerZIndex ?? 0,
+          layerOpacity: cur?.layerOpacity ?? 100,
+          isHidden: cur?.isHidden ?? false,
+          isLocked: newLocked,
+        });
+        toast.message(newLocked ? "🔒 تم قفل العنصر لمنع التعديل" : "🔓 تم فتح قفل العنصر");
+      } else if (data.type === "AQEEQ_STUDIO_DELETE_LAYER") {
+        if (data.id.startsWith("section-")) {
+          deleteSection.mutate({ pagePath: pagePath || "/", sectionId: data.id });
+        } else {
+          deleteLayer(data.id, data.id);
+        }
       }
     };
     window.addEventListener("message", handleStudioMessage);
     return () => window.removeEventListener("message", handleStudioMessage);
-  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected]);
+  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected, saveDuplicatedSection, deleteSection, builderSections.length, pagePath, overrideMap, saveLayer]);
 
   const fitSelectedBackground = (axis: "width" | "height" | "fill" | "contain") => {
     if (!selected) return;
@@ -2733,7 +3063,8 @@ function BackgroundSizingControls({ aspectLocked, autoArrange, onFit, onToggleAs
 }
 
 export function VisualEditable({ id, htmlId, tag, label, defaultText, children, className = "", as: Tag = "div", onAction, onClick, title, style }: { id: string; htmlId?: string; tag: ElementTag; label: string; defaultText?: string; children?: ReactNode | ((text: string) => ReactNode); className?: string; as?: "article" | "div" | "span" | "small" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "button" | "section" | "footer" | "header" | "aside" | "nav"; onAction?: () => void; onClick?: () => void; title?: string; style?: React.CSSProperties }) {
-  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
+  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
+  const isInteractiveTransform = layerMode || Boolean(isStudioCanvasMode);
   const override = getOverride(id);
   const content = override?.contentText ?? defaultText ?? "";
   const selected = selectedIds.includes(id) || selectedId === id;
@@ -2772,7 +3103,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     return true;
   };
   const begin = (event: React.PointerEvent<HTMLElement>, mode: "move" | "resize", resizeHandle?: ResizeHandle) => {
-    if (!isEditing || (!layerMode && !(mode === "resize" && isDirectBackground)) || !canManipulateLayer(isLocked)) return;
+    if (!isEditing || (!isInteractiveTransform && !(mode === "resize" && isDirectBackground)) || !canManipulateLayer(isLocked)) return;
     event.preventDefault(); event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -2881,7 +3212,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     if (isEditing && event.shiftKey) return;
     if (isEditing && (isDirectBackground || event.target === event.currentTarget && isBackgroundSurface(id, label, tag))) {
       event.preventDefault(); event.stopPropagation(); select(id, tag, label);
-      if (layerMode) begin(event, "move");
+      if (isInteractiveTransform) begin(event, "move");
       return;
     }
     if (isEditing && event.pointerType === "touch") {
@@ -2890,9 +3221,35 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       return;
     }
     begin(event, "move");
-  }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={(event) => { if (isEditing) { event.preventDefault(); event.stopPropagation(); if (isLocked) return; if (longPress.current.selected) { longPress.current.selected = false; return; } if (event.target === event.currentTarget && selectSectionBackground()) return; select(id, tag, label, event.shiftKey); return; } if (override?.linkUrl) { event.preventDefault(); event.stopPropagation(); if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer"); else window.location.assign(override.linkUrl); return; } onAction?.(); onClick?.(); }} style={visualStyle} className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${layerMode && !isLocked ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""}`}>
+  }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={(event) => { if (isEditing) { event.preventDefault(); event.stopPropagation(); if (isLocked) return; if (longPress.current.selected) { longPress.current.selected = false; return; } if (event.target === event.currentTarget && selectSectionBackground()) return; select(id, tag, label, event.shiftKey); return; } if (override?.linkUrl) { event.preventDefault(); event.stopPropagation(); if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer"); else window.location.assign(override.linkUrl); return; } onAction?.(); onClick?.(); }} style={visualStyle} className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${isInteractiveTransform && !isLocked ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""}`}>
+    {isEditing && isStudioCanvasMode && selected ? (
+      <div
+        data-aq-quick-actions
+        className="pointer-events-auto absolute -top-10 left-1/2 -translate-x-1/2 z-[86] flex items-center gap-1 rounded-xl border border-amber-400/40 bg-[#090d14]/95 px-2 py-1 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 select-none"
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <span className="text-[10px] font-black text-amber-300 px-1 border-l border-white/15 whitespace-nowrap">{label}</span>
+        <button
+          type="button"
+          title="تكرار العنصر كمسودة"
+          onClick={() => duplicateSelected?.()}
+          className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
+        >
+          <Copy size={12} />
+        </button>
+        <button
+          type="button"
+          title="حذف العنصر"
+          onClick={() => deleteLayer?.(id, label)}
+          className="grid h-6 w-6 place-items-center rounded-lg text-red-400 hover:bg-red-500/20 hover:text-red-300 transition"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+    ) : null}
     {isEditing ? <span className={`pointer-events-none absolute -top-5 right-0 z-[82] inline-flex items-center gap-1 rounded-t-lg bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 transition-opacity duration-200 ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>{isLocked ? <Lock size={10} /> : null}{label}</span> : null}
-    {isEditing && layerMode && selected ? <span className="pointer-events-none absolute -bottom-6 right-0 z-[82] rounded-lg bg-[#08467d] px-2 py-1 text-[10px] font-black text-white shadow-lg">X {Math.round(inspectorFrame.x)} · Y {Math.round(inspectorFrame.y)} · {inspectorFrame.width ? `${Math.round(inspectorFrame.width)}×${Math.round(inspectorFrame.height ?? 0)}` : "حجم تلقائي"}</span> : null}
+    {isEditing && isInteractiveTransform && selected ? <span className="pointer-events-none absolute -bottom-6 right-0 z-[82] rounded-lg bg-[#08467d] px-2 py-1 text-[10px] font-black text-white shadow-lg">X {Math.round(inspectorFrame.x)} · Y {Math.round(inspectorFrame.y)} · {inspectorFrame.width ? `${Math.round(inspectorFrame.width)}×${Math.round(inspectorFrame.height ?? 0)}` : "حجم تلقائي"}</span> : null}
     {isEditing && selected && isDirectBackground && liveFrame ? <><span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 z-[82] border-t border-dashed border-[#f8ca14]/90" /><span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-1/2 z-[82] border-l border-dashed border-[#f8ca14]/90" /><span className="pointer-events-none absolute left-1/2 top-1/2 z-[83] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f8ca14]/60 bg-[#111521]/95 px-2.5 py-1 text-[10px] font-black text-[#f8ca14] shadow-xl">{Math.round(liveFrame.width ?? 0)} × {Math.round(liveFrame.height ?? 0)} بكسل</span><span className="pointer-events-none absolute -top-7 left-1/2 z-[83] -translate-x-1/2 whitespace-nowrap rounded-lg border border-[#f8ca14]/45 bg-[#111521]/95 px-2 py-1 text-[9px] font-black text-[#f8ca14]">منتصف الخلفية · {backgroundAspectLocked ? "النسبة مقفلة" : "نسبة حرة"}</span></> : null}
     {isEditing && selected && !isLocked && isDirectBackground ? ([
       { handle: "nw", label: "تكبير أو تصغير الخلفية من أعلى اليمين", className: "-top-2 -right-2 cursor-nwse-resize" },
@@ -2901,8 +3258,8 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       { handle: "se", label: "تكبير أو تصغير الخلفية من أسفل اليسار", className: "-bottom-2 -left-2 cursor-nwse-resize" },
       { handle: "n", label: "قص الخلفية من الأعلى مع تثبيت الحافة السفلية", className: "-top-2 left-1/2 -translate-x-1/2 cursor-ns-resize" },
       { handle: "s", label: "قص الخلفية من الأسفل مع التصاق القسم التالي", className: "-bottom-2 left-1/2 -translate-x-1/2 cursor-ns-resize" },
-    ] as const).map(({ handle, label: handleLabel, className: handleClass }) => <button key={handle} type="button" aria-label={handleLabel} title={handleLabel} onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize", handle); }} className={`absolute z-[83] grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-amber-300 shadow-[0_0_0_3px_rgba(7,9,13,.45)] ${handleClass}`}><span className="h-1.5 w-1.5 rounded-full bg-amber-950" /></button>) : isEditing && layerMode && selected && !isLocked ? <button type="button" aria-label="تغيير حجم الطبقة" onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize"); }} className="absolute -bottom-2 -left-2 z-[83] grid h-5 w-5 place-items-center rounded-md border-2 border-white bg-[#08467d] text-white shadow-lg"><Move size={11} /></button> : null}
-    {isEditing && layerMode && selected && !isLocked && !isDirectBackground ? ([
+    ] as const).map(({ handle, label: handleLabel, className: handleClass }) => <button key={handle} type="button" aria-label={handleLabel} title={handleLabel} onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize", handle); }} className={`absolute z-[83] grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-amber-300 shadow-[0_0_0_3px_rgba(7,9,13,.45)] ${handleClass}`}><span className="h-1.5 w-1.5 rounded-full bg-amber-950" /></button>) : isEditing && isInteractiveTransform && selected && !isLocked ? <button type="button" aria-label="تغيير حجم الطبقة" onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize"); }} className="absolute -bottom-2 -left-2 z-[83] grid h-5 w-5 place-items-center rounded-md border-2 border-white bg-[#08467d] text-white shadow-lg"><Move size={11} /></button> : null}
+    {isEditing && isInteractiveTransform && selected && !isLocked && !isDirectBackground ? ([
       { handle: "nw", label: "تغيير حجم العنصر من أعلى اليمين", className: "-top-2 -right-2 cursor-nwse-resize" },
       { handle: "ne", label: "تغيير حجم العنصر من أعلى اليسار", className: "-top-2 -left-2 cursor-nesw-resize" },
       { handle: "sw", label: "تغيير حجم العنصر من أسفل اليمين", className: "-bottom-2 -right-2 cursor-nesw-resize" },
