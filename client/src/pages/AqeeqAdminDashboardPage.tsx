@@ -3694,8 +3694,9 @@ export default function AqeeqAdminDashboardPage() {
                     : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
                 }`}
               >
-                <Link2 size={15} />
-                <span>روابط وشارات الهيدر والفوتر 🔗</span>
+                <Share2 size={15} />
+                <span>الهيدر والفوتر وقنوات التواصل الاجتماعي 📱🔗</span>
+                <span className="rounded-full bg-amber-400/20 text-amber-400 px-2 py-0.5 text-[10px]">10 منصات</span>
               </button>
 
               <button
@@ -5791,6 +5792,26 @@ export default function AqeeqAdminDashboardPage() {
                     <CheckCircle2 size={16} />
                     <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ بيانات المجمعات والتواصل"}</span>
                   </Button>
+                </div>
+
+                {/* Shortcut to Social Media Settings */}
+                <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                  dark ? "bg-amber-400/5 border-amber-400/20 text-slate-200" : "bg-amber-50 border-amber-200 text-slate-800"
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">📱</span>
+                    <div>
+                      <p className="text-xs font-black">تبحث عن إدارة قنوات وحسابات التواصل الاجتماعي الـ 10 الرسمية؟</p>
+                      <p className="text-[11px] text-slate-400">𝕏 تويتر، إنستغرام، سناب شات، تيك توك، فيسبوك، لينكد إن، ثريدز، يوتيوب، تليجرام، وواتساب.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSystemSubTab("header_footer")}
+                    className="shrink-0 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <span>فتح إعدادات السوشيل ميديا 🔗</span>
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
