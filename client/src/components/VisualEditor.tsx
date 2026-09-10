@@ -31,7 +31,7 @@ import VisualDesignTokensPanel from "./VisualDesignTokensPanel";
 import VisualLayersPanel from "./VisualLayersPanel";
 import SiteBuilderDrawer from "./SiteBuilderDrawer";
 
-type VisualOverride = {
+export type VisualOverride = {
   id: number;
   pagePath: string;
   elementId: string;

@@ -65,6 +65,8 @@ import { AqeeqHomeTabsLibrary } from "@/components/AqeeqHomeTabsLibrary";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqNationalTraitsSection } from "@/components/AqeeqNationalTraitsSection";
 import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
+import { SmartReorderStack } from "@/components/studio/SmartReorderStack";
+import { SectionCommanderBar } from "@/components/studio/SectionCommanderBar";
 
 import { AqeeqWeeklyHighlightsSection } from "@/components/AqeeqWeeklyHighlightsSection";
 
@@ -1074,106 +1076,134 @@ export default function AlaqeeqStudioPublicPage() {
               dark ? "text-white" : "text-slate-900"
             )}
           >
-
-
+          <SectionCommanderBar
+            sectionId="studio-hero-section"
+            title="غلاف واجهة مدارس العقيق الرئيسي"
+            icon={<Sparkles size={13} />}
+            isEditing={isEditing}
+            canMoveUp={false}
+          />
 
         <div className="relative mx-auto grid max-w-[1380px] 2xl:max-w-[1560px] items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 2xl:gap-20 px-4 sm:px-6 md:px-8 pt-5 sm:pt-8 md:pt-10 pb-8 sm:pb-12 md:pb-16 md:grid-cols-[minmax(340px,0.95fr)_minmax(0,1.05fr)] lg:grid-cols-[minmax(430px,0.95fr)_minmax(0,1.05fr)]">
           <div>
-            {isNationalDay ? (
-              <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
-                dark
-                  ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]"
-                  : "bg-slate-50 border-[#08467d]/20 text-[#08467d]"
-              }`}>
-                <span className="text-sm">🇸🇦</span>
-                <span className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>{customBadgeText}</span>
-                <span className={`font-normal mr-1 ${dark ? "text-white/60" : "text-[#08467d]/70"}`}>· هوية اليوم الوطني</span>
-              </div>
-            ) : (
-              <VisualEditable
-                id="studio-hero-kicker"
-                tag="text"
-                label="شارة الغلاف الرئيسي"
-                defaultText="ALAQEEQ SCHOOLS · OFFICIAL PORTAL"
-                as="p"
-                className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
-              />
-            )}
+            <SmartReorderStack
+              stackId="hero-headline"
+              isEditing={isEditing}
+              items={[
+                {
+                  id: "hero-badge-item",
+                  label: "شارة الغلاف",
+                  content: isNationalDay ? (
+                    <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 mb-3 text-xs font-black shadow-md backdrop-blur-md ${
+                      dark
+                        ? "bg-[#f8ca14]/10 border-[#f8ca14]/30 text-[#f8ca14]"
+                        : "bg-slate-50 border-[#08467d]/20 text-[#08467d]"
+                    }`}>
+                      <span className="text-sm">🇸🇦</span>
+                      <span className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>{customBadgeText}</span>
+                      <span className={`font-normal mr-1 ${dark ? "text-white/60" : "text-[#08467d]/70"}`}>· هوية اليوم الوطني</span>
+                    </div>
+                  ) : (
+                    <VisualEditable
+                      id="studio-hero-kicker"
+                      tag="text"
+                      label="شارة الغلاف الرئيسي"
+                      defaultText="ALAQEEQ SCHOOLS · OFFICIAL PORTAL"
+                      as="p"
+                      className={"text-[10px] font-black tracking-[0.18em] " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")}
+                    />
+                  ),
+                },
+                {
+                  id: "hero-title-item",
+                  label: "العنوان الرئيسي",
+                  content: (
+                    <h1 className={"mt-2.5 sm:mt-4 text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-black leading-[1.15] " + (
+                      isNationalDay
+                        ? dark ? "text-white" : "text-emerald-950"
+                        : dark ? "text-white" : "text-black"
+                    )}>
+                      <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي" defaultText="ذاكرة العقيق" as="span" />
+                      <br />
+                      <span className={isNationalDay ? (dark ? "snd-text-gradient" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
+                        <VisualEditable
+                          id="studio-hero-accent"
+                          tag="text"
+                          label="تكملة العنوان"
+                          defaultText="في مكان واحد."
+                          as="span"
+                        />
+                      </span>
+                    </h1>
+                  ),
+                },
+                {
+                  id: "hero-desc-item",
+                  label: "الوصف الرئيسي",
+                  content: (
+                    <VisualEditable
+                      id="studio-hero-description"
+                      tag="text"
+                      label="الوصف الرئيسي"
+                      defaultText="الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - نلهم الأجيال ونصنع الأثر من خلال بيئة تعليمية رائدة ومعتمدة عالمياً."
+                      as="p"
+                      className={"mt-3 sm:mt-5 max-w-xl text-xs sm:text-sm leading-6 sm:leading-8 " + (
+                        isNationalDay
+                          ? dark ? "text-emerald-100/80" : "text-emerald-900/80"
+                          : dark ? "text-slate-300" : "text-slate-600"
+                      )}
+                    />
+                  ),
+                },
+                {
+                  id: "hero-cta-item",
+                  label: "أزرار التواصل",
+                  content: (
+                    <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/admissions")}
+                        data-visual-id="hero-cta-admissions"
+                        data-visual-tag="button"
+                        data-visual-label="زر القبول والتسجيل في الهيرو"
+                        className={`inline-flex items-center gap-2 rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-black shadow-lg transition active:scale-95 ${
+                          dark
+                            ? isNationalDay
+                              ? "bg-gradient-to-r from-[#D4AF37] to-amber-500 text-black shadow-[#D4AF37]/20 hover:opacity-95"
+                              : "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
+                            : isNationalDay
+                            ? "bg-gradient-to-r from-[#005A36] to-[#003822] text-white shadow-[#005A36]/30 hover:opacity-95"
+                            : "bg-gradient-to-r from-[#08467d] to-[#052c52] text-white shadow-[#08467d]/25 hover:opacity-95"
+                        }`}
+                      >
+                        <Send size={15} />
+                        <span>القبول والتسجيل والرسوم ✦</span>
+                      </button>
 
-            <h1 className={"mt-2.5 sm:mt-4 text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-black leading-[1.15] " + (
-              isNationalDay
-                ? dark ? "text-white" : "text-emerald-950"
-                : dark ? "text-white" : "text-black"
-            )}>
-              <VisualEditable id="studio-hero-title" tag="text" label="العنوان الرئيسي" defaultText="ذاكرة العقيق" as="span" />
-              <br />
-              <span className={isNationalDay ? (dark ? "snd-text-gradient" : "text-[#005A36]") : (dark ? "text-[#f8ca14]" : "text-[#08467d]")}>
-                <VisualEditable
-                  id="studio-hero-accent"
-                  tag="text"
-                  label="تكملة العنوان"
-                  defaultText="في مكان واحد."
-                  as="span"
-                />
-              </span>
-            </h1>
-
-            <VisualEditable
-              id="studio-hero-description"
-              tag="text"
-              label="الوصف الرئيسي"
-              defaultText="الموقع الرسمي لمدارس العقيق الأهلية والدولية بالمدينة المنورة - نلهم الأجيال ونصنع الأثر من خلال بيئة تعليمية رائدة ومعتمدة عالمياً."
-              as="p"
-              className={"mt-3 sm:mt-5 max-w-xl text-xs sm:text-sm leading-6 sm:leading-8 " + (
-                isNationalDay
-                  ? dark ? "text-emerald-100/80" : "text-emerald-900/80"
-                  : dark ? "text-slate-300" : "text-slate-600"
-              )}
+                      <button
+                        type="button"
+                        onClick={() => navigate("/accreditations")}
+                        data-visual-id="hero-cta-accreditations"
+                        data-visual-tag="button"
+                        data-visual-label="زر الاعتمادات الدولية في الهيرو"
+                        className={`inline-flex items-center gap-2 rounded-2xl border px-4 sm:px-5 py-2.5 sm:py-3 text-xs font-black transition active:scale-95 ${
+                          dark
+                            ? isNationalDay
+                              ? "border-emerald-600/30 bg-emerald-950/30 text-white hover:bg-emerald-900/40"
+                              : "border-white/15 bg-white/5 text-white hover:bg-white/10"
+                            : isNationalDay
+                            ? "border-emerald-700/20 bg-emerald-50 text-emerald-900 hover:bg-emerald-100/80"
+                            : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
+                        }`}
+                      >
+                        <Award size={15} className={isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]"} />
+                        <span>الاعتمادات الدولية</span>
+                      </button>
+                    </div>
+                  ),
+                },
+              ]}
             />
-
-
-            {/* Quick Action CTA Buttons */}
-            <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => navigate("/admissions")}
-                data-visual-id="hero-cta-admissions"
-                data-visual-tag="button"
-                data-visual-label="زر القبول والتسجيل في الهيرو"
-                className={`inline-flex items-center gap-2 rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-black shadow-lg transition active:scale-95 ${
-                  dark
-                    ? isNationalDay
-                      ? "bg-gradient-to-r from-[#D4AF37] to-amber-500 text-black shadow-[#D4AF37]/20 hover:opacity-95"
-                      : "bg-gradient-to-r from-[#f8ca14] to-amber-500 text-black shadow-[#f8ca14]/20 hover:opacity-95"
-                    : isNationalDay
-                    ? "bg-gradient-to-r from-[#005A36] to-[#003822] text-white shadow-[#005A36]/30 hover:opacity-95"
-                    : "bg-gradient-to-r from-[#08467d] to-[#052c52] text-white shadow-[#08467d]/25 hover:opacity-95"
-                }`}
-              >
-                <Send size={15} />
-                <span>القبول والتسجيل والرسوم ✦</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate("/accreditations")}
-                data-visual-id="hero-cta-accreditations"
-                data-visual-tag="button"
-                data-visual-label="زر الاعتمادات الدولية في الهيرو"
-                className={`inline-flex items-center gap-2 rounded-2xl border px-4 sm:px-5 py-2.5 sm:py-3 text-xs font-black transition active:scale-95 ${
-                  dark
-                    ? isNationalDay
-                      ? "border-emerald-600/30 bg-emerald-950/30 text-white hover:bg-emerald-900/40"
-                      : "border-white/15 bg-white/5 text-white hover:bg-white/10"
-                    : isNationalDay
-                    ? "border-emerald-700/20 bg-emerald-50 text-emerald-900 hover:bg-emerald-100/80"
-                    : "border-black/10 bg-black/5 text-slate-800 hover:bg-black/10"
-                }`}
-              >
-                <Award size={15} className={isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]"} />
-                <span>الاعتمادات الدولية</span>
-              </button>
-            </div>
 
 
             {/* Stats Bar */}
@@ -1820,56 +1850,91 @@ export default function AlaqeeqStudioPublicPage() {
         tag="section"
         label="قسم صوت العقيق والكلمة التوجيهية"
         as="section"
-        className="py-14 md:py-20 transition bg-transparent border-0"
+        className={"relative py-14 md:py-20 transition bg-transparent border-0"}
       >
+        <SectionCommanderBar
+          sectionId="studio-editorial-section"
+          title="صوت العقيق والكلمة التربوية"
+          icon={<Quote size={13} />}
+          isEditing={isEditing}
+        />
         <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8">
           <div className="mb-8 sm:mb-10 text-right">
-            <VisualEditable
-              id="studio-editorial-kicker"
-              tag="text"
-              label="شارة صوت العقيق"
-              defaultText={isNationalDay ? "🇸🇦 رسالة القيادة في اليوم الوطني" : "EDITORIAL · LEADERSHIP MESSAGE"}
-              as="span"
-              className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
-                isNationalDay
-                  ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
-                  : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
-              )}
-            >
-              {(text) => (
-                <>
-                  <Quote size={12} />
-                  {text}
-                </>
-              )}
-            </VisualEditable>
-            <VisualEditable
-              id="studio-editorial-title"
-              tag="text"
-              label="عنوان صوت العقيق"
-              defaultText="صوت العقيق والكلمة التربوية"
-              as="h2"
-              className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
-            />
-            {/* Glowing Golden Accent Line (يتمدد مع السكرول وينكمش عند الخروج) */}
-            <motion.div
-              initial={{ width: 0, opacity: 0.3 }}
-              whileInView={{ width: 175, opacity: 1 }}
-              viewport={{ once: false, margin: "-20px" }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
-                dark
-                  ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
-                  : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
-              }`}
-            />
-            <VisualEditable
-              id="studio-editorial-desc"
-              tag="text"
-              label="وصف صوت العقيق"
-              defaultText="رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق."
-              as="p"
-              className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}
+            <SmartReorderStack
+              stackId="editorial-header"
+              isEditing={isEditing}
+              items={[
+                {
+                  id: "editorial-kicker-item",
+                  label: "شارة صوت العقيق",
+                  content: (
+                    <VisualEditable
+                      id="studio-editorial-kicker"
+                      tag="text"
+                      label="شارة صوت العقيق"
+                      defaultText={isNationalDay ? "🇸🇦 رسالة القيادة في اليوم الوطني" : "EDITORIAL · LEADERSHIP MESSAGE"}
+                      as="span"
+                      className={"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-3 " + (
+                        isNationalDay
+                          ? "snd-kicker-badge border-[#f8ca14]/40 bg-[#f8ca14]/10 text-[#f8ca14]"
+                          : dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/10 text-[#f8ca14]" : "border-[#08467d]/20 bg-[#08467d]/10 text-[#08467d]"
+                      )}
+                    >
+                      {(text) => (
+                        <>
+                          <Quote size={12} />
+                          {text}
+                        </>
+                      )}
+                    </VisualEditable>
+                  ),
+                },
+                {
+                  id: "editorial-title-item",
+                  label: "عنوان صوت العقيق",
+                  content: (
+                    <VisualEditable
+                      id="studio-editorial-title"
+                      tag="text"
+                      label="عنوان صوت العقيق"
+                      defaultText="صوت العقيق والكلمة التربوية"
+                      as="h2"
+                      className={"text-2xl sm:text-4xl font-black font-cairo " + (dark ? "text-white" : isNationalDay ? "text-[#003822]" : "text-black")}
+                    />
+                  ),
+                },
+                {
+                  id: "editorial-line-item",
+                  label: "الخط المضيء",
+                  content: (
+                    <motion.div
+                      initial={{ width: 0, opacity: 0.3 }}
+                      whileInView={{ width: 175, opacity: 1 }}
+                      viewport={{ once: false, margin: "-20px" }}
+                      transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                      className={`h-1 sm:h-[3.5px] rounded-full my-3.5 ${
+                        dark
+                          ? "bg-gradient-to-l from-[#f8ca14] via-[#f8ca14]/80 to-transparent shadow-[0_0_15px_rgba(248,202,20,0.6)]"
+                          : "bg-gradient-to-l from-[#08467d] via-[#08467d]/80 to-transparent shadow-[0_0_12px_rgba(8,70,125,0.4)]"
+                      }`}
+                    />
+                  ),
+                },
+                {
+                  id: "editorial-desc-item",
+                  label: "وصف صوت العقيق",
+                  content: (
+                    <VisualEditable
+                      id="studio-editorial-desc"
+                      tag="text"
+                      label="وصف صوت العقيق"
+                      defaultText="رسائل قيادية ملهمة وتوجيهات تربوية تعكس رؤية ورسالة مدارس العقيق."
+                      as="p"
+                      className={"mt-2 max-w-xl text-xs sm:text-sm " + (dark ? "text-slate-400" : isNationalDay ? "text-emerald-800" : "text-slate-600")}
+                    />
+                  ),
+                },
+              ]}
             />
           </div>
 

@@ -2482,11 +2482,12 @@
       "updatedAt": "2026-09-10T12:28:44.643Z"
     },
     "/::studio-hero-section": {
-      "id": 1789043354410,
+      "id": 1789043898572,
       "pagePath": "/",
       "elementId": "studio-hero-section",
       "elementTag": "section",
       "alignment": "center",
+      "margin": "0px 0px 0px 0px",
       "layerX": 0,
       "layerY": 0,
       "layerWidth": null,
@@ -2497,7 +2498,7 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "draft",
-      "updatedAt": "2026-09-10T12:29:14.410Z"
+      "updatedAt": "2026-09-10T12:38:18.572Z"
     },
     "/::studio-scrub-title": {
       "id": 1789043395731,
@@ -2536,27 +2537,9 @@
       "updatedAt": "2026-09-10T12:35:24.959Z"
     },
     "/::studio-highlights-kicker": {
-      "id": 1789043852476,
+      "id": 1789043881572,
       "pagePath": "/",
       "elementId": "studio-highlights-kicker",
-      "elementTag": "text",
-      "alignment": "center",
-      "layerX": 0,
-      "layerY": 0,
-      "layerWidth": null,
-      "layerHeight": null,
-      "layerZIndex": 0,
-      "layerOpacity": 100,
-      "customCss": "{\"isFloating\":false,\"flexOrder\":1}",
-      "isHidden": false,
-      "updatedBy": 1,
-      "status": "draft",
-      "updatedAt": "2026-09-10T12:37:32.476Z"
-    },
-    "/::studio-highlights-title": {
-      "id": 1789043852476,
-      "pagePath": "/",
-      "elementId": "studio-highlights-title",
       "elementTag": "text",
       "alignment": "center",
       "layerX": 0,
@@ -2569,10 +2552,29 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "draft",
-      "updatedAt": "2026-09-10T12:37:32.476Z"
+      "updatedAt": "2026-09-10T12:38:01.572Z"
+    },
+    "/::studio-highlights-title": {
+      "id": 1789043887374,
+      "pagePath": "/",
+      "elementId": "studio-highlights-title",
+      "elementTag": "text",
+      "alignment": "center",
+      "margin": "0px 0px 0px 0px",
+      "layerX": 0,
+      "layerY": 0,
+      "layerWidth": null,
+      "layerHeight": null,
+      "layerZIndex": 0,
+      "layerOpacity": 100,
+      "customCss": "{\"isFloating\":false,\"flexOrder\":2}",
+      "isHidden": false,
+      "updatedBy": 1,
+      "status": "draft",
+      "updatedAt": "2026-09-10T12:38:07.374Z"
     },
     "/::studio-highlights-desc": {
-      "id": 1789043852476,
+      "id": 1789043881572,
       "pagePath": "/",
       "elementId": "studio-highlights-desc",
       "elementTag": "text",
@@ -2587,7 +2589,7 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "draft",
-      "updatedAt": "2026-09-10T12:37:32.476Z"
+      "updatedAt": "2026-09-10T12:38:01.572Z"
     }
   },
   "nextId": {
