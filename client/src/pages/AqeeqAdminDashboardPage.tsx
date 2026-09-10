@@ -680,6 +680,7 @@ export default function AqeeqAdminDashboardPage() {
   // Auxiliary UI States
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isDeployConfirmOpen, setIsDeployConfirmOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
@@ -1895,9 +1896,78 @@ export default function AqeeqAdminDashboardPage() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectTab={handleNavigateTab}
-        onTriggerDeploy={() => deployMutation.mutate()}
+        onTriggerDeploy={() => setIsDeployConfirmOpen(true)}
         admissionsList={admissionsList}
       />
+
+      {/* ── DB-6: Pre-Publish Summary Dialog ─────────────────────────────── */}
+      <Dialog open={isDeployConfirmOpen} onOpenChange={setIsDeployConfirmOpen}>
+        <DialogContent
+          className={`max-w-md rounded-[2rem] border p-6 text-right shadow-2xl ${
+            dark ? "border-white/10 bg-[#0b0e15] text-white" : "border-black/10 bg-white text-black"
+          }`}
+          dir="rtl"
+        >
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-3xl">🚀</span>
+              <DialogTitle className="text-lg font-black">تأكيد نشر التعديلات</DialogTitle>
+            </div>
+            <DialogDescription className={`text-xs font-bold leading-6 ${dark ? "text-slate-400" : "text-slate-500"}`}>
+              أنت على وشك مزامنة جميع التعديلات الحالية إلى الموقع المباشر على ريندر.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className={`my-4 rounded-xl border p-4 space-y-2 text-xs font-bold ${dark ? "border-white/10 bg-white/5" : "border-black/10 bg-slate-50"}`}>
+            <div className="flex items-center justify-between">
+              <span className={dark ? "text-slate-400" : "text-slate-500"}>المقالات المنشورة</span>
+              <span className="font-black">{allAdminArticles.filter((a: any) => a.status === "published").length}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className={dark ? "text-slate-400" : "text-slate-500"}>بانتظار المراجعة</span>
+              <span className={`font-black ${pendingArticlesCount > 0 ? "text-amber-400" : ""}`}>{pendingArticlesCount}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className={dark ? "text-slate-400" : "text-slate-500"}>طلبات القبول الجديدة</span>
+              <span className={`font-black ${pendingLeadsCount > 0 ? "text-amber-400" : ""}`}>{pendingLeadsCount}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className={dark ? "text-slate-400" : "text-slate-500"}>الألبومات الإجمالية</span>
+              <span className="font-black">{masterContent.filter((c: any) => c.type === "album").length}</span>
+            </div>
+          </div>
+
+          {pendingArticlesCount > 0 && (
+            <p className="text-xs font-bold text-amber-400 mb-3 flex items-center gap-1.5">
+              ⚠️ يوجد {pendingArticlesCount} مقال بانتظار الموافقة — تأكد من مراجعته قبل النشر
+            </p>
+          )}
+
+          <DialogFooter className="flex gap-2 flex-row-reverse justify-start mt-2">
+            <button
+              type="button"
+              disabled={isDeploying}
+              onClick={() => {
+                setIsDeployConfirmOpen(false);
+                setIsDeploying(true);
+                deployMutation.mutate();
+              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#f8ca14] px-5 py-2.5 text-xs font-black text-black hover:bg-yellow-400 transition disabled:opacity-50"
+            >
+              {isDeploying ? "⏳ جارٍ النشر..." : "🚀 نعم، انشر الآن"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsDeployConfirmOpen(false)}
+              className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-xs font-black transition ${
+                dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              إلغاء
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
