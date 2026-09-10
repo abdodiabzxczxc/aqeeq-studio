@@ -21,7 +21,6 @@ import AqeeqPodcastPage from "./pages/AqeeqPodcastPage";
 import SchoolNewsPage from "./pages/SchoolNewsPage";
 import AqeeqAlbumsPage from "./pages/AqeeqAlbumsPage";
 import AqeeqShowcasePage from "./pages/AqeeqShowcasePage";
-import { InContextHUDBridge } from "./components/admin/executive/InContextHUDBridge";
 
 // 🤖 Lazy-loaded Assistant Widget (Isolated chunk)
 const AqeeqAiAssistantWidget = lazy(() =>
@@ -262,11 +261,6 @@ function StudioAppShell() {
             <Suspense fallback={null}>
               <AqeeqAiAssistantWidget />
             </Suspense>
-          </ErrorBoundary>
-        )}
-        {!isLoginPage && (
-          <ErrorBoundary fallback={null}>
-            <InContextHUDBridge />
           </ErrorBoundary>
         )}
         {!isLoginPage && (
