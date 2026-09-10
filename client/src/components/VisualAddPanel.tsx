@@ -355,7 +355,7 @@ export default function VisualAddPanel({ open, onClose, pagePath }: { open: bool
       <aside
         data-aq-editor-panel="add"
         onPointerDown={(event) => event.stopPropagation()}
-        className="fixed inset-x-0 bottom-0 z-[340] flex h-[82svh] flex-col rounded-t-[1.75rem] border-t border-amber-400/25 bg-[#080808]/[0.98] text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl md:inset-y-0 md:left-0 md:right-auto md:h-auto md:w-[min(420px,100vw)] md:rounded-none md:border-r"
+        className="fixed inset-x-0 bottom-0 z-[340] flex h-[82svh] flex-col rounded-t-[1.75rem] border-t border-amber-400/25 bg-[#080808]/[0.98] text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-[min(420px,100vw)] md:rounded-none md:border-l"
         dir="rtl"
       >
         {/* Header */}

@@ -190,6 +190,19 @@ export async function listUsers() {
   return getLocalUsersList();
 }
 
+export async function countUsers(): Promise<number> {
+  try {
+    const db = await getDb().catch(() => null);
+    if (db) {
+      const [result] = await db.select({ total: count() }).from(users);
+      if (result) return result.total;
+    }
+  } catch (e) {
+    console.warn("Failed to count users from db:", e);
+  }
+  return getLocalUsersList().length;
+}
+
 export async function updateUserRole(id: number, role: "user" | "admin" | "receptionist" | "coordinator" | "auditor") {
   try {
     const db = await getDb().catch(() => null);

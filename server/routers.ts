@@ -44,6 +44,7 @@ import {
   listAuditLogs,
   logAudit,
   listUsers,
+  countUsers,
   updateUserRole,
   listNotifications,
   createNotification,
@@ -956,11 +957,11 @@ export const appRouter = router({
   // ==================== Executive Admin Command Center ====================
   executiveAdmin: router({
     getOverviewStats: adminProcedure.query(async () => {
-      const [issues, albums, showcase, usersList, logs, broadcast, orchestration, articles, showcases, podcasts] = await Promise.all([
+      const [issues, albums, showcase, totalUsersCount, logs, broadcast, orchestration, articles, showcases, podcasts] = await Promise.all([
         listSchoolNewsIssues().catch(() => []),
         listAqeeqAlbums().catch(() => []),
         getAqeeqShowcaseBySlug("news-offers").catch(() => null),
-        listUsers().catch(() => []),
+        countUsers().catch(() => 0),
         listAuditLogs(10).catch(() => []),
         getSiteBroadcast().catch((): SiteBroadcast => ({ enabled: false, message: "", type: "info" })),
         getSiteOrchestration().catch(() => null),
@@ -1141,9 +1142,8 @@ export const appRouter = router({
         totalPosts,
         totalMediaFiles,
         totalViews,
-        // NOTE: usersList is fetched only for .length here.
-        // TODO: Replace with a COUNT() query once the DB layer supports it (PERF-1)
-        totalUsers: usersList.length,
+        // PERF-1: uses COUNT() query — no full user list loaded into memory
+        totalUsers: totalUsersCount,
         activeStoriesCount: visibleStories.length,
         activeStories: visibleStories,
         hiddenStories,
