@@ -7,7 +7,7 @@ import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArch
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
 import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay, Layers, FolderCheck } from "lucide-react";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { AqeeqAlbumTvMode } from "@/components/AqeeqAlbumTvMode";
 import { AqeeqAiYearbookGenerator } from "@/components/AqeeqAiYearbookGenerator";
@@ -264,6 +264,17 @@ export default function AqeeqAlbumsPage() {
   const { data: journalIssues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
   const visibleAlbums = useMemo(() => searchAndSortAqeeqContent(albums, searchQuery, sort), [albums, searchQuery, sort]) as PublicAlbum[];
+
+  // ─── FEAT-3: Client-side pagination for albums ──────────────────────────────
+  const ALBUMS_PER_PAGE = 6;
+  const [albumPage, setAlbumPage] = useState(1);
+  const totalAlbumPages = Math.max(1, Math.ceil(visibleAlbums.length / ALBUMS_PER_PAGE));
+  const paginatedAlbums = useMemo(
+    () => visibleAlbums.slice((albumPage - 1) * ALBUMS_PER_PAGE, albumPage * ALBUMS_PER_PAGE),
+    [visibleAlbums, albumPage],
+  );
+  useEffect(() => { setAlbumPage(1); }, [searchQuery, sort]);
+  // ────────────────────────────────────────────────────────────────────────────
 
 
   const featuredAlbum = useMemo(() => {
@@ -707,15 +718,55 @@ export default function AqeeqAlbumsPage() {
         </div>
             <AqeeqArchiveControls id="albums-archive-controls" label="البحث وترتيب الألبومات" query={searchQuery} onQueryChange={setSearchQuery} sort={sort} onSortChange={setSort} />
             {visibleAlbums.length ? (
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-40px" }}
-                className="grid gap-6 lg:grid-cols-2"
-              >
-                {visibleAlbums.map((album, index) => <AlbumCard key={album.id} album={album} index={index} dark={dark} onOpen={() => navigate(`/albums/${album.slug}`)} />)}
-              </motion.div>
+              <>
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: "-40px" }}
+                  className="grid gap-6 lg:grid-cols-2"
+                >
+                  {paginatedAlbums.map((album, index) => <AlbumCard key={album.id} album={album} index={index} dark={dark} onOpen={() => navigate(`/albums/${album.slug}`)} />)}
+                </motion.div>
+
+                {/* Pagination Controls */}
+                {totalAlbumPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8" dir="rtl">
+                    <button
+                      type="button"
+                      aria-label="الصفحة السابقة"
+                      onClick={() => { setAlbumPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      disabled={albumPage === 1}
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer ${
+                        dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >›</button>
+                    {Array.from({ length: totalAlbumPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        type="button"
+                        aria-label={`الصفحة ${page}`}
+                        aria-current={albumPage === page ? "page" : undefined}
+                        onClick={() => { setAlbumPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition cursor-pointer ${
+                          albumPage === page
+                            ? dark ? "border-[#f8ca14] bg-[#f8ca14] text-black" : "border-[#08467d] bg-[#08467d] text-white"
+                            : dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                        }`}
+                      >{page}</button>
+                    ))}
+                    <button
+                      type="button"
+                      aria-label="الصفحة التالية"
+                      onClick={() => { setAlbumPage((p) => Math.min(totalAlbumPages, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      disabled={albumPage === totalAlbumPages}
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-black transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer ${
+                        dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-black/10 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >‹</button>
+                  </div>
+                )}
+              </>
             ) : (
               <VisualEditable id="albums-search-empty" tag="text" label="رسالة عدم وجود نتائج للألبومات" defaultText="لا توجد ألبومات مطابقة للبحث." as="p" className={`rounded-2xl border border-dashed p-8 text-center text-sm font-black ${
                 dark ? "border-[#f8ca14]/30 text-[#f8ca14]" : "border-[#08467d]/30 text-[#08467d]"
