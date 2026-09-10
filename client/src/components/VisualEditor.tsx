@@ -14,7 +14,7 @@ import { extractCopyableStyle, isBackgroundLikeLayer, type CopyableLayerStyle } 
 import { backgroundSizeCss, isBackgroundLayer, isBackgroundSurface, isCoreBackgroundLayer, lowerLayerZIndex, resolveBackgroundOrigin, type BackgroundOrigin } from "@/lib/layerBackground";
 import { resolveEditorToolbarSide, toggleEditorToolbarSide, type EditorToolbarSide } from "@/lib/editorToolbarSide";
 import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImageWrapperClassName } from "@/lib/visualEditorLayout";
-import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowLeftRight, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowDown, ArrowLeftRight, ArrowUp, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Edit3, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, History, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Monitor, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X, Zap } from "lucide-react";
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -221,6 +221,7 @@ type VisualEditorContextValue = {
   saveLayer: (elementId: string, patch: Pick<VisualOverride, "layerX" | "layerY" | "layerWidth" | "layerHeight" | "layerZIndex" | "isHidden"> & Partial<Pick<VisualOverride, "layerOpacity" | "isLocked">>) => void;
   deleteLayer: (elementId: string, label: string) => void;
   duplicateSelected?: () => void;
+  updateTextContent?: (elementId: string, newText: string) => void;
   isStudioCanvasMode?: boolean;
   getOverride: (elementId: string) => VisualOverride | undefined;
   getOwnOverride: (elementId: string) => VisualOverride | undefined;
@@ -257,6 +258,7 @@ const VisualEditorContext = createContext<VisualEditorContextValue>({
   saveLayer: () => undefined,
   deleteLayer: () => undefined,
   duplicateSelected: () => undefined,
+  updateTextContent: () => undefined,
   isStudioCanvasMode: false,
   getOverride: () => undefined,
   getOwnOverride: () => undefined,
@@ -726,6 +728,17 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       setSelected(null);
     },
     onError: (error) => toast.error(error.message || "تعذر حذف القسم"),
+  });
+
+  const reorderSections = trpc.visualEditor.sections.reorder.useMutation({
+    onSuccess: () => {
+      if (pagePath) {
+        void utils.visualEditor.sections.list.invalidate({ pagePath });
+        void utils.visualEditor.sections.publicList.invalidate({ pagePath });
+      }
+      toast.success("تم حفظ ترتيب الأقسام كمسودة");
+    },
+    onError: (error) => toast.error(error.message || "تعذر إعادة ترتيب الأقسام"),
   });
 
   const overrideMap = useMemo(() => {
@@ -1647,6 +1660,69 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     saveLayer,
     deleteLayer,
     duplicateSelected,
+    updateTextContent: (elementId: string, newText: string) => {
+      if (!pagePath) return;
+      setDraft((d) => ({ ...d, contentText: newText }));
+      const current = overrideMap.get(elementId);
+      const key = `${pagePath}::${elementId}`;
+      const elementTag = (current?.elementTag || "text") as any;
+      const updatedOverride: VisualOverride = {
+        id: current?.id ?? 0,
+        elementId,
+        pagePath,
+        elementTag,
+        contentText: newText,
+        mediaUrl: current?.mediaUrl ?? null,
+        altText: current?.altText ?? null,
+        textColor: current?.textColor ?? null,
+        bgColor: current?.bgColor ?? null,
+        fontSize: current?.fontSize ?? null,
+        alignment: current?.alignment ?? null,
+        linkUrl: current?.linkUrl ?? null,
+        borderRadius: current?.borderRadius ?? null,
+        padding: current?.padding ?? null,
+        margin: current?.margin ?? null,
+        customCss: current?.customCss ?? null,
+        layerX: current?.layerX ?? 0,
+        layerY: current?.layerY ?? 0,
+        layerWidth: current?.layerWidth ?? null,
+        layerHeight: current?.layerHeight ?? null,
+        layerZIndex: current?.layerZIndex ?? 0,
+        layerOpacity: current?.layerOpacity ?? 100,
+        backgroundSize: current?.backgroundSize ?? 100,
+        backgroundPositionX: current?.backgroundPositionX ?? 50,
+        backgroundPositionY: current?.backgroundPositionY ?? 50,
+        backgroundOverlay: current?.backgroundOverlay ?? 0,
+        isLocked: current?.isLocked ?? false,
+        isHidden: current?.isHidden ?? false,
+        status: "draft",
+      };
+      setLocalOverrides((prev) => ({ ...prev, [key]: updatedOverride }));
+      save.mutate({
+        elementId,
+        pagePath,
+        elementTag,
+        contentText: newText,
+        mediaUrl: current?.mediaUrl ?? undefined,
+        altText: current?.altText ?? undefined,
+        textColor: current?.textColor ?? undefined,
+        bgColor: current?.bgColor ?? undefined,
+        fontSize: current?.fontSize ?? undefined,
+        alignment: current?.alignment ?? undefined,
+        linkUrl: current?.linkUrl ?? undefined,
+        borderRadius: current?.borderRadius ?? undefined,
+        padding: current?.padding ?? undefined,
+        margin: current?.margin ?? undefined,
+        customCss: current?.customCss ?? undefined,
+        layerX: current?.layerX ?? 0,
+        layerY: current?.layerY ?? 0,
+        layerWidth: current?.layerWidth ?? null,
+        layerHeight: current?.layerHeight ?? null,
+        layerZIndex: current?.layerZIndex ?? 0,
+        layerOpacity: current?.layerOpacity ?? 100,
+        isHidden: current?.isHidden ?? false,
+      });
+    },
     alignSelected,
     alignSelectedVertically,
     distributeSelected,
@@ -1654,7 +1730,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setGroupTranslation,
     getOverride: (elementId) => resolveHeroOverrideForPreview(overrideMap, elementId),
     getOwnOverride: (elementId) => overrideMap.get(elementId),
-  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, isStudioCanvasMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap]);
+  }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, isStudioCanvasMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap, setDraft, save]);
 
   const saveSelected = () => {
     if (!pagePath || !selected) return;
@@ -2269,11 +2345,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         } else {
           deleteLayer(data.id, data.id);
         }
+      } else if (data.type === "AQEEQ_STUDIO_REORDER_SECTION") {
+        window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: data.sectionId, direction: data.direction }, "*");
       }
     };
     window.addEventListener("message", handleStudioMessage);
     return () => window.removeEventListener("message", handleStudioMessage);
-  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected, saveDuplicatedSection, deleteSection, builderSections.length, pagePath, overrideMap, saveLayer]);
+  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected, saveDuplicatedSection, deleteSection, reorderSections, builderSections.length, pagePath, overrideMap, saveLayer]);
 
   const fitSelectedBackground = (axis: "width" | "height" | "fill" | "contain") => {
     if (!selected) return;
@@ -3063,7 +3141,7 @@ function BackgroundSizingControls({ aspectLocked, autoArrange, onFit, onToggleAs
 }
 
 export function VisualEditable({ id, htmlId, tag, label, defaultText, children, className = "", as: Tag = "div", onAction, onClick, title, style }: { id: string; htmlId?: string; tag: ElementTag; label: string; defaultText?: string; children?: ReactNode | ((text: string) => ReactNode); className?: string; as?: "article" | "div" | "span" | "small" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "button" | "section" | "footer" | "header" | "aside" | "nav"; onAction?: () => void; onClick?: () => void; title?: string; style?: React.CSSProperties }) {
-  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
+  const { isEditing, selectedId, selectedIds, select, getOverride, layerMode, isStudioCanvasMode, duplicateSelected, deleteLayer, updateTextContent, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, setGroupTranslation, saveLayer, showAlignmentGuides } = useContext(VisualEditorContext);
   const isInteractiveTransform = layerMode || Boolean(isStudioCanvasMode);
   const override = getOverride(id);
   const content = override?.contentText ?? defaultText ?? "";
@@ -3072,6 +3150,18 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   const behavior = parseLayerBehavior(override?.customCss);
   const layerRef = useRef<HTMLElement | null>(null);
   const [isInView, setIsInView] = useState(!behavior.revealOnScroll);
+  const [isInlineEditing, setIsInlineEditing] = useState(false);
+  const isTextLike = tag === "text" || tag === "button" || ["h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "button"].includes(Tag);
+
+  const finishInlineEdit = () => {
+    setIsInlineEditing(false);
+    if (!layerRef.current) return;
+    const newText = (layerRef.current.innerText || layerRef.current.textContent || "").trim();
+    if (newText && newText !== content) {
+      updateTextContent?.(id, newText);
+      toast.success("تم تحديث النص مباشرة كمسودة");
+    }
+  };
   const interaction = useRef<{ mode: "move" | "resize"; resizeHandle?: ResizeHandle; startX: number; startY: number; startLeft: number; startTop: number; baseX: number; baseY: number; baseWidth: number; baseHeight: number; groupIds: string[]; translationX: number; translationY: number } | null>(null);
   const longPress = useRef<{ timer: number | null; startX: number; startY: number; selected: boolean }>({ timer: null, startX: 0, startY: 0, selected: false });
   const [liveFrame, setLiveFrame] = useState<{ x: number; y: number; width: number | null; height: number | null } | null>(null);
@@ -3207,21 +3297,129 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     ...(style?.position ? { position: style.position } : {}),
   };
 
-  return <Tag ref={layerRef as never} id={htmlId} title={title} data-visual-id={id} data-visual-label={label} data-visual-tag={tag} onPointerDown={(event) => {
-    if (isEditing && isLocked) { event.preventDefault(); event.stopPropagation(); return; }
-    if (isEditing && event.shiftKey) return;
-    if (isEditing && (isDirectBackground || event.target === event.currentTarget && isBackgroundSurface(id, label, tag))) {
-      event.preventDefault(); event.stopPropagation(); select(id, tag, label);
-      if (isInteractiveTransform) begin(event, "move");
-      return;
-    }
-    if (isEditing && event.pointerType === "touch") {
-      if (isDirectBackground) { event.preventDefault(); event.stopPropagation(); select(id, tag, label); return; }
-      longPress.current = { timer: window.setTimeout(() => { longPress.current.selected = true; longPress.current.timer = null; select(id, tag, label, true); }, 520), startX: event.clientX, startY: event.clientY, selected: false };
-      return;
-    }
-    begin(event, "move");
-  }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={(event) => { if (isEditing) { event.preventDefault(); event.stopPropagation(); if (isLocked) return; if (longPress.current.selected) { longPress.current.selected = false; return; } if (event.target === event.currentTarget && selectSectionBackground()) return; select(id, tag, label, event.shiftKey); return; } if (override?.linkUrl) { event.preventDefault(); event.stopPropagation(); if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer"); else window.location.assign(override.linkUrl); return; } onAction?.(); onClick?.(); }} style={visualStyle} className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${isInteractiveTransform && !isLocked ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""}`}>
+  return <Tag
+    ref={layerRef as never}
+    id={htmlId}
+    title={title}
+    data-visual-id={id}
+    data-visual-label={label}
+    data-visual-tag={tag}
+    contentEditable={isInlineEditing}
+    suppressContentEditableWarning={true}
+    onBlur={isInlineEditing ? finishInlineEdit : undefined}
+    onKeyDown={(event) => {
+      if (!isInlineEditing) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsInlineEditing(false);
+      } else if (event.key === "Enter" && !event.shiftKey && Tag !== "p") {
+        event.preventDefault();
+        finishInlineEdit();
+      }
+    }}
+    onDoubleClick={(event) => {
+      if (isEditing && !isLocked && isTextLike) {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsInlineEditing(true);
+        setTimeout(() => layerRef.current?.focus(), 50);
+      }
+    }}
+    onPointerDown={(event) => {
+      if (isInlineEditing) return;
+      if (isEditing && isLocked) { event.preventDefault(); event.stopPropagation(); return; }
+      if (isEditing && event.shiftKey) return;
+      if (isEditing && (isDirectBackground || event.target === event.currentTarget && isBackgroundSurface(id, label, tag))) {
+        event.preventDefault(); event.stopPropagation(); select(id, tag, label);
+        if (isInteractiveTransform) begin(event, "move");
+        return;
+      }
+      if (isEditing && event.pointerType === "touch") {
+        if (isDirectBackground) { event.preventDefault(); event.stopPropagation(); select(id, tag, label); return; }
+        longPress.current = { timer: window.setTimeout(() => { longPress.current.selected = true; longPress.current.timer = null; select(id, tag, label, true); }, 520), startX: event.clientX, startY: event.clientY, selected: false };
+        return;
+      }
+      begin(event, "move");
+    }}
+    onPointerMove={move}
+    onPointerUp={end}
+    onPointerCancel={end}
+    onClick={(event) => {
+      if (isInlineEditing) return;
+      if (isEditing) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (isLocked) return;
+        if (longPress.current.selected) { longPress.current.selected = false; return; }
+        if (event.target === event.currentTarget && selectSectionBackground()) return;
+        select(id, tag, label, event.shiftKey);
+        return;
+      }
+      if (override?.linkUrl) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer");
+        else window.location.assign(override.linkUrl);
+        return;
+      }
+      onAction?.();
+      onClick?.();
+    }}
+    style={visualStyle}
+    className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? "group relative cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80" : ""} ${isInteractiveTransform && !isLocked && !isInlineEditing ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""} ${isInlineEditing ? "ring-2 ring-amber-400 bg-amber-400/10 cursor-text !outline-none" : ""}`}
+  >
+    {isEditing && isInlineEditing ? (
+      <div
+        data-aq-inline-toolbar
+        className="pointer-events-auto absolute -top-12 left-1/2 -translate-x-1/2 z-[99] flex items-center gap-1.5 rounded-2xl border border-amber-400/50 bg-[#090d14]/98 px-2.5 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 select-none"
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <span className="text-[10px] font-black text-amber-300 px-1 border-l border-white/20 whitespace-nowrap">تحرير حي</span>
+        <button
+          type="button"
+          title="تغليظ الخط (Bold)"
+          onClick={(e) => { e.preventDefault(); document.execCommand("bold", false); }}
+          className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white font-black text-xs hover:bg-white/20 transition"
+        >
+          B
+        </button>
+        <button
+          type="button"
+          title="مائل (Italic)"
+          onClick={(e) => { e.preventDefault(); document.execCommand("italic", false); }}
+          className="grid h-6 w-6 place-items-center rounded-lg bg-white/10 text-white italic text-xs hover:bg-white/20 transition"
+        >
+          I
+        </button>
+        <div className="flex items-center gap-1 px-1 border-x border-white/15">
+          {[
+            { color: "#d9bd26", label: "ذهبي" },
+            { color: "#ffffff", label: "أبيض" },
+            { color: "#38bdf8", label: "سماوي" },
+            { color: "#ef4444", label: "أحمر" },
+          ].map((c) => (
+            <button
+              key={c.color}
+              type="button"
+              title={c.label}
+              onClick={(e) => { e.preventDefault(); document.execCommand("foreColor", false, c.color); }}
+              className="h-4 w-4 rounded-full border border-white/30 hover:scale-125 transition"
+              style={{ backgroundColor: c.color }}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          title="تأكيد وحفظ التعديل"
+          onClick={(e) => { e.preventDefault(); finishInlineEdit(); }}
+          className="flex items-center gap-1 rounded-xl bg-amber-400 px-2.5 py-1 text-[10px] font-black text-amber-950 hover:bg-amber-300 transition"
+        >
+          <Check size={12} />
+          <span>تم</span>
+        </button>
+      </div>
+    ) : null}
     {isEditing && isStudioCanvasMode && selected ? (
       <div
         data-aq-quick-actions
@@ -3230,6 +3428,40 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         onPointerDown={(e) => e.stopPropagation()}
       >
         <span className="text-[10px] font-black text-amber-300 px-1 border-l border-white/15 whitespace-nowrap">{label}</span>
+        {isTextLike ? (
+          <button
+            type="button"
+            title="كتابة مباشرة على الشاشة (انقر نقرتين)"
+            onClick={() => {
+              setIsInlineEditing(true);
+              setTimeout(() => layerRef.current?.focus(), 50);
+            }}
+            className="flex items-center gap-1 rounded-lg bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-200 hover:bg-amber-400/30 transition"
+          >
+            <Edit3 size={11} />
+            <span>اكتب</span>
+          </button>
+        ) : null}
+        {(tag === "section" || tag === "section-block" || id.startsWith("section-")) ? (
+          <>
+            <button
+              type="button"
+              title="تحريك القسم للأعلى"
+              onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "up" }, "*")}
+              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
+            >
+              <ArrowUp size={12} />
+            </button>
+            <button
+              type="button"
+              title="تحريك القسم للأسفل"
+              onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "down" }, "*")}
+              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
+            >
+              <ArrowDown size={12} />
+            </button>
+          </>
+        ) : null}
         <button
           type="button"
           title="تكرار العنصر كمسودة"

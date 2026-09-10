@@ -313,6 +313,64 @@ export function StudioInspector({
               </div>
             </div>
 
+            {/* Visual Box Model Diagram */}
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-amber-300">مخطط المسافات (Box Model)</span>
+                <span className="text-[9px] text-slate-500 font-mono">Margin · Padding</span>
+              </div>
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-2 text-center text-[9px] text-amber-400 font-mono">
+                <div className="flex justify-between items-center px-1 mb-1">
+                  <span>MARGIN</span>
+                  <input
+                    type="text"
+                    placeholder="0px"
+                    value={draft.margin ?? ""}
+                    onChange={(e) => onChangeDraft({ margin: e.target.value })}
+                    className="w-24 rounded bg-black/50 border border-white/10 px-1.5 py-0.5 text-center text-[10px] text-white outline-none focus:border-amber-400"
+                    dir="ltr"
+                  />
+                </div>
+                <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-2 text-sky-400">
+                  <div className="flex justify-between items-center px-1 mb-1">
+                    <span>PADDING</span>
+                    <input
+                      type="text"
+                      placeholder="0px"
+                      value={draft.padding ?? ""}
+                      onChange={(e) => onChangeDraft({ padding: e.target.value })}
+                      className="w-24 rounded bg-black/50 border border-white/10 px-1.5 py-0.5 text-center text-[10px] text-white outline-none focus:border-sky-400"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div className="rounded border border-dashed border-white/20 bg-white/5 py-2 text-center text-[10px] text-white font-bold truncate">
+                    {selectedElement.label} ({selectedElement.tag})
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-1 pt-1">
+                {[
+                  { label: "بدون", val: "0px" },
+                  { label: "خفيف", val: "8px 14px" },
+                  { label: "متوسط", val: "16px 24px" },
+                  { label: "كبير", val: "28px 36px" },
+                ].map((pad) => (
+                  <button
+                    key={pad.label}
+                    type="button"
+                    onClick={() => onChangeDraft({ padding: pad.val })}
+                    className={`rounded-lg border px-1.5 py-1 text-[9px] font-bold transition ${
+                      draft.padding === pad.val
+                        ? "border-sky-400 bg-sky-400/20 text-sky-300"
+                        : "border-white/10 bg-black/30 text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {pad.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Colors */}
             <div className="grid grid-cols-2 gap-2.5">
               <div>

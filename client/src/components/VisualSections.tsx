@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc";
-import { CalendarDays, CheckCircle2, ChevronLeft, Copy, GripVertical, Heart, ImageIcon, ImagePlus, Link2, MapPin, PlayCircle, Plus, Save, Sparkles, Star, Trash2, Users, Video, X } from "lucide-react";
+import { ArrowDown, ArrowUp, CalendarDays, CheckCircle2, ChevronLeft, Copy, GripVertical, Heart, ImageIcon, ImagePlus, Link2, MapPin, PlayCircle, Plus, Save, Sparkles, Star, Trash2, Users, Video, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -158,7 +158,44 @@ export default function VisualSections({ pagePath, anchorId = "page-end" }: { pa
   const save = trpc.visualEditor.sections.save.useMutation({ onSuccess: invalidate, onError: (error) => toast.error(error.message || "تعذر وضع القالب داخل الصفحة") });
   const remove = trpc.visualEditor.sections.delete.useMutation({ onSuccess: () => { invalidate(); toast.success("تم حذف القسم من هذه الصفحة"); }, onError: (error) => toast.error(error.message || "تعذر الحذف") });
   const publish = trpc.visualEditor.sections.publish.useMutation({ onSuccess: () => { invalidate(); toast.success("تم نشر القسم للزوار"); }, onError: (error) => toast.error(error.message || "تعذر النشر") });
-  const reorder = trpc.visualEditor.sections.reorder.useMutation({ onSuccess: invalidate });
+  const reorder = trpc.visualEditor.sections.reorder.useMutation({
+    onSuccess: () => {
+      invalidate();
+      toast.success("تم تحديث ترتيب الأقسام كمسودة");
+    },
+    onError: (error) => toast.error(error.message || "تعذر إعادة ترتيب الأقسام"),
+  });
+
+  const moveSection = (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= anchored.length) return;
+    const currentAnchorIds = anchored.map((s) => s.sectionId);
+    const swapped = [...currentAnchorIds];
+    const temp = swapped[index];
+    swapped[index] = swapped[targetIndex];
+    swapped[targetIndex] = temp;
+
+    const sectionIds = sections.map((s) => s.sectionId);
+    const firstAnchorPosition = currentAnchorIds.length ? sectionIds.indexOf(currentAnchorIds[0]) : 0;
+    const nextOrder = sectionIds.filter((id) => !currentAnchorIds.includes(id));
+    nextOrder.splice(firstAnchorPosition < 0 ? 0 : firstAnchorPosition, 0, ...swapped);
+
+    reorder.mutate({ pagePath, sectionIds: nextOrder });
+  };
+
+  useEffect(() => {
+    const handleReorderMsg = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || data.type !== "AQEEQ_STUDIO_REORDER_SECTION_BY_ID") return;
+      const { sectionId, direction } = data;
+      const idx = anchored.findIndex((s) => s.sectionId === sectionId);
+      if (idx !== -1) {
+        moveSection(idx, direction);
+      }
+    };
+    window.addEventListener("message", handleReorderMsg);
+    return () => window.removeEventListener("message", handleReorderMsg);
+  }, [anchored, sections, pagePath]);
 
   const insertFromPayload = (payload: InsertPayload, index: number) => {
     const sectionId = `section-${payload.sectionType}-${Date.now().toString(36)}`;
@@ -201,7 +238,7 @@ export default function VisualSections({ pagePath, anchorId = "page-end" }: { pa
   return <section className={isEditing ? "relative" : ""} data-page-anchor={anchorId}>
     {dropZone(0)}
     {anchored.map((section, index) => <div key={section.sectionId} className="group/section relative">
-      {isEditing ? <div className="pointer-events-none absolute right-5 top-5 z-[84] flex items-center gap-1 opacity-0 transition group-hover/section:opacity-100"><span className="pointer-events-auto inline-flex items-center gap-1 rounded-lg bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-amber-100 shadow-xl"><GripVertical size={13} />قسم قابل للإدارة</span><button type="button" onClick={(event) => { event.stopPropagation(); setEditingSection(section); }} title="تعديل محتوى القسم" className="pointer-events-auto inline-flex items-center gap-1 rounded-lg border border-[#08467d]/50 bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-[#f8ca14] shadow-xl transition hover:bg-[#08467d] hover:text-white"><Save size={13} />تعديل</button><button type="button" onClick={(event) => { event.stopPropagation(); duplicate(section); }} title="تكرار القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200"><Copy size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); remove.mutate({ pagePath, sectionId: section.sectionId }); }} title="حذف القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/40 bg-[#111521]/95 text-[#de191e] shadow-xl transition hover:bg-[#de191e]/15"><Trash2 size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); publish.mutate({ pagePath, sectionId: section.sectionId }); }} title="نشر القسم" className="pointer-events-auto rounded-lg bg-emerald-400 px-2 py-1.5 text-[10px] font-black text-emerald-950 shadow-xl">نشر</button></div> : null}
+      {isEditing ? <div className="pointer-events-none absolute right-5 top-5 z-[84] flex items-center gap-1 opacity-0 transition group-hover/section:opacity-100"><span className="pointer-events-auto inline-flex items-center gap-1 rounded-lg bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-amber-100 shadow-xl"><GripVertical size={13} />قسم</span><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "up"); }} disabled={index === 0} title="تحريك القسم للأعلى" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowUp size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); moveSection(index, "down"); }} disabled={index === anchored.length - 1} title="تحريك القسم للأسفل" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200 disabled:opacity-30"><ArrowDown size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); setEditingSection(section); }} title="تعديل محتوى القسم" className="pointer-events-auto inline-flex items-center gap-1 rounded-lg border border-[#08467d]/50 bg-[#111521]/95 px-2 py-1.5 text-[10px] font-black text-[#f8ca14] shadow-xl transition hover:bg-[#08467d] hover:text-white"><Save size={13} />تعديل</button><button type="button" onClick={(event) => { event.stopPropagation(); duplicate(section); }} title="تكرار القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-slate-600 bg-[#111521]/95 text-slate-200 shadow-xl transition hover:border-amber-300 hover:text-amber-200"><Copy size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); remove.mutate({ pagePath, sectionId: section.sectionId }); }} title="حذف القسم" className="pointer-events-auto grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/40 bg-[#111521]/95 text-[#de191e] shadow-xl transition hover:bg-[#de191e]/15"><Trash2 size={13} /></button><button type="button" onClick={(event) => { event.stopPropagation(); publish.mutate({ pagePath, sectionId: section.sectionId }); }} title="نشر القسم" className="pointer-events-auto rounded-lg bg-emerald-400 px-2 py-1.5 text-[10px] font-black text-emerald-950 shadow-xl">نشر</button></div> : null}
       <BuilderSectionView section={section} pagePath={pagePath} />
       {dropZone(index + 1)}
     </div>)}

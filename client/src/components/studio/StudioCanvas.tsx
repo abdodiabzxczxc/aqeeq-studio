@@ -21,6 +21,7 @@ export interface StudioCanvasHandle {
   toggleLayerVisibility: (id: string) => void;
   toggleLayerLock: (id: string) => void;
   deleteLayer: (id: string) => void;
+  reorderSection: (sectionId: string, direction: "up" | "down") => void;
 }
 
 export const StudioCanvas = React.forwardRef<
@@ -159,6 +160,12 @@ export const StudioCanvas = React.forwardRef<
     deleteLayer: (id) => {
       iframeRef.current?.contentWindow?.postMessage(
         { type: "AQEEQ_STUDIO_DELETE_LAYER", id },
+        "*"
+      );
+    },
+    reorderSection: (sectionId, direction) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "AQEEQ_STUDIO_REORDER_SECTION", sectionId, direction },
         "*"
       );
     },

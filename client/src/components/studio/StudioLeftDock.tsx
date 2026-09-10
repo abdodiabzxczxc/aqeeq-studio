@@ -22,6 +22,9 @@ import {
   Unlock,
   Trash2,
   Search,
+  ChevronUp,
+  ChevronDown,
+  GripVertical,
 } from "lucide-react";
 import { StudioSchoolBlocks, type SchoolBlock } from "./StudioSchoolBlocks";
 import { StudioAiCopilot } from "./StudioAiCopilot";
@@ -72,6 +75,7 @@ export function StudioLeftDock({
   onToggleLayerVisibility,
   onToggleLayerLock,
   onDeleteLayer,
+  onReorderSection,
   pagePath,
 }: {
   activeTab: StudioDockTab;
@@ -86,6 +90,7 @@ export function StudioLeftDock({
   onToggleLayerVisibility?: (id: string) => void;
   onToggleLayerLock?: (id: string) => void;
   onDeleteLayer?: (id: string) => void;
+  onReorderSection?: (id: string, direction: "up" | "down") => void;
   pagePath: string;
 }) {
   const [layerSearch, setLayerSearch] = useState("");
@@ -192,11 +197,23 @@ export function StudioLeftDock({
                       <button
                         key={el.label}
                         type="button"
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData(
+                            "application/x-site-builder-block",
+                            JSON.stringify({
+                              id: el.tag,
+                              title: el.label,
+                              sectionType: "custom",
+                              config: { builderElement: el.tag, title: el.label },
+                            })
+                          );
+                        }}
                         onClick={() => {
                           onInsertElement?.(el.tag, el.label);
                           toast.success(`✓ تمت إضافة «${el.label}»`);
                         }}
-                        className="flex flex-col items-start rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-right transition hover:border-amber-400/50 hover:bg-amber-400/10 cursor-pointer"
+                        className="flex flex-col items-start rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-right transition hover:border-amber-400/50 hover:bg-amber-400/10 cursor-grab active:cursor-grabbing"
                       >
                         <span className="grid h-8 w-8 place-items-center rounded-xl bg-amber-400/15 text-amber-300 mb-2">
                           <Icon size={16} />
@@ -247,11 +264,23 @@ export function StudioLeftDock({
                       <button
                         key={tmpl.type}
                         type="button"
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData(
+                            "application/x-site-builder-block",
+                            JSON.stringify({
+                              id: tmpl.type,
+                              title: tmpl.title,
+                              sectionType: tmpl.type,
+                              config: { title: tmpl.title, subtitle: tmpl.hint },
+                            })
+                          );
+                        }}
                         onClick={() => {
                           onInsertSection?.(tmpl.type);
                           toast.success(`✓ تمت إضافة قسم «${tmpl.title}»`);
                         }}
-                        className="flex w-full items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 text-right transition hover:border-amber-400/40 hover:bg-amber-400/5 cursor-pointer"
+                        className="flex w-full items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 text-right transition hover:border-amber-400/40 hover:bg-amber-400/5 cursor-grab active:cursor-grabbing"
                       >
                         <span className="text-2xl">{tmpl.emoji}</span>
                         <div>
@@ -394,11 +423,33 @@ export function StudioLeftDock({
                             </div>
                           </div>
 
-                          {/* Action icons: Eye (hide/show), Lock (lock/unlock), Trash (delete) */}
+                          {/* Action icons: Reorder Up/Down, Eye, Lock, Trash */}
                           <div
                             className="flex items-center gap-1 shrink-0"
                             onClick={(e) => e.stopPropagation()}
                           >
+                            {/* Reorder section up / down if section */}
+                            {(layer.tag.includes("section") || layer.id.startsWith("section-")) ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => onReorderSection?.(layer.id, "up")}
+                                  title="تحريك القسم للأعلى"
+                                  className="grid h-6 w-6 place-items-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-amber-300 transition"
+                                >
+                                  <ChevronUp size={12} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => onReorderSection?.(layer.id, "down")}
+                                  title="تحريك القسم للأسفل"
+                                  className="grid h-6 w-6 place-items-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-amber-300 transition"
+                                >
+                                  <ChevronDown size={12} />
+                                </button>
+                              </>
+                            ) : null}
+
                             {/* Toggle visibility */}
                             <button
                               type="button"

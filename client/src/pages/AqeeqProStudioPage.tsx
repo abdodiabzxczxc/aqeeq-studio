@@ -93,6 +93,10 @@ export default function AqeeqProStudioPage() {
     canvasRef.current?.deleteLayer(id);
   };
 
+  const handleReorderSection = (sectionId: string, direction: "up" | "down") => {
+    canvasRef.current?.reorderSection(sectionId, direction);
+  };
+
   const handleApplyAiText = (text: { headline: string; body: string; cta: string }) => {
     if (selectedElement) {
       handleDraftChange({ contentText: text.headline });
@@ -144,6 +148,7 @@ export default function AqeeqProStudioPage() {
           onToggleLayerVisibility={handleToggleLayerVisibility}
           onToggleLayerLock={handleToggleLayerLock}
           onDeleteLayer={handleDeleteLayer}
+          onReorderSection={handleReorderSection}
           pagePath={currentPath}
         />
 
