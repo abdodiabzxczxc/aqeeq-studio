@@ -95,6 +95,7 @@ export function ExecutiveTopBar({
           <button
             type="button"
             onClick={onToggleCanvas}
+            aria-label="فتح/إغلاق الكانفاس الحي متعدد الشاشات"
             className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition cursor-pointer ${
               isCanvasOpen
                 ? "border-amber-400 bg-amber-400 text-black shadow-md shadow-amber-400/20"
@@ -114,6 +115,7 @@ export function ExecutiveTopBar({
           <button
             type="button"
             onClick={onToggleHealth}
+            aria-label="فاحص سلامة وجودة الموقع الاستباقي"
             className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition cursor-pointer ${
               isHealthOpen
                 ? "border-emerald-500 bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
@@ -133,6 +135,7 @@ export function ExecutiveTopBar({
           href="/"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="معاينة البوابة الرسمية الحية في نافذة جديدة"
           className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition ${
             dark
               ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
@@ -148,6 +151,7 @@ export function ExecutiveTopBar({
         <button
           type="button"
           onClick={toggleTheme}
+          aria-label={dark ? "التحويل للمظهر النهاري" : "التحويل للمظهر الليلي"}
           className={`flex h-9 w-9 items-center justify-center rounded-xl border transition cursor-pointer ${
             dark
               ? "border-white/10 bg-white/5 text-amber-400 hover:bg-white/10"
