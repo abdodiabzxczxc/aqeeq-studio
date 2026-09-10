@@ -53,6 +53,12 @@ import {
 import { renderPortalIcon } from "@/components/PortalIconRenderer";
 import { TemplateVariant, TEMPLATE_VARIANT_INFO } from "@/lib/useSiteTheme";
 import { trpc } from "@/lib/trpc";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface SystemBrandHubProps {
   dark: boolean;
@@ -515,21 +521,21 @@ export function SystemBrandHub({
 
       {/* SUBTAB 1: HEADER & FOOTER & JOBS & 10 SOCIAL CHANNELS */}
       {subTab === "header_footer" && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <Accordion type="multiple" defaultValue={["topbar"]} className="space-y-4 animate-in fade-in duration-200">
           {/* Section 1A: Top Utility Bar & Employment Portal (بوابة التوظيف) */}
-          <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
-            <div className="flex items-center justify-between gap-4 pb-4 border-b border-current/10">
+          <AccordionItem value="topbar" className={`rounded-3xl border overflow-hidden ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <AccordionTrigger className="px-6 py-4 text-right hover:no-underline [&>svg]:ml-0 [&>svg]:mr-auto">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
                   <Briefcase size={20} />
                 </div>
-                <div>
-                  <h3 className="text-base font-black">الشريط العلوي الرئاسي وبوابة التوظيف (Top Utility Bar)</h3>
-                  <p className="text-xs text-slate-400 font-bold mt-0.5">
-                    التحكم في زر بوابة التوظيف، أوقات الاستقبال والدوام، وأرقام التواصل الرسمية بأعلى الموقع
-                  </p>
+                <div className="text-right">
+                  <p className="text-sm font-black">الشريط العلوي الرئاسي وبوابة التوظيف</p>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">أرقام التواصل، أوقات الدوام، رابط بوابة التوظيف</p>
                 </div>
               </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6 space-y-6">
               <Button
                 type="button"
                 onClick={async () => {
@@ -546,7 +552,6 @@ export function SystemBrandHub({
                 <Save size={13} />
                 <span>{isSaving ? "جاري الحفظ..." : "حفظ التعديلات 💾"}</span>
               </Button>
-            </div>
 
             {/* Employment Portal Box (بوابة التوظيف) */}
             <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3">
@@ -641,11 +646,24 @@ export function SystemBrandHub({
                 />
               </div>
             </div>
-          </div>
+            </AccordionContent>
+          </AccordionItem>
 
           {/* Section 1B: The 10 Official Social Media Platforms (شبكات التواصل الاجتماعي الـ 10) */}
-          <div className={`p-6 rounded-3xl border space-y-5 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
-            <div className="flex items-center justify-between pb-3 border-b border-current/10">
+          <AccordionItem value="social" className={`rounded-3xl border overflow-hidden ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
+            <AccordionTrigger className="px-6 py-4 text-right hover:no-underline [&>svg]:ml-0 [&>svg]:mr-auto">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <Share2 size={20} />
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-black">شبكات التواصل الاجتماعي الرسمية (10 قنوات)</p>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">تظهر في فوتر الموقع وشريط الاتصال السريع</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="flex items-center justify-between pb-3 border-b border-current/10 mb-4">
               <div>
                 <h3 className="text-base font-black">شبكات التواصل الاجتماعي الرسمية (10 قنوات معتمدة) 📱🔗</h3>
                 <p className="text-xs text-slate-400 font-bold mt-0.5">
@@ -727,9 +745,11 @@ export function SystemBrandHub({
                 <span>{isSaving ? "جاري الحفظ..." : "حفظ وتفعيل شبكات التواصل الـ 10 💾"}</span>
               </Button>
             </div>
-          </div>
-        </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
+
 
       {/* SUBTAB: FOOTER CONTENT & QUICK LINKS MANAGER (روابط وبطاقة الفوتر) */}
       {subTab === "footer" && (
