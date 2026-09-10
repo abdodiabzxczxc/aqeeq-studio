@@ -5,7 +5,6 @@ import {
   GraduationCap,
   Layers3,
   Palette,
-  Sparkles,
   History,
   X,
   Type,
@@ -27,12 +26,11 @@ import {
   GripVertical,
 } from "lucide-react";
 import { StudioSchoolBlocks, type SchoolBlock } from "./StudioSchoolBlocks";
-import { StudioAiCopilot } from "./StudioAiCopilot";
 import VisualDesignTokensPanel from "../VisualDesignTokensPanel";
 import VisualHistoryDrawer from "../VisualHistoryDrawer";
 import { toast } from "sonner";
 
-export type StudioDockTab = "elements" | "sections" | "schoolCms" | "layers" | "tokens" | "ai" | "history" | null;
+export type StudioDockTab = "elements" | "sections" | "schoolCms" | "layers" | "tokens" | "history" | null;
 
 export type StudioLayerItem = {
   id: string;
@@ -110,7 +108,6 @@ export function StudioLeftDock({
     { id: "schoolCms" as const, label: "بيانات حية", icon: GraduationCap, tooltip: "كتل المدرسة الحية (CMS)" },
     { id: "layers" as const, label: "الطبقات", icon: Layers3, tooltip: "شجرة طبقات الصفحة وعناصرها" },
     { id: "tokens" as const, label: "الهوية", icon: Palette, tooltip: "ألوان الموقع وثيمات المناسبات" },
-    { id: "ai" as const, label: "ذكاء اصطناعي", icon: Sparkles, tooltip: "مساعد العقيق الذكي" },
     { id: "history" as const, label: "التاريخ", icon: History, tooltip: "سجل النسخ السابقة" },
   ];
 
@@ -172,7 +169,6 @@ export function StudioLeftDock({
               {activeTab === "schoolCms" && "كتل المدرسة الحية"}
               {activeTab === "layers" && "شجرة الطبقات والعناصر"}
               {activeTab === "tokens" && "هوية الموقع والألوان"}
-              {activeTab === "ai" && "مساعد العقيق الذكي"}
               {activeTab === "history" && "سجل التعديلات الزمني"}
             </h3>
             <button
@@ -501,12 +497,7 @@ export function StudioLeftDock({
               <VisualDesignTokensPanel open={true} onClose={() => onSelectTab(null)} />
             )}
 
-            {/* 5. AI COPILOT TAB */}
-            {activeTab === "ai" && (
-              <StudioAiCopilot onApplyText={onApplyAiText} />
-            )}
-
-            {/* 6. HISTORY TAB */}
+            {/* 5. HISTORY TAB */}
             {activeTab === "history" && (
               <VisualHistoryDrawer open={true} onClose={() => onSelectTab(null)} />
             )}

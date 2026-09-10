@@ -721,6 +721,19 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     },
     onError: (error) => toast.error(error.message || "تعذر نشر التعديل"),
   });
+  const publishAll = trpc.visualEditor.publishAll.useMutation({
+    onSuccess: () => {
+      toast.success("✓ تم حفظ ونشر كافة التعديلات مباشرة على الموقع لجميع الزوار!");
+      if (pagePath) {
+        void utils.visualEditor.list.invalidate({ pagePath });
+        void utils.visualEditor.publicList.invalidate({ pagePath });
+        void utils.visualEditor.history.invalidate({ pagePath });
+        void utils.homepage.publicSnapshot.invalidate();
+      }
+      void utils.visualEditor.listAll.invalidate();
+    },
+    onError: (error) => toast.error(error.message || "تعذر نشر التعديلات"),
+  });
   const restoreHistory = trpc.visualEditor.restore.useMutation({
     onSuccess: () => {
       toast.success("تمت استعادة النسخة إلى مسودة جديدة");
@@ -786,17 +799,17 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           pagePath,
           elementId: selected.id,
           elementTag: selected.tag,
-          contentText: draft.contentText || (existing?.contentText ?? null),
-          mediaUrl: draft.mediaUrl || (existing?.mediaUrl ?? null),
-          altText: draft.altText || (existing?.altText ?? null),
-          linkUrl: draft.linkUrl || (existing?.linkUrl ?? null),
+          contentText: draft.contentText !== undefined ? draft.contentText : (existing?.contentText ?? null),
+          mediaUrl: draft.mediaUrl !== undefined && draft.mediaUrl !== "" ? draft.mediaUrl : (existing?.mediaUrl ?? null),
+          altText: draft.altText !== undefined ? draft.altText : (existing?.altText ?? null),
+          linkUrl: draft.linkUrl !== undefined ? draft.linkUrl : (existing?.linkUrl ?? null),
           alignment: draft.alignment || (existing?.alignment ?? "center"),
-          textColor: draft.textColor || (existing?.textColor ?? null),
-          bgColor: draft.bgColor || (existing?.bgColor ?? null),
-          fontSize: draft.fontSize || (existing?.fontSize ?? null),
-          padding: draft.padding || (existing?.padding ?? null),
-          margin: draft.margin || (existing?.margin ?? null),
-          borderRadius: draft.borderRadius || (existing?.borderRadius ?? null),
+          textColor: draft.textColor !== undefined ? (draft.textColor || null) : (existing?.textColor ?? null),
+          bgColor: draft.bgColor !== undefined ? (draft.bgColor || null) : (existing?.bgColor ?? null),
+          fontSize: draft.fontSize !== undefined ? (draft.fontSize || null) : (existing?.fontSize ?? null),
+          padding: draft.padding !== undefined ? (draft.padding || null) : (existing?.padding ?? null),
+          margin: draft.margin !== undefined ? (draft.margin || null) : (existing?.margin ?? null),
+          borderRadius: draft.borderRadius !== undefined ? (draft.borderRadius || null) : (existing?.borderRadius ?? null),
           layerX: draft.layerX,
           layerY: draft.layerY,
           layerWidth: draft.layerWidth,
@@ -821,8 +834,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const selectedHistory = selected ? history.filter((item) => item.elementId === selected.id).slice(0, 4) : [];
   const isSelectedBackground = Boolean(selected && isBackgroundSurface(selected.id, selected.label, selected.tag));
 
+  const lastSelectedElementId = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!selected) return;
+    if (!selected) {
+      lastSelectedElementId.current = null;
+      return;
+    }
+    // Only re-initialize if the selected element actually changed
+    if (lastSelectedElementId.current === selected.id) {
+      return;
+    }
+    lastSelectedElementId.current = selected.id;
     draftPreviewEnabled.current = false;
 
     let defaultContent = currentOverride?.contentText ?? "";
@@ -874,7 +897,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       isLocked: currentOverride?.isLocked ?? false,
       isHidden: currentOverride?.isHidden ?? false,
     });
-  }, [selected?.id, currentOverride?.id]);
+  }, [selected?.id, currentOverride]);
 
   useEffect(() => {
     if (!selected || !pagePath) return;
@@ -884,7 +907,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       pagePath,
       elementId: selected.id,
       elementTag: selected.tag,
-      contentText: draft.contentText || null,
+      contentText: draft.contentText !== undefined ? draft.contentText : null,
       mediaUrl: draft.mediaUrl || null,
       altText: draft.altText || null,
       linkUrl: draft.linkUrl || null,
@@ -2205,6 +2228,56 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     if (issues.length) toast.warning(`فحص قبل النشر: ${issues.slice(0, 3).join(" · ")}${issues.length > 3 ? ` +${issues.length - 3}` : ""}`); else toast.success("فحص قبل النشر: لا توجد مشكلات ظاهرة في عناصر الصفحة");
   };
 
+  const publishAllAndSave = async () => {
+    runPrePublishCheck();
+    const pendingKeys = Object.keys(localOverrides).filter((k) => k.startsWith(`${pagePath}::`));
+    const toastId = toast.loading("جارٍ حفظ ونشر التعديلات على الموقع...");
+    try {
+      if (pendingKeys.length > 0) {
+        const savePromises = pendingKeys.map(async (key) => {
+          const item = localOverrides[key];
+          if (!item) return;
+          return save.mutateAsync({
+            pagePath: item.pagePath as any,
+            elementId: item.elementId as any,
+            elementTag: item.elementTag,
+            contentText: item.contentText,
+            mediaUrl: item.mediaUrl,
+            altText: item.altText,
+            linkUrl: item.linkUrl,
+            alignment: item.alignment,
+            textColor: item.textColor,
+            bgColor: item.bgColor,
+            fontSize: item.fontSize,
+            padding: item.padding,
+            margin: item.margin,
+            borderRadius: item.borderRadius,
+            layerX: item.layerX,
+            layerY: item.layerY,
+            layerWidth: item.layerWidth,
+            layerHeight: item.layerHeight,
+            layerZIndex: item.layerZIndex,
+            layerOpacity: item.layerOpacity,
+            backgroundSize: item.backgroundSize,
+            backgroundPositionX: item.backgroundPositionX,
+            backgroundPositionY: item.backgroundPositionY,
+            backgroundOverlay: item.backgroundOverlay,
+            customCss: item.customCss,
+            isLocked: item.isLocked,
+            isHidden: item.isHidden,
+          });
+        });
+        await Promise.all(savePromises);
+      }
+
+      await publishAll.mutateAsync();
+      setLocalOverrides({});
+      toast.success("✓ تم حفظ ونشر كافة التعديلات بنجاح وظهرت فوراً لزوار الموقع!", { id: toastId });
+    } catch (err: any) {
+      toast.error(err?.message || "تعذر نشر التعديلات", { id: toastId });
+    }
+  };
+
   // ── E-1,2,3,4,17: Global Keyboard Shortcuts ─────────────────────────
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
@@ -2228,7 +2301,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // Ctrl+S / Cmd+S — حفظ ونشر
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
-        if (!previewMode) runPrePublishCheck();
+        if (!previewMode) void publishAllAndSave();
         return;
       }
       // Escape — إلغاء التحديد أو خروج من المعاينة
@@ -2317,20 +2390,66 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
             const key = `${pagePath}::${selected.id}`;
             setLocalOverrides((curr) => {
               const existing = curr[key] || overrideMap.get(selected.id);
-              if (!existing) return curr;
+              const fallback: VisualOverride = {
+                id: 0,
+                pagePath,
+                elementId: selected.id,
+                elementTag: (selected.tag as ElementTag) || "text",
+                contentText: null,
+                mediaUrl: null,
+                altText: null,
+                linkUrl: null,
+                alignment: "center",
+                textColor: null,
+                bgColor: null,
+                fontSize: null,
+                padding: null,
+                margin: null,
+                borderRadius: null,
+                layerX: 0,
+                layerY: 0,
+                layerWidth: null,
+                layerHeight: null,
+                layerZIndex: 0,
+                layerOpacity: 100,
+                backgroundSize: 100,
+                backgroundPositionX: 50,
+                backgroundPositionY: 50,
+                backgroundOverlay: 0,
+                customCss: null,
+                isLocked: false,
+                isHidden: false,
+                status: "draft",
+              };
+              const base = existing || fallback;
               return {
                 ...curr,
                 [key]: {
-                  ...existing,
-                  contentText: next.contentText || existing.contentText,
-                  mediaUrl: next.mediaUrl || existing.mediaUrl,
-                  textColor: next.textColor || existing.textColor,
-                  bgColor: next.bgColor || existing.bgColor,
-                  fontSize: next.fontSize || existing.fontSize,
-                  padding: next.padding || existing.padding,
-                  margin: next.margin || existing.margin,
-                  borderRadius: next.borderRadius || existing.borderRadius,
+                  ...base,
+                  contentText: next.contentText !== undefined ? next.contentText : base.contentText,
+                  mediaUrl: next.mediaUrl !== undefined && next.mediaUrl !== "" ? next.mediaUrl : base.mediaUrl,
+                  altText: next.altText !== undefined ? next.altText : base.altText,
+                  linkUrl: next.linkUrl !== undefined ? next.linkUrl : base.linkUrl,
+                  alignment: next.alignment || base.alignment,
+                  textColor: next.textColor !== undefined ? (next.textColor || null) : base.textColor,
+                  bgColor: next.bgColor !== undefined ? (next.bgColor || null) : base.bgColor,
+                  fontSize: next.fontSize !== undefined ? (next.fontSize || null) : base.fontSize,
+                  padding: next.padding !== undefined ? (next.padding || null) : base.padding,
+                  margin: next.margin !== undefined ? (next.margin || null) : base.margin,
+                  borderRadius: next.borderRadius !== undefined ? (next.borderRadius || null) : base.borderRadius,
+                  layerX: next.layerX !== undefined ? next.layerX : base.layerX,
+                  layerY: next.layerY !== undefined ? next.layerY : base.layerY,
+                  layerWidth: next.layerWidth !== undefined ? next.layerWidth : base.layerWidth,
+                  layerHeight: next.layerHeight !== undefined ? next.layerHeight : base.layerHeight,
+                  layerZIndex: next.layerZIndex !== undefined ? next.layerZIndex : base.layerZIndex,
+                  layerOpacity: next.layerOpacity !== undefined ? next.layerOpacity : base.layerOpacity,
+                  backgroundSize: next.backgroundSize !== undefined ? next.backgroundSize : base.backgroundSize,
+                  backgroundPositionX: next.backgroundPositionX !== undefined ? next.backgroundPositionX : base.backgroundPositionX,
+                  backgroundPositionY: next.backgroundPositionY !== undefined ? next.backgroundPositionY : base.backgroundPositionY,
+                  backgroundOverlay: next.backgroundOverlay !== undefined ? next.backgroundOverlay : base.backgroundOverlay,
                   customCss: nextCss,
+                  isLocked: next.isLocked ?? base.isLocked,
+                  isHidden: next.isHidden ?? base.isHidden,
                 },
               };
             });
@@ -2342,7 +2461,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       } else if (data.type === "AQEEQ_STUDIO_REDO") {
         redoSession();
       } else if (data.type === "AQEEQ_STUDIO_PUBLISH") {
-        runPrePublishCheck();
+        void publishAllAndSave();
       } else if (data.type === "AQEEQ_STUDIO_SAVE_DRAFT") {
         saveSelected();
       } else if (data.type === "AQEEQ_STUDIO_DELETE_SELECTED") {
@@ -2609,7 +2728,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     };
     window.addEventListener("message", handleStudioMessage);
     return () => window.removeEventListener("message", handleStudioMessage);
-  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, saveSelected, deleteLayer, duplicateSelected, saveDuplicatedSection, deleteSection, reorderSections, builderSections.length, pagePath, overrideMap, saveLayer]);
+  }, [isStudioCanvasMode, selected, isSelectedBackground, undoSession, redoSession, runPrePublishCheck, publishAllAndSave, saveSelected, deleteLayer, duplicateSelected, saveDuplicatedSection, deleteSection, reorderSections, builderSections.length, pagePath, overrideMap, saveLayer]);
 
   const fitSelectedBackground = (axis: "width" | "height" | "fill" | "contain") => {
     if (!selected) return;
@@ -2714,7 +2833,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
             <span>{Object.keys(localOverrides).filter(k => k.startsWith(`${pagePath}::`)).length} تعديل</span>
           </div>
         ) : null}
-        <WorkspaceButton active={false} label="حفظ ونشر (Ctrl+S)" icon={<Check size={17} />} onClick={runPrePublishCheck} />
+        <WorkspaceButton active={false} label="حفظ ونشر (Ctrl+S)" icon={<Check size={17} />} onClick={() => void publishAllAndSave()} />
         <WorkspaceButton active={false} label="خروج (Escape)" icon={<X size={17} />} onClick={() => { closeWorkspacePanels(); setIsEditing(false); setSelected(null); setSelectedIds([]); setLayerMode(false); setToolGroup(null); }} />
       </div>
     </nav>

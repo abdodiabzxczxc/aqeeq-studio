@@ -2608,7 +2608,7 @@
       "updatedAt": "2026-09-10T12:38:01.572Z"
     },
     "/::stack-order-hero-headline": {
-      "id": 1789045712168,
+      "id": 1789046214135,
       "pagePath": "/",
       "elementId": "stack-order-hero-headline",
       "elementTag": "text",
@@ -2623,7 +2623,7 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "draft",
-      "updatedAt": "2026-09-10T13:08:32.168Z"
+      "updatedAt": "2026-09-10T13:16:54.135Z"
     }
   },
   "nextId": {

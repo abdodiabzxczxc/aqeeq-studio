@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Camera,
   RotateCcw,
@@ -65,6 +66,7 @@ export function StudioSnapshotManager({
   }, [open]);
 
   if (!open) return null;
+  if (typeof document === "undefined") return null;
 
   const currentPathSnapshots = snapshots.filter(
     (s) => s.pagePath === pagePath || s.pagePath === "/"
@@ -100,7 +102,7 @@ export function StudioSnapshotManager({
     const next = snapshots.filter((s) => s.id !== id);
     setSnapshots(next);
     saveSnapshots(next);
-    toast.message(`تم حذف اللقطة «${name}»`);
+    toast.message(`تم حذف اللقطة: ${name}`);
   };
 
   const handleExportJson = (snapshot: DesignSnapshot) => {
@@ -134,19 +136,22 @@ export function StudioSnapshotManager({
           setSnapshots(next);
           saveSnapshots(next);
           toast.success("تم استيراد لقطة التصميم بنجاح!");
+        } else {
+          toast.error("ملف اللقطة غير صالح");
         }
       } catch {
-        toast.error("ملف اللقطة غير صالح");
+        toast.error("فشل قراءة الملف");
       }
     };
     reader.readAsText(file);
     e.target.value = "";
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[450] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md animate-in fade-in duration-200"
       dir="rtl"
+      data-no-visual-edit="true"
       onClick={onClose}
     >
       <div
@@ -295,6 +300,7 @@ export function StudioSnapshotManager({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
