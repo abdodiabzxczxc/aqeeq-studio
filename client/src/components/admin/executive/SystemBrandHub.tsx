@@ -571,7 +571,7 @@ export function SystemBrandHub({
               <div>
                 <h3 className="text-base font-black">شبكات التواصل الاجتماعي الرسمية (10 قنوات معتمدة) 📱🔗</h3>
                 <p className="text-xs text-slate-400 font-bold mt-0.5">
-                  تظهر في الترويسة والفوتر وشريط الاتصال السريع، وتغذي شارات التواصل بالموقع
+                  تظهر في فوتر الموقع وشريط الاتصال السريع، وتغذي شارات التواصل بالموقع
                 </p>
               </div>
               <div className="flex items-center gap-2">

@@ -74,7 +74,6 @@ import {
   PORTAL_CATEGORY_LABELS,
 } from "@shared/portals";
 import { renderPortalIcon } from "@/components/PortalIconRenderer";
-import { getActiveSocialLinks } from "@/components/SocialMediaIcons";
 
 export type Section =
   | "studio"
@@ -148,10 +147,6 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
     [systemPortalsList]
   );
 
-  const activeSocialLinks = useMemo(
-    () => getActiveSocialLinks(orchestration?.social),
-    [orchestration?.social]
-  );
 
 
 
@@ -568,26 +563,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
               </>
             )}
 
-            {activeSocialLinks.length > 0 && (
-              <>
-                <span className="h-3 w-px bg-current opacity-20 hidden lg:inline-block" />
-                <div className="hidden lg:flex items-center gap-1.5" dir="ltr">
-                  {activeSocialLinks.map((item) => (
-                    <a
-                      key={item.key}
-                      href={item.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      title={item.name}
-                      aria-label={item.name}
-                      className={`grid h-6 w-6 place-items-center rounded-lg border border-transparent hover:border-current/20 transition-all text-current opacity-70 hover:opacity-100 hover:scale-110 ${item.hoverColorClass}`}
-                    >
-                      {item.icon}
-                    </a>
-                  ))}
-                </div>
-              </>
-            )}
+
           </div>
         </div>
       </div>
@@ -1555,36 +1531,7 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                     </div>
                   </div>
 
-                  {/* 7. 📱 سابعاً: منصات التواصل الاجتماعي الرسمية للجوال */}
-                  {activeSocialLinks.length > 0 && (
-                    <div className={`p-3.5 rounded-2xl border space-y-2.5 ${
-                      dark ? "bg-white/[0.04] border-white/10" : "bg-white border-slate-200 shadow-xs"
-                    }`}>
-                      <div className="flex items-center justify-between text-xs font-black">
-                        <span className={dark ? "text-white" : "text-slate-900"}>شبكات التواصل الاجتماعي الرسمية 📱</span>
-                        <span className="text-[10px] text-amber-500 font-bold">{activeSocialLinks.length} قنوات</span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap pt-1" dir="ltr">
-                        {activeSocialLinks.map((item) => (
-                          <a
-                            key={item.key}
-                            href={item.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={item.name}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition hover:scale-105 active:scale-95 ${
-                              dark
-                                ? "border-white/10 bg-white/5 text-slate-200 hover:text-white"
-                                : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-black"
-                            } ${item.hoverColorClass}`}
-                          >
-                            <span className="shrink-0">{item.icon}</span>
-                            <span className="text-[11px] font-bold" dir="rtl">{item.name}</span>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             </>
