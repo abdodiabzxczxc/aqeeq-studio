@@ -51,8 +51,9 @@ export const TEMPLATE_VARIANT_INFO: Record<TemplateVariant, { label: string; enL
 
 export function useSiteTheme() {
   const { data: orchestration, isLoading } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 1000 * 5, // 5 seconds fresh cache
   });
 
   const themeMode = orchestration?.themeMode;

@@ -51,6 +51,8 @@ import {
   PortalIconCategory,
 } from "@shared/portals";
 import { renderPortalIcon } from "@/components/PortalIconRenderer";
+import { TemplateVariant, TEMPLATE_VARIANT_INFO } from "@/lib/useSiteTheme";
+import { trpc } from "@/lib/trpc";
 
 interface SystemBrandHubProps {
   dark: boolean;
@@ -67,6 +69,7 @@ export function SystemBrandHub({
   isSaving,
   mode = "all",
 }: SystemBrandHubProps) {
+  const utils = trpc.useUtils();
   const defaultTab = mode === "alerts" ? "popup" : "header_footer";
   const [subTab, setSubTab] = useState<"header_footer" | "footer" | "popup" | "vacation" | "portals" | "emergency" | "marketing" | "seasons">(defaultTab);
 
@@ -162,9 +165,36 @@ export function SystemBrandHub({
   const currentPixels = orchestration?.marketingPixels || {};
   const [pixelsForm, setPixelsForm] = useState(currentPixels);
 
-  // 7. Seasons Form
+  // 7. Seasons & National Day Theme Form
   const currentTheme = orchestration?.theme || {};
-  const [selectedSeason, setSelectedSeason] = useState<string>(currentTheme?.season || "default");
+  const currentThemeMode = orchestration?.themeMode || {
+    activeTheme: "default",
+    expiresAt: null,
+    templateVariant: "vision",
+    customBadgeText: "نحلم ونحقق 🇸🇦",
+    showCelebrationRibbon: true,
+    backgroundPatternOpacity: 85,
+  };
+  const [selectedSeason, setSelectedSeason] = useState<string>(
+    orchestration?.themeMode?.activeTheme === "saudi-national-day"
+      ? "national_day"
+      : orchestration?.theme?.season || "default"
+  );
+  const [themeModeForm, setThemeModeForm] = useState<{
+    activeTheme: "default" | "saudi-national-day";
+    durationHours: number | null;
+    templateVariant: TemplateVariant;
+    customBadgeText: string;
+    showCelebrationRibbon: boolean;
+    backgroundPatternOpacity: number;
+  }>({
+    activeTheme: (orchestration?.themeMode?.activeTheme || (currentTheme?.season === "national_day" ? "saudi-national-day" : "default")) as "default" | "saudi-national-day",
+    durationHours: null,
+    templateVariant: (orchestration?.themeMode?.templateVariant as TemplateVariant) || "vision",
+    customBadgeText: orchestration?.themeMode?.customBadgeText || "نحلم ونحقق 🇸🇦",
+    showCelebrationRibbon: orchestration?.themeMode?.showCelebrationRibbon !== false,
+    backgroundPatternOpacity: orchestration?.themeMode?.backgroundPatternOpacity ?? 85,
+  });
 
   // 8. Footer Form (Pre-footer, Badges, Quick Links, Copyright)
   const currentFooter = orchestration?.footer || {
@@ -262,7 +292,25 @@ export function SystemBrandHub({
       }
       if (orchestration.emergencyBanner) setBannerForm(orchestration.emergencyBanner);
       if (orchestration.marketingPixels) setPixelsForm(orchestration.marketingPixels);
-      if (orchestration.theme?.season) setSelectedSeason(orchestration.theme.season);
+      if (orchestration.themeMode) {
+        setThemeModeForm((prev) => ({
+          ...prev,
+          activeTheme: orchestration.themeMode.activeTheme || "default",
+          templateVariant: (orchestration.themeMode.templateVariant as TemplateVariant) || "vision",
+          customBadgeText: orchestration.themeMode.customBadgeText || "نحلم ونحقق 🇸🇦",
+          showCelebrationRibbon: orchestration.themeMode.showCelebrationRibbon !== false,
+          backgroundPatternOpacity: orchestration.themeMode.backgroundPatternOpacity ?? 85,
+        }));
+        if (orchestration.themeMode.activeTheme === "saudi-national-day") {
+          setSelectedSeason("national_day");
+        }
+      }
+      if (orchestration.theme?.season) {
+        setSelectedSeason(orchestration.theme.season);
+        if (orchestration.theme.season === "national_day") {
+          setThemeModeForm((prev) => ({ ...prev, activeTheme: "saudi-national-day" }));
+        }
+      }
       if (orchestration.footer) setFooterForm((prev: any) => ({ ...prev, ...orchestration.footer }));
       if (orchestration.eventModal) setEventModalForm((prev: any) => ({ ...prev, ...orchestration.eventModal }));
       if (orchestration.vacationMode) setVacationForm((prev: any) => ({ ...prev, ...orchestration.vacationMode }));
@@ -1880,53 +1928,291 @@ export function SystemBrandHub({
         </div>
       )}
 
-      {/* SUBTAB 5: NATIONAL SEASONS SWITCHER */}
+      {/* SUBTAB 5: NATIONAL SEASONS SWITCHER & SAUDI NATIONAL DAY STUDIO */}
       {subTab === "seasons" && (
         <div className={`p-6 rounded-3xl border space-y-6 ${dark ? "border-white/10 bg-[#0d1218]" : "border-black/10 bg-white shadow-xs"}`}>
-          <div className="pb-4 border-b border-current/10">
-            <h3 className="text-base font-black">محول المناسبات الوطنية والمواسم بنقرة زر 🇸🇦</h3>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">
-              تغيير هوية وأجواء الموقع بالكامل ليتناسب مع المناسبات الوطنية والتعليمية الكبرى
-            </p>
+          {/* Header */}
+          <div className="pb-4 border-b border-current/10 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-black flex items-center gap-2">
+                <span>محول المناسبات الوطنية وثيم اليوم الوطني 🇸🇦</span>
+              </h3>
+              <p className="text-xs text-slate-400 font-bold mt-0.5">
+                تغيير هوية وأجواء الموقع بالكامل لليوم الوطني 94 بنقرة واحدة (ألوان زمردية، زخارف الهوية الوطنية، وشريط التهنئة الاحتفالي)
+              </p>
+            </div>
+
+            <a
+              href="/?siteTheme=saudi-national-day"
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-black transition flex items-center gap-2 border border-emerald-500/30 shadow-xs cursor-pointer"
+            >
+              <ExternalLink size={14} />
+              <span>معاينة حية للموقع بثيم اليوم الوطني ↗</span>
+            </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {SEASONS.map((season) => {
-              const isSelected = selectedSeason === season.id;
-              return (
-                <div
-                  key={season.id}
-                  onClick={() => setSelectedSeason(season.id)}
-                  className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? "border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/5"
-                      : "border-current/10 bg-white/[0.02] hover:bg-white/[0.05]"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-black">{season.name}</h4>
-                    {isSelected && <CheckCircle2 size={16} className="text-amber-400" />}
-                  </div>
-                  <p className="text-[11px] text-slate-400 font-bold">{season.desc}</p>
+          {/* Active Live Status Pill */}
+          {themeModeForm.activeTheme === "saudi-national-day" ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-emerald-900/60 to-teal-950/80 border border-emerald-500/40 text-white shadow-lg shadow-emerald-950/30">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-tr from-[#005A36] to-[#5aba1c] text-white font-black text-xl shadow-md">
+                  🇸🇦
                 </div>
-              );
-            })}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-black text-emerald-300">ثيم اليوم الوطني السعودي مفعّل ونشط على كامل الموقع 🇸🇦✨</h4>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                  </div>
+                  <p className="text-xs text-emerald-200/80 font-bold mt-0.5">
+                    القالب المعتمد: {TEMPLATE_VARIANT_INFO[themeModeForm.templateVariant]?.label || "القالب العام"} · الشعار: «{themeModeForm.customBadgeText}» · شفافية الزخارف: {themeModeForm.backgroundPatternOpacity}%
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-black border border-emerald-500/30">
+                🟢 حي ومباشر الآن
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-current/10 text-slate-300">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#08467d] text-[#f8ca14] font-black text-base shadow-sm">
+                  💎
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-white">الهوية الرسمية الأصلية للعقيق (الكلاسيكية) نشطة حالياً 🏛️</h4>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">اللون الكحلي والذهبي والزمردي الرسمي المستقر لكافة صفحات الموقع</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-slate-500/10 text-slate-400 text-[11px] font-black border border-slate-500/20">
+                الهوية القياسية
+              </span>
+            </div>
+          )}
+
+          {/* Season Chooser Cards */}
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400">اختر المناسبة أو الموسم المطلوب تفعيله:</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {SEASONS.map((season) => {
+                const isSelected = selectedSeason === season.id;
+                const isNational = season.id === "national_day";
+                return (
+                  <div
+                    key={season.id}
+                    onClick={() => {
+                      setSelectedSeason(season.id);
+                      if (isNational) {
+                        setThemeModeForm((prev) => ({ ...prev, activeTheme: "saudi-national-day" }));
+                      } else {
+                        setThemeModeForm((prev) => ({ ...prev, activeTheme: "default" }));
+                      }
+                    }}
+                    className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                      isSelected
+                        ? isNational
+                          ? "border-emerald-500 bg-emerald-500/15 ring-2 ring-emerald-500/40 shadow-lg shadow-emerald-600/20"
+                          : "border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/5"
+                        : "border-current/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-black">{season.name}</h4>
+                      {isSelected ? (
+                        <CheckCircle2 size={16} className={isNational ? "text-emerald-400" : "text-amber-400"} />
+                      ) : (
+                        <div className="h-4 w-4 rounded-full border border-current/20" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-bold">{season.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="pt-4 border-t border-current/10 flex justify-end">
+          {/* DEDICATED SAUDI NATIONAL DAY STUDIO (Revealed when national_day is selected) */}
+          {(selectedSeason === "national_day" || themeModeForm.activeTheme === "saudi-national-day") && (
+            <div className={`p-5 rounded-2xl border space-y-6 ${dark ? "border-emerald-500/30 bg-emerald-950/20" : "border-emerald-500/20 bg-emerald-50/60"}`}>
+              <div className="pb-3 border-b border-emerald-500/20 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🇸🇦</span>
+                  <h4 className="text-xs font-black text-emerald-400 tracking-wide">
+                    إعدادات وتخصيص هوية اليوم الوطني السعودي 94
+                  </h4>
+                </div>
+                <span className="text-[11px] text-emerald-400/80 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/20">
+                  معايير الهوية الرسمية (نحلم ونحقق)
+                </span>
+              </div>
+
+              {/* 1. Official Template Variants */}
+              <div className="space-y-3">
+                <label className="text-xs font-black flex items-center justify-between">
+                  <span>🎨 القالب الفني المعتمد (5 قوالب رسمية):</span>
+                  <span className="text-[11px] text-emerald-400 font-normal">
+                    {TEMPLATE_VARIANT_INFO[themeModeForm.templateVariant]?.label}
+                  </span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {(Object.keys(TEMPLATE_VARIANT_INFO) as TemplateVariant[]).map((vKey) => {
+                    const info = TEMPLATE_VARIANT_INFO[vKey];
+                    const isPicked = themeModeForm.templateVariant === vKey;
+                    return (
+                      <div
+                        key={vKey}
+                        onClick={() => setThemeModeForm((prev) => ({ ...prev, templateVariant: vKey }))}
+                        className={`p-3 rounded-xl border transition cursor-pointer flex items-center justify-between ${
+                          isPicked
+                            ? "border-emerald-500 bg-emerald-500/20 ring-1 ring-emerald-500"
+                            : "border-current/10 bg-white/5 hover:bg-white/10"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="h-4 w-4 rounded-full shrink-0 shadow-xs"
+                            style={{ backgroundColor: info.color }}
+                          />
+                          <div>
+                            <p className="text-xs font-black">{info.label}</p>
+                            <p className="text-[10px] text-slate-400 font-mono">{info.enLabel}</p>
+                          </div>
+                        </div>
+                        {isPicked && <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />}
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-400">يتغير نمط الخلفية والزخارف الرسمية في الهيرو والسكاشن تلقائياً حسب القالب المختار.</p>
+              </div>
+
+              {/* Controls Row: Duration + Slogan Text */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Duration / Expiry */}
+                <div className="space-y-2">
+                  <label className="text-xs font-black flex items-center gap-1.5">
+                    <span>⏱ مدة تفعيل الثيم:</span>
+                  </label>
+                  <select
+                    value={themeModeForm.durationHours === null ? "permanent" : String(themeModeForm.durationHours)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setThemeModeForm((prev) => ({
+                        ...prev,
+                        durationHours: val === "permanent" ? null : Number(val),
+                      }));
+                    }}
+                    className={`w-full rounded-xl border p-2.5 text-xs font-black cursor-pointer ${
+                      dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
+                    }`}
+                  >
+                    <option value="permanent">♾️ دائم حتى أقوم بإيقافه يدوياً</option>
+                    <option value="24">⏱ ٢٤ ساعة (يوم الاحتفال)</option>
+                    <option value="48">⏱ ٤٨ ساعة (يومان)</option>
+                    <option value="168">⏱ أسبوع كامل (7 أيام)</option>
+                    <option value="720">⏱ شهر كامل (30 يوماً)</option>
+                  </select>
+                  <p className="text-[10px] text-slate-400">يعود الموقع تلقائياً للهوية الأصلية فور انتهاء المدة المحددة.</p>
+                </div>
+
+                {/* Slogan Text */}
+                <div className="space-y-2">
+                  <label className="text-xs font-black flex items-center gap-1.5">
+                    <span>✍️ نص شارة وشعار المناسبة:</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={themeModeForm.customBadgeText}
+                    onChange={(e) => setThemeModeForm((prev) => ({ ...prev, customBadgeText: e.target.value }))}
+                    placeholder="نحلم ونحقق 🇸🇦"
+                    className={`w-full rounded-xl border p-2.5 text-xs font-black ${
+                      dark ? "border-white/10 bg-black/60 text-white" : "border-slate-200 bg-white text-slate-900"
+                    }`}
+                  />
+                  <p className="text-[10px] text-slate-400">تظهر في الهيدر والـ Ribbon أعلى كافة صفحات الموقع.</p>
+                </div>
+              </div>
+
+              {/* Toggles: Ribbon & Pattern Opacity */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-emerald-500/20">
+                <label className="flex items-center gap-2.5 cursor-pointer text-xs font-black">
+                  <input
+                    type="checkbox"
+                    checked={themeModeForm.showCelebrationRibbon}
+                    onChange={(e) => setThemeModeForm((prev) => ({ ...prev, showCelebrationRibbon: e.target.checked }))}
+                    className="h-4 w-4 rounded border-emerald-400 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>إظهار شريط التهنئة الاحتفالي أعلى الموقع (Celebration Ribbon مع زر الكونفيتي 🎊)</span>
+                </label>
+
+                <div className="flex items-center gap-3 text-xs font-black">
+                  <span className="text-slate-400">شفافية الزخارف:</span>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    step="5"
+                    value={themeModeForm.backgroundPatternOpacity}
+                    onChange={(e) => setThemeModeForm((prev) => ({ ...prev, backgroundPatternOpacity: Number(e.target.value) }))}
+                    className="w-28 accent-emerald-500 cursor-pointer"
+                  />
+                  <span className="font-mono text-emerald-400">{themeModeForm.backgroundPatternOpacity}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Footer */}
+          <div className="pt-4 border-t border-current/10 flex flex-wrap items-center justify-between gap-3">
+            <a
+              href="/?siteTheme=saudi-national-day"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5"
+            >
+              <ExternalLink size={13} />
+              <span>تجربة الثيم كزائر في تبويب جديد</span>
+            </a>
+
             <Button
               type="button"
               onClick={async () => {
+                const isNd = selectedSeason === "national_day";
                 await onSaveOrchestration({
                   theme: { ...currentTheme, season: selectedSeason },
+                  themeMode: {
+                    activeTheme: isNd ? "saudi-national-day" : "default",
+                    expiresAt: isNd && themeModeForm.durationHours ? Date.now() + themeModeForm.durationHours * 3600 * 1000 : null,
+                    templateVariant: themeModeForm.templateVariant,
+                    customBadgeText: themeModeForm.customBadgeText,
+                    showCelebrationRibbon: themeModeForm.showCelebrationRibbon,
+                    backgroundPatternOpacity: themeModeForm.backgroundPatternOpacity,
+                  },
                 });
-                toast.success(`تم تفعيل (${SEASONS.find((s) => s.id === selectedSeason)?.name}) بنجاح`);
+                await utils.executiveAdmin.getSiteOrchestration.invalidate();
+                toast.success(
+                  isNd
+                    ? "تم تفعيل ثيم اليوم الوطني السعودي بنجاح على كامل الموقع! 🇸🇦✨"
+                    : `تم تطبيق (${SEASONS.find((s) => s.id === selectedSeason)?.name}) بنجاح`
+                );
               }}
               disabled={isSaving}
-              className="rounded-xl font-black text-xs px-6 bg-amber-500 hover:bg-amber-400 text-black gap-2 cursor-pointer"
+              className={`rounded-xl font-black text-xs px-7 py-3 transition shadow-lg gap-2 cursor-pointer ${
+                selectedSeason === "national_day"
+                  ? "bg-gradient-to-r from-[#005A36] via-[#006C35] to-[#5aba1c] hover:opacity-90 text-white shadow-emerald-700/30"
+                  : "bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20"
+              }`}
             >
               <Sparkles size={14} />
-              <span>تطبيق الموسم على الموقع الحي 🚀</span>
+              <span>
+                {selectedSeason === "national_day"
+                  ? "حفظ وتفعيل ثيم اليوم الوطني على كامل الموقع فوراً 🇸🇦🚀"
+                  : "تطبيق الموسم المختار على الموقع الحي 🚀"}
+              </span>
             </Button>
           </div>
         </div>
