@@ -1876,6 +1876,43 @@ export function SystemBrandHub({
               </div>
             </div>
           </div>
+
+          {/* DB-7: معاينة حية للبانر */}
+          <div className="space-y-2">
+            <p className="text-xs font-black text-slate-400">معاينة — كيف يبدو التنبيه على الموقع</p>
+            <div
+              className={`w-full flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-black transition-all duration-300 ${
+                !bannerForm.enabled
+                  ? "opacity-40 bg-slate-700/40 border border-white/10 text-slate-400"
+                  : bannerForm.type === "urgent"
+                  ? "bg-rose-600 text-white shadow-[0_0_20px_rgba(225,29,72,.4)]"
+                  : bannerForm.type === "celebration"
+                  ? "bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,.4)]"
+                  : "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,.4)]"
+              }`}
+            >
+              <span className="flex items-center gap-2 min-w-0">
+                <span className="text-base shrink-0">
+                  {bannerForm.type === "urgent" ? "🚨" : bannerForm.type === "celebration" ? "🎉" : "📢"}
+                </span>
+                <span className="truncate leading-snug">
+                  {bannerForm.text?.trim() ? bannerForm.text : <span className="opacity-50 italic font-bold">اكتب نص التنبيه لترى المعاينة هنا...</span>}
+                </span>
+              </span>
+              {bannerForm.linkText?.trim() ? (
+                <span className={`shrink-0 rounded-lg px-3 py-1 text-xs font-black border ${
+                  bannerForm.type === "celebration"
+                    ? "border-black/20 bg-black/10 text-black"
+                    : "border-white/30 bg-white/10 text-white"
+                }`}>
+                  {bannerForm.linkText} ←
+                </span>
+              ) : null}
+            </div>
+            {!bannerForm.enabled ? (
+              <p className="text-[10px] font-bold text-slate-500 text-center">⚠️ الشريط معطل — فعّله أعلاه ليظهر على الموقع</p>
+            ) : null}
+          </div>
         </div>
       )}
 
