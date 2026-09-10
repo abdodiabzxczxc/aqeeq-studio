@@ -10,6 +10,7 @@ import { AqeeqAdmissionsScrubReel } from "@/components/AqeeqAdmissionsScrubReel"
 import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSection";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
+import { FaqAccordionSection } from "@/components/FaqAccordionSection";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1637,6 +1638,14 @@ export default function AqeeqSchoolAdmissionsPage() {
 
       {/* 📱 قسم تطبيق مدارس العقيق الذكي — الهاتف ثلاثي الأبعاد الدوار، فيديو الشرح، ورمز QR التفاعلي */}
       <AqeeqSchoolAppShowcaseSection dark={dark} />
+
+      {/* ❓ محرك الأسئلة الشائعة التفاعلي للقبول والرسوم والمواصلات */}
+      <FaqAccordionSection
+        dark={dark}
+        defaultCategory="admissions"
+        title="الأسئلة الأكثر شيوعاً حول القبول والرسوم"
+        subtitle="إجابات واضحة ومعتمدة عن خطط التقسيط، الخصومات الممنوحة، النقل المدرسي والاعتماد الدولي"
+      />
 
       {/* Grand Finale CTA */}
       <AqeeqGrandFinaleCta

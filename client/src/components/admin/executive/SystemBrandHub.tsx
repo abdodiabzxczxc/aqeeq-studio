@@ -32,6 +32,12 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  Palmtree,
+  Megaphone,
+  FileText,
+  Award,
+  GraduationCap,
+  Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -59,7 +65,7 @@ export function SystemBrandHub({
   onSaveOrchestration,
   isSaving,
 }: SystemBrandHubProps) {
-  const [subTab, setSubTab] = useState<"header_footer" | "emergency" | "portals" | "marketing" | "seasons">("header_footer");
+  const [subTab, setSubTab] = useState<"header_footer" | "footer" | "popup" | "vacation" | "portals" | "emergency" | "marketing" | "seasons">("header_footer");
 
   // 1. Top Utility Bar Form (بوابة التوظيف وأرقام الاستقبال)
   const currentTopBar = orchestration?.topBar || {
@@ -148,6 +154,60 @@ export function SystemBrandHub({
   // 7. Seasons Form
   const currentTheme = orchestration?.theme || {};
   const [selectedSeason, setSelectedSeason] = useState<string>(currentTheme?.season || "default");
+
+  // 8. Footer Form (Pre-footer, Badges, Quick Links, Copyright)
+  const currentFooter = orchestration?.footer || {
+    preFooterEnabled: true,
+    preFooterTitle: "ابدأ مسيرة التفوق والريادة مع مدارس العقيق ✦",
+    preFooterDesc: "بيئة تعليمية رائدة تجمع بين أصالة القيم وأحدث معايير التعليم الدولي (الأمريكي والدولي)، بمجمعات نموذجية متكاملة للبنين والبنات بالمدينة المنورة.",
+    preFooterCta1Text: "حجز مقعد دراسي",
+    preFooterCta1Url: "/admissions",
+    preFooterCta2Text: "مستشار القبول",
+    preFooterCta2Url: "https://wa.me/966531896000",
+    preFooterCta3Text: "جدول الرسوم المعتمد",
+    preFooterCta3Url: "/admissions#fees-table-section",
+    badge1Enabled: true,
+    badge1Text: "اعتماد Cognia",
+    badge1Url: "/accreditations",
+    badge2Enabled: true,
+    badge2Text: "مركز اختبارات SAT & IELTS",
+    badge2Url: "/accreditations",
+    quickLink1Enabled: true,
+    quickLink1Text: "القبول والتسجيل ✦",
+    quickLink1Url: "/admissions",
+    quickLink2Enabled: true,
+    quickLink2Text: "الاعتمادات",
+    quickLink2Url: "/accreditations",
+    quickLink3Enabled: true,
+    quickLink3Text: "المجمعات 🏫",
+    quickLink3Url: "/about",
+    copyrightText: "جميع الحقوق محفوظة لمدارس العقيق الأهلية والدولية © 2026",
+  };
+  const [footerForm, setFooterForm] = useState(currentFooter);
+
+  // 9. Event Pop-up Modal Form
+  const currentEventModal = orchestration?.eventModal || {
+    enabled: false,
+    title: "فتح باب القبول والتسجيل للعام الدراسي الجديد",
+    subtitle: "يسر مدارس العقيق الأهلية والدولية الإعلان عن بدء استقبال طلبات الالتحاق ببرامج التعليم العام والمسار الأمريكي المعتمد.",
+    badge: "إعلان هام ✦ 2026/2027",
+    imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80",
+    ctaText: "حجز مقعد دراسي الآن 🚀",
+    ctaUrl: "/admissions",
+  };
+  const [eventModalForm, setEventModalForm] = useState(currentEventModal);
+
+  // 10. Vacation / Maintenance Mode Form
+  const currentVacation = orchestration?.vacationMode || {
+    enabled: false,
+    title: "إجازة نهاية الفصل الدراسي",
+    message: "نتمنى لطلابنا وأولياء أمورنا إجازة سعيدة ومباركة. يُستأنف استقبال طلبات التسجيل الإلكتروني على مدار الساعة.",
+    type: "vacation",
+    linkText: "التقديم الإلكتروني 24/7",
+    linkUrl: "/admissions",
+  };
+  const [vacationForm, setVacationForm] = useState(currentVacation);
+
 
   const SEASONS = [
     { id: "default", name: "الهوية الرسمية الأصلية 🏛️", desc: "أزرق ياقوتي ملكي مع ذهب العقيق المعتمد" },
@@ -249,6 +309,42 @@ export function SystemBrandHub({
             }`}
           >
             <span>الهيدر والتوظيف والسوشيال 📱</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("footer")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              subTab === "footer"
+                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <FileText size={13} />
+            <span>روابط وبطاقة الفوتر 📄</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("popup")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              subTab === "popup"
+                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Megaphone size={13} />
+            <span>النافذة الإعلانية المنبثقة 📣</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("vacation")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              subTab === "vacation"
+                ? dark ? "bg-[#f8ca14] text-black shadow" : "bg-[#08467d] text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Palmtree size={13} />
+            <span>وضع العطلات والصيانة 🌴</span>
           </button>
           <button
             type="button"

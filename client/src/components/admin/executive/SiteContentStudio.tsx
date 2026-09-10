@@ -17,6 +17,9 @@ import { HomepageContentManager } from "@/components/admin/content/HomepageConte
 import { AboutPageContentManager } from "@/components/admin/content/AboutPageContentManager";
 import { AccreditationsContentManager } from "@/components/admin/content/AccreditationsContentManager";
 import { TuitionFeesContentManager } from "@/components/admin/content/TuitionFeesContentManager";
+import { FaqContentManager } from "@/components/admin/content/FaqContentManager";
+import { PartnersContentManager } from "@/components/admin/content/PartnersContentManager";
+import { HelpCircle, Handshake } from "lucide-react";
 
 interface SiteContentStudioProps {
   dark: boolean;
@@ -32,7 +35,7 @@ export function SiteContentStudio({
   isSaving,
 }: SiteContentStudioProps) {
   const [activeSection, setActiveSection] = useState<
-    "homepage" | "about" | "accreditations" | "fees" | "covers"
+    "homepage" | "about" | "accreditations" | "fees" | "covers" | "faqs" | "partners"
   >("homepage");
 
   // Hero Covers State
@@ -40,7 +43,7 @@ export function SiteContentStudio({
   const [heroForm, setHeroForm] = useState(currentHero);
 
   const SECTIONS: Array<{
-    id: "homepage" | "about" | "accreditations" | "fees" | "covers";
+    id: "homepage" | "about" | "accreditations" | "fees" | "covers" | "faqs" | "partners";
     label: string;
     icon: any;
     desc: string;
@@ -74,6 +77,18 @@ export function SiteContentStudio({
       label: "أغلفة الهيرو 🎯",
       icon: ImageIcon,
       desc: "تخصيص أغلفة المجلات والألبومات بالرئيسية",
+    },
+    {
+      id: "faqs",
+      label: "الأسئلة الشائعة ❓",
+      icon: HelpCircle,
+      desc: "إدارة أسئلة التسجيل، الرسوم، والخدمات التفاعلية",
+    },
+    {
+      id: "partners",
+      label: "الشركاء والاعتمادات 🤝",
+      icon: Handshake,
+      desc: "شريط الرعاة والشركاء والاعتمادات الدولي التفاعلي",
     },
   ];
 
@@ -149,6 +164,24 @@ export function SiteContentStudio({
 
         {activeSection === "fees" && (
           <TuitionFeesContentManager
+            dark={dark}
+            orchestration={orchestration}
+            onSave={onSaveOrchestration}
+            isSaving={isSaving}
+          />
+        )}
+
+        {activeSection === "faqs" && (
+          <FaqContentManager
+            dark={dark}
+            orchestration={orchestration}
+            onSave={onSaveOrchestration}
+            isSaving={isSaving}
+          />
+        )}
+
+        {activeSection === "partners" && (
+          <PartnersContentManager
             dark={dark}
             orchestration={orchestration}
             onSave={onSaveOrchestration}

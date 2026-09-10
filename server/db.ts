@@ -878,6 +878,40 @@ export type SiteOrchestrationConfig = {
       awardingBody: string;
     }>;
   };
+  faqs?: Array<{
+    id: string;
+    question: string;
+    answer: string;
+    category: "admissions" | "academics" | "services" | "general";
+    visible: boolean;
+    order: number;
+  }>;
+  partners?: Array<{
+    id: string;
+    name: string;
+    logoUrl: string;
+    targetUrl: string;
+    visible: boolean;
+    order: number;
+    category?: string;
+  }>;
+  eventModal?: {
+    enabled: boolean;
+    title: string;
+    subtitle?: string;
+    badge?: string;
+    imageUrl?: string;
+    ctaText?: string;
+    ctaUrl?: string;
+  };
+  vacationMode?: {
+    enabled: boolean;
+    title?: string;
+    message?: string;
+    type?: "vacation" | "maintenance";
+    linkText?: string;
+    linkUrl?: string;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -1229,6 +1263,121 @@ export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
       },
     ],
   },
+  faqs: [
+    {
+      id: "faq-1",
+      question: "متى يبدأ موعد التقديم للعام الدراسي الجديد؟",
+      answer: "يبدأ التسجيل المبكر مع بداية الفصل الدراسي الثالث ويستمر حتى اكتمال الطاقة الاستيعابية المحددة لكل مرحلة دراسية.",
+      category: "admissions",
+      visible: true,
+      order: 1,
+    },
+    {
+      id: "faq-2",
+      question: "ما هي متطلبات واختبارات القبول في المسار الدولي؟",
+      answer: "يشترط اجتياز اختبار تحديد المستوى في مادتي اللغة الإنجليزية والرياضيات، بالإضافة إلى المقابلة الشخصية مع المرشد الأكاديمي.",
+      category: "academics",
+      visible: true,
+      order: 2,
+    },
+    {
+      id: "faq-3",
+      question: "هل تتوفر خدمات النقل المدرسي المكيف لجميع أحياء المدينة؟",
+      answer: "نعم، تمتلك مدارس العقيق أسطولاً مدرسياً حديثاً ومجهزاً بأنظمة التتبع الذكي ومكيفاً بالكامل يغطي معظم الأحياء بالمدينة المنورة.",
+      category: "services",
+      visible: true,
+      order: 3,
+    },
+    {
+      id: "faq-4",
+      question: "ما هي التسهيلات وأنظمة التقسيط المتاحة لسداد الرسوم؟",
+      answer: "نوفر أنظمة سداد مرنة وميسرة تشمل السداد الفصلي على 3 دفعات، مع خصم السداد النقدي الكامل، وخصم 10% تلقائي للأشقاء.",
+      category: "admissions",
+      visible: true,
+      order: 4,
+    },
+    {
+      id: "faq-5",
+      question: "ما هي الاعتمادات الدولية المعتمدة لشهادة خريجي العقيق؟",
+      answer: "خريجو مدارس العقيق يحصلون على شهادة معتمدة من وزارة التعليم بالإضافة إلى اعتماد كوجنيا الأمريكي الدولي (Cognia) بتقييم 99.2%.",
+      category: "general",
+      visible: true,
+      order: 5,
+    },
+  ],
+  partners: [
+    {
+      id: "partner-moe",
+      name: "وزارة التعليم بالمملكة",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/ar/thumb/9/98/Ministry_of_Education_%28Saudi_Arabia%29.svg/1200px-Ministry_of_Education_%28Saudi_Arabia%29.svg.png",
+      targetUrl: "https://moe.gov.sa",
+      visible: true,
+      order: 1,
+      category: "official",
+    },
+    {
+      id: "partner-cognia",
+      name: "اعتماد كوجنيا الدولي Cognia",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Cognia_logo.png",
+      targetUrl: "https://www.cognia.org",
+      visible: true,
+      order: 2,
+      category: "accreditation",
+    },
+    {
+      id: "partner-mawhiba",
+      name: "مؤسسة الملك عبد العزيز ورجاله للموهبة والإبداع (موهبة)",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/ar/archive/6/6f/20210920150931%21Mawhiba_Logo.png",
+      targetUrl: "https://www.mawhiba.org.sa",
+      visible: true,
+      order: 3,
+      category: "excellence",
+    },
+    {
+      id: "partner-idp",
+      name: "المركز الدولي لاختبارات آيلتس (IDP IELTS)",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/IELTS_logo.svg/1200px-IELTS_logo.svg.png",
+      targetUrl: "https://www.ielts.org",
+      visible: true,
+      order: 4,
+      category: "testing",
+    },
+    {
+      id: "partner-sat",
+      name: "كوليدج بورد اختبارات السات (College Board SAT)",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/College_Board_logo.svg/1200px-College_Board_logo.svg.png",
+      targetUrl: "https://www.collegeboard.org",
+      visible: true,
+      order: 5,
+      category: "testing",
+    },
+    {
+      id: "partner-madrasati",
+      name: "منصة مدرستي الرقمية",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/ar/f/fe/Madrasati_logo.png",
+      targetUrl: "https://schools.madrasati.sa",
+      visible: true,
+      order: 6,
+      category: "digital",
+    },
+  ],
+  eventModal: {
+    enabled: false,
+    title: "فتح باب القبول والتسجيل للعام الدراسي الجديد",
+    subtitle: "يسر مدارس العقيق الأهلية والدولية الإعلان عن بدء استقبال طلبات الالتحاق ببرامج التعليم العام والمسار الأمريكي المعتمد.",
+    badge: "إعلان هام ✦ 2026/2027",
+    imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80",
+    ctaText: "حجز مقعد دراسي الآن 🚀",
+    ctaUrl: "/admissions",
+  },
+  vacationMode: {
+    enabled: false,
+    title: "إجازة نهاية الفصل الدراسي",
+    message: "نتمنى لطلابنا وأولياء أمورنا إجازة سعيدة ومباركة. يُستأنف استقبال طلبات التسجيل الإلكتروني على مدار الساعة.",
+    type: "vacation",
+    linkText: "التقديم الإلكتروني 24/7",
+    linkUrl: "/admissions",
+  },
 };
 
 export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
@@ -1272,6 +1421,10 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           aboutPageConfig: { ...DEFAULT_SITE_ORCHESTRATION.aboutPageConfig, ...(parsed.aboutPageConfig || {}) },
           accreditationsConfig: { ...DEFAULT_SITE_ORCHESTRATION.accreditationsConfig, ...(parsed.accreditationsConfig || {}) },
           systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
+          faqs: Array.isArray(parsed.faqs) && parsed.faqs.length > 0 ? parsed.faqs : DEFAULT_SITE_ORCHESTRATION.faqs,
+          partners: Array.isArray(parsed.partners) && parsed.partners.length > 0 ? parsed.partners : DEFAULT_SITE_ORCHESTRATION.partners,
+          eventModal: { ...DEFAULT_SITE_ORCHESTRATION.eventModal, ...(parsed.eventModal || {}) },
+          vacationMode: { ...DEFAULT_SITE_ORCHESTRATION.vacationMode, ...(parsed.vacationMode || {}) },
         };
       }
     } catch (err) {
@@ -1338,6 +1491,10 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     schoolCampuses: { ...(current.schoolCampuses || DEFAULT_SITE_ORCHESTRATION.schoolCampuses!), ...(data.schoolCampuses || {}) },
     admissionsSettings: { ...(current.admissionsSettings || DEFAULT_SITE_ORCHESTRATION.admissionsSettings!), ...(data.admissionsSettings || {}) },
     marketingPixels: { ...(current.marketingPixels || DEFAULT_SITE_ORCHESTRATION.marketingPixels!), ...(data.marketingPixels || {}) },
+    faqs: data.faqs !== undefined ? data.faqs : current.faqs,
+    partners: data.partners !== undefined ? data.partners : current.partners,
+    eventModal: { ...(current.eventModal || DEFAULT_SITE_ORCHESTRATION.eventModal!), ...(data.eventModal || {}) },
+    vacationMode: { ...(current.vacationMode || DEFAULT_SITE_ORCHESTRATION.vacationMode!), ...(data.vacationMode || {}) },
     interactiveFx: data.interactiveFx !== undefined
       ? { ...(current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx!), ...data.interactiveFx }
       : (current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx),

@@ -210,6 +210,7 @@ function App() {
 import { useSiteTheme } from "./lib/useSiteTheme";
 import { useAqeeqStudioTheme } from "./lib/aqeeqStudioTheme";
 import { AqeeqCelebrationConfetti } from "./components/AqeeqCelebrationConfetti";
+import { AqeeqEventModal } from "./components/AqeeqEventModal";
 
 function StudioAppShell() {
   const [location] = useLocation();
@@ -266,6 +267,11 @@ function StudioAppShell() {
         {!isLoginPage && (
           <ErrorBoundary fallback={null}>
             <InContextHUDBridge />
+          </ErrorBoundary>
+        )}
+        {!isLoginPage && (
+          <ErrorBoundary fallback={null}>
+            <AqeeqEventModal />
           </ErrorBoundary>
         )}
       </div>
