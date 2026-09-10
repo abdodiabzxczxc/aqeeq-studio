@@ -277,17 +277,59 @@ export function reloadLocalDb(): LocalDbState {
   return getLocalDb();
 }
 
+let _saveInProgress = false;
+let _pendingSave = false;
+
 export function saveLocalDb() {
   if (!memoryState) return;
   ensureDataDir();
-  try {
-    const json = JSON.stringify(memoryState, null, 2);
-    fs.writeFileSync(DB_FILE, json, "utf-8");
-    if (fs.existsSync(path.dirname(SEED_FILE))) {
-      fs.writeFileSync(SEED_FILE, json, "utf-8");
+
+  // If a save is already running, mark that another is pending
+  if (_saveInProgress) {
+    _pendingSave = true;
+    return;
+  }
+
+  _saveInProgress = true;
+  const json = JSON.stringify(memoryState, null, 2);
+  const tmpFile = DB_FILE + ".tmp";
+
+  const finalize = () => {
+    _saveInProgress = false;
+    if (_pendingSave) {
+      _pendingSave = false;
+      saveLocalDb();
     }
+  };
+
+  try {
+    // Atomic write: write to .tmp then rename — prevents corruption on crash
+    fs.writeFile(tmpFile, json, "utf-8", (err) => {
+      if (err) {
+        console.error("[LocalDB] Save error (write):", err);
+        finalize();
+        return;
+      }
+      fs.rename(tmpFile, DB_FILE, (renameErr) => {
+        if (renameErr) {
+          console.error("[LocalDB] Save error (rename):", renameErr);
+          finalize();
+          return;
+        }
+        // Also write seed file if directory exists
+        if (fs.existsSync(path.dirname(SEED_FILE))) {
+          fs.writeFile(SEED_FILE, json, "utf-8", (seedErr) => {
+            if (seedErr) console.error("[LocalDB] Seed save error:", seedErr);
+            finalize();
+          });
+        } else {
+          finalize();
+        }
+      });
+    });
   } catch (err) {
-    console.error("[LocalDB] Save error:", err);
+    console.error("[LocalDB] Save error (sync):", err);
+    finalize();
   }
 }
 

@@ -69,28 +69,9 @@ function ScrollToTopOnNavigation() {
   }, []);
 
   useEffect(() => {
-    // 1. Instant scroll reset to top
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    // Single instant scroll reset — avoids Layout Thrashing from multiple calls
+    window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-
-    // 2. Secondary frame check to ensure any dynamic layout reflows stay at the top
-    const frame = requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    });
-
-    const timer = setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }, 60);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timer);
-    };
   }, [location]);
 
   return null;

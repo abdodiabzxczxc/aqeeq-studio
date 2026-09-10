@@ -18,7 +18,18 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { TuitionFeesContentManager } from "@/components/admin/content/TuitionFeesContentManager";
+
 
 interface LeadItem {
   id: number;
@@ -59,6 +70,8 @@ export function OperationsHub({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [trackFilter, setTrackFilter] = useState<string>("all");
+  const [deleteTargetLead, setDeleteTargetLead] = useState<LeadItem | null>(null);
+
 
   // Registration switch states
   const currentAdm = orchestration?.admissionsSettings || {};
@@ -313,11 +326,7 @@ export function OperationsHub({
                       {onDeleteLead && (
                         <button
                           type="button"
-                          onClick={() => {
-                            if (window.confirm(`هل أنت متأكد من حذف طلب الطالب (${lead.studentName})؟`)) {
-                              onDeleteLead(lead.id);
-                            }
-                          }}
+                          onClick={() => setDeleteTargetLead(lead)}
                           className="p-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
                           title="حذف الطلب"
                         >
@@ -414,6 +423,36 @@ export function OperationsHub({
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTargetLead} onOpenChange={(open) => !open && setDeleteTargetLead(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-rose-500">⚠️ تأكيد حذف الطلب</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm leading-relaxed">
+              هل أنت متأكد من حذف طلب التسجيل للطالب{" "}
+              <span className="font-bold text-foreground">«{deleteTargetLead?.studentName}»</span>؟
+              <br />
+              <span className="text-rose-400 font-semibold">هذا الإجراء لا يمكن التراجع عنه.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse gap-2">
+            <AlertDialogCancel onClick={() => setDeleteTargetLead(null)}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-rose-500 hover:bg-rose-600 text-white"
+              onClick={() => {
+                if (deleteTargetLead && onDeleteLead) {
+                  onDeleteLead(deleteTargetLead.id);
+                  toast.success(`تم حذف طلب الطالب ${deleteTargetLead.studentName}`);
+                }
+                setDeleteTargetLead(null);
+              }}
+            >
+              نعم، احذف الطلب
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

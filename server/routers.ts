@@ -700,7 +700,7 @@ export const appRouter = router({
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "school_news.publish", details: JSON.stringify({ issueId: input.id }) });
       return issue;
     }),
-    generateAiStory: publicProcedure
+    generateAiStory: adminProcedure
       .input(
         z.object({
           title: z.string().optional(),
@@ -785,7 +785,7 @@ export const appRouter = router({
       triggerAutoPageCapture("home");
       return result;
     }),
-    generateAiStory: publicProcedure
+    generateAiStory: adminProcedure
       .input(
         z.object({
           title: z.string().optional(),
