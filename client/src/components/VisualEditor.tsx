@@ -147,6 +147,7 @@ type LayerBehavior = {
   backgroundOriginal?: BackgroundOrigin;
   isFloating?: boolean;
   floatingPin?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  flexOrder?: number;
 };
 
 function parseLayerBehavior(raw?: string | null): LayerBehavior {
@@ -157,6 +158,7 @@ function parseLayerBehavior(raw?: string | null): LayerBehavior {
       device: ["all", "mobile", "desktop"].includes(value.device || "all") ? value.device : "all",
       animation: ["none", "fade", "rise", "slide"].includes(value.animation || "none") ? value.animation : "none",
       isFloating: Boolean(value.isFloating),
+      flexOrder: typeof value.flexOrder === "number" ? value.flexOrder : undefined,
     };
   } catch { return { device: "all", animation: "none", isFloating: false }; }
 }
@@ -349,14 +351,16 @@ export function shouldShowWorkspacePanel(isEditing: boolean, isPreviewing: boole
 function toStyle(override?: VisualOverride): React.CSSProperties {
   if (!override) return {};
   const behavior = parseLayerBehavior(override.customCss);
+  const isSection = override.elementTag === "section" || override.elementTag === "section-block" || override.elementId.startsWith("section-");
+  const isFloating = behavior.isFloating === true && !isSection;
   const safeZIndex = isBackgroundLayer(override.elementId) ? Math.max(0, override.layerZIndex) : override.layerZIndex;
   const hasGeometry = Boolean(override.layerX || override.layerY || override.layerWidth || override.layerHeight || safeZIndex);
-  const isCroppedSection = Boolean(override.layerHeight && ["section", "section-block"].includes(override.elementTag));
+  const isCroppedSection = Boolean(override.layerHeight && isSection);
   const usesGradient = Boolean(override.bgColor?.includes("gradient("));
   const usesBackgroundImage = Boolean(override.mediaUrl && ["section", "section-block", "text", "button"].includes(override.elementTag));
   const overlay = Math.max(0, Math.min(100, override.backgroundOverlay ?? 0)) / 100;
   const texture = behavior.texture ? "radial-gradient(rgba(255,255,255,.14) .65px,transparent .8px),radial-gradient(rgba(0,0,0,.16) .6px,transparent .8px)" : "";
-  const imageBase = usesBackgroundImage ? (overlay ? `linear-gradient(rgba(0,0,0,${overlay}),rgba(0,0,0,${overlay})), url(\"${override.mediaUrl}\")` : `url(\"${override.mediaUrl}\")`) : usesGradient ? override.bgColor || "" : "";
+  const imageBase = usesBackgroundImage ? (overlay ? `linear-gradient(rgba(0,0,0,${overlay}),rgba(0,0,0,${overlay})), url("${override.mediaUrl}")` : `url("${override.mediaUrl}")`) : usesGradient ? override.bgColor || "" : "";
   const textGradient = behavior.textGradient === "gold" ? "linear-gradient(135deg,#fff2bd,#e5b84f 45%,#93610d)" : behavior.textGradient === "sky" ? "linear-gradient(135deg,#e2f7ff,#55c8f1 50%,#5b83ec)" : behavior.textGradient === "violet" ? "linear-gradient(135deg,#f3e8ff,#c68aff 48%,#8e58e8)" : "";
   const textShadow = behavior.textShadow === "soft" ? "0 3px 16px rgba(0,0,0,.32)" : behavior.textShadow === "strong" ? "0 4px 0 rgba(0,0,0,.48),0 12px 30px rgba(0,0,0,.42)" : undefined;
   const textStroke = behavior.textStroke === "light" ? "1px rgba(255,255,255,.45)" : behavior.textStroke === "dark" ? "1px rgba(0,0,0,.6)" : undefined;
@@ -386,13 +390,14 @@ function toStyle(override?: VisualOverride): React.CSSProperties {
     ...(behavior.innerShadow || designEffects.boxShadow ? { boxShadow: [behavior.innerShadow ? "inset 0 1px 0 rgba(255,255,255,.16), inset 0 -12px 28px rgba(0,0,0,.22)" : "", designEffects.boxShadow || ""].filter(Boolean).join(",") } : {}),
     ...(behavior.gradientBorder ? { border: "1px solid transparent", borderImage: "linear-gradient(135deg,#fff2bd,#e5b84f 45%,#6e4210) 1" } : {}),
     ...(buttonStyle === "filled" ? { border: "1px solid #e5b84f" } : buttonStyle === "outline" ? { border: "1px solid rgba(229,184,79,.72)" } : buttonStyle === "ghost" ? { border: "1px solid rgba(255,255,255,.16)" } : {}),
-    transform: behavior.isFloating && (override.layerX || override.layerY) ? `translate3d(${override.layerX}px, ${override.layerY}px, 0)` : undefined,
+    transform: isFloating && (override.layerX || override.layerY) ? `translate3d(${override.layerX}px, ${override.layerY}px, 0)` : undefined,
     width: override.layerWidth ? `${override.layerWidth}px` : undefined,
     height: override.layerHeight ? `${override.layerHeight}px` : undefined,
     minHeight: isCroppedSection ? 0 : undefined,
     overflow: isCroppedSection ? "hidden" : undefined,
-    position: behavior.isFloating ? "absolute" : (hasGeometry ? "relative" : undefined),
-    zIndex: behavior.isFloating ? Math.max(25, safeZIndex || 25) : (hasGeometry ? safeZIndex : undefined),
+    position: isFloating ? "absolute" : (!isSection && hasGeometry ? "relative" : undefined),
+    zIndex: isFloating ? Math.max(25, safeZIndex || 25) : (!isSection && hasGeometry ? safeZIndex : undefined),
+    order: behavior.flexOrder !== undefined ? behavior.flexOrder : undefined,
     opacity: override.layerOpacity / 100,
     display: override.isHidden ? "none" : undefined,
   };
@@ -3372,7 +3377,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       toast.success("تم تحديث النص مباشرة كمسودة");
     }
   };
-  const interaction = useRef<{ mode: "move" | "resize"; resizeHandle?: ResizeHandle; startX: number; startY: number; startLeft: number; startTop: number; baseX: number; baseY: number; baseWidth: number; baseHeight: number; groupIds: string[]; translationX: number; translationY: number } | null>(null);
+  const interaction = useRef<{ mode: "move" | "resize"; resizeHandle?: ResizeHandle; startX: number; startY: number; lastClientX?: number; lastClientY?: number; startLeft: number; startTop: number; baseX: number; baseY: number; baseWidth: number; baseHeight: number; groupIds: string[]; translationX: number; translationY: number } | null>(null);
   const longPress = useRef<{ timer: number | null; startX: number; startY: number; selected: boolean }>({ timer: null, startX: 0, startY: 0, selected: false });
   const [liveFrame, setLiveFrame] = useState<{ x: number; y: number; width: number | null; height: number | null } | null>(null);
   useEffect(() => {
@@ -3384,6 +3389,18 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     observer.observe(node);
     return () => observer.disconnect();
   }, [behavior.revealOnScroll, isEditing]);
+
+  useEffect(() => {
+    if (behavior.flexOrder !== undefined && layerRef.current?.parentElement) {
+      const parent = layerRef.current.parentElement;
+      const computed = window.getComputedStyle(parent);
+      if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
+        parent.style.display = "flex";
+        parent.style.flexDirection = "column";
+      }
+    }
+  }, [behavior.flexOrder]);
+
   const clearLongPress = () => {
     if (longPress.current.timer !== null) window.clearTimeout(longPress.current.timer);
     longPress.current.timer = null;
@@ -3402,13 +3419,52 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     select(backgroundId, backgroundTag, backgroundLabel);
     return true;
   };
+
+  const moveSibling = (direction: "up" | "down") => {
+    const el = layerRef.current;
+    if (!el || !el.parentElement) return;
+    const parent = el.parentElement;
+
+    const computed = window.getComputedStyle(parent);
+    if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
+      parent.style.display = "flex";
+      parent.style.flexDirection = "column";
+    }
+
+    const allChildren = Array.from(parent.children) as HTMLElement[];
+    const currentIndex = allChildren.indexOf(el);
+    if (currentIndex === -1) return;
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= allChildren.length) {
+      toast.info(direction === "up" ? "العنصر في أعلى موضعه بالفعل داخل الحاوية" : "العنصر في أسفل موضعه بالفعل داخل الحاوية");
+      return;
+    }
+
+    allChildren.forEach((child, idx) => {
+      let assignedOrder = idx;
+      if (idx === currentIndex) assignedOrder = targetIndex;
+      else if (idx === targetIndex) assignedOrder = currentIndex;
+
+      child.style.order = String(assignedOrder);
+
+      const sid = child.dataset.visualId;
+      if (sid) {
+        const existingCss = getOverride(sid)?.customCss || "";
+        const nextCss = serializeLayerBehavior(existingCss, { flexOrder: assignedOrder, isFloating: false });
+        updateElementOverride?.(sid, { customCss: nextCss, layerX: 0, layerY: 0 });
+      }
+    });
+
+    toast.success(direction === "up" ? "تم تحريك العنصر للأعلى في الهيكل بنجاح" : "تم تحريك العنصر للأسفل في الهيكل بنجاح");
+  };
   const begin = (event: React.PointerEvent<HTMLElement>, mode: "move" | "resize", resizeHandle?: ResizeHandle) => {
     if (!isEditing || (!isInteractiveTransform && !(mode === "resize" && isDirectBackground)) || !canManipulateLayer(isLocked)) return;
     event.preventDefault(); event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
     event.currentTarget.setPointerCapture(event.pointerId);
     const groupIds = mode === "move" && selectedIds.length > 1 && selectedIds.includes(id) ? unlockedLayerIds(selectedIds, (elementId) => getOverride(elementId)?.isLocked) : [id];
-    interaction.current = { mode, resizeHandle, startX: event.clientX, startY: event.clientY, startLeft: rect.left, startTop: rect.top, baseX: override?.layerX ?? 0, baseY: override?.layerY ?? 0, baseWidth: override?.layerWidth ?? Math.round(rect.width), baseHeight: override?.layerHeight ?? Math.round(rect.height), groupIds, translationX: 0, translationY: 0 };
+    interaction.current = { mode, resizeHandle, startX: event.clientX, startY: event.clientY, lastClientX: event.clientX, lastClientY: event.clientY, startLeft: rect.left, startTop: rect.top, baseX: override?.layerX ?? 0, baseY: override?.layerY ?? 0, baseWidth: override?.layerWidth ?? Math.round(rect.width), baseHeight: override?.layerHeight ?? Math.round(rect.height), groupIds, translationX: 0, translationY: 0 };
     if (groupIds.length === 1) select(id, tag, label);
   };
   const move = (event: React.PointerEvent<HTMLElement>) => {
@@ -3418,12 +3474,19 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     }
     const active = interaction.current;
     if (!active) return;
+    active.lastClientX = event.clientX;
+    active.lastClientY = event.clientY;
+    const isStructuralSection = tag === "section" || tag === "section-block" || id.startsWith("section-");
     const snapGrid = (value: number) => gridEnabled ? snapToLayerGrid(value) : value;
     const dx = snapGrid(event.clientX - active.startX); const dy = snapGrid(event.clientY - active.startY);
     if (active.mode === "move") {
+      if (isStructuralSection) {
+        // Sections reorder as whole page blocks — never translate with arbitrary pixels
+        return;
+      }
       const gridX = snapGrid(active.baseX + dx);
       const gridY = snapGrid(active.baseY + dy);
-      const snap = magnetEnabled ? snapLayerToElements(
+      const snap = magnetEnabled && behavior.isFloating ? snapLayerToElements(
         { left: active.startLeft + gridX - active.baseX, top: active.startTop + gridY - active.baseY, width: active.baseWidth, height: active.baseHeight },
         Array.from(document.querySelectorAll<HTMLElement>("[data-visual-id]")).filter((node) => !active.groupIds.includes(node.dataset.visualId || "")).map((node) => {
           const rect = node.getBoundingClientRect();
@@ -3438,7 +3501,12 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       if (active.groupIds.length > 1) {
         setGroupTranslation({ ids: active.groupIds, dx: active.translationX, dy: active.translationY });
       } else {
-        setLiveFrame({ x, y, width: override?.layerWidth ?? null, height: override?.layerHeight ?? null });
+        setLiveFrame({
+          x: behavior.isFloating ? x : 0,
+          y: behavior.isFloating ? y : Math.round(dy / 2),
+          width: override?.layerWidth ?? null,
+          height: override?.layerHeight ?? null,
+        });
       }
     } else {
       showAlignmentGuides({});
@@ -3461,20 +3529,84 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       return;
     }
     const frame = liveFrame ?? { x: override?.layerX ?? 0, y: override?.layerY ?? 0, width: override?.layerWidth ?? null, height: override?.layerHeight ?? null };
-    const isStructuralSection = tag === "section" || tag === "section-block";
+    const isStructuralSection = tag === "section" || tag === "section-block" || id.startsWith("section-");
     const savedFrame = active.mode === "resize" && isStructuralSection ? { ...frame, y: active.baseY } : frame;
-    const movedFar = active.mode === "move" && (Math.abs(savedFrame.x) > 6 || Math.abs(savedFrame.y) > 6);
-    const shouldFloat = behavior.isFloating || movedFar;
-    const nextCustomCss = shouldFloat && !behavior.isFloating
-      ? serializeLayerBehavior(override?.customCss || "", { isFloating: true })
-      : override?.customCss;
-    if (shouldFloat && !behavior.isFloating) {
-      toast.info("تم تفعيل وضع التموضع الحر (Floating Pin) لهذا العنصر");
+
+    // 1. Structural Section Reordering (Block flow — never pixel translate or float)
+    if (isStructuralSection && active.mode === "move") {
+      const dy = (active.lastClientY ?? active.startY) - active.startY;
+      if (dy < -40) {
+        window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "up" }, "*");
+        toast.success("جاري تقديم القسم للأعلى في ترتيب الصفحة");
+      } else if (dy > 40) {
+        window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "down" }, "*");
+        toast.success("جاري تأخير القسم للأسفل في ترتيب الصفحة");
+      }
+      saveLayer(id, { layerX: 0, layerY: 0, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: 0, layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
+      interaction.current = null; setLiveFrame(null); showAlignmentGuides({});
+      return;
     }
-    saveLayer(id, { layerX: savedFrame.x, layerY: savedFrame.y, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: override?.layerZIndex ?? (shouldFloat ? 25 : 0), layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
-    if (nextCustomCss !== override?.customCss) {
-      updateElementOverride?.(id, { customCss: nextCustomCss });
+
+    // 2. Structural Flow Element Reordering (DOM slot swapping via CSS order, zero pixel overlap)
+    if (!behavior.isFloating && !isStructuralSection && active.mode === "move") {
+      const dy = (active.lastClientY ?? active.startY) - active.startY;
+      const el = layerRef.current;
+      const parent = el?.parentElement;
+      if (el && parent && Math.abs(dy) > 15) {
+        const computed = window.getComputedStyle(parent);
+        if (computed.display !== "flex" && computed.display !== "grid" && computed.display !== "inline-flex") {
+          parent.style.display = "flex";
+          parent.style.flexDirection = "column";
+        }
+        const allChildren = Array.from(parent.children) as HTMLElement[];
+        const currentIndex = allChildren.indexOf(el);
+        let targetIndex = -1;
+        const releaseY = active.lastClientY ?? active.startY;
+
+        for (let i = 0; i < allChildren.length; i++) {
+          if (i === currentIndex) continue;
+          const rect = allChildren[i].getBoundingClientRect();
+          if (releaseY >= rect.top && releaseY <= rect.bottom) {
+            targetIndex = i;
+            break;
+          }
+        }
+
+        if (targetIndex === -1) {
+          if (dy > 30 && currentIndex < allChildren.length - 1) targetIndex = currentIndex + 1;
+          else if (dy < -30 && currentIndex > 0) targetIndex = currentIndex - 1;
+        }
+
+        if (targetIndex !== -1 && targetIndex !== currentIndex) {
+          allChildren.forEach((child, idx) => {
+            let assignedOrder = idx;
+            if (idx === currentIndex) assignedOrder = targetIndex;
+            else if (idx === targetIndex) assignedOrder = currentIndex;
+
+            child.style.order = String(assignedOrder);
+
+            const sid = child.dataset.visualId;
+            if (sid) {
+              const existingCss = getOverride(sid)?.customCss || "";
+              const nextCss = serializeLayerBehavior(existingCss, { flexOrder: assignedOrder, isFloating: false });
+              updateElementOverride?.(sid, { customCss: nextCss, layerX: 0, layerY: 0 });
+            }
+          });
+          toast.success("تم إدراج العنصر في الموضع الجديد بسلاسة دون تداخل");
+          interaction.current = null; setLiveFrame(null); showAlignmentGuides({});
+          return;
+        }
+      }
+
+      // Released without crossing slot: keep in flow with zero pixel displacement
+      saveLayer(id, { layerX: 0, layerY: 0, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: 0, layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
+      interaction.current = null; setLiveFrame(null); showAlignmentGuides({});
+      return;
     }
+
+    // 3. Explicit Floating Element (User explicitly enabled isFloating)
+    const isFloating = behavior.isFloating === true && !isStructuralSection;
+    saveLayer(id, { layerX: isFloating ? savedFrame.x : 0, layerY: isFloating ? savedFrame.y : 0, layerWidth: savedFrame.width, layerHeight: savedFrame.height, layerZIndex: override?.layerZIndex ?? (isFloating ? 25 : 0), layerOpacity: override?.layerOpacity ?? 100, isHidden: override?.isHidden ?? false });
     const containingSection = isDirectBackground ? layerRef.current?.parentElement?.closest<HTMLElement>("[data-visual-id]") : null;
     const containingSectionId = containingSection?.dataset.visualId;
     const containingSectionTag = containingSection?.dataset.visualTag as ElementTag | undefined;
@@ -3502,6 +3634,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   const hasCustomTextColor = Boolean(customTextColor);
   const hasCustomBgColor = Boolean(customBgColor);
 
+  const isStructuralSection = tag === "section" || tag === "section-block" || id.startsWith("section-");
   const visualStyle: React.CSSProperties = {
     ...style,
     ...toStyle(override),
@@ -3513,7 +3646,12 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       "--aq-custom-bg-color": customBgColor,
       backgroundColor: customBgColor,
     } as React.CSSProperties : {}),
-    ...(groupOffset ? { transform: `translate3d(${(override?.layerX ?? 0) + groupOffset.dx}px, ${(override?.layerY ?? 0) + groupOffset.dy}px, 0)` } : liveFrame ? { transform: `translate3d(${liveFrame.x}px, ${liveFrame.y}px, 0)`, width: liveFrame.width ? `${liveFrame.width}px` : undefined, height: liveFrame.height ? `${liveFrame.height}px` : undefined } : {}),
+    ...(groupOffset && !isStructuralSection && behavior.isFloating ? { transform: `translate3d(${(override?.layerX ?? 0) + groupOffset.dx}px, ${(override?.layerY ?? 0) + groupOffset.dy}px, 0)` } : liveFrame ? {
+      transform: !isStructuralSection && behavior.isFloating ? `translate3d(${liveFrame.x}px, ${liveFrame.y}px, 0)` : undefined,
+      width: liveFrame.width ? `${liveFrame.width}px` : undefined,
+      height: liveFrame.height ? `${liveFrame.height}px` : undefined,
+      opacity: !behavior.isFloating && interaction.current?.mode === "move" ? 0.75 : undefined,
+    } : {}),
     ...(spacingDrag?.isDragging ? { marginBottom: `${spacingDrag.currentMargin}px` } : {}),
     ...(behavior.revealOnScroll && !isEditing && !isInView ? { opacity: 0 } : {}),
     ...(style?.position ? { position: style.position } : {}),
@@ -3668,7 +3806,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
           <>
             <button
               type="button"
-              title="تحريك القسم للأعلى"
+              title="تحريك القسم للأعلى في ترتيب الصفحة"
               onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "up" }, "*")}
               className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
             >
@@ -3676,21 +3814,40 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
             </button>
             <button
               type="button"
-              title="تحريك القسم للأسفل"
+              title="تحريك القسم للأسفل في ترتيب الصفحة"
               onClick={() => window.postMessage({ type: "AQEEQ_STUDIO_REORDER_SECTION_BY_ID", sectionId: id, direction: "down" }, "*")}
               className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
             >
               <ArrowDown size={12} />
             </button>
           </>
-        ) : null}
+        ) : (
+          <>
+            <button
+              type="button"
+              title="تحريك العنصر للأعلى في الهيكل وتبديل موضعه مع العنصر السابق"
+              onClick={() => moveSibling("up")}
+              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
+            >
+              <ArrowUp size={12} />
+            </button>
+            <button
+              type="button"
+              title="تحريك العنصر للأسفل في الهيكل وتبديل موضعه مع العنصر التالي"
+              onClick={() => moveSibling("down")}
+              className="grid h-6 w-6 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition"
+            >
+              <ArrowDown size={12} />
+            </button>
+          </>
+        )}
         <button
           type="button"
           title={behavior.isFloating ? "تحويل إلى تدفق متجاوب ذكي (Smart Flow)" : "تحويل إلى عنصر عائم حر (Floating Pin)"}
           onClick={() => {
             const nextFloating = !behavior.isFloating;
             const nextCss = serializeLayerBehavior(override?.customCss || "", { isFloating: nextFloating });
-            updateElementOverride?.(id, { customCss: nextCss });
+            updateElementOverride?.(id, { customCss: nextCss, layerX: 0, layerY: 0 });
             toast.success(nextFloating ? "تم تفعيل التموضع الحر (Floating Pin)" : "تمت العودة للتدفق المتجاوب الذكي (Smart Flow)");
           }}
           className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-bold transition ${
