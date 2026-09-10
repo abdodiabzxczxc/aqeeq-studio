@@ -18,7 +18,11 @@ import {
   ArrowRight,
   ExternalLink,
   UserCheck,
-  X
+  X,
+  Sparkles,
+  Layers,
+  Image,
+  Building2,
 } from "lucide-react";
 
 interface CommandItem {
@@ -35,6 +39,7 @@ interface AqeeqAdminCommandPaletteProps {
   onClose: () => void;
   onSelectTab: (tab: any, subTab?: string) => void;
   onTriggerDeploy?: () => void;
+  onOpenMediaVault?: () => void;
   admissionsList?: any[];
 }
 
@@ -43,6 +48,7 @@ export function AqeeqAdminCommandPalette({
   onClose,
   onSelectTab,
   onTriggerDeploy,
+  onOpenMediaVault,
   admissionsList = [],
 }: AqeeqAdminCommandPaletteProps) {
   const { theme } = useAqeeqStudioTheme();
@@ -73,6 +79,42 @@ export function AqeeqAdminCommandPalette({
       category: "لوحات التحكم الأساسية",
       icon: LayoutDashboard,
       action: () => { onSelectTab("radar"); onClose(); },
+    },
+    {
+      id: "cmd-media-vault",
+      title: "مكتبة الوسائط المركزية (Media Vault)",
+      category: "الأدوات التنفيذية المتقدمة",
+      icon: Image,
+      shortcut: "Ctrl+M",
+      action: () => { onOpenMediaVault?.(); onClose(); },
+    },
+    {
+      id: "cmd-ai-studio",
+      title: "استوديو الذكاء الاصطناعي والأوامر الصوتية (AI Co-Pilot)",
+      category: "الأدوات التنفيذية المتقدمة",
+      icon: Sparkles,
+      action: () => { onSelectTab("content", "ai_studio"); onClose(); },
+    },
+    {
+      id: "cmd-bento-grid",
+      title: "إدارة شبكة البنتو التفاعلية (Bento Grid Manager)",
+      category: "المحرر المرئي وهندسة الموقع",
+      icon: Layers,
+      action: () => { onSelectTab("content", "bento"); onClose(); },
+    },
+    {
+      id: "cmd-campuses-3d",
+      title: "التوأم الرقمي لمجمعات المدارس 3D (Campus Digital Twin)",
+      category: "لوحات التحكم الأساسية",
+      icon: Building2,
+      action: () => { onSelectTab("system", "campuses"); onClose(); },
+    },
+    {
+      id: "cmd-overrides-inspector",
+      title: "مفتش التعديلات البصرية الشامل (Visual Overrides Inspector)",
+      category: "المحرر المرئي وهندسة الموقع",
+      icon: Palette,
+      action: () => { onSelectTab("system", "overrides"); onClose(); },
     },
     {
       id: "cmd-admissions-inbox",

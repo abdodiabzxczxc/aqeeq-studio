@@ -101,6 +101,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { LiveHolographicRadar } from "@/components/admin/LiveHolographicRadar";
+import { CampusDigitalTwin3D } from "@/components/admin/CampusDigitalTwin3D";
+import { AutonomousAiStudio } from "@/components/admin/AutonomousAiStudio";
+import { BentoGridManager } from "@/components/admin/BentoGridManager";
+import { VisualOverridesInspector } from "@/components/admin/VisualOverridesInspector";
+import { MediaVaultModal } from "@/components/admin/MediaVaultModal";
+
 function directDriveImage(url: string | null | undefined) {
   if (!url) return null;
   const match = url.match(/\/file\/d\/([A-Za-z0-9_-]+)/);
@@ -109,9 +116,9 @@ function directDriveImage(url: string | null | undefined) {
 
 export type TabKey = "radar" | "admissions" | "content" | "campaigns" | "system";
 export type AdmissionsSubTab = "inbox" | "fees" | "settings";
-export type ContentSubTab = "master" | "articles" | "backdrops";
+export type ContentSubTab = "master" | "articles" | "bento" | "ai_studio" | "backdrops";
 export type CampaignsSubTab = "broadcast" | "whatsapp" | "radio";
-export type SystemSubTab = "pages" | "portals" | "header_footer" | "theme" | "users" | "campuses" | "marketing" | "backup";
+export type SystemSubTab = "pages" | "overrides" | "portals" | "header_footer" | "theme" | "users" | "campuses" | "marketing" | "backup";
 
 export interface CorePageItem {
   key: string;
@@ -580,6 +587,7 @@ export default function AqeeqAdminDashboardPage() {
   const [isYearbookOpen, setIsYearbookOpen] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isMediaVaultOpen, setIsMediaVaultOpen] = useState(false);
   const [admissionsFilter, setAdmissionsFilter] = useState<string>("all");
   const [admissionsSearch, setAdmissionsSearch] = useState<string>("");
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
@@ -1477,10 +1485,14 @@ export default function AqeeqAdminDashboardPage() {
       if (subTab === "inbox" || subTab === "fees" || subTab === "settings") {
         setAdmissionsSubTab(subTab);
       }
-    } else if (tab === "content" || tab === "articles") {
+    } else if (tab === "content" || tab === "articles" || tab === "bento" || tab === "ai_studio") {
       setActiveTab("content");
       if (tab === "articles" || subTab === "articles") {
         setContentSubTab("articles");
+      } else if (tab === "bento" || subTab === "bento") {
+        setContentSubTab("bento");
+      } else if (tab === "ai_studio" || subTab === "ai_studio") {
+        setContentSubTab("ai_studio");
       } else {
         setContentSubTab("master");
       }
@@ -1493,10 +1505,12 @@ export default function AqeeqAdminDashboardPage() {
       } else {
         setCampaignsSubTab("broadcast");
       }
-    } else if (tab === "system" || tab === "users" || tab === "orchestration") {
+    } else if (tab === "system" || tab === "users" || tab === "orchestration" || tab === "overrides") {
       setActiveTab("system");
       if (tab === "users" || subTab === "users") {
         setSystemSubTab("users");
+      } else if (tab === "overrides" || subTab === "overrides") {
+        setSystemSubTab("overrides");
       } else if (subTab === "header_nav" || subTab === "pages") {
         setSystemSubTab("pages");
       } else if (subTab === "campuses") {
@@ -1625,6 +1639,15 @@ export default function AqeeqAdminDashboardPage() {
             >
               <Palette size={14} />
               <span>المحرر البصري 🎨</span>
+            </button>
+
+            {/* Media Vault Global Button */}
+            <button
+              onClick={() => setIsMediaVaultOpen(true)}
+              className="hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-blue-400/30 bg-blue-400/10 px-3.5 py-2 text-xs font-black text-blue-400 hover:bg-blue-400 hover:text-black transition shadow-sm cursor-pointer"
+              title="فتح مكتبة الوسائط المركزية"
+            >
+              <span>مكتبة الوسائط 🖼️</span>
             </button>
 
             {/* Quick Link to Pages Management */}
@@ -1808,6 +1831,9 @@ export default function AqeeqAdminDashboardPage() {
         {/* ============================================================== */}
         {activeTab === "radar" && (
           <div className="space-y-8 animate-in fade-in duration-300">
+            {/* NEXT-GEN HOLOGRAPHIC RADAR & LIVE TELEMETRY */}
+            <LiveHolographicRadar dark={dark} />
+
             {/* AI Yearbook Super Feature Banner */}
             <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 shadow-2xl border ${
               dark
@@ -2920,6 +2946,32 @@ export default function AqeeqAdminDashboardPage() {
                 <Camera size={15} />
                 <span>صور الخلفيات المتحركة (مدارسنا · الاعتمادات · القبول) 🖼️✨</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setContentSubTab("bento")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "bento"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Layers size={15} />
+                <span>شبكة البنتو التفاعلية (Bento Grid) 🍱</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setContentSubTab("ai_studio")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  contentSubTab === "ai_studio"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <Sparkles size={15} />
+                <span>استوديو الذكاء الاصطناعي والأوامر الصوتية 🤖🎙️</span>
+              </button>
             </div>
 
             {/* SUBTAB 1: UNIFIED MASTER CONTENT TABLE */}
@@ -3657,6 +3709,20 @@ export default function AqeeqAdminDashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* SUBTAB 4: BENTO GRID MANAGER */}
+            {contentSubTab === "bento" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <BentoGridManager dark={dark} />
+              </div>
+            )}
+
+            {/* SUBTAB 5: AUTONOMOUS AI STUDIO */}
+            {contentSubTab === "ai_studio" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <AutonomousAiStudio dark={dark} />
+              </div>
+            )}
           </div>
         )}
 
@@ -3679,6 +3745,19 @@ export default function AqeeqAdminDashboardPage() {
                 <Compass size={15} />
                 <span>إدارة الصفحات وشريط التنقل 🧭</span>
                 <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px]">9</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSystemSubTab("overrides")}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black transition cursor-pointer ${
+                  systemSubTab === "overrides"
+                    ? dark ? "bg-[#f8ca14] text-black shadow-md" : "bg-[#08467d] text-white shadow-md"
+                    : dark ? "bg-white/5 text-slate-300 hover:bg-white/10" : "bg-white text-slate-700 hover:bg-slate-100 border border-black/5"
+                }`}
+              >
+                <SlidersHorizontal size={15} />
+                <span>مفتش التعديلات البصرية (Visual Overrides) 🔍</span>
               </button>
 
               <button
@@ -4139,6 +4218,13 @@ export default function AqeeqAdminDashboardPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* SUBTAB: VISUAL OVERRIDES INSPECTOR */}
+            {systemSubTab === "overrides" && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <VisualOverridesInspector dark={dark} />
               </div>
             )}
 
@@ -5959,6 +6045,9 @@ export default function AqeeqAdminDashboardPage() {
                     <span>{setOrchestrationMutation.isPending ? "جاري الحفظ..." : "حفظ بيانات المجمعات والتواصل"}</span>
                   </Button>
                 </div>
+
+                {/* 3D DIGITAL TWIN OF AL-AQEEQ CAMPUS */}
+                <CampusDigitalTwin3D dark={dark} />
 
                 {/* Shortcut to Social Media Settings */}
                 <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
@@ -8159,12 +8248,20 @@ export default function AqeeqAdminDashboardPage() {
         onOpenChange={setIsYearbookOpen}
       />
 
+      {/* MODAL: CENTRAL MEDIA VAULT */}
+      <MediaVaultModal
+        open={isMediaVaultOpen}
+        onOpenChange={setIsMediaVaultOpen}
+        dark={dark}
+      />
+
       {/* MODAL 11: COMMAND PALETTE (CTRL+K) */}
       <AqeeqAdminCommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectTab={handleNavigateTab}
         onTriggerDeploy={() => deployMutation.mutate()}
+        onOpenMediaVault={() => setIsMediaVaultOpen(true)}
         admissionsList={admissionsList}
       />
     </div>
