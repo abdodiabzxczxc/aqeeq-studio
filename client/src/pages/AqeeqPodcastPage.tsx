@@ -765,7 +765,7 @@ export default function AqeeqPodcastPage() {
   >
 
       {/* ==================== 🌟 2. MAIN IMPERIAL PAVILIONS (أروقة أثير العقيق الملكية) ==================== */}
-      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16 space-y-10">
+      <div className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-32 sm:pb-36 space-y-10">
         
         {/* Universal Filter & Search Deck */}
         <div

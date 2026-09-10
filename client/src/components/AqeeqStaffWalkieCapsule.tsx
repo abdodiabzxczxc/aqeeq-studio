@@ -90,7 +90,7 @@ export function AqeeqStaffWalkieCapsule() {
   if (!isStaff) return null;
 
   return (
-    <div dir="rtl" className="fixed bottom-5 right-5 z-40">
+    <div dir="rtl" className="fixed right-5 z-40" style={{ bottom: "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem))" }}>
       {/* Floating Walkie Dynamic Capsule */}
       {!isOpen && (
         <button

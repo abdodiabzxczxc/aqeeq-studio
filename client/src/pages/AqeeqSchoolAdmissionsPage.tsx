@@ -1487,7 +1487,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                         <select
                           value={formData.gradeLevel}
                           onChange={(e) => setFormData({ ...formData, gradeLevel: e.target.value })}
-                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                          className={`w-full h-12 rounded-xl border px-3 text-base outline-none ${
                             dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
                           }`}
                         >
@@ -1502,7 +1502,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                         <select
                           value={formData.track}
                           onChange={(e) => setFormData({ ...formData, track: e.target.value })}
-                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                          className={`w-full h-12 rounded-xl border px-3 text-base outline-none ${
                             dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
                           }`}
                         >
@@ -1515,7 +1515,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                         <select
                           value={formData.gender}
                           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                          className={`w-full h-12 rounded-xl border px-3 text-xs font-bold outline-none ${
+                          className={`w-full h-12 rounded-xl border px-3 text-base outline-none ${
                             dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
                           }`}
                         >
@@ -1598,7 +1598,7 @@ export default function AqeeqSchoolAdmissionsPage() {
                         placeholder="اكتب هنا أي تفاصيل تود إضافتها (مثل درجات الطالب السابقة أو تطلعاتكم)..."
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        className={`w-full rounded-xl border p-3 text-xs outline-none ${
+                        className={`w-full rounded-xl border p-3 text-base outline-none ${
                           dark ? "border-white/10 bg-[#090e14] text-white" : "border-black/10 bg-slate-50 text-slate-800"
                         }`}
                       />

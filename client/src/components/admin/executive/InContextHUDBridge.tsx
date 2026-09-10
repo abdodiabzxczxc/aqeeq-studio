@@ -41,7 +41,8 @@ export function InContextHUDBridge() {
   return (
     <div
       dir="rtl"
-      className="fixed bottom-6 left-6 z-50 select-none animate-in fade-in slide-in-from-bottom-4 duration-300 font-[Tajawal,sans-serif]"
+      className="fixed left-6 z-50 select-none animate-in fade-in slide-in-from-bottom-4 duration-300 font-[Tajawal,sans-serif]"
+      style={{ bottom: "calc(max(1.5rem, env(safe-area-inset-bottom) + 0.5rem))" }}
     >
       <div className="rounded-2xl border border-amber-400/40 bg-[#070b10]/95 text-white shadow-2xl backdrop-blur-2xl p-2 flex flex-col gap-2 min-w-[240px]">
         {/* Header Pill */}

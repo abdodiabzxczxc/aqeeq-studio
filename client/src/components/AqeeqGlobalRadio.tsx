@@ -86,7 +86,7 @@ export function AqeeqGlobalRadio() {
   const currentTrack = audioTracks[currentIndex];
 
   return (
-    <div className="fixed bottom-6 left-6 z-[90] font-['Tajawal']" dir="rtl">
+    <div className="fixed left-6 z-[90] font-['Tajawal']" dir="rtl" style={{ bottom: "calc(max(1.5rem, env(safe-area-inset-bottom) + 0.5rem))" }}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
