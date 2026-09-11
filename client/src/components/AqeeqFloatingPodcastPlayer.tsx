@@ -1773,12 +1773,11 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMobileIslandMinimized(true);
-                  toast.info("تم تصغير المشغل — الصوت مستمر في الخلفية 🎵", { duration: 2500 });
                 }}
                 className={`grid h-7 w-7 place-items-center rounded-full transition shrink-0 ${
                   isDark ? "text-slate-400 hover:text-amber-300 hover:bg-white/10" : "text-slate-500 hover:text-amber-600 hover:bg-black/5"
                 }`}
-                title="تصغير المشغل والاستمرار في الاستماع بالخلفية"
+                title="تصغير المشغل"
               >
                 <ChevronDown size={16} />
               </button>
