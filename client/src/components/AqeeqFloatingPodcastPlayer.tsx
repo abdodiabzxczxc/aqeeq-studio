@@ -23,7 +23,8 @@ import {
   RotateCw,
   Mic,
   Power,
-  Search
+  Search,
+  Bot
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -1062,7 +1063,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
             setIsHovered(false);
           }
         }}
-        className="aq-podcast-player fixed right-[max(0.875rem,calc((100vw-1560px)/2+1.5rem))] z-50 select-none transition-[bottom] duration-300 ease-out"
+        className={`aq-podcast-player fixed right-[max(0.875rem,calc((100vw-1560px)/2+1.5rem))] z-50 select-none transition-[bottom] duration-300 ease-out ${
+          activeItem ? "hidden sm:block" : "block"
+        }`}
         style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
       >
           <div className="relative flex items-center gap-3">
@@ -1657,13 +1660,149 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       </div>
 
       {/* ========================================================================= */}
+      {/* 1.5 MOBILE UNIFIED SPATIAL ISLAND (جزيرة العقيق الفضائية الموحدة على الجوال) */}
+      {/* Integrates Audio Turntable, Live Frequency Spectrum, and AI Co-Pilot in ONE Luxury Pill */}
+      {/* ========================================================================= */}
+      {activeItem && (
+        <div
+          dir="rtl"
+          data-no-visual-edit="true"
+          className="fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.25rem)] max-w-[400px] select-none block sm:hidden font-[Tajawal,sans-serif] animate-in fade-in slide-in-from-bottom-3 duration-300"
+          style={{
+            bottom: "calc(max(0.75rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))",
+          }}
+        >
+          <div
+            className={`relative flex items-center justify-between h-[56px] px-2 rounded-full border shadow-[0_16px_50px_rgba(0,0,0,0.88),0_0_30px_rgba(248,202,20,0.22)] backdrop-blur-2xl ring-1 transition-all duration-300 overflow-hidden ${
+              isDark
+                ? "bg-[#070b14]/96 border-amber-400/50 text-white ring-white/10"
+                : "bg-white/96 border-amber-400/60 text-slate-900 ring-black/5"
+            }`}
+          >
+            {/* Top Liquid Neon Mesh Hairline */}
+            <div className="aq-fluid-mesh absolute top-0 left-6 right-6 h-[1.5px] opacity-80" />
+
+            {/* A. RIGHT: Spinning Vinyl Record Turntable (Opens Library Drawer) */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPlaylistDrawerOpen((prev) => !prev);
+              }}
+              className="relative grid h-10 w-10 place-items-center rounded-full shrink-0 active:scale-95 transition"
+              title="مكتبة الصوتيات والبودكاست"
+            >
+              <div
+                className={`relative grid h-9 w-9 place-items-center rounded-full border border-amber-400/70 shadow-md overflow-hidden ${
+                  isPlaying ? "animate-[spin_4s_linear_infinite]" : ""
+                }`}
+              >
+                <img
+                  src={getSongCover(activeItem, theme)}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      theme === "light" ? "/audio-default-cover-light.svg" : "/audio-default-cover-dark.svg";
+                  }}
+                />
+                <div className="absolute h-2 w-2 rounded-full bg-[#050608] border border-amber-300" />
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-amber-400 text-slate-950 font-black shadow-sm text-[8px]">
+                <ListMusic size={9} />
+              </span>
+            </button>
+
+            {/* B. CENTER: Play/Pause Jewel & Track Title with Live Spectrum */}
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 px-1 justify-between">
+              {/* Play/Pause Jewel Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
+                className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow-md active:scale-90 transition shrink-0 mx-0.5"
+                title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
+              >
+                {isPlaying ? <Pause size={14} /> : <Play size={14} className="mr-0.5 fill-current" />}
+              </button>
+
+              {/* Title & Micro Live Frequency Waves */}
+              <div
+                onClick={() => setPlaylistDrawerOpen(true)}
+                className="min-w-0 flex-1 cursor-pointer text-right px-1"
+              >
+                <div className="flex items-center gap-1.5 justify-start">
+                  <span className="text-[11px] font-black truncate text-amber-300 leading-tight">
+                    {activeItem.title}
+                  </span>
+                  {isPlaying && (
+                    <div className="flex items-end gap-0.5 h-2.5 shrink-0">
+                      <span className="w-0.5 h-full bg-emerald-400 rounded-full animate-pulse" />
+                      <span className="w-0.5 h-2/3 bg-emerald-400 rounded-full animate-pulse delay-75" />
+                      <span className="w-0.5 h-4/5 bg-emerald-400 rounded-full animate-pulse delay-150" />
+                    </div>
+                  )}
+                </div>
+                <span className="text-[9px] text-slate-400 font-mono block truncate leading-none mt-0.5">
+                  {formatTime(progress)} / {formatTime(duration)}
+                </span>
+              </div>
+
+              {/* Dismiss / Stop Button (X) */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isPlaying) togglePlay();
+                  setActiveItem(null);
+                }}
+                className="grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:text-white transition shrink-0"
+                title="إغلاق المشغل"
+              >
+                <X size={13} />
+              </button>
+            </div>
+
+            {/* C. LEFT: AI Assistant Co-Pilot Orb (Fires aqeeq-open-ai) */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.dispatchEvent(new CustomEvent("aqeeq-open-ai"));
+              }}
+              className="group relative flex items-center p-1 rounded-full border border-amber-400/60 bg-gradient-to-tr from-[#f8ca14]/20 via-amber-400/10 to-transparent hover:scale-105 active:scale-95 transition shadow-sm shrink-0 mr-0.5"
+              title="تحدث مع مستشار العقيق الذكي"
+            >
+              <div className="relative grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-[#f8ca14] to-yellow-300 text-slate-950 font-black shadow">
+                <Bot size={16} />
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-slate-950 animate-pulse bg-emerald-400" />
+              </div>
+              <Sparkles size={10} className="text-amber-400 mx-0.5" />
+            </button>
+
+            {/* Bottom Hairline Progress Scrubber */}
+            {duration > 0 && (
+              <div className="absolute bottom-0 left-5 right-5 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-400 to-[#f8ca14] transition-all duration-100"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
       {/* 2. LUXURY FLOATING PLAYLIST SHEET (Anchored right above the Vinyl Dock) */}
       {/* ========================================================================= */}
       {playlistDrawerOpen && (
         <div
           ref={playlistSheetRef}
           dir="rtl"
-          className={`fixed right-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] w-[calc(100vw-1.5rem)] sm:w-[410px] max-h-[75vh] sm:max-h-[540px] flex flex-col rounded-3xl backdrop-blur-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-none transition-[bottom] duration-300 ease-out ${
+          className={`fixed right-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] w-[calc(100vw-1.5rem)] sm:w-[410px] max-h-[75vh] sm:max-h-[540px] flex flex-col rounded-3xl backdrop-blur-2xl shadow-2xl z-[65] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-none transition-[bottom] duration-300 ease-out ${
             isDark
               ? "bg-[#090b11]/98 border border-amber-400/40 shadow-[0_24px_70px_rgba(0,0,0,0.9)] ring-1 ring-amber-400/20 text-white"
               : "bg-white/98 border border-slate-200/90 shadow-[0_24px_70px_rgba(0,0,0,0.18)] ring-1 ring-amber-400/30 text-slate-900"

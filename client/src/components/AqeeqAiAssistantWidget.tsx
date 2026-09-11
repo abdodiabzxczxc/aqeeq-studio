@@ -162,6 +162,12 @@ export function AqeeqAiAssistantWidget() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  useEffect(() => {
+    const handleOpenAi = () => setIsOpen(true);
+    window.addEventListener("aqeeq-open-ai", handleOpenAi);
+    return () => window.removeEventListener("aqeeq-open-ai", handleOpenAi);
+  }, []);
+
   const [isOpen, setIsOpen] = useState(false);
   const [activeUiStyle, setActiveUiStyle] = useState<"siri" | "swiss">(() => {
     return (localStorage.getItem("aqeeq_ai_ui_style") as "siri" | "swiss") || "siri";
@@ -286,9 +292,7 @@ export function AqeeqAiAssistantWidget() {
       dir="rtl"
       className={`fixed left-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] ${isOpen ? "z-[60]" : "z-50"} font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out`}
       style={{
-        bottom: isMobile && hasActivePlayer
-          ? "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px) + 4.75rem)"
-          : "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))",
+        bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))",
       }}
     >
       {/* ── 1. Permanent Luxury Spatial Morphing Orb (When Closed) ── */}
@@ -299,7 +303,9 @@ export function AqeeqAiAssistantWidget() {
             setIsOpen(true);
             stopSpeaking();
           }}
-          className={`group relative flex items-center rounded-full border-2 p-1.5 sm:p-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+          className={`group relative items-center rounded-full border-2 p-1.5 sm:p-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
+            hasActivePlayer ? "hidden sm:flex" : "flex"
+          } ${
             isDark
               ? "border-amber-400/60 bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(248,202,20,0.35)]"
               : "border-amber-400/80 bg-white/95 text-slate-900 shadow-[0_10px_35px_rgba(248,202,20,0.25)]"
