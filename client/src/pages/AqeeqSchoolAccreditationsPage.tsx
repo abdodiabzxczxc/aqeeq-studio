@@ -532,7 +532,7 @@ export default function AqeeqSchoolAccreditationsPage() {
 
               {/* Full-Width 4-Portal Interactive Switcher Grid */}
               <div
-                className={`flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-2 p-1.5 rounded-2xl border shadow-inner w-full overflow-x-auto scrollbar-hide ${
+                className={`grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-2 rounded-2xl border shadow-inner w-full ${
                   dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
                 }`}
               >
@@ -549,7 +549,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveHubTab(tab.id as any)}
-                      className={`relative px-3 sm:px-3 py-2.5 sm:py-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-center gap-2 shrink-0 sm:shrink min-w-[155px] sm:min-w-0 flex-1 ${
+                      className={`relative p-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-center gap-2 w-full ${
                         isActive
                           ? "text-white font-black"
                           : dark
@@ -568,9 +568,9 @@ export default function AqeeqSchoolAccreditationsPage() {
                           transition={{ type: "spring", stiffness: 380, damping: 30 }}
                         />
                       )}
-                      <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2 w-full">
                         <Icon size={16} className={`shrink-0 ${isActive ? "text-[#f8ca14]" : "text-slate-400"}`} />
-                        <span className="text-xs sm:text-[13px] xl:text-sm font-black whitespace-nowrap">
+                        <span className="text-xs sm:text-[13px] xl:text-sm font-black text-center leading-tight">
                           {tab.label}
                         </span>
                         <span

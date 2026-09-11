@@ -32,6 +32,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { usePodcastPlayer } from "./AqeeqFloatingPodcastPlayer";
 
 
 type ActionShortcut = {
@@ -150,7 +151,16 @@ function renderInlineBoldAndLinks(str: string, isDark: boolean = true) {
 export function AqeeqAiAssistantWidget() {
   const { theme } = useAqeeqStudioTheme();
   const isDark = theme === "dark";
+  const { activeItem, isPlaying } = usePodcastPlayer();
+  const hasActivePlayer = Boolean(activeItem || isPlaying);
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(typeof window !== "undefined" && window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeUiStyle, setActiveUiStyle] = useState<"siri" | "swiss">(() => {
@@ -274,8 +284,12 @@ export function AqeeqAiAssistantWidget() {
   return (
     <div
       dir="rtl"
-      className="fixed left-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] z-50 font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out"
-      style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
+      className={`fixed left-[max(0.75rem,calc((100vw-1560px)/2+1.5rem))] ${isOpen ? "z-[60]" : "z-50"} font-[Tajawal,sans-serif] transition-[bottom] duration-300 ease-out`}
+      style={{
+        bottom: isMobile && hasActivePlayer
+          ? "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px) + 4.75rem)"
+          : "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))",
+      }}
     >
       {/* ── 1. Permanent Luxury Spatial Morphing Orb (When Closed) ── */}
       {!isOpen && (

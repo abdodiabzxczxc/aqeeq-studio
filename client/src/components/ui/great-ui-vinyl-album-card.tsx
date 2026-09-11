@@ -80,8 +80,16 @@ export function VinylAlbumCard({
   return (
     <div
       className={`relative inline-flex items-center justify-center select-none ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(false);
+        }
+      }}
       dir="ltr"
     >
       {/* Outer Atmospheric Glow */}
@@ -351,14 +359,22 @@ export function GrandVinylDeck({
   const isEmerged = isPlaying || isHovered;
   const isAmber = accentColor === "amber";
 
-  // Responsive slide distance: -75px on mobile, -170px on desktop
-  const slideDistance = isMobile ? -75 : -170;
+  // Responsive slide distance: subtle -30px on mobile so it stays within viewport, -170px on desktop
+  const slideDistance = isMobile ? -30 : -170;
 
   return (
     <div
       className={`grand-vinyl-deck relative w-full flex items-center justify-center lg:justify-start select-none ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(false);
+        }
+      }}
       dir="rtl"
     >
       {/* Outer Atmospheric Glow on Active Playback */}
@@ -375,7 +391,7 @@ export function GrandVinylDeck({
       {/* Assembly Frame that nests both the Sleeve and the Centered Sliding Disc */}
       <motion.div
         animate={{
-          maxWidth: isEmerged ? (isMobile ? 360 : 395) : (isMobile ? "100%" : 520),
+          maxWidth: isMobile ? "100%" : (isEmerged ? 395 : 520),
         }}
         transition={{
           type: "spring",
@@ -405,7 +421,9 @@ export function GrandVinylDeck({
               : { duration: 0.6, ease: "easeOut" },
           }}
           onClick={onTogglePlay}
-          className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 cursor-pointer rounded-full shadow-2xl z-0 will-change-transform h-[310px] w-[310px] sm:h-[360px] sm:w-[360px]"
+          className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 cursor-pointer rounded-full shadow-2xl z-0 will-change-transform ${
+            isMobile ? "h-[260px] w-[260px]" : "h-[310px] w-[310px] sm:h-[360px] sm:w-[360px]"
+          }`}
           style={{
             // Authentic deep obsidian multi-tone grooved vinyl
             background:
@@ -470,7 +488,7 @@ export function GrandVinylDeck({
         {/* =================================================================== */}
         <motion.div
           animate={{
-            maxWidth: isEmerged ? (isMobile ? 360 : 395) : (isMobile ? "100%" : 520),
+            maxWidth: isMobile ? "100%" : (isEmerged ? 395 : 520),
           }}
           transition={{
             type: "spring",

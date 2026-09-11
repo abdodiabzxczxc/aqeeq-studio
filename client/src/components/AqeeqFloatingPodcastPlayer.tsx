@@ -237,9 +237,13 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay } = useSiteTheme();
   const isDark = theme === "dark";
-
-
-  // Assemble current school songs from orchestration or defaults
+  const [location] = useLocation();
+  const isAtheerPage =
+    location === "/atheer" ||
+    location.startsWith("/atheer") ||
+    location === "/podcast" ||
+    location.startsWith("/podcast") ||
+    location === "/podcasts";
   const schoolSongs = useMemo(() => {
     const customSongs = (orchestration as any)?.schoolSongs;
     if (Array.isArray(customSongs) && customSongs.length > 0) {
@@ -998,9 +1002,6 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     );
   }, [podcastsList, playlistSearch]);
 
-  const [location] = useLocation();
-  const isAtheerPage = location === "/atheer" || location.startsWith("/atheer");
-
   return (
     <PodcastPlayerContext.Provider
       value={{
@@ -1051,8 +1052,16 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       <div
         dir="rtl"
         data-no-visual-edit="true"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => {
+          if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+            setIsHovered(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+            setIsHovered(false);
+          }
+        }}
         className="aq-podcast-player fixed right-[max(0.875rem,calc((100vw-1560px)/2+1.5rem))] z-50 select-none transition-[bottom] duration-300 ease-out"
         style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
       >
@@ -1273,7 +1282,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
           {/* Attached Control Dock (Single-Line Capsule: Compact and safe on mobile) */}
           {isDockVisible && (
             <div
-              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2 sm:px-4 max-w-[calc(100vw-7.5rem)] sm:max-w-none shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
                 isPodcast
                   ? isDark
                     ? "border-[#f8ca14]/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-[#f8ca14]/30"
@@ -1380,7 +1389,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         skipTime(15);
                       }}
-                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`relative hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="تقديم 15 ثانية ⏩"
@@ -1409,7 +1418,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         skipTime(-15);
                       }}
-                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`relative hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-[#063560] hover:bg-[#08467d]/10"
                       }`}
                       title="تأخير 15 ثانية ⏪"
@@ -1442,7 +1451,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         skipTime(15);
                       }}
-                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`relative hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
                       title="تقديم 15 ثانية ⏩"
@@ -1472,7 +1481,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         skipTime(-15);
                       }}
-                      className={`relative grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`relative hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-[#f8ca14] hover:text-white hover:bg-white/10" : "text-[#08467d] hover:text-black hover:bg-[#f8ca14]/20"
                       }`}
                       title="تأخير 15 ثانية ⏪"
@@ -1490,7 +1499,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         playNextSong();
                       }}
-                      className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-slate-300 hover:text-amber-300 hover:bg-white/10" : "text-slate-700 hover:text-amber-700 hover:bg-black/5"
                       }`}
                       title="الأغنية التالية"
@@ -1519,7 +1528,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                         e.stopPropagation();
                         handlePrevOrRestart();
                       }}
-                      className={`grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
+                      className={`hidden sm:grid h-7 w-7 place-items-center rounded-full transition active:scale-95 ${
                         isDark ? "text-slate-300 hover:text-amber-300 hover:bg-white/10" : "text-slate-700 hover:text-amber-700 hover:bg-black/5"
                       }`}
                       title="الأغنية السابقة / إعادة من البداية"
