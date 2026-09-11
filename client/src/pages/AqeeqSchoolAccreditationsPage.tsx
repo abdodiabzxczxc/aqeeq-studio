@@ -532,7 +532,7 @@ export default function AqeeqSchoolAccreditationsPage() {
 
               {/* Full-Width 4-Portal Interactive Switcher Grid */}
               <div
-                className={`grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-1.5 rounded-2xl border shadow-inner w-full ${
+                className={`flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-2 p-1.5 rounded-2xl border shadow-inner w-full overflow-x-auto scrollbar-hide ${
                   dark ? "border-white/10 bg-black/40 backdrop-blur-md" : "border-slate-200 bg-slate-100/90"
                 }`}
               >
@@ -549,7 +549,7 @@ export default function AqeeqSchoolAccreditationsPage() {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveHubTab(tab.id as any)}
-                      className={`relative px-2.5 sm:px-3 py-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-center gap-2 w-full ${
+                      className={`relative px-3 sm:px-3 py-2.5 sm:py-3 rounded-xl text-center transition-all duration-300 z-10 select-none flex items-center justify-center gap-2 shrink-0 sm:shrink min-w-[155px] sm:min-w-0 flex-1 ${
                         isActive
                           ? "text-white font-black"
                           : dark

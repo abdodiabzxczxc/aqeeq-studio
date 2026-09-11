@@ -346,7 +346,7 @@ export function AqeeqHomeTabsLibrary({
                         navigate(heroItem.href);
                       }
                     }}
-                    className={`group relative flex-1 min-h-[380px] sm:min-h-[440px] lg:h-[480px] 2xl:h-[520px] rounded-[2rem] sm:rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-end p-5 sm:p-8 lg:p-10 ${
+                    className={`group relative flex-1 min-h-[440px] sm:min-h-[480px] lg:h-[480px] 2xl:h-[520px] rounded-[2rem] sm:rounded-[2.5rem] border overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:shadow-3xl flex flex-col justify-between p-5 sm:p-8 lg:p-10 ${
                       dark
                         ? "bg-[#0b1016] border-white/15 shadow-black/80 hover:border-[#f8ca14]/50"
                         : "bg-white border-slate-200 shadow-xl hover:border-[#08467d]/40"
@@ -358,14 +358,14 @@ export function AqeeqHomeTabsLibrary({
                       label="صورة العنصر الرئيسي للمكتبة"
                       src={heroItem.coverUrl || "/alaqeeq-hero-light.png"}
                       alt={heroItem.title}
-                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-108 transition-transform duration-1000 ease-out"
+                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-108 transition-transform duration-1000 ease-out pointer-events-none"
                     />
 
                     {/* Gradient Depth Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent z-10 pointer-events-none" />
 
-                    {/* Top Floating Badge Bar */}
-                    <div className="absolute top-6 inset-x-6 sm:inset-x-10 z-20 flex items-center justify-between">
+                    {/* Top Floating Badge Bar (In Natural Flow to Prevent Title Collision) */}
+                    <div className="relative z-20 flex flex-wrap items-center justify-between gap-3 mb-6">
                       <span className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-black backdrop-blur-md border ${
                         dark 
                           ? "bg-black/60 border-white/20 text-[#f8ca14]" 
@@ -375,38 +375,40 @@ export function AqeeqHomeTabsLibrary({
                         <span>{currentConfig.heroBadge}</span>
                       </span>
 
-                      <span className="text-[11px] font-mono text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                        {heroItem.dateOrMeta}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {/* Audio Spectrum Visualizer (When Podcast Tab) */}
+                        {activeTab === "podcasts" && (
+                          <div className="hidden sm:flex items-center gap-1 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full">
+                            <Volume2 size={13} className="text-[#f8ca14]" />
+                            <div className="flex items-center gap-0.5 h-3">
+                              {[6, 12, 8, 14, 5, 10, 13, 7].map((h, i) => (
+                                <motion.span
+                                  key={i}
+                                  animate={{ height: [4, h, 3] }}
+                                  transition={{ duration: 0.7 + i * 0.1, repeat: Infinity, ease: "easeInOut" }}
+                                  className="w-1 bg-[#f8ca14] rounded-full inline-block"
+                                />
+                              ))}
+                            </div>
+                            <span className="text-[10px] font-black text-[#f8ca14] mr-1">صوت نقي</span>
+                          </div>
+                        )}
+
+                        <span className="text-[11px] font-mono text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                          {heroItem.dateOrMeta}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Audio Spectrum Visualizer (When Podcast Tab) */}
-                    {activeTab === "podcasts" && (
-                      <div className="absolute top-20 right-6 sm:right-10 z-20 hidden sm:flex items-center gap-1 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
-                        <Volume2 size={14} className="text-[#f8ca14]" />
-                        <div className="flex items-center gap-0.5 h-3">
-                          {[6, 12, 8, 14, 5, 10, 13, 7].map((h, i) => (
-                            <motion.span
-                              key={i}
-                              animate={{ height: [4, h, 3] }}
-                              transition={{ duration: 0.7 + i * 0.1, repeat: Infinity, ease: "easeInOut" }}
-                              className="w-1 bg-[#f8ca14] rounded-full inline-block"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-[10px] font-black text-[#f8ca14] mr-1">صوت فائق النقاوة</span>
-                      </div>
-                    )}
-
                     {/* Hero Content */}
-                    <div className="relative z-20 text-white">
+                    <div className="relative z-20 text-white mt-auto">
                       <VisualEditable
                         id={`studio-library-hero-title-${activeTab}`}
                         tag="text"
                         label="عنوان العنصر المتصدر"
                         defaultText={heroItem.title}
                         as="h3"
-                        className="text-2xl sm:text-4xl font-black font-cairo leading-tight mb-3 group-hover:text-[#f8ca14] transition-colors drop-shadow-lg"
+                        className="text-xl sm:text-3xl lg:text-4xl font-black font-cairo leading-snug sm:leading-tight mb-2 sm:mb-3 group-hover:text-[#f8ca14] transition-colors drop-shadow-lg"
                       />
                       {heroItem.excerpt && (
                         <VisualEditable
@@ -415,14 +417,14 @@ export function AqeeqHomeTabsLibrary({
                           label="وصف العنصر المتصدر"
                           defaultText={heroItem.excerpt}
                           as="p"
-                          className="text-xs sm:text-sm text-slate-300 max-w-lg mb-6 line-clamp-2 leading-relaxed"
+                          className="text-xs sm:text-sm text-slate-300 max-w-lg mb-4 sm:mb-6 line-clamp-2 leading-relaxed"
                         />
                       )}
 
                       <div className="flex items-center gap-4">
                         <button
                           type="button"
-                          className={`font-black px-7 py-3 rounded-2xl flex items-center gap-2.5 text-xs sm:text-sm shadow-xl transition-all duration-300 group-hover:scale-105 active:scale-95 ${
+                          className={`font-black px-5 sm:px-7 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2.5 text-xs sm:text-sm shadow-xl transition-all duration-300 group-hover:scale-105 active:scale-95 ${
                             dark
                               ? "bg-[#f8ca14] text-black hover:bg-[#e6b90f]"
                               : "bg-[#08467d] text-white hover:bg-[#063863]"

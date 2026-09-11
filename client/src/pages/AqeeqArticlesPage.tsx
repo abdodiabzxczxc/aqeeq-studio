@@ -1069,28 +1069,46 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                           );
                         }
 
-                        const lines = trimmed.split(/\n|\r\n/);
+                        // Helper to render bold markdown (**text**)
+                        const renderInlineMarkdown = (rawText: string, keyPrefix: string | number) => {
+                          const parts = rawText.split(/(\*\*[^*]+\*\*)/g);
+                          return parts.map((part: string, pIdx: number) => {
+                            if (part.startsWith("**") && part.endsWith("**")) {
+                              return (
+                                <strong key={`${keyPrefix}-${pIdx}`} className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
+                                  {part.slice(2, -2)}
+                                </strong>
+                              );
+                            }
+                            return <span key={`${keyPrefix}-${pIdx}`}>{part}</span>;
+                          });
+                        };
+
+                        const lines = trimmed.split(/\n|\r\n/).map((l) => l.trim()).filter(Boolean);
+                        const hasBullets = lines.some((l) => /^(\d+[\.\-\)]|\*|\-|•)\s*/.test(l));
+
+                        if (!hasBullets) {
+                          // Standard prose paragraph: join lines with space so text flows naturally
+                          const fullParagraphText = lines.join(" ");
+                          return (
+                            <p
+                              key={idx}
+                              className={`text-base sm:text-lg leading-[2.3] font-normal text-justify ${
+                                dark ? "text-slate-200" : "text-slate-800"
+                              }`}
+                            >
+                              {renderInlineMarkdown(fullParagraphText, idx)}
+                            </p>
+                          );
+                        }
+
+                        // Mixed or bulleted content: render bullets cleanly
                         return (
                           <div key={idx} className="space-y-3">
-                            {lines.map((line: string, lIdx: number) => {
-                              const lineTrimmed = line.trim();
-                              if (!lineTrimmed) return null;
-
+                            {lines.map((lineTrimmed: string, lIdx: number) => {
                               const isNumbered = /^\d+[\.\-\)]\s*/.test(lineTrimmed);
                               const isBullet = /^[\*\-•]\s*/.test(lineTrimmed);
                               const cleanText = lineTrimmed.replace(/^(\d+[\.\-\)]|\*|\-|•)\s*/, "");
-
-                              const parts = (isNumbered || isBullet ? cleanText : lineTrimmed).split(/(\*\*[^*]+\*\*)/g);
-                              const renderedParts = parts.map((part: string, pIdx: number) => {
-                                 if (part.startsWith("**") && part.endsWith("**")) {
-                                   return (
-                                     <strong key={pIdx} className={`font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                                       {part.slice(2, -2)}
-                                     </strong>
-                                   );
-                                 }
-                                return <span key={pIdx}>{part}</span>;
-                              });
 
                               if (isNumbered || isBullet) {
                                 return (
@@ -1101,7 +1119,7 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                                     <p className={`flex-1 text-base sm:text-lg leading-[2.3] font-normal ${
                                       dark ? "text-slate-100" : "text-slate-800"
                                     }`}>
-                                      {renderedParts}
+                                      {renderInlineMarkdown(cleanText, `${idx}-${lIdx}`)}
                                     </p>
                                   </div>
                                 );
@@ -1110,11 +1128,11 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
                               return (
                                 <p
                                   key={lIdx}
-                                  className={`text-base sm:text-lg leading-[2.3] font-normal ${
+                                  className={`text-base sm:text-lg leading-[2.3] font-normal text-justify ${
                                     dark ? "text-slate-200" : "text-slate-800"
                                   }`}
                                 >
-                                  {renderedParts}
+                                  {renderInlineMarkdown(lineTrimmed, `${idx}-${lIdx}`)}
                                 </p>
                               );
                             })}

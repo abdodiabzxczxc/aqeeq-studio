@@ -269,7 +269,7 @@ export function AqeeqAiAssistantWidget() {
     }
   };
 
-  if (location.startsWith("/admin") || location === "/login") return null;
+  if (location.startsWith("/admin") || location === "/login" || (location.startsWith("/albums/") && location.length > 8)) return null;
 
   return (
     <div

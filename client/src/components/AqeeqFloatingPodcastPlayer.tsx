@@ -1270,10 +1270,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
             )}
           </button>
 
-          {/* Attached Control Dock (Single-Line Capsule: Stretches HORIZONTALLY ONLY) */}
+          {/* Attached Control Dock (Single-Line Capsule: Compact and safe on mobile) */}
           {isDockVisible && (
             <div
-              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2.5 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2 sm:px-4 max-w-[calc(100vw-7.5rem)] sm:max-w-none shrink-0 ${
                 isPodcast
                   ? isDark
                     ? "border-[#f8ca14]/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-[#f8ca14]/30"
@@ -1283,7 +1283,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                     : "border-slate-200/90 bg-white/95 backdrop-blur-2xl text-slate-900 ring-1 ring-amber-400/30 shadow-[0_15px_45px_rgba(0,0,0,0.12)]"
               }`}
             >
-              {/* 1. Rightmost: Playlist Launcher Button (فتح القائمة: آخر حاجة على اليمين) */}
+              {/* 1. Rightmost: Playlist Launcher Button */}
               <button
                 type="button"
                 data-playlist-trigger="true"
@@ -1309,9 +1309,9 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 <ListMusic size={14} />
               </button>
 
-              {/* 2. وقبله الصوت التعلية والتوطية (من الشمال واطي لليمين عالي مع خلفية ملونة تقل عند الخفض) */}
+              {/* 2. وقبله الصوت التعلية والتوطية (متاح على الكمبيوتر ومخفي على الجوال للاكتفاء بأزرار الهاتف) */}
               {isExpanded && (
-                <div className={`flex items-center gap-1.5 border-r pr-2 shrink-0 animate-in fade-in slide-in-from-right-2 duration-200 ${
+                <div className={`hidden sm:flex items-center gap-1.5 border-r pr-2 shrink-0 animate-in fade-in slide-in-from-right-2 duration-200 ${
                   isDark ? "border-white/10" : "border-slate-200"
                 }`}>
                   <button
@@ -1530,15 +1530,15 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 )}
               </div>
 
-              {/* 4. Track Info: Thumbnail & Title & Live Time (شمال: الاسم دائماً على الشمال) */}
+              {/* 4. Track Info: Thumbnail & Title & Live Time */}
               <div
                 onClick={() => setIsExpanded(!isExpanded)}
-                className={`flex items-center gap-2 cursor-pointer shrink-0 max-w-[135px] sm:max-w-[170px] truncate border-r pr-2 ${
+                className={`flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 max-w-[85px] xs:max-w-[110px] sm:max-w-[170px] truncate border-r pr-1.5 sm:pr-2 ${
                   isDark ? "border-white/10" : "border-slate-200"
                 }`}
                 title={isExpanded ? "انقر للتقليص" : "انقر لتوسيع عناصر التحكم"}
               >
-                <div className={`h-7 w-7 overflow-hidden shrink-0 border ${
+                <div className={`hidden sm:block h-7 w-7 overflow-hidden shrink-0 border ${
                   isPodcast
                     ? isDark ? "border-[#f8ca14]/40 bg-[#121008] rounded-lg" : "border-slate-200 bg-white rounded-lg"
                     : isDark ? "border-amber-400/40 bg-black rounded-full" : "border-slate-300 bg-slate-100 rounded-full"

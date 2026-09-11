@@ -752,10 +752,10 @@ export default function AqeeqSchoolAdmissionsPage() {
           )}
 
           {/* Track Switcher Tabs */}
-          <div className="mt-8 inline-flex items-center rounded-2xl border p-1.5 backdrop-blur-md border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] shadow-sm">
+          <div className="mt-8 flex flex-col sm:inline-flex sm:flex-row w-full sm:w-auto items-stretch sm:items-center rounded-2xl border p-1.5 backdrop-blur-md border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] shadow-sm gap-1 sm:gap-0">
             <button
               onClick={() => setActiveTrack("national")}
-              className={`rounded-xl px-6 py-2.5 text-sm font-black transition ${
+              className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition text-center ${
                 activeTrack === "national"
                   ? dark
                     ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
@@ -769,7 +769,7 @@ export default function AqeeqSchoolAdmissionsPage() {
             </button>
             <button
               onClick={() => setActiveTrack("international")}
-              className={`rounded-xl px-6 py-2.5 text-sm font-black transition ${
+              className={`rounded-xl px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black transition text-center ${
                 activeTrack === "international"
                   ? dark
                     ? "bg-[#f8ca14] text-black shadow-md shadow-[#f8ca14]/20"
