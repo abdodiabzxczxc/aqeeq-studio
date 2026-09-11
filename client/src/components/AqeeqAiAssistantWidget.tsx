@@ -151,8 +151,8 @@ function renderInlineBoldAndLinks(str: string, isDark: boolean = true) {
 export function AqeeqAiAssistantWidget() {
   const { theme } = useAqeeqStudioTheme();
   const isDark = theme === "dark";
-  const { activeItem, isPlaying } = usePodcastPlayer();
-  const hasActivePlayer = Boolean(activeItem || isPlaying);
+  const { activeItem, isPlaying, isMobileIslandMinimized } = usePodcastPlayer();
+  const isIslandActiveOnMobile = Boolean(activeItem) && !isMobileIslandMinimized;
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -304,7 +304,7 @@ export function AqeeqAiAssistantWidget() {
             stopSpeaking();
           }}
           className={`group relative items-center rounded-full border-2 p-1.5 sm:p-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 ${
-            hasActivePlayer ? "hidden sm:flex" : "flex"
+            isIslandActiveOnMobile ? "hidden sm:flex" : "flex"
           } ${
             isDark
               ? "border-amber-400/60 bg-[#070b16]/95 text-white shadow-[0_10px_35px_rgba(248,202,20,0.35)]"

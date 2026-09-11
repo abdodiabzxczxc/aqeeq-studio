@@ -206,7 +206,7 @@ function StudioAppShell() {
 
   const { snapshot } = usePublishedHomepage();
   const brand = snapshot?.settings;
-  const { activeItem } = usePodcastPlayer();
+  const { activeItem, isMobileIslandMinimized } = usePodcastPlayer();
   const { isNationalDay } = useSiteTheme();
   const { theme } = useAqeeqStudioTheme();
   const dark = theme === "dark";
@@ -232,7 +232,7 @@ function StudioAppShell() {
       {/* 🎞️ Global Cinematic Film Grain Texture */}
       {!isLoginPage && <div className="aqeeq-grain-overlay" aria-hidden />}
       {!isLoginPage && isNationalDay && <AqeeqCelebrationConfetti />}
-      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem ? "pb-[100px] sm:pb-[120px]" : ""}`}>
+      <div className={`min-h-screen transition-[padding-bottom] duration-300 ${!isLoginPage && activeItem ? (isMobileIslandMinimized ? "pb-6 sm:pb-[120px]" : "pb-[100px] sm:pb-[120px]") : ""}`}>
         {!isLoginPage && <ErrorBoundary fallback={null}><AqeeqBroadcastBanner /></ErrorBoundary>}
         <ErrorBoundary><Router /></ErrorBoundary>
 

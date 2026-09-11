@@ -169,6 +169,9 @@ type AudioPlayerContextType = {
   volume: number;
   currentTrackType: AudioTrackType | null;
 
+  isMobileIslandMinimized: boolean;
+  setIsMobileIslandMinimized: (minimized: boolean) => void;
+
   // Actions
   playSong: (song: UniversalAudioItem | number) => void;
   playPodcast: (podcast: any) => void;
@@ -198,6 +201,8 @@ const PodcastPlayerContext = createContext<AudioPlayerContextType>({
   activePodcast: null,
   isPlaying: false,
   isMuted: false,
+  isMobileIslandMinimized: false,
+  setIsMobileIslandMinimized: () => {},
   progress: 0,
   duration: 0,
   currentTime: 0,
@@ -266,6 +271,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   }, [orchestration, theme]);
 
   const [activeItem, setActiveItem] = useState<UniversalAudioItem | null>(null);
+  const [isMobileIslandMinimized, setIsMobileIslandMinimized] = useState(false);
   const currentTrackType = activeItem?.type || null;
   const isPodcast = currentTrackType === "podcast";
   const isVideo = currentTrackType === "video" || activeItem?.type === "video";
@@ -375,6 +381,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       return;
     }
 
+    setIsMobileIslandMinimized(false);
     setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
     setLastSong(targetSong);
     setActiveItem(targetSong);
@@ -440,6 +447,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     };
 
     setActiveItem(podItem);
+    setIsMobileIslandMinimized(false);
     setIsPlaying(true);
     if (!isAtheerPage) {
       setIsExpanded(true);
@@ -468,6 +476,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       duration: video.duration || "10:00",
     };
     setActiveItem(vidItem);
+    setIsMobileIslandMinimized(false);
     setIsPlaying(true);
   };
 
@@ -614,6 +623,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
   const stopPodcast = () => {
     setIsPlaying(false);
     setActiveItem(null);
+    setIsMobileIslandMinimized(false);
     setCompletionPrompt({ visible: false, finishedPodcastTitle: "" });
     setIsExpanded(false);
     setIsHovered(false);
@@ -649,6 +659,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
     };
 
     setActiveItem(readerItem);
+    setIsMobileIslandMinimized(false);
     setIsPlaying(track.autoPlay !== false);
 
     return () => {
@@ -1010,6 +1021,8 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
         activePodcast: activeItem?.type === "podcast" ? activeItem : null,
         isPlaying,
         isMuted,
+        isMobileIslandMinimized,
+        setIsMobileIslandMinimized,
         progress,
         duration,
         currentTime: progress,
@@ -1064,7 +1077,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
           }
         }}
         className={`aq-podcast-player fixed right-[max(0.875rem,calc((100vw-1560px)/2+1.5rem))] z-50 select-none transition-[bottom] duration-300 ease-out ${
-          activeItem ? "hidden sm:block" : "block"
+          (activeItem && !isMobileIslandMinimized) ? "hidden sm:block" : "block"
         }`}
         style={{ bottom: "calc(max(1rem, env(safe-area-inset-bottom)) + var(--mobile-sticky-bar-offset, 0px))" }}
       >
@@ -1121,6 +1134,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
             type="button"
             onClick={(e) => {
               e.stopPropagation();
+              if (isMobileIslandMinimized) {
+                setIsMobileIslandMinimized(false);
+                return;
+              }
               if (isExpanded) {
                 // If it is currently expanded, clicking CLOSES it!
                 setIsExpanded(false);
@@ -1282,10 +1299,10 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
             )}
           </button>
 
-          {/* Attached Control Dock (Single-Line Capsule: Compact and safe on mobile) */}
+          {/* Attached Control Dock (Single-Line Capsule: Desktop only, hidden on mobile) */}
           {isDockVisible && (
             <div
-              className={`flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
+              className={`hidden sm:flex items-center gap-1.5 sm:gap-2.5 rounded-full border shadow-2xl transition-all duration-300 relative overflow-hidden animate-in fade-in slide-in-from-right-3 duration-200 h-12 sm:h-14 px-2 sm:px-4 max-w-[calc(100vw-5rem)] sm:max-w-none shrink-0 ${
                 isPodcast
                   ? isDark
                     ? "border-[#f8ca14]/40 bg-[#080914]/95 backdrop-blur-2xl text-white ring-1 ring-[#f8ca14]/30"
@@ -1663,7 +1680,7 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
       {/* 1.5 MOBILE UNIFIED SPATIAL ISLAND (جزيرة العقيق الفضائية الموحدة على الجوال) */}
       {/* Integrates Audio Turntable, Live Frequency Spectrum, and AI Co-Pilot in ONE Luxury Pill */}
       {/* ========================================================================= */}
-      {activeItem && (
+      {!location.startsWith("/admin") && location !== "/login" && activeItem && !isMobileIslandMinimized && (
         <div
           dir="rtl"
           data-no-visual-edit="true"
@@ -1750,18 +1767,20 @@ export function PodcastPlayerProvider({ children }: { children: React.ReactNode 
                 </span>
               </div>
 
-              {/* Dismiss / Stop Button (X) */}
+              {/* Minimize to Background Listening Button (ChevronDown) */}
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (isPlaying) togglePlay();
-                  setActiveItem(null);
+                  setIsMobileIslandMinimized(true);
+                  toast.info("تم تصغير المشغل — الصوت مستمر في الخلفية 🎵", { duration: 2500 });
                 }}
-                className="grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:text-white transition shrink-0"
-                title="إغلاق المشغل"
+                className={`grid h-7 w-7 place-items-center rounded-full transition shrink-0 ${
+                  isDark ? "text-slate-400 hover:text-amber-300 hover:bg-white/10" : "text-slate-500 hover:text-amber-600 hover:bg-black/5"
+                }`}
+                title="تصغير المشغل والاستمرار في الاستماع بالخلفية"
               >
-                <X size={13} />
+                <ChevronDown size={16} />
               </button>
             </div>
 
