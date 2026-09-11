@@ -1728,12 +1728,16 @@ aside[data-aq-editor-properties]::before {
     top: auto !important; 
     bottom: max(1rem, env(safe-area-inset-bottom, 1rem)) !important; 
     flex-direction: row; 
-    max-width: fit-content; 
+    max-width: calc(100vw - 1.5rem) !important; 
+    overflow-x: auto !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
     transform: translateX(-50%) !important; 
     border-radius: 9999px !important;
     z-index: 45;
     box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-  } 
+  }
+  .aq-dark-reader-rail::-webkit-scrollbar { display: none; } 
   .aq-dark-reader-rail-button { 
     width: 2.25rem; 
     height: 2.25rem; 

@@ -20,9 +20,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 
 export function AqeeqStaffWalkieCapsule() {
   const { user, isAuthenticated } = useAuth();
+  const { activeItem, activePodcast } = usePodcastPlayer();
+  const hasActiveAudio = Boolean(activeItem || activePodcast);
   const isStaff = isAuthenticated && (user?.role === "admin" || user?.role === "receptionist" || user?.role === "coordinator");
 
   const [isOpen, setIsOpen] = useState(false);
@@ -90,7 +93,15 @@ export function AqeeqStaffWalkieCapsule() {
   if (!isStaff) return null;
 
   return (
-    <div dir="rtl" className="fixed right-5 z-40" style={{ bottom: "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem))" }}>
+    <div
+      dir="rtl"
+      className="fixed right-5 z-40 transition-all duration-300"
+      style={{
+        bottom: hasActiveAudio
+          ? "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem) + 4.5rem)"
+          : "calc(max(1.25rem, env(safe-area-inset-bottom) + 0.5rem))",
+      }}
+    >
       {/* Floating Walkie Dynamic Capsule */}
       {!isOpen && (
         <button

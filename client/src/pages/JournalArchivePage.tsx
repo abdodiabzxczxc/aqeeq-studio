@@ -76,18 +76,20 @@ function JournalCard({
     }`}>
       <div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "linear-gradient(128deg,transparent 0 48%,rgba(255,255,255,.04) 48.1% 48.3%,transparent 48.4%)" }} />
       <div className="relative flex h-full flex-col gap-5 sm:flex-row">
-        <button onClick={onOpen} className={`relative min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border shadow-inner sm:w-[45%] transition duration-500 group-hover:scale-[1.02] ${
+        <button onClick={onOpen} className={`relative min-h-[160px] sm:min-h-[220px] w-full overflow-hidden rounded-[1.5rem] border shadow-inner sm:w-[45%] transition duration-500 group-hover:scale-[1.02] ${
           dark ? "border-amber-300/35 bg-black" : "border-slate-200 bg-slate-100"
         }`} aria-label={`فتح ${issue.title}`}>
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(217,189,38,.12),transparent_38%)]" />
-          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 shadow-[0_14px_25px_rgba(0,0,0,.35)] transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
+          {/* Back tilted cover - hidden on mobile */}
+          <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block shadow-[0_14px_25px_rgba(0,0,0,.35)] transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
             dark ? "border-amber-100/25 bg-black" : "border-slate-300 bg-slate-200"
           }`} style={{ transform: "rotate(-7deg)" }}>
             {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
           </div>
-          <div className={`absolute bottom-[6%] right-[10%] top-[6%] w-[54%] overflow-hidden rounded-[1rem] border p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)] transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
+          {/* Front cover - full frame on mobile */}
+          <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)] transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
             dark ? "border-amber-100/70 bg-black" : "border-slate-300 bg-white"
-          }`} style={{ transform: "rotate(2deg)" }}>
+          }`} style={{ transform: "rotate(0deg)" }}>
             {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className={dark ? "text-amber-200" : "text-[#08467d]"} size={34} /></div>}
           </div>
         </button>
@@ -270,7 +272,7 @@ export default function JournalArchivePage() {
               </div>
             </div>
           </VisualEditable>
-          <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-12 sm:pb-16">
+          <VisualEditable id="journal-archive-shell" tag="section" label="رفوف مكتبة المجلة" as="section" className="mx-auto max-w-[1380px] 2xl:max-w-[1560px] px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-28 sm:pb-32">
               <div className="mb-8 flex items-end justify-between gap-4 pb-2">
                 <div>
                   <p className="aq-kicker">THE JOURNAL SHELF</p>
