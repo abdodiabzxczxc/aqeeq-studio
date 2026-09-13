@@ -677,18 +677,48 @@ export const appRouter = router({
         return pages;
       } catch (err: any) {
         if (input.driveFolderUrl.includes(".pdf") || input.driveFolderUrl.includes("/file/d/")) {
-          throw new Error("هذا الرابط يشير لملف PDF. يرجى استخدام زر «استيراد PDF من Drive» في قسم الصفحات باليمين ليتم تحويل صفحاته فوراً.");
+          throw new Error("هذا الرابط يشير لملف PDF وليس مجلد صور. يرجى استخدام خيار «استيراد PDF من Drive» لتحويل صفحاته فوراً.");
         }
         throw err;
       }
     }),
     fetchDrivePdf: adminProcedure.input(z.object({ driveUrl: z.string().min(1).max(1024) })).mutation(async ({ input }) => {
       const fileId = await getDrivePdfFileId(input.driveUrl);
-      const downloadUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
-      const response = await fetch(downloadUrl, { headers: { "User-Agent": "AlaqeeqStudio/1.0" } });
-      if (!response.ok) throw new Error("تعذر تحميل ملف PDF من Google Drive. تأكد أن الملف أو الفولدر متاح للمشاهدة لأي شخص لديه الرابط.");
-      const buffer = Buffer.from(await response.arrayBuffer());
-      if (buffer.length > 30 * 1024 * 1024) throw new Error("الحد الأقصى لملف PDF هو 30 ميجابايت");
+      const fetchHeaders: Record<string, string> = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      };
+      const directUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download&confirm=t`;
+      let res = await fetch(directUrl, { headers: fetchHeaders, redirect: "follow" });
+      if (!res.ok) {
+        const altUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}&confirm=t`;
+        res = await fetch(altUrl, { headers: fetchHeaders, redirect: "follow" });
+      }
+      let finalRes = res;
+      const contentType = finalRes.headers.get("content-type") || "";
+      if (contentType.includes("text/html")) {
+        const html = await res.text();
+        const actionMatch = html.match(/action="([^"]+)"/);
+        const confirmMatch = html.match(/name="confirm" value="([^"]+)"/) || html.match(/confirm=([^&"]+)/);
+        const uuidMatch = html.match(/name="uuid" value="([^"]+)"/) || html.match(/uuid=([^&"]+)/);
+        let finalDownloadUrl = "";
+        if (actionMatch && actionMatch[1]) {
+          const actionUrl = actionMatch[1].replace(/&amp;/g, "&");
+          const confirmParam = confirmMatch ? `&confirm=${encodeURIComponent(confirmMatch[1])}` : "";
+          const uuidParam = uuidMatch ? `&uuid=${encodeURIComponent(uuidMatch[1])}` : "";
+          finalDownloadUrl = `${actionUrl}${actionUrl.includes("?") ? "" : "?"}${confirmParam}${uuidParam}`;
+        } else if (confirmMatch && confirmMatch[1]) {
+          finalDownloadUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download&confirm=${encodeURIComponent(confirmMatch[1])}`;
+        }
+        if (finalDownloadUrl) {
+          const cookies = res.headers.get("set-cookie") || "";
+          const confirmHeaders: Record<string, string> = { ...fetchHeaders };
+          if (cookies) confirmHeaders.Cookie = cookies;
+          finalRes = await fetch(finalDownloadUrl, { headers: confirmHeaders, redirect: "follow" });
+        }
+      }
+      if (!finalRes.ok) throw new Error("تعذر تحميل ملف PDF من Google Drive. تأكد أن الملف متاح للمشاهدة لأي شخص لديه الرابط.");
+      const buffer = Buffer.from(await finalRes.arrayBuffer());
+      if (buffer.length > 35 * 1024 * 1024) throw new Error("الحد الأقصى لملف PDF هو 35 ميجابايت");
       return { base64: buffer.toString("base64"), fileName: `drive-${fileId}.pdf` };
     }),
     delete: adminProcedure.input(z.object({ id: z.number().int().positive(), confirm: z.literal(true) })).mutation(async ({ input, ctx }) => {

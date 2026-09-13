@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import JournalPdfImporter from "@/components/JournalPdfImporter";
+import JournalPdfImporter, { JournalPdfImporterRef, ImportedPage } from "@/components/JournalPdfImporter";
 import MediaLibrary from "@/components/MediaLibrary";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { Button } from "@/components/ui/button";
@@ -23,9 +23,11 @@ import {
   Edit3,
   FilePlus2,
   FileText,
+  FileUp,
   GripVertical,
   ImageIcon,
   ImagePlus,
+  Link2,
   Loader2,
   Music2,
   Play,
@@ -257,6 +259,7 @@ export default function JournalStudioPage() {
   const [pageId, setPageId] = useState<number | null>(null);
   const [target, setTarget] = useState<Target>(null);
   const [editingPage, setEditingPage] = useState<{ id: number; caption: string } | null>(null);
+  const pdfImporterRef = useRef<JournalPdfImporterRef>(null);
 
   const [title, setTitle] = useState("النشرة الأسبوعية");
   const [date, setDate] = useState(today());
@@ -364,6 +367,26 @@ export default function JournalStudioPage() {
     },
     onError: (error) => toast.error(error.message),
   });
+
+  const handleDriveSubmit = () => {
+    if (!issue) return;
+    const url = driveFolderUrl.trim();
+    if (!url) return;
+
+    const lower = url.toLowerCase();
+    const isPdf =
+      lower.includes("/file/d/") ||
+      lower.includes(".pdf") ||
+      (lower.includes("drive.google.com") && !lower.includes("/folders/"));
+
+    if (isPdf) {
+      toast.info("تم رصد رابط ملف PDF — جارٍ التحويل والاستيراد التلقائي لجميع الصفحات 📄✨");
+      pdfImporterRef.current?.importFromDriveUrl(url);
+      return;
+    }
+
+    importFromDrive.mutate({ issueId: issue.id, driveFolderUrl: url });
+  };
 
   const updatePage = trpc.schoolNews.updatePage.useMutation({
     onSuccess: () => {
@@ -815,23 +838,29 @@ export default function JournalStudioPage() {
                 <div>
                   <h2 className={"font-black " + (dark ? "text-white" : "text-black")}>Google Drive</h2>
                   <p className={"mt-1 text-xs " + (dark ? "text-slate-400" : "text-slate-500")}>
-                    استيراد صور صفحات العدد مباشرة من فولدر Google Drive.
+                    استيراد صور صفحات العدد من مجلد صور أو رابط ملف PDF مباشرة.
                   </p>
                 </div>
               </div>
 
               <div className="mt-5">
-                <Label className={dark ? "text-slate-200" : "text-slate-800"}>رابط فولدر Google Drive للصور</Label>
+                <Label className={dark ? "text-slate-200" : "text-slate-800"}>رابط مجلد صور أو ملف PDF من Google Drive</Label>
                 <div className="mt-2 flex gap-2">
                   <Input
                     value={driveFolderUrl}
                     onChange={(e) => setDriveFolderUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleDriveSubmit();
+                      }
+                    }}
                     dir="ltr"
-                    placeholder="https://drive.google.com/drive/folders/..."
+                    placeholder="https://drive.google.com/drive/folders/... أو /file/d/..."
                     className={dark ? "border-white/15 bg-[#111111] text-white" : "border-black/15 bg-white text-black"}
                   />
                   <Button
-                    onClick={() => importFromDrive.mutate({ issueId: issue.id, driveFolderUrl })}
+                    onClick={handleDriveSubmit}
                     disabled={!driveFolderUrl.trim() || importFromDrive.isPending}
                     className={"shrink-0 font-black " + (
                       dark ? "!bg-[#f8ca14] !text-black hover:opacity-90" : "!bg-[#08467d] !text-white hover:opacity-90"
@@ -840,11 +869,14 @@ export default function JournalStudioPage() {
                     {importFromDrive.isPending ? <Loader2 className="animate-spin" size={16} /> : <CloudDownload size={16} />}
                   </Button>
                 </div>
+                <p className={"mt-2 text-[11px] " + (dark ? "text-slate-400" : "text-slate-500")}>
+                  💡 يدعم مجلدات صور (JPG/PNG) أو روابط ملفات PDF؛ يتم تحويل الـ PDF لصفحات تلقائياً.
+                </p>
               </div>
             </article>
 
             {/* PDF Importer Card */}
-            <article className={"rounded-[1.6rem] border p-5 sm:p-6 transition " + (
+            <article id="pdf-importer-card" className={"rounded-[1.6rem] border p-5 sm:p-6 transition " + (
               dark ? "border-white/[0.08] bg-[#080808] text-white shadow-xl" : "border-black/[0.08] bg-white text-black shadow-md"
             )}>
               <div className="flex items-center gap-3">
@@ -859,8 +891,9 @@ export default function JournalStudioPage() {
 
               <div className="mt-5">
                 <JournalPdfImporter
+                  ref={pdfImporterRef}
                   issueId={issue.id}
-                  onImported={(pages) => addPages.mutate({ issueId: issue.id, pages })}
+                  onImported={(pages: ImportedPage[]) => addPages.mutate({ issueId: issue.id, pages })}
                 />
               </div>
             </article>
@@ -954,14 +987,56 @@ export default function JournalStudioPage() {
                   ))}
                 </Reorder.Group>
               ) : (
-                <div className={"rounded-2xl border border-dashed p-12 text-center " + (
+                <div className={"rounded-[2rem] border-2 border-dashed p-8 sm:p-12 text-center transition " + (
                   dark ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.02]" : "border-[#08467d]/20 bg-[#08467d]/[0.02]"
                 )}>
-                  <BookOpen className={"mx-auto " + (dark ? "text-[#f8ca14]" : "text-[#08467d]")} size={38} />
-                  <p className={"mt-4 font-black " + (dark ? "text-white" : "text-black")}>لا توجد صفحات في هذا العدد بعد</p>
-                  <p className={"mt-2 text-sm " + (dark ? "text-slate-400" : "text-slate-500")}>
-                    استورد من فولدر Drive أو ارفع ملف PDF أو أضف صور الصفحات مباشرة.
+                  <div className={"mx-auto flex h-16 w-16 items-center justify-center rounded-2xl " + (
+                    dark ? "bg-[#f8ca14]/10 text-[#f8ca14]" : "bg-[#08467d]/10 text-[#08467d]"
+                  )}>
+                    <BookOpen size={32} />
+                  </div>
+                  <h3 className={"mt-4 text-lg font-black " + (dark ? "text-white" : "text-black")}>
+                    لا توجد صفحات في هذا العدد بعد
+                  </h3>
+                  <p className={"mx-auto mt-2 max-w-md text-xs sm:text-sm " + (dark ? "text-slate-400" : "text-slate-500")}>
+                    اختر طريقتك المفضلة لبدء بناء العدد: تحويل ملف PDF كامل بضغطة واحدة، أو سحب صور من Google Drive، أو إضافة صفحات فردية.
                   </p>
+
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => pdfImporterRef.current?.openDriveInput()}
+                      className={"font-black shadow-md " + (
+                        dark ? "!bg-[#f8ca14] !text-black hover:opacity-90" : "!bg-[#08467d] !text-white hover:opacity-90"
+                      )}
+                    >
+                      <Link2 className="ml-2" size={16} />
+                      استيراد PDF من Drive
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => pdfImporterRef.current?.openFileInput()}
+                      className={dark ? "border-white/20 bg-white/5 text-white hover:bg-white/10" : "border-black/20 bg-black/5 text-black hover:bg-black/10"}
+                    >
+                      <FileUp className="ml-2" size={16} />
+                      رفع PDF من جهازك
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setPageId(null);
+                        setTarget("add");
+                      }}
+                      className={dark ? "border-white/20 bg-white/5 text-white hover:bg-white/10" : "border-black/20 bg-black/5 text-black hover:bg-black/10"}
+                    >
+                      <Plus className="ml-2" size={16} />
+                      إضافة صفحة صورة يدوياً
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

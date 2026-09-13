@@ -1,15 +1,22 @@
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { FileUp, Link2, Loader2, Sparkles } from "lucide-react";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
-type ImportedPage = { imageUrl: string; imageStorageKey?: string; caption: string };
-type Props = { issueId: number; onImported: (pages: ImportedPage[]) => void };
+export type ImportedPage = { imageUrl: string; imageStorageKey?: string; caption: string };
+export type Props = { issueId: number; onImported: (pages: ImportedPage[]) => void };
+
+export type JournalPdfImporterRef = {
+  importFromDriveUrl: (url: string) => Promise<void>;
+  openDriveInput: (url?: string) => void;
+  openFileInput: () => void;
+  isProcessing: boolean;
+};
 
 const readAsDataUrl = (file: Blob) =>
   new Promise<string>((resolve, reject) => {
@@ -29,7 +36,10 @@ function base64ToUint8Array(base64: string): Uint8Array {
   return bytes;
 }
 
-export default function JournalPdfImporter({ onImported }: Props) {
+const JournalPdfImporter = forwardRef<JournalPdfImporterRef, Props>(function JournalPdfImporter(
+  { onImported },
+  ref
+) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [percent, setPercent] = useState(0);
@@ -116,15 +126,18 @@ export default function JournalPdfImporter({ onImported }: Props) {
     await processPdfData(new Uint8Array(arrayBuffer), cleanName);
   };
 
-  const handleDriveImport = async () => {
-    if (!driveUrl.trim()) {
+  const handleDriveImport = async (overrideUrl?: string) => {
+    const targetUrl = (typeof overrideUrl === "string" ? overrideUrl : driveUrl).trim();
+    if (!targetUrl) {
       toast.error("يرجى إدخال رابط Google Drive لملف الـ PDF");
       return;
     }
+    setShowDriveInput(true);
+    setDriveUrl(targetUrl);
     try {
       setStatus("جارٍ جلب ملف PDF من Google Drive…");
       setPercent(2);
-      const res = await fetchDrivePdf.mutateAsync({ driveUrl: driveUrl.trim() });
+      const res = await fetchDrivePdf.mutateAsync({ driveUrl: targetUrl });
       const bytes = base64ToUint8Array(res.base64);
       await processPdfData(bytes, res.fileName.replace(/\.pdf$/i, ""));
     } catch (error) {
@@ -133,6 +146,24 @@ export default function JournalPdfImporter({ onImported }: Props) {
       setPercent(0);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    importFromDriveUrl: async (url: string) => {
+      await handleDriveImport(url);
+    },
+    openDriveInput: (url?: string) => {
+      setShowDriveInput(true);
+      if (url) setDriveUrl(url);
+      const el = document.getElementById("pdf-importer-card");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    },
+    openFileInput: () => {
+      inputRef.current?.click();
+    },
+    isProcessing: Boolean(status) || fetchDrivePdf.isPending || upload.isPending,
+  }));
 
   return (
     <div className="space-y-2.5">
@@ -179,7 +210,7 @@ export default function JournalPdfImporter({ onImported }: Props) {
           />
           <button
             type="button"
-            onClick={handleDriveImport}
+            onClick={() => handleDriveImport()}
             disabled={!driveUrl.trim() || Boolean(status)}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-3 py-2 text-xs font-bold text-black transition hover:bg-amber-400 disabled:opacity-50"
           >
@@ -200,4 +231,6 @@ export default function JournalPdfImporter({ onImported }: Props) {
       ) : null}
     </div>
   );
-}
+});
+
+export default JournalPdfImporter;
