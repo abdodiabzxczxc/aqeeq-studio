@@ -12,17 +12,20 @@ import {
   Check,
   Cloud,
   FolderDown,
+  Headphones,
   Loader2,
   Music2,
   Pause,
   Play,
+  Radio,
+  Search,
   Sparkles,
   Star,
   Trash2,
   Upload,
   Zap,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -39,11 +42,13 @@ export function AqeeqAudioManagerField({
   label = "الموسيقى والخلفية الصوتية",
 }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.4);
+  const [volume, setVolume] = useState(0.5);
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"uploaded" | "drive" | "presets" | "upload">("uploaded");
+  const [activeTab, setActiveTab] = useState<"atheer" | "uploaded" | "drive" | "presets" | "upload">("atheer");
   const [defaultAudio, setDefaultAudio] = useState<string | null>(() => getAqeeqDefaultBackgroundAudio());
   const [driveInputUrl, setDriveInputUrl] = useState("");
+  const [atheerSearch, setAtheerSearch] = useState("");
+  const [atheerCategory, setAtheerCategory] = useState<string>("all");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -51,10 +56,117 @@ export function AqeeqAudioManagerField({
   const mediaListQuery = trpc.visualEditor.media.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
+  const orchestrationQuery = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+  const podcastsQuery = trpc.podcasts.list.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const uploadedAudioList = (mediaListQuery.data || []).filter(
     (item) => item.kind === "audio" || (item.mimeType && item.mimeType.startsWith("audio/"))
   );
+
+  const schoolSongs = useMemo(() => {
+    const raw = (orchestrationQuery.data as any)?.schoolSongs;
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw.map((s: any, idx: number) => ({
+        id: s.id || `atheer-song-${idx}`,
+        title: s.title || "نشيد العقيق",
+        artist: s.artist || "مدارس العقيق الأهلية",
+        category: s.category || "النشيد المدرسي",
+        mediaUrl: s.mediaUrl || "",
+        coverUrl: s.coverUrl || "",
+        kind: "song" as const,
+      }));
+    }
+    return [];
+  }, [orchestrationQuery.data]);
+
+  const podcastAudioTracks = useMemo(() => {
+    const raw = podcastsQuery.data || [];
+    return raw
+      .filter((p) => p.mediaType === "audio" && Boolean(p.mediaUrl))
+      .map((p) => ({
+        id: `podcast-${p.id}`,
+        title: p.title,
+        artist: p.hostName || "استوديو أثير العقيق 🎙️",
+        category: p.category || "بودكاست أثير",
+        mediaUrl: p.mediaUrl,
+        coverUrl: p.coverUrl || p.thumbnailUrl || "",
+        kind: "podcast" as const,
+      }));
+  }, [podcastsQuery.data]);
+
+  const allAtheerTracks = useMemo(() => {
+    return [...schoolSongs, ...podcastAudioTracks];
+  }, [schoolSongs, podcastAudioTracks]);
+
+  const atheerCategories = useMemo(() => {
+    const set = new Set<string>();
+    allAtheerTracks.forEach((t) => {
+      if (t.category) set.add(t.category);
+    });
+    return ["all", ...Array.from(set)];
+  }, [allAtheerTracks]);
+
+  const filteredAtheerTracks = useMemo(() => {
+    return allAtheerTracks.filter((track) => {
+      if (atheerCategory !== "all" && track.category !== atheerCategory) return false;
+      if (!atheerSearch.trim()) return true;
+      const q = atheerSearch.trim().toLowerCase();
+      return (
+        track.title.toLowerCase().includes(q) ||
+        track.artist.toLowerCase().includes(q) ||
+        track.category.toLowerCase().includes(q)
+      );
+    });
+  }, [allAtheerTracks, atheerCategory, atheerSearch]);
+
+  const matchedTrackInfo = useMemo(() => {
+    if (!value) return null;
+    const cleanVal = value.trim();
+
+    // 1. Check Atheer tracks
+    const atheerMatch = allAtheerTracks.find((t) => {
+      if (!t.mediaUrl) return false;
+      const cleanUrl = t.mediaUrl.trim();
+      if (cleanVal === cleanUrl) return true;
+      const id1 = cleanVal.match(/\/api\/drive-audio-proxy\/([a-zA-Z0-9_-]+)/)?.[1];
+      const id2 =
+        cleanUrl.match(/\/api\/drive-audio-proxy\/([a-zA-Z0-9_-]+)/)?.[1] ||
+        cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+      return Boolean(id1 && id2 && id1 === id2);
+    });
+    if (atheerMatch) return { ...atheerMatch, sourceBadge: "أثير العقيق 🎙️" };
+
+    // 2. Check uploaded tracks
+    const uploadedMatch = uploadedAudioList.find((u) => u.url === cleanVal);
+    if (uploadedMatch)
+      return {
+        title: uploadedMatch.fileName,
+        artist: "مرفوعاتك",
+        sourceBadge: "سحابة الموقع ☁️",
+        mediaUrl: uploadedMatch.url,
+      };
+
+    // 3. Check presets
+    const presetMatch = AQEEQ_AUDIO_PRESETS.find((p) => p.url === cleanVal);
+    if (presetMatch)
+      return {
+        title: presetMatch.title,
+        artist: presetMatch.subtitle,
+        sourceBadge: "نغمات ملكية ✨",
+        mediaUrl: presetMatch.url,
+      };
+
+    // 4. Fallback Google Drive
+    if (cleanVal.includes("/api/drive-audio-proxy/")) {
+      return { title: "مقطع من Google Drive", artist: "بث صوتي مباشر", sourceBadge: "Google Drive 📁", mediaUrl: cleanVal };
+    }
+
+    return { title: "مقطع صوتي", artist: "رابط مباشر", sourceBadge: "رابط صوتي 🔗", mediaUrl: cleanVal };
+  }, [value, allAtheerTracks, uploadedAudioList]);
 
   const uploadMutation = trpc.visualEditor.media.upload.useMutation({
     onSuccess: (result) => {
@@ -102,6 +214,35 @@ export function AqeeqAudioManagerField({
     }
   };
 
+  const previewSingleAudio = (url: string) => {
+    if (!url) return;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(url);
+      audioRef.current.volume = volume;
+      audioRef.current.onended = () => setIsPlaying(false);
+    }
+    const currentSrc = audioRef.current.src || "";
+    if (!currentSrc.includes(url) && !url.includes(currentSrc)) {
+      audioRef.current.src = url;
+      audioRef.current.volume = volume;
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+      return;
+    }
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.volume = volume;
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+    }
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -142,7 +283,7 @@ export function AqeeqAudioManagerField({
       audioRef.current.volume = volume;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
     }
-    toast.success(`تم اختيار: ${title || "المقطع الصوتي"}`);
+    toast.success(`تم اختيار «${title || "المقطع الصوتي"}» كخلفية صوتية بنجاح 🎵`);
   };
 
   const handleImportDriveAudio = () => {
@@ -197,6 +338,15 @@ export function AqeeqAudioManagerField({
     toast.message("تم إلغاء الموسيقى الخلفية");
   };
 
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div
       className={`rounded-2xl border p-4 transition-colors ${
@@ -246,8 +396,71 @@ export function AqeeqAudioManagerField({
         ) : null}
       </div>
 
+      {/* Active Selected Audio Banner */}
+      {value ? (
+        <div
+          className={`mt-3 flex items-center justify-between gap-3 rounded-xl border p-2.5 transition ${
+            dark ? "border-amber-400/30 bg-amber-400/[0.08]" : "border-amber-500/30 bg-amber-50"
+          }`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-black font-black text-sm shrink-0 shadow-sm">
+              {matchedTrackInfo?.sourceBadge?.includes("أثير") ? "🎙️" : "🎵"}
+            </span>
+            <div className="min-w-0">
+              <p className={`text-xs font-black truncate ${dark ? "text-white" : "text-black"}`}>
+                المقطع الفعال: <span className="text-amber-400">«{matchedTrackInfo?.title || "مقطع مخصص"}»</span>
+              </p>
+              <p className={`text-[10px] truncate ${dark ? "text-slate-400" : "text-slate-600"}`}>
+                {matchedTrackInfo ? `${matchedTrackInfo.sourceBadge} · ${matchedTrackInfo.artist || ""}` : "رابط صوتي مباشر"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={togglePreview}
+              className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-bold transition ${
+                isPlaying
+                  ? "border-amber-400 bg-amber-400 text-black font-black"
+                  : dark
+                    ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400 hover:text-black"
+                    : "border-amber-500/40 bg-amber-100 text-amber-900 hover:bg-amber-400 hover:text-black"
+              }`}
+            >
+              {isPlaying ? <Pause size={12} /> : <Play size={12} />}
+              <span>{isPlaying ? "إيقاف" : "معاينة"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={clearAudio}
+              className="grid h-7 w-7 place-items-center rounded-lg border border-[#de191e]/30 text-[#de191e] transition hover:bg-[#de191e]/20"
+              title="إلغاء المقطع الصوتي (صامت)"
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {/* Tabs */}
       <div className="mt-3 flex flex-wrap gap-1.5 border-b border-white/10 pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab("atheer")}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            activeTab === "atheer"
+              ? "bg-amber-400 text-slate-950 font-black shadow-sm"
+              : dark
+                ? "text-slate-400 hover:text-amber-200 hover:bg-white/5"
+                : "text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          <Radio size={14} />
+          <span>أثير العقيق 🎙️ ({allAtheerTracks.length})</span>
+        </button>
+
         <button
           type="button"
           onClick={() => setActiveTab("uploaded")}
@@ -290,7 +503,7 @@ export function AqeeqAudioManagerField({
           }`}
         >
           <Sparkles size={14} />
-          <span>نغمات العقيق الملكية</span>
+          <span>نغمات ملكية</span>
         </button>
 
         <button
@@ -308,6 +521,151 @@ export function AqeeqAudioManagerField({
           <span>رفع ملف جديد</span>
         </button>
       </div>
+
+      {/* Tab 0: Atheer Songs & Anthems */}
+      {activeTab === "atheer" ? (
+        <div className="mt-3 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search size={14} className="absolute right-3 top-2.5 text-slate-400 pointer-events-none" />
+              <Input
+                value={atheerSearch}
+                onChange={(e) => setAtheerSearch(e.target.value)}
+                placeholder="ابحث في أناشيد وأغاني أثير (مثال: احنا العقيق، حلم، صرح، ضوء...)"
+                className={`pr-8 text-xs ${
+                  dark ? "border-white/10 bg-black/40 text-white placeholder:text-slate-500" : "border-slate-300 bg-white text-black"
+                }`}
+              />
+            </div>
+
+            {atheerCategories.length > 2 ? (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide shrink-0">
+                {atheerCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setAtheerCategory(cat)}
+                    className={`rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition shrink-0 ${
+                      atheerCategory === cat
+                        ? "bg-amber-400 text-slate-950 font-black shadow-sm"
+                        : dark
+                          ? "bg-white/5 text-slate-300 hover:bg-white/10"
+                          : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                    }`}
+                  >
+                    {cat === "all" ? `الكل (${allAtheerTracks.length})` : cat}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {filteredAtheerTracks.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-white/15 p-6 text-center">
+              <Radio size={24} className="mx-auto text-amber-400/60" />
+              <p className={`mt-2 text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>
+                لم يتم العثور على أناشيد مطابقة في أثير
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-72 overflow-y-auto pr-1">
+              {filteredAtheerTracks.map((item) => {
+                const cleanVal = value?.trim();
+                const cleanUrl = item.mediaUrl.trim();
+                const isSelected = Boolean(
+                  cleanVal &&
+                    (cleanVal === cleanUrl ||
+                      (cleanVal.includes("/api/drive-audio-proxy/") &&
+                        cleanUrl.includes("/api/drive-audio-proxy/") &&
+                        cleanVal.split("?")[0] === cleanUrl.split("?")[0]))
+                );
+                const isPreviewPlaying = Boolean(
+                  isPlaying &&
+                    audioRef.current?.src &&
+                    (audioRef.current.src === item.mediaUrl || audioRef.current.src.endsWith(item.mediaUrl))
+                );
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`group flex items-center justify-between gap-2.5 rounded-xl border p-2.5 transition ${
+                      isSelected
+                        ? "border-amber-400 bg-amber-400/15 text-amber-200 ring-1 ring-amber-400/40 shadow-sm"
+                        : dark
+                          ? "border-white/10 bg-black/20 text-slate-300 hover:border-amber-400/40 hover:bg-black/35"
+                          : "border-slate-900/10 bg-white text-slate-700 hover:border-amber-400/50"
+                    }`}
+                  >
+                    {/* Play preview on cover */}
+                    <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/60 shadow-sm">
+                      <img
+                        src={item.coverUrl || (dark ? "/audio-default-cover-dark.svg" : "/audio-default-cover-light.svg")}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = dark
+                            ? "/audio-default-cover-dark.svg"
+                            : "/audio-default-cover-light.svg";
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          previewSingleAudio(item.mediaUrl);
+                        }}
+                        className="absolute inset-0 flex items-center justify-center bg-black/45 text-white transition hover:bg-black/60"
+                        title={isPreviewPlaying ? "إيقاف المعاينة" : "استماع"}
+                      >
+                        {isPreviewPlaying ? (
+                          <Pause size={13} className="text-amber-400" />
+                        ) : (
+                          <Play size={13} className="translate-x-[-0.5px]" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Title and details */}
+                    <button
+                      type="button"
+                      onClick={() => selectAudio(item.mediaUrl, item.title)}
+                      className="min-w-0 flex-1 text-right"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate text-xs font-black">{item.title}</p>
+                        {isSelected ? (
+                          <span className="rounded-full bg-amber-400 px-1.5 py-0.2 text-[9px] font-black text-black shrink-0">
+                            مُحدد ✓
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className={`mt-0.5 truncate text-[10px] ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                        {item.artist} · <span className="text-amber-300/80 font-bold">{item.category}</span>
+                      </p>
+                    </button>
+
+                    {/* Select button */}
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => selectAudio(item.mediaUrl, item.title)}
+                      className={`h-7 px-2 text-[11px] font-black shrink-0 transition ${
+                        isSelected
+                          ? "bg-amber-400 text-black hover:bg-amber-300"
+                          : dark
+                            ? "border border-white/15 bg-white/5 text-slate-200 hover:bg-amber-400 hover:text-black"
+                            : "border border-slate-300 bg-slate-100 text-slate-700 hover:bg-amber-400 hover:text-black"
+                      }`}
+                    >
+                      {isSelected ? "مُحدد" : "اختيار"}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* Tab 1: Uploaded Audio Library */}
       {activeTab === "uploaded" ? (
@@ -387,7 +745,7 @@ export function AqeeqAudioManagerField({
         </div>
       ) : null}
 
-      {/* Tab 2: Google Drive Audio Stream (Zero Server Disk Space) */}
+      {/* Tab 2: Google Drive Audio Stream */}
       {activeTab === "drive" ? (
         <div className="mt-3 space-y-3">
           <div className="rounded-xl border border-amber-300/20 bg-amber-300/[.04] p-3">

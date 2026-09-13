@@ -3,6 +3,7 @@ import MediaLibrary from "@/components/MediaLibrary";
 import ShowcaseMediaGroupComposer, { type ShowcaseGroupMediaItem } from "@/components/ShowcaseMediaGroupComposer";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AqeeqVideoPoster } from "@/components/AqeeqVideoPoster";
+import { AqeeqAudioManagerField } from "@/components/AqeeqAudioManagerField";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -310,6 +311,7 @@ export default function AqeeqShowcaseStudioPage() {
   const [groupMediaLibraryOpen, setGroupMediaLibraryOpen] = useState(false);
   const [groupMedia, setGroupMedia] = useState<ShowcaseGroupMediaItem[]>([]);
   const [libraryField, setLibraryField] = useState<"logo" | "audio" | "watermark" | "post" | null>(null);
+  const [audioManagerOpen, setAudioManagerOpen] = useState(false);
 
   const { data: showcase, isLoading } = trpc.aqeeqShowcases.showcase.useQuery(
     { slug: SHOWCASE_SLUG },
@@ -753,7 +755,13 @@ export default function AqeeqShowcaseStudioPage() {
                     <button
                       key={field}
                       type="button"
-                      onClick={() => setLibraryField(field)}
+                      onClick={() => {
+                        if (field === "audio") {
+                          setAudioManagerOpen(true);
+                        } else {
+                          setLibraryField(field);
+                        }
+                      }}
                       className={`rounded-lg border p-2 text-right transition ${
                         dark
                           ? "border-white/10 hover:border-[#f8ca14]/40 hover:bg-[#f8ca14]/10"
@@ -765,7 +773,7 @@ export default function AqeeqShowcaseStudioPage() {
                         {label}
                       </span>
                       <span dir="ltr" className={`mt-2 block truncate text-[9px] ${dark ? "text-slate-400" : "text-slate-500"}`}>
-                        {value || "اختيار من مكتبة الوسائط"}
+                        {value || (field === "audio" ? "اختيار نغمة أو نشيد أثير" : "اختيار من مكتبة الوسائط")}
                       </span>
                     </button>
                   ))}
@@ -1070,11 +1078,32 @@ export default function AqeeqShowcaseStudioPage() {
       </button>
 
       {/* Modals & Dialogs */}
+      <Dialog open={audioManagerOpen} onOpenChange={setAudioManagerOpen}>
+        <DialogContent className={`max-w-2xl ${dark ? "border-white/10 bg-[#0c1017] text-white" : "border-black/10 bg-white text-black"}`}>
+          <DialogHeader>
+            <DialogTitle className="text-right text-base font-black">
+              الموسيقى والخلفية الصوتية لصفحة الأخبار
+            </DialogTitle>
+            <DialogDescription className="text-right text-xs text-slate-400">
+              اختر نشيداً من أناشيد أثير العقيق أو مقطعاً صوتياً مخصصاً ليعمل في خلفية الأخبار والتغطيات
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-2">
+            <AqeeqAudioManagerField
+              value={form.backgroundAudioUrl || null}
+              onChange={(url) => setForm((state) => ({ ...state, backgroundAudioUrl: url || "" }))}
+              dark={dark}
+              label="الموسيقى والخلفية الصوتية للأخبار"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <MediaLibrary
         open={Boolean(libraryField)}
         onClose={() => setLibraryField(null)}
         onSelect={selectAsset}
-        accept={libraryField === "audio" ? "audio" : libraryField === "post" ? "all" : "image"}
+        accept={libraryField === "post" ? "all" : "image"}
       />
       <MediaLibrary
         open={groupMediaLibraryOpen}
