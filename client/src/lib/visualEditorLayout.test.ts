@@ -8,8 +8,10 @@ describe("visual editor studio routing and image layout", () => {
     expect(shouldOpenVisualEditorFromLocation("/?tab=archive")).toBe(false);
   });
 
-  it("keeps image editor wrappers sized to their full card container", () => {
+  it("keeps image editor wrappers sized to their full card container and preserves positioning", () => {
     const classes = visualImageWrapperClassName("absolute inset-0 h-full w-full object-cover", false);
+    expect(classes).toContain("absolute");
+    expect(classes).toContain("inset-0");
     expect(classes).toContain("block");
     expect(classes).toContain("h-full");
     expect(classes).toContain("w-full");

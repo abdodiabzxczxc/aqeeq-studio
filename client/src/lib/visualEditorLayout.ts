@@ -12,10 +12,19 @@ export function isAqeeqStudioVisualPath(path: string) {
 }
 
 export function visualImageWrapperClassName(className: string, isBrandMark: boolean) {
+  const isAbsolute = /(?:^|\s)absolute(?:\s|$)/.test(className);
+  const hasInset0 = /(?:^|\s)inset-0(?:\s|$)/.test(className);
   const fillsHeight = /(?:^|\s)h-full(?:\s|$)/.test(className);
   const fillsWidth = /(?:^|\s)w-full(?:\s|$)/.test(className);
+  const pointerEventsNone = /(?:^|\s)pointer-events-none(?:\s|$)/.test(className);
+  const zMatch = className.match(/(?:^|\s)(z-(?:0|10|20|30|40|50|\[\d+\]))(?:\s|$)/);
+  const zClass = zMatch ? zMatch[1] : "";
   const fillsContainer = fillsHeight || fillsWidth;
   return [
+    isAbsolute ? "absolute" : "",
+    hasInset0 ? "inset-0" : "",
+    zClass,
+    pointerEventsNone ? "pointer-events-none" : "",
     fillsContainer ? "block" : "inline-block",
     "max-w-full",
     fillsHeight ? "h-full" : "",
