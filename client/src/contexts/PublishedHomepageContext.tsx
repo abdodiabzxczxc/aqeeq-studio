@@ -16,7 +16,7 @@ type PublishedHomepageState = {
 
 const PublishedHomepageContext = createContext<PublishedHomepageState>({ snapshot: undefined, isReady: false });
 
-const CACHE_KEY = "aqeeq-published-homepage-snapshot-v4";
+const CACHE_KEY = "aqeeq-published-homepage-snapshot-v5";
 
 function getInitialSnapshot(): PublishedHomepageSnapshot | undefined {
   try {
@@ -25,12 +25,25 @@ function getInitialSnapshot(): PublishedHomepageSnapshot | undefined {
     localStorage.removeItem("aqeeq-published-homepage-snapshot");
     localStorage.removeItem("aqeeq-published-homepage-snapshot-v2");
     localStorage.removeItem("aqeeq-published-homepage-snapshot-v3");
+    localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
 
     // Purge any old overrides cache that contained junk screenshots
     const oldHeroKey = "aqeeq-overrides-/";
     const rawOverrides = localStorage.getItem(oldHeroKey);
     if (rawOverrides && (rawOverrides.includes("1xThWYMf3BNp69nhsdIBCgpVLnUPMOW29") || rawOverrides.includes("1rt8BNQ5qhQ1xDDHDd1omS5UyVJEKbLPz") || rawOverrides.includes("butterfly.app") || rawOverrides.includes("fifamobile"))) {
       localStorage.removeItem(oldHeroKey);
+    }
+
+    // 1. Frame-0 Absolute Source of Truth: server-injected state in HTML head
+    const serverOverrides = (window as any).__AQEEQ_SERVER_OVERRIDES__;
+    if (Array.isArray(serverOverrides) && serverOverrides.length > 0) {
+      return {
+        settings: {},
+        content: [],
+        overrides: serverOverrides,
+        sections: [],
+        pages: [],
+      };
     }
 
     const raw = localStorage.getItem(CACHE_KEY);
@@ -43,7 +56,7 @@ function getInitialSnapshot(): PublishedHomepageSnapshot | undefined {
 export function PublishedHomepageProvider({ children }: { children: React.ReactNode }) {
   const initial = getInitialSnapshot();
   const query = trpc.homepage.publicSnapshot.useQuery(undefined, {
-    staleTime: 5_000,
+    staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchOnMount: true,

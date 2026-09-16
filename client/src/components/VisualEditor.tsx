@@ -617,16 +617,14 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const initialCachedOverrides = useMemo(() => {
     try {
       if (typeof window === "undefined") return EMPTY_OVERRIDES;
-      const combined: VisualOverride[] = [];
-      const seen = new Set<string>();
+      const map = new Map<string, VisualOverride>();
 
       // 1. Read Server-Injected overrides (Frame 0 - Instant from HTML head)
       const serverOverrides = (window as any).__AQEEQ_SERVER_OVERRIDES__;
       if (Array.isArray(serverOverrides)) {
         for (const item of serverOverrides) {
           if (item && item.elementId && (!item.pagePath || item.pagePath === pagePath)) {
-            combined.push(item);
-            seen.add(item.elementId);
+            map.set(item.elementId, item);
           }
         }
       }
@@ -637,33 +635,51 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const local = JSON.parse(raw);
         if (Array.isArray(local)) {
           for (const item of local) {
-            if (item && item.elementId && !seen.has(item.elementId)) {
-              combined.push(item);
-              seen.add(item.elementId);
+            if (item && item.elementId) {
+              const existing = map.get(item.elementId);
+              if (!existing) {
+                map.set(item.elementId, item);
+              } else {
+                const existingTime = new Date((existing as any).updatedAt || 0).getTime();
+                const newTime = new Date((item as any).updatedAt || 0).getTime();
+                if (newTime >= existingTime) {
+                  map.set(item.elementId, item);
+                }
+              }
             }
           }
         }
       }
-      return combined.length > 0 ? combined : EMPTY_OVERRIDES;
+      return Array.from(map.values());
     } catch {
       return EMPTY_OVERRIDES;
     }
   }, [pageCacheKey, pagePath]);
 
-  const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 5_000, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
+  const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 0, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
   const fetchedPublicOverrides = publicListQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
   const publicOverrides = useMemo(() => {
     if (pagePath === "/") {
       const serverList = (snapshot?.overrides as VisualOverride[]) || [];
-      if (serverList.length === 0) return initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES;
       const map = new Map<string, VisualOverride>();
       initialCachedOverrides.forEach((item) => map.set(item.elementId, item));
-      serverList.forEach((item) => map.set(item.elementId, item));
+      serverList.forEach((item) => {
+        const existing = map.get(item.elementId);
+        if (!existing) {
+          map.set(item.elementId, item);
+        } else {
+          const existingTime = new Date((existing as any).updatedAt || 0).getTime();
+          const newTime = new Date((item as any).updatedAt || 0).getTime();
+          if (newTime >= existingTime) {
+            map.set(item.elementId, item);
+          }
+        }
+      });
       return Array.from(map.values());
     }
     return fetchedPublicOverrides;
   }, [pagePath, snapshot?.overrides, initialCachedOverrides, fetchedPublicOverrides]);
-  const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 5_000, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
+  const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 0, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
   const editorOverrides = editorOverridesQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
 
   useEffect(() => {
@@ -681,7 +697,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const overrides = isAdmin && isEditing ? editorOverrides : publicOverrides;
   const save = trpc.visualEditor.save.useMutation({
     onSuccess: (savedData) => {
-      toast.success("تم حفظ التعديل كمسودة خاصة بك");
+      toast.success("تم حفظ التعديل ونشره بنجاح");
       if (savedData) {
         try {
           const current = (initialCachedOverrides as VisualOverride[]) || [];
@@ -692,6 +708,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       }
       try {
         localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+        localStorage.removeItem("aqeeq-published-homepage-snapshot-v5");
       } catch {}
       if (pagePath) {
         void utils.visualEditor.list.invalidate({ pagePath });
@@ -1693,6 +1710,29 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     sharedTargets.forEach((elementId) => {
       setInstantVisualOverride({ ...optimisticOverride, elementId });
     });
+    // Synchronous immediate write to localStorage and window.__AQEEQ_SERVER_OVERRIDES__
+    try {
+      const current = (initialCachedOverrides as VisualOverride[]) || [];
+      const updated = [
+        ...current.filter((o) => !sharedTargets.includes(o.elementId)),
+        ...sharedTargets.map((elementId) => ({ ...optimisticOverride, elementId })),
+      ];
+      localStorage.setItem(pageCacheKey, JSON.stringify(updated));
+      localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+      localStorage.removeItem("aqeeq-published-homepage-snapshot-v5");
+    } catch {}
+
+    if (typeof window !== "undefined") {
+      const srv = (window as any).__AQEEQ_SERVER_OVERRIDES__;
+      if (Array.isArray(srv)) {
+        sharedTargets.forEach((elementId) => {
+          const idx = srv.findIndex((x: any) => x && x.elementId === elementId && (!x.pagePath || x.pagePath === pagePath));
+          if (idx >= 0) srv[idx] = { ...optimisticOverride, elementId };
+          else srv.push({ ...optimisticOverride, elementId });
+        });
+      }
+    }
+
     // Immediate direct DOM update for instant live responsiveness
     if (domNode) {
       if (isTextTag && payload.contentText !== null && payload.contentText !== undefined) {

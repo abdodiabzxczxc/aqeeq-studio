@@ -2114,14 +2114,14 @@ export async function listVisualElementOverrides(pagePath: string, scope: "all" 
     const overrides = getLocalDb().overrides || {};
     const rows = Object.values(overrides).filter((r: any) => r.pagePath === pagePath);
     if (scope === "all") return rows;
-    return rows.filter((r: any) => r.status === "published");
+    return rows.filter((r: any) => r.status !== "trash");
   }
   const rows = await db.select().from(visualElementOverrides).where(eq(visualElementOverrides.pagePath, pagePath)).orderBy(visualElementOverrides.elementId);
   if (scope === "all") return rows;
   return rows.flatMap((row) => {
     if (row.status === "published") return [row];
-    if (!row.publishedSnapshot) return [];
-    try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return []; }
+    if (!row.publishedSnapshot) return [row]; // Fallback to current state so user edits always stick
+    try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return [row]; }
   });
 }
 
@@ -2131,14 +2131,14 @@ export async function listAllVisualElementOverrides(scope: "all" | "published" =
     const overrides = getLocalDb().overrides || {};
     const rows = Object.values(overrides);
     if (scope === "all") return rows;
-    return rows.filter((r: any) => r.status === "published");
+    return rows.filter((r: any) => r.status !== "trash");
   }
   const rows = await db.select().from(visualElementOverrides).orderBy(visualElementOverrides.pagePath, visualElementOverrides.elementId);
   if (scope === "all") return rows;
   return rows.flatMap((row) => {
     if (row.status === "published") return [row];
-    if (!row.publishedSnapshot) return [];
-    try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return []; }
+    if (!row.publishedSnapshot) return [row];
+    try { return [{ ...row, ...JSON.parse(row.publishedSnapshot), status: "published" as const }]; } catch { return [row]; }
   });
 }
 
@@ -2169,18 +2169,25 @@ export async function publishAllVisualElementOverrides(userId: number) {
 
 export async function upsertVisualElementOverride(input: VisualOverrideInput) {
   const db = await getDb();
+  const now = new Date().toISOString();
   if (!db) {
     const local = getLocalDb();
     if (!local.overrides) local.overrides = {};
     const key = `${input.pagePath}::${input.elementId}`;
-    local.overrides[key] = { id: Date.now(), ...input, status: "draft", updatedAt: new Date().toISOString() };
+    local.overrides[key] = {
+      id: Date.now(),
+      ...input,
+      status: "published",
+      updatedAt: now,
+      publishedAt: now,
+    };
     saveLocalDb();
     return local.overrides[key];
   }
   const current = await db.select().from(visualElementOverrides).where(and(eq(visualElementOverrides.pagePath, input.pagePath), eq(visualElementOverrides.elementId, input.elementId))).limit(1);
   if (current[0]) await db.insert(visualElementOverrideHistory).values({ overrideId: current[0].id, pagePath: current[0].pagePath, elementId: current[0].elementId, snapshot: JSON.stringify(visualSnapshot(current[0])), userId: input.updatedBy });
-  await db.insert(visualElementOverrides).values(input).onDuplicateKeyUpdate({
-    set: { elementTag: input.elementTag, contentText: input.contentText, mediaUrl: input.mediaUrl, altText: input.altText, linkUrl: input.linkUrl, alignment: input.alignment, textColor: input.textColor, bgColor: input.bgColor, fontSize: input.fontSize, padding: input.padding, margin: input.margin, borderRadius: input.borderRadius, layerX: input.layerX, layerY: input.layerY, layerWidth: input.layerWidth, layerHeight: input.layerHeight, layerZIndex: input.layerZIndex, layerOpacity: input.layerOpacity, backgroundSize: input.backgroundSize, backgroundPositionX: input.backgroundPositionX, backgroundPositionY: input.backgroundPositionY, backgroundOverlay: input.backgroundOverlay, isLocked: input.isLocked, isHidden: input.isHidden, customCss: input.customCss, status: "draft", updatedBy: input.updatedBy, updatedAt: new Date() },
+  await db.insert(visualElementOverrides).values({ ...input, status: "published", publishedAt: new Date() }).onDuplicateKeyUpdate({
+    set: { elementTag: input.elementTag, contentText: input.contentText, mediaUrl: input.mediaUrl, altText: input.altText, linkUrl: input.linkUrl, alignment: input.alignment, textColor: input.textColor, bgColor: input.bgColor, fontSize: input.fontSize, padding: input.padding, margin: input.margin, borderRadius: input.borderRadius, layerX: input.layerX, layerY: input.layerY, layerWidth: input.layerWidth, layerHeight: input.layerHeight, layerZIndex: input.layerZIndex, layerOpacity: input.layerOpacity, backgroundSize: input.backgroundSize, backgroundPositionX: input.backgroundPositionX, backgroundPositionY: input.backgroundPositionY, backgroundOverlay: input.backgroundOverlay, isLocked: input.isLocked, isHidden: input.isHidden, customCss: input.customCss, status: "published", publishedAt: new Date(), updatedBy: input.updatedBy, updatedAt: new Date() },
   });
   const result = await db.select().from(visualElementOverrides).where(and(eq(visualElementOverrides.pagePath, input.pagePath), eq(visualElementOverrides.elementId, input.elementId))).limit(1);
   return result[0];

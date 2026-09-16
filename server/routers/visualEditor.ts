@@ -89,9 +89,10 @@ export const visualEditorRouter = router({
     isHidden: z.boolean().optional(),
   })).mutation(async ({ input, ctx }) => {
     const override = await upsertVisualElementOverride({ ...input, customCss: input.customCss ?? null, updatedBy: ctx.user.id });
+    await publishVisualElementOverride(input.pagePath, input.elementId, ctx.user.id).catch(() => null);
     await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.save", details: JSON.stringify({ pagePath: input.pagePath, elementId: input.elementId }) });
     triggerAutoPageCapture(input.pagePath);
-    return override;
+    return { ...override, status: "published" as const };
   }),
 
   reset: adminProcedure.input(z.object({ pagePath: pagePathSchema, elementId: supportedElementSchema })).mutation(async ({ input, ctx }) => {

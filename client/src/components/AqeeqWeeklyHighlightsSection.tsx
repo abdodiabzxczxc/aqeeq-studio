@@ -125,20 +125,25 @@ export function AqeeqWeeklyHighlightsSection({
               }`}
             >
               {/* Top Deck Tab (Visible even when stacked) */}
-              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-slate-200"}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
-                    dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d]"
-                  }`}>
-                    <Sparkles size={13} />
-                    <VisualEditable
-                      id="studio-bento-card1-deck-pill"
-                      tag="text"
-                      label="شارة تاب كارت 1"
-                      defaultText="01 / تغطية الأسبوع الكبرى"
-                      as="span"
-                    />
-                  </span>
+              <div data-no-visual-edit="true" className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-slate-200"}`}>
+                <div data-no-visual-edit="true" className="flex items-center gap-2">
+                  <VisualEditable
+                    id="studio-bento-card1-deck-pill"
+                    tag="text"
+                    label="شارة تاب كارت 1"
+                    defaultText="01 / تغطية الأسبوع الكبرى"
+                    as="span"
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider cursor-pointer ${
+                      dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d]"
+                    }`}
+                  >
+                    {(text) => (
+                      <>
+                        <Sparkles size={13} />
+                        <span>{text}</span>
+                      </>
+                    )}
+                  </VisualEditable>
                   <VisualEditable
                     id="studio-bento-card1-deck-subtitle"
                     tag="text"
@@ -258,20 +263,25 @@ export function AqeeqWeeklyHighlightsSection({
               }`}
             >
               {/* Top Deck Tab */}
-              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-amber-200"}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
-                    dark ? "bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40" : "bg-amber-100 text-amber-900 border border-amber-300"
-                  }`}>
-                    <Award size={13} />
-                    <VisualEditable
-                      id="studio-bento-card2-deck-pill"
-                      tag="text"
-                      label="شارة تاب كارت 2"
-                      defaultText="02 / وسام التميز والتكريم"
-                      as="span"
-                    />
-                  </span>
+              <div data-no-visual-edit="true" className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-amber-200"}`}>
+                <div data-no-visual-edit="true" className="flex items-center gap-2">
+                  <VisualEditable
+                    id="studio-bento-card2-deck-pill"
+                    tag="text"
+                    label="شارة تاب كارت 2"
+                    defaultText="02 / وسام التميز والتكريم"
+                    as="span"
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider cursor-pointer ${
+                      dark ? "bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40" : "bg-amber-100 text-amber-900 border border-amber-300"
+                    }`}
+                  >
+                    {(text) => (
+                      <>
+                        <Award size={13} />
+                        <span>{text}</span>
+                      </>
+                    )}
+                  </VisualEditable>
                   <VisualEditable
                     id="studio-bento-card2-deck-subtitle"
                     tag="text"
@@ -385,20 +395,25 @@ export function AqeeqWeeklyHighlightsSection({
               }`}
             >
               {/* Top Deck Tab */}
-              <div className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-[#de191e]/15"}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
-                    dark ? "bg-[#de191e]/20 text-[#de191e] border border-[#de191e]/40" : "bg-[#de191e]/10 text-[#de191e] border border-[#de191e]/20"
-                  }`}>
-                    <Flame size={13} />
-                    <VisualEditable
-                      id="studio-bento-card3-deck-pill"
-                      tag="text"
-                      label="شارة تاب كارت 3"
-                      defaultText="03 / نبض المجتمع والتشجيع"
-                      as="span"
-                    />
-                  </span>
+              <div data-no-visual-edit="true" className={`flex items-center justify-between border-b pb-4 mb-6 ${dark ? "border-white/10" : "border-[#de191e]/15"}`}>
+                <div data-no-visual-edit="true" className="flex items-center gap-2">
+                  <VisualEditable
+                    id="studio-bento-card3-deck-pill"
+                    tag="text"
+                    label="شارة تاب كارت 3"
+                    defaultText="03 / نبض المجتمع والتشجيع"
+                    as="span"
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider cursor-pointer ${
+                      dark ? "bg-[#de191e]/20 text-[#de191e] border border-[#de191e]/40" : "bg-[#de191e]/10 text-[#de191e] border border-[#de191e]/20"
+                    }`}
+                  >
+                    {(text) => (
+                      <>
+                        <Flame size={13} />
+                        <span>{text}</span>
+                      </>
+                    )}
+                  </VisualEditable>
                   <VisualEditable
                     id="studio-bento-card3-deck-subtitle"
                     tag="text"
