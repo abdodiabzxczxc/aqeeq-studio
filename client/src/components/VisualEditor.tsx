@@ -2386,46 +2386,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       </div>
     </nav>
   ) : null;
-  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div data-no-visual-edit="true" data-aq-editor-panel="true" className="aq-editor-floating-bar fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{isEditing && !previewMode && pendingElementIds.size > 0 ? (
-    <div
-      data-no-visual-edit="true"
-      data-aq-editor-panel="true"
-      data-aq-editor-floating-bar="true"
-      className="aq-editor-floating-bar fixed bottom-6 left-1/2 -translate-x-1/2 z-[350] flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-amber-400/40 bg-[#0c0f17]/95 px-4 py-3 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-3 duration-200"
-      dir="rtl"
-    >
-      <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-        </span>
-        <span>لديك <strong className="text-white font-black px-1.5 py-0.5 rounded-lg bg-amber-400/20 text-amber-200">{pendingElementIds.size}</strong> تعديلات معلقة لم تُنشر بعد</span>
-      </div>
-
-      <div className="hidden sm:block h-5 w-px bg-white/15 mx-1" />
-
-      <button
-        type="button"
-        onClick={publishAllPending}
-        disabled={batchSave.isPending}
-        className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 px-4 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
-      >
-        {batchSave.isPending ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-        <span>🚀 نشر جميع التعديلات دفعة واحدة ({pendingElementIds.size})</span>
-      </button>
-
-      <button
-        type="button"
-        onClick={discardAllPending}
-        disabled={batchSave.isPending}
-        className="inline-flex items-center gap-1 rounded-xl border border-white/15 hover:bg-white/10 text-slate-300 px-3 py-2 text-xs font-bold transition active:scale-95 cursor-pointer"
-        title="إلغاء جميع التعديلات المعلقة غير المحفوظة"
-      >
-        <X size={13} />
-        <span>تراجع</span>
-      </button>
-    </div>
-  ) : null}{pagePath ? <>
+  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div data-no-visual-edit="true" data-aq-editor-panel="true" className="aq-editor-floating-bar fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{pagePath ? <>
     <EditorOperationsDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, operationsOpen)} onClose={() => setOperationsOpen(false)} onManage={() => navigate("/control")} />
     <SiteBuilderDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, builderOpen)} onClose={() => setBuilderOpen(false)} pagePath={pagePath} initialTab={builderTab} />
     <VisualAddPanel open={shouldShowWorkspacePanel(isEditing, previewMode, addPanelOpen)} onClose={() => setAddPanelOpen(false)} pagePath={pagePath} />
