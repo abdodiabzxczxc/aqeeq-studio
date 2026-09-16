@@ -2775,6 +2775,11 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
     };
   }, [resolvedSrc]);
 
+  const isImmediatelyReady = priority || isImagePreloaded(resolvedSrc);
+  const opacityClasses = isImmediatelyReady
+    ? "opacity-100"
+    : `transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`;
+
   const image = (
     <img
       key={resolvedSrc}
@@ -2786,9 +2791,9 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
       referrerPolicy="no-referrer"
       loading={loading || (priority ? "eager" : "lazy")}
       {...(priority ? { fetchPriority: "high" } : {})}
-      decoding="async"
+      decoding={priority ? "sync" : "async"}
       onLoad={() => setIsLoaded(true)}
-      className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"} transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+      className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"} ${opacityClasses}`}
       style={
         isBrandMark
           ? style

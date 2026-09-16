@@ -15,7 +15,7 @@ import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/comp
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { resolveMediaUrl } from "@/lib/mediaUtils";
-import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
+import { getCachedSiteOrchestration, cacheSiteOrchestration, preloadImage, getInstantVisualOverride } from "@/lib/visualOverridesCache";
 
 export const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
   { title: "اعتماد كوجنيا الأمريكية Cognia", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تقييم 99.2%", date: "اعتماد دولي" },
@@ -103,10 +103,34 @@ export default function AqeeqSchoolAccreditationsPage() {
   const [activeHubTab, setActiveHubTab] = useState<"cognia" | "ielts" | "sat" | "stem">("cognia");
   const [activePathway, setActivePathway] = useState<"saudi" | "scholarship" | "global">("saudi");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  // Preload tab imagery into browser memory to guarantee instant, zero-flicker tab transitions
+  useEffect(() => {
+    const criticalImages = [
+      "/covers/first-lego-champions.png",
+      "/covers/student-robotics-accreditations.jpg",
+      "https://aqeeq.edu.sa/web/image/1907-cf5d04ed/sat-logo.jpg",
+      "https://aqeeq.edu.sa/web/image/1905-c752dcc6/act-logo.jpg",
+      "https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png",
+      "/covers/cover-about.jpg",
+      "/covers/cover-admissions.jpg",
+    ];
 
+    const stemFll = getInstantVisualOverride("accreditations-stem-fll-photo", "/accreditations", "/covers/first-lego-champions.png");
+    if (stemFll?.mediaUrl) criticalImages.push(stemFll.mediaUrl);
+    const stemWro = getInstantVisualOverride("accreditations-stem-wro-photo", "/accreditations", "/covers/student-robotics-accreditations.jpg");
+    if (stemWro?.mediaUrl) criticalImages.push(stemWro.mediaUrl);
+    const heroFll = getInstantVisualOverride("accreditations-hero-fll-photo", "/accreditations", "/covers/first-lego-champions.png");
+    if (heroFll?.mediaUrl) criticalImages.push(heroFll.mediaUrl);
+    const heroWro = getInstantVisualOverride("accreditations-hero-wro-photo", "/accreditations", "/covers/student-robotics-accreditations.jpg");
+    if (heroWro?.mediaUrl) criticalImages.push(heroWro.mediaUrl);
 
+    criticalImages.forEach((src) => {
+      if (src) preloadImage(src);
+    });
+  }, []);
 
-  // ========================================================
+  const heroFllOverride = getInstantVisualOverride("accreditations-hero-fll-photo", "/accreditations", "/covers/first-lego-champions.png");
+  const heroWroOverride = getInstantVisualOverride("accreditations-hero-wro-photo", "/accreditations", "/covers/student-robotics-accreditations.jpg");
   // 1. 3D Overlapping Credential Covers Fan-out on Scroll
   // ========================================================
   const { scrollY } = useScroll();
@@ -341,14 +365,15 @@ export default function AqeeqSchoolAccreditationsPage() {
                         label="صورة طلاب العقيق في أولمبياد الروبوت العالمي WRO"
                         src="/covers/student-robotics-accreditations.jpg"
                         alt="طلاب مدارس العقيق في منافسات أولمبياد الروبوت الدولي WRO"
+                        priority={true}
                         className="h-full w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
-                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-[#f8ca14] shadow-md">
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-[#f8ca14] shadow-md pointer-events-none">
                         <Award size={12} className="text-[#f8ca14]" />
                         <span>خامس العالم 🌐</span>
                       </div>
-                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right">
+                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right pointer-events-none">
                         <span className="text-[9px] font-black text-[#f8ca14] block">WRO INTERNATIONAL</span>
                         <h4 className="text-xs sm:text-sm font-black drop-shadow truncate">أولمبياد الروبوت الدولي</h4>
                       </div>
@@ -371,9 +396,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                     <div className={`flex items-center justify-between pb-2 border-b ${dark ? "border-white/10" : "border-slate-100"}`}>
                       <div className="flex items-center gap-1.5 sm:gap-2">
                         <div className="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200">
-                          <img
+                          <VisualImage
+                            id="accreditations-cognia-hero-logo"
+                            label="شعار اعتماد كوجنيا في بطاقة البطل"
                             src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
                             alt="شعار اعتماد كوجنيا"
+                            priority={true}
                             className="h-7 sm:h-8 w-auto object-contain"
                           />
                         </div>
@@ -445,14 +473,15 @@ export default function AqeeqSchoolAccreditationsPage() {
                         label="صورة أبطال العقيق - كأس بطولة فيرست ليجو بالمملكة"
                         src="/covers/first-lego-champions.png"
                         alt="أبطال مدارس العقيق مع كأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
+                        priority={true}
                         className="h-full w-full object-cover object-[center_12%]"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
-                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-amber-400/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 shadow-md">
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-amber-400/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 shadow-md pointer-events-none">
                         <Trophy size={12} className="text-[#f8ca14]" />
                         <span>بطل المملكة 🥇</span>
                       </div>
-                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right">
+                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right pointer-events-none">
                         <span className="text-[9px] font-black text-amber-300 block">FIRST SAUDI ARABIA</span>
                         <h4 className="text-xs sm:text-sm font-black drop-shadow truncate">بطولة فيرست ليجو</h4>
                       </div>
@@ -698,9 +727,12 @@ export default function AqeeqSchoolAccreditationsPage() {
                         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-6">
                           <div className="flex items-center gap-3">
                             <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
-                              <img
+                              <VisualImage
+                                id="accreditations-cognia-card-logo"
+                                label="شعار اعتماد كوجنيا في بطاقة التقييم"
                                 src="https://aqeeq.edu.sa/web/image/1901-f0d65949/Cognia-glossy-logo-800x800-1.png"
                                 alt="شعار اعتماد كوجنيا"
+                                priority={true}
                                 className="h-10 w-auto object-contain"
                               />
                             </div>
@@ -941,9 +973,12 @@ export default function AqeeqSchoolAccreditationsPage() {
 
                         <div className="flex items-center gap-4 mb-4">
                           <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 shrink-0">
-                            <img
+                            <VisualImage
+                              id="accreditations-sat-center-logo"
+                              label="شعار مركز اختبارات Digital SAT"
                               src="https://aqeeq.edu.sa/web/image/1907-cf5d04ed/sat-logo.jpg"
                               alt="شعار مركز اختبارات SAT"
+                              priority={true}
                               className="h-12 w-auto object-contain"
                             />
                           </div>
@@ -1001,9 +1036,12 @@ export default function AqeeqSchoolAccreditationsPage() {
 
                         <div className="flex items-center gap-4 mb-4">
                           <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 shrink-0">
-                            <img
+                            <VisualImage
+                              id="accreditations-act-center-logo"
+                              label="شعار مركز اختبارات ACT الدولية"
                               src="https://aqeeq.edu.sa/web/image/1905-c752dcc6/act-logo.jpg"
                               alt="شعار مركز اختبارات ACT"
+                              priority={true}
                               className="h-12 w-auto object-contain"
                             />
                           </div>
@@ -1087,17 +1125,20 @@ export default function AqeeqSchoolAccreditationsPage() {
                       }`}
                     >
                       <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
-                        <img
-                          src="/covers/first-lego-champions.png"
+                        <VisualImage
+                          id="accreditations-stem-fll-photo"
+                          label="صورة بطولة فيرست ليجو FLL"
+                          src={heroFllOverride?.mediaUrl || "/covers/first-lego-champions.png"}
                           alt="تتويج أبطال مدارس العقيق بكأس بطولة فيرست ليجو FIRST LEGO League بالمملكة"
+                          priority={true}
                           className="h-full w-full object-cover object-[center_12%] transition duration-700 hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md pointer-events-none">
                           <Trophy size={12} className="text-[#f8ca14]" />
                           <span>بطل المملكة 🥇</span>
                         </div>
-                        <div className="absolute bottom-3 right-3 left-3 text-white text-right">
+                        <div className="absolute bottom-3 right-3 left-3 text-white text-right pointer-events-none">
                           <span className="text-[10px] font-black text-amber-300">FIRST SAUDI ARABIA</span>
                           <h4 className="text-sm font-black drop-shadow">بطولة فيرست ليجو (FIRST LEGO League)</h4>
                         </div>
@@ -1132,17 +1173,20 @@ export default function AqeeqSchoolAccreditationsPage() {
                       }`}
                     >
                       <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-4 border border-black/10">
-                        <img
-                          src="/covers/student-robotics-accreditations.jpg"
+                        <VisualImage
+                          id="accreditations-stem-wro-photo"
+                          label="صورة أولمبياد الروبوت العالمي WRO"
+                          src={heroWroOverride?.mediaUrl || "/covers/student-robotics-accreditations.jpg"}
                           alt="طلاب مدارس العقيق في أولمبياد الروبوت العالمي WRO"
+                          priority={true}
                           className="h-full w-full object-cover transition duration-700 hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-[#f8ca14]/40 px-3 py-1 text-xs font-black text-[#f8ca14] shadow-md">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-[#f8ca14]/40 px-3 py-1 text-xs font-black text-[#f8ca14] shadow-md pointer-events-none">
                           <Award size={12} className="text-[#f8ca14]" />
                           <span>خامس العالم 🏆</span>
                         </div>
-                        <div className="absolute bottom-3 right-3 left-3 text-white text-right">
+                        <div className="absolute bottom-3 right-3 left-3 text-white text-right pointer-events-none">
                           <span className="text-[10px] font-black text-[#f8ca14]">WRO INTERNATIONAL</span>
                           <h4 className="text-sm font-black drop-shadow">أولمبياد الروبوت العالمي (WRO)</h4>
                         </div>
