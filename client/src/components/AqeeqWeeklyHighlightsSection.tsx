@@ -131,11 +131,31 @@ export function AqeeqWeeklyHighlightsSection({
                     dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30" : "bg-[#08467d]/10 text-[#08467d]"
                   }`}>
                     <Sparkles size={13} />
-                    01 / تغطية الأسبوع الكبرى
+                    <VisualEditable
+                      id="studio-bento-card1-deck-pill"
+                      tag="text"
+                      label="شارة تاب كارت 1"
+                      defaultText="01 / تغطية الأسبوع الكبرى"
+                      as="span"
+                    />
                   </span>
-                  <span className="text-xs font-bold text-slate-500 hidden sm:inline">· الحدث التعليمي الأبرز</span>
+                  <VisualEditable
+                    id="studio-bento-card1-deck-subtitle"
+                    tag="text"
+                    label="وصف تاب كارت 1"
+                    defaultText="· الحدث التعليمي الأبرز"
+                    as="span"
+                    className="text-xs font-bold text-slate-500 hidden sm:inline"
+                  />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">1 من 3</span>
+                <VisualEditable
+                  id="studio-bento-card1-deck-counter"
+                  tag="text"
+                  label="عداد كارت 1"
+                  defaultText="1 من 3"
+                  as="span"
+                  className="text-xs font-mono font-bold text-slate-500"
+                />
               </div>
 
               {/* Card Body Grid */}
@@ -182,10 +202,23 @@ export function AqeeqWeeklyHighlightsSection({
                           : "bg-[#08467d] text-white hover:bg-[#063560] shadow-lg shadow-[#08467d]/20"
                       }`}
                     >
-                      <span>تصفح التغطية الكاملة</span>
+                      <VisualEditable
+                        id="studio-bento-card1-btn-text"
+                        tag="text"
+                        label="نص زر كارت 1"
+                        defaultText="تصفح التغطية الكاملة"
+                        as="span"
+                      />
                       <ArrowUpLeft size={16} />
                     </button>
-                    <span className="text-xs text-slate-500 font-medium">محدث أسبوعياً</span>
+                    <VisualEditable
+                      id="studio-bento-card1-btn-badge"
+                      tag="text"
+                      label="شارة زر كارت 1"
+                      defaultText="محدث أسبوعياً"
+                      as="span"
+                      className="text-xs text-slate-500 font-medium"
+                    />
                   </div>
                 </div>
 
@@ -200,9 +233,14 @@ export function AqeeqWeeklyHighlightsSection({
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-4 right-4 rounded-full border border-white/20 bg-black/60 backdrop-blur-md px-3 py-1 text-[11px] font-black text-white">
-                    📸 عدسة استوديو العقيق
-                  </span>
+                  <VisualEditable
+                    id="studio-bento-card1-lens-badge"
+                    tag="text"
+                    label="شارة صورة كارت 1"
+                    defaultText="📸 عدسة استوديو العقيق"
+                    as="span"
+                    className="absolute bottom-4 right-4 rounded-full border border-white/20 bg-black/60 backdrop-blur-md px-3 py-1 text-[11px] font-black text-white"
+                  />
                 </div>
               </div>
             </div>
@@ -226,11 +264,31 @@ export function AqeeqWeeklyHighlightsSection({
                     dark ? "bg-[#f8ca14]/20 text-[#f8ca14] border border-[#f8ca14]/40" : "bg-amber-100 text-amber-900 border border-amber-300"
                   }`}>
                     <Award size={13} />
-                    02 / وسام التميز والتكريم
+                    <VisualEditable
+                      id="studio-bento-card2-deck-pill"
+                      tag="text"
+                      label="شارة تاب كارت 2"
+                      defaultText="02 / وسام التميز والتكريم"
+                      as="span"
+                    />
                   </span>
-                  <span className="text-xs font-bold text-slate-500 hidden sm:inline">· فخر مدارس العقيق</span>
+                  <VisualEditable
+                    id="studio-bento-card2-deck-subtitle"
+                    tag="text"
+                    label="وصف تاب كارت 2"
+                    defaultText="· فخر مدارس العقيق"
+                    as="span"
+                    className="text-xs font-bold text-slate-500 hidden sm:inline"
+                  />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">2 من 3</span>
+                <VisualEditable
+                  id="studio-bento-card2-deck-counter"
+                  tag="text"
+                  label="عداد كارت 2"
+                  defaultText="2 من 3"
+                  as="span"
+                  className="text-xs font-mono font-bold text-slate-500"
+                />
               </div>
 
               {/* Card Body Grid */}
@@ -268,16 +326,26 @@ export function AqeeqWeeklyHighlightsSection({
                     className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
                   />
                   <div className="mt-8 flex items-center gap-3">
-                    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black ${
-                      dark ? "bg-white/10 text-amber-300 border border-amber-400/30" : "bg-amber-100 text-amber-900 border border-amber-300"
-                    }`}>
-                      🥇 وسام الشرف الأكاديمي
-                    </span>
-                    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black ${
-                      dark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-700"
-                    }`}>
-                      🎖️ تميز مستمر
-                    </span>
+                    <VisualEditable
+                      id="studio-bento-card2-badge1"
+                      tag="text"
+                      label="شارة التميز 1"
+                      defaultText="🥇 وسام الشرف الأكاديمي"
+                      as="span"
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black ${
+                        dark ? "bg-white/10 text-amber-300 border border-amber-400/30" : "bg-amber-100 text-amber-900 border border-amber-300"
+                      }`}
+                    />
+                    <VisualEditable
+                      id="studio-bento-card2-badge2"
+                      tag="text"
+                      label="شارة التميز 2"
+                      defaultText="🎖️ تميز مستمر"
+                      as="span"
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black ${
+                        dark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-700"
+                      }`}
+                    />
                   </div>
                 </div>
 
@@ -292,9 +360,14 @@ export function AqeeqWeeklyHighlightsSection({
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-4 right-4 rounded-full border border-amber-400/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-amber-300">
-                    🏆 منصة التتويج
-                  </span>
+                  <VisualEditable
+                    id="studio-bento-card2-lens-badge"
+                    tag="text"
+                    label="شارة صورة كارت 2"
+                    defaultText="🏆 منصة التتويج"
+                    as="span"
+                    className="absolute bottom-4 right-4 rounded-full border border-amber-400/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-amber-300"
+                  />
                 </div>
               </div>
             </div>
@@ -318,11 +391,31 @@ export function AqeeqWeeklyHighlightsSection({
                     dark ? "bg-[#de191e]/20 text-[#de191e] border border-[#de191e]/40" : "bg-[#de191e]/10 text-[#de191e] border border-[#de191e]/20"
                   }`}>
                     <Flame size={13} />
-                    03 / نبض المجتمع والتشجيع
+                    <VisualEditable
+                      id="studio-bento-card3-deck-pill"
+                      tag="text"
+                      label="شارة تاب كارت 3"
+                      defaultText="03 / نبض المجتمع والتشجيع"
+                      as="span"
+                    />
                   </span>
-                  <span className="text-xs font-bold text-slate-500 hidden sm:inline">· تفاعل حي مباشر</span>
+                  <VisualEditable
+                    id="studio-bento-card3-deck-subtitle"
+                    tag="text"
+                    label="وصف تاب كارت 3"
+                    defaultText="· تفاعل حي مباشر"
+                    as="span"
+                    className="text-xs font-bold text-slate-500 hidden sm:inline"
+                  />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">3 من 3</span>
+                <VisualEditable
+                  id="studio-bento-card3-deck-counter"
+                  tag="text"
+                  label="عداد كارت 3"
+                  defaultText="3 من 3"
+                  as="span"
+                  className="text-xs font-mono font-bold text-slate-500"
+                />
               </div>
 
               {/* Card Body Grid */}
@@ -404,9 +497,14 @@ export function AqeeqWeeklyHighlightsSection({
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-4 right-4 rounded-full border border-[#de191e]/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-[#de191e]">
-                    🤝 معاً نصنع قادة الغد
-                  </span>
+                  <VisualEditable
+                    id="studio-bento-card3-lens-badge"
+                    tag="text"
+                    label="شارة صورة كارت 3"
+                    defaultText="🤝 معاً نصنع قادة الغد"
+                    as="span"
+                    className="absolute bottom-4 right-4 rounded-full border border-[#de191e]/40 bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-black text-[#de191e]"
+                  />
                 </div>
               </div>
             </div>
