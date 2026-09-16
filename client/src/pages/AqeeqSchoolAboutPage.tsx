@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { ArticlesScrollParallaxBackdrop, type ArticleBackdropItem } from "@/components/ui/articles-scroll-parallax-backdrop";
 import { trpc } from "@/lib/trpc";
+import { resolveMediaUrl } from "@/lib/mediaUtils";
 
 export const ABOUT_UNFURLING_ITEMS = [
   { id: "about-1", title: "تأسيس مدارس العقيق 1994", image: "/covers/cover-about.jpg", badge: "30+ عاماً ريادة", date: "طيبة الطيبة" },
@@ -81,7 +82,7 @@ export default function AqeeqSchoolAboutPage() {
         title: item.title,
         category: item.badge || item.date || "مدارس العقيق",
         authorName: item.date || "صرح العقيق",
-        coverUrl: item.image,
+        coverUrl: resolveMediaUrl(item.image || item.thumbnail || item.coverUrl) || item.image || item.thumbnail || item.coverUrl || "/covers/cover-about.jpg",
       }));
     }
     return ABOUT_PARALLAX_ITEMS;

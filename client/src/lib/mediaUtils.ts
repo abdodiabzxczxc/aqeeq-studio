@@ -12,13 +12,26 @@
  */
 export function extractDriveFileId(url: string | null | undefined): string | null {
   if (!url) return null;
-  return (
-    url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
-    url.match(/[?&]id=([A-Za-z0-9_-]+)/)?.[1] ||
-    url.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
-    url.match(/drive\.usercontent\.google\.com\/download\?id=([A-Za-z0-9_-]+)/)?.[1] ||
-    null
-  );
+  const trimmed = url.trim();
+
+  // If it's already a drive proxy url: /api/drive-proxy/{id}
+  const proxyMatch = trimmed.match(/\/api\/drive-(?:video-|audio-)?proxy\/([A-Za-z0-9_-]+)/);
+  if (proxyMatch) return proxyMatch[1];
+
+  // Standard Drive URLs
+  const standardMatch =
+    trimmed.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    trimmed.match(/[?&]id=([A-Za-z0-9_-]+)/)?.[1] ||
+    trimmed.match(/lh3\.googleusercontent\.com\/d\/([A-Za-z0-9_-]+)/)?.[1] ||
+    trimmed.match(/drive\.usercontent\.google\.com\/download\?id=([A-Za-z0-9_-]+)/)?.[1];
+  if (standardMatch) return standardMatch;
+
+  // Bare Drive ID (typically 25 to 55 characters of base64url characters without slashes or spaces)
+  if (/^[A-Za-z0-9_-]{25,55}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return null;
 }
 
 /**

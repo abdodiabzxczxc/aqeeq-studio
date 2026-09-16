@@ -3,6 +3,7 @@ import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset,
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import { triggerAutoPageCapture } from "../previewCapture";
+import { readGoogleDriveAlbum } from "../googleDriveAlbum";
 
 const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditations|life|dashboard|control|scan|journal|albums|offers|live|live\/ideas|news|maison|studio|atheer|podcast|articles|showcase)$|^\/(?:news|albums|offers|journal|atheer|podcast|articles|showcase)\/manage$|^\/(?:event|workspace)\/\d+(?:\/(?:stage|memories|premiere|honor|portrait))?$|^\/(?:guest\/[a-zA-Z0-9-]+|news\/[a-z0-9-]+|news\/month\/\d{4}-\d{2}|journal\/(?:issue\/[a-z0-9-]+|month\/\d{4}-\d{2}|archive|[a-z0-9-]+)|albums\/[a-z0-9-]+|articles\/[a-z0-9-]+|showcase\/[a-z0-9-]+|studio\/[a-zA-Z0-9_/-]+|page\/[a-z0-9-]{3,96})$/, "الصفحة غير مدعومة في المحرر البصري");
 const cssTokenSchema = z.string().max(96).regex(/^[#a-zA-Z0-9.%(), /-]*$/, "قيمة النمط غير صالحة").nullable().optional();
@@ -177,6 +178,72 @@ export const visualEditorRouter = router({
       const asset = await createMediaAsset({ url: input.url, kind: "embed", fileName: input.title.trim(), altText: input.altText?.trim() || null, uploadedBy: ctx.user.id });
       await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.media_embed", details: JSON.stringify({ id: asset?.id, url: input.url }) });
       return asset;
+    }),
+    addDriveMedia: adminProcedure.input(z.object({
+      url: z.string().min(5).max(1024),
+      title: z.string().min(1).max(255).optional(),
+      altText: z.string().max(300).optional(),
+    })).mutation(async ({ input, ctx }) => {
+      const trimmed = input.url.trim();
+      const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                        trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+                        trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      const fileId = fileMatch ? fileMatch[1] : (/^[a-zA-Z0-9_-]{20,}$/.test(trimmed) ? trimmed : null);
+      if (!fileId) throw new Error("رابط Google Drive غير صالح أو لم يتم العثور على معرّف الملف");
+      const proxyUrl = `/api/drive-proxy/${fileId}`;
+      const assetTitle = input.title?.trim() || `صورة Drive — ${fileId.slice(0, 8)}`;
+      const filename = safeFileName(assetTitle);
+      const asset = await createMediaAsset({
+        storageKey: `drive:${fileId}`,
+        url: proxyUrl,
+        kind: "image",
+        mimeType: "image/jpeg",
+        fileName: filename,
+        fileSize: null,
+        altText: input.altText?.trim() || assetTitle,
+        uploadedBy: ctx.user.id,
+      });
+      await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.media_drive_import", details: JSON.stringify({ id: asset?.id, fileId, url: proxyUrl }) });
+      return asset;
+    }),
+    listDriveFolder: adminProcedure.input(z.object({
+      folderUrl: z.string().min(5).max(1024),
+    })).mutation(async ({ input }) => {
+      const media = await readGoogleDriveAlbum(input.folderUrl);
+      return media.filter((item) => item.mediaType === "image");
+    }),
+    importDriveFolder: adminProcedure.input(z.object({
+      folderUrl: z.string().min(5).max(1024),
+    })).mutation(async ({ input, ctx }) => {
+      const media = await readGoogleDriveAlbum(input.folderUrl);
+      const images = media.filter((item) => item.mediaType === "image");
+      if (!images.length) {
+        throw new Error("لم نجد أي صور داخل مجلد Google Drive. تأكد أن المجلد يحوي صوراً وأن الصلاحية «أي شخص لديه الرابط - مشاهد»");
+      }
+      const createdAssets = [];
+      for (const img of images) {
+        const title = img.fileName || `صورة Drive — ${img.driveFileId.slice(0, 8)}`;
+        const filename = safeFileName(title);
+        const proxyUrl = `/api/drive-proxy/${img.driveFileId}`;
+        const asset = await createMediaAsset({
+          storageKey: `drive:${img.driveFileId}`,
+          url: proxyUrl,
+          kind: "image",
+          mimeType: img.mimeType || "image/jpeg",
+          fileName: filename,
+          fileSize: null,
+          altText: title,
+          uploadedBy: ctx.user.id,
+        });
+        createdAssets.push(asset);
+      }
+      await logAudit({
+        userId: ctx.user.id,
+        userName: ctx.user.name,
+        action: "visual_editor.media_drive_folder_import",
+        details: JSON.stringify({ folderUrl: input.folderUrl, count: createdAssets.length }),
+      });
+      return { count: createdAssets.length, assets: createdAssets };
     }),
     delete: adminProcedure.input(z.object({ id: z.number().positive() })).mutation(async ({ input, ctx }) => {
       const result = await deleteMediaAsset(input.id);

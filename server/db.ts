@@ -928,6 +928,11 @@ export type SiteOrchestrationConfig = {
     linkText?: string;
     linkUrl?: string;
   };
+  backdrops?: {
+    about?: any[] | null;
+    accreditations?: any[] | null;
+    admissions?: any[] | null;
+  };
 };
 
 export const DEFAULT_SITE_ORCHESTRATION: SiteOrchestrationConfig = {
@@ -1444,6 +1449,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
           partners: Array.isArray(parsed.partners) && parsed.partners.length > 0 ? parsed.partners : DEFAULT_SITE_ORCHESTRATION.partners,
           eventModal: { ...DEFAULT_SITE_ORCHESTRATION.eventModal, ...(parsed.eventModal || {}) },
           vacationMode: { ...DEFAULT_SITE_ORCHESTRATION.vacationMode, ...(parsed.vacationMode || {}) },
+          backdrops: parsed.backdrops || DEFAULT_SITE_ORCHESTRATION.backdrops || {},
         };
       }
     } catch (err) {
@@ -1483,6 +1489,7 @@ export async function getSiteOrchestration(): Promise<SiteOrchestrationConfig> {
         aboutPageConfig: { ...DEFAULT_SITE_ORCHESTRATION.aboutPageConfig, ...(parsed.aboutPageConfig || {}) },
         accreditationsConfig: { ...DEFAULT_SITE_ORCHESTRATION.accreditationsConfig, ...(parsed.accreditationsConfig || {}) },
         systemPortals: Array.isArray(parsed.systemPortals) && parsed.systemPortals.length > 0 ? parsed.systemPortals : DEFAULT_SITE_ORCHESTRATION.systemPortals,
+        backdrops: parsed.backdrops || DEFAULT_SITE_ORCHESTRATION.backdrops || {},
       };
     }
   } catch (err) {
@@ -1514,6 +1521,7 @@ export async function setSiteOrchestration(data: Partial<SiteOrchestrationConfig
     partners: data.partners !== undefined ? data.partners : current.partners,
     eventModal: { ...(current.eventModal || DEFAULT_SITE_ORCHESTRATION.eventModal!), ...(data.eventModal || {}) },
     vacationMode: { ...(current.vacationMode || DEFAULT_SITE_ORCHESTRATION.vacationMode!), ...(data.vacationMode || {}) },
+    backdrops: data.backdrops !== undefined ? data.backdrops : current.backdrops,
     interactiveFx: data.interactiveFx !== undefined
       ? { ...(current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx!), ...data.interactiveFx }
       : (current.interactiveFx || DEFAULT_SITE_ORCHESTRATION.interactiveFx),

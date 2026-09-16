@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { Camera, ArrowUpLeft, Sparkles, Tv, Layers, Settings2, ImageIcon } from "lucide-react";
 import { Link } from "wouter";
+import { resolveMediaUrl } from "@/lib/mediaUtils";
 
 export interface ParallaxProduct {
   title: string;
@@ -409,12 +410,18 @@ export const ProductCard = ({
       <Link href={product.link} className="block h-full w-full">
         {/* Background Album Photo with smooth zoom on hover */}
         <img
-          src={product.thumbnail}
+          src={resolveMediaUrl(product.thumbnail) || product.thumbnail || "/covers/cover-about.jpg"}
           alt={product.title}
           loading={priority ? "eager" : "lazy"}
           {...(priority ? { fetchPriority: "high" } : {})}
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover/product:scale-108"
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (!target.src.endsWith("/covers/cover-about.jpg")) {
+              target.src = "/covers/cover-about.jpg";
+            }
+          }}
         />
 
         {/* Ambient Top & Bottom Gradients */}
@@ -574,11 +581,17 @@ export function HeroParallaxBackdrop({
               }`}
             >
               <img
-                src={product.thumbnail}
+                src={resolveMediaUrl(product.thumbnail) || product.thumbnail || "/covers/cover-about.jpg"}
                 alt=""
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith("/covers/cover-about.jpg")) {
+                    target.src = "/covers/cover-about.jpg";
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               {product.category && (
@@ -607,11 +620,17 @@ export function HeroParallaxBackdrop({
               }`}
             >
               <img
-                src={product.thumbnail}
+                src={resolveMediaUrl(product.thumbnail) || product.thumbnail || "/covers/cover-about.jpg"}
                 alt=""
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith("/covers/cover-about.jpg")) {
+                    target.src = "/covers/cover-about.jpg";
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               {product.category && (

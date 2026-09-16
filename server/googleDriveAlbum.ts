@@ -122,13 +122,13 @@ export function mapDriveFileToAlbumMedia(file: NonNullable<DriveListResponse["fi
 export function parsePublicDriveFolderHtml(html: string): DriveAlbumMedia[] {
   const results: DriveAlbumMedia[] = [];
   const seen = new Set<string>();
-  const entry = /aria-label="([^"]+)"[^>]*\bssk=['"][^'"]*?:([A-Za-z0-9_-]{20,})-0-\d+['"]/g;
-  for (const match of Array.from(html.matchAll(entry))) {
-    const label = decodeDriveText(match[1] || "");
-    const driveFileId = match[2] || "";
-    const fileName = label.replace(/\s+(?:Image|Video)\s+(?:Shared|not shared)$/i, "");
+
+  const processCandidate = (rawLabel: string, driveFileId: string) => {
+    if (!driveFileId || seen.has(driveFileId)) return;
+    const label = decodeDriveText(rawLabel || "");
+    const fileName = label.replace(/\s+(?:Image|Video|Audio)?\s*(?:Shared|not shared)$/i, "").trim();
     const mediaType = getMediaTypeFromFileName(fileName);
-    if (!driveFileId || !mediaType || seen.has(driveFileId)) continue;
+    if (!mediaType) return;
     seen.add(driveFileId);
     const id = encodeURIComponent(driveFileId);
     results.push({
@@ -139,7 +139,37 @@ export function parsePublicDriveFolderHtml(html: string): DriveAlbumMedia[] {
       mimeType: mimeTypeFromFileName(fileName, mediaType),
       mediaType,
     });
+  };
+
+  // Pattern 1: aria-label with ssk
+  const entry = /aria-label="([^"]+)"[^>]*\bssk=['"][^'"]*?:([A-Za-z0-9_-]{20,})-0-\d+['"]/g;
+  for (const match of Array.from(html.matchAll(entry))) {
+    processCandidate(match[1], match[2]);
   }
+
+  // Pattern 2: reverse ssk then aria-label
+  const sskReverse = /ssk=['"][^'"]*?:([A-Za-z0-9_-]{20,})-0-\d+['"][^>]*aria-label="([^"]+)"/g;
+  for (const match of Array.from(html.matchAll(sskReverse))) {
+    processCandidate(match[2], match[1]);
+  }
+
+  // Pattern 3: data-id with aria-label
+  const dataIdEntry = /data-id="([A-Za-z0-9_-]{20,})"[^>]*aria-label="([^"]+)"/g;
+  for (const match of Array.from(html.matchAll(dataIdEntry))) {
+    processCandidate(match[2], match[1]);
+  }
+
+  const ariaDataId = /aria-label="([^"]+)"[^>]*data-id="([A-Za-z0-9_-]{20,})"/g;
+  for (const match of Array.from(html.matchAll(ariaDataId))) {
+    processCandidate(match[1], match[2]);
+  }
+
+  // Pattern 4: embedded JSON array items
+  const jsonRegex = /\["([A-Za-z0-9_-]{25,})",\s*(?:\[\s*)?"([^"]+\.(?:jpg|jpeg|jpe|png|webp|gif|avif|heic|heif|bmp|tif|tiff|svg|ico|mp4|webm|mov|m4v|ogg|ogv|avi|mkv|3gp))"/gi;
+  for (const match of Array.from(html.matchAll(jsonRegex))) {
+    processCandidate(match[2], match[1]);
+  }
+
   return results;
 }
 

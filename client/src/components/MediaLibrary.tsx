@@ -1,8 +1,9 @@
 import { trpc } from "@/lib/trpc";
 import { Progress } from "@/components/ui/progress";
-import { Check, Copy, Film, ImageIcon, Link2, Loader2, Music2, Sparkles, Trash2, Upload, X } from "lucide-react";
-import { ChangeEvent, useMemo, useState } from "react";
+import { Check, CheckCircle2, Cloud, Copy, Film, FolderOpen, ImageIcon, Layers, Link2, Loader2, Music2, RefreshCw, Search, Sparkles, Trash2, Upload, X } from "lucide-react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { extractDriveFileId, directDriveImage } from "@/lib/mediaUtils";
 
 export type MediaAsset = {
   id: number;
@@ -37,21 +38,75 @@ export default function MediaLibrary({
   onSelect,
   accept = "all",
   workspace = false,
+  defaultTab = "presets",
 }: {
   open: boolean;
   onClose: () => void;
   onSelect?: (asset: MediaAsset) => void;
   accept?: "all" | "image" | "video" | "audio";
   workspace?: boolean;
+  defaultTab?: "presets" | "uploads" | "drive";
 }) {
   const utils = trpc.useUtils();
   const { data: assets = [], isLoading } = trpc.visualEditor.media.list.useQuery(undefined, { enabled: open, refetchOnWindowFocus: false });
-  const [activeTab, setActiveTab] = useState<"presets" | "uploads">("presets");
+  const [activeTab, setActiveTab] = useState<"presets" | "uploads" | "drive">(defaultTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [embedUrl, setEmbedUrl] = useState("");
   const [embedTitle, setEmbedTitle] = useState("");
+  const [driveUrl, setDriveUrl] = useState("");
+  const [driveTitle, setDriveTitle] = useState("");
+  const [driveSubTab, setDriveSubTab] = useState<"folder" | "single">("folder");
+  const [driveFolderUrl, setDriveFolderUrl] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("aqeeq_last_drive_folder_url") || "";
+    }
+    return "";
+  });
+  const [driveFolderItems, setDriveFolderItems] = useState<Array<{
+    driveFileId: string;
+    mediaUrl: string;
+    thumbnailUrl: string;
+    fileName: string;
+    mimeType: string;
+    mediaType: "image";
+  }>>([]);
+  const [driveFolderSearch, setDriveFolderSearch] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [open, defaultTab]);
+
+  const listDriveFolder = trpc.visualEditor.media.listDriveFolder.useMutation({
+    onSuccess: (items) => {
+      setDriveFolderItems(items as any);
+      if (items.length > 0) {
+        toast.success(`تم استخراج ${items.length} صورة من مجلد Google Drive بنجاح! 📁`);
+      } else {
+        toast.info("تم فتح المجلد لكن لم يُعثر على صور ظاهرة. تأكد أن الصلاحية «أي شخص لديه الرابط - مشاهد» وأن الملفات صور.");
+      }
+      if (typeof window !== "undefined" && driveFolderUrl.trim()) {
+        localStorage.setItem("aqeeq_last_drive_folder_url", driveFolderUrl.trim());
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "تعذر قراءة مجلد Google Drive. تأكد من أن الرابط صحيح والصلاحية عامة.");
+    },
+  });
+
+  const importDriveFolder = trpc.visualEditor.media.importDriveFolder.useMutation({
+    onSuccess: (res) => {
+      toast.success(`تم استيراد ${res.count} صورة بنجاح وحفظها في مكتبتك! 💾✨`);
+      void utils.visualEditor.media.list.invalidate();
+      setActiveTab("uploads");
+    },
+    onError: (error) => {
+      toast.error(error.message || "تعذر استيراد صور المجلد");
+    },
+  });
 
   const upload = trpc.visualEditor.media.upload.useMutation({
     onSuccess: () => {
@@ -69,6 +124,22 @@ export default function MediaLibrary({
       setUploadStatus(null);
       toast.error(error.message || "تعذر رفع الملف");
     },
+  });
+
+  const addDriveMedia = trpc.visualEditor.media.addDriveMedia.useMutation({
+    onSuccess: (asset) => {
+      toast.success("تم استيراد الصورة من Google Drive بنجاح! 📁");
+      setDriveUrl("");
+      setDriveTitle("");
+      void utils.visualEditor.media.list.invalidate();
+      if (onSelect && asset) {
+        onSelect(asset as MediaAsset);
+        onClose();
+      } else {
+        setActiveTab("uploads");
+      }
+    },
+    onError: (error) => toast.error(error.message || "تعذر استيراد الصورة من Google Drive"),
   });
 
   const addEmbed = trpc.visualEditor.media.addEmbed.useMutation({
@@ -160,17 +231,21 @@ export default function MediaLibrary({
 
   return (
     <div
-      data-aq-editor-panel={workspace ? "media" : undefined}
-      className={
+      data-aq-editor-panel="media"
+      data-no-visual-edit="true"
+      role="dialog"
+      aria-modal="true"
+      className={`aq-media-library-modal ${
         workspace
           ? "fixed inset-x-3 bottom-3 z-[340] flex max-h-[82svh] flex-col overflow-hidden rounded-3xl border border-amber-400/25 bg-[#0e121a] shadow-2xl md:inset-y-0 md:left-0 md:right-auto md:max-h-none md:w-[min(480px,100vw)] md:rounded-none md:border-y-0 md:border-l-0 md:border-r"
           : "fixed inset-0 z-[400] flex items-end justify-center bg-black/75 p-3 backdrop-blur-md sm:items-center"
-      }
+      }`}
       style={workspace ? undefined : { zIndex: MEDIA_LIBRARY_Z_INDEX }}
       dir="rtl"
       onMouseDown={workspace ? undefined : onClose}
     >
       <section
+        data-no-visual-edit="true"
         className={
           workspace
             ? "flex min-h-0 flex-1 flex-col overflow-hidden"
@@ -229,6 +304,18 @@ export default function MediaLibrary({
               <ImageIcon size={13} />
               <span>الملفات المرفوعة ({assets.length})</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("drive")}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black transition ${
+                activeTab === "drive"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-slate-300 hover:text-white"
+              }`}
+            >
+              <Cloud size={13} />
+              <span>Google Drive 📁</span>
+            </button>
           </div>
 
           <div className="min-w-[200px] flex-1 max-w-xs">
@@ -248,9 +335,299 @@ export default function MediaLibrary({
             workspace ? "grid-cols-1" : "max-h-[calc(88vh-130px)] lg:grid-cols-[1fr_280px]"
           }`}
         >
-          {/* Gallery Grid */}
+          {/* Gallery Grid or Drive Importer */}
           <div className="min-h-72 p-4">
-            {activeTab === "presets" ? (
+            {activeTab === "drive" ? (
+              <div className="space-y-4">
+                {/* Drive Mode Switcher */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDriveSubTab("folder")}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        driveSubTab === "folder"
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-slate-400 hover:text-white bg-white/5"
+                      }`}
+                    >
+                      <FolderOpen size={14} />
+                      <span>قائمة صور مجلد Google Drive {driveFolderItems.length > 0 ? `(${driveFolderItems.length})` : ""}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDriveSubTab("single")}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        driveSubTab === "single"
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-slate-400 hover:text-white bg-white/5"
+                      }`}
+                    >
+                      <Cloud size={14} />
+                      <span>رابط صورة مفردة</span>
+                    </button>
+                  </div>
+
+                  {driveSubTab === "folder" && driveFolderItems.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => importDriveFolder.mutate({ folderUrl: driveFolderUrl.trim() })}
+                        disabled={importDriveFolder.isPending}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white text-xs font-bold transition cursor-pointer disabled:opacity-50 shadow"
+                        title="حفظ جميع صور هذا المجلد في مكتبة الوسائط المرفوعة"
+                      >
+                        {importDriveFolder.isPending ? <Loader2 size={13} className="animate-spin" /> : <Layers size={13} />}
+                        <span>حفظ الكل في مكتبتي ({driveFolderItems.length})</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {driveSubTab === "folder" ? (
+                  <div className="space-y-4">
+                    {/* Folder Input Bar */}
+                    <div className="rounded-2xl border border-blue-500/30 bg-[#0e1422] p-3.5 space-y-2">
+                      <label className="block text-xs font-bold text-slate-200">
+                        رابط مجلد Google Drive (يجب ضبط مشاركة المجلد: «أي شخص لديه الرابط - مشاهد»):
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          value={driveFolderUrl}
+                          onChange={(e) => setDriveFolderUrl(e.target.value)}
+                          placeholder="https://drive.google.com/drive/folders/1ABCxyz... أو معرف الفولدر"
+                          dir="ltr"
+                          className="flex-1 rounded-xl border border-blue-500/40 bg-black/50 px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-400 font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!driveFolderUrl.trim()) {
+                              toast.error("يرجى إدخال رابط مجلد Google Drive أولاً");
+                              return;
+                            }
+                            listDriveFolder.mutate({ folderUrl: driveFolderUrl.trim() });
+                          }}
+                          disabled={!driveFolderUrl.trim() || listDriveFolder.isPending}
+                          className="rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2 text-xs font-black text-white disabled:opacity-40 transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        >
+                          {listDriveFolder.isPending ? <Loader2 className="animate-spin" size={14} /> : <FolderOpen size={14} />}
+                          <span>{listDriveFolder.isPending ? "جارٍ فحص المجلد..." : "استعراض صور المجلد 📂"}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Folder Results */}
+                    {listDriveFolder.isPending ? (
+                      <div className="flex h-56 flex-col items-center justify-center gap-3 text-slate-400">
+                        <Loader2 className="animate-spin text-blue-400" size={32} />
+                        <span className="text-xs font-bold">جارٍ استخراج وتجهيز صور المجلد من Google Drive...</span>
+                      </div>
+                    ) : driveFolderItems.length > 0 ? (
+                      <div className="space-y-3">
+                        {/* Search & Stats Bar */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                          <div className="flex items-center gap-2 text-xs text-blue-300 font-bold">
+                            <CheckCircle2 size={14} className="text-emerald-400" />
+                            <span>تم العثور على {driveFolderItems.length} صورة في هذا المجلد — اضغط على أي صورة لتطبيقها فوراً</span>
+                          </div>
+                          <input
+                            type="text"
+                            value={driveFolderSearch}
+                            onChange={(e) => setDriveFolderSearch(e.target.value)}
+                            placeholder="تصفية بالاسم..."
+                            className="h-7 rounded-lg border border-white/10 bg-black/40 px-2.5 text-[11px] text-white outline-none focus:border-blue-400 w-44"
+                          />
+                        </div>
+
+                        {/* Images Grid */}
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
+                          {driveFolderItems
+                            .filter((item) => !driveFolderSearch.trim() || item.fileName.toLowerCase().includes(driveFolderSearch.toLowerCase().trim()))
+                            .map((item) => (
+                              <article
+                                key={item.driveFileId}
+                                onClick={() => {
+                                  const asset: MediaAsset = {
+                                    id: -Math.floor(Math.random() * 1000000) - 1,
+                                    url: `/api/drive-proxy/${item.driveFileId}`,
+                                    kind: "image",
+                                    mimeType: item.mimeType || "image/jpeg",
+                                    fileName: item.fileName,
+                                    fileSize: null,
+                                    altText: item.fileName,
+                                  };
+                                  addDriveMedia.mutate({
+                                    url: `/api/drive-proxy/${item.driveFileId}`,
+                                    title: item.fileName,
+                                  });
+                                  if (onSelect) {
+                                    onSelect(asset);
+                                    onClose();
+                                    toast.success(`تم اختيار وتطبيق: ${item.fileName} 🖼️`);
+                                  }
+                                }}
+                                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-blue-500/20 bg-[#101624] hover:border-blue-400 hover:shadow-[0_10px_30px_rgba(59,130,246,0.2)] transition duration-200 cursor-pointer p-2"
+                              >
+                                <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-slate-950 border border-white/5">
+                                  <img
+                                    src={`/api/drive-proxy/${item.driveFileId}`}
+                                    alt={item.fileName}
+                                    loading="lazy"
+                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                  />
+                                  <span className="absolute top-1.5 left-1.5 rounded-md bg-black/75 px-1.5 py-0.5 font-mono text-[9px] text-blue-300 uppercase">
+                                    {item.fileName.split(".").pop() || "IMG"}
+                                  </span>
+                                </div>
+
+                                <div className="mt-2 text-right">
+                                  <h4 className="text-xs font-bold text-slate-100 line-clamp-1 leading-snug" title={item.fileName}>
+                                    {item.fileName}
+                                  </h4>
+                                </div>
+
+                                <div className="mt-2 pt-1 border-t border-white/[0.06]">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const asset: MediaAsset = {
+                                        id: -Math.floor(Math.random() * 1000000) - 1,
+                                        url: `/api/drive-proxy/${item.driveFileId}`,
+                                        kind: "image",
+                                        mimeType: item.mimeType || "image/jpeg",
+                                        fileName: item.fileName,
+                                        fileSize: null,
+                                        altText: item.fileName,
+                                      };
+                                      addDriveMedia.mutate({
+                                        url: `/api/drive-proxy/${item.driveFileId}`,
+                                        title: item.fileName,
+                                      });
+                                      if (onSelect) {
+                                        onSelect(asset);
+                                        onClose();
+                                        toast.success(`تم اختيار وتطبيق: ${item.fileName} 🖼️`);
+                                      }
+                                    }}
+                                    className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 py-1.5 px-3 text-xs font-black text-white shadow-md transition cursor-pointer"
+                                  >
+                                    <Check size={13} />
+                                    <span>{onSelect ? "اختيار وتطبيق هذه الصورة ✓" : "اختيار الصورة"}</span>
+                                  </button>
+                                </div>
+                              </article>
+                            ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-blue-500/30 bg-blue-500/[0.02] p-8 text-center space-y-3">
+                        <div className="grid h-12 w-12 mx-auto place-items-center rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                          <FolderOpen size={24} />
+                        </div>
+                        <h4 className="text-sm font-black text-white">ارفع كل صورك على مجلد في Google Drive وافرزها هنا بنقرة زر</h4>
+                        <div className="max-w-md mx-auto text-xs text-slate-400 leading-relaxed space-y-1.5 text-right bg-black/40 p-3.5 rounded-xl border border-white/5">
+                          <div className="font-bold text-amber-300">كيف تستخدم هذه الميزة؟</div>
+                          <div>1. أنشئ مجلداً على Google Drive وارفع فيه كل صور الصفحة التي تريدها.</div>
+                          <div>2. اضغط كليك يمين على المجلد ثم <strong className="text-white">«مشاركة» (Share)</strong> واختر <strong className="text-white">«أي شخص لديه الرابط - مشاهد»</strong>.</div>
+                          <div>3. انسخ رابط المجلد والصقه في الخانة بالأعلى واضغط <strong className="text-blue-300">«استعراض صور المجلد»</strong> لتظهر لك جميع الصور في شبكة وتختار منها لأي بطاقة بسهولة!</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Single File Direct Import View */
+                  <div className="max-w-xl mx-auto space-y-4 p-5 rounded-3xl border border-blue-500/20 bg-[#0e1422]">
+                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-600/20 text-blue-400">
+                        <Cloud size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-white">استيراد صورة واحدة برابط مباشر</h4>
+                        <p className="text-xs text-slate-400">الصق رابط أي صورة من Drive مباشرة</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-300 mb-1">
+                          رابط ملف Google Drive (أو معرّف الملف):
+                        </label>
+                        <input
+                          type="text"
+                          value={driveUrl}
+                          onChange={(e) => setDriveUrl(e.target.value)}
+                          placeholder="https://drive.google.com/file/d/1A2B3C.../view?usp=sharing"
+                          dir="ltr"
+                          className="w-full rounded-xl border border-blue-500/40 bg-black/50 p-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-400 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-300 mb-1">
+                          اسم توضيحي للصورة (اختياري):
+                        </label>
+                        <input
+                          type="text"
+                          value={driveTitle}
+                          onChange={(e) => setDriveTitle(e.target.value)}
+                          placeholder="مثال: غلاف فعاليات مدارس العقيق 2026"
+                          className="w-full rounded-xl border border-white/10 bg-black/30 p-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      {/* Real-time Drive Preview */}
+                      {(() => {
+                        const match = driveUrl.match(/\/file\/d\/([A-Za-z0-9_-]+)/) ||
+                                      driveUrl.match(/[?&]id=([A-Za-z0-9_-]+)/) ||
+                                      driveUrl.match(/\/d\/([A-Za-z0-9_-]+)/);
+                        const fileId = match ? match[1] : (/^[A-Za-z0-9_-]{20,}$/.test(driveUrl.trim()) ? driveUrl.trim() : null);
+
+                        if (!fileId) return null;
+                        const previewUrl = `/api/drive-proxy/${fileId}`;
+
+                        return (
+                          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-3 space-y-2">
+                            <div className="flex items-center justify-between text-xs font-bold text-emerald-300">
+                              <span className="flex items-center gap-1.5">
+                                <Check size={14} />
+                                تم التعرف على معرّف Drive: <code className="font-mono text-[11px] bg-black/40 px-1.5 py-0.5 rounded">{fileId}</code>
+                              </span>
+                              <span className="text-[10px] opacity-80">معاينة حية</span>
+                            </div>
+
+                            <div className="relative aspect-[16/9] max-h-48 w-full rounded-xl overflow-hidden bg-black/60 border border-white/10">
+                              <img
+                                src={previewUrl}
+                                alt="Drive Preview"
+                                className="h-full w-full object-contain"
+                                onError={() => {
+                                  toast.error("تأكد أن إذن المشاركة في Drive: «أي شخص لديه الرابط يمكنه العرض»");
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      <div className="pt-2 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => addDriveMedia.mutate({ url: driveUrl.trim(), title: driveTitle.trim() || undefined })}
+                          disabled={!driveUrl.trim() || addDriveMedia.isPending}
+                          className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs shadow-lg transition active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {addDriveMedia.isPending ? <Loader2 className="animate-spin" size={16} /> : <Cloud size={16} />}
+                          <span>{onSelect ? "استيراد وتطبيق هذه الصورة فوراً ✓" : "استيراد وحفظ في المكتبة 💾"}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : activeTab === "presets" ? (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
                 {filteredPresets.map((asset) => (
                   <article
@@ -417,6 +794,30 @@ export default function MediaLibrary({
                   <Progress value={uploadProgress} className="h-1.5 bg-slate-800" />
                 </div>
               )}
+
+              {/* Quick Google Drive Import */}
+              <div className="rounded-2xl border border-blue-500/30 bg-blue-500/[0.04] p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-black text-blue-300">
+                  <Cloud size={14} />
+                  <span>استيراد من Google Drive</span>
+                </div>
+                <input
+                  value={driveUrl}
+                  onChange={(e) => setDriveUrl(e.target.value)}
+                  dir="ltr"
+                  placeholder="رابط ملف Drive..."
+                  className="w-full rounded-lg border border-blue-500/30 bg-black/50 px-2.5 py-1.5 text-xs text-white outline-none focus:border-blue-400 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => addDriveMedia.mutate({ url: driveUrl.trim(), title: driveTitle.trim() || undefined })}
+                  disabled={!driveUrl.trim() || addDriveMedia.isPending}
+                  className="w-full rounded-lg bg-blue-600 hover:bg-blue-500 px-3 py-1.5 text-xs font-black text-white disabled:opacity-40 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  {addDriveMedia.isPending ? <Loader2 className="animate-spin" size={13} /> : <Cloud size={13} />}
+                  <span>استيراد الصورة للمكتبة</span>
+                </button>
+              </div>
 
               {accept !== "image" && (
                 <div className="rounded-2xl border border-white/10 bg-black/30 p-3">

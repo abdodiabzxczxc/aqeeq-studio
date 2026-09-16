@@ -1011,9 +1011,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       return Boolean(
         node.closest(".aq-editor-toolbar") ||
         node.closest(".aq-editor-drawer") ||
+        node.closest(".aq-media-library-modal") ||
         node.closest("[data-aq-editor-properties]") ||
+        node.closest("[data-aq-editor-panel]") ||
+        node.closest("[data-aq-editor-modal]") ||
         node.closest("[data-radix-popper-content-wrapper]") ||
         node.closest("[role='dialog']") ||
+        node.closest("[role='alertdialog']") ||
         node.closest("[role='menu']") ||
         node.closest("[role='listbox']") ||
         node.closest("[role='tooltip']") ||
@@ -1045,7 +1049,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 1. Scan Images anywhere on the page (except editor UI and video players)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
@@ -1073,7 +1077,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, span, a, button, label, li, td, th"
       ));
       textNodes.forEach((node, idx) => {
-        if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Extract direct text content
@@ -1114,7 +1118,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 3. Scan SVG Icons anywhere on the page
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
@@ -1140,10 +1144,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (!isEditing || previewMode) return;
       if (e.metaKey || e.ctrlKey) return;
       const targetEl = e.target as Element | null;
-      if (!targetEl || isEditorSystemUi(targetEl)) return;
+      if (!targetEl) return;
 
-      // Allow videos, media elements, and interactive FX to receive clicks freely
-      if (targetEl.closest("[data-no-visual-edit], [data-interactive-fx], [data-hover-preview], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")) {
+      // CRITICAL: NEVER intercept clicks inside editor system UI, media library modals, or dialogs!
+      if (
+        isEditorSystemUi(targetEl) ||
+        targetEl.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-interactive-fx], [data-hover-preview], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")
+      ) {
         return;
       }
 
@@ -1689,6 +1696,25 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       ...Object.fromEntries(sharedHeroBackgroundIds(selected.id).map((elementId) => [`${pagePath}::${elementId}`, { ...next, elementId }])),
     }));
     setDraft((value) => ({ ...value, bgColor: patch.bgColor ?? value.bgColor, mediaUrl: patch.mediaUrl ?? value.mediaUrl, altText: patch.altText ?? value.altText, backgroundSize: patch.backgroundSize ?? value.backgroundSize, backgroundPositionX: patch.backgroundPositionX ?? value.backgroundPositionX, backgroundPositionY: patch.backgroundPositionY ?? value.backgroundPositionY, backgroundOverlay: patch.backgroundOverlay ?? value.backgroundOverlay }));
+
+    // Immediate DOM update for instant visual feedback on canvas
+    try {
+      const targetNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+      if (targetNode) {
+        if (patch.mediaUrl !== undefined) {
+          if (targetNode.tagName === "IMG") {
+            (targetNode as HTMLImageElement).src = patch.mediaUrl || "";
+          } else {
+            const innerImg = targetNode.querySelector<HTMLImageElement>("img");
+            if (innerImg) innerImg.src = patch.mediaUrl || "";
+            else targetNode.style.backgroundImage = patch.mediaUrl ? `url(${patch.mediaUrl})` : "";
+          }
+        }
+        if (patch.bgColor !== undefined) {
+          targetNode.style.backgroundColor = patch.bgColor || "";
+        }
+      }
+    } catch {}
   };
 
   const currentBackground = () => ({ bgColor: currentOverride?.bgColor ?? draft.bgColor ?? "", mediaUrl: currentOverride?.mediaUrl ?? draft.mediaUrl ?? "", backgroundSize: currentOverride?.backgroundSize ?? draft.backgroundSize, backgroundPositionX: currentOverride?.backgroundPositionX ?? draft.backgroundPositionX, backgroundPositionY: currentOverride?.backgroundPositionY ?? draft.backgroundPositionY, backgroundOverlay: currentOverride?.backgroundOverlay ?? draft.backgroundOverlay });

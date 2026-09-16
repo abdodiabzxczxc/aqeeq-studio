@@ -14,6 +14,7 @@ import { AccreditationsScrollGlobalBackdrop } from "@/components/ui/accreditatio
 import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { resolveMediaUrl } from "@/lib/mediaUtils";
 
 export const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
   { title: "اعتماد كوجنيا الأمريكية Cognia", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تقييم 99.2%", date: "اعتماد دولي" },
@@ -75,7 +76,7 @@ export default function AqeeqSchoolAccreditationsPage() {
       return custom.map((item: any) => ({
         title: item.title,
         link: item.link || "#accreditations-hub-section",
-        thumbnail: item.image,
+        thumbnail: resolveMediaUrl(item.thumbnail || item.image) || item.thumbnail || item.image || "/covers/cover-about.jpg",
         category: item.badge || item.category,
         date: item.date,
       }));

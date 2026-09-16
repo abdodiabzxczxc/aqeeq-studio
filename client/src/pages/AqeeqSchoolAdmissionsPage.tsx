@@ -12,6 +12,7 @@ import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { FaqAccordionSection } from "@/components/FaqAccordionSection";
 import { usePageSeo } from "@/lib/usePageSeo";
+import { resolveMediaUrl } from "@/lib/mediaUtils";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -123,7 +124,10 @@ export default function AqeeqSchoolAdmissionsPage() {
   const dynamicAdmissionsItems = useMemo<UnfurlingItem[]>(() => {
     const custom = (orchestration as any)?.backdrops?.admissions;
     if (custom && Array.isArray(custom) && custom.length > 0) {
-      return custom;
+      return custom.map((item: any) => ({
+        ...item,
+        image: resolveMediaUrl(item.image || item.thumbnail) || item.image || item.thumbnail || "/covers/cover-admissions.jpg",
+      }));
     }
     return ADMISSIONS_UNFURLING_ITEMS;
   }, [orchestration]);
