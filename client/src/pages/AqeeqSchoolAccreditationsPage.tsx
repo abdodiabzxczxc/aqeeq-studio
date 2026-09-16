@@ -368,14 +368,34 @@ export default function AqeeqSchoolAccreditationsPage() {
                         priority={true}
                         className="h-full w-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
-                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-[#f8ca14] shadow-md pointer-events-none">
-                        <Award size={12} className="text-[#f8ca14]" />
-                        <span>خامس العالم 🌐</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none z-10" />
+                      <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-full bg-black/85 border border-[#f8ca14]/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-[#f8ca14] shadow-md">
+                        <Award size={12} className="text-[#f8ca14] shrink-0" />
+                        <VisualEditable
+                          id="accreditations-hero-wro-badge"
+                          tag="text"
+                          label="شارة خامس العالم روبوت"
+                          defaultText="خامس العالم 🌐"
+                          as="span"
+                        />
                       </div>
-                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right pointer-events-none">
-                        <span className="text-[9px] font-black text-[#f8ca14] block">WRO INTERNATIONAL</span>
-                        <h4 className="text-xs sm:text-sm font-black drop-shadow truncate">أولمبياد الروبوت الدولي</h4>
+                      <div className="absolute bottom-2.5 right-2.5 left-2.5 z-20 text-white text-right">
+                        <VisualEditable
+                          id="accreditations-hero-wro-sub"
+                          tag="text"
+                          label="تصنيف أولمبياد الروبوت"
+                          defaultText="WRO INTERNATIONAL"
+                          as="span"
+                          className="text-[9px] font-black text-[#f8ca14] block"
+                        />
+                        <VisualEditable
+                          id="accreditations-hero-wro-title"
+                          tag="text"
+                          label="عنوان أولمبياد الروبوت"
+                          defaultText="أولمبياد الروبوت الدولي"
+                          as="h4"
+                          className="text-xs sm:text-sm font-black drop-shadow truncate"
+                        />
                       </div>
                     </div>
                   </motion.div>
@@ -476,14 +496,34 @@ export default function AqeeqSchoolAccreditationsPage() {
                         priority={true}
                         className="h-full w-full object-cover object-[center_12%]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
-                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/85 border border-amber-400/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 shadow-md pointer-events-none">
-                        <Trophy size={12} className="text-[#f8ca14]" />
-                        <span>بطل المملكة 🥇</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none z-10" />
+                      <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 rounded-full bg-black/85 border border-amber-400/50 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 shadow-md">
+                        <Trophy size={12} className="text-[#f8ca14] shrink-0" />
+                        <VisualEditable
+                          id="accreditations-hero-fll-badge"
+                          tag="text"
+                          label="شارة بطل المملكة ليجو"
+                          defaultText="بطل المملكة 🥇"
+                          as="span"
+                        />
                       </div>
-                      <div className="absolute bottom-2.5 right-2.5 left-2.5 text-white text-right pointer-events-none">
-                        <span className="text-[9px] font-black text-amber-300 block">FIRST SAUDI ARABIA</span>
-                        <h4 className="text-xs sm:text-sm font-black drop-shadow truncate">بطولة فيرست ليجو</h4>
+                      <div className="absolute bottom-2.5 right-2.5 left-2.5 z-20 text-white text-right">
+                        <VisualEditable
+                          id="accreditations-hero-fll-sub"
+                          tag="text"
+                          label="تصنيف بطولة فيرست ليجو"
+                          defaultText="FIRST SAUDI ARABIA"
+                          as="span"
+                          className="text-[9px] font-black text-amber-300 block"
+                        />
+                        <VisualEditable
+                          id="accreditations-hero-fll-title"
+                          tag="text"
+                          label="عنوان بطولة فيرست ليجو"
+                          defaultText="بطولة فيرست ليجو"
+                          as="h4"
+                          className="text-xs sm:text-sm font-black drop-shadow truncate"
+                        />
                       </div>
                     </div>
                   </motion.div>
@@ -1133,14 +1173,34 @@ export default function AqeeqSchoolAccreditationsPage() {
                           priority={true}
                           className="h-full w-full object-cover object-[center_12%] transition duration-700 hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-                        <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md pointer-events-none">
-                          <Trophy size={12} className="text-[#f8ca14]" />
-                          <span>بطل المملكة 🥇</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
+                        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/40 px-3 py-1 text-xs font-black text-amber-300 shadow-md">
+                          <Trophy size={12} className="text-[#f8ca14] shrink-0" />
+                          <VisualEditable
+                            id="accreditations-stem-fll-badge"
+                            tag="text"
+                            label="شارة بطل المملكة FLL"
+                            defaultText="بطل المملكة 🥇"
+                            as="span"
+                          />
                         </div>
-                        <div className="absolute bottom-3 right-3 left-3 text-white text-right pointer-events-none">
-                          <span className="text-[10px] font-black text-amber-300">FIRST SAUDI ARABIA</span>
-                          <h4 className="text-sm font-black drop-shadow">بطولة فيرست ليجو (FIRST LEGO League)</h4>
+                        <div className="absolute bottom-3 right-3 left-3 z-20 text-white text-right">
+                          <VisualEditable
+                            id="accreditations-stem-fll-sub"
+                            tag="text"
+                            label="وسم بطولة FLL"
+                            defaultText="FIRST SAUDI ARABIA"
+                            as="span"
+                            className="text-[10px] font-black text-amber-300 block"
+                          />
+                          <VisualEditable
+                            id="accreditations-stem-fll-title"
+                            tag="text"
+                            label="عنوان صورة بطولة FLL"
+                            defaultText="بطولة فيرست ليجو (FIRST LEGO League)"
+                            as="h4"
+                            className="text-sm font-black drop-shadow"
+                          />
                         </div>
                       </div>
 
@@ -1181,14 +1241,34 @@ export default function AqeeqSchoolAccreditationsPage() {
                           priority={true}
                           className="h-full w-full object-cover transition duration-700 hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-black/85 border border-[#f8ca14]/40 px-3 py-1 text-xs font-black text-[#f8ca14] shadow-md pointer-events-none">
-                          <Award size={12} className="text-[#f8ca14]" />
-                          <span>خامس العالم 🏆</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
+                        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 rounded-full bg-black/85 border border-[#f8ca14]/40 px-3 py-1 text-xs font-black text-[#f8ca14] shadow-md">
+                          <Award size={12} className="text-[#f8ca14] shrink-0" />
+                          <VisualEditable
+                            id="accreditations-stem-wro-badge"
+                            tag="text"
+                            label="شارة خامس العالم WRO"
+                            defaultText="خامس العالم 🏆"
+                            as="span"
+                          />
                         </div>
-                        <div className="absolute bottom-3 right-3 left-3 text-white text-right pointer-events-none">
-                          <span className="text-[10px] font-black text-[#f8ca14]">WRO INTERNATIONAL</span>
-                          <h4 className="text-sm font-black drop-shadow">أولمبياد الروبوت العالمي (WRO)</h4>
+                        <div className="absolute bottom-3 right-3 left-3 z-20 text-white text-right">
+                          <VisualEditable
+                            id="accreditations-stem-wro-sub"
+                            tag="text"
+                            label="وسم أولمبياد WRO"
+                            defaultText="WRO INTERNATIONAL"
+                            as="span"
+                            className="text-[10px] font-black text-[#f8ca14] block"
+                          />
+                          <VisualEditable
+                            id="accreditations-stem-wro-title"
+                            tag="text"
+                            label="عنوان صورة أولمبياد WRO"
+                            defaultText="أولمبياد الروبوت العالمي (WRO)"
+                            as="h4"
+                            className="text-sm font-black drop-shadow"
+                          />
                         </div>
                       </div>
 

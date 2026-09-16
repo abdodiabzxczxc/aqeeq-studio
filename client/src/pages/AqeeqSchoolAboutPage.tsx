@@ -284,19 +284,31 @@ export default function AqeeqSchoolAboutPage() {
                 {/* Floating Orbiting Satellite Badge 1 (Top-Right Parallax) */}
                 <motion.div
                   style={{ y: heroBadge1Y }}
-                  className="absolute -top-6 -right-4 sm:-right-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d]/95 to-[#042442]/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
+                  className="absolute -top-6 -right-4 sm:-right-8 z-30 hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#08467d]/95 to-[#042442]/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
                 >
-                  <ShieldCheck size={16} className="text-[#f8ca14]" />
-                  <span>Cognia USA · اعتماد دولي</span>
+                  <ShieldCheck size={16} className="text-[#f8ca14] shrink-0" />
+                  <VisualEditable
+                    id="about-hero-satellite-badge-1"
+                    tag="text"
+                    label="شارة الاعتماد الدولي"
+                    defaultText="Cognia USA · اعتماد دولي"
+                    as="span"
+                  />
                 </motion.div>
 
                 {/* Floating Orbiting Satellite Badge 2 (Bottom-Left Parallax) */}
                 <motion.div
                   style={{ y: heroBadge2Y }}
-                  className="absolute -bottom-6 -left-4 sm:-left-8 z-30 pointer-events-none hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0c1218]/95 to-black/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
+                  className="absolute -bottom-6 -left-4 sm:-left-8 z-30 hidden sm:flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0c1218]/95 to-black/95 text-white border border-[#f8ca14]/40 px-4 py-2 text-xs font-black shadow-2xl backdrop-blur-xl"
                 >
-                  <Star size={14} className="text-[#f8ca14] fill-[#f8ca14]" />
-                  <span>30 عاماً من الريادة · 1994 - 2026</span>
+                  <Star size={14} className="text-[#f8ca14] fill-[#f8ca14] shrink-0" />
+                  <VisualEditable
+                    id="about-hero-satellite-badge-2"
+                    tag="text"
+                    label="شارة أعوام الريادة"
+                    defaultText="30 عاماً من الريادة · 1994 - 2026"
+                    as="span"
+                  />
                 </motion.div>
 
                 <motion.div
@@ -339,23 +351,48 @@ export default function AqeeqSchoolAboutPage() {
                         alt="طلاب مدارس العقيق في حفل التميز والتكريم"
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none z-10" />
 
                       {/* Top Floating Badge */}
-                      <div className="absolute top-3.5 right-3.5 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
-                        <Sparkles size={13} className="text-[#f8ca14]" />
-                        <span>{isNationalDay ? "🇸🇦 عزّنا بطبعنا · 94 عاماً من المجد" : "نلهم الأجيال · نصنع الأثر"}</span>
+                      <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-2 rounded-full bg-black/80 border border-white/20 px-3.5 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                        <Sparkles size={13} className="text-[#f8ca14] shrink-0" />
+                        <VisualEditable
+                          id="about-hero-student-photo-badge"
+                          tag="text"
+                          label="شارة صورة الطلاب"
+                          defaultText={isNationalDay ? "🇸🇦 عزّنا بطبعنا · 94 عاماً من المجد" : "نلهم الأجيال · نصنع الأثر"}
+                          as="span"
+                        />
                       </div>
 
                       {/* Bottom Overlaid Details */}
-                      <div className="absolute bottom-3.5 right-3.5 left-3.5 flex items-center justify-between text-white">
+                      <div className="absolute bottom-3.5 right-3.5 left-3.5 z-20 flex items-center justify-between text-white">
                         <div>
-                          <h4 className="text-sm font-black drop-shadow-md">صرح تعليمي وتربوي رائد</h4>
-                          <p className="text-[11px] text-[#f8ca14] drop-shadow-md">أصالة القيم ومعايير الاعتماد الدولي</p>
+                          <VisualEditable
+                            id="about-hero-student-photo-title"
+                            tag="text"
+                            label="عنوان صورة الطلاب"
+                            defaultText="صرح تعليمي وتربوي رائد"
+                            as="h4"
+                            className="text-sm font-black drop-shadow-md"
+                          />
+                          <VisualEditable
+                            id="about-hero-student-photo-subtitle"
+                            tag="text"
+                            label="وصف صورة الطلاب"
+                            defaultText="أصالة القيم ومعايير الاعتماد الدولي"
+                            as="p"
+                            className="text-[11px] text-[#f8ca14] drop-shadow-md"
+                          />
                         </div>
-                        <span className="rounded-xl bg-[#08467d]/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow text-white">
-                          المدينة المنورة
-                        </span>
+                        <VisualEditable
+                          id="about-hero-student-photo-city"
+                          tag="text"
+                          label="مدينة صورة الطلاب"
+                          defaultText="المدينة المنورة"
+                          as="span"
+                          className="rounded-xl bg-[#08467d]/90 px-2.5 py-1 text-[10px] font-black backdrop-blur-md shadow text-white"
+                        />
                       </div>
                     </div>
 

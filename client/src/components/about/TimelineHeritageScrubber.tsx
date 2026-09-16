@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
-import { VisualImage } from "@/components/VisualEditor";
+import { VisualImage, VisualEditable } from "@/components/VisualEditor";
 import { preloadImage } from "@/lib/visualOverridesCache";
 
 export interface TimelineEra {
@@ -264,18 +264,28 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
               </div>
 
               {/* Grand Era Title */}
-              <h3 className={`text-xl sm:text-2xl font-black mb-2.5 leading-snug drop-shadow-sm ${
-                dark ? "text-white" : "text-[#08467d]"
-              }`}>
-                {activeEra.title}
-              </h3>
+              <VisualEditable
+                id={`about-timeline-title-${activeEra.shortYear}`}
+                tag="text"
+                label={`عنوان محطة (${activeEra.shortYear})`}
+                defaultText={activeEra.title}
+                as="h3"
+                className={`text-xl sm:text-2xl font-black mb-2.5 leading-snug drop-shadow-sm ${
+                  dark ? "text-white" : "text-[#08467d]"
+                }`}
+              />
 
               {/* Narrative Description */}
-              <p className={`text-xs sm:text-sm leading-relaxed mb-3.5 font-medium ${
-                dark ? "text-slate-300" : "text-slate-600"
-              }`}>
-                {activeEra.desc}
-              </p>
+              <VisualEditable
+                id={`about-timeline-desc-${activeEra.shortYear}`}
+                tag="text"
+                label={`وصف محطة (${activeEra.shortYear})`}
+                defaultText={activeEra.desc}
+                as="p"
+                className={`text-xs sm:text-sm leading-relaxed mb-3.5 font-medium ${
+                  dark ? "text-slate-300" : "text-slate-600"
+                }`}
+              />
 
               {/* Compact Growth Leap Transformation Box */}
               <div
@@ -293,9 +303,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                     <span className="block text-[9px] font-black uppercase tracking-wider opacity-75">
                       الوثبة والتحول النوعي
                     </span>
-                    <span className="text-xs font-black block mt-0.5">
-                      {activeEra.leap.to}
-                    </span>
+                    <VisualEditable
+                      id={`about-timeline-leap-${activeEra.shortYear}`}
+                      tag="text"
+                      label={`تحول محطة (${activeEra.shortYear})`}
+                      defaultText={activeEra.leap.to}
+                      as="span"
+                      className="text-xs font-black block mt-0.5"
+                    />
                   </div>
                 </div>
                 <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 shrink-0 text-emerald-600 dark:text-emerald-400">
@@ -316,7 +331,13 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   dark ? "text-[#f8ca14]" : "text-[#08467d]"
                 }`}>
                   <span className="font-serif ml-1 opacity-60">“</span>
-                  {activeEra.quote}
+                  <VisualEditable
+                    id={`about-timeline-quote-${activeEra.shortYear}`}
+                    tag="text"
+                    label={`اقتباس محطة (${activeEra.shortYear})`}
+                    defaultText={activeEra.quote}
+                    as="span"
+                  />
                   <span className="font-serif mr-1 opacity-60">”</span>
                 </p>
               </div>
@@ -394,9 +415,15 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden shadow-xl border border-white/20 aspect-[16/11] max-h-[360px] group bg-[#091016]">
                 {/* Official Archival Seal (Golden Stamp) */}
-                <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-md text-[#f8ca14] text-[9px] font-black tracking-wider pointer-events-none">
-                  <ShieldCheck size={11} className="text-[#f8ca14]" />
-                  <span>وثيقة أرشيفية ✦</span>
+                <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-md text-[#f8ca14] text-[9px] font-black tracking-wider">
+                  <ShieldCheck size={11} className="text-[#f8ca14] shrink-0" />
+                  <VisualEditable
+                    id={`about-timeline-seal-${activeEra.shortYear}`}
+                    tag="text"
+                    label={`ختم أرشيفي (${activeEra.shortYear})`}
+                    defaultText="وثيقة أرشيفية ✦"
+                    as="span"
+                  />
                 </div>
 
                 {/* Photo with Smooth Scale Hover */}
@@ -411,17 +438,29 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                 />
 
                 {/* Cinematic Vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none z-10" />
 
                 {/* Bottom Overlay Info Banner */}
-                <div className="absolute bottom-3 right-3 left-3 text-white pointer-events-none">
+                <div className="absolute bottom-3 right-3 left-3 z-20 text-white">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <Milestone size={14} className="text-[#f8ca14]" />
-                    <span className="text-[11px] font-black text-[#f8ca14]">{activeEra.stats}</span>
+                    <Milestone size={14} className="text-[#f8ca14] shrink-0" />
+                    <VisualEditable
+                      id={`about-timeline-stats-${activeEra.shortYear}`}
+                      tag="text"
+                      label={`إحصائية صورة (${activeEra.shortYear})`}
+                      defaultText={activeEra.stats}
+                      as="span"
+                      className="text-[11px] font-black text-[#f8ca14]"
+                    />
                   </div>
-                  <p className="text-[10px] text-slate-200 line-clamp-2 leading-relaxed font-medium">
-                    {activeEra.highlight}
-                  </p>
+                  <VisualEditable
+                    id={`about-timeline-highlight-${activeEra.shortYear}`}
+                    tag="text"
+                    label={`وصف صورة (${activeEra.shortYear})`}
+                    defaultText={activeEra.highlight}
+                    as="p"
+                    className="text-[10px] text-slate-200 line-clamp-2 leading-relaxed font-medium"
+                  />
                 </div>
               </div>
             </div>
