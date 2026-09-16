@@ -1156,6 +1156,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (!node) return false;
       return Boolean(
         node.closest(".aq-editor-toolbar") ||
+        node.closest(".aq-editor-floating-bar") ||
+        node.closest("[data-aq-editor-floating-bar]") ||
         node.closest(".aq-editor-drawer") ||
         node.closest(".aq-media-library-modal") ||
         node.closest("[data-aq-editor-properties]") ||
@@ -1195,7 +1197,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 1. Scan Images anywhere on the page (except editor UI and video players)
       const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
       images.forEach((img, idx) => {
-        if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(img) || img.closest("[data-no-visual-edit], .aq-editor-floating-bar, [data-aq-editor-floating-bar], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) {
+          if (img.dataset.visualAuto === "true") {
+            delete img.dataset.visualId;
+            delete img.dataset.visualTag;
+            delete img.dataset.visualLabel;
+            delete img.dataset.visualAuto;
+          }
+          return;
+        }
         if (img.dataset.visualId && img.dataset.visualAuto !== "true") return;
 
         let id = img.dataset.visualId;
@@ -1234,7 +1244,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         "h1, h2, h3, h4, h5, h6, p, blockquote, figcaption, span, a, button, label, li, td, th"
       ));
       textNodes.forEach((node, idx) => {
-        if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(node) || node.closest("[data-no-visual-edit], .aq-editor-floating-bar, [data-aq-editor-floating-bar], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) {
+          if (node.dataset.visualAuto === "true") {
+            delete node.dataset.visualId;
+            delete node.dataset.visualTag;
+            delete node.dataset.visualLabel;
+            delete node.dataset.visualAuto;
+          }
+          return;
+        }
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Extract direct text content
@@ -1275,7 +1293,16 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       // 3. Scan SVG Icons anywhere on the page
       const svgs = Array.from(root.querySelectorAll<SVGElement>("svg"));
       svgs.forEach((svg, idx) => {
-        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) return;
+        if (isEditorSystemUi(svg) || svg.closest("[data-no-visual-edit], .aq-editor-floating-bar, [data-aq-editor-floating-bar], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-aqeeq-video], .group\\/screen")) {
+          const htmlSvg = svg as unknown as HTMLElement;
+          if (htmlSvg.dataset?.visualAuto === "true") {
+            delete htmlSvg.dataset.visualId;
+            delete htmlSvg.dataset.visualTag;
+            delete htmlSvg.dataset.visualLabel;
+            delete htmlSvg.dataset.visualAuto;
+          }
+          return;
+        }
         const htmlSvg = svg as unknown as HTMLElement;
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
@@ -1303,10 +1330,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       const targetEl = e.target as Element | null;
       if (!targetEl) return;
 
-      // CRITICAL: NEVER intercept clicks inside editor system UI, media library modals, or dialogs!
+      // CRITICAL: NEVER intercept clicks inside editor system UI, floating bar, media library modals, or dialogs!
       if (
         isEditorSystemUi(targetEl) ||
-        targetEl.closest("[data-no-visual-edit], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-interactive-fx], [data-hover-preview], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")
+        targetEl.closest("[data-no-visual-edit], .aq-editor-floating-bar, [data-aq-editor-floating-bar], .aq-media-library-modal, [data-aq-editor-panel], [role='dialog'], [role='alertdialog'], [data-interactive-fx], [data-hover-preview], [data-aqeeq-video], [data-video-player], .group\\/screen, .group\\/yt, video, iframe, audio")
       ) {
         return;
       }
@@ -2359,9 +2386,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       </div>
     </nav>
   ) : null;
-  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div className="fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{isEditing && !previewMode && pendingElementIds.size > 0 ? (
+  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div data-no-visual-edit="true" data-aq-editor-panel="true" className="aq-editor-floating-bar fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{isEditing && !previewMode && pendingElementIds.size > 0 ? (
     <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[350] flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-amber-400/40 bg-[#0c0f17]/95 px-4 py-3 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-3 duration-200"
+      data-no-visual-edit="true"
+      data-aq-editor-panel="true"
+      data-aq-editor-floating-bar="true"
+      className="aq-editor-floating-bar fixed bottom-6 left-1/2 -translate-x-1/2 z-[350] flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-amber-400/40 bg-[#0c0f17]/95 px-4 py-3 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-3 duration-200"
       dir="rtl"
     >
       <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
