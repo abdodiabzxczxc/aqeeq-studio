@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Compass, Target, Sparkles, Heart, Shield, Award, Users, Lightbulb } from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 
@@ -226,49 +226,46 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
             })}
           </div>
 
-          {/* Dynamic Active Value Translation Card */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeValue.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-              className={`p-5 sm:p-7 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
-                dark
-                  ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.04]"
-                  : "border-slate-200 bg-white shadow-md"
-              }`}
-            >
-              <div className="space-y-1.5 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#f8ca14]" />
-                  <h5 className={`text-base sm:text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                    {activeValue.title}
-                  </h5>
-                </div>
-                <p className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
-                  {activeValue.desc}
+          {/* Dynamic Active Value Translation Card (Instant Snappy Switch) */}
+          <motion.div
+            key={activeValue.id}
+            initial={{ opacity: 0.35 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
+            className={`p-5 sm:p-7 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
+              dark
+                ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.04]"
+                : "border-slate-200 bg-white shadow-md"
+            }`}
+          >
+            <div className="space-y-1.5 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#f8ca14]" />
+                <h5 className={`text-base sm:text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
+                  {activeValue.title}
+                </h5>
+              </div>
+              <p className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
+                {activeValue.desc}
+              </p>
+              <div className="pt-2">
+                <span className="text-[11px] font-black text-[#f8ca14] block">
+                  التطبيق السلوكي داخل المدرسة:
+                </span>
+                <p className={`text-xs leading-relaxed mt-0.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>
+                  {activeValue.action}
                 </p>
-                <div className="pt-2">
-                  <span className="text-[11px] font-black text-[#f8ca14] block">
-                    التطبيق السلوكي داخل المدرسة:
-                  </span>
-                  <p className={`text-xs leading-relaxed mt-0.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                    {activeValue.action}
-                  </p>
-                </div>
               </div>
+            </div>
 
-              <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl border shadow-md ${
-                dark
-                  ? "bg-black/50 border-white/15 text-[#f8ca14]"
-                  : "bg-slate-50 border-slate-200 text-[#08467d]"
-              }`}>
-                <ActiveValueIcon size={30} />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+            <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl border shadow-md ${
+              dark
+                ? "bg-black/50 border-white/15 text-[#f8ca14]"
+                : "bg-slate-50 border-slate-200 text-[#08467d]"
+            }`}>
+              <ActiveValueIcon size={30} />
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

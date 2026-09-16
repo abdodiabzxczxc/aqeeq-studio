@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Sparkles,
   Milestone,
@@ -35,81 +35,81 @@ export const TIMELINE_ERAS: TimelineEra[] = [
   {
     year: "1994 م — 1415 هـ",
     shortYear: "1994",
-    label: "التأسيس والانطلاقة",
-    title: "غراس البدايات وتأسيس أول مجمع تعليمي بالمدينة المنورة",
-    desc: "انطلقت مدارس العقيق برؤية واضحة لتكون نموذجاً تعليمياً وتربوياً فريداً بطيبة الطيبة. بدأت المدارس بتأسيس المراحل التأسيسية وتخريج أجيال متمكنة في القرآن الكريم واللغة والعلوم، وتكريس منظومة القيم الأخلاقية الأصيلة في نفوس الطلاب.",
+    label: "الخطوة الأولى",
+    title: "غراس البدايات.. خطوتنا الأولى في بناء الأجيال",
+    desc: "انطلقنا في طيبة الطيبة بحلم واحد؛ أن نخلق بيئة تعليمية تحتضن أبناءنا وتجمع بين قوة التأسيس الأكاديمي ودفء التربية. بدأنا رحلتنا بالتركيز على بناء أساس متين، وغرس القيم التي تطمئنك على طفلك في كل خطوة يخطوها معنا.",
     highlight: "نواة التميز والانطلاقة الأولى بطيبة الطيبة",
-    stats: "أكثر من 30 دفعة تخرجت منذ التأسيس",
+    stats: "27 عاماً من بناء العقول",
     image: "/api/drive-proxy/1ulrpYsDrV7xbDdysqTsNoLNUvblw14p5",
-    quote: "ثلاثون عاماً من غراس الخير في طيبة الطيبة، خرّجت أجيالاً تقود الحاضر وتصنع المستقبل.",
+    quote: "27 عاماً من العطاء في المدينة المنورة.. نخرج أجيالاً نفخر بها وتفخر بها عائلاتهم.",
     leap: {
       from: "البدايات الأولى في المدينة",
-      to: "تأسيس أول صرح تعليمي رائد بطيبة الطيبة",
+      to: "تأسيس بيئة تعليمية تضع مصلحة الطالب في المقام الأول.",
     },
     metrics: [
-      { label: "سنة التأسيس", val: "1415 هـ / 1994 م" },
-      { label: "الدفعة الأولى", val: "أول صرح متكامل" },
-      { label: "الموقع الأصلي", val: "المدينة المنورة" },
+      { label: "مسيرتنا", val: "أكثر من 27 عاماً" },
+      { label: "هدفنا الأساسي", val: "بناء صرح متكامل" },
+      { label: "مقرنا", val: "قلب المدينة المنورة" },
     ],
   },
   {
     year: "2010 م — 1431 هـ",
     shortYear: "2010",
-    label: "المجمعات والمسابح",
-    title: "تدشين المجمعات الكبرى والمسابح الأولمبية والملاعب المغطاة",
-    desc: "شهدت هذه المرحلة نقلة نوعية كبرى بافتتاح مجمع البنين الشامل ومجمع البنات في حي الرانوناء بمحاذاة ممشى الهجرة، بتجهيزات مدرسية نموذجية شملت المسابح شبه الأولمبية المغطاة، الصالات الرياضية المغلقة، وقاعات المعامل الذكية.",
-    highlight: "مجمعات صرحية مستقلة بمواصفات هندسية قياسية",
-    stats: "طاقة استيعابية تتجاوز 10,000 طالب وطالبة",
+    label: "خطوة التوسع",
+    title: "مجمعات تعليمية مستقلة.. تمنحهم المساحة للنمو والإبداع",
+    desc: "كبرنا بثقتكم، وانتقلنا لمرحلة جديدة بتأسيس مجمعات مستقلة للبنين والبنات في حي الرانوناء بمحاذاة ممشى الهجرة، لتوفير بيئة تعليمية متكاملة تتسع لطموحاتهم.",
+    highlight: "مجمعات مستقلة للبنين والبنات بأعلى المواصفات",
+    stats: "بيئة تستوعب طموحهم",
     image: "/api/drive-proxy/1IkefgGSvnqfdhLiMHYd25-lz3AuBH5n1",
-    quote: "صروح معمارية مستقلة صُممت لتكون بيئة حياة ونمو متكامل للطالب فكرياً وبدنياً.",
+    quote: "المدرسة ليست فصولاً دراسية فقط؛ بل مساحة حياة يتنفس فيها أبناؤنا شغف المعرفة والرياضة والإبداع.",
     leap: {
       from: "المباني التعليمية الأولى",
-      to: "صروح مستقلة 25,000م² ومسابح شبه أولمبية",
+      to: "مجمعات مستقلة تمتد على مساحات شاسعة، مجهزة بأحدث المرافق الرياضية والمعامل المتطورة.",
     },
     metrics: [
-      { label: "المساحة الإنشائية", val: "25,000م² نموذجية" },
-      { label: "المسابح المغطاة", val: "معايير FINA الدولية" },
-      { label: "الصالات", val: "ملاعب ومسارح مغلقة" },
+      { label: "مساحات شاسعة", val: "25,000 متر مربع" },
+      { label: "رياضة ولياقة", val: "مسابح وملاعب مغطاة" },
+      { label: "بيئة تفاعلية", val: "معامل ومسارح مجهزة" },
     ],
   },
   {
     year: "2018 م — 1439 هـ",
     shortYear: "2018",
-    label: "اعتماد كوجنيا (Cognia)",
-    title: "الاعتماد الأكاديمي الأمريكي من منظمة كوجنيا (Cognia USA)",
-    desc: "توجت مسيرة الجودة بحصول مدارس العقيق على الاعتماد الدولي الأمريكي من كوجنيا، ليصبح خريجو المدارس مؤهلين للحصول على شهادة الدبلومة الأمريكية المعتمدة دولياً، بالتزامن مع إطلاق نوادي وأكاديميات الروبوت والابتكار المتقدمة.",
-    highlight: "الريادة في التعليم الدولي والحوكمة الأكاديمية",
-    stats: "تقييم جودة معتمد عالمياً بنسبة تفوق 98%",
+    label: "بصمة الجودة",
+    title: "جودة تعليمية تضاهي أرقى المدارس العالمية",
+    desc: "التفوق لدينا ليس مجرد شعار، بل هو واقع توجناه بالحصول على الاعتماد الدولي الأمريكي من كوجنيا، ليصبح خريجو المدارس مؤهلين للحصول على شهادة الدبلومة الأمريكية المعتمدة دولياً، بالتزامن مع إطلاق نوادي وأكاديميات الروبوت والابتكار المتقدمة.",
+    highlight: "تقييم عالمي يتجاوز 98% في جودة التعليم",
+    stats: "ثقة دولية تقود مسيرتنا",
     image: "/api/drive-proxy/1qifbHFSgFaBQH1g63qvK2WmQtls0l4AR",
-    quote: "شهادة عالمية تؤكد أن ما نقدمه لأبنائنا يضاهي أرقى المعايير التعليمية في العالم.",
+    quote: "اعتراف دولي يطمئنك أن أبناءنا يتلقون تعليماً يضاهي الأفضل عالمياً.",
     leap: {
       from: "الريادة المحلية",
-      to: "الاعتماد الدولي الأمريكي (Cognia USA)",
+      to: "اعتماد \"كوجنيا\" الأمريكي لضمان جودة التعليم وتميز المخرجات الأكاديمية.",
     },
     metrics: [
-      { label: "جهة الاعتماد", val: "Cognia USA العالمية" },
-      { label: "الشهادة الممنوحة", val: "American Diploma" },
-      { label: "نسبة التحقيق", val: "+98% معايير الجودة" },
+      { label: "معايير دولية", val: "منظمة Cognia الأمريكية" },
+      { label: "المسار الأكاديمي", val: "الدبلومة الأمريكية" },
+      { label: "نسبة المطابقة", val: "98% لمعايير الجودة" },
     ],
   },
   {
     year: "2024 - 2026 م",
     shortYear: "2026",
-    label: "مراكز الاختبارات والـ AI",
-    title: "اعتماد مراكز IELTS و SAT الدولية ومنظومة الذكاء الاصطناعي",
-    desc: "العصر الرقمي والريادة العالمية: اعتماد مدارس العقيق كمركز رسمي لاختبارات IELTS IDP و SAT بالمدينة المنورة، مع تتويج الطلاب بالمركز الخامس عالمياً في أولمبياد الروبوت WRO، وتكامل المناهج مع الذكاء الاصطناعي والتحول الرقمي المتوافق 100% مع رؤية 2030.",
-    highlight: "مركز اختبارات دولي معتمد وحضور عالمي في الـ AI",
-    stats: "المركز الخامس عالمياً في أولمبياد الروبوت الدولي WRO",
+    label: "نحو المستقبل",
+    title: "العالم بين أيديهم.. من مراكز القياس الدولية لتقنيات المستقبل",
+    desc: "لم نقف يوماً عند حدود المناهج التقليدية؛ بل جلبنا مراكز اختبارات IELTS و SAT الرسمية إلى داخل فصولنا لتسهيل طريقهم نحو أفضل الجامعات. دمجنا الذكاء الاصطناعي في يومهم الدراسي، ودعمنا شغفهم ليصلوا للمركز الخامس عالمياً في أولمبياد الروبوت (WRO)، لنجهزهم ليكونوا قادة حقيقيين يواكبون طموحات رؤية 2030.",
+    highlight: "إنجازات مستمرة في أولمبياد الروبوت ومراكز القياس الدولية",
+    stats: "من فصولنا لمنصات التتويج",
     image: "/api/drive-proxy/16IxreFp6eRLCuLDZyIWEoU9eWHzOCJuC",
-    quote: "من طيبة الطيبة إلى منصات التتويج العالمية، أبناؤنا ينافسون ويحصدون المراكز الأولى دولياً.",
+    quote: "من فصولنا في المدينة المنورة إلى منصات التتويج العالمية.. أبناؤنا يصنعون الفارق",
     leap: {
       from: "التعليم التفاعلي الذكي",
-      to: "مراكز IELTS و SAT الرسمية والخامس عالمياً WRO",
+      to: "مراكز معتمدة للقياس الدولي، ودعم كامل لابتكارات الروبوت والذكاء الاصطناعي.",
     },
     metrics: [
-      { label: "مراكز الاختبارات", val: "IDP IELTS & SAT Official" },
-      { label: "أولمبياد الروبوت", val: "الخامس عالمياً WRO" },
-      { label: "الرؤية المستقبلية", val: "رؤية السعودية 2030" },
+      { label: "بوابتهم للجامعة", val: "مراكز IELTS و SAT" },
+      { label: "أبطال الابتكار", val: "المركز الخامس في WRO" },
+      { label: "طموحنا", val: "مواكبة تطلعات 2030" },
     ],
   },
 ];
@@ -180,9 +180,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   </span>
                   <span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14] animate-pulse" />
                 </div>
-                <span className={`text-[11px] font-bold block ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                  خريطة الحقب التاريخية (1994 — 2026)
-                </span>
+                <VisualEditable
+                  id="about-timeline-badge-subtitle"
+                  tag="text"
+                  label="عنوان فرعي لخريطة الحقب"
+                  defaultText="خريطة الحقب التاريخية (1994 — 2026)"
+                  as="span"
+                  className={`text-[11px] font-bold block ${dark ? "text-slate-300" : "text-slate-600"}`}
+                />
               </div>
             </div>
           </div>
@@ -228,9 +233,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                     >
                       {era.shortYear}
                     </span>
-                    <span className="text-[9px] sm:text-[10px] font-bold block truncate mt-0.5 opacity-90">
-                      {era.label}
-                    </span>
+                    <VisualEditable
+                      id={`about-timeline-tab-label-${era.shortYear}`}
+                      tag="text"
+                      label={`اسم تبويب (${era.shortYear})`}
+                      defaultText={era.label}
+                      as="span"
+                      className="text-[9px] sm:text-[10px] font-bold block truncate mt-0.5 opacity-90"
+                    />
                   </div>
                 </button>
               );
@@ -238,16 +248,14 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
           </div>
         </div>
 
-        {/* Dynamic Era Showcase Stage (Master-Detail View) */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeEra.shortYear}
-            initial={{ opacity: 0, y: 12, filter: "blur(3px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10 text-right"
-          >
+        {/* Dynamic Era Showcase Stage (Instant Snappy Switch with Micro-Fade - No Blank Hole) */}
+        <motion.div
+          key={activeEra.shortYear}
+          initial={{ opacity: 0.35 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.12, ease: "easeOut" }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10 text-right"
+        >
             {/* Story & Achievements Column (7 cols) */}
             <div className="lg:col-span-7">
               {/* Milestone Tag & Era Hijri Date */}
@@ -353,12 +361,24 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                         : "border-slate-200/90 bg-white shadow-sm"
                     }`}
                   >
-                    <span className="block text-[9px] text-slate-400 dark:text-slate-500 font-bold truncate">{m.label}</span>
-                    <span className={`text-[11px] sm:text-xs font-black mt-0.5 block truncate ${
-                      dark ? "text-white" : "text-[#08467d]"
-                    }`}>
-                      {m.val}
-                    </span>
+                    <VisualEditable
+                      id={`about-timeline-metric-label-${activeEra.shortYear}-${mIdx}`}
+                      tag="text"
+                      label={`تسمية مؤشر ${mIdx + 1} (${activeEra.shortYear})`}
+                      defaultText={m.label}
+                      as="span"
+                      className="block text-[9px] text-slate-400 dark:text-slate-500 font-bold truncate"
+                    />
+                    <VisualEditable
+                      id={`about-timeline-metric-val-${activeEra.shortYear}-${mIdx}`}
+                      tag="text"
+                      label={`قيمة مؤشر ${mIdx + 1} (${activeEra.shortYear})`}
+                      defaultText={m.val}
+                      as="span"
+                      className={`text-[11px] sm:text-xs font-black mt-0.5 block truncate ${
+                        dark ? "text-white" : "text-[#08467d]"
+                      }`}
+                    />
                   </div>
                 ))}
               </div>
@@ -465,7 +485,6 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
               </div>
             </div>
           </motion.div>
-        </AnimatePresence>
       </div>
 
       {/* 3. Bottom Historical Legacy Pillars Triad */}
@@ -479,10 +498,22 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
             <GraduationCap size={22} />
           </div>
           <div>
-            <span className="block text-xs font-black text-[#f8ca14]">+15,000 خريج وخريجة</span>
-            <span className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-              ساهموا في بناء ونهضة الوطن بكافة القطاعات
-            </span>
+            <VisualEditable
+              id="about-timeline-pillar-val-1"
+              tag="text"
+              label="رقم الركيزة الأولى"
+              defaultText="+15,000 خريج وخريجة"
+              as="span"
+              className="block text-xs font-black text-[#f8ca14]"
+            />
+            <VisualEditable
+              id="about-timeline-pillar-desc-1"
+              tag="text"
+              label="وصف الركيزة الأولى"
+              defaultText="ساهموا في بناء ونهضة الوطن بكافة القطاعات"
+              as="span"
+              className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}
+            />
           </div>
         </div>
 
@@ -495,10 +526,22 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
             <Award size={22} />
           </div>
           <div>
-            <span className="block text-xs font-black text-[#08467d] dark:text-[#f8ca14]">100% نسبة القبول الجامعي</span>
-            <span className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-              في أرقى الجامعات السعودية والعالمية المعتمدة
-            </span>
+            <VisualEditable
+              id="about-timeline-pillar-val-2"
+              tag="text"
+              label="رقم الركيزة الثانية"
+              defaultText="100% نسبة القبول الجامعي"
+              as="span"
+              className="block text-xs font-black text-[#08467d] dark:text-[#f8ca14]"
+            />
+            <VisualEditable
+              id="about-timeline-pillar-desc-2"
+              tag="text"
+              label="وصف الركيزة الثانية"
+              defaultText="في أرقى الجامعات السعودية والعالمية المعتمدة"
+              as="span"
+              className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}
+            />
           </div>
         </div>
 
@@ -511,10 +554,22 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
             <Building2 size={22} />
           </div>
           <div>
-            <span className="block text-xs font-black text-emerald-500">صروح مستقلة 25,000م²</span>
-            <span className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}>
-              بممشى الهجرة بالرانوناء بأعلى المواصفات
-            </span>
+            <VisualEditable
+              id="about-timeline-pillar-val-3"
+              tag="text"
+              label="رقم الركيزة الثالثة"
+              defaultText="صروح مستقلة 25,000م²"
+              as="span"
+              className="block text-xs font-black text-emerald-500"
+            />
+            <VisualEditable
+              id="about-timeline-pillar-desc-3"
+              tag="text"
+              label="وصف الركيزة الثالثة"
+              defaultText="بممشى الهجرة بالرانوناء بأعلى المواصفات"
+              as="span"
+              className={`text-[11px] ${dark ? "text-slate-400" : "text-slate-600 font-medium"}`}
+            />
           </div>
         </div>
       </div>
