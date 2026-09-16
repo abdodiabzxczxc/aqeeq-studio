@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { nativeCompressionMiddleware } from "./compression";
+import { registerSeoRoutes } from "../seoRoutes";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -46,6 +47,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  registerSeoRoutes(app);
   // Health check endpoint for uptime monitors / Render keep-alive
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok", uptime: Math.floor(process.uptime()), timestamp: Date.now() });

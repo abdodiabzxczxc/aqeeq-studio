@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Protect Admin & Internal endpoints from web crawlers
+Disallow: /admin
+Disallow: /api/trpc
+Disallow: /api/sync
+
+Sitemap: https://alaqeeq.edu.sa/sitemap.xml
