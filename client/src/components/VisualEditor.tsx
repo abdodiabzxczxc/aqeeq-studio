@@ -14,7 +14,7 @@ import { extractCopyableStyle, isBackgroundLikeLayer, type CopyableLayerStyle } 
 import { backgroundSizeCss, isBackgroundLayer, isBackgroundSurface, isCoreBackgroundLayer, lowerLayerZIndex, resolveBackgroundOrigin, type BackgroundOrigin } from "@/lib/layerBackground";
 import { resolveEditorToolbarSide, toggleEditorToolbarSide, type EditorToolbarSide } from "@/lib/editorToolbarSide";
 import { isAqeeqStudioVisualPath, shouldOpenVisualEditorFromLocation, visualImageWrapperClassName } from "@/lib/visualEditorLayout";
-import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowLeftRight, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, ImageIcon, Instagram, Layers3, Link2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, AlignVerticalJustifyCenter, AlignVerticalSpaceAround, Archive, ArrowLeftRight, Blocks, BookOpen, Calendar, Camera, Check, ChevronLeft, ChevronRight, Clapperboard, Clipboard, Copy, Download, Eye, EyeOff, ExternalLink, Grid3X3, GripHorizontal, Heart, ImageIcon, Instagram, Layers3, Link2, Loader2, Lock, LogIn, LogOut, Mail, Magnet, MapPin, MapPinned, Maximize2, Menu, MessageCircle, Minimize2, Minus, Moon, Move, Palette, Phone, Plus, Printer, Redo2, RotateCcw, Rows3, Send, Settings2, Share2, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Square, Star, Sun, Ticket, Trash2, Undo2, Users, Video, Volume2, Wand2, X } from "lucide-react";
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -443,6 +443,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [lastSaved, setLastSaved] = useState<{ element: { id: string; tag: ElementTag }; previous?: VisualOverride } | null>(null);
   const [pendingLayerDeletion, setPendingLayerDeletion] = useState<PendingLayerDeletion | null>(null);
   const [localOverrides, setLocalOverrides] = useState<Record<string, VisualOverride>>({});
+  const [pendingElementIds, setPendingElementIds] = useState<Set<string>>(() => {
+    if (typeof window !== "undefined" && pagePath) {
+      try {
+        const raw = window.localStorage.getItem(`aqeeq-pending-overrides-${pagePath}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return new Set(parsed);
+        }
+      } catch {}
+    }
+    return new Set<string>();
+  });
   const [undoStack, setUndoStack] = useState<Record<string, VisualOverride>[]>([]);
   const [redoStack, setRedoStack] = useState<Record<string, VisualOverride>[]>([]);
   const [styleClipboard, setStyleClipboard] = useState<CopyableLayerStyle | null>(null);
@@ -719,6 +731,25 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     },
     onError: (error) => toast.error(error.message || "تعذر حفظ التعديل"),
   });
+  const batchSave = trpc.visualEditor.batchSave.useMutation({
+    onSuccess: (data) => {
+      setPendingElementIds(new Set());
+      if (pagePath && typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem(`aqeeq-pending-overrides-${pagePath}`);
+          window.localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+          window.localStorage.removeItem("aqeeq-published-homepage-snapshot-v5");
+        } catch {}
+      }
+      if (pagePath) {
+        void utils.visualEditor.list.invalidate({ pagePath });
+        void utils.visualEditor.publicList.invalidate({ pagePath });
+        void utils.visualEditor.history.invalidate({ pagePath });
+        void utils.homepage.publicSnapshot.invalidate();
+      }
+    },
+    onError: (error) => toast.error(error.message || "تعذر حفظ التعديلات الجماعية"),
+  });
   const moveToTrash = trpc.visualEditor.trash.move.useMutation({
     onSuccess: () => { if (pagePath) void utils.visualEditor.trash.list.invalidate({ pagePath }); },
     onError: (error) => toast.error(error.message || "تعذر نقل الطبقة إلى سلة المهملات"),
@@ -858,6 +889,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     // NEVER apply a stale draft from a previously selected element to a newly selected element!
     if (!draftPreviewEnabled.current) return;
     if (draftElementIdRef.current !== selected.id) return;
+
+    setPendingElementIds((prev) => {
+      const next = new Set(prev);
+      sharedHeroElementIds(selected.id).forEach((id) => next.add(id));
+      return next;
+    });
 
     const isTextTag = selected.tag === "text" || selected.tag === "button";
     const isMediaTag = selected.tag === "image" || selected.tag === "video";
@@ -1375,6 +1412,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setUndoStack((stack) => [...stack, localOverrides].slice(-40));
     setRedoStack([]);
     setLocalOverrides((current) => ({ ...current, [`${pagePath}::${elementId}`]: optimistic }));
+    setPendingElementIds((prev) => {
+      const next = new Set(prev);
+      next.add(elementId);
+      return next;
+    });
     if (selected?.id === elementId) setDraft((current) => ({ ...current, ...patch }));
   };
 
@@ -1767,7 +1809,14 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         onSuccess: () => {
           publish.mutate({ pagePath, elementId: elementId as Parameters<typeof publish.mutate>[0]["elementId"] });
           savedCount += 1;
-          if (savedCount === sharedTargets.length) toast.success(isSharedHeroBackground(selected.id) ? "تم تطبيق خلفية الغلاف ونشرها للهاتف واللابتوب" : "تم حفظ التعديل ونشره فوراً على الصفحة");
+          if (savedCount === sharedTargets.length) {
+            setPendingElementIds((prev) => {
+              const next = new Set(prev);
+              sharedTargets.forEach((id) => next.delete(id));
+              return next;
+            });
+            toast.success(isSharedHeroBackground(selected.id) ? "تم تطبيق خلفية الغلاف ونشرها للهاتف واللابتوب" : "تم حفظ التعديل ونشره فوراً على الصفحة");
+          }
         },
         onError: (err) => {
           toast.error(err.message || "تعذر حفظ التعديل");
@@ -1781,11 +1830,208 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const publishAllPending = () => {
+    if (!pagePath) return;
+
+    const elementsToSave = new Map<string, any>();
+
+    // 1. If currently selected element has an active draft, include its latest state!
+    if (selected) {
+      const domNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+      const imgEl = domNode?.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode?.querySelector<HTMLImageElement>("img");
+      const originalSrc = imgEl ? (imgEl.getAttribute("src") || imgEl.src) : undefined;
+      const finalCustomCss = (draft.mediaUrl && originalSrc && originalSrc !== draft.mediaUrl)
+        ? serializeLayerBehavior(draft.customCss || "{}", { originalSrc })
+        : (draft.customCss || null);
+
+      const isTextTag = selected.tag === "text" || selected.tag === "button";
+      const isMediaTag = selected.tag === "image" || selected.tag === "video";
+
+      const currentItemPayload = {
+        elementId: selected.id,
+        elementTag: selected.tag,
+        contentText: isTextTag ? (draft.contentText || null) : null,
+        mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
+        altText: isMediaTag ? (draft.altText || null) : null,
+        linkUrl: draft.linkUrl || null,
+        alignment: draft.alignment || null,
+        textColor: isTextTag ? (draft.textColor || null) : null,
+        bgColor: draft.bgColor || null,
+        fontSize: isTextTag ? (draft.fontSize || null) : null,
+        padding: draft.padding || null,
+        margin: draft.margin || null,
+        borderRadius: draft.borderRadius || null,
+        layerX: draft.layerX,
+        layerY: draft.layerY,
+        layerWidth: draft.layerWidth,
+        layerHeight: draft.layerHeight,
+        layerZIndex: draft.layerZIndex,
+        layerOpacity: draft.layerOpacity,
+        backgroundSize: draft.backgroundSize,
+        backgroundPositionX: draft.backgroundPositionX,
+        backgroundPositionY: draft.backgroundPositionY,
+        backgroundOverlay: draft.backgroundOverlay,
+        customCss: finalCustomCss,
+        isLocked: draft.isLocked,
+        isHidden: draft.isHidden,
+      };
+
+      const shared = sharedHeroElementIds(selected.id);
+      shared.forEach((id) => {
+        elementsToSave.set(id, { ...currentItemPayload, elementId: id });
+      });
+    }
+
+    // 2. Gather all other pending overrides from localOverrides
+    pendingElementIds.forEach((id) => {
+      if (elementsToSave.has(id)) return;
+      const override = localOverrides[`${pagePath}::${id}`] || overrideMap.get(id);
+      if (override) {
+        elementsToSave.set(id, {
+          elementId: override.elementId,
+          elementTag: override.elementTag,
+          contentText: override.contentText ?? null,
+          mediaUrl: override.mediaUrl ?? null,
+          altText: override.altText ?? null,
+          linkUrl: override.linkUrl ?? null,
+          alignment: override.alignment ?? null,
+          textColor: override.textColor ?? null,
+          bgColor: override.bgColor ?? null,
+          fontSize: override.fontSize ?? null,
+          padding: override.padding ?? null,
+          margin: override.margin ?? null,
+          borderRadius: override.borderRadius ?? null,
+          layerX: override.layerX ?? 0,
+          layerY: override.layerY ?? 0,
+          layerWidth: override.layerWidth ?? null,
+          layerHeight: override.layerHeight ?? null,
+          layerZIndex: override.layerZIndex ?? 0,
+          layerOpacity: override.layerOpacity ?? 100,
+          backgroundSize: override.backgroundSize ?? 100,
+          backgroundPositionX: override.backgroundPositionX ?? 50,
+          backgroundPositionY: override.backgroundPositionY ?? 50,
+          backgroundOverlay: override.backgroundOverlay ?? 0,
+          customCss: override.customCss ?? null,
+          isLocked: override.isLocked ?? false,
+          isHidden: override.isHidden ?? false,
+        });
+      }
+    });
+
+    const items = Array.from(elementsToSave.values());
+    if (items.length === 0) {
+      toast.info("جميع التعديلات منشورة ومحدثة بالفعل");
+      return;
+    }
+
+    // 3. Synchronous optimistic write to localStorage and window.__AQEEQ_SERVER_OVERRIDES__
+    try {
+      const current = (initialCachedOverrides as VisualOverride[]) || [];
+      const itemIds = new Set(items.map((it) => it.elementId));
+      const updated = [
+        ...current.filter((o) => !itemIds.has(o.elementId)),
+        ...items.map((it) => ({ ...it, pagePath, status: "published" as const, id: -1 })),
+      ];
+      localStorage.setItem(pageCacheKey, JSON.stringify(updated));
+      localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+      localStorage.removeItem("aqeeq-published-homepage-snapshot-v5");
+      localStorage.removeItem(`aqeeq-pending-overrides-${pagePath}`);
+    } catch {}
+
+    if (typeof window !== "undefined") {
+      const srv = (window as any).__AQEEQ_SERVER_OVERRIDES__;
+      if (Array.isArray(srv)) {
+        items.forEach((item) => {
+          const idx = srv.findIndex((x: any) => x && x.elementId === item.elementId && (!x.pagePath || x.pagePath === pagePath));
+          const rec = { ...item, pagePath, status: "published" as const, id: -1 };
+          if (idx >= 0) srv[idx] = rec;
+          else srv.push(rec);
+        });
+      }
+    }
+
+    // Mark as published in localOverrides
+    setLocalOverrides((current) => {
+      const next = { ...current };
+      items.forEach((item) => {
+        next[`${pagePath}::${item.elementId}`] = { ...item, pagePath, status: "published" as const, id: -1 };
+      });
+      return next;
+    });
+
+    batchSave.mutate({ pagePath, items }, {
+      onSuccess: (res) => {
+        toast.success(`🚀 تم حفظ ونشر جميع التعديلات (${res.count} عناصر) بنجاح على الموقع!`);
+        setPendingElementIds(new Set());
+      },
+      onError: (err) => {
+        toast.error(err.message || "تعذر نشر التعديلات");
+      },
+    });
+  };
+
+  const discardAllPending = () => {
+    if (pendingElementIds.size === 0) return;
+    setLocalOverrides((current) => {
+      const next = { ...current };
+      pendingElementIds.forEach((id) => {
+        delete next[`${pagePath}::${id}`];
+      });
+      return next;
+    });
+    setPendingElementIds(new Set());
+    if (pagePath && typeof window !== "undefined") {
+      try { window.localStorage.removeItem(`aqeeq-pending-overrides-${pagePath}`); } catch {}
+    }
+    if (selected) {
+      setDraft(EMPTY_DRAFT);
+      draftPreviewEnabled.current = false;
+    }
+    toast.info("تم التراجع عن جميع التعديلات غير المنشورة واستعادة الحالة الأصلية");
+  };
+
+  useEffect(() => {
+    if (!pagePath || typeof window === "undefined") return;
+    try {
+      if (pendingElementIds.size > 0) {
+        window.localStorage.setItem(`aqeeq-pending-overrides-${pagePath}`, JSON.stringify(Array.from(pendingElementIds)));
+      } else {
+        window.localStorage.removeItem(`aqeeq-pending-overrides-${pagePath}`);
+      }
+    } catch {}
+  }, [pendingElementIds, pagePath]);
+
+  useEffect(() => {
+    if (pendingElementIds.size === 0) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [pendingElementIds.size]);
+
+  useEffect(() => {
+    if (!isEditing || previewMode) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        publishAllPending();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isEditing, previewMode, publishAllPending]);
 
   const restoreSelectedOrigin = () => {
     if (!pagePath || !selected) return;
     draftPreviewEnabled.current = false;
     setLocalOverrides((current) => clearLocalPreviewAfterReset(current, pagePath, selected.id));
+    setPendingElementIds((prev) => {
+      const next = new Set(prev);
+      sharedHeroElementIds(selected.id).forEach((id) => next.delete(id));
+      return next;
+    });
     setDraft(EMPTY_DRAFT);
     reset.mutate({ pagePath, elementId: selected.id as Parameters<typeof reset.mutate>[0]["elementId"] });
   };
@@ -2094,12 +2340,62 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           </span>
           <span>المحرر الذكي نشط (يتعرف على كل عنصر)</span>
         </div>
-        <WorkspaceButton active={false} label="حفظ ونشر" icon={<Check size={17} />} onClick={runPrePublishCheck} />
+        <WorkspaceButton
+          active={pendingElementIds.size > 0}
+          label={pendingElementIds.size > 0 ? `نشر كل التعديلات (${pendingElementIds.size})` : "حفظ ونشر"}
+          icon={
+            <div className="relative inline-flex items-center justify-center">
+              <Check size={17} />
+              {pendingElementIds.size > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-400 px-1 text-[10px] font-black text-slate-950 ring-2 ring-black">
+                  {pendingElementIds.size}
+                </span>
+              )}
+            </div>
+          }
+          onClick={pendingElementIds.size > 0 ? publishAllPending : runPrePublishCheck}
+        />
         <WorkspaceButton active={false} label="خروج" icon={<X size={17} />} onClick={() => { closeWorkspacePanels(); setIsEditing(false); setSelected(null); setSelectedIds([]); setLayerMode(false); setToolGroup(null); }} />
       </div>
     </nav>
   ) : null;
-  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div className="fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{pagePath ? <>
+  return <VisualEditorContext.Provider value={contextValue}><div className={isEditing && mobilePreview ? "mx-auto min-h-screen max-w-[390px] overflow-hidden border-x border-amber-400/35 bg-[#090b12] shadow-[0_0_0_1px_rgba(251,191,36,.15),0_20px_80px_rgba(0,0,0,.7)]" : ""}>{isEditing && !previewMode && layerMode && gridEnabled ? <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] opacity-40 [background-image:linear-gradient(rgba(8,70,125,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(8,70,125,.35)_1px)] [background-size:8px_8px]" /> : null}{selectionBox && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed z-[79] border border-[#08467d] bg-[#08467d]/15" style={{ left: selectionBox.left, top: selectionBox.top, width: selectionBox.width, height: selectionBox.height }} /> : null}{alignmentGuides.x !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 z-[79] border-l-2 border-[#f8ca14]" style={{ left: alignmentGuides.x }} /> : null}{alignmentGuides.y !== undefined && !previewMode ? <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 z-[79] border-t-2 border-[#f8ca14]" style={{ top: alignmentGuides.y }} /> : null}{editorToolbar}{advancedTools}{children}</div>{previewMode ? <button onClick={() => setPreviewMode(false)} className="fixed left-4 top-4 z-[320] rounded-full border border-amber-300/35 bg-[#111521]/95 px-4 py-2 text-xs font-black text-amber-100 shadow-xl backdrop-blur">عودة للتحرير</button> : null}{pendingLayerDeletion ? <div className="fixed bottom-4 left-4 right-4 z-[320] flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#de191e]/40 bg-[#171018]/[.98] p-3 shadow-2xl backdrop-blur sm:right-auto sm:w-[min(440px,calc(100vw-32px))]" dir="rtl"><div className="min-w-0"><div className="text-xs font-black text-white">تم مسح «{pendingLayerDeletion.label}» كمسودة</div><p className="mt-1 text-[10px] leading-4 text-slate-400">لن يُحفظ الحذف على الموقع إلا عند تأكيد حفظ المسودة.</p></div><div className="flex shrink-0 gap-2"><button onClick={restorePendingLayerDeletion} className="rounded-xl border border-white/15 px-3 py-2 text-xs font-black text-slate-100">تراجع</button><button onClick={savePendingLayerDeletion} disabled={save.isPending} className="rounded-xl bg-[#de191e] px-3 py-2 text-xs font-black text-white disabled:opacity-50">حفظ المسودة</button></div></div> : null}{isEditing && !previewMode && pendingElementIds.size > 0 ? (
+    <div
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[350] flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-amber-400/40 bg-[#0c0f17]/95 px-4 py-3 shadow-[0_15px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-3 duration-200"
+      dir="rtl"
+    >
+      <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+        </span>
+        <span>لديك <strong className="text-white font-black px-1.5 py-0.5 rounded-lg bg-amber-400/20 text-amber-200">{pendingElementIds.size}</strong> تعديلات معلقة لم تُنشر بعد</span>
+      </div>
+
+      <div className="hidden sm:block h-5 w-px bg-white/15 mx-1" />
+
+      <button
+        type="button"
+        onClick={publishAllPending}
+        disabled={batchSave.isPending}
+        className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 px-4 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+      >
+        {batchSave.isPending ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+        <span>🚀 نشر جميع التعديلات دفعة واحدة ({pendingElementIds.size})</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={discardAllPending}
+        disabled={batchSave.isPending}
+        className="inline-flex items-center gap-1 rounded-xl border border-white/15 hover:bg-white/10 text-slate-300 px-3 py-2 text-xs font-bold transition active:scale-95 cursor-pointer"
+        title="إلغاء جميع التعديلات المعلقة غير المحفوظة"
+      >
+        <X size={13} />
+        <span>تراجع</span>
+      </button>
+    </div>
+  ) : null}{pagePath ? <>
     <EditorOperationsDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, operationsOpen)} onClose={() => setOperationsOpen(false)} onManage={() => navigate("/control")} />
     <SiteBuilderDrawer open={shouldShowWorkspacePanel(isEditing, previewMode, builderOpen)} onClose={() => setBuilderOpen(false)} pagePath={pagePath} initialTab={builderTab} />
     <VisualAddPanel open={shouldShowWorkspacePanel(isEditing, previewMode, addPanelOpen)} onClose={() => setAddPanelOpen(false)} pagePath={pagePath} />
@@ -2807,7 +3103,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-white/[0.08] bg-black/80 p-3.5">
+        <div className="border-t border-white/[0.08] bg-black/80 p-3.5 space-y-2">
           <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
@@ -2825,9 +3121,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
               className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-3 py-2.5 text-xs font-black text-amber-950 shadow-lg shadow-amber-400/20 transition hover:bg-amber-300 disabled:opacity-50"
             >
               <Check size={16} />
-              حفظ ونشر التعديل
+              {pendingElementIds.size > 1 ? "حفظ هذا فقط" : "حفظ ونشر التعديل"}
             </button>
           </div>
+          {pendingElementIds.size > 1 && (
+            <button
+              type="button"
+              onClick={publishAllPending}
+              disabled={batchSave.isPending}
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 px-4 py-2.5 text-xs font-black shadow-lg shadow-amber-400/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              {batchSave.isPending ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+              <span>🚀 نشر جميع التعديلات دفعة واحدة ({pendingElementIds.size})</span>
+            </button>
+          )}
         </div>
           </>
         ) : null}

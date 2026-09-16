@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset, deletePageSection, deleteVisualFreeformElement, deleteVisualElementOverride, getCustomPageBySlug, listCustomPageHistory, listCustomPages, listMediaAssets, listPageSectionHistory, listPageSections, listVisualElementTrash, listVisualFreeformElements, listVisualElementOverrideHistory, listVisualElementOverrides, listAllVisualElementOverrides, logAudit, moveVisualElementToTrash, permanentlyDeleteVisualElementTrash, publishPageSection, publishVisualFreeformElement, publishVisualElementOverride, publishAllVisualElementOverrides, reorderPageSections, restoreCustomPageHistory, restorePageSectionHistory, restoreVisualElementTrash, restoreVisualElementOverrideHistory, updateCustomPage, upsertPageSection, upsertVisualFreeformElement, upsertVisualElementOverride } from "../db";
+import { batchUpsertVisualElementOverrides, createCustomPage, createMediaAsset, deleteCustomPage, deleteMediaAsset, deletePageSection, deleteVisualFreeformElement, deleteVisualElementOverride, getCustomPageBySlug, listCustomPageHistory, listCustomPages, listMediaAssets, listPageSectionHistory, listPageSections, listVisualElementTrash, listVisualFreeformElements, listVisualElementOverrideHistory, listVisualElementOverrides, listAllVisualElementOverrides, logAudit, moveVisualElementToTrash, permanentlyDeleteVisualElementTrash, publishPageSection, publishVisualFreeformElement, publishVisualElementOverride, publishAllVisualElementOverrides, reorderPageSections, restoreCustomPageHistory, restorePageSectionHistory, restoreVisualElementTrash, restoreVisualElementOverrideHistory, updateCustomPage, upsertPageSection, upsertVisualFreeformElement, upsertVisualElementOverride } from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import { triggerAutoPageCapture } from "../previewCapture";
@@ -9,6 +9,35 @@ const pagePathSchema = z.string().regex(/^\/$|^\/(?:about|admissions|accreditati
 const cssTokenSchema = z.string().max(96).regex(/^[#a-zA-Z0-9.%(), /-]*$/, "قيمة النمط غير صالحة").nullable().optional();
 const supportedElementSchema = z.string().min(2).max(128).regex(/^[a-zA-Z0-9_.-]+$/, "معرف العنصر غير صالح");
 const sectionTypeSchema = z.enum(["hero", "features", "gallery", "video", "cta", "custom"]);
+
+const visualOverrideItemSchema = z.object({
+  elementId: supportedElementSchema,
+  elementTag: z.enum(["text", "button", "section", "image", "video", "icon", "section-block"]),
+  contentText: z.string().max(1500).nullable().optional(),
+  mediaUrl: z.string().max(1024).nullable().optional(),
+  altText: z.string().max(300).nullable().optional(),
+  linkUrl: z.string().max(1024).nullable().optional(),
+  alignment: z.enum(["start", "center", "end", "stretch"]).nullable().optional(),
+  textColor: cssTokenSchema,
+  bgColor: cssTokenSchema,
+  fontSize: cssTokenSchema,
+  padding: cssTokenSchema,
+  margin: cssTokenSchema,
+  borderRadius: cssTokenSchema,
+  layerX: z.number().int().min(-4000).max(4000).optional(),
+  layerY: z.number().int().min(-4000).max(4000).optional(),
+  layerWidth: z.number().int().min(20).max(5000).nullable().optional(),
+  layerHeight: z.number().int().min(20).max(5000).nullable().optional(),
+  layerZIndex: z.number().int().min(-100).max(300).optional(),
+  layerOpacity: z.number().int().min(0).max(100).optional(),
+  backgroundSize: z.number().int().min(25).max(300).optional(),
+  backgroundPositionX: z.number().int().min(0).max(100).optional(),
+  backgroundPositionY: z.number().int().min(0).max(100).optional(),
+  backgroundOverlay: z.number().int().min(0).max(100).optional(),
+  customCss: z.string().max(4000).nullable().optional(),
+  isLocked: z.boolean().optional(),
+  isHidden: z.boolean().optional(),
+});
 const sectionConfigSchema = z.object({
   anchorId: z.string().min(2).max(96).regex(/^[a-z0-9-]+$/, "موضع الإدراج غير صالح").optional(),
   builderElement: z.enum(["text", "image", "button", "icon", "shape"]).optional(),
@@ -59,40 +88,35 @@ export const visualEditorRouter = router({
     return result;
   }),
 
-  save: adminProcedure.input(z.object({
+  save: adminProcedure.input(visualOverrideItemSchema.extend({
     pagePath: pagePathSchema,
-    elementId: supportedElementSchema,
-    elementTag: z.enum(["text", "button", "section", "image", "video", "icon", "section-block"]),
-    contentText: z.string().max(1500).nullable().optional(),
-    mediaUrl: z.string().max(1024).nullable().optional(),
-    altText: z.string().max(300).nullable().optional(),
-    linkUrl: z.string().max(1024).nullable().optional(),
-    alignment: z.enum(["start", "center", "end", "stretch"]).nullable().optional(),
-    textColor: cssTokenSchema,
-    bgColor: cssTokenSchema,
-    fontSize: cssTokenSchema,
-    padding: cssTokenSchema,
-    margin: cssTokenSchema,
-    borderRadius: cssTokenSchema,
-    layerX: z.number().int().min(-4000).max(4000).optional(),
-    layerY: z.number().int().min(-4000).max(4000).optional(),
-    layerWidth: z.number().int().min(20).max(5000).nullable().optional(),
-    layerHeight: z.number().int().min(20).max(5000).nullable().optional(),
-    layerZIndex: z.number().int().min(-100).max(300).optional(),
-    layerOpacity: z.number().int().min(0).max(100).optional(),
-    backgroundSize: z.number().int().min(25).max(300).optional(),
-    backgroundPositionX: z.number().int().min(0).max(100).optional(),
-    backgroundPositionY: z.number().int().min(0).max(100).optional(),
-    backgroundOverlay: z.number().int().min(0).max(100).optional(),
-    customCss: z.string().max(4000).nullable().optional(),
-    isLocked: z.boolean().optional(),
-    isHidden: z.boolean().optional(),
   })).mutation(async ({ input, ctx }) => {
     const override = await upsertVisualElementOverride({ ...input, customCss: input.customCss ?? null, updatedBy: ctx.user.id });
     await publishVisualElementOverride(input.pagePath, input.elementId, ctx.user.id).catch(() => null);
     await logAudit({ userId: ctx.user.id, userName: ctx.user.name, action: "visual_editor.save", details: JSON.stringify({ pagePath: input.pagePath, elementId: input.elementId }) });
     triggerAutoPageCapture(input.pagePath);
     return { ...override, status: "published" as const };
+  }),
+
+  batchSave: adminProcedure.input(z.object({
+    pagePath: pagePathSchema,
+    items: z.array(visualOverrideItemSchema).min(1).max(200),
+  })).mutation(async ({ input, ctx }) => {
+    const inputs = input.items.map((it) => ({
+      ...it,
+      pagePath: input.pagePath,
+      customCss: it.customCss ?? null,
+      updatedBy: ctx.user.id,
+    }));
+    const results = await batchUpsertVisualElementOverrides(inputs);
+    await logAudit({
+      userId: ctx.user.id,
+      userName: ctx.user.name,
+      action: "visual_editor.batch_save",
+      details: JSON.stringify({ pagePath: input.pagePath, count: input.items.length }),
+    });
+    triggerAutoPageCapture(input.pagePath);
+    return { count: results.length, items: results };
   }),
 
   reset: adminProcedure.input(z.object({ pagePath: pagePathSchema, elementId: supportedElementSchema })).mutation(async ({ input, ctx }) => {

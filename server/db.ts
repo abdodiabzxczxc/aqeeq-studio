@@ -2193,6 +2193,36 @@ export async function upsertVisualElementOverride(input: VisualOverrideInput) {
   return result[0];
 }
 
+export async function batchUpsertVisualElementOverrides(items: VisualOverrideInput[]) {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  if (!db) {
+    const local = getLocalDb();
+    if (!local.overrides) local.overrides = {};
+    const results = [];
+    for (let i = 0; i < items.length; i++) {
+      const input = items[i];
+      const key = `${input.pagePath}::${input.elementId}`;
+      local.overrides[key] = {
+        id: Date.now() + i,
+        ...input,
+        status: "published",
+        updatedAt: now,
+        publishedAt: now,
+      };
+      results.push(local.overrides[key]);
+    }
+    saveLocalDb();
+    return results;
+  }
+  const results = [];
+  for (const input of items) {
+    const res = await upsertVisualElementOverride(input);
+    results.push(res);
+  }
+  return results;
+}
+
 export async function publishVisualElementOverride(pagePath: string, elementId: string, userId: number) {
   const db = await getDb();
   if (!db) {
