@@ -18,6 +18,19 @@ import { AlignCenter, AlignLeft, AlignRight, AlignVerticalDistributeCenter, Alig
 import { createContext, type MouseEvent, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import {
+  useAqeeqStudioTheme,
+  getAqeeqStudioTheme,
+  resolveThemeSafeTextColor,
+  isTooDarkForDarkTheme,
+  isTooLightForLightTheme,
+} from "@/lib/aqeeqStudioTheme";
+
+export {
+  resolveThemeSafeTextColor,
+  isTooDarkForDarkTheme,
+  isTooLightForLightTheme,
+};
 import ContextLayerToolbar from "./ContextLayerToolbar";
 import { AqeeqVideoPoster } from "./AqeeqVideoPoster";
 import DesignToolsPanel, { type DesignEffectsPatch } from "./DesignToolsPanel";
@@ -345,7 +358,7 @@ export function shouldShowWorkspacePanel(isEditing: boolean, isPreviewing: boole
   return isEditing && !isPreviewing && isOpen;
 }
 
-function toStyle(override?: VisualOverride): React.CSSProperties {
+function toStyle(override?: VisualOverride, isDarkTheme: boolean = (typeof window !== "undefined" && getAqeeqStudioTheme() === "dark")): React.CSSProperties {
   if (!override) return {};
   const behavior = parseLayerBehavior(override.customCss);
   const safeZIndex = isBackgroundLayer(override.elementId) ? Math.max(0, override.layerZIndex) : override.layerZIndex;
@@ -361,7 +374,8 @@ function toStyle(override?: VisualOverride): React.CSSProperties {
   const textStroke = behavior.textStroke === "light" ? "1px rgba(255,255,255,.45)" : behavior.textStroke === "dark" ? "1px rgba(0,0,0,.6)" : undefined;
   const designEffects = designEffectStyle(behavior);
   const buttonStyle = override.elementTag === "button" ? behavior.buttonStyle : "inherit";
-  const resolvedColor = buttonStyle === "filled" ? "#17100a" : buttonStyle === "outline" ? override.textColor || "#f5df9d" : buttonStyle === "ghost" ? override.textColor || "#fff" : textGradient ? undefined : override.textColor || undefined;
+  const safeTextColor = resolveThemeSafeTextColor(override.textColor, isDarkTheme);
+  const resolvedColor = buttonStyle === "filled" ? "#17100a" : buttonStyle === "outline" ? safeTextColor || "#f5df9d" : buttonStyle === "ghost" ? safeTextColor || "#fff" : textGradient ? undefined : safeTextColor || undefined;
   const resolvedBackgroundColor = behavior.glass ? "rgba(18,23,33,.38)" : buttonStyle === "filled" ? "#e5b84f" : buttonStyle === "outline" ? "transparent" : buttonStyle === "ghost" ? "rgba(255,255,255,.07)" : usesGradient ? undefined : override.bgColor || undefined;
   const resolvedLetterSpacing = behavior.headingStyle === "display" ? "-.04em" : behavior.headingStyle === "heading" ? "-.02em" : behavior.letterSpacing === "wide" ? ".055em" : behavior.letterSpacing === "wider" ? ".12em" : undefined;
   const resolvedLineHeight = behavior.headingStyle === "display" ? "1" : behavior.headingStyle === "heading" ? "1.16" : behavior.headingStyle === "body" ? "1.7" : behavior.lineHeight === "relaxed" ? "1.55" : behavior.lineHeight === "loose" ? "1.8" : undefined;
@@ -836,6 +850,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     let defaultMedia = isMediaTag ? (currentOverride?.mediaUrl ?? "") : "";
     let defaultAlt = isMediaTag ? (currentOverride?.altText ?? "") : "";
     let defaultTextColor = currentOverride?.textColor ?? "";
+    if (defaultTextColor && (defaultTextColor.toLowerCase().startsWith("oklch(") || isTooDarkForDarkTheme(defaultTextColor) || isTooLightForLightTheme(defaultTextColor))) {
+      defaultTextColor = "";
+    }
 
     if (!currentOverride && typeof document !== "undefined") {
       const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
@@ -1279,9 +1296,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
             node.textContent = override.contentText;
           }
         }
-        if (override?.textColor && node.style.color !== override.textColor) {
-          node.style.color = override.textColor;
-        } else if (!override?.textColor && node.style.color) {
+        const isDark = getAqeeqStudioTheme() === "dark";
+        const safeColor = resolveThemeSafeTextColor(override?.textColor, isDark);
+        if (safeColor && node.style.color !== safeColor) {
+          node.style.color = safeColor;
+        } else if (!safeColor && node.style.color) {
           node.style.color = "";
         }
         if (override?.fontSize && node.style.fontSize !== override.fontSize) {
@@ -1315,8 +1334,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
 
         const override = overrideMap.get(id);
-        if (override?.textColor) {
-          htmlSvg.style.color = override.textColor;
+        const isDark = getAqeeqStudioTheme() === "dark";
+        const safeIconColor = resolveThemeSafeTextColor(override?.textColor, isDark);
+        if (safeIconColor && htmlSvg.style.color !== safeIconColor) {
+          htmlSvg.style.color = safeIconColor;
+        } else if (!safeIconColor && htmlSvg.style.color) {
+          htmlSvg.style.color = "";
         }
       });
     };
@@ -1418,9 +1441,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
+    const handleThemeChange = () => {
+      debouncedScan();
+    };
+    window.addEventListener("aqeeq-studio-theme-change", handleThemeChange);
+
     return () => {
       if (scanTimer) clearTimeout(scanTimer);
       window.removeEventListener("click", handleCaptureClick, true);
+      window.removeEventListener("aqeeq-studio-theme-change", handleThemeChange);
       observer.disconnect();
       document.body.classList.remove("aq-smart-editable-active");
     };
@@ -1821,9 +1850,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           imgEl.src = payload.mediaUrl;
         }
       }
-      if (isTextTag && payload.textColor) {
-        domNode.style.color = payload.textColor;
-      } else if (isTextTag && !payload.textColor && domNode.style.color) {
+      const currentTheme = getAqeeqStudioTheme();
+      const safeInlineColor = resolveThemeSafeTextColor(payload.textColor, currentTheme === "dark");
+      if (isTextTag && safeInlineColor) {
+        domNode.style.color = safeInlineColor;
+      } else if (isTextTag && !safeInlineColor && domNode.style.color) {
         domNode.style.color = "";
       }
       if (isTextTag && payload.fontSize) {
@@ -3446,16 +3477,18 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
     }
     interaction.current = null; setLiveFrame(null); showAlignmentGuides({});
   };
+  const { theme } = useAqeeqStudioTheme();
+  const isDark = theme === "dark";
   const groupOffset = groupTranslation?.ids.includes(id) ? groupTranslation : null;
   const inspectorFrame = liveFrame ?? { x: override?.layerX ?? 0, y: override?.layerY ?? 0, width: override?.layerWidth, height: override?.layerHeight };
-  const customTextColor = override?.textColor;
+  const customTextColor = resolveThemeSafeTextColor(override?.textColor, isDark);
   const customBgColor = override?.bgColor && !override.bgColor.includes("gradient(") ? override.bgColor : undefined;
   const hasCustomTextColor = Boolean(customTextColor);
   const hasCustomBgColor = Boolean(customBgColor);
 
   const visualStyle: React.CSSProperties = {
     ...style,
-    ...toStyle(override),
+    ...toStyle(override, isDark),
     ...(customTextColor ? {
       "--aq-custom-text-color": customTextColor,
       color: customTextColor,
@@ -3677,7 +3710,8 @@ export function useVisualText(id: string, fallback: string) {
 
 export function useVisualStyle(id: string) {
   const { getOverride } = useContext(VisualEditorContext);
-  return toStyle(getOverride(id));
+  const { theme } = useAqeeqStudioTheme();
+  return toStyle(getOverride(id), theme === "dark");
 }
 
 export function useVisualEditorState() {
