@@ -56,11 +56,34 @@ export function isTooLightForLightTheme(color: string): boolean {
   return false;
 }
 
+export function isTemplateBrandColor(color: string): boolean {
+  const c = color.trim().toLowerCase();
+  return (
+    c === "#08467d" ||
+    c === "#085187" ||
+    c === "rgb(8, 70, 125)" ||
+    c === "rgb(8, 81, 135)" ||
+    c === "rgb(8,70,125)" ||
+    c === "rgb(8,81,135)"
+  );
+}
+
+export function sanitizeOverrideTextColor(color: string | null | undefined): string | null {
+  if (!color) return null;
+  const c = color.trim().toLowerCase();
+  if (c.startsWith("oklch(")) return null;
+  if (isTemplateBrandColor(c)) return null;
+  if (c === "#000" || c === "#000000" || c === "black" || c === "rgb(0, 0, 0)" || c === "rgb(0,0,0)") return null;
+  if (c === "#fff" || c === "#ffffff" || c === "white" || c === "rgb(255, 255, 255)" || c === "rgb(255,255,255)") return null;
+  return color;
+}
+
 export function resolveThemeSafeTextColor(color: string | null | undefined, isDarkTheme: boolean): string | undefined {
   if (!color) return undefined;
   const trimmed = color.trim();
   if (!trimmed) return undefined;
   if (trimmed.toLowerCase().startsWith("oklch(")) return undefined;
+  if (isTemplateBrandColor(trimmed)) return undefined;
   if (isDarkTheme && isTooDarkForDarkTheme(trimmed)) return undefined;
   if (!isDarkTheme && isTooLightForLightTheme(trimmed)) return undefined;
   return trimmed;

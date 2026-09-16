@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   getAqeeqStudioTheme,
   getAqeeqThemeLogoFilter,
+  isTemplateBrandColor,
   isTooDarkForDarkTheme,
   isTooLightForLightTheme,
   resolveThemeSafeTextColor,
+  sanitizeOverrideTextColor,
 } from "./aqeeqStudioTheme";
 
 describe("مظهر استوديو العقيق", () => {
@@ -58,6 +60,33 @@ describe("مظهر استوديو العقيق", () => {
     // أخضر
     expect(resolveThemeSafeTextColor("#10b981", true)).toBe("#10b981");
     expect(resolveThemeSafeTextColor("#10b981", false)).toBe("#10b981");
+  });
+
+  it("يتعامل مع أزرق العقيق كلون قوالب محايد يُترك لفئات Tailwind ليتحول بسلاسة", () => {
+    expect(isTemplateBrandColor("#08467d")).toBe(true);
+    expect(isTemplateBrandColor("rgb(8, 70, 125)")).toBe(true);
+    expect(isTemplateBrandColor("#085187")).toBe(true);
+    expect(isTemplateBrandColor("rgb(8, 81, 135)")).toBe(true);
+
+    // في كلا الوضعين يُلغى ليعتمد على كلاسات Tailwind المتجاوبة بسلاسة تامة
+    expect(resolveThemeSafeTextColor("#08467d", false)).toBeUndefined();
+    expect(resolveThemeSafeTextColor("#08467d", true)).toBeUndefined();
+    expect(resolveThemeSafeTextColor("rgb(8, 70, 125)", false)).toBeUndefined();
+    expect(resolveThemeSafeTextColor("rgb(8, 70, 125)", true)).toBeUndefined();
+  });
+
+  it("ينظف ألوان النصوص الافتراضية والملتقطة تلقائياً sanitizeOverrideTextColor", () => {
+    expect(sanitizeOverrideTextColor("oklch(0.446 0.043 257.281)")).toBeNull();
+    expect(sanitizeOverrideTextColor("#08467d")).toBeNull();
+    expect(sanitizeOverrideTextColor("rgb(8, 70, 125)")).toBeNull();
+    expect(sanitizeOverrideTextColor("#000000")).toBeNull();
+    expect(sanitizeOverrideTextColor("rgb(0, 0, 0)")).toBeNull();
+    expect(sanitizeOverrideTextColor("#ffffff")).toBeNull();
+    expect(sanitizeOverrideTextColor("rgb(255, 255, 255)")).toBeNull();
+
+    // الألوان المخصصة الفعلية تُحفظ كما هي
+    expect(sanitizeOverrideTextColor("#f8ca14")).toBe("#f8ca14");
+    expect(sanitizeOverrideTextColor("#de191e")).toBe("#de191e");
   });
 });
 

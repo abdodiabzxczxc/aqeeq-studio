@@ -238,6 +238,39 @@ let memoryState: LocalDbState | null = null;
 
 const SEED_FILE = path.resolve(process.cwd(), "server", "seedData.json");
 
+function sanitizeOverrides(overrides: Record<string, any> | undefined) {
+  if (!overrides) return;
+  for (const item of Object.values(overrides)) {
+    if (item && item.textColor) {
+      const c = String(item.textColor).trim().toLowerCase();
+      if (
+        c.startsWith("oklch(") ||
+        c === "#08467d" ||
+        c === "#085187" ||
+        c === "rgb(8, 70, 125)" ||
+        c === "rgb(8, 81, 135)" ||
+        c === "rgb(8,70,125)" ||
+        c === "rgb(8,81,135)" ||
+        c === "#000" ||
+        c === "#000000" ||
+        c === "black" ||
+        c === "rgb(0, 0, 0)" ||
+        c === "rgb(0,0,0)" ||
+        c === "#fff" ||
+        c === "#ffffff" ||
+        c === "white" ||
+        c === "rgb(255, 255, 255)" ||
+        c === "rgb(255,255,255)" ||
+        c === "rgb(222, 25, 30)" ||
+        c === "rgb(197, 155, 39)" ||
+        c === "rgb(248, 202, 20)"
+      ) {
+        item.textColor = null;
+      }
+    }
+  }
+}
+
 export function getLocalDb(): LocalDbState {
   if (memoryState) return memoryState;
 
@@ -247,6 +280,7 @@ export function getLocalDb(): LocalDbState {
       const content = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(content);
       if (parsed && (parsed.albums?.length > 0 || parsed.issues?.length > 0 || parsed.showcases?.length > 0)) {
+        sanitizeOverrides(parsed.overrides);
         memoryState = parsed;
         return memoryState!;
       }
@@ -260,6 +294,7 @@ export function getLocalDb(): LocalDbState {
     try {
       const seedContent = fs.readFileSync(SEED_FILE, "utf-8");
       memoryState = JSON.parse(seedContent);
+      sanitizeOverrides(memoryState?.overrides);
       saveLocalDb();
       return memoryState!;
     } catch (e) {

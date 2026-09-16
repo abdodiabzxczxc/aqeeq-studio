@@ -2167,7 +2167,38 @@ export async function publishAllVisualElementOverrides(userId: number) {
   return { success: true, count: rows.length };
 }
 
-export async function upsertVisualElementOverride(input: VisualOverrideInput) {
+function sanitizeOverrideInputTextColor(color: string | null | undefined): string | null {
+  if (!color) return null;
+  const c = String(color).trim().toLowerCase();
+  if (
+    c.startsWith("oklch(") ||
+    c === "#08467d" ||
+    c === "#085187" ||
+    c === "rgb(8, 70, 125)" ||
+    c === "rgb(8, 81, 135)" ||
+    c === "rgb(8,70,125)" ||
+    c === "rgb(8,81,135)" ||
+    c === "#000" ||
+    c === "#000000" ||
+    c === "black" ||
+    c === "rgb(0, 0, 0)" ||
+    c === "rgb(0,0,0)" ||
+    c === "#fff" ||
+    c === "#ffffff" ||
+    c === "white" ||
+    c === "rgb(255, 255, 255)" ||
+    c === "rgb(255,255,255)"
+  ) {
+    return null;
+  }
+  return color;
+}
+
+export async function upsertVisualElementOverride(rawInput: VisualOverrideInput) {
+  const input = {
+    ...rawInput,
+    textColor: sanitizeOverrideInputTextColor(rawInput.textColor),
+  };
   const db = await getDb();
   const now = new Date().toISOString();
   if (!db) {
@@ -2193,7 +2224,11 @@ export async function upsertVisualElementOverride(input: VisualOverrideInput) {
   return result[0];
 }
 
-export async function batchUpsertVisualElementOverrides(items: VisualOverrideInput[]) {
+export async function batchUpsertVisualElementOverrides(rawItems: VisualOverrideInput[]) {
+  const items = rawItems.map((item) => ({
+    ...item,
+    textColor: sanitizeOverrideInputTextColor(item.textColor),
+  }));
   const db = await getDb();
   const now = new Date().toISOString();
   if (!db) {

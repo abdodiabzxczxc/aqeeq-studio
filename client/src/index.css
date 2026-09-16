@@ -310,6 +310,10 @@ body.light #root {
   background: #f8fafc !important;
 }
 
+[data-visual-id] {
+  transition: color 200ms ease, -webkit-text-fill-color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
 [data-visual-id].aq-has-custom-text-color,
 [data-visual-id].aq-has-custom-text-color * {
   color: var(--aq-custom-text-color) !important;

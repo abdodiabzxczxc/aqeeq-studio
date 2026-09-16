@@ -24,12 +24,16 @@ import {
   resolveThemeSafeTextColor,
   isTooDarkForDarkTheme,
   isTooLightForLightTheme,
+  isTemplateBrandColor,
+  sanitizeOverrideTextColor,
 } from "@/lib/aqeeqStudioTheme";
 
 export {
   resolveThemeSafeTextColor,
   isTooDarkForDarkTheme,
   isTooLightForLightTheme,
+  isTemplateBrandColor,
+  sanitizeOverrideTextColor,
 };
 import ContextLayerToolbar from "./ContextLayerToolbar";
 import { AqeeqVideoPoster } from "./AqeeqVideoPoster";
@@ -677,7 +681,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(serverOverrides)) {
         for (const item of serverOverrides) {
           if (item && item.elementId && (!item.pagePath || item.pagePath === pagePath)) {
-            map.set(item.elementId, item);
+            const sanitizedTextColor = sanitizeOverrideTextColor(item.textColor);
+            const entry = sanitizedTextColor !== item.textColor ? { ...item, textColor: sanitizedTextColor } : item;
+            map.set(entry.elementId, entry);
           }
         }
       }
@@ -689,14 +695,16 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         if (Array.isArray(local)) {
           for (const item of local) {
             if (item && item.elementId) {
-              const existing = map.get(item.elementId);
+              const sanitizedTextColor = sanitizeOverrideTextColor(item.textColor);
+              const entry = sanitizedTextColor !== item.textColor ? { ...item, textColor: sanitizedTextColor } : item;
+              const existing = map.get(entry.elementId);
               if (!existing) {
-                map.set(item.elementId, item);
+                map.set(entry.elementId, entry);
               } else {
                 const existingTime = new Date((existing as any).updatedAt || 0).getTime();
-                const newTime = new Date((item as any).updatedAt || 0).getTime();
+                const newTime = new Date((entry as any).updatedAt || 0).getTime();
                 if (newTime >= existingTime) {
-                  map.set(item.elementId, item);
+                  map.set(entry.elementId, entry);
                 }
               }
             }
@@ -849,10 +857,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   });
 
   const overrideMap = useMemo(() => {
-    const map = new Map((overrides as VisualOverride[]).map((item) => [item.elementId, item]));
+    const map = new Map(
+      (overrides as VisualOverride[]).map((item) => {
+        const sanitizedTextColor = sanitizeOverrideTextColor(item.textColor);
+        const entry = sanitizedTextColor !== item.textColor ? { ...item, textColor: sanitizedTextColor } : item;
+        return [entry.elementId, entry];
+      })
+    );
     if (pagePath) {
       Object.entries(localOverrides).forEach(([key, override]) => {
-        if (key.startsWith(`${pagePath}::`)) map.set(override.elementId, override);
+        if (key.startsWith(`${pagePath}::`)) {
+          const sanitizedTextColor = sanitizeOverrideTextColor(override.textColor);
+          const entry = sanitizedTextColor !== override.textColor ? { ...override, textColor: sanitizedTextColor } : override;
+          map.set(entry.elementId, entry);
+        }
       });
     }
     return map;
@@ -1471,7 +1489,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     observer.observe(document.body, { childList: true, subtree: true });
 
     const handleThemeChange = () => {
-      debouncedScan();
+      scanAndTag();
     };
     window.addEventListener("aqeeq-studio-theme-change", handleThemeChange);
 
