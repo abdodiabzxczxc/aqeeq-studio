@@ -614,12 +614,38 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const initialCachedOverrides = useMemo(() => {
     try {
       if (typeof window === "undefined") return EMPTY_OVERRIDES;
+      const combined: VisualOverride[] = [];
+      const seen = new Set<string>();
+
+      // 1. Read Server-Injected overrides (Frame 0 - Instant from HTML head)
+      const serverOverrides = (window as any).__AQEEQ_SERVER_OVERRIDES__;
+      if (Array.isArray(serverOverrides)) {
+        for (const item of serverOverrides) {
+          if (item && item.elementId && (!item.pagePath || item.pagePath === pagePath)) {
+            combined.push(item);
+            seen.add(item.elementId);
+          }
+        }
+      }
+
+      // 2. Read LocalStorage cache (if any drafts or locally saved edits)
       const raw = localStorage.getItem(pageCacheKey);
-      return raw ? JSON.parse(raw) : EMPTY_OVERRIDES;
+      if (raw) {
+        const local = JSON.parse(raw);
+        if (Array.isArray(local)) {
+          for (const item of local) {
+            if (item && item.elementId && !seen.has(item.elementId)) {
+              combined.push(item);
+              seen.add(item.elementId);
+            }
+          }
+        }
+      }
+      return combined.length > 0 ? combined : EMPTY_OVERRIDES;
     } catch {
       return EMPTY_OVERRIDES;
     }
-  }, [pageCacheKey]);
+  }, [pageCacheKey, pagePath]);
 
   const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
   const fetchedPublicOverrides = publicListQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
@@ -1066,13 +1092,22 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
         let id = img.dataset.visualId;
         if (!id) {
-          const srcPath = img.getAttribute("src") || "";
-          const altText = img.alt || "";
-          id = `auto-img-${hashString(srcPath + altText + idx)}`;
-          img.dataset.visualId = id;
-          img.dataset.visualTag = "image";
-          img.dataset.visualLabel = altText || `صورة ${idx + 1}`;
-          img.dataset.visualAuto = "true";
+          const parentVisual = img.closest<HTMLElement>("[data-visual-id]");
+          if (parentVisual && parentVisual.dataset.visualId && parentVisual.dataset.visualAuto !== "true") {
+            id = parentVisual.dataset.visualId;
+            img.dataset.visualId = id;
+            img.dataset.visualTag = (parentVisual.dataset.visualTag as any) || "image";
+            img.dataset.visualLabel = parentVisual.dataset.visualLabel || img.alt || "صورة";
+            img.dataset.visualAuto = "false";
+          } else {
+            const srcPath = img.getAttribute("src") || "";
+            const altText = img.alt || "";
+            id = `auto-img-${hashString(srcPath + altText + idx)}`;
+            img.dataset.visualId = id;
+            img.dataset.visualTag = "image";
+            img.dataset.visualLabel = altText || `صورة ${idx + 1}`;
+            img.dataset.visualAuto = "true";
+          }
         }
 
         const currentSrcAttr = img.getAttribute("src");
@@ -1199,12 +1234,23 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const img = targetEl as HTMLImageElement;
         e.preventDefault();
         e.stopPropagation();
-        const id = img.dataset.visualId || `auto-img-${hashString((img.src || "") + (img.alt || ""))}`;
+        const parentVisual = img.closest<HTMLElement>("[data-visual-id]");
+        const isParentCanonical = parentVisual && parentVisual.dataset.visualId && parentVisual.dataset.visualAuto !== "true";
+        const id = (img.dataset.visualId && img.dataset.visualAuto !== "true")
+          ? img.dataset.visualId
+          : isParentCanonical
+          ? parentVisual.dataset.visualId!
+          : img.dataset.visualId || `auto-img-${hashString((img.src || "") + (img.alt || ""))}`;
+        const label = img.dataset.visualLabel || parentVisual?.dataset.visualLabel || img.alt || "صورة";
         img.dataset.visualId = id;
         img.dataset.visualTag = "image";
-        img.dataset.visualLabel = img.alt || "صورة";
-        img.dataset.visualAuto = "true";
-        selectElement(id, "image", img.dataset.visualLabel);
+        img.dataset.visualLabel = label;
+        if (isParentCanonical || (img.dataset.visualId && img.dataset.visualAuto !== "true")) {
+          img.dataset.visualAuto = "false";
+        } else {
+          img.dataset.visualAuto = "true";
+        }
+        selectElement(id, "image", label);
         return;
       }
       if (targetEl.tagName === "svg" || targetEl.closest("svg")) {
@@ -1508,7 +1554,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     distributeSelected,
     showAlignmentGuides: setAlignmentGuides,
     setGroupTranslation,
-    getOverride: (elementId) => resolveHeroOverrideForPreview(overrideMap, elementId),
+    getOverride: (elementId) => resolveHeroOverrideForPreview(overrideMap, elementId) || (getInstantVisualOverride(elementId, pagePath) as unknown as VisualOverride | undefined),
     getOwnOverride: (elementId) => overrideMap.get(elementId),
   }), [isEditing, previewMode, mobilePreview, isAdmin, pagePath, pathname, navigate, layerMode, gridEnabled, magnetEnabled, backgroundAspectLocked, backgroundAutoArrange, groupTranslation, selected?.id, selected?.label, selected?.tag, selectedIds, overrideMap]);
 
@@ -2732,6 +2778,9 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   const image = (
     <img
       key={resolvedSrc}
+      data-visual-id={id}
+      data-visual-tag="image"
+      data-visual-label={label}
       src={resolvedSrc}
       alt={resolvedAlt}
       referrerPolicy="no-referrer"

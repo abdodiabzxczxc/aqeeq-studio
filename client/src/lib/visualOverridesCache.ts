@@ -84,40 +84,52 @@ function initCache() {
     }
 
     // 3. Fallback defaults for Timeline heritage eras in case of clean initial browser state
-    if (!memoryReplacements["/covers/first-lego-champions.png"]) {
-      const legoKeys = normalizeSrcKeys("/covers/first-lego-champions.png");
-      for (const k of legoKeys) {
-        memoryReplacements[k] = "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb";
-      }
-    }
-    if (!memoryReplacements["/covers/cover-accreditations.jpg"]) {
-      const cogKeys = normalizeSrcKeys("/covers/cover-accreditations.jpg");
-      for (const k of cogKeys) {
-        memoryReplacements[k] = "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx";
-      }
-    }
+    const ERA_FALLBACKS = [
+      {
+        year: "1994",
+        orig: "/covers/student-excellence-about.jpg",
+        mediaUrl: "/api/drive-proxy/1ulrpYsDrV7xbDdysqTsNoLNUvblw14p5",
+        altText: "im 5-01.png",
+      },
+      {
+        year: "2010",
+        orig: "/covers/student-lab-admissions.jpg",
+        mediaUrl: "/api/drive-proxy/1IkefgGSvnqfdhLiMHYd25-lz3AuBH5n1",
+        altText: "IMG_2925.PNG",
+      },
+      {
+        year: "2018",
+        orig: "/covers/cover-accreditations.jpg",
+        mediaUrl: "/api/drive-proxy/1qifbHFSgFaBQH1g63qvK2WmQtls0l4AR",
+        altText: "im 3-01.png",
+      },
+      {
+        year: "2026",
+        orig: "/covers/first-lego-champions.png",
+        mediaUrl: "/api/drive-proxy/16IxreFp6eRLCuLDZyIWEoU9eWHzOCJuC",
+        altText: "IMG_2868.PNG",
+      },
+    ];
 
-    if (!memoryRegistry["about-timeline-era-2026"]) {
-      const ov2026: CachedVisualOverride = {
-        elementId: "about-timeline-era-2026",
-        pagePath: "/about",
-        mediaUrl: "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb",
-        altText: "IMG_2850.PNG",
-        status: "published",
-      };
-      memoryRegistry["about-timeline-era-2026"] = ov2026;
-      memoryRegistry["/about::about-timeline-era-2026"] = ov2026;
-    }
-    if (!memoryRegistry["about-timeline-era-2018"]) {
-      const ov2018: CachedVisualOverride = {
-        elementId: "about-timeline-era-2018",
-        pagePath: "/about",
-        mediaUrl: "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx",
-        altText: "im 2-01.png",
-        status: "published",
-      };
-      memoryRegistry["about-timeline-era-2018"] = ov2018;
-      memoryRegistry["/about::about-timeline-era-2018"] = ov2018;
+    for (const era of ERA_FALLBACKS) {
+      if (!memoryReplacements[era.orig]) {
+        const keys = normalizeSrcKeys(era.orig);
+        for (const k of keys) {
+          memoryReplacements[k] = era.mediaUrl;
+        }
+      }
+      const elementId = `about-timeline-era-${era.year}`;
+      if (!memoryRegistry[elementId]) {
+        const ov: CachedVisualOverride = {
+          elementId,
+          pagePath: "/about",
+          mediaUrl: era.mediaUrl,
+          altText: era.altText,
+          status: "published",
+        };
+        memoryRegistry[elementId] = ov;
+        memoryRegistry[`/about::${elementId}`] = ov;
+      }
     }
 
     // Migrate legacy aqeeq-overrides-/ if present

@@ -120,10 +120,10 @@ describe("visualOverridesCache — Zero-Flash Image Hydration", () => {
 
   it("should instantly resolve timeline era overrides without network fetch", () => {
     const era2026 = getInstantVisualOverride("about-timeline-era-2026", "/about");
-    expect(era2026?.mediaUrl).toBe("/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb");
+    expect(era2026?.mediaUrl).toBe("/api/drive-proxy/16IxreFp6eRLCuLDZyIWEoU9eWHzOCJuC");
 
     const era2018 = getInstantVisualOverride("about-timeline-era-2018", "/about");
-    expect(era2018?.mediaUrl).toBe("/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx");
+    expect(era2018?.mediaUrl).toBe("/api/drive-proxy/1qifbHFSgFaBQH1g63qvK2WmQtls0l4AR");
   });
 
   it("should resolve server-injected overrides and replacements instantly", () => {

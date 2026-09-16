@@ -85,8 +85,10 @@ async function serveAqeeqShowcaseVideo(req: express.Request, res: express.Respon
 }
 
 const STATIC_MEDIA_REPLACEMENTS: Record<string, string> = {
-  "/covers/first-lego-champions.png": "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb",
-  "/covers/cover-accreditations.jpg": "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx",
+  "/covers/student-excellence-about.jpg": "/api/drive-proxy/1ulrpYsDrV7xbDdysqTsNoLNUvblw14p5",
+  "/covers/student-lab-admissions.jpg": "/api/drive-proxy/1IkefgGSvnqfdhLiMHYd25-lz3AuBH5n1",
+  "/covers/cover-accreditations.jpg": "/api/drive-proxy/1qifbHFSgFaBQH1g63qvK2WmQtls0l4AR",
+  "/covers/first-lego-champions.png": "/api/drive-proxy/16IxreFp6eRLCuLDZyIWEoU9eWHzOCJuC",
 };
 
 async function serveMediaRewrite(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -99,10 +101,16 @@ async function serveMediaRewrite(req: express.Request, res: express.Response, ne
     const overrides = await listAllVisualElementOverrides("all");
     for (const ov of overrides as any[]) {
       if (!ov?.mediaUrl) continue;
-      if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
+      if (reqPath === "/covers/student-excellence-about.jpg" && (ov.elementId === "about-timeline-era-1994" || ov.elementId === "auto-img-fscsr")) {
+        return res.redirect(302, ov.mediaUrl);
+      }
+      if (reqPath === "/covers/student-lab-admissions.jpg" && (ov.elementId === "about-timeline-era-2010" || ov.elementId === "auto-img-87oz7u")) {
         return res.redirect(302, ov.mediaUrl);
       }
       if (reqPath === "/covers/cover-accreditations.jpg" && (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0")) {
+        return res.redirect(302, ov.mediaUrl);
+      }
+      if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
         return res.redirect(302, ov.mediaUrl);
       }
       if (ov.customCss) {
@@ -132,10 +140,14 @@ async function injectServerStateIntoHtml(html: string): Promise<string> {
     if (Array.isArray(overrides)) {
       for (const ov of overrides as any[]) {
         if (ov?.mediaUrl) {
-          if (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as") {
-            replacements["/covers/first-lego-champions.png"] = ov.mediaUrl;
+          if (ov.elementId === "about-timeline-era-1994" || ov.elementId === "auto-img-fscsr") {
+            replacements["/covers/student-excellence-about.jpg"] = ov.mediaUrl;
+          } else if (ov.elementId === "about-timeline-era-2010" || ov.elementId === "auto-img-87oz7u") {
+            replacements["/covers/student-lab-admissions.jpg"] = ov.mediaUrl;
           } else if (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0") {
             replacements["/covers/cover-accreditations.jpg"] = ov.mediaUrl;
+          } else if (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as") {
+            replacements["/covers/first-lego-champions.png"] = ov.mediaUrl;
           }
           if (ov.customCss) {
             try {
@@ -252,6 +264,9 @@ export function serveStatic(app: Express) {
       next(e);
     }
   });
+
+  // Rewrite replaced media before static serving
+  app.use(serveMediaRewrite);
 
   // ⚡ High-speed immutable caching for hashed production assets (/assets/*)
   app.use(
