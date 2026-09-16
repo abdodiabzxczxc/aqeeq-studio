@@ -43,10 +43,10 @@ function getInitialSnapshot(): PublishedHomepageSnapshot | undefined {
 export function PublishedHomepageProvider({ children }: { children: React.ReactNode }) {
   const initial = getInitialSnapshot();
   const query = trpc.homepage.publicSnapshot.useQuery(undefined, {
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    staleTime: 5_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
   });
 
   const snapshot = (query.data as PublishedHomepageSnapshot | undefined) || initial;

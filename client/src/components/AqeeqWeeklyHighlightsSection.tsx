@@ -141,9 +141,14 @@ export function AqeeqWeeklyHighlightsSection({
               {/* Card Body Grid */}
               <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
                 <div className="order-2 lg:order-1 text-right">
-                  <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                    الحدث التعليمي الأبرز
-                  </span>
+                  <VisualEditable
+                    id="studio-bento-card1-kicker"
+                    tag="text"
+                    label="شارة الحدث الأبرز"
+                    defaultText="الحدث التعليمي الأبرز"
+                    as="span"
+                    className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                  />
                   <VisualEditable
                     id="studio-bento-card1-title"
                     tag="text"
@@ -151,12 +156,15 @@ export function AqeeqWeeklyHighlightsSection({
                     defaultText={eventTitle}
                     as="h3"
                     className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
-                  >
-                    انطلاق فعاليات الأسبوع العلمي وتكريم الفرسان
-                  </VisualEditable>
-                  <p className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                    تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز والابتكار في ساحات ومختبرات مدارس العقيق الأهلية والدولية.
-                  </p>
+                  />
+                  <VisualEditable
+                    id="studio-bento-card1-desc"
+                    tag="text"
+                    label="وصف الحدث الأبرز"
+                    defaultText="تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز والابتكار في ساحات ومختبرات مدارس العقيق الأهلية والدولية."
+                    as="p"
+                    className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
+                  />
                   <div className="mt-8 flex items-center gap-4">
                     <button
                       type="button"
@@ -227,9 +235,14 @@ export function AqeeqWeeklyHighlightsSection({
                     }`}>
                       <Award size={20} />
                     </div>
-                    <span className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                      وسام التميز الأكاديمي · الأسبوع 14
-                    </span>
+                    <VisualEditable
+                      id="studio-bento-card2-kicker"
+                      tag="text"
+                      label="شارة وسام التميز"
+                      defaultText="وسام التميز الأكاديمي · الأسبوع 14"
+                      as="span"
+                      className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                    />
                   </div>
                   <VisualEditable
                     id="studio-bento-card2-title"
@@ -238,12 +251,15 @@ export function AqeeqWeeklyHighlightsSection({
                     defaultText="تكريم فرسان موهبة وأبطال الروبوتيكس"
                     as="h3"
                     className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
-                  >
-                    تكريم فرسان موهبة وأبطال الروبوتيكس
-                  </VisualEditable>
-                  <p className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                    تحقيق المراكز الأولى في مسابقات الابتكار والذكاء الاصطناعي على مستوى المنطقة وتكريم الطلاب وأولياء أمورهم في حفل بهيج.
-                  </p>
+                  />
+                  <VisualEditable
+                    id="studio-bento-card2-desc"
+                    tag="text"
+                    label="وصف وسام التميز"
+                    defaultText="تحقيق المراكز الأولى في مسابقات الابتكار والذكاء الاصطناعي على مستوى المنطقة وتكريم الطلاب وأولياء أمورهم في حفل بهيج."
+                    as="p"
+                    className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
+                  />
                   <div className="mt-8 flex items-center gap-3">
                     <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black ${
                       dark ? "bg-white/10 text-amber-300 border border-amber-400/30" : "bg-amber-100 text-amber-900 border border-amber-300"
@@ -311,19 +327,36 @@ export function AqeeqWeeklyHighlightsSection({
                     }`}>
                       <Flame size={20} />
                     </div>
-                    <span className={`text-xs font-black ${dark ? "text-[#de191e]" : "text-[#de191e]"}`}>
-                      نبض وتفاعل أولياء الأمور والطلاب
-                    </span>
+                    <VisualEditable
+                      id="studio-bento-card3-kicker"
+                      tag="text"
+                      label="شارة نبض المجتمع"
+                      defaultText="نبض وتفاعل أولياء الأمور والطلاب"
+                      as="span"
+                      className={`text-xs font-black ${dark ? "text-[#de191e]" : "text-[#de191e]"}`}
+                    />
                   </div>
                   <div className="mt-2 flex items-baseline gap-4">
                     <h3 className={`text-4xl sm:text-6xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
                       +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
                     </h3>
-                    <span className={`text-sm font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>قلب تشجيع هذا الأسبوع ❤️</span>
+                    <VisualEditable
+                      id="studio-bento-card3-counter-label"
+                      tag="text"
+                      label="نص عداد القلوب"
+                      defaultText="قلب تشجيع هذا الأسبوع ❤️"
+                      as="span"
+                      className={`text-sm font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                    />
                   </div>
-                  <p className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>
-                    كل إعجاب وتشجيع هنا ينعكس فخراً وإلهاماً في نفوس أبنائنا وبناتنا في رحلتهم نحو القمة.
-                  </p>
+                  <VisualEditable
+                    id="studio-bento-card3-desc"
+                    tag="text"
+                    label="وصف نبض المجتمع"
+                    defaultText="كل إعجاب وتشجيع هنا ينعكس فخراً وإلهاماً في نفوس أبنائنا وبناتنا في رحلتهم نحو القمة."
+                    as="p"
+                    className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
+                  />
                   <div className="mt-8 flex items-center gap-4">
                     <button
                       type="button"

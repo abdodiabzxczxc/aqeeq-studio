@@ -449,6 +449,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const [groupedIds, setGroupedIds] = useState<string[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
   const draftPreviewEnabled = useRef(false);
+  const draftElementIdRef = useRef<string | null>(null);
   const [toolGroup, setToolGroup] = useState<"design" | "arrange" | "publish" | null>(null);
   const [showAdvancedProperties, setShowAdvancedProperties] = useState(false);
   const [sidebarsCollapsed, setSidebarsCollapsed] = useState(false);
@@ -649,10 +650,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     }
   }, [pageCacheKey, pagePath]);
 
-  const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
+  const publicListQuery = trpc.visualEditor.publicList.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && pagePath !== "/"), staleTime: 5_000, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
   const fetchedPublicOverrides = publicListQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
-  const publicOverrides = pagePath === "/" ? (snapshot?.overrides ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES)) : fetchedPublicOverrides;
-  const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 60_000, refetchOnWindowFocus: false, refetchOnReconnect: true, refetchInterval: false });
+  const publicOverrides = useMemo(() => {
+    if (pagePath === "/") {
+      const serverList = (snapshot?.overrides as VisualOverride[]) || [];
+      if (serverList.length === 0) return initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES;
+      const map = new Map<string, VisualOverride>();
+      initialCachedOverrides.forEach((item) => map.set(item.elementId, item));
+      serverList.forEach((item) => map.set(item.elementId, item));
+      return Array.from(map.values());
+    }
+    return fetchedPublicOverrides;
+  }, [pagePath, snapshot?.overrides, initialCachedOverrides, fetchedPublicOverrides]);
+  const editorOverridesQuery = trpc.visualEditor.list.useQuery({ pagePath: pagePath ?? "/" }, { enabled: Boolean(pagePath && isAdmin && isEditing), staleTime: 5_000, refetchOnWindowFocus: true, refetchOnReconnect: true, refetchInterval: false });
   const editorOverrides = editorOverridesQuery.data ?? (initialCachedOverrides.length > 0 ? initialCachedOverrides : EMPTY_OVERRIDES);
 
   useEffect(() => {
@@ -679,7 +690,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         } catch {}
         setInstantVisualOverride(savedData as any);
       }
-      if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
+      try {
+        localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+      } catch {}
+      if (pagePath) {
+        void utils.visualEditor.list.invalidate({ pagePath });
+        void utils.visualEditor.publicList.invalidate({ pagePath });
+        void utils.visualEditor.history.invalidate({ pagePath });
+        void utils.homepage.publicSnapshot.invalidate();
+      }
     },
     onError: (error) => toast.error(error.message || "تعذر حفظ التعديل"),
   });
@@ -698,14 +717,30 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const filtered = current.filter((o) => o.elementId !== variables.elementId);
         localStorage.setItem(pageCacheKey, JSON.stringify(filtered));
       } catch {}
-      if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.publicList.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
+      try {
+        localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+      } catch {}
+      if (pagePath) {
+        void utils.visualEditor.list.invalidate({ pagePath });
+        void utils.visualEditor.publicList.invalidate({ pagePath });
+        void utils.visualEditor.history.invalidate({ pagePath });
+        void utils.homepage.publicSnapshot.invalidate();
+      }
     },
     onError: (error) => toast.error(error.message || "تعذر استعادة العنصر"),
   });
   const publish = trpc.visualEditor.publish.useMutation({
     onSuccess: () => {
       toast.success("تم نشر التعديل للزوار بنجاح");
-      if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.publicList.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); void utils.homepage.publicSnapshot.invalidate(); }
+      try {
+        localStorage.removeItem("aqeeq-published-homepage-snapshot-v4");
+      } catch {}
+      if (pagePath) {
+        void utils.visualEditor.list.invalidate({ pagePath });
+        void utils.visualEditor.publicList.invalidate({ pagePath });
+        void utils.visualEditor.history.invalidate({ pagePath });
+        void utils.homepage.publicSnapshot.invalidate();
+      }
     },
     onError: (error) => toast.error(error.message || "تعذر نشر التعديل"),
   });
@@ -738,24 +773,32 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const isSelectedBackground = Boolean(selected && isBackgroundSurface(selected.id, selected.label, selected.tag));
 
   useEffect(() => {
-    if (!selected) return;
+    if (!selected) {
+      draftElementIdRef.current = null;
+      draftPreviewEnabled.current = false;
+      return;
+    }
     draftPreviewEnabled.current = false;
+    draftElementIdRef.current = selected.id;
 
-    let defaultContent = currentOverride?.contentText ?? "";
-    let defaultMedia = currentOverride?.mediaUrl ?? "";
-    let defaultAlt = currentOverride?.altText ?? "";
+    const isTextTag = selected.tag === "text" || selected.tag === "button";
+    const isMediaTag = selected.tag === "image" || selected.tag === "video";
+
+    let defaultContent = isTextTag ? (currentOverride?.contentText ?? "") : "";
+    let defaultMedia = isMediaTag ? (currentOverride?.mediaUrl ?? "") : "";
+    let defaultAlt = isMediaTag ? (currentOverride?.altText ?? "") : "";
     let defaultTextColor = currentOverride?.textColor ?? "";
 
     if (!currentOverride && typeof document !== "undefined") {
       const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
       if (el) {
-        if (selected.tag === "image") {
+        if (isMediaTag) {
           const imgEl = el instanceof HTMLImageElement ? el : el.querySelector<HTMLImageElement>("img");
           if (imgEl) {
             defaultMedia = imgEl.src || "";
             defaultAlt = imgEl.alt || "";
           }
-        } else if (selected.tag === "text") {
+        } else if (isTextTag) {
           defaultContent = el.textContent?.trim() || "";
           try {
             defaultTextColor = window.getComputedStyle(el).color || "";
@@ -765,9 +808,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     }
 
     setDraft({
-      contentText: defaultContent,
-      mediaUrl: defaultMedia,
-      altText: defaultAlt,
+      contentText: isTextTag ? defaultContent : "",
+      mediaUrl: isMediaTag ? defaultMedia : "",
+      altText: isMediaTag ? defaultAlt : "",
       linkUrl: currentOverride?.linkUrl ?? "",
       alignment: currentOverride?.alignment ?? "center",
       textColor: defaultTextColor,
@@ -794,20 +837,27 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!selected || !pagePath) return;
+    // CRITICAL: Only push draft to localOverrides when user actively edited the draft for THIS selected element!
+    // NEVER apply a stale draft from a previously selected element to a newly selected element!
+    if (!draftPreviewEnabled.current) return;
+    if (draftElementIdRef.current !== selected.id) return;
+
+    const isTextTag = selected.tag === "text" || selected.tag === "button";
+    const isMediaTag = selected.tag === "image" || selected.tag === "video";
     const source = overrideMap.get(selected.id);
     const preview: VisualOverride = {
       id: source?.id ?? -1,
       pagePath,
       elementId: selected.id,
       elementTag: selected.tag,
-      contentText: draft.contentText || null,
-      mediaUrl: draft.mediaUrl || null,
-      altText: draft.altText || null,
+      contentText: isTextTag ? (draft.contentText || null) : null,
+      mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
+      altText: isMediaTag ? (draft.altText || null) : null,
       linkUrl: draft.linkUrl || null,
       alignment: draft.alignment || null,
-      textColor: draft.textColor || null,
+      textColor: isTextTag ? (draft.textColor || null) : null,
       bgColor: draft.bgColor || null,
-      fontSize: draft.fontSize || null,
+      fontSize: isTextTag ? (draft.fontSize || null) : null,
       padding: draft.padding || null,
       margin: draft.margin || null,
       borderRadius: draft.borderRadius || null,
@@ -1020,6 +1070,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       toast.info("هذا العنصر مقفل — يمكنك إلغاء القفل من لوحة الطبقات");
       return;
     }
+    draftPreviewEnabled.current = false;
+    draftElementIdRef.current = elementId;
     setSelected({ id: elementId, tag: elementTag, label });
     setSelectedIds((current) => additive ? (current.includes(elementId) ? current.filter((id) => id !== elementId) : [...current, elementId]) : [elementId]);
     setAddPanelOpen(false);
@@ -1570,25 +1622,28 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       ? serializeLayerBehavior(draft.customCss || "{}", { originalSrc })
       : (draft.customCss || null);
 
+    const isTextTag = selected.tag === "text" || selected.tag === "button";
+    const isMediaTag = selected.tag === "image" || selected.tag === "video";
+
     const payload = {
       pagePath,
       elementId: selected.id as Parameters<typeof save.mutate>[0]["elementId"],
       elementTag: selected.tag,
-      contentText: draft.contentText || null,
-      mediaUrl: draft.mediaUrl || null,
-      altText: draft.altText || null,
+      contentText: isTextTag ? (draft.contentText || null) : null,
+      mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
+      altText: isMediaTag ? (draft.altText || null) : null,
       linkUrl: draft.linkUrl || null,
       alignment: draft.alignment || null,
-      textColor: draft.textColor || null,
+      textColor: isTextTag ? (draft.textColor || null) : null,
       bgColor: draft.bgColor || null,
-      fontSize: draft.fontSize || null,
+      fontSize: isTextTag ? (draft.fontSize || null) : null,
       padding: draft.padding || null,
       margin: draft.margin || null,
       borderRadius: draft.borderRadius || null,
       layerX: draft.layerX,
       layerY: draft.layerY,
       layerWidth: draft.layerWidth,
-    layerHeight: draft.layerHeight,
+      layerHeight: draft.layerHeight,
       layerZIndex: draft.layerZIndex,
       layerOpacity: draft.layerOpacity,
       backgroundSize: draft.backgroundSize,
@@ -1640,12 +1695,12 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     });
     // Immediate direct DOM update for instant live responsiveness
     if (domNode) {
-      if (payload.contentText !== null && payload.contentText !== undefined) {
+      if (isTextTag && payload.contentText !== null && payload.contentText !== undefined) {
         const textChild = Array.from(domNode.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
         if (textChild) textChild.textContent = payload.contentText;
         else domNode.textContent = payload.contentText;
       }
-      if (payload.mediaUrl) {
+      if (isMediaTag && payload.mediaUrl) {
         const imgEl = domNode.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode.querySelector<HTMLImageElement>("img");
         if (imgEl) {
           const currentSrcAttr = imgEl.getAttribute("src");
@@ -1658,10 +1713,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           imgEl.src = payload.mediaUrl;
         }
       }
-      if (payload.textColor) {
+      if (isTextTag && payload.textColor) {
         domNode.style.color = payload.textColor;
       }
-      if (payload.fontSize) {
+      if (isTextTag && payload.fontSize) {
         domNode.style.fontSize = payload.fontSize;
       }
     }
@@ -3093,7 +3148,11 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
         { handle: "s" as const, label: "قص القسم من الأسفل مع التصاق القسم التالي", className: "-bottom-2 left-1/2 -translate-x-1/2 cursor-ns-resize" },
       ] : []),
     ] as const).map(({ handle, label: handleLabel, className: handleClass }) => <button key={handle} type="button" aria-label={handleLabel} title={handleLabel} onPointerDown={(event) => { event.stopPropagation(); begin(event, "resize", handle); }} className={`absolute z-[83] grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-[#08467d] shadow-[0_0_0_3px_rgba(7,9,13,.45)] ${handleClass}`}><span className="h-1.5 w-1.5 rounded-full bg-[#f8ca14]" /></button>) : null}
-    {typeof children === "function" ? children(content) : children ?? content}
+    {typeof children === "function"
+      ? children(content)
+      : (tag === "text" || tag === "button") && override?.contentText !== null && override?.contentText !== undefined
+      ? override.contentText
+      : children ?? content}
   </Tag>;
 }
 
