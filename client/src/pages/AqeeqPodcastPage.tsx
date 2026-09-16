@@ -15,6 +15,7 @@ import { VinylAlbumCard, GrandVinylDeck, GrandCinemaDeck } from "@/components/ui
 import { SpatialAudioReactiveSpectrum } from "@/components/ui/spatial-audio-reactive-spectrum";
 import { AtheerScrollVinylBackdrop, type AtheerScrollBackdropItem } from "@/components/ui/atheer-scroll-vinyl-backdrop";
 import { motion } from "framer-motion";
+import { usePageSeo } from "@/lib/usePageSeo";
 
 import {
   Play,
@@ -113,6 +114,14 @@ export default function AqeeqPodcastPage() {
   const dark = theme === "dark";
 
   const { user, isAuthenticated } = useAuth();
+
+  usePageSeo({
+    title: "أثير العقيق - البودكاست والإذاعة المدرسية | مدارس العقيق بالمدينة المنورة",
+    description: "أثير العقيق - المنصة الصوتية والمرئية الرسمية لمدارس العقيق بالمدينة المنورة. حلقات البودكاست التربوي، الإذاعة الصباحية، الأناشيد المدرسية وحوارات الطلاب والقيادات.",
+    keywords: "بودكاست مدارس العقيق, إذاعة مدرسية المدينة المنورة, أثير العقيق, أناشيد مدارس العقيق, لقاءات تربوية المدينة",
+    canonical: "https://alaqeeq.edu.sa/podcasts",
+  });
+
   const [, navigate] = useLocation();
   const isAdmin = isAuthenticated && user?.role === "admin";
 

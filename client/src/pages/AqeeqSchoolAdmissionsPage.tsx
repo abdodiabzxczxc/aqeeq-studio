@@ -11,6 +11,7 @@ import AqeeqSchoolAppShowcaseSection from "@/components/AqeeqSchoolAppShowcaseSe
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { FaqAccordionSection } from "@/components/FaqAccordionSection";
+import { usePageSeo } from "@/lib/usePageSeo";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,6 +78,13 @@ export default function AqeeqSchoolAdmissionsPage() {
   const { theme } = useAqeeqStudioTheme();
   const { isNationalDay } = useSiteTheme();
   const dark = theme === "dark";
+
+  usePageSeo({
+    title: "القبول والتسجيل والرسوم الدراسية 1446 | مدارس العقيق الأهلية والدولية",
+    description: "بوابة القبول والتسجيل لمدارس العقيق الأهلية والدولية بالمدينة المنورة - حاسبة الرسوم، خطط التقسيط، مسارات البنين والبنات، والاعتماد الأمريكي كوجنيا.",
+    keywords: "تسجيل مدارس العقيق, رسوم مدارس العقيق, مدارس أهلية بالمدينة المنورة, مدارس دولية المدينة المنورة, حاسبة رسوم المدارس المدينة",
+    canonical: "https://alaqeeq.edu.sa/admissions",
+  });
 
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {

@@ -36,6 +36,7 @@ import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
+import { usePageSeo } from "@/lib/usePageSeo";
 
 
 const CATEGORIES = [
@@ -305,6 +306,15 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [readingArticle, setReadingArticle] = useState<any>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  usePageSeo({
+    title: readingArticle 
+      ? readingArticle.title 
+      : "المقالات والأبحاث التربوية | مدارس العقيق بالمدينة المنورة",
+    description: readingArticle?.excerpt || "منصة المقالات والأبحاث التعليمية والتربوية لمدارس العقيق بالمدينة المنورة - كتابات وإسهامات نخبة من المعلمين والخبراء والطلاب.",
+    keywords: "مقالات تعليمية المدينة المنورة, أبحاث تربوية, مدارس العقيق, استراتيجيات التعلم الحديث, الذكاء الاصطناعي في التعليم",
+    canonical: readingArticle ? `https://alaqeeq.edu.sa/articles/${readingArticle.slug}` : "https://alaqeeq.edu.sa/articles",
+  });
 
   const { data: rawArticles = [], isLoading, refetch } = trpc.articles.listPublished.useQuery({
     category: selectedCategory,

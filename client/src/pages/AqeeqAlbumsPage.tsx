@@ -17,6 +17,7 @@ import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
 import { AqeeqGrandFinaleCta } from "@/components/AqeeqGrandFinaleCta";
 import { useMagneticTilt, staggerContainer, fadeUpSpring } from "@/lib/motionPresets";
 import { motion } from "framer-motion";
+import { usePageSeo } from "@/lib/usePageSeo";
 import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
 
 type PublicAlbum = { id: number; slug: string; title: string; description: string | null; coverUrl: string | null; mediaCount: number; viewCount: number };
@@ -252,6 +253,13 @@ export default function AqeeqAlbumsPage() {
   const dark = theme === "dark";
   const { isNationalDay } = useSiteTheme();
   const { user, isAuthenticated } = useAuth();
+
+  usePageSeo({
+    title: "استوديو وألبومات الفعاليات المدرسية | مدارس العقيق بالمدينة المنورة",
+    description: "استوديو مدارس العقيق الأهلية والدولية - ألبومات الصور والفيديوهات للأنشطة، الفعاليات المدرسية، معارض STEM، والمسابقات الكبرى بالمدينة المنورة.",
+    keywords: "فعاليات مدارس العقيق, ألبومات مدارس المدينة المنورة, صور فعاليات مدرسية, اليوم الوطني مدارس العقيق, احتفالات التخرج المدينة",
+    canonical: "https://alaqeeq.edu.sa/albums",
+  });
 
   const [, navigate] = useLocation();
   const albumsHeroRef = useRef<HTMLDivElement>(null);
