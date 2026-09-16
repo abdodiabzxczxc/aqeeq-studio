@@ -238,8 +238,8 @@ export default function SchoolNewsPage() {
     undefined,
     {
       initialData: getCachedSiteOrchestration(),
-      refetchOnMount: true,
-      staleTime: 0,
+      staleTime: 60000,
+      refetchOnWindowFocus: false,
     }
   );
 

@@ -1584,7 +1584,7 @@
       "watermarkTint": "#d6b96a",
       "status": "published",
       "createdAt": "2026-08-29T18:31:25.878Z",
-      "updatedAt": "2026-09-16T07:18:23.109Z",
+      "updatedAt": "2026-09-16T07:54:30.097Z",
       "posts": [
         {
           "id": 161,
@@ -2755,7 +2755,7 @@
     "album": 8,
     "albumMedia": 133,
     "showcase": 2,
-    "showcasePost": 184,
+    "showcasePost": 188,
     "showcasePostMedia": 1,
     "mediaAsset": 39,
     "admission": 2

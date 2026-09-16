@@ -288,8 +288,8 @@ export default function AlaqeeqStudioPublicPage() {
   const { data: podcasts = [], isLoading: podcastsLoading } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
   const { data: orchestration, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     initialData: getCachedSiteOrchestration(),
-    refetchOnMount: true,
-    staleTime: 0,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

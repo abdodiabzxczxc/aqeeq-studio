@@ -1072,7 +1072,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
 
         const override = overrideMap.get(id) || getInstantVisualOverride(id, pagePath, img.getAttribute("src") || undefined);
-        if (override?.mediaUrl && img.src !== override.mediaUrl) {
+        const currentSrcAttr = img.getAttribute("src");
+        if (override?.mediaUrl && currentSrcAttr !== override.mediaUrl && img.src !== override.mediaUrl) {
           img.src = override.mediaUrl;
         }
         if (override?.altText && img.alt !== override.altText) {

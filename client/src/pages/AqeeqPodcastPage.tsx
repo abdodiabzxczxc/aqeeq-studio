@@ -129,8 +129,8 @@ export default function AqeeqPodcastPage() {
   const { data: rawPodcasts = [], isLoading, refetch } = trpc.podcasts.list.useQuery({});
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     initialData: getCachedSiteOrchestration(),
-    refetchOnMount: true,
-    staleTime: 0,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

@@ -340,8 +340,8 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     initialData: getCachedSiteOrchestration(),
-    refetchOnMount: true,
-    staleTime: 0,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

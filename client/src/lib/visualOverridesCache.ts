@@ -141,12 +141,21 @@ export function syncOverridesToCache(overrides: CachedVisualOverride[]) {
 
   for (const item of overrides) {
     if (!item || !item.elementId) continue;
-    const existing = memoryRegistry[item.elementId] || {};
-    memoryRegistry[item.elementId] = { ...existing, ...item };
-    if (item.pagePath) {
-      memoryRegistry[`${item.pagePath}::${item.elementId}`] = { ...existing, ...item };
+    const existing = memoryRegistry[item.elementId];
+    if (
+      !existing ||
+      existing.mediaUrl !== item.mediaUrl ||
+      existing.contentText !== item.contentText ||
+      existing.bgColor !== item.bgColor ||
+      existing.textColor !== item.textColor ||
+      existing.backgroundOverlay !== item.backgroundOverlay
+    ) {
+      memoryRegistry[item.elementId] = { ...(existing || {}), ...item };
+      if (item.pagePath) {
+        memoryRegistry[`${item.pagePath}::${item.elementId}`] = { ...(existing || {}), ...item };
+      }
+      changed = true;
     }
-    changed = true;
   }
 
   if (changed) {
@@ -164,6 +173,7 @@ export function syncOverridesToCache(overrides: CachedVisualOverride[]) {
 export function recordSrcReplacement(originalSrc: string, newSrc: string) {
   if (!originalSrc || !newSrc || originalSrc === newSrc) return;
   initCache();
+  if (memoryReplacements[originalSrc] === newSrc) return;
   memoryReplacements[originalSrc] = newSrc;
   try {
     if (typeof window !== "undefined") {
@@ -189,6 +199,7 @@ export function removeInstantVisualOverride(elementId: string, pagePath?: string
 }
 
 let memoryOrchestration: any = undefined;
+let lastOrchestrationHash = "";
 
 /**
  * Retrieves the cached site orchestration synchronously (0ms RAM lookup)
@@ -212,7 +223,10 @@ export function cacheSiteOrchestration(data: any) {
   if (typeof window === "undefined" || !data) return;
   memoryOrchestration = data;
   try {
-    localStorage.setItem(SITE_ORCHESTRATION_KEY, JSON.stringify(data));
+    const json = JSON.stringify(data);
+    if (json === lastOrchestrationHash) return;
+    lastOrchestrationHash = json;
+    localStorage.setItem(SITE_ORCHESTRATION_KEY, json);
   } catch {}
 }
 

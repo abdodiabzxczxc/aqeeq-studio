@@ -1148,8 +1148,8 @@ export default function AqeeqShowcasePage() {
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
     initialData: getCachedSiteOrchestration(),
-    refetchOnMount: true,
-    staleTime: 0,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
