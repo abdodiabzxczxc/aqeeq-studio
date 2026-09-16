@@ -27,6 +27,7 @@ import {
   Bot
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -233,9 +234,14 @@ export const usePodcastPlayer = () => useContext(PodcastPlayerContext);
 
 export function PodcastPlayerProvider({ children }: { children: React.ReactNode }) {
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnWindowFocus: false,
     staleTime: 60000,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
   const { data: podcastsList = [] } = trpc.podcasts.list.useQuery({}, {
     refetchOnWindowFocus: false,
   });

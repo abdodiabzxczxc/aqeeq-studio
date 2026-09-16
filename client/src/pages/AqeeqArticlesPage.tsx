@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation, useParams } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -338,9 +339,14 @@ export default function AqeeqArticlesPage({ params }: { params?: { slug?: string
   };
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnMount: true,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const articles = useMemo(() => {
     const list = [...rawArticles];

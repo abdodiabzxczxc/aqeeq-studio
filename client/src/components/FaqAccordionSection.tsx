@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { DEFAULT_FAQS, FaqItem } from "@/components/admin/content/FaqContentManager";
 import { HelpCircle, ChevronDown, Search, Sparkles, MessageCircleQuestion } from "lucide-react";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 interface FaqAccordionSectionProps {
   dark?: boolean;
@@ -25,9 +26,14 @@ export function FaqAccordionSection({
   subtitle = "كل ما تود معرفته عن التسجيل، المسارات التعليمية، والخدمات بمدارس العقيق",
 }: FaqAccordionSectionProps) {
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     staleTime: 60000,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const faqsList: FaqItem[] =
     (orchestration as any)?.faqs && (orchestration as any).faqs.length > 0

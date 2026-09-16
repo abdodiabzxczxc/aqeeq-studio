@@ -6,8 +6,9 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { ArrowUpLeft, BookOpen, CalendarDays, ChevronLeft, FolderArchive, Layers, Loader2, Newspaper, Settings2, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { AqeeqLuxuryPageShell } from "@/components/AqeeqLuxuryPageShell";
@@ -235,8 +236,16 @@ export default function SchoolNewsPage() {
   );
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(
     undefined,
-    { refetchOnMount: true, staleTime: 0 }
+    {
+      initialData: getCachedSiteOrchestration(),
+      refetchOnMount: true,
+      staleTime: 0,
+    }
   );
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const visibleIssues = useMemo(
     () => searchAndSortAqeeqContent(issues, searchQuery, sort) as NewsIssue[],

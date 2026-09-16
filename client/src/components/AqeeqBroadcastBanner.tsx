@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { AlertCircle, ArrowUpLeft, Sparkles, Volume2, X, Palmtree } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 export function AqeeqBroadcastBanner() {
   const { data: broadcast } = trpc.executiveAdmin.getBroadcast.useQuery(undefined, {
@@ -9,9 +10,14 @@ export function AqeeqBroadcastBanner() {
   });
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     staleTime: 30000,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const [dismissed, setDismissed] = useState(false);
 

@@ -12,6 +12,7 @@ import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Instagram, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
 import { toast } from "sonner";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
@@ -1145,7 +1146,15 @@ export default function AqeeqShowcasePage() {
 
   const { data: showcase, isLoading: showcaseLoading } = trpc.aqeeqShowcases.publicShowcase.useQuery({ slug: "news-offers" }, { refetchOnWindowFocus: false });
   const { data: issues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
-  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
   const recordPostView = trpc.aqeeqShowcases.recordPostView.useMutation();
   const isAdmin = isAuthenticated && user?.role === "admin";
   const posts = useMemo(() => (showcase?.posts || []) as ShowcasePost[], [showcase?.posts]);

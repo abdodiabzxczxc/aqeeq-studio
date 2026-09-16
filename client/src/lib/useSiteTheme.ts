@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 export type ThemeType = "default" | "saudi-national-day";
 export type TemplateVariant = "general" | "generosity" | "authenticity" | "vision" | "giving";
@@ -51,10 +52,15 @@ export const TEMPLATE_VARIANT_INFO: Record<TemplateVariant, { label: string; enL
 
 export function useSiteTheme() {
   const { data: orchestration, isLoading } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     staleTime: 1000 * 5, // 5 seconds fresh cache
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const themeMode = orchestration?.themeMode;
 

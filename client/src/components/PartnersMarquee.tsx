@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { DEFAULT_PARTNERS, PartnerItem } from "@/components/admin/content/PartnersContentManager";
 import { ExternalLink, Award } from "lucide-react";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 interface PartnersMarqueeProps {
   dark?: boolean;
@@ -9,9 +10,14 @@ interface PartnersMarqueeProps {
 
 export function PartnersMarquee({ dark = true }: PartnersMarqueeProps) {
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     staleTime: 60000,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const partnersList: PartnerItem[] = (orchestration as any)?.partners && (orchestration as any).partners.length > 0
     ? (orchestration as any).partners

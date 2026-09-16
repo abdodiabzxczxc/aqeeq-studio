@@ -15,6 +15,7 @@ import { HeroParallax, HeroParallaxBackdrop, type ParallaxProduct } from "@/comp
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { resolveMediaUrl } from "@/lib/mediaUtils";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 export const ACCREDITATIONS_PARALLAX_PRODUCTS: ParallaxProduct[] = [
   { title: "اعتماد كوجنيا الأمريكية Cognia", link: "#accreditations-hub-section", thumbnail: "/covers/cover-about.jpg", category: "تقييم 99.2%", date: "اعتماد دولي" },
@@ -66,9 +67,14 @@ export default function AqeeqSchoolAccreditationsPage() {
   const accreditationsHeroRef = useRef<HTMLDivElement>(null);
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnMount: true,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const dynamicAccreditationsParallaxProducts = useMemo<ParallaxProduct[]>(() => {
     const custom = (orchestration as any)?.backdrops?.accreditations;

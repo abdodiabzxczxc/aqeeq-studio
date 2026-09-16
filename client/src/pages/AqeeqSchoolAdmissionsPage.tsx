@@ -13,6 +13,7 @@ import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
 import { FaqAccordionSection } from "@/components/FaqAccordionSection";
 import { usePageSeo } from "@/lib/usePageSeo";
 import { resolveMediaUrl } from "@/lib/mediaUtils";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,9 +118,14 @@ export default function AqeeqSchoolAdmissionsPage() {
   const admissionsHeroRef = useRef<HTMLDivElement>(null);
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnMount: true,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const dynamicAdmissionsItems = useMemo<UnfurlingItem[]>(() => {
     const custom = (orchestration as any)?.backdrops?.admissions;

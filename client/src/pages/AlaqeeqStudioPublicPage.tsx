@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { resolveStudioCardCovers } from "@/lib/studioCardCovers";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
@@ -285,7 +286,15 @@ export default function AlaqeeqStudioPublicPage() {
   const { data: showcases = [], isLoading: showcasesLoading } = trpc.aqeeqShowcases.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: articles = [], isLoading: articlesLoading } = trpc.articles.listPublished.useQuery({}, { refetchOnWindowFocus: false });
   const { data: podcasts = [], isLoading: podcastsLoading } = trpc.podcasts.list.useQuery({}, { refetchOnWindowFocus: false });
-  const { data: orchestration, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
+  const { data: orchestration, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   // Interactive FX Modal & Media Picker State
   const [editingHoverItem, setEditingHoverItem] = useState<InteractiveHoverItem | null>(null);

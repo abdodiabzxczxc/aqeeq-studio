@@ -160,8 +160,77 @@
 
     <!-- CDN Preconnect for Fast Image Loading -->
     <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
-    <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
+    <!-- Instant Pre-Paint Zero-Flash Image Hydration Engine (Frame 0 Protection) -->
+    <script>
+      (function() {
+        try {
+          var reg = JSON.parse(localStorage.getItem('aqeeq_global_overrides_registry_v2') || '{}');
+          var reps = JSON.parse(localStorage.getItem('aqeeq_src_replacements_v2') || '{}');
+          var legacy = JSON.parse(localStorage.getItem('aqeeq-overrides-/') || '[]');
+          if (Array.isArray(legacy)) {
+            for (var i = 0; i < legacy.length; i++) {
+              var it = legacy[i];
+              if (it && it.elementId && !reg[it.elementId]) reg[it.elementId] = it;
+            }
+          }
+          var path = window.location.pathname.replace(/\/$/, '') || '/';
 
+          function checkAndSwap(el) {
+            if (!el || el.nodeType !== 1) return;
+            if (el.tagName === 'IMG') {
+              var id = el.getAttribute('data-visual-id');
+              var src = el.getAttribute('src');
+              var hit = (id && (reg[path + '::' + id] || reg[id])) || (src && reps[src]);
+              var newSrc = hit && (hit.mediaUrl || hit);
+              if (typeof newSrc === 'string' && newSrc && el.src !== newSrc) {
+                el.src = newSrc;
+              }
+            } else if (el.tagName === 'DIV' || el.tagName === 'SECTION') {
+              var id = el.getAttribute('data-visual-id');
+              var hit = id && (reg[path + '::' + id] || reg[id]);
+              if (hit && hit.mediaUrl) {
+                var bg = el.style.backgroundImage;
+                if (!bg || bg.indexOf(hit.mediaUrl) === -1) {
+                  var overlay = hit.backgroundOverlay ? Math.max(0, Math.min(100, hit.backgroundOverlay)) / 100 : 0;
+                  el.style.backgroundImage = overlay
+                    ? 'linear-gradient(rgba(0,0,0,' + overlay + '),rgba(0,0,0,' + overlay + ')), url("' + hit.mediaUrl + '")'
+                    : 'url("' + hit.mediaUrl + '")';
+                }
+              }
+            }
+          }
+
+          var observer = new MutationObserver(function(mutations) {
+            for (var m = 0; m < mutations.length; m++) {
+              var mut = mutations[m];
+              if (mut.type === 'childList') {
+                for (var n = 0; n < mut.addedNodes.length; n++) {
+                  var node = mut.addedNodes[n];
+                  if (node.nodeType === 1) {
+                    checkAndSwap(node);
+                    var children = node.querySelectorAll ? node.querySelectorAll('img, [data-visual-id]') : [];
+                    for (var k = 0; k < children.length; k++) checkAndSwap(children[k]);
+                  }
+                }
+              } else if (mut.type === 'attributes' && mut.attributeName === 'src') {
+                checkAndSwap(mut.target);
+              }
+            }
+          });
+
+          observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['src', 'data-visual-id']
+          });
+
+          window.addEventListener('load', function() {
+            setTimeout(function() { observer.disconnect(); }, 2500);
+          }, { once: true });
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

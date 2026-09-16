@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { AqeeqUniversalMediaPickerModal, MediaPickerItem } from "@/components/AqeeqUniversalMediaPickerModal";
@@ -765,8 +766,13 @@ export default function AqeeqAdminDashboardPage() {
   });
 
   const { data: orchestrationData, refetch: refetchOrchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
   });
+
+  useEffect(() => {
+    if (orchestrationData) cacheSiteOrchestration(orchestrationData);
+  }, [orchestrationData]);
 
   const { data: admissionsList = [], refetch: refetchAdmissions, isLoading: isLoadingAdmissions } = trpc.admissions.list.useQuery(undefined, {
     enabled: Boolean(isAuthenticated && user?.role === "admin"),
@@ -939,8 +945,9 @@ export default function AqeeqAdminDashboardPage() {
   }, [selectedSharePage, utmSource, utmCampaign]);
 
   const setOrchestrationMutation = trpc.executiveAdmin.setSiteOrchestration.useMutation({
-    onSuccess: () => {
+    onSuccess: (saved) => {
       toast.success("تم حفظ وتحديث الإعدادات بنجاح! 🚀");
+      if (saved) cacheSiteOrchestration(saved);
       void refetchOrchestration();
     },
     onError: (err) => toast.error(err.message || "تعذر حفظ التعديلات"),

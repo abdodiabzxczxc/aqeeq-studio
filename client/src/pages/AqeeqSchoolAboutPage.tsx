@@ -13,6 +13,7 @@ import { useLocation } from "wouter";
 import { ArticlesScrollParallaxBackdrop, type ArticleBackdropItem } from "@/components/ui/articles-scroll-parallax-backdrop";
 import { trpc } from "@/lib/trpc";
 import { resolveMediaUrl } from "@/lib/mediaUtils";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 
 export const ABOUT_UNFURLING_ITEMS = [
   { id: "about-1", title: "تأسيس مدارس العقيق 1994", image: "/covers/cover-about.jpg", badge: "30+ عاماً ريادة", date: "طيبة الطيبة" },
@@ -70,9 +71,14 @@ export default function AqeeqSchoolAboutPage() {
   const aboutHeroRef = useRef<HTMLDivElement>(null);
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnMount: true,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const dynamicAboutParallaxItems = useMemo<ArticleBackdropItem[]>(() => {
     const custom = (orchestration as any)?.backdrops?.about;

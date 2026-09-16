@@ -28,6 +28,12 @@ import PageMapDrawer from "./PageMapDrawer";
 import VisualAddPanel from "./VisualAddPanel";
 import VisualLayersPanel from "./VisualLayersPanel";
 import SiteBuilderDrawer from "./SiteBuilderDrawer";
+import {
+  getInstantVisualOverride,
+  setInstantVisualOverride,
+  syncOverridesToCache,
+  recordSrcReplacement,
+} from "@/lib/visualOverridesCache";
 
 type VisualOverride = {
   id: number;
@@ -623,6 +629,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       try {
         localStorage.setItem(pageCacheKey, JSON.stringify(dataToCache));
       } catch {}
+      syncOverridesToCache(dataToCache as any);
     }
   }, [pageCacheKey, isAdmin, isEditing, editorOverridesQuery.data, publicListQuery.data, snapshot?.overrides, pagePath]);
 
@@ -638,6 +645,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           const updated = [...current.filter((o) => o.elementId !== (savedData as any).elementId), savedData as VisualOverride];
           localStorage.setItem(pageCacheKey, JSON.stringify(updated));
         } catch {}
+        setInstantVisualOverride(savedData as any);
       }
       if (pagePath) { void utils.visualEditor.list.invalidate({ pagePath }); void utils.visualEditor.history.invalidate({ pagePath }); }
     },
@@ -1063,7 +1071,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           img.dataset.visualAuto = "true";
         }
 
-        const override = overrideMap.get(id);
+        const override = overrideMap.get(id) || getInstantVisualOverride(id, pagePath, img.getAttribute("src") || undefined);
         if (override?.mediaUrl && img.src !== override.mediaUrl) {
           img.src = override.mediaUrl;
         }
@@ -1566,6 +1574,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       ...current,
       ...Object.fromEntries(sharedTargets.map((elementId) => [`${pagePath}::${elementId}`, { ...optimisticOverride, elementId }])),
     }));
+    sharedTargets.forEach((elementId) => {
+      setInstantVisualOverride({ ...optimisticOverride, elementId });
+    });
     // Immediate direct DOM update for instant live responsiveness
     const domNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
     if (domNode) {
@@ -1577,6 +1588,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (payload.mediaUrl) {
         const imgEl = domNode.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode.querySelector<HTMLImageElement>("img");
         if (imgEl) {
+          if (imgEl.src && imgEl.src !== payload.mediaUrl) {
+            recordSrcReplacement(imgEl.src, payload.mediaUrl);
+          }
           imgEl.src = payload.mediaUrl;
         }
       }
@@ -1696,6 +1710,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       ...Object.fromEntries(sharedHeroBackgroundIds(selected.id).map((elementId) => [`${pagePath}::${elementId}`, { ...next, elementId }])),
     }));
     setDraft((value) => ({ ...value, bgColor: patch.bgColor ?? value.bgColor, mediaUrl: patch.mediaUrl ?? value.mediaUrl, altText: patch.altText ?? value.altText, backgroundSize: patch.backgroundSize ?? value.backgroundSize, backgroundPositionX: patch.backgroundPositionX ?? value.backgroundPositionX, backgroundPositionY: patch.backgroundPositionY ?? value.backgroundPositionY, backgroundOverlay: patch.backgroundOverlay ?? value.backgroundOverlay }));
+
+    if (patch.mediaUrl) {
+      sharedHeroBackgroundIds(selected.id).forEach((elementId) => {
+        setInstantVisualOverride({
+          elementId,
+          pagePath,
+          elementTag: selected.tag,
+          mediaUrl: patch.mediaUrl,
+          altText: patch.altText,
+        });
+      });
+    }
 
     // Immediate DOM update for instant visual feedback on canvas
     try {
@@ -2631,21 +2657,13 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
 
 export function VisualImage({ id, label, src, alt, className = "", linkUrl, style, priority = false, loading }: { id: string; label: string; src: string; alt: string; className?: string; linkUrl?: string; style?: React.CSSProperties; priority?: boolean; loading?: "lazy" | "eager" }) {
   const { getOverride } = useContext(VisualEditorContext);
+  const [pathname] = useLocation();
+  const pagePath = normalizedPath(pathname);
   const override = getOverride(id);
   const cachedOverride = useMemo(() => {
     if (override?.mediaUrl) return override;
-    try {
-      if (typeof window !== "undefined") {
-        const raw = localStorage.getItem("aqeeq-overrides-/");
-        if (raw) {
-          const list = JSON.parse(raw);
-          const found = list.find((item: any) => item.elementId === id);
-          if (found) return found;
-        }
-      }
-    } catch {}
-    return null;
-  }, [override, id]);
+    return getInstantVisualOverride(id, pagePath, src);
+  }, [override, id, pagePath, src]);
 
   const activeOverride = override || cachedOverride;
   const resolvedSrc = activeOverride?.mediaUrl || src;
@@ -2671,10 +2689,13 @@ export function VisualIcon({ id, label, icon = "sparkles", className = "", size 
 
 export function VisualBackground({ id, label, src, alt, className = "", style }: { id: string; label: string; src?: string; alt: string; className?: string; style?: React.CSSProperties }) {
   const { getOverride, getOwnOverride } = useContext(VisualEditorContext);
+  const [pathname] = useLocation();
+  const pagePath = normalizedPath(pathname);
   const ownOverride = getOwnOverride(id);
   const sharedSourceOverride = isSharedHeroBackground(id) ? getOverride(heroBackgroundSourceId(id)) : undefined;
-  const sourceOverride = sharedSourceOverride ?? ownOverride ?? getOverride(id);
-  const presentationOverride = ownOverride ?? sourceOverride;
+  const instantOverride = getInstantVisualOverride(id, pagePath, src);
+  const sourceOverride = sharedSourceOverride ?? ownOverride ?? getOverride(id) ?? instantOverride;
+  const presentationOverride = ownOverride ?? sourceOverride ?? instantOverride;
   const resolvedSrc = resolveBackgroundSource(sourceOverride?.mediaUrl, sourceOverride?.bgColor, src);
   const overlay = Math.max(0, Math.min(100, presentationOverride?.backgroundOverlay ?? 0)) / 100;
   const backgroundStyle: React.CSSProperties = resolvedSrc

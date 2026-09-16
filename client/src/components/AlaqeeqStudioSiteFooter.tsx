@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { useSiteTheme } from "@/lib/useSiteTheme";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { useLocation } from "wouter";
 import { VisualEditable } from "@/components/VisualEditor";
 import {
@@ -50,9 +52,14 @@ export function AlaqeeqStudioSiteFooter() {
   const [, navigate] = useLocation();
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     refetchOnWindowFocus: false,
     staleTime: 60000,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const whatsappNumber = orchestration?.social?.whatsappNumber || "966531896000";
   const cleanWhatsapp = whatsappNumber.replace(/[^0-9]/g, "");

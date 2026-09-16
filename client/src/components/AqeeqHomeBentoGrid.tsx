@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { useLocation } from "wouter";
 import { Play, BookOpen, ImageIcon, Mic, Newspaper, Sparkles, ArrowUpLeft, Disc, Volume2 } from "lucide-react";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
@@ -98,8 +99,13 @@ export function AqeeqHomeBentoGrid({
   });
 
   const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
     staleTime: 60000,
   });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
 
   const isAlbumEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "albums")?.enabled !== false;
   const isJournalEnabled = orchestration?.bentoCards?.find((c: any) => c.id === "journal")?.enabled !== false;

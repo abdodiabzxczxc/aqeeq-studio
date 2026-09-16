@@ -6,6 +6,7 @@ import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { searchAndSortAqeeqContent, type AqeeqSortOption } from "@/lib/aqeeqArchiveControls";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { ArrowUpLeft, Camera, Eye, ImageIcon, Loader2, Settings2, Sparkles, Video, MonitorPlay, Layers, FolderCheck } from "lucide-react";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
@@ -270,7 +271,15 @@ export default function AqeeqAlbumsPage() {
   const isAdmin = isAuthenticated && user?.role === "admin";
   const { data: albums = [], isLoading } = trpc.aqeeqAlbums.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: journalIssues = [] } = trpc.schoolNews.publicList.useQuery(undefined, { refetchOnWindowFocus: false });
-  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnMount: true, staleTime: 0 });
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
   const visibleAlbums = useMemo(() => searchAndSortAqeeqContent(albums, searchQuery, sort), [albums, searchQuery, sort]) as PublicAlbum[];
 
   // ─── FEAT-3: Client-side pagination for albums ──────────────────────────────

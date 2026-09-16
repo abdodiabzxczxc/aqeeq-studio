@@ -53,6 +53,7 @@ import {
 import { toast } from "sonner";
 import { usePodcastPlayer } from "@/components/AqeeqFloatingPodcastPlayer";
 import { trpc } from "@/lib/trpc";
+import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
 import { triggerNationalCelebration } from "./AqeeqCelebrationConfetti";
 import { AlaqeeqSpotlightSearch } from "@/components/AlaqeeqSpotlightSearch";
 import { AqeeqOccasionRibbon } from "@/components/AqeeqOccasionRibbon";
@@ -96,7 +97,14 @@ type AlaqeeqStudioSiteHeaderProps = {
 export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudioSiteHeaderProps) {
   const [location, navigate] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, { refetchOnWindowFocus: false });
+  const { data: orchestration } = trpc.executiveAdmin.getSiteOrchestration.useQuery(undefined, {
+    initialData: getCachedSiteOrchestration(),
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (orchestration) cacheSiteOrchestration(orchestration);
+  }, [orchestration]);
   const editor = useVisualEditorState();
   const { theme, toggleTheme } = useAqeeqStudioTheme();
   const { isNationalDay } = useSiteTheme();
