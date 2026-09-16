@@ -81,6 +81,49 @@ function initCache() {
 }
 
 /**
+ * Generates all normalized key variants for an image URL so relative and absolute URLs match.
+ */
+export function normalizeSrcKeys(src: string): string[] {
+  if (!src) return [];
+  const keys = new Set<string>();
+  const trimmed = src.trim();
+  keys.add(trimmed);
+
+  const noQuery = trimmed.split("?")[0].split("#")[0];
+  keys.add(noQuery);
+
+  if (trimmed.startsWith("/")) {
+    if (typeof window !== "undefined" && window.location?.origin) {
+      keys.add(window.location.origin + trimmed);
+      keys.add(window.location.origin + noQuery);
+    }
+  } else {
+    try {
+      const url = new URL(trimmed);
+      keys.add(url.pathname);
+      keys.add(url.origin + url.pathname);
+    } catch {}
+  }
+  return Array.from(keys);
+}
+
+/**
+ * Resolves any image URL against the synchronous replacements cache.
+ * Returns the replacement URL in 0.001ms if replaced, otherwise returns original src.
+ */
+export function resolveInstantSrc(src?: string | null): string {
+  if (!src) return "";
+  initCache();
+  const keys = normalizeSrcKeys(src);
+  for (const k of keys) {
+    if (memoryReplacements[k]) {
+      return memoryReplacements[k];
+    }
+  }
+  return src;
+}
+
+/**
  * Synchronously retrieves any active override for an element ID, page path, or fallback src.
  * Returns in 0.001ms from RAM cache with zero network delay.
  */
@@ -99,11 +142,14 @@ export function getInstantVisualOverride(
   if (memoryRegistry[elementId]?.mediaUrl || memoryRegistry[elementId]?.contentText) {
     return memoryRegistry[elementId];
   }
-  if (fallbackSrc && memoryReplacements[fallbackSrc]) {
-    return {
-      elementId,
-      mediaUrl: memoryReplacements[fallbackSrc],
-    };
+  if (fallbackSrc) {
+    const replaced = resolveInstantSrc(fallbackSrc);
+    if (replaced && replaced !== fallbackSrc) {
+      return {
+        elementId,
+        mediaUrl: replaced,
+      };
+    }
   }
   return undefined;
 }
@@ -168,18 +214,26 @@ export function syncOverridesToCache(overrides: CachedVisualOverride[]) {
 }
 
 /**
- * Associates an original image source URL with a new replacement URL
+ * Associates an original image source URL with a new replacement URL across all normalized key variants
  */
 export function recordSrcReplacement(originalSrc: string, newSrc: string) {
   if (!originalSrc || !newSrc || originalSrc === newSrc) return;
   initCache();
-  if (memoryReplacements[originalSrc] === newSrc) return;
-  memoryReplacements[originalSrc] = newSrc;
-  try {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(SRC_REPLACEMENTS_KEY, JSON.stringify(memoryReplacements));
+  const keys = normalizeSrcKeys(originalSrc);
+  let changed = false;
+  for (const k of keys) {
+    if (memoryReplacements[k] !== newSrc) {
+      memoryReplacements[k] = newSrc;
+      changed = true;
     }
-  } catch {}
+  }
+  if (changed) {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(SRC_REPLACEMENTS_KEY, JSON.stringify(memoryReplacements));
+      }
+    } catch {}
+  }
 }
 
 /**

@@ -33,6 +33,7 @@ import {
   setInstantVisualOverride,
   syncOverridesToCache,
   recordSrcReplacement,
+  resolveInstantSrc,
 } from "@/lib/visualOverridesCache";
 
 type VisualOverride = {
@@ -1071,10 +1072,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           img.dataset.visualAuto = "true";
         }
 
-        const override = overrideMap.get(id) || getInstantVisualOverride(id, pagePath, img.getAttribute("src") || undefined);
         const currentSrcAttr = img.getAttribute("src");
-        if (override?.mediaUrl && currentSrcAttr !== override.mediaUrl && img.src !== override.mediaUrl) {
-          img.src = override.mediaUrl;
+        const override = overrideMap.get(id) || getInstantVisualOverride(id, pagePath, currentSrcAttr || undefined);
+        const targetSrc = override?.mediaUrl || resolveInstantSrc(currentSrcAttr);
+        if (targetSrc && currentSrcAttr !== targetSrc && img.src !== targetSrc) {
+          img.src = targetSrc;
         }
         if (override?.altText && img.alt !== override.altText) {
           img.alt = override.altText;
@@ -1589,6 +1591,10 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (payload.mediaUrl) {
         const imgEl = domNode.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode.querySelector<HTMLImageElement>("img");
         if (imgEl) {
+          const currentSrcAttr = imgEl.getAttribute("src");
+          if (currentSrcAttr && currentSrcAttr !== payload.mediaUrl) {
+            recordSrcReplacement(currentSrcAttr, payload.mediaUrl);
+          }
           if (imgEl.src && imgEl.src !== payload.mediaUrl) {
             recordSrcReplacement(imgEl.src, payload.mediaUrl);
           }
@@ -2667,7 +2673,7 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   }, [override, id, pagePath, src]);
 
   const activeOverride = override || cachedOverride;
-  const resolvedSrc = activeOverride?.mediaUrl || src;
+  const resolvedSrc = activeOverride?.mediaUrl || resolveInstantSrc(src) || src;
   const resolvedAlt = activeOverride?.altText || alt;
   const resolvedLink = activeOverride?.linkUrl || linkUrl;
   const opensInNewTab = parseLayerBehavior(activeOverride?.customCss).openInNewTab;

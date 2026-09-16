@@ -19,6 +19,7 @@ import {
   setInstantVisualOverride,
   syncOverridesToCache,
   recordSrcReplacement,
+  resolveInstantSrc,
   getCachedSiteOrchestration,
   cacheSiteOrchestration,
   removeInstantVisualOverride,
@@ -65,6 +66,17 @@ describe("visualOverridesCache — Zero-Flash Image Hydration", () => {
     const res = getInstantVisualOverride("any-id", "/admissions", "https://example.com/hardcoded.jpg");
     expect(res).toBeDefined();
     expect(res?.mediaUrl).toBe("https://example.com/customized.jpg");
+  });
+
+  it("should match relative paths and resolveInstantSrc synchronously", () => {
+    recordSrcReplacement("/covers/first-lego-champions.png", "/uploads/my-new-lego-cover.jpg");
+
+    expect(resolveInstantSrc("/covers/first-lego-champions.png")).toBe("/uploads/my-new-lego-cover.jpg");
+    expect(resolveInstantSrc("/covers/first-lego-champions.png?v=1")).toBe("/uploads/my-new-lego-cover.jpg");
+
+    const res = getInstantVisualOverride("about-timeline-era-2026", "/about", "/covers/first-lego-champions.png");
+    expect(res).toBeDefined();
+    expect(res?.mediaUrl).toBe("/uploads/my-new-lego-cover.jpg");
   });
 
   it("should bulk sync overrides into cache", () => {

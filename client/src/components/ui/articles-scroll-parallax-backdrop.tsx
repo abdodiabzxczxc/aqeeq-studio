@@ -8,6 +8,7 @@ import {
   useSpring,
 } from "framer-motion";
 import { BookOpen, Sparkles } from "lucide-react";
+import { resolveInstantSrc } from "@/lib/visualOverridesCache";
 
 export interface ArticleBackdropItem {
   id: string | number;
@@ -144,7 +145,7 @@ export function ArticlesScrollParallaxBackdrop({
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-800">
                 {item.coverUrl ? (
                   <img
-                    src={item.coverUrl}
+                    src={resolveInstantSrc(item.coverUrl) || item.coverUrl}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -189,7 +190,7 @@ export function ArticlesScrollParallaxBackdrop({
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-800">
                 {item.coverUrl ? (
                   <img
-                    src={item.coverUrl}
+                    src={resolveInstantSrc(item.coverUrl) || item.coverUrl}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -234,7 +235,7 @@ export function ArticlesScrollParallaxBackdrop({
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-800">
                 {item.coverUrl ? (
                   <img
-                    src={item.coverUrl}
+                    src={resolveInstantSrc(item.coverUrl) || item.coverUrl}
                     alt=""
                     loading="lazy"
                     decoding="async"

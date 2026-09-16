@@ -12,7 +12,7 @@ import { getAqeeqShowcaseDisplaySource } from "@/lib/aqeeqShowcaseMedia";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { getAqeeqViewerKey } from "@/lib/aqeeqViewTracking";
 import { trpc } from "@/lib/trpc";
-import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
+import { getCachedSiteOrchestration, cacheSiteOrchestration, resolveInstantSrc } from "@/lib/visualOverridesCache";
 import { ArrowUpLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, ImageIcon, Instagram, Layers3, Loader2, Play, Settings2, Sparkles, X, Heart, Share2, Maximize2, Minimize2, Video } from "lucide-react";
 import { toast } from "sonner";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
@@ -34,7 +34,7 @@ const SHOWCASE_TYPE_OPTIONS = [{ id: "all", label: "الكل" }, { id: "images",
 const isSocialPost = (post: ShowcasePost) => ["x", "instagram", "youtube"].includes(post.sourceType || "drive");
 const matchesContentType = (post: ShowcasePost, type: ContentType) => type === "all" || type === "social" ? (type === "all" ? true : isSocialPost(post)) : !isSocialPost(post) && post.mediaType === (type === "images" ? "image" : "video");
 
-function ShowcaseMedia({ post, className = "", playing = false }: { post: ShowcasePost; className?: string; playing?: boolean }) { if (post.mediaType === "image") return <img src={getAqeeqShowcaseDisplaySource(post)} alt={post.title || post.fileName} className={`block h-auto w-full ${className}`} loading="lazy" />; if (playing) return <div className={className}><AqeeqUnifiedVideoFrame sourceUrl={post.mediaUrl} title={post.title || post.fileName} /></div>; return <AqeeqVideoPoster sourceUrl={post.mediaUrl} posterUrl={getAqeeqShowcaseDisplaySource(post)} title={post.title || post.fileName.replace(/\.[^.]+$/, "")} className={className} interactive={false} />; }
+function ShowcaseMedia({ post, className = "", playing = false }: { post: ShowcasePost; className?: string; playing?: boolean }) { const displaySrc = resolveInstantSrc(getAqeeqShowcaseDisplaySource(post)) || getAqeeqShowcaseDisplaySource(post); if (post.mediaType === "image") return <img src={displaySrc} alt={post.title || post.fileName} className={`block h-auto w-full ${className}`} loading="lazy" />; if (playing) return <div className={className}><AqeeqUnifiedVideoFrame sourceUrl={post.mediaUrl} title={post.title || post.fileName} /></div>; return <AqeeqVideoPoster sourceUrl={post.mediaUrl} posterUrl={displaySrc} title={post.title || post.fileName.replace(/\.[^.]+$/, "")} className={className} interactive={false} />; }
 function ShowcaseHeroCover({ post, className = "" }: { post: ShowcasePost; className?: string }) {
   const src = getAqeeqShowcaseDisplaySource(post);
 

@@ -1,7 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { useAqeeqStudioTheme } from "@/lib/aqeeqStudioTheme";
 import { resolveStudioCardCovers } from "@/lib/studioCardCovers";
-import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
+import { getCachedSiteOrchestration, cacheSiteOrchestration, getInstantVisualOverride, resolveInstantSrc } from "@/lib/visualOverridesCache";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
 import { AlaqeeqStudioSiteFooter } from "@/components/AlaqeeqStudioSiteFooter";
@@ -110,7 +110,7 @@ function StudioCardImage({
 }) {
   const { getOverride } = useVisualEditorState();
   const override = getOverride(id);
-  const resolvedSrc = override?.mediaUrl || src;
+  const resolvedSrc = override?.mediaUrl || getInstantVisualOverride(id, "/", src)?.mediaUrl || resolveInstantSrc(src) || src;
   const resolvedAlt = override?.altText || alt;
   return (
     <VisualEditable id={id} tag="image" label={label} as="span" className="absolute inset-0 block overflow-hidden">

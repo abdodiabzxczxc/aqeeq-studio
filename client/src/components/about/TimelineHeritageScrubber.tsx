@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
+import { VisualImage } from "@/components/VisualEditor";
 
 export interface TimelineEra {
   year: string;
@@ -384,7 +385,9 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                 </div>
 
                 {/* Photo with Smooth Scale Hover */}
-                <img
+                <VisualImage
+                  id={`about-timeline-era-${activeEra.shortYear}`}
+                  label={`صورة محطة ${activeEra.shortYear} - ${activeEra.label}`}
                   src={activeEra.image}
                   alt={activeEra.title}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"

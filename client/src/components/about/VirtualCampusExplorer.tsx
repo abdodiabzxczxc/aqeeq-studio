@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
+import { VisualImage } from "@/components/VisualEditor";
 import { useLocation } from "wouter";
 
 export interface FacilityItem {
@@ -342,7 +343,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 }`}
               >
                 {/* Background Photo */}
-                <img
+                <VisualImage
+                  id={`about-facility-${fac.id}`}
+                  label={`مرفق ${fac.name} (${fac.tag})`}
                   src={fac.image}
                   alt={fac.name}
                   className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
@@ -535,7 +538,13 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       }`}
                     >
                       <div className="rounded-2xl overflow-hidden aspect-video relative">
-                        <img loading="lazy" src={fac.image} alt={fac.name} className="h-full w-full object-cover" />
+                        <VisualImage
+                          id={`about-facility-mobile-${fac.id}`}
+                          label={`مرفق ${fac.name} (جوال)`}
+                          src={fac.image}
+                          alt={fac.name}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                       <p className={`text-xs leading-relaxed font-medium ${
                         dark ? "text-slate-300" : "text-slate-600"
