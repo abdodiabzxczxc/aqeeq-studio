@@ -153,20 +153,22 @@ type LayerBehavior = {
   openInNewTab?: boolean;
   backgroundOriginal?: BackgroundOrigin;
   originalSrc?: string;
+  objectFit?: "cover" | "contain" | "fill";
 };
 
-function parseLayerBehavior(raw?: string | null): LayerBehavior {
+export function parseLayerBehavior(raw?: string | null): LayerBehavior {
   try {
     const value = JSON.parse(raw || "{}") as LayerBehavior;
     return {
       ...value,
       device: ["all", "mobile", "desktop"].includes(value.device || "all") ? value.device : "all",
       animation: ["none", "fade", "rise", "slide"].includes(value.animation || "none") ? value.animation : "none",
+      objectFit: ["cover", "contain", "fill"].includes(value.objectFit || "") ? value.objectFit : undefined,
     };
   } catch { return { device: "all", animation: "none" }; }
 }
 
-function serializeLayerBehavior(current: string, patch: Partial<LayerBehavior>) {
+export function serializeLayerBehavior(current: string, patch: Partial<LayerBehavior>) {
   return JSON.stringify({ ...parseLayerBehavior(current), ...patch });
 }
 
@@ -1801,6 +1803,32 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         if (patch.bgColor !== undefined) {
           targetNode.style.backgroundColor = patch.bgColor || "";
         }
+        if (patch.backgroundPositionX !== undefined || patch.backgroundPositionY !== undefined) {
+          const posX = patch.backgroundPositionX ?? current?.backgroundPositionX ?? draft.backgroundPositionX ?? 50;
+          const posY = patch.backgroundPositionY ?? current?.backgroundPositionY ?? draft.backgroundPositionY ?? 50;
+          const pos = `${posX}% ${posY}%`;
+          if (targetNode.tagName === "IMG") {
+            (targetNode as HTMLImageElement).style.objectPosition = pos;
+            (targetNode as HTMLImageElement).style.transformOrigin = pos;
+          } else {
+            const innerImg = targetNode.querySelector<HTMLImageElement>("img");
+            if (innerImg) {
+              innerImg.style.objectPosition = pos;
+              innerImg.style.transformOrigin = pos;
+            }
+            targetNode.style.backgroundPosition = pos;
+          }
+        }
+        if (patch.backgroundSize !== undefined) {
+          const scale = patch.backgroundSize / 100;
+          if (targetNode.tagName === "IMG") {
+            (targetNode as HTMLImageElement).style.transform = `scale(${scale})`;
+          } else {
+            const innerImg = targetNode.querySelector<HTMLImageElement>("img");
+            if (innerImg) innerImg.style.transform = `scale(${scale})`;
+            targetNode.style.backgroundSize = `${patch.backgroundSize}%`;
+          }
+        }
       }
     } catch {}
   };
@@ -1839,6 +1867,19 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const updateLayerBehavior = (patch: Partial<LayerBehavior>) => {
     draftPreviewEnabled.current = true;
     setDraft((current) => ({ ...current, customCss: serializeLayerBehavior(current.customCss, patch) }));
+    if (selected && patch.objectFit !== undefined) {
+      try {
+        const targetNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+        if (targetNode) {
+          if (targetNode.tagName === "IMG") {
+            (targetNode as HTMLImageElement).style.objectFit = patch.objectFit || "";
+          } else {
+            const innerImg = targetNode.querySelector<HTMLImageElement>("img");
+            if (innerImg) innerImg.style.objectFit = patch.objectFit || "";
+          }
+        }
+      } catch {}
+    }
   };
   const updateDesignEffects = (patch: DesignEffectsPatch) => updateLayerBehavior(patch);
   const savedBackgroundOrigin = selected ? resolveBackgroundOrigin(selected.id, layerBehavior.backgroundOriginal) : undefined;
@@ -2235,19 +2276,222 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
               </div>
 
               {selected.tag === "image" ? (
-                <div className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                    <span>تكبير الصورة</span>
-                    <span className="text-amber-300">{draft.backgroundSize || 100}%</span>
+                <div className="space-y-3.5 rounded-2xl border border-amber-400/30 bg-black/40 p-3.5 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span className="flex items-center gap-1.5 text-xs font-black text-amber-300">
+                      <Move size={14} />
+                      <span>ضبط موضع الصورة والقص (Focal Point)</span>
+                    </span>
+                    <span className="rounded-md border border-amber-400/30 bg-amber-400/15 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                      تحكم دقيق
+                    </span>
                   </div>
-                  <input
-                    type="range"
-                    min={50}
-                    max={200}
-                    value={draft.backgroundSize || 100}
-                    onChange={(event) => stageSelectedBackground({ backgroundSize: Number(event.target.value) })}
-                    className="h-2 w-full cursor-pointer accent-amber-300"
+
+                  {/* 1. Fit Mode: Cover vs Contain */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>طريقة ملاءمة الصورة داخل الإطار</span>
+                      <span className="text-[10px] text-amber-300/80">
+                        {layerBehavior.objectFit === "contain" ? "كاملة بدون قص" : "ملء الإطار (قص تلقائي)"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateLayerBehavior({ objectFit: "cover" });
+                          toast.success("تم اختيار ملاءمة تغطية الإطار (Cover)");
+                        }}
+                        className={`flex flex-col items-center gap-0.5 rounded-xl border p-2 text-center transition ${
+                          layerBehavior.objectFit !== "contain"
+                            ? "border-amber-400 bg-amber-400/20 text-amber-300 shadow-sm font-black"
+                            : "border-white/10 bg-black/30 text-slate-400 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <span className="text-xs font-bold">ملء وقص (Cover)</span>
+                        <span className="text-[10px] opacity-75">يملأ الإطار بالكامل</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateLayerBehavior({ objectFit: "contain" });
+                          toast.success("تم اختيار إظهار الصورة كاملة دون قص (Contain)");
+                        }}
+                        className={`flex flex-col items-center gap-0.5 rounded-xl border p-2 text-center transition ${
+                          layerBehavior.objectFit === "contain"
+                            ? "border-amber-400 bg-amber-400/20 text-amber-300 shadow-sm font-black"
+                            : "border-white/10 bg-black/30 text-slate-400 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <span className="text-xs font-bold">كاملة (Contain)</span>
+                        <span className="text-[10px] opacity-75">إظهار الصورة كاملة 100%</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 2. Interactive 2D Focal Position Pad */}
+                  <ImageFocalPositionPad
+                    posX={draft.backgroundPositionX ?? 50}
+                    posY={draft.backgroundPositionY ?? 50}
+                    mediaUrl={draft.mediaUrl}
+                    onChange={(x, y) => stageSelectedBackground({ backgroundPositionX: x, backgroundPositionY: y })}
                   />
+
+                  {/* 3. Quick 3x3 Focal Presets */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>توجيه سريع للبؤرة (3×3)</span>
+                      <span className="text-[10px] text-amber-300/80">انقر للتركيز الفوري</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { label: "أعلى يمين", x: 100, y: 10 },
+                        { label: "أعلى وسط 👤 (وجوه)", x: 50, y: 10, highlight: true },
+                        { label: "أعلى يسار", x: 0, y: 10 },
+                        { label: "وسط يمين", x: 100, y: 50 },
+                        { label: "في المنتصف 🎯", x: 50, y: 50 },
+                        { label: "وسط يسار", x: 0, y: 50 },
+                        { label: "أسفل يمين", x: 100, y: 90 },
+                        { label: "أسفل وسط", x: 50, y: 90 },
+                        { label: "أسفل يسار", x: 0, y: 90 },
+                      ].map((preset) => {
+                        const isActive = (draft.backgroundPositionX ?? 50) === preset.x && (draft.backgroundPositionY ?? 50) === preset.y;
+                        return (
+                          <button
+                            key={`${preset.x}-${preset.y}`}
+                            type="button"
+                            onClick={() => stageSelectedBackground({ backgroundPositionX: preset.x, backgroundPositionY: preset.y })}
+                            className={`rounded-lg border px-1 py-1.5 text-[10px] font-bold transition ${
+                              isActive
+                                ? "border-amber-400 bg-amber-400 text-slate-950 shadow font-black"
+                                : preset.highlight
+                                ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+                                : "border-white/10 bg-black/30 text-slate-300 hover:border-white/20 hover:text-white"
+                            }`}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 4. Fine-Tuning Vertical and Horizontal Sliders */}
+                  <div className="space-y-2.5 pt-1">
+                    {/* Vertical Slider */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                        <span>تحريك رأسي (أعلى ↕ أسفل)</span>
+                        <span className="font-mono text-amber-300">{draft.backgroundPositionY ?? 50}%</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => stageSelectedBackground({ backgroundPositionY: Math.max(0, (draft.backgroundPositionY ?? 50) - 5) })}
+                          className="h-7 px-2 rounded-lg border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 transition"
+                          title="تحريك الصورة لأعلى"
+                        >
+                          ↑ أعلى (-5%)
+                        </button>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={draft.backgroundPositionY ?? 50}
+                          onChange={(event) => stageSelectedBackground({ backgroundPositionY: Number(event.target.value) })}
+                          className="h-2 flex-1 cursor-pointer accent-amber-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => stageSelectedBackground({ backgroundPositionY: Math.min(100, (draft.backgroundPositionY ?? 50) + 5) })}
+                          className="h-7 px-2 rounded-lg border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 transition"
+                          title="تحريك الصورة لأسفل"
+                        >
+                          ↓ أسفل (+5%)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Horizontal Slider */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                        <span>تحريك أفقي (يمين ↔ يسار)</span>
+                        <span className="font-mono text-amber-300">{draft.backgroundPositionX ?? 50}%</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => stageSelectedBackground({ backgroundPositionX: Math.max(0, (draft.backgroundPositionX ?? 50) - 5) })}
+                          className="h-7 px-2 rounded-lg border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 transition"
+                          title="تحريك الصورة لليسار"
+                        >
+                          ← يسار (-5%)
+                        </button>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={draft.backgroundPositionX ?? 50}
+                          onChange={(event) => stageSelectedBackground({ backgroundPositionX: Number(event.target.value) })}
+                          className="h-2 flex-1 cursor-pointer accent-amber-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => stageSelectedBackground({ backgroundPositionX: Math.min(100, (draft.backgroundPositionX ?? 50) + 5) })}
+                          className="h-7 px-2 rounded-lg border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 transition"
+                          title="تحريك الصورة لليمين"
+                        >
+                          → يمين (+5%)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 5. Zoom Scale */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>تكبير وتصغير (Zoom)</span>
+                      <span className="font-mono text-amber-300">{draft.backgroundSize || 100}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={50}
+                      max={200}
+                      value={draft.backgroundSize || 100}
+                      onChange={(event) => stageSelectedBackground({ backgroundSize: Number(event.target.value) })}
+                      className="h-2 w-full cursor-pointer accent-amber-300"
+                    />
+                    <div className="grid grid-cols-4 gap-1 pt-0.5">
+                      {[75, 100, 125, 150].map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => stageSelectedBackground({ backgroundSize: size })}
+                          className={`rounded-md border py-1 text-[10px] font-bold transition ${
+                            (draft.backgroundSize || 100) === size
+                              ? "border-amber-300 bg-amber-300 text-slate-950 font-black"
+                              : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          {size === 100 ? "100% (أصلي)" : `${size}%`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 6. Reset Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      stageSelectedBackground({ backgroundPositionX: 50, backgroundPositionY: 50, backgroundSize: 100 });
+                      updateLayerBehavior({ objectFit: "cover" });
+                      toast.success("تمت استعادة موضع وتكبير الصورة إلى المنتصف الافتراضي");
+                    }}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <RotateCcw size={13} />
+                    <span>إعادة ضبط الموضع للمنتصف (Reset)</span>
+                  </button>
                 </div>
               ) : null}
             </div>
@@ -2407,6 +2651,45 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
                 </button>
               </div>
 
+              {isSelectedBackground && draft.mediaUrl ? (
+                <div className="space-y-2.5 pt-2 border-t border-white/10">
+                  <ImageFocalPositionPad
+                    posX={draft.backgroundPositionX ?? 50}
+                    posY={draft.backgroundPositionY ?? 50}
+                    mediaUrl={draft.mediaUrl}
+                    onChange={(x, y) => stageSelectedBackground({ backgroundPositionX: x, backgroundPositionY: y })}
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>تحريك رأسي للصورة (أعلى ↕ أسفل)</span>
+                      <span className="font-mono text-amber-300">{draft.backgroundPositionY ?? 50}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={draft.backgroundPositionY ?? 50}
+                      onChange={(event) => stageSelectedBackground({ backgroundPositionY: Number(event.target.value) })}
+                      className="h-2 w-full cursor-pointer accent-amber-300"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>تحريك أفقي للصورة (يمين ↔ يسار)</span>
+                      <span className="font-mono text-amber-300">{draft.backgroundPositionX ?? 50}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={draft.backgroundPositionX ?? 50}
+                      onChange={(event) => stageSelectedBackground({ backgroundPositionX: Number(event.target.value) })}
+                      className="h-2 w-full cursor-pointer accent-amber-300"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               {isSelectedBackground ? (
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
@@ -2456,6 +2739,103 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       </aside>
     ) : null}
   </> : null}</VisualEditorContext.Provider>;
+}
+
+function ImageFocalPositionPad({
+  posX,
+  posY,
+  mediaUrl,
+  onChange,
+}: {
+  posX: number;
+  posY: number;
+  mediaUrl?: string | null;
+  onChange: (x: number, y: number) => void;
+}) {
+  const padRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+
+  const updateFromPointer = (clientX: number, clientY: number) => {
+    if (!padRef.current) return;
+    const rect = padRef.current.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const rawX = ((clientX - rect.left) / rect.width) * 100;
+    const rawY = ((clientY - rect.top) / rect.height) * 100;
+    const clampedX = Math.round(Math.max(0, Math.min(100, rawX)));
+    const clampedY = Math.round(Math.max(0, Math.min(100, rawY)));
+    onChange(clampedX, clampedY);
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+        <span className="flex items-center gap-1.5">
+          <Move size={12} className="text-amber-300" />
+          <span>وسادة التوجيه التفاعلية (اسحب أو انقر)</span>
+        </span>
+        <span className="rounded-md border border-amber-400/30 bg-amber-400/15 px-1.5 py-0.5 font-mono text-[10px] text-amber-300">
+          X: {posX}% · Y: {posY}%
+        </span>
+      </div>
+
+      <div
+        ref={padRef}
+        onPointerDown={(e) => {
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {}
+          isDragging.current = true;
+          updateFromPointer(e.clientX, e.clientY);
+        }}
+        onPointerMove={(e) => {
+          if (isDragging.current) {
+            updateFromPointer(e.clientX, e.clientY);
+          }
+        }}
+        onPointerUp={(e) => {
+          try {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+          } catch {}
+          isDragging.current = false;
+        }}
+        onPointerCancel={() => {
+          isDragging.current = false;
+        }}
+        className="relative h-28 w-full cursor-crosshair overflow-hidden rounded-xl border border-white/20 bg-slate-950 shadow-inner select-none touch-none"
+        title="انقر أو اسحب لتحديد بؤرة وموضع الصورة"
+      >
+        {mediaUrl ? (
+          <img
+            src={mediaUrl}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20 filter blur-[0.5px]"
+          />
+        ) : null}
+
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3 divide-x divide-y divide-white/10" />
+
+        <div className="pointer-events-none absolute left-1/2 top-0 bottom-0 w-px bg-white/15" />
+        <div className="pointer-events-none absolute top-1/2 left-0 right-0 h-px bg-white/15" />
+
+        <div
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ left: `${posX}%`, top: `${posY}%` }}
+        >
+          <div className="relative flex items-center justify-center">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-amber-300 bg-amber-400/25 shadow-[0_0_12px_rgba(248,202,20,0.8)]">
+              <span className="h-2 w-2 rounded-full bg-amber-300 shadow-sm" />
+            </span>
+          </div>
+        </div>
+
+        <span className="pointer-events-none absolute top-1 right-2 text-[9px] font-bold text-white/40">أعلى يمين</span>
+        <span className="pointer-events-none absolute top-1 left-2 text-[9px] font-bold text-white/40">أعلى يسار</span>
+        <span className="pointer-events-none absolute bottom-1 right-2 text-[9px] font-bold text-white/40">أسفل يمين</span>
+        <span className="pointer-events-none absolute bottom-1 left-2 text-[9px] font-bold text-white/40">أسفل يسار</span>
+      </div>
+    </div>
+  );
 }
 
 function TokenField({ label, value, placeholder, onChange }: { label: string; value: string; placeholder: string; onChange: (value: string) => void }) {
@@ -2731,7 +3111,9 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   const resolvedSrc = activeOverride?.mediaUrl || resolveInstantSrc(src) || src;
   const resolvedAlt = activeOverride?.altText || alt;
   const resolvedLink = activeOverride?.linkUrl || linkUrl;
-  const opensInNewTab = parseLayerBehavior(activeOverride?.customCss).openInNewTab;
+  const parsedBehavior = parseLayerBehavior(activeOverride?.customCss);
+  const opensInNewTab = parsedBehavior.openInNewTab;
+  const customObjectFit = parsedBehavior.objectFit;
   const alignmentClass = activeOverride?.alignment === "start" ? "mr-0 ml-auto" : activeOverride?.alignment === "end" ? "ml-0 mr-auto" : activeOverride?.alignment === "stretch" ? "w-full" : "mx-auto";
   const isBrandMark = /(?:logo|شعار|brand)/i.test(`${id} ${label}`);
   const imageTransform = !isBrandMark && activeOverride?.backgroundSize && activeOverride.backgroundSize !== 100 ? `scale(${activeOverride.backgroundSize / 100})` : undefined;
@@ -2799,6 +3181,7 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
           ? style
           : {
               ...style,
+              ...(customObjectFit ? { objectFit: customObjectFit } : {}),
               objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`,
               transform: imageTransform,
               transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`,

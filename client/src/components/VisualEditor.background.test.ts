@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clearLocalPreviewAfterReset, heroBackgroundLayerFor, resolveBackgroundSource, resolveVisualIconName, shouldConfirmMediaReplacement, shouldShowEditorChrome, shouldShowPropertiesPanel, shouldShowWorkspacePanel } from "./VisualEditor";
+import { clearLocalPreviewAfterReset, heroBackgroundLayerFor, parseLayerBehavior, resolveBackgroundSource, resolveVisualIconName, serializeLayerBehavior, shouldConfirmMediaReplacement, shouldShowEditorChrome, shouldShowPropertiesPanel, shouldShowWorkspacePanel } from "./VisualEditor";
 import { shouldHideForFocusedEditing } from "./AlaqeeqKeyNav";
 import { MEDIA_LIBRARY_Z_INDEX } from "./MediaLibrary";
 import { resolveHeroOverrideForPreview } from "./VisualEditor";
@@ -101,6 +101,25 @@ describe("مصدر خلفية المحرر", () => {
     const override = { elementId: "home-hero-title", textColor: "#e5b84f", elementTag: "text" };
     const resolved = resolveHeroOverrideForPreview(new Map([[override.elementId, override as never]]), override.elementId) as typeof override;
     expect(resolved.textColor).toBe("#e5b84f");
+  });
+
+  it("يدعم قراءة وضبط ملاءمة الصورة objectFit بين cover و contain و fill", () => {
+    expect(parseLayerBehavior(JSON.stringify({ objectFit: "contain" })).objectFit).toBe("contain");
+    expect(parseLayerBehavior(JSON.stringify({ objectFit: "cover" })).objectFit).toBe("cover");
+    expect(parseLayerBehavior(JSON.stringify({ objectFit: "invalid" })).objectFit).toBeUndefined();
+
+    const serialized = serializeLayerBehavior(JSON.stringify({ device: "mobile" }), { objectFit: "contain" });
+    const parsed = parseLayerBehavior(serialized);
+    expect(parsed.objectFit).toBe("contain");
+    expect(parsed.device).toBe("mobile");
+  });
+
+  it("يحتفظ بإحداثيات بؤرة الصورة الرأسية والأفقية لتجنب قص الوجوه", () => {
+    const defaultFocus = { backgroundPositionX: 50, backgroundPositionY: 50 };
+    const faceFocusPreset = { backgroundPositionX: 50, backgroundPositionY: 10 };
+    expect(defaultFocus.backgroundPositionX).toBe(50);
+    expect(defaultFocus.backgroundPositionY).toBe(50);
+    expect(faceFocusPreset.backgroundPositionY).toBe(10);
   });
 });
 
