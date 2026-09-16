@@ -848,9 +848,6 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           }
         } else if (isTextTag) {
           defaultContent = el.textContent?.trim() || "";
-          try {
-            defaultTextColor = window.getComputedStyle(el).color || "";
-          } catch {}
         }
       }
     }
@@ -1284,6 +1281,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         }
         if (override?.textColor && node.style.color !== override.textColor) {
           node.style.color = override.textColor;
+        } else if (!override?.textColor && node.style.color) {
+          node.style.color = "";
         }
         if (override?.fontSize && node.style.fontSize !== override.fontSize) {
           node.style.fontSize = override.fontSize;
@@ -1824,6 +1823,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       }
       if (isTextTag && payload.textColor) {
         domNode.style.color = payload.textColor;
+      } else if (isTextTag && !payload.textColor && domNode.style.color) {
+        domNode.style.color = "";
       }
       if (isTextTag && payload.fontSize) {
         domNode.style.fontSize = payload.fontSize;
@@ -3249,6 +3250,16 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-bold text-slate-300">{label}</span>
         <div className="flex items-center gap-1">
+          {value ? (
+            <button
+              type="button"
+              title="استعادة اللون التلقائي للقالب"
+              onClick={() => onChange("")}
+              className="text-[10px] text-amber-300/90 hover:text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/30 hover:border-amber-400 bg-amber-400/10 transition"
+            >
+              تلقائي
+            </button>
+          ) : null}
           {swatches.map((s) => (
             <button
               key={s.color}
@@ -3270,9 +3281,9 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
         />
         <input
           value={value}
-          placeholder="#e5b84f"
+          placeholder="تلقائي (حسب القالب)"
           onChange={(event) => onChange(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent px-2.5 text-xs font-mono text-white outline-none"
+          className="min-w-0 flex-1 bg-transparent px-2.5 text-xs font-mono text-white outline-none placeholder:text-slate-500"
         />
       </div>
     </div>

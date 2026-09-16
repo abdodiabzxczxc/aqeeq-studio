@@ -220,7 +220,12 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                     />
                   )}
                   <div className="relative z-10">
-                    <span className={`block text-xs sm:text-sm font-black ${isActive ? "text-[#f8ca14]" : ""}`}>
+                    <span
+                      className={`block text-xs sm:text-sm font-black transition-colors ${
+                        isActive ? "!text-[#f8ca14]" : ""
+                      }`}
+                      style={isActive ? { color: "#f8ca14" } : undefined}
+                    >
                       {era.shortYear}
                     </span>
                     <span className="text-[9px] sm:text-[10px] font-bold block truncate mt-0.5 opacity-90">
