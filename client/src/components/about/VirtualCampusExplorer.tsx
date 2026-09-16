@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 import { VisualImage } from "@/components/VisualEditor";
+import { preloadImage } from "@/lib/visualOverridesCache";
 import { useLocation } from "wouter";
 
 export interface FacilityItem {
@@ -203,6 +204,15 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
   const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
 
+  // Preload all facility images on mount so tab/card switching is 0ms
+  useEffect(() => {
+    [...BOYS_FACILITIES, ...GIRLS_FACILITIES].forEach((f) => {
+      if (f.image) {
+        preloadImage(f.image);
+      }
+    });
+  }, []);
+
   const facilities = campusTab === "boys" ? BOYS_FACILITIES : GIRLS_FACILITIES;
   const activeFac = facilities[activeFacilityIndex] || facilities[0];
 
@@ -332,7 +342,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     setActiveFacilityIndex(fIdx);
                   }
                 }}
-                className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 ${
+                className={`relative rounded-[2rem] overflow-hidden border transition-colors duration-300 bg-[#091016] ${
                   isExpanded
                     ? dark
                       ? "flex-[5] border-[#f8ca14]/50 shadow-2xl ring-1 ring-[#f8ca14]/30"
@@ -348,6 +358,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                   label={`مرفق ${fac.name} (${fac.tag})`}
                   src={fac.image}
                   alt={fac.name}
+                  priority={isExpanded}
                   className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
                     isExpanded ? "scale-105" : "grayscale-[25%] group-hover:scale-110"
                   }`}

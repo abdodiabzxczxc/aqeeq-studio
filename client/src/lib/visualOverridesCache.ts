@@ -185,6 +185,43 @@ export function resolveInstantSrc(src?: string | null): string {
   return src;
 }
 
+const preloadedUrls = new Set<string>();
+
+/**
+ * Checks whether an image URL has already been preloaded / decoded in memory
+ */
+export function isImagePreloaded(src?: string | null): boolean {
+  if (!src || typeof Image === "undefined") return false;
+  return preloadedUrls.has(src);
+}
+
+/**
+ * Preloads an image into browser memory asynchronously and marks it in the preloaded set.
+ * Guaranteed to resolve safely without rejecting.
+ */
+export function preloadImage(src?: string | null): Promise<void> {
+  if (!src || typeof window === "undefined" || typeof Image === "undefined") return Promise.resolve();
+  const resolved = resolveInstantSrc(src) || src;
+  if (preloadedUrls.has(resolved)) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = resolved;
+    if (img.complete) {
+      preloadedUrls.add(resolved);
+      resolve();
+    } else {
+      img.onload = () => {
+        preloadedUrls.add(resolved);
+        resolve();
+      };
+      img.onerror = () => {
+        resolve();
+      };
+    }
+  });
+}
+
 /**
  * Synchronously retrieves any active override for an element ID, page path, or fallback src.
  * Returns in 0.001ms from RAM cache with zero network delay.
@@ -229,6 +266,10 @@ export function setInstantVisualOverride(override: CachedVisualOverride) {
   memoryRegistry[override.elementId] = updated;
   if (override.pagePath) {
     memoryRegistry[`${override.pagePath}::${override.elementId}`] = updated;
+  }
+
+  if (override.mediaUrl) {
+    preloadImage(override.mediaUrl);
   }
 
   // Update localStorage safely

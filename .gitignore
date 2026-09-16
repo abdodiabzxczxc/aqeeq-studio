@@ -102,6 +102,8 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+*.mov
+*.mp4
 
 # Database
 *.db

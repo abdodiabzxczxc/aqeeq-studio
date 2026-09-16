@@ -34,6 +34,8 @@ import {
   syncOverridesToCache,
   recordSrcReplacement,
   resolveInstantSrc,
+  isImagePreloaded,
+  preloadImage,
 } from "@/lib/visualOverridesCache";
 
 type VisualOverride = {
@@ -2689,8 +2691,83 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
   const imageTransform = !isBrandMark && activeOverride?.backgroundSize && activeOverride.backgroundSize !== 100 ? `scale(${activeOverride.backgroundSize / 100})` : undefined;
   const fillHeight = /(?:^|\s)h-full(?:\s|$)/.test(className);
   const fillWidth = /(?:^|\s)w-full(?:\s|$)/.test(className);
-  const image = <img src={resolvedSrc} alt={resolvedAlt} referrerPolicy="no-referrer" loading={loading || (priority ? "eager" : "lazy")} {...(priority ? { fetchPriority: "high" } : {})} decoding="async" className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"}`} style={isBrandMark ? style : { ...style, objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`, transform: imageTransform, transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%` }} />;
-  return <VisualEditable id={id} tag="image" label={label} as="div" className={visualImageWrapperClassName(className, isBrandMark)}>{resolvedLink ? <a href={resolvedLink} target={opensInNewTab ? "_blank" : undefined} rel={opensInNewTab ? "noopener noreferrer" : undefined} className={`${fillHeight ? "block h-full" : ""} ${fillWidth ? "w-full" : ""}`}>{image}</a> : image}</VisualEditable>;
+
+  const [isLoaded, setIsLoaded] = useState<boolean>(() => {
+    if (typeof window === "undefined" || typeof Image === "undefined") return true;
+    if (isImagePreloaded(resolvedSrc)) return true;
+    const probe = new Image();
+    probe.src = resolvedSrc;
+    return probe.complete;
+  });
+
+  useEffect(() => {
+    if (!resolvedSrc || typeof Image === "undefined") return;
+    if (isImagePreloaded(resolvedSrc)) {
+      setIsLoaded(true);
+      return;
+    }
+    let active = true;
+    const probe = new Image();
+    probe.src = resolvedSrc;
+    if (probe.complete) {
+      setIsLoaded(true);
+      preloadImage(resolvedSrc);
+    } else {
+      setIsLoaded(false);
+      probe.onload = () => {
+        if (active) {
+          setIsLoaded(true);
+          preloadImage(resolvedSrc);
+        }
+      };
+      probe.onerror = () => {
+        if (active) setIsLoaded(true);
+      };
+    }
+    return () => {
+      active = false;
+    };
+  }, [resolvedSrc]);
+
+  const image = (
+    <img
+      key={resolvedSrc}
+      src={resolvedSrc}
+      alt={resolvedAlt}
+      referrerPolicy="no-referrer"
+      loading={loading || (priority ? "eager" : "lazy")}
+      {...(priority ? { fetchPriority: "high" } : {})}
+      decoding="async"
+      onLoad={() => setIsLoaded(true)}
+      className={`${className} ${alignmentClass} ${isBrandMark ? "" : "block"} transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+      style={
+        isBrandMark
+          ? style
+          : {
+              ...style,
+              objectPosition: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`,
+              transform: imageTransform,
+              transformOrigin: `${activeOverride?.backgroundPositionX ?? 50}% ${activeOverride?.backgroundPositionY ?? 50}%`,
+            }
+      }
+    />
+  );
+  return (
+    <VisualEditable id={id} tag="image" label={label} as="div" className={visualImageWrapperClassName(className, isBrandMark)}>
+      {resolvedLink ? (
+        <a
+          href={resolvedLink}
+          target={opensInNewTab ? "_blank" : undefined}
+          rel={opensInNewTab ? "noopener noreferrer" : undefined}
+          className={`${fillHeight ? "block h-full" : ""} ${fillWidth ? "w-full" : ""}`}
+        >
+          {image}
+        </a>
+      ) : (
+        image
+      )}
+    </VisualEditable>
+  );
 }
 
 
@@ -2711,6 +2788,9 @@ export function VisualBackground({ id, label, src, alt, className = "", style }:
   const sourceOverride = sharedSourceOverride ?? ownOverride ?? getOverride(id) ?? instantOverride;
   const presentationOverride = ownOverride ?? sourceOverride ?? instantOverride;
   const resolvedSrc = resolveBackgroundSource(sourceOverride?.mediaUrl, sourceOverride?.bgColor, src);
+  useEffect(() => {
+    if (resolvedSrc) preloadImage(resolvedSrc);
+  }, [resolvedSrc]);
   const overlay = Math.max(0, Math.min(100, presentationOverride?.backgroundOverlay ?? 0)) / 100;
   const backgroundStyle: React.CSSProperties = resolvedSrc
     ? { position: "absolute", ...style, backgroundImage: overlay ? `linear-gradient(rgba(0,0,0,${overlay}),rgba(0,0,0,${overlay})), url("${resolvedSrc}")` : `url("${resolvedSrc}")`, backgroundSize: backgroundSizeCss(presentationOverride?.backgroundSize), backgroundPosition: `${presentationOverride?.backgroundPositionX ?? 50}% ${presentationOverride?.backgroundPositionY ?? 50}%`, backgroundRepeat: "no-repeat" }

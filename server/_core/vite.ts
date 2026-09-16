@@ -96,7 +96,7 @@ async function serveMediaRewrite(req: express.Request, res: express.Response, ne
   }
 
   try {
-    const overrides = await listAllVisualElementOverrides("published");
+    const overrides = await listAllVisualElementOverrides("all");
     for (const ov of overrides as any[]) {
       if (!ov?.mediaUrl) continue;
       if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
@@ -121,7 +121,7 @@ async function serveMediaRewrite(req: express.Request, res: express.Response, ne
 async function injectServerStateIntoHtml(html: string): Promise<string> {
   try {
     const [overrides, orchestration] = await Promise.all([
-      listAllVisualElementOverrides("published").catch(() => []),
+      listAllVisualElementOverrides("all").catch(() => []),
       getSiteOrchestration().catch(() => null),
     ]);
 

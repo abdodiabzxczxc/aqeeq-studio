@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 import { VisualImage } from "@/components/VisualEditor";
+import { preloadImage } from "@/lib/visualOverridesCache";
 
 export interface TimelineEra {
   year: string;
@@ -120,6 +121,15 @@ interface TimelineHeritageScrubberProps {
 export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubberProps) {
   const [activeIndex, setActiveIndex] = useState<number>(3);
   const activeEra = TIMELINE_ERAS[activeIndex];
+
+  // Preload all era images into memory immediately on mount to ensure 0ms tab switching
+  useEffect(() => {
+    TIMELINE_ERAS.forEach((era) => {
+      if (era.image) {
+        preloadImage(era.image);
+      }
+    });
+  }, []);
 
   return (
     <section id="timeline-section" className="pt-8 sm:pt-10 pb-14 sm:pb-16 w-full max-w-[1380px] 2xl:max-w-[1560px] mx-auto px-4 sm:px-6 md:px-8">
@@ -377,9 +387,9 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
 
             {/* Archival Photo Column with Royal Seal (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-white/20 aspect-[16/11] max-h-[360px] group">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-white/20 aspect-[16/11] max-h-[360px] group bg-[#091016]">
                 {/* Official Archival Seal (Golden Stamp) */}
-                <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-md text-[#f8ca14] text-[9px] font-black tracking-wider">
+                <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#f8ca14]/60 shadow-md text-[#f8ca14] text-[9px] font-black tracking-wider pointer-events-none">
                   <ShieldCheck size={11} className="text-[#f8ca14]" />
                   <span>وثيقة أرشيفية ✦</span>
                 </div>
@@ -390,6 +400,8 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                   label={`صورة محطة ${activeEra.shortYear} - ${activeEra.label}`}
                   src={activeEra.image}
                   alt={activeEra.title}
+                  priority={true}
+                  loading="eager"
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
 
@@ -397,7 +409,7 @@ export function TimelineHeritageScrubber({ dark = true }: TimelineHeritageScrubb
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
 
                 {/* Bottom Overlay Info Banner */}
-                <div className="absolute bottom-3 right-3 left-3 text-white">
+                <div className="absolute bottom-3 right-3 left-3 text-white pointer-events-none">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Milestone size={14} className="text-[#f8ca14]" />
                     <span className="text-[11px] font-black text-[#f8ca14]">{activeEra.stats}</span>
