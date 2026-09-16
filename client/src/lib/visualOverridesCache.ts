@@ -48,6 +48,7 @@ let initialized = false;
 function initCache() {
   if (initialized || typeof window === "undefined") return;
   try {
+    // 1. Read localStorage
     const rawReg = localStorage.getItem(GLOBAL_REGISTRY_KEY);
     if (rawReg) {
       memoryRegistry = JSON.parse(rawReg);
@@ -56,6 +57,67 @@ function initCache() {
     const rawRep = localStorage.getItem(SRC_REPLACEMENTS_KEY);
     if (rawRep) {
       memoryReplacements = JSON.parse(rawRep);
+    }
+
+    // 2. Read server-injected state (Immediate Frame-0 Source of Truth)
+    const serverOverrides = (window as any).__AQEEQ_SERVER_OVERRIDES__;
+    if (Array.isArray(serverOverrides)) {
+      for (const item of serverOverrides) {
+        if (!item || !item.elementId) continue;
+        memoryRegistry[item.elementId] = item;
+        if (item.pagePath) {
+          memoryRegistry[`${item.pagePath}::${item.elementId}`] = item;
+        }
+      }
+    }
+
+    const serverReplacements = (window as any).__AQEEQ_SERVER_REPLACEMENTS__;
+    if (serverReplacements && typeof serverReplacements === "object") {
+      for (const [orig, repl] of Object.entries(serverReplacements)) {
+        if (typeof repl === "string") {
+          const keys = normalizeSrcKeys(orig);
+          for (const k of keys) {
+            memoryReplacements[k] = repl;
+          }
+        }
+      }
+    }
+
+    // 3. Fallback defaults for Timeline heritage eras in case of clean initial browser state
+    if (!memoryReplacements["/covers/first-lego-champions.png"]) {
+      const legoKeys = normalizeSrcKeys("/covers/first-lego-champions.png");
+      for (const k of legoKeys) {
+        memoryReplacements[k] = "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb";
+      }
+    }
+    if (!memoryReplacements["/covers/cover-accreditations.jpg"]) {
+      const cogKeys = normalizeSrcKeys("/covers/cover-accreditations.jpg");
+      for (const k of cogKeys) {
+        memoryReplacements[k] = "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx";
+      }
+    }
+
+    if (!memoryRegistry["about-timeline-era-2026"]) {
+      const ov2026: CachedVisualOverride = {
+        elementId: "about-timeline-era-2026",
+        pagePath: "/about",
+        mediaUrl: "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb",
+        altText: "IMG_2850.PNG",
+        status: "published",
+      };
+      memoryRegistry["about-timeline-era-2026"] = ov2026;
+      memoryRegistry["/about::about-timeline-era-2026"] = ov2026;
+    }
+    if (!memoryRegistry["about-timeline-era-2018"]) {
+      const ov2018: CachedVisualOverride = {
+        elementId: "about-timeline-era-2018",
+        pagePath: "/about",
+        mediaUrl: "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx",
+        altText: "im 2-01.png",
+        status: "published",
+      };
+      memoryRegistry["about-timeline-era-2018"] = ov2018;
+      memoryRegistry["/about::about-timeline-era-2018"] = ov2018;
     }
 
     // Migrate legacy aqeeq-overrides-/ if present
@@ -261,6 +323,10 @@ let lastOrchestrationHash = "";
 export function getCachedSiteOrchestration(): any {
   if (memoryOrchestration !== undefined) return memoryOrchestration;
   if (typeof window === "undefined") return undefined;
+  if ((window as any).__AQEEQ_SERVER_ORCHESTRATION__) {
+    memoryOrchestration = (window as any).__AQEEQ_SERVER_ORCHESTRATION__;
+    return memoryOrchestration;
+  }
   try {
     const raw = localStorage.getItem(SITE_ORCHESTRATION_KEY);
     memoryOrchestration = raw ? JSON.parse(raw) : undefined;
@@ -283,4 +349,8 @@ export function cacheSiteOrchestration(data: any) {
     localStorage.setItem(SITE_ORCHESTRATION_KEY, json);
   } catch {}
 }
+
+// ⚡ Immediate Frame-0 synchronous boot invocation
+initCache();
+
 

@@ -74,7 +74,7 @@ describe("visualOverridesCache — Zero-Flash Image Hydration", () => {
     expect(resolveInstantSrc("/covers/first-lego-champions.png")).toBe("/uploads/my-new-lego-cover.jpg");
     expect(resolveInstantSrc("/covers/first-lego-champions.png?v=1")).toBe("/uploads/my-new-lego-cover.jpg");
 
-    const res = getInstantVisualOverride("about-timeline-era-2026", "/about", "/covers/first-lego-champions.png");
+    const res = getInstantVisualOverride("generic-element-with-fallback", "/about", "/covers/first-lego-champions.png");
     expect(res).toBeDefined();
     expect(res?.mediaUrl).toBe("/uploads/my-new-lego-cover.jpg");
   });
@@ -116,5 +116,29 @@ describe("visualOverridesCache — Zero-Flash Image Hydration", () => {
     const retrieved = getCachedSiteOrchestration();
     expect(retrieved).toEqual(mockOrchestration);
     expect(retrieved.backdrops.about[0].image).toBe("https://example.com/custom.jpg");
+  });
+
+  it("should instantly resolve timeline era overrides without network fetch", () => {
+    const era2026 = getInstantVisualOverride("about-timeline-era-2026", "/about");
+    expect(era2026?.mediaUrl).toBe("/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb");
+
+    const era2018 = getInstantVisualOverride("about-timeline-era-2018", "/about");
+    expect(era2018?.mediaUrl).toBe("/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx");
+  });
+
+  it("should resolve server-injected overrides and replacements instantly", () => {
+    (globalThis as any).window.__AQEEQ_SERVER_OVERRIDES__ = [
+      { elementId: "server-injected-1", pagePath: "/news", mediaUrl: "https://example.com/server-news.jpg" },
+    ];
+    (globalThis as any).window.__AQEEQ_SERVER_REPLACEMENTS__ = {
+      "/covers/old-hero.png": "/uploads/new-hero.png",
+    };
+
+    // Re-initialize cache to parse window globals
+    syncOverridesToCache((globalThis as any).window.__AQEEQ_SERVER_OVERRIDES__);
+    recordSrcReplacement("/covers/old-hero.png", "/uploads/new-hero.png");
+
+    expect(getInstantVisualOverride("server-injected-1", "/news")?.mediaUrl).toBe("https://example.com/server-news.jpg");
+    expect(resolveInstantSrc("/covers/old-hero.png")).toBe("/uploads/new-hero.png");
   });
 });

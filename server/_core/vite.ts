@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSiteOrchestration } from "../db";
+import { getAqeeqAlbumBySlug, getAqeeqShowcaseBySlug, getSiteOrchestration, listAllVisualElementOverrides } from "../db";
 import { streamAqeeqAlbumMedia, streamAqeeqAlbumVideo, streamAqeeqAlbumZip, streamAqeeqDriveVideo } from "../aqeeqAlbumDownloads";
 import { serveDynamicSocialPreview } from "../dynamicSocialPreview";
 
@@ -84,6 +84,77 @@ async function serveAqeeqShowcaseVideo(req: express.Request, res: express.Respon
   }
 }
 
+const STATIC_MEDIA_REPLACEMENTS: Record<string, string> = {
+  "/covers/first-lego-champions.png": "/api/drive-proxy/1frzCOSTm-WWxAMlkjq415Zisy4ASkqeb",
+  "/covers/cover-accreditations.jpg": "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx",
+};
+
+async function serveMediaRewrite(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const reqPath = req.path;
+  if (STATIC_MEDIA_REPLACEMENTS[reqPath]) {
+    return res.redirect(302, STATIC_MEDIA_REPLACEMENTS[reqPath]);
+  }
+
+  if (reqPath.startsWith("/covers/")) {
+    try {
+      const overrides = await listAllVisualElementOverrides("published");
+      for (const ov of overrides as any[]) {
+        if (!ov?.mediaUrl) continue;
+        if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
+          return res.redirect(302, ov.mediaUrl);
+        }
+        if (reqPath === "/covers/cover-accreditations.jpg" && (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0")) {
+          return res.redirect(302, ov.mediaUrl);
+        }
+      }
+    } catch {}
+  }
+  next();
+}
+
+async function injectServerStateIntoHtml(html: string): Promise<string> {
+  try {
+    const [overrides, orchestration] = await Promise.all([
+      listAllVisualElementOverrides("published").catch(() => []),
+      getSiteOrchestration().catch(() => null),
+    ]);
+
+    const replacements: Record<string, string> = {
+      ...STATIC_MEDIA_REPLACEMENTS,
+    };
+
+    if (Array.isArray(overrides)) {
+      for (const ov of overrides as any[]) {
+        if (ov?.mediaUrl && ov.elementId) {
+          if (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as") {
+            replacements["/covers/first-lego-champions.png"] = ov.mediaUrl;
+          } else if (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0") {
+            replacements["/covers/cover-accreditations.jpg"] = ov.mediaUrl;
+          }
+        }
+      }
+    }
+
+    const safeOverrides = JSON.stringify(overrides || []).replace(/</g, "\\u003c");
+    const safeOrchestration = JSON.stringify(orchestration || {}).replace(/</g, "\\u003c");
+    const safeReplacements = JSON.stringify(replacements).replace(/</g, "\\u003c");
+
+    const scriptTag = `<script id="aqeeq-server-state">
+  window.__AQEEQ_SERVER_OVERRIDES__ = ${safeOverrides};
+  window.__AQEEQ_SERVER_ORCHESTRATION__ = ${safeOrchestration};
+  window.__AQEEQ_SERVER_REPLACEMENTS__ = ${safeReplacements};
+</script>`;
+
+    if (html.includes("</head>")) {
+      return html.replace("</head>", `${scriptTag}\n</head>`);
+    }
+    return `${scriptTag}\n${html}`;
+  } catch (err) {
+    console.error("Failed to inject server state into HTML:", err);
+    return html;
+  }
+}
+
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
@@ -98,6 +169,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
+  app.use(serveMediaRewrite);
   app.get("/api/albums/:slug/download.zip", serveAqeeqAlbumZip);
   app.get("/api/albums/:slug/media/:mediaId/download", serveAqeeqAlbumMedia);
   app.get("/api/albums/:slug/media/:mediaId/stream", serveAqeeqAlbumVideo);
@@ -122,6 +194,7 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
       );
+      template = await injectServerStateIntoHtml(template);
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store, must-revalidate" }).end(page);
     } catch (e) {
@@ -142,12 +215,30 @@ export function serveStatic(app: Express) {
     );
   }
 
+  app.use(serveMediaRewrite);
   app.get("/api/albums/:slug/download.zip", serveAqeeqAlbumZip);
   app.get("/api/albums/:slug/media/:mediaId/download", serveAqeeqAlbumMedia);
   app.get("/api/albums/:slug/media/:mediaId/stream", serveAqeeqAlbumVideo);
   app.get("/api/showcases/:slug/posts/:postId/stream", serveAqeeqShowcaseVideo);
   app.get("/api/og-image.png", serveOgImage);
   app.use(serveDynamicSocialPreview);
+
+  // Serve pre-injected index.html for root and direct index requests
+  app.get(["/", "/index.html"], async (_req, res, next) => {
+    try {
+      const indexPath = path.resolve(distPath, "index.html");
+      if (!fs.existsSync(indexPath)) return next();
+      const rawHtml = await fs.promises.readFile(indexPath, "utf-8");
+      const page = await injectServerStateIntoHtml(rawHtml);
+      res.status(200).set({
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      }).send(page);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   // ⚡ High-speed immutable caching for hashed production assets (/assets/*)
   app.use(
     express.static(distPath, {
@@ -167,8 +258,21 @@ export function serveStatic(app: Express) {
     })
   );
 
-  // fall through to index.html if the file doesn't exist (with no-cache so Chrome always loads fresh bundle)
-  app.use("*", (_req, res) => {
-    res.set({ "Cache-Control": "no-cache, no-store, must-revalidate" }).sendFile(path.resolve(distPath, "index.html"));
+  // fall through to index.html with server state pre-injected
+  app.use("*", async (_req, res, next) => {
+    try {
+      const indexPath = path.resolve(distPath, "index.html");
+      if (!fs.existsSync(indexPath)) {
+        return res.status(404).send("Build directory or index.html not found. Run npm run build.");
+      }
+      const rawHtml = await fs.promises.readFile(indexPath, "utf-8");
+      const page = await injectServerStateIntoHtml(rawHtml);
+      res.status(200).set({
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      }).send(page);
+    } catch (e) {
+      next(e);
+    }
   });
 }

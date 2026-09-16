@@ -1584,27 +1584,8 @@
       "watermarkTint": "#d6b96a",
       "status": "published",
       "createdAt": "2026-08-29T18:31:25.878Z",
-      "updatedAt": "2026-09-16T08:03:50.931Z",
+      "updatedAt": "2026-09-16T08:26:37.725Z",
       "posts": [
-        {
-          "id": 161,
-          "showcaseId": 1,
-          "driveFileId": "x-2097977957662724209",
-          "mediaUrl": "https://x.com/alaqeeq_school/status/2097977957662724209",
-          "thumbnailUrl": "https://pbs.twimg.com/media/HR2CE8WW8AAZsN8.jpg?name=orig",
-          "fileName": "منشور X · @alaqeeq_school",
-          "mimeType": "application/x-x-post",
-          "mediaType": "image",
-          "sourceType": "x",
-          "externalUrl": "https://x.com/alaqeeq_school/status/2097977957662724209",
-          "title": "تابعونا على حسابنا الجديد\n في سناب شات 👻\n\nوكونوا أقرب لأخبا…",
-          "description": "تابعونا على حسابنا الجديد\n في سناب شات 👻\n\nوكونوا أقرب لأخبار \n#مدارس_العقيق_الأهلية_والدولية، \nفعالياتنا، إنجازات طلابنا، والتغطيات \nالميدانية واللقاءات الطلابية.\n\n#تعليم_المدينة\n#المدينه_المنورة",
-          "isNew": true,
-          "postOrder": 0,
-          "viewCount": 0,
-          "createdAt": "2026-09-10T10:26:19.266Z",
-          "media": []
-        },
         {
           "id": 160,
           "showcaseId": 1,
@@ -1619,9 +1600,28 @@
           "title": "تجارب تفاعلية، \nوأنشطة ممتعة، \nولحظات مليئة بالفضول! \n\nبانتظ…",
           "description": "تجارب تفاعلية، \nوأنشطة ممتعة، \nولحظات مليئة بالفضول! \n\nبانتظاركم في أكاديمية \n#مدارس_العقيق_الأهلية_والدولية \n\n#تعليم_المدينة\n#المدينه_المنورة",
           "isNew": true,
-          "postOrder": 1,
+          "postOrder": 0,
           "viewCount": 0,
           "createdAt": "2026-09-10T10:25:55.149Z",
+          "media": []
+        },
+        {
+          "id": 161,
+          "showcaseId": 1,
+          "driveFileId": "x-2097977957662724209",
+          "mediaUrl": "https://x.com/alaqeeq_school/status/2097977957662724209",
+          "thumbnailUrl": "https://pbs.twimg.com/media/HR2CE8WW8AAZsN8.jpg?name=orig",
+          "fileName": "منشور X · @alaqeeq_school",
+          "mimeType": "application/x-x-post",
+          "mediaType": "image",
+          "sourceType": "x",
+          "externalUrl": "https://x.com/alaqeeq_school/status/2097977957662724209",
+          "title": "تابعونا على حسابنا الجديد\n في سناب شات 👻\n\nوكونوا أقرب لأخبا…",
+          "description": "تابعونا على حسابنا الجديد\n في سناب شات 👻\n\nوكونوا أقرب لأخبار \n#مدارس_العقيق_الأهلية_والدولية، \nفعالياتنا، إنجازات طلابنا، والتغطيات \nالميدانية واللقاءات الطلابية.\n\n#تعليم_المدينة\n#المدينه_المنورة",
+          "isNew": true,
+          "postOrder": 1,
+          "viewCount": 0,
+          "createdAt": "2026-09-10T10:26:19.266Z",
           "media": []
         },
         {
@@ -2681,13 +2681,13 @@
       "publishedAt": "2026-09-16T07:16:54.800Z"
     },
     "/about::auto-img-a5wup0": {
-      "id": 1789542878113,
+      "id": 1789547189173,
       "pagePath": "/about",
       "elementId": "auto-img-a5wup0",
       "elementTag": "image",
       "contentText": null,
-      "mediaUrl": "/api/drive-proxy/1Smdt80LJzZx5DGWNvvbgsoUB7aZSaTlx",
-      "altText": "im 2-01.png",
+      "mediaUrl": "/api/drive-proxy/1jXL0y0GnB0O6Vt6KOy6vA6RihrPDlcHG",
+      "altText": "IMG_2853.PNG",
       "linkUrl": null,
       "alignment": "center",
       "textColor": null,
@@ -2711,8 +2711,8 @@
       "isHidden": false,
       "updatedBy": 1,
       "status": "published",
-      "updatedAt": "2026-09-16T07:14:38.113Z",
-      "publishedAt": "2026-09-16T07:14:38.174Z"
+      "updatedAt": "2026-09-16T08:26:29.173Z",
+      "publishedAt": "2026-09-16T08:26:29.225Z"
     },
     "/about::auto-img-6qq45p": {
       "id": 1789542828775,
@@ -2755,7 +2755,7 @@
     "album": 8,
     "albumMedia": 133,
     "showcase": 2,
-    "showcasePost": 190,
+    "showcasePost": 192,
     "showcasePostMedia": 1,
     "mediaAsset": 39,
     "admission": 2
