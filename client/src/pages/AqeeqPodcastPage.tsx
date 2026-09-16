@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
-import { getCachedSiteOrchestration, cacheSiteOrchestration } from "@/lib/visualOverridesCache";
+import { getCachedSiteOrchestration, cacheSiteOrchestration, resolveInstantSrc } from "@/lib/visualOverridesCache";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { AlaqeeqStudioSiteHeader } from "@/components/AlaqeeqStudioSiteHeader";
@@ -683,7 +683,7 @@ export default function AqeeqPodcastPage() {
                 >
                   {secondPodcast.coverUrl ? (
                     <img
-                      src={directDriveImage(secondPodcast.coverUrl) || secondPodcast.coverUrl}
+                      src={resolveInstantSrc(directDriveImage(secondPodcast.coverUrl) || secondPodcast.coverUrl)}
                       alt=""
                       className="h-full w-full rounded-[1.2rem] object-cover"
                     />
@@ -720,7 +720,7 @@ export default function AqeeqPodcastPage() {
                     {featuredPodcast.coverUrl ? (
                       <div className="relative h-full w-full">
                         <img
-                          src={directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl}
+                          src={resolveInstantSrc(directDriveImage(featuredPodcast.coverUrl) || featuredPodcast.coverUrl)}
                           alt={`غلاف ${featuredPodcast.title}`}
                           className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                         />

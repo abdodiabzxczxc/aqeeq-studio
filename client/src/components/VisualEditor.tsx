@@ -150,6 +150,7 @@ type LayerBehavior = {
   buttonHover?: "none" | "lift" | "glow" | "shimmer";
   openInNewTab?: boolean;
   backgroundOriginal?: BackgroundOrigin;
+  originalSrc?: string;
 };
 
 function parseLayerBehavior(raw?: string | null): LayerBehavior {
@@ -1512,6 +1513,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
   const saveSelected = () => {
     if (!pagePath || !selected) return;
     setLastSaved({ element: { id: selected.id, tag: selected.tag }, previous: currentOverride });
+    const domNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+    const imgEl = domNode?.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode?.querySelector<HTMLImageElement>("img");
+    const originalSrc = imgEl ? (imgEl.getAttribute("src") || imgEl.src) : undefined;
+    const finalCustomCss = (draft.mediaUrl && originalSrc && originalSrc !== draft.mediaUrl)
+      ? serializeLayerBehavior(draft.customCss || "{}", { originalSrc })
+      : (draft.customCss || null);
+
     const payload = {
       pagePath,
       elementId: selected.id as Parameters<typeof save.mutate>[0]["elementId"],
@@ -1537,7 +1545,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       backgroundPositionX: draft.backgroundPositionX,
       backgroundPositionY: draft.backgroundPositionY,
       backgroundOverlay: draft.backgroundOverlay,
-      customCss: draft.customCss || null,
+      customCss: finalCustomCss,
       isLocked: draft.isLocked,
       isHidden: draft.isHidden,
     };
@@ -1568,7 +1576,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       backgroundPositionX: payload.backgroundPositionX,
       backgroundPositionY: payload.backgroundPositionY,
       backgroundOverlay: payload.backgroundOverlay,
-      customCss: draft.customCss || null,
+      customCss: finalCustomCss,
       isLocked: payload.isLocked,
       isHidden: payload.isHidden,
       status: "published",
@@ -1581,7 +1589,6 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       setInstantVisualOverride({ ...optimisticOverride, elementId });
     });
     // Immediate direct DOM update for instant live responsiveness
-    const domNode = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
     if (domNode) {
       if (payload.contentText !== null && payload.contentText !== undefined) {
         const textChild = Array.from(domNode.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);

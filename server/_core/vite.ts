@@ -95,20 +95,26 @@ async function serveMediaRewrite(req: express.Request, res: express.Response, ne
     return res.redirect(302, STATIC_MEDIA_REPLACEMENTS[reqPath]);
   }
 
-  if (reqPath.startsWith("/covers/")) {
-    try {
-      const overrides = await listAllVisualElementOverrides("published");
-      for (const ov of overrides as any[]) {
-        if (!ov?.mediaUrl) continue;
-        if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
-          return res.redirect(302, ov.mediaUrl);
-        }
-        if (reqPath === "/covers/cover-accreditations.jpg" && (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0")) {
-          return res.redirect(302, ov.mediaUrl);
-        }
+  try {
+    const overrides = await listAllVisualElementOverrides("published");
+    for (const ov of overrides as any[]) {
+      if (!ov?.mediaUrl) continue;
+      if (reqPath === "/covers/first-lego-champions.png" && (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as")) {
+        return res.redirect(302, ov.mediaUrl);
       }
-    } catch {}
-  }
+      if (reqPath === "/covers/cover-accreditations.jpg" && (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0")) {
+        return res.redirect(302, ov.mediaUrl);
+      }
+      if (ov.customCss) {
+        try {
+          const parsed = JSON.parse(ov.customCss);
+          if (parsed?.originalSrc && typeof parsed.originalSrc === "string" && parsed.originalSrc.trim() === reqPath) {
+            return res.redirect(302, ov.mediaUrl);
+          }
+        } catch {}
+      }
+    }
+  } catch {}
   next();
 }
 
@@ -125,11 +131,19 @@ async function injectServerStateIntoHtml(html: string): Promise<string> {
 
     if (Array.isArray(overrides)) {
       for (const ov of overrides as any[]) {
-        if (ov?.mediaUrl && ov.elementId) {
+        if (ov?.mediaUrl) {
           if (ov.elementId === "about-timeline-era-2026" || ov.elementId === "auto-img-q64as") {
             replacements["/covers/first-lego-champions.png"] = ov.mediaUrl;
           } else if (ov.elementId === "about-timeline-era-2018" || ov.elementId === "auto-img-a5wup0") {
             replacements["/covers/cover-accreditations.jpg"] = ov.mediaUrl;
+          }
+          if (ov.customCss) {
+            try {
+              const parsed = JSON.parse(ov.customCss);
+              if (parsed?.originalSrc && typeof parsed.originalSrc === "string") {
+                replacements[parsed.originalSrc.trim()] = ov.mediaUrl;
+              }
+            } catch {}
           }
         }
       }

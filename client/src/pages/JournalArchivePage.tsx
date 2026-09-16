@@ -17,11 +17,12 @@ import { useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { HeroParallaxBackdrop, type ParallaxProduct } from "@/components/ui/hero-parallax";
+import { resolveInstantSrc } from "@/lib/visualOverridesCache";
 
 function JournalCover({ issueCoverUrl, fillFrame = false }: { issueCoverUrl?: string | null; fillFrame?: boolean }) {
   const { getOverride } = useVisualEditorState();
   const override = getOverride("journal-cover-art");
-  const imageUrl = override?.mediaUrl || issueCoverUrl;
+  const imageUrl = override?.mediaUrl || resolveInstantSrc(issueCoverUrl) || issueCoverUrl;
   const scale = normalizeJournalCoverScale(override?.fontSize);
   return (
     <VisualEditable
@@ -84,13 +85,13 @@ function JournalCard({
           <div className={`absolute bottom-[9%] left-[8%] top-[9%] w-[46%] overflow-hidden rounded-[1rem] border opacity-55 hidden sm:block shadow-[0_14px_25px_rgba(0,0,0,.35)] transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-105 ${
             dark ? "border-amber-100/25 bg-black" : "border-slate-300 bg-slate-200"
           }`} style={{ transform: "rotate(-7deg)" }}>
-            {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
+            {issue.coverUrl ? <img loading="lazy" src={resolveInstantSrc(issue.coverUrl) || issue.coverUrl} alt="" className="h-full w-full object-contain" /> : null}
           </div>
           {/* Front cover - full frame on mobile */}
           <div className={`absolute inset-1 sm:bottom-[6%] sm:right-[10%] sm:top-[6%] sm:w-[54%] sm:inset-auto overflow-hidden rounded-[1rem] border p-0 sm:p-1.5 shadow-[0_18px_32px_rgba(0,0,0,.55)] transition-transform duration-500 group-hover:rotate-3 group-hover:scale-105 ${
             dark ? "border-amber-100/70 bg-black" : "border-slate-300 bg-white"
           }`} style={{ transform: "rotate(0deg)" }}>
-            {issue.coverUrl ? <img loading="lazy" src={issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className={dark ? "text-amber-200" : "text-[#08467d]"} size={34} /></div>}
+            {issue.coverUrl ? <img loading="lazy" src={resolveInstantSrc(issue.coverUrl) || issue.coverUrl} alt={`غلاف ${issue.title}`} className="h-full w-full rounded-[.7rem] object-contain" /> : <div className="grid h-full place-items-center"><BookOpen className={dark ? "text-amber-200" : "text-[#08467d]"} size={34} /></div>}
           </div>
         </button>
         <div className="flex min-w-0 flex-1 flex-col">
