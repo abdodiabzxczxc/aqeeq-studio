@@ -338,6 +338,33 @@ function normalizedPath(pathname: string) {
 }
 
 
+export function applyTextContentToNode(node: HTMLElement, newText: string): void {
+  // If the node has no element children (e.g. <span>, <h1>, <p> containing only text nodes),
+  // setting textContent cleanly replaces ALL text nodes and prevents stale text fragments:
+  if (node.children.length === 0) {
+    if (node.textContent !== newText) {
+      node.textContent = newText;
+    }
+    return;
+  }
+
+  // If the node has child elements (e.g. a button containing an <svg> icon alongside text nodes):
+  const isTextNode = (n: ChildNode) => n.nodeType === 3 || (typeof Node !== "undefined" && n.nodeType === Node.TEXT_NODE);
+  const textChildren = Array.from(node.childNodes).filter(isTextNode);
+  if (textChildren.length > 0) {
+    if (textChildren[0].textContent !== newText) {
+      textChildren[0].textContent = newText;
+    }
+    // Remove all subsequent text nodes so old fragments (like "(2018)" or previous words) are completely removed!
+    for (let i = 1; i < textChildren.length; i++) {
+      textChildren[i].remove();
+    }
+  } else if (typeof document !== "undefined") {
+    // No text node among children, append a new text node
+    node.appendChild(document.createTextNode(newText));
+  }
+}
+
 export function resolveBackgroundSource(mediaUrl: string | null | undefined, bgColor: string | null | undefined, fallback?: string) {
   return mediaUrl || (bgColor ? undefined : fallback);
 }
@@ -953,6 +980,13 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         ...Object.fromEntries(sharedHeroElementIds(selected.id).map((elementId) => [`${pagePath}::${elementId}`, { ...preview, elementId }])),
       };
     });
+
+    if (typeof document !== "undefined") {
+      const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
+      if (el && isTextTag && preview.contentText !== null && preview.contentText !== undefined) {
+        applyTextContentToNode(el, preview.contentText);
+      }
+    }
   }, [draft, pagePath, selected?.id, selected?.tag]);
 
   useEffect(() => {
@@ -1289,12 +1323,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
         const override = overrideMap.get(id);
         if (override?.contentText) {
-          const textChild = Array.from(node.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
-          if (textChild) {
-            if (textChild.textContent !== override.contentText) textChild.textContent = override.contentText;
-          } else {
-            node.textContent = override.contentText;
-          }
+          applyTextContentToNode(node, override.contentText);
         }
         const isDark = getAqeeqStudioTheme() === "dark";
         const safeColor = resolveThemeSafeTextColor(override?.textColor, isDark);
@@ -1833,9 +1862,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     // Immediate direct DOM update for instant live responsiveness
     if (domNode) {
       if (isTextTag && payload.contentText !== null && payload.contentText !== undefined) {
-        const textChild = Array.from(domNode.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
-        if (textChild) textChild.textContent = payload.contentText;
-        else domNode.textContent = payload.contentText;
+        applyTextContentToNode(domNode, payload.contentText);
       }
       if (isMediaTag && payload.mediaUrl) {
         const imgEl = domNode.tagName === "IMG" ? (domNode as HTMLImageElement) : domNode.querySelector<HTMLImageElement>("img");

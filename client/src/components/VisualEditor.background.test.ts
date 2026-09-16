@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clearLocalPreviewAfterReset, heroBackgroundLayerFor, parseLayerBehavior, resolveBackgroundSource, resolveVisualIconName, serializeLayerBehavior, shouldConfirmMediaReplacement, shouldShowEditorChrome, shouldShowPropertiesPanel, shouldShowWorkspacePanel } from "./VisualEditor";
+import { applyTextContentToNode, clearLocalPreviewAfterReset, heroBackgroundLayerFor, parseLayerBehavior, resolveBackgroundSource, resolveVisualIconName, serializeLayerBehavior, shouldConfirmMediaReplacement, shouldShowEditorChrome, shouldShowPropertiesPanel, shouldShowWorkspacePanel } from "./VisualEditor";
 import { shouldHideForFocusedEditing } from "./AlaqeeqKeyNav";
 import { MEDIA_LIBRARY_Z_INDEX } from "./MediaLibrary";
 import { resolveHeroOverrideForPreview } from "./VisualEditor";
@@ -120,6 +120,49 @@ describe("مصدر خلفية المحرر", () => {
     expect(defaultFocus.backgroundPositionX).toBe(50);
     expect(defaultFocus.backgroundPositionY).toBe(50);
     expect(faceFocusPreset.backgroundPositionY).toBe(10);
+  });
+
+  it("يستبدل النص بالكامل ويحذف أي أجزاء نصوص قديمة متتالية لمنع تكرار الجملة", () => {
+    const textNode1 = { nodeType: 3, textContent: "التالي " } as unknown as ChildNode;
+    const textNode2 = {
+      nodeType: 3,
+      textContent: "(2018)",
+      remove() {
+        const idx = node.childNodes.indexOf(this);
+        if (idx >= 0) node.childNodes.splice(idx, 1);
+      },
+    } as unknown as ChildNode;
+    const node = {
+      children: [],
+      childNodes: [textNode1, textNode2],
+      textContent: "التالي (2018)",
+    } as unknown as HTMLElement;
+
+    applyTextContentToNode(node, "التالي (الاعتماد الدولي)");
+    expect(node.textContent).toBe("التالي (الاعتماد الدولي)");
+  });
+
+  it("يحافظ على أيقونة SVG ويحذف أجزاء النصوص القديمة الإضافية", () => {
+    const svgEl = { nodeType: 1, tagName: "SVG" } as unknown as Element;
+    const textNode1 = { nodeType: 3, textContent: "التالي " } as unknown as ChildNode;
+    const textNode2 = {
+      nodeType: 3,
+      textContent: "(2018)",
+      remove() {
+        const idx = node.childNodes.indexOf(this);
+        if (idx >= 0) node.childNodes.splice(idx, 1);
+      },
+    } as unknown as ChildNode;
+    const node = {
+      children: [svgEl],
+      childNodes: [svgEl, textNode1, textNode2],
+      textContent: "",
+    } as unknown as HTMLElement;
+
+    applyTextContentToNode(node, "التالي (الاعتماد الدولي)");
+    expect(textNode1.textContent).toBe("التالي (الاعتماد الدولي)");
+    expect(node.childNodes).not.toContain(textNode2);
+    expect(node.childNodes).toContain(svgEl);
   });
 });
 
