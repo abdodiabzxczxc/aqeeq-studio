@@ -141,14 +141,21 @@ export function AqeeqWeeklyHighlightsSection({
               {/* Card Body Grid */}
               <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
                 <div className="order-2 lg:order-1 text-right">
-                  <VisualEditable
-                    id="studio-bento-card1-kicker"
-                    tag="text"
-                    label="شارة الحدث الأبرز"
-                    defaultText="الحدث التعليمي الأبرز"
-                    as="span"
-                    className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
-                  />
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`grid h-10 w-10 place-items-center rounded-xl ${
+                      dark ? "bg-[#f8ca14]/15 text-[#f8ca14] border border-[#f8ca14]/30" : "bg-blue-100 text-[#08467d]"
+                    }`}>
+                      <Sparkles size={20} />
+                    </div>
+                    <VisualEditable
+                      id="studio-bento-card1-kicker"
+                      tag="text"
+                      label="شارة الحدث الأبرز"
+                      defaultText="الحدث التعليمي الأبرز"
+                      as="span"
+                      className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                    />
+                  </div>
                   <VisualEditable
                     id="studio-bento-card1-title"
                     tag="text"
@@ -333,46 +340,56 @@ export function AqeeqWeeklyHighlightsSection({
                       label="شارة نبض المجتمع"
                       defaultText="نبض وتفاعل أولياء الأمور والطلاب"
                       as="span"
-                      className={`text-xs font-black ${dark ? "text-[#de191e]" : "text-[#de191e]"}`}
+                      className={`text-xs font-black text-[#de191e]`}
                     />
                   </div>
-                  <div className="mt-2 flex items-baseline gap-4">
-                    <h3 className={`text-4xl sm:text-6xl font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
-                      +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
-                    </h3>
-                    <VisualEditable
-                      id="studio-bento-card3-counter-label"
-                      tag="text"
-                      label="نص عداد القلوب"
-                      defaultText="قلب تشجيع هذا الأسبوع ❤️"
-                      as="span"
-                      className={`text-sm font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
-                    />
-                  </div>
+                  <VisualEditable
+                    id="studio-bento-card3-title"
+                    tag="text"
+                    label="عنوان نبض المجتمع"
+                    defaultText="فخر واعتزاز.. شركاء النجاح يصنعون الإلهام"
+                    as="h3"
+                    className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
+                  />
                   <VisualEditable
                     id="studio-bento-card3-desc"
                     tag="text"
                     label="وصف نبض المجتمع"
-                    defaultText="كل إعجاب وتشجيع هنا ينعكس فخراً وإلهاماً في نفوس أبنائنا وبناتنا في رحلتهم نحو القمة."
+                    defaultText="كل إعجاب وتشجيع هنا ينعكس فخراً وإلهاماً في نفوس أبنائنا وبناتنا في رحلتهم نحو القمة، تجربة تشاركية مستمرة بين المدرسة والأسرة."
                     as="p"
                     className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
                   />
-                  <div className="mt-8 flex items-center gap-4">
+                  <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button
                       type="button"
                       onClick={toggleLike}
-                      className={`inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl text-xs font-black transition active:scale-95 ${
+                      className={`inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl text-xs font-black transition active:scale-95 ${
                         hasLiked
                           ? "bg-[#de191e] text-white shadow-xl shadow-[#de191e]/30 ring-4 ring-[#de191e]/20"
                           : dark
-                          ? "bg-white/10 text-white hover:bg-[#de191e]/25 border border-white/15"
-                          : "bg-white text-slate-900 hover:bg-[#de191e]/10 border border-slate-200 shadow-md"
+                          ? "bg-[#de191e]/20 text-[#de191e] hover:bg-[#de191e]/30 border border-[#de191e]/40"
+                          : "bg-[#de191e]/10 text-[#de191e] hover:bg-[#de191e]/20 border border-[#de191e]/25 shadow-sm"
                       }`}
                     >
-                      <Heart size={18} className={hasLiked ? "fill-current text-white animate-bounce" : "text-[#de191e]"} />
+                      <Heart size={16} className={hasLiked ? "fill-current text-white animate-bounce" : "text-[#de191e]"} />
                       <span>{hasLiked ? "تم تسجيل تشجيعك! شكراً لك ❤️" : "أرسل تشجيعك للطلاب الآن"}</span>
                     </button>
-                    <span className="text-xs text-slate-500 font-medium">تفاعل فوري</span>
+
+                    <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border ${
+                      dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"
+                    }`}>
+                      <span className={`text-base sm:text-lg font-black font-cairo ${dark ? "text-white" : "text-black"}`}>
+                        +{(orchestration?.weeklyBento?.heartsCount ?? 142) + (hasLiked ? 1 : 0)}
+                      </span>
+                      <VisualEditable
+                        id="studio-bento-card3-counter-label"
+                        tag="text"
+                        label="نص عداد القلوب"
+                        defaultText="قلب تشجيع هذا الأسبوع ❤️"
+                        as="span"
+                        className={`text-xs font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                      />
+                    </div>
                   </div>
                 </div>
 
