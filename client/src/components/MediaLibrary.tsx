@@ -30,6 +30,10 @@ export const PRESET_SCHOOL_MEDIA: MediaAsset[] = [
   { id: 9010, url: "/articles/morning-radio-student-personality-development.jpg", kind: "image", mimeType: "image/jpeg", fileName: "الإذاعة المدرسية وبناء شخصية الطالب", fileSize: null, altText: "الإذاعة المدرسية" },
   { id: 9011, url: "/articles/words-to-wonders-primary-english-journey.jpg", kind: "image", mimeType: "image/jpeg", fileName: "مسارات اللغة الإنجليزية والبرامج الدولية", fileSize: null, altText: "مسار اللغة الإنجليزية" },
   { id: 9012, url: "/alaqeeq-logo.png", kind: "image", mimeType: "image/png", fileName: "شعار مدارس العقيق الرسمي الأصلي", fileSize: null, altText: "شعار مدارس العقيق" },
+  { id: 9013, url: "/api/drive-proxy/1ulrpYsDrV7xbDdysqTsNoLNUvblw14p5", kind: "image", mimeType: "image/png", fileName: "محطة 1994 الأرشيفية — غراس البدايات وتأسيس أول مجمع", fileSize: null, altText: "وثيقة تأسيس مدارس العقيق 1994" },
+  { id: 9014, url: "/api/drive-proxy/1IkefgGSvnqfdhLiMHYd25-lz3AuBH5n1", kind: "image", mimeType: "image/png", fileName: "محطة 2010 الأرشيفية — المجمعات الكبرى والمسابح الأولمبية", fileSize: null, altText: "مجمعات العقيق والمسابح 2010" },
+  { id: 9015, url: "/api/drive-proxy/1qifbHFSgFaBQH1g63qvK2WmQtls0l4AR", kind: "image", mimeType: "image/png", fileName: "محطة 2018 الأرشيفية — اعتماد كوجنيا الأمريكي الدولي", fileSize: null, altText: "اعتماد كوجنيا الأمريكي 2018" },
+  { id: 9016, url: "/api/drive-proxy/16IxreFp6eRLCuLDZyIWEoU9eWHzOCJuC", kind: "image", mimeType: "image/png", fileName: "محطة 2026 الأرشيفية — مراكز الاختبارات والذكاء الاصطناعي", fileSize: null, altText: "مراكز الاختبارات والذكاء الاصطناعي 2026" },
 ];
 
 export default function MediaLibrary({

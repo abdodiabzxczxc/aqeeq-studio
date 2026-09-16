@@ -111,13 +111,21 @@ function initCache() {
       },
     ];
 
-    for (const era of ERA_FALLBACKS) {
-      if (!memoryReplacements[era.orig]) {
-        const keys = normalizeSrcKeys(era.orig);
-        for (const k of keys) {
-          memoryReplacements[k] = era.mediaUrl;
-        }
+    // Clean up any stale src replacements that mapped default school covers so the original assets display properly
+    const CLEANUP_COVER_SRCS = [
+      "/covers/student-excellence-about.jpg",
+      "/covers/student-lab-admissions.jpg",
+      "/covers/cover-accreditations.jpg",
+      "/covers/first-lego-champions.png",
+    ];
+    for (const coverSrc of CLEANUP_COVER_SRCS) {
+      const keys = normalizeSrcKeys(coverSrc);
+      for (const k of keys) {
+        delete memoryReplacements[k];
       }
+    }
+
+    for (const era of ERA_FALLBACKS) {
       const elementId = `about-timeline-era-${era.year}`;
       if (!memoryRegistry[elementId]) {
         const ov: CachedVisualOverride = {
