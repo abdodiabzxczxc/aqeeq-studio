@@ -3,12 +3,16 @@ import { motion } from "framer-motion";
 import { Compass, Target, Sparkles, Heart, Shield, Award, Users, Lightbulb } from "lucide-react";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
 
+import { VisualEditable } from "@/components/VisualEditor";
+
 interface ValueItem {
   id: string;
   name: string;
+  tag: string;
   icon: any;
   title: string;
   desc: string;
+  actionTitle: string;
   action: string;
   color: string;
 }
@@ -17,45 +21,55 @@ const FIVE_VALUES: ValueItem[] = [
   {
     id: "authenticity",
     name: "الأصالة",
+    tag: "جذورنا وهويتنا",
     icon: Heart,
-    title: "الاعتزاز بالهوية الإسلامية والوطنية",
-    desc: "نستلهم من عبق المدينة المنورة وتاريخها المبارك قيماً راسخة تصوغ وجدان الطالب، وتجعله فخوراً بانتمائه لدينه ووطنه وقيادته الرشيدة.",
-    action: "تُترجم عملياً عبر برامج السيرة النبوية، حفظ القرآن، والاعتزاز بالتراث واللغة العربية في كافة الأنشطة المدرسية.",
+    title: "فخرنا بهويتنا وأخلاقنا",
+    desc: "لأننا في قلب المدينة المنورة، نحرص أن يكبر أبناؤنا وهم فخورون بدينهم ووطنهم. نزرع فيهم قيمنا الأصيلة ليكونوا منفتحين على العالم، لكن جذورهم ثابتة ومتمسكة بأخلاقنا.",
+    actionTitle: "كيف نطبقها؟",
+    action: "نطبق ذلك يومياً عبر اهتمامنا بالقرآن الكريم، لغتنا العربية، وربطهم بسيرة النبي في تعاملاتهم وتصرفاتهم داخل المدرسة.",
     color: "#f8ca14",
   },
   {
     id: "excellence",
     name: "الإتقان",
+    tag: "الجودة القصوى",
     icon: Award,
     title: "مبدأ «إن الله يحب إذا عمل أحدكم عملاً أن يتقنه»",
     desc: "الإتقان ليس مجرد شعار بل معيار يومي في التدريس، والتقييم، والرعاية الفردية لكل طالب للوصول به إلى أعلى درجات التحصيل.",
+    actionTitle: "كيف نطبقها؟",
     action: "تُترجم عملياً عبر مؤشرات قياس أداء دورية، تدريب مستمر للكادر، وحرص مطلق على جودة المخرجات الأكاديمية.",
     color: "#08467d",
   },
   {
     id: "innovation",
     name: "الابتكار",
+    tag: "العصر الرقمي",
     icon: Lightbulb,
     title: "التفكير النقدي واستشراف المستقبل",
     desc: "نحفز عقول الطلاب على التساؤل والبحث والاكتشاف، ونحول الفصول إلى ورش عمل لإنتاج الحلول الإبداعية والتقنية المتقدمة.",
+    actionTitle: "كيف نطبقها؟",
     action: "تُترجم عملياً في معامل الروبوتات والـ AI، ومشاريع التخرج البحثية، والمشاركات في مسابقات موهبة وأولمبياد العلوم.",
     color: "#10b981",
   },
   {
     id: "leadership",
     name: "القيادة",
+    tag: "صناعة الأثر",
     icon: Shield,
     title: "صناعة شخصية القائد المسؤول",
     desc: "تمكين الطلاب من اتخاذ القرار، وإدارة فرق العمل، واكتساب مهارات الخطابة والإقناع والتفكير الاستراتيجي الواثق.",
+    actionTitle: "كيف نطبقها؟",
     action: "تُترجم عملياً في المجلس الطلابي، ملتقيات المناظرات، الإذاعة الصباحية، والمسؤوليات القيادية داخل الفصول.",
     color: "#6366f1",
   },
   {
     id: "belonging",
     name: "الانتماء",
+    tag: "خدمة الوطن",
     icon: Users,
     title: "خدمة المجتمع والتطوع الفاعل",
     desc: "غرس روح العطاء والمشاركة المجتمعية الفاعلة ورد الجميل لطيبة الطيبة والوطن الغالي من خلال الأعمال التطوعية الإيجابية.",
+    actionTitle: "كيف نطبقها؟",
     action: "تُترجم عملياً في مبادرات خدمة زوار المسجد النبوي، حملات التشجير، وبرامج المسؤولية المجتمعية السنوية.",
     color: "#ec4899",
   },
@@ -108,16 +122,26 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                 <Compass size={24} />
               </div>
               <div>
-                <h4 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  الرؤية الاستراتيجية (Vision 2030)
-                </h4>
+                <VisualEditable
+                  id="about-vision-card-title"
+                  tag="text"
+                  label="عنوان بطاقة الرؤية"
+                  defaultText="الرؤية الاستراتيجية (Vision 2030)"
+                  as="h4"
+                  className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
+                />
                 <span className="text-xs text-[#f8ca14] font-bold">أصالة القيم وريادة المستقبل</span>
               </div>
             </div>
 
-            <p className={`text-xs sm:text-sm leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}>
-              أن تكون مدارس العقيق الأهلية والدولية نموذجاً تعليمياً وتربوياً رائداً على مستوى المملكة والعالم الإسلامي، يُخرج قادة للمستقبل متسلحين بالعلم النافع، والأخلاق الفاضلة، والمهارات التنافسية العالمية التي تواكب مستهدفات برنامج تنمية القدرات البشرية ورؤية 2030.
-            </p>
+            <VisualEditable
+              id="about-vision-card-desc"
+              tag="text"
+              label="نص بطاقة الرؤية"
+              defaultText="أن تكون مدارس العقيق الأهلية والدولية نموذجاً تعليمياً وتربوياً رائداً على مستوى المملكة والعالم الإسلامي، يُخرج قادة للمستقبل متسلحين بالعلم النافع، والأخلاق الفاضلة، والمهارات التنافسية العالمية التي تواكب مستهدفات برنامج تنمية القدرات البشرية ورؤية 2030."
+              as="p"
+              className={`text-xs sm:text-sm leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}
+            />
 
             <div className="flex flex-wrap gap-2">
               <span className={`px-3 py-1 rounded-xl text-[11px] font-black border ${
@@ -149,16 +173,26 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                 <Target size={24} />
               </div>
               <div>
-                <h4 className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  الرسالة التربوية (Mission)
-                </h4>
+                <VisualEditable
+                  id="about-mission-card-title"
+                  tag="text"
+                  label="عنوان بطاقة الرسالة"
+                  defaultText="الرسالة التربوية (Mission)"
+                  as="h4"
+                  className={`text-xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
+                />
                 <span className="text-xs text-[#f8ca14] font-bold">جودة التعليم وبناء الشخصية المتكاملة</span>
               </div>
             </div>
 
-            <p className={`text-xs sm:text-sm leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}>
-              توفير بيئة تعليمية وتربوية محفزة وجاذبة، تضم نخبة من الكفاءات التعليمية المؤهلة، وتطبق أحدث المعايير الدولية والاعتمادات الأكاديمية (Cognia الأمريكية)، لبناء شخصية متكاملة للطالب تعتز بهويتها وتسهم باقتدار في نهضة وطنها.
-            </p>
+            <VisualEditable
+              id="about-mission-card-desc"
+              tag="text"
+              label="نص بطاقة الرسالة"
+              defaultText="توفير بيئة تعليمية وتربوية محفزة وجاذبة، تضم نخبة من الكفاءات التعليمية المؤهلة، وتطبق أحدث المعايير الدولية والاعتمادات الأكاديمية (Cognia الأمريكية)، لبناء شخصية متكاملة للطالب تعتز بهويتها وتسهم باقتدار في نهضة وطنها."
+              as="p"
+              className={`text-xs sm:text-sm leading-relaxed mb-6 font-medium ${dark ? "text-slate-300" : "text-slate-700"}`}
+            />
 
             <div className="flex flex-wrap gap-2">
               <span className={`px-3 py-1 rounded-xl text-[11px] font-black border ${
@@ -186,12 +220,22 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
             <div className="inline-flex items-center gap-1.5 text-xs font-black text-[#f8ca14] mb-1">
               <span>✦ بوصلة السلوك والقيم المؤسسية ✦</span>
             </div>
-            <h4 className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-              قيم العقيق الجوهرية الخمس (The 5 Virtues)
-            </h4>
-            <p className={`text-xs sm:text-sm mt-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-              اختر أي قيمة لاستكشاف كيف نترجمها عملياً داخل الفصول وسلوك الطالب اليومي:
-            </p>
+            <VisualEditable
+              id="about-values-title"
+              tag="text"
+              label="عنوان قسم القيم"
+              defaultText="5 قيم أساسية.. نبني عليها شخصية طفلك"
+              as="h4"
+              className={`text-xl sm:text-2xl font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
+            />
+            <VisualEditable
+              id="about-values-subtitle"
+              tag="text"
+              label="وصف قسم القيم"
+              defaultText="تعرف كيف نغرس هذه القيم في تفاصيل يومهم الدراسي بحب واهتمام، لتكون أسلوب حياة وليس مجرد كلام."
+              as="p"
+              className={`text-xs sm:text-sm mt-1.5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+            />
           </div>
 
           {/* Virtues Grid Pills */}
@@ -204,7 +248,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                   key={val.id}
                   type="button"
                   onClick={() => setActiveValueId(val.id)}
-                  className={`p-3.5 rounded-2xl border text-center transition-all duration-300 active:scale-95 ${
+                  className={`p-3.5 rounded-2xl border text-center transition-all duration-150 active:scale-95 cursor-pointer ${
                     isSelected
                       ? "bg-gradient-to-r from-[#08467d] to-[#042442] border-[#f8ca14]/60 text-white shadow-lg ring-1 ring-[#f8ca14]/50 scale-[1.02]"
                       : dark
@@ -212,27 +256,36 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
                       : "border-slate-200 bg-white text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/40 shadow-sm"
                   }`}
                 >
-                  <div className="flex items-center justify-center gap-2 mb-1">
+                  <div className="flex items-center justify-center gap-2 mb-1 pointer-events-none">
                     <VIcon size={16} className={isSelected ? "text-[#f8ca14]" : ""} />
-                    <span className={`text-sm font-black ${isSelected ? "text-[#f8ca14]" : ""}`}>
-                      {val.name}
-                    </span>
+                    <VisualEditable
+                      id={`about-value-${val.id}-name`}
+                      tag="text"
+                      label={`اسم قيمة ${val.name}`}
+                      defaultText={val.name}
+                      as="span"
+                      className={`text-sm font-black ${isSelected ? "text-[#f8ca14]" : ""}`}
+                    />
                   </div>
-                  <span className="block text-[10px] font-bold opacity-75 truncate">
-                    {val.id === "authenticity" ? "الهوية والأصل" : val.id === "excellence" ? "الجودة القصوى" : val.id === "innovation" ? "العصر الرقمي" : val.id === "leadership" ? "صناعة الأثر" : "خدمة الوطن"}
-                  </span>
+                  <div className="pointer-events-none">
+                    <VisualEditable
+                      id={`about-value-${val.id}-tag`}
+                      tag="text"
+                      label={`شعار قيمة ${val.name}`}
+                      defaultText={val.tag}
+                      as="span"
+                      className="block text-[10px] font-bold opacity-75 truncate"
+                    />
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Dynamic Active Value Translation Card (Instant Snappy Switch) */}
-          <motion.div
+          {/* Dynamic Active Value Translation Card (Instant 0ms Snappy Switch) */}
+          <div
             key={activeValue.id}
-            initial={{ opacity: 0.35 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            className={`p-5 sm:p-7 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
+            className={`p-5 sm:p-7 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-colors duration-150 ${
               dark
                 ? "border-[#f8ca14]/30 bg-[#f8ca14]/[0.04]"
                 : "border-slate-200 bg-white shadow-md"
@@ -241,20 +294,40 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
             <div className="space-y-1.5 flex-1">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-[#f8ca14]" />
-                <h5 className={`text-base sm:text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}>
-                  {activeValue.title}
-                </h5>
+                <VisualEditable
+                  id={`about-value-${activeValue.id}-title`}
+                  tag="text"
+                  label={`عنوان قيمة ${activeValue.name}`}
+                  defaultText={activeValue.title}
+                  as="h5"
+                  className={`text-base sm:text-lg font-black ${dark ? "text-white" : "text-[#0a192f]"}`}
+                />
               </div>
-              <p className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}>
-                {activeValue.desc}
-              </p>
+              <VisualEditable
+                id={`about-value-${activeValue.id}-desc`}
+                tag="text"
+                label={`وصف قيمة ${activeValue.name}`}
+                defaultText={activeValue.desc}
+                as="p"
+                className={`text-xs sm:text-sm font-medium leading-relaxed ${dark ? "text-slate-300" : "text-slate-700"}`}
+              />
               <div className="pt-2">
-                <span className="text-[11px] font-black text-[#f8ca14] block">
-                  التطبيق السلوكي داخل المدرسة:
-                </span>
-                <p className={`text-xs leading-relaxed mt-0.5 ${dark ? "text-slate-400" : "text-slate-600"}`}>
-                  {activeValue.action}
-                </p>
+                <VisualEditable
+                  id={`about-value-${activeValue.id}-action-title`}
+                  tag="text"
+                  label={`تسمية تطبيق قيمة ${activeValue.name}`}
+                  defaultText={activeValue.actionTitle}
+                  as="span"
+                  className="text-[11px] font-black text-[#f8ca14] block"
+                />
+                <VisualEditable
+                  id={`about-value-${activeValue.id}-action`}
+                  tag="text"
+                  label={`تفاصيل تطبيق قيمة ${activeValue.name}`}
+                  defaultText={activeValue.action}
+                  as="p"
+                  className={`text-xs leading-relaxed mt-0.5 ${dark ? "text-slate-400" : "text-slate-600"}`}
+                />
               </div>
             </div>
 
@@ -265,7 +338,7 @@ export function VisionMissionCompass({ dark = true }: VisionMissionCompassProps)
             }`}>
               <ActiveValueIcon size={30} />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -1501,11 +1501,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     }
 
     let scanTimer: ReturnType<typeof setTimeout> | null = null;
+    let scanRaf: number | null = null;
     const debouncedScan = () => {
-      if (scanTimer) clearTimeout(scanTimer);
-      scanTimer = setTimeout(() => {
+      // Use requestAnimationFrame to sync DOM text immediately BEFORE browser repaint,
+      // eliminating any flash of old text (FOUC) across the entire site.
+      if (scanRaf !== null) cancelAnimationFrame(scanRaf);
+      scanRaf = requestAnimationFrame(() => {
         scanAndTag();
-      }, 300);
+        scanRaf = null;
+      });
     };
 
     const observer = new MutationObserver(() => {
@@ -1519,6 +1523,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     window.addEventListener("aqeeq-studio-theme-change", handleThemeChange);
 
     return () => {
+      if (scanRaf !== null) cancelAnimationFrame(scanRaf);
       if (scanTimer) clearTimeout(scanTimer);
       window.removeEventListener("click", handleCaptureClick, true);
       window.removeEventListener("aqeeq-studio-theme-change", handleThemeChange);
