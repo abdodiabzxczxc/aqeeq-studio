@@ -1180,7 +1180,13 @@ export default function AlaqeeqStudioPublicPage() {
                 }`}
               >
                 <Award size={15} className={isNationalDay ? "text-[#D4AF37]" : "text-[#f8ca14]"} />
-                <span>الاعتمادات الدولية</span>
+                <VisualEditable
+                  id="hero-cta-accreditations-text"
+                  tag="text"
+                  label="نص زر الاعتمادات في الهيرو"
+                  defaultText="اعتماداتنا"
+                  as="span"
+                />
               </button>
             </div>
 

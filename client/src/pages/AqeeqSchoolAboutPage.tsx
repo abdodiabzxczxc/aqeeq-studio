@@ -162,21 +162,27 @@ export default function AqeeqSchoolAboutPage() {
                   }`}
                 >
                   {isNationalDay ? <span>🇸🇦</span> : <Building2 size={14} className={dark ? "text-[#f8ca14]" : "text-[#c59b27]"} />}
-                  <span>{isNationalDay ? "مسيرة وطنية رائدة منذ عام 1994 · عزّنا بطبعنا" : "صرح العقيق التعليمي الرائد بالمدينة المنورة"}</span>
+                  <VisualEditable
+                    id="about-hero-badge"
+                    tag="text"
+                    label="شارة الهيرو"
+                    defaultText={isNationalDay ? "مسيرة وطنية رائدة منذ عام 1994 · عزّنا بطبعنا" : "تعليم عالمي بقلب المدينة المنورة"}
+                    as="span"
+                  />
                 </div>
 
                 <VisualEditable
                   id="about-hero-title"
                   tag="text"
                   label="عنوان هيرو عن المدارس"
-                  defaultText="مدارس العقيق الأهلية والدولية."
+                  defaultText="مدارس العقيق هنا يُصنع مستقبلهم"
                   as="h1"
                   className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.18] mb-6 ${
                     dark ? "text-white" : "text-black"
                   }`}
                 >
                   {(text) => {
-                    const raw = text || "مدارس العقيق الأهلية والدولية.";
+                    const raw = text || "مدارس العقيق هنا يُصنع مستقبلهم";
                     const match = raw.match(/^(مدارس العقيق)(.*)$/);
                     if (match) {
                       return (
@@ -212,7 +218,7 @@ export default function AqeeqSchoolAboutPage() {
                   id="about-hero-desc"
                   tag="text"
                   label="وصف هيرو عن المدارس"
-                  defaultText="صرح تعليمي رائد للبنين والبنات في طيبة الطيبة. نهتم بتأهيل جيل متميز بأخلاق إسلامية راسخة وعلوم عصرية متقدمة، يجمع بين أصالة القيم ومعايير الاعتماد الدولي."
+                  defaultText="طوال ٢٧ عاماً في المدينة المنورة، كنا أكثر من مجرد مدرسة؛ نحن بيئة آمنة تشاركك مسؤولية بناء طفلك. نجمع بين جودة التعليم الدولي المعتمد ودفء قيمنا الأصيلة، ليخطو أبناؤنا نحو المستقبل بثقة تامة."
                   as="p"
                   className={`text-base sm:text-lg font-medium leading-relaxed max-w-2xl mb-8 ${
                     dark ? "text-slate-300" : "text-slate-700 font-medium"
@@ -229,7 +235,13 @@ export default function AqeeqSchoolAboutPage() {
                         : "bg-gradient-to-r from-[#08467d] to-[#042442] text-white hover:opacity-95 shadow-[#08467d]/25"
                     }`}
                   >
-                    <span>القبول والتسجيل والرسوم</span>
+                    <VisualEditable
+                      id="about-hero-admissions-btn"
+                      tag="text"
+                      label="زر القبول والتسجيل"
+                      defaultText="ابدأ رحلة التسجيل الآن"
+                      as="span"
+                    />
                     <ArrowRight size={18} className="mr-2" />
                   </Button>
 
@@ -242,7 +254,13 @@ export default function AqeeqSchoolAboutPage() {
                         : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"
                     }`}
                   >
-                    <span>الاعتمادات ومراكز الاختبارات</span>
+                    <VisualEditable
+                      id="about-hero-accreditations-btn"
+                      tag="text"
+                      label="زر الاعتمادات ومراكز الاختبارات"
+                      defaultText="اعتماداتنا الدولية"
+                      as="span"
+                    />
                   </Button>
                 </div>
 
@@ -253,28 +271,76 @@ export default function AqeeqSchoolAboutPage() {
                   }`}
                 >
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                      {(orchestration as any)?.aboutPageConfig?.statYears || "منذ 1994"}
-                    </span>
-                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>+30 عاماً من الريادة</span>
+                    <VisualEditable
+                      id="about-hero-stat-years-val"
+                      tag="text"
+                      label="إحصائية الخبرة (القيمة)"
+                      defaultText={(orchestration as any)?.aboutPageConfig?.statYears || "٢٧ عاماً"}
+                      as="span"
+                      className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                    />
+                    <VisualEditable
+                      id="about-hero-stat-years-lbl"
+                      tag="text"
+                      label="إحصائية الخبرة (الوصف)"
+                      defaultText="من الخبرة والريادة في بناء الأجيال"
+                      as="span"
+                      className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                    />
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                      {(orchestration as any)?.aboutPageConfig?.statCampuses || "مجمعين"}
-                    </span>
-                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>للبنين والبنات</span>
+                    <VisualEditable
+                      id="about-hero-stat-campuses-val"
+                      tag="text"
+                      label="إحصائية المجمعات (القيمة)"
+                      defaultText={(orchestration as any)?.aboutPageConfig?.statCampuses || "بيئة تعليمية"}
+                      as="span"
+                      className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                    />
+                    <VisualEditable
+                      id="about-hero-stat-campuses-lbl"
+                      tag="text"
+                      label="إحصائية المجمعات (الوصف)"
+                      defaultText="متكاملة تناسب أبناءنا وبناتنا"
+                      as="span"
+                      className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                    />
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}>
-                      {(orchestration as any)?.aboutPageConfig?.statAccreditation || "Cognia"}
-                    </span>
-                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>اعتماد أمريكي</span>
+                    <VisualEditable
+                      id="about-hero-stat-accreditation-val"
+                      tag="text"
+                      label="إحصائية الاعتماد (القيمة)"
+                      defaultText={(orchestration as any)?.aboutPageConfig?.statAccreditation || "اعتماد دولي"}
+                      as="span"
+                      className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#c59b27]"}`}
+                    />
+                    <VisualEditable
+                      id="about-hero-stat-accreditation-lbl"
+                      tag="text"
+                      label="إحصائية الاعتماد (الوصف)"
+                      defaultText="جودة تعليم تضاهي المدارس العالمية"
+                      as="span"
+                      className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                    />
                   </div>
                   <div className="p-2 rounded-xl transition hover:scale-105">
-                    <span className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}>
-                      {(orchestration as any)?.aboutPageConfig?.statGrades || "KG - 12"}
-                    </span>
-                    <span className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}>كافة المراحل</span>
+                    <VisualEditable
+                      id="about-hero-stat-grades-val"
+                      tag="text"
+                      label="إحصائية المراحل (القيمة)"
+                      defaultText={(orchestration as any)?.aboutPageConfig?.statGrades || "من الروضة"}
+                      as="span"
+                      className={`block text-xl sm:text-2xl font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
+                    />
+                    <VisualEditable
+                      id="about-hero-stat-grades-lbl"
+                      tag="text"
+                      label="إحصائية المراحل (الوصف)"
+                      defaultText="وحتى التخرج"
+                      as="span"
+                      className={`text-[11px] font-bold ${dark ? "text-slate-400" : "text-slate-600"}`}
+                    />
                   </div>
                 </div>
               </div>
@@ -431,7 +497,13 @@ export default function AqeeqSchoolAboutPage() {
                 : "border-black/5 bg-slate-50 text-slate-700 hover:text-[#08467d] hover:border-[#08467d]/30 hover:bg-white"
             }`}
           >
-            مسيرة 30 عاماً 📜
+            <VisualEditable
+              id="about-quick-jump-timeline"
+              tag="text"
+              label="رابط القفز السريع - مسيرة العقيق"
+              defaultText="مسيرة ٢٧ عاماً 📜"
+              as="span"
+            />
           </a>
           <a
             href="#campuses-section"

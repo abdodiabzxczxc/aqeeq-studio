@@ -1128,7 +1128,13 @@ export function AlaqeeqStudioSiteHeader({ title, active, logoUrl }: AlaqeeqStudi
                             <span>{navAdmissionsText} متاح الآن</span>
                           </span>
                           <h3 className="text-xs sm:text-sm font-black tracking-tight leading-snug">
-                            احجز مقعد ابنك للعام الجديد
+                            <VisualEditable
+                              id="header-nav-admissions-title"
+                              tag="text"
+                              label="عنوان القبول في القائمة"
+                              defaultText="احجز مقعد ابنك"
+                              as="span"
+                            />
                           </h3>
                           <p className="text-[10px] text-white/80 mt-0.5 font-medium">
                             تعليم أهلي ودولي معتمد بمناهج عالمية
