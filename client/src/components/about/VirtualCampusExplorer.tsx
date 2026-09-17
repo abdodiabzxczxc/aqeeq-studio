@@ -206,7 +206,7 @@ interface VirtualCampusExplorerProps {
 
 export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProps) {
   const [, navigate] = useLocation();
-  const { isEditing, select } = useVisualEditorState();
+  const { isEditing, select, getOverride } = useVisualEditorState();
   const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
 
@@ -221,6 +221,10 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
 
   const facilities = campusTab === "boys" ? BOYS_FACILITIES : GIRLS_FACILITIES;
   const activeFac = facilities[activeFacilityIndex] || facilities[0];
+
+  const getFacilityName = (fac: FacilityItem) => {
+    return getOverride(`about-facility-${fac.id}-name`)?.contentText || fac.name;
+  };
 
   return (
     <section
@@ -337,12 +341,21 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           {facilities.map((fac, fIdx) => {
             const FacIcon = fac.icon;
             const isExpanded = activeFacilityIndex === fIdx;
+            const facName = getFacilityName(fac);
 
             return (
               <motion.div
                 key={fac.id}
                 layout
                 transition={{ type: "spring", stiffness: 220, damping: 26, mass: 0.9 }}
+                onClickCapture={() => {
+                  if (!isExpanded) {
+                    setActiveFacilityIndex(fIdx);
+                    if (isEditing) {
+                      select(`about-facility-${fac.id}-name`, "text", `اسم مرفق ${fac.name}`);
+                    }
+                  }
+                }}
                 onClick={() => {
                   if (!isExpanded) {
                     setActiveFacilityIndex(fIdx);
@@ -359,16 +372,18 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 }`}
               >
                 {/* Background Photo */}
-                <VisualImage
-                  id={`about-facility-${fac.id}`}
-                  label={`مرفق ${fac.name} (${fac.tag})`}
-                  src={fac.image}
-                  alt={fac.name}
-                  priority={isExpanded}
-                  className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
-                    isExpanded ? "scale-105" : "grayscale-[25%] group-hover:scale-110"
-                  }`}
-                />
+                <div className={`absolute inset-0 h-full w-full ${!isExpanded ? "pointer-events-none" : ""}`}>
+                  <VisualImage
+                    id={`about-facility-${fac.id}`}
+                    label={`مرفق ${fac.name} (${fac.tag})`}
+                    src={fac.image}
+                    alt={fac.name}
+                    priority={isExpanded}
+                    className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
+                      isExpanded ? "scale-105" : "grayscale-[25%] group-hover:scale-110"
+                    }`}
+                  />
+                </div>
                 {/* Dark Scrim */}
                 <div
                   className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
@@ -528,7 +543,16 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                   </div>
                 ) : (
                   /* Compressed Vertical Spine */
-                  <div className="relative z-10 h-full flex flex-col items-center justify-between py-8 select-none">
+                  <div
+                    data-no-visual-edit="true"
+                    onClick={() => {
+                      setActiveFacilityIndex(fIdx);
+                      if (isEditing) {
+                        select(`about-facility-${fac.id}-name`, "text", `اسم مرفق ${fac.name}`);
+                      }
+                    }}
+                    className="relative z-10 h-full flex flex-col items-center justify-between py-8 select-none cursor-pointer"
+                  >
                     <div className={`grid h-12 w-12 place-items-center rounded-2xl border shadow-md backdrop-blur-md transition ${
                       dark
                         ? "bg-black/70 border-white/20 text-[#f8ca14] group-hover:border-[#f8ca14]/40"
@@ -537,7 +561,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       <FacIcon size={20} />
                     </div>
                     <span className="font-black text-sm text-white [writing-mode:vertical-rl] tracking-wider transform rotate-180 group-hover:text-[#f8ca14] transition drop-shadow-md">
-                      {fac.name}
+                      {facName}
                     </span>
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md border ${
                       dark
@@ -562,6 +586,14 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
             return (
               <div
                 key={fac.id}
+                onClickCapture={() => {
+                  if (!isExpanded) {
+                    setActiveFacilityIndex(fIdx);
+                    if (isEditing) {
+                      select(`about-facility-${fac.id}-name`, "text", `اسم مرفق ${fac.name}`);
+                    }
+                  }
+                }}
                 onClick={() => setActiveFacilityIndex(fIdx)}
                 className={`rounded-3xl border overflow-hidden transition ${
                   isExpanded
@@ -582,11 +614,11 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     }`}>
                       <FacIcon size={18} />
                     </div>
-                    <div className="text-right">
+                    <div className={`text-right ${!isExpanded ? "pointer-events-none" : ""}`}>
                       <VisualEditable
-                        id={`about-facility-${fac.id}-mobile-tag`}
+                        id={`about-facility-${fac.id}-tag`}
                         tag="text"
-                        label={`وسام مرفق ${fac.name} (جوال)`}
+                        label={`وسام مرفق ${fac.name}`}
                         defaultText={fac.tag}
                         as="span"
                         className={`text-[10px] font-bold block ${
@@ -594,9 +626,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                         }`}
                       />
                       <VisualEditable
-                        id={`about-facility-${fac.id}-mobile-name`}
+                        id={`about-facility-${fac.id}-name`}
                         tag="text"
-                        label={`اسم مرفق ${fac.name} (جوال)`}
+                        label={`اسم مرفق ${fac.name}`}
                         defaultText={fac.name}
                         as="h4"
                         className={`text-sm font-black ${
@@ -635,9 +667,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                         />
                       </div>
                       <VisualEditable
-                        id={`about-facility-${fac.id}-mobile-desc`}
+                        id={`about-facility-${fac.id}-desc`}
                         tag="text"
-                        label={`وصف مرفق ${fac.name} (جوال)`}
+                        label={`وصف مرفق ${fac.name}`}
                         defaultText={fac.desc}
                         as="p"
                         className={`text-xs leading-relaxed font-medium ${
@@ -652,7 +684,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                               : "border-slate-200 bg-white shadow-sm"
                           }`}>
                             <VisualEditable
-                              id={`about-facility-${fac.id}-mobile-metric-${gIdx}-num`}
+                              id={`about-facility-${fac.id}-metric-${gIdx}-num`}
                               tag="text"
                               label={`رقم معيار ${fac.name} (${gIdx + 1})`}
                               defaultText={gm.num}
@@ -662,7 +694,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                               }`}
                             />
                             <VisualEditable
-                              id={`about-facility-${fac.id}-mobile-metric-${gIdx}-label`}
+                              id={`about-facility-${fac.id}-metric-${gIdx}-label`}
                               tag="text"
                               label={`تسمية معيار ${fac.name} (${gIdx + 1})`}
                               defaultText={gm.label}

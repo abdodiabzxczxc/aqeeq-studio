@@ -364,9 +364,14 @@ export function applyTextContentToNode(node: HTMLElement, newText: string): void
     for (let i = 1; i < textChildren.length; i++) {
       textChildren[i].remove();
     }
-  } else if (typeof document !== "undefined") {
-    // No text node among children, append a new text node
-    node.appendChild(document.createTextNode(newText));
+  } else if (!node.querySelector("svg, img, video, canvas")) {
+    // If all children are text-only formatting spans, update the primary child span cleanly
+    const primaryChild = node.children[0] as HTMLElement | undefined;
+    if (primaryChild && primaryChild.children.length === 0) {
+      if (primaryChild.textContent !== newText) {
+        primaryChild.textContent = newText;
+      }
+    }
   }
 }
 
@@ -1206,10 +1211,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
   const selectElement = (elementId: string, elementTag: ElementTag, label: string, additive = false) => {
     if (!isEditing) return;
-    if (!canManipulateLayer(overrideMap.get(elementId)?.isLocked)) {
-      toast.info("هذا العنصر مقفل — يمكنك إلغاء القفل من لوحة الطبقات");
-      return;
-    }
+    const isLocked = !canManipulateLayer(overrideMap.get(elementId)?.isLocked);
     draftPreviewEnabled.current = false;
     draftElementIdRef.current = elementId;
     setSelected({ id: elementId, tag: elementTag, label });
@@ -1220,6 +1222,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     setWorkspaceMediaOpen(false);
     setPageMapOpen(false);
     setPanelAnchorTop(null);
+    if (isLocked) {
+      toast.info("العنصر مقفل — يمكنك فك القفل من لوحة التعديل للتحرير");
+    }
   };
 
   useEffect(() => {
@@ -2648,6 +2653,34 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           <>
             <div className="aq-editor-properties-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <div className="space-y-4 p-4">
+          {draft.isLocked ? (
+            <div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-3 flex items-center justify-between gap-2 shadow-sm">
+              <div className="flex items-center gap-2 min-w-0 text-amber-200 text-xs font-bold">
+                <Lock size={15} className="shrink-0 text-amber-400" />
+                <span className="truncate">هذا العنصر مقفل لحمايته من التعديل</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  saveLayer(selected.id, {
+                    layerX: draft.layerX,
+                    layerY: draft.layerY,
+                    layerWidth: draft.layerWidth,
+                    layerHeight: draft.layerHeight,
+                    layerZIndex: draft.layerZIndex,
+                    layerOpacity: draft.layerOpacity,
+                    isLocked: false,
+                    isHidden: draft.isHidden,
+                  });
+                  setDraft((d) => ({ ...d, isLocked: false }));
+                  toast.success("تم فك قفل العنصر بنجاح للتحرير");
+                }}
+                className="shrink-0 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-black text-xs font-black rounded-xl transition shadow active:scale-95 cursor-pointer"
+              >
+                🔓 فك القفل
+              </button>
+            </div>
+          ) : null}
           {["studio-hero-journal-image", "studio-hero-album-image", "studio-hero-showcase-image"].includes(selected.id) && (
             <div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-2.5">
               <div className="text-[11px] font-black text-amber-300 mb-2">أغلفة الواجهة الرئيسية (بدّل بينها مباشرة):</div>
@@ -3743,7 +3776,10 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
   };
 
   return <Tag ref={layerRef as never} id={htmlId} title={title} data-visual-id={id} data-visual-label={label} data-visual-tag={tag} onPointerDown={(event) => {
-    if (isEditing && isLocked) { event.preventDefault(); event.stopPropagation(); return; }
+    if (isEditing && isLocked) {
+      // Don't drag/move when locked, but let pointer event pass so click can select
+      return;
+    }
     if (isEditing && event.shiftKey) return;
     if (isEditing && (isDirectBackground || event.target === event.currentTarget && isBackgroundSurface(id, label, tag))) {
       event.preventDefault(); event.stopPropagation(); select(id, tag, label);
@@ -3756,8 +3792,8 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
       return;
     }
     begin(event, "move");
-  }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={(event) => { if (isEditing) { event.preventDefault(); event.stopPropagation(); if (isLocked) return; if (longPress.current.selected) { longPress.current.selected = false; return; } if (event.target === event.currentTarget && selectSectionBackground()) return; select(id, tag, label, event.shiftKey); return; } if (override?.linkUrl) { event.preventDefault(); event.stopPropagation(); if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer"); else window.location.assign(override.linkUrl); return; } onAction?.(); onClick?.(); }} style={visualStyle} className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? `group ${/(?:^|\s)absolute(?:\s|$)/.test(className) ? "" : "relative"} cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80` : ""} ${layerMode && !isLocked ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "cursor-not-allowed hover:outline hover:outline-1 hover:outline-dashed hover:outline-slate-500/50" : ""}`}>
-    {isEditing ? <span className={`pointer-events-none absolute -top-5 right-0 z-[82] inline-flex items-center gap-1 rounded-t-lg bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 transition-opacity duration-200 ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>{isLocked ? <Lock size={10} /> : null}{label}</span> : null}
+  }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={(event) => { if (isEditing) { event.preventDefault(); event.stopPropagation(); if (longPress.current.selected) { longPress.current.selected = false; return; } if (event.target === event.currentTarget && selectSectionBackground()) return; select(id, tag, label, event.shiftKey); return; } if (override?.linkUrl) { event.preventDefault(); event.stopPropagation(); if (behavior.openInNewTab) window.open(override.linkUrl, "_blank", "noopener,noreferrer"); else window.location.assign(override.linkUrl); return; } onAction?.(); onClick?.(); }} style={visualStyle} className={`${className} ${hasCustomTextColor ? "aq-has-custom-text-color" : ""} ${hasCustomBgColor ? "aq-has-custom-bg-color" : ""} aq-layer-device-${behavior.device ?? "all"} aq-layer-motion-${behavior.animation ?? "none"} ${behavior.revealOnScroll && !isEditing ? `aq-layer-scroll-reveal ${isInView ? "is-visible" : ""}` : ""} ${behavior.buttonHover ? `aq-layer-hover-${behavior.buttonHover}` : ""} ${override?.linkUrl && !isEditing ? "cursor-pointer" : ""} ${isEditing ? `group ${/(?:^|\s)absolute(?:\s|$)/.test(className) ? "" : "relative"} cursor-pointer transition hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400/80` : ""} ${layerMode && !isLocked ? "touch-none cursor-grab active:cursor-grab" : ""} ${selected ? "z-[81] !outline !outline-2 !outline-amber-300 shadow-[0_0_0_5px_rgba(251,191,36,.12)]" : ""} ${isEditing && isLocked ? "hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-500/70" : ""}`}>
+    {isEditing ? <span className={`pointer-events-none absolute -top-5 right-0 z-[82] inline-flex items-center gap-1 rounded-t-lg bg-amber-400 px-2 py-0.5 text-[10px] font-black text-amber-950 transition-opacity duration-200 ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>{isLocked ? <Lock size={10} /> : null}{label}{isLocked ? " (مقفل)" : ""}</span> : null}
     {isEditing && layerMode && selected ? <span className="pointer-events-none absolute -bottom-6 right-0 z-[82] rounded-lg bg-[#08467d] px-2 py-1 text-[10px] font-black text-white shadow-lg">X {Math.round(inspectorFrame.x)} · Y {Math.round(inspectorFrame.y)} · {inspectorFrame.width ? `${Math.round(inspectorFrame.width)}×${Math.round(inspectorFrame.height ?? 0)}` : "حجم تلقائي"}</span> : null}
     {isEditing && selected && isDirectBackground && liveFrame ? <><span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 z-[82] border-t border-dashed border-[#f8ca14]/90" /><span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-1/2 z-[82] border-l border-dashed border-[#f8ca14]/90" /><span className="pointer-events-none absolute left-1/2 top-1/2 z-[83] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f8ca14]/60 bg-[#111521]/95 px-2.5 py-1 text-[10px] font-black text-[#f8ca14] shadow-xl">{Math.round(liveFrame.width ?? 0)} × {Math.round(liveFrame.height ?? 0)} بكسل</span><span className="pointer-events-none absolute -top-7 left-1/2 z-[83] -translate-x-1/2 whitespace-nowrap rounded-lg border border-[#f8ca14]/45 bg-[#111521]/95 px-2 py-1 text-[9px] font-black text-[#f8ca14]">منتصف الخلفية · {backgroundAspectLocked ? "النسبة مقفلة" : "نسبة حرة"}</span></> : null}
     {isEditing && selected && !isLocked && isDirectBackground ? ([
