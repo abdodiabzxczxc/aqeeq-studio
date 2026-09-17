@@ -240,7 +240,11 @@ const SEED_FILE = path.resolve(process.cwd(), "server", "seedData.json");
 
 function sanitizeOverrides(overrides: Record<string, any> | undefined) {
   if (!overrides) return;
-  for (const item of Object.values(overrides)) {
+  for (const [key, item] of Object.entries(overrides)) {
+    if (item?.elementId?.startsWith("auto-txt-") || key.includes("auto-txt-")) {
+      delete overrides[key];
+      continue;
+    }
     if (item && item.textColor) {
       const c = String(item.textColor).trim().toLowerCase();
       if (

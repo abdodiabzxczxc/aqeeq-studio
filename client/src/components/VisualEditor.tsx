@@ -700,7 +700,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const local = JSON.parse(raw);
         if (Array.isArray(local)) {
           for (const item of local) {
-            if (item && item.elementId) {
+            // Ignore legacy or orphaned auto-txt entries to prevent ghost text flicker
+            if (item && item.elementId && !item.elementId.startsWith("auto-txt-")) {
               const sanitizedTextColor = sanitizeOverrideTextColor(item.textColor);
               const entry = sanitizedTextColor !== item.textColor ? { ...item, textColor: sanitizedTextColor } : item;
               const existing = map.get(entry.elementId);
@@ -1246,6 +1247,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     const isEditorSystemUi = (node: Element | null): boolean => {
       if (!node) return false;
       return Boolean(
+        node.closest("aside") ||
         node.closest(".aq-editor-toolbar") ||
         node.closest(".aq-editor-floating-bar") ||
         node.closest("[data-aq-editor-floating-bar]") ||
@@ -1254,6 +1256,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         node.closest("[data-aq-editor-properties]") ||
         node.closest("[data-aq-editor-panel]") ||
         node.closest("[data-aq-editor-modal]") ||
+        node.closest("[data-sonner-toaster]") ||
+        node.closest("[data-sonner-toast]") ||
         node.closest("[data-radix-popper-content-wrapper]") ||
         node.closest("[role='dialog']") ||
         node.closest("[role='alertdialog']") ||
@@ -1311,7 +1315,9 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           } else {
             const srcPath = img.getAttribute("src") || "";
             const altText = img.alt || "";
-            id = `auto-img-${hashString(srcPath + altText + idx)}`;
+            const parentTag = img.parentElement?.tagName.toLowerCase() || "root";
+            const siblingIndex = Array.from(img.parentElement?.children || []).indexOf(img);
+            id = `auto-img-${hashString(srcPath + altText + parentTag + siblingIndex)}`;
             img.dataset.visualId = id;
             img.dataset.visualTag = "image";
             img.dataset.visualLabel = altText || `صورة ${idx + 1}`;
@@ -1344,6 +1350,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           }
           return;
         }
+
+        // CRITICAL FIX: NEVER auto-tag or mutate any element inside a CANONICAL (non-auto) VisualEditable element!
+        // This permanently eliminates conflicting auto-txt IDs from clobbering tabbed components or card contents.
+        const canonicalParent = node.closest<HTMLElement>("[data-visual-id]:not([data-visual-auto='true'])");
+        if (canonicalParent && canonicalParent !== node) {
+          if (node.dataset.visualAuto === "true") {
+            delete node.dataset.visualId;
+            delete node.dataset.visualTag;
+            delete node.dataset.visualLabel;
+            delete node.dataset.visualAuto;
+          }
+          return;
+        }
+
         if (node.dataset.visualId && node.dataset.visualAuto !== "true") return;
 
         // Extract direct text content
@@ -1357,7 +1377,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
         let id = node.dataset.visualId;
         if (!id) {
-          id = `auto-txt-${hashString(directText.slice(0, 30) + idx)}`;
+          // Hierarchy-stable auto-id (parent tag + sibling index) rather than global page index
+          const parentTag = node.parentElement?.tagName.toLowerCase() || "root";
+          const siblingIndex = Array.from(node.parentElement?.children || []).indexOf(node);
+          const tagKey = `${node.tagName.toLowerCase()}_${parentTag}_${siblingIndex}`;
+          id = `auto-txt-${hashString(directText.slice(0, 30) + tagKey)}`;
           node.dataset.visualId = id;
           node.dataset.visualTag = "text";
           node.dataset.visualLabel = directText.slice(0, 24);
@@ -1394,11 +1418,26 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
           return;
         }
         const htmlSvg = svg as unknown as HTMLElement;
+
+        // Skip svgs inside canonical Visual elements
+        const canonicalSvgParent = htmlSvg.closest<HTMLElement>("[data-visual-id]:not([data-visual-auto='true'])");
+        if (canonicalSvgParent && canonicalSvgParent !== htmlSvg) {
+          if (htmlSvg.dataset?.visualAuto === "true") {
+            delete htmlSvg.dataset.visualId;
+            delete htmlSvg.dataset.visualTag;
+            delete htmlSvg.dataset.visualLabel;
+            delete htmlSvg.dataset.visualAuto;
+          }
+          return;
+        }
+
         if (htmlSvg.dataset?.visualId && htmlSvg.dataset?.visualAuto !== "true") return;
 
         let id = htmlSvg.dataset?.visualId;
         if (!id) {
-          id = `auto-icon-${hashString((svg.getAttribute("class") || "") + idx)}`;
+          const parentTag = htmlSvg.parentElement?.tagName.toLowerCase() || "root";
+          const siblingIndex = Array.from(htmlSvg.parentElement?.children || []).indexOf(htmlSvg);
+          id = `auto-icon-${hashString((svg.getAttribute("class") || "") + parentTag + siblingIndex)}`;
           htmlSvg.dataset.visualId = id;
           htmlSvg.dataset.visualTag = "icon";
           htmlSvg.dataset.visualLabel = `أيقونة ${idx + 1}`;
@@ -1432,19 +1471,20 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // 1. First priority: explicit visual element
-      const visualEl = targetEl.closest<HTMLElement>("[data-visual-id]");
-      if (visualEl && !isEditorSystemUi(visualEl)) {
+      // 1. Highest priority: Canonical (explicit, non-auto) visual element
+      // Any click inside a canonical VisualEditable will ALWAYS select that canonical element directly, NEVER a rogue child
+      const canonicalVisualEl = targetEl.closest<HTMLElement>("[data-visual-id]:not([data-visual-auto='true'])");
+      if (canonicalVisualEl && !isEditorSystemUi(canonicalVisualEl)) {
         e.preventDefault();
         e.stopPropagation();
-        const id = visualEl.dataset.visualId!;
-        const tag = (visualEl.dataset.visualTag || "text") as ElementTag;
-        const label = visualEl.dataset.visualLabel || id;
+        const id = canonicalVisualEl.dataset.visualId!;
+        const tag = (canonicalVisualEl.dataset.visualTag || "text") as ElementTag;
+        const label = canonicalVisualEl.dataset.visualLabel || id;
         selectElement(id, tag, label);
         return;
       }
 
-      // 2. Second priority: auto-tagged element
+      // 2. Second priority: auto-tagged element (only if outside any canonical container)
       const autoTarget = targetEl.closest<HTMLElement>("[data-visual-auto='true']");
       if (autoTarget && !isEditorSystemUi(autoTarget)) {
         e.preventDefault();
@@ -1486,6 +1526,11 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
         const svg = (targetEl.tagName === "svg" ? targetEl : targetEl.closest("svg")) as unknown as HTMLElement;
         e.preventDefault();
         e.stopPropagation();
+        const parentCanonical = svg.closest<HTMLElement>("[data-visual-id]:not([data-visual-auto='true'])");
+        if (parentCanonical && parentCanonical.dataset.visualId) {
+          selectElement(parentCanonical.dataset.visualId, (parentCanonical.dataset.visualTag as ElementTag) || "text", parentCanonical.dataset.visualLabel || parentCanonical.dataset.visualId);
+          return;
+        }
         const id = svg.dataset?.visualId || `auto-icon-${hashString(svg.getAttribute?.("class") || "icon")}`;
         svg.dataset.visualId = id;
         svg.dataset.visualTag = "icon";
