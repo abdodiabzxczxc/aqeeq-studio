@@ -12,10 +12,11 @@ import {
   CalendarCheck,
   ChevronLeft,
   Layers,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
-import { VisualEditable, VisualImage } from "@/components/VisualEditor";
+import { useVisualEditorState, VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { preloadImage } from "@/lib/visualOverridesCache";
 import { useLocation } from "wouter";
 
@@ -205,6 +206,7 @@ interface VirtualCampusExplorerProps {
 
 export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProps) {
   const [, navigate] = useLocation();
+  const { isEditing, select } = useVisualEditorState();
   const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
 
@@ -369,7 +371,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                 />
                 {/* Dark Scrim */}
                 <div
-                  className={`absolute inset-0 transition-opacity duration-500 ${
+                  className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
                     isExpanded
                       ? "bg-gradient-to-t from-black/95 via-black/60 to-black/30"
                       : "bg-black/75 group-hover:bg-black/60"
@@ -378,9 +380,9 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
 
                 {/* Expanded View Content */}
                 {isExpanded ? (
-                  <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white">
+                  <div className="relative z-10 h-full flex flex-col justify-between p-8 text-right text-white pointer-events-none">
                     {/* Top Bar with Badges & Live Status */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between pointer-events-auto">
                       <div className="flex items-center gap-2">
                         <VisualEditable
                           id={`about-facility-${fac.id}-tag`}
@@ -399,20 +401,36 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                           className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md"
                         />
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-[#f8ca14] bg-black/60 px-3.5 py-1 rounded-full border border-[#f8ca14]/30 backdrop-blur-md">
-                        <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
-                        <VisualEditable
-                          id={`about-facility-${fac.id}-live-status`}
-                          tag="text"
-                          label={`حالة مرفق ${fac.name}`}
-                          defaultText="مرفق حي مجهز 100%"
-                          as="span"
-                        />
+                      <div className="flex items-center gap-2">
+                        {isEditing ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              select(`about-facility-${fac.id}`, "image", `مرفق ${fac.name} (${fac.tag})`);
+                            }}
+                            className="flex items-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-3 py-1 text-xs font-black shadow-lg transition active:scale-95 cursor-pointer"
+                            title="تغيير صورة هذا المرفق في المحرر المرئي"
+                          >
+                            <Camera size={13} />
+                            <span>تغيير صورة المرفق</span>
+                          </button>
+                        ) : null}
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#f8ca14] bg-black/60 px-3.5 py-1 rounded-full border border-[#f8ca14]/30 backdrop-blur-md">
+                          <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
+                          <VisualEditable
+                            id={`about-facility-${fac.id}-live-status`}
+                            tag="text"
+                            label={`حالة مرفق ${fac.name}`}
+                            defaultText="مرفق حي مجهز 100%"
+                            as="span"
+                          />
+                        </div>
                       </div>
                     </div>
 
                     {/* Center Story */}
-                    <div className="max-w-2xl my-auto py-4">
+                    <div className="max-w-2xl my-auto py-4 pointer-events-auto">
                       <VisualEditable
                         id={`about-facility-${fac.id}-name`}
                         tag="text"
@@ -471,7 +489,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     </div>
 
                     {/* Bottom CTA Row */}
-                    <div className={`flex flex-wrap items-center gap-3 pt-4 border-t ${
+                    <div className={`flex flex-wrap items-center gap-3 pt-4 border-t pointer-events-auto ${
                       dark ? "border-white/10" : "border-white/25"
                     }`}>
                       <a
@@ -609,8 +627,8 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     >
                       <div className="rounded-2xl overflow-hidden aspect-video relative">
                         <VisualImage
-                          id={`about-facility-mobile-${fac.id}`}
-                          label={`مرفق ${fac.name} (جوال)`}
+                          id={`about-facility-${fac.id}`}
+                          label={`مرفق ${fac.name} (${fac.tag})`}
                           src={fac.image}
                           alt={fac.name}
                           className="h-full w-full object-cover"

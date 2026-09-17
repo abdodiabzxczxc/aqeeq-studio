@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { isAqeeqDriveVideo } from "@/lib/aqeeqAlbumMedia";
+import { directDriveImage } from "@/lib/mediaUtils";
 import { alignedLayerX, alignedLayerY, distributeLayerSpacing, type HorizontalLayerAlign, type VerticalLayerAlign } from "@/lib/layerAlignment";
 import { snapToLayerGrid } from "@/lib/layerGrid";
 import { snapLayerToElements } from "@/lib/layerSnap";
@@ -957,6 +958,7 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
     const isTextTag = selected.tag === "text" || selected.tag === "button";
     const isMediaTag = selected.tag === "image" || selected.tag === "video";
+    const canHaveMedia = isMediaTag || isSelectedBackground || ["section", "section-block"].includes(selected.tag) || Boolean(draft.mediaUrl);
     const source = overrideMap.get(selected.id);
     const preview: VisualOverride = {
       id: source?.id ?? -1,
@@ -964,8 +966,8 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       elementId: selected.id,
       elementTag: selected.tag,
       contentText: isTextTag ? (draft.contentText || null) : null,
-      mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
-      altText: isMediaTag ? (draft.altText || null) : null,
+      mediaUrl: canHaveMedia ? (draft.mediaUrl || null) : null,
+      altText: canHaveMedia ? (draft.altText || null) : null,
       linkUrl: draft.linkUrl || null,
       alignment: draft.alignment || null,
       textColor: isTextTag ? (draft.textColor || null) : null,
@@ -999,10 +1001,28 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       };
     });
 
+    if (preview.mediaUrl) {
+      sharedHeroElementIds(selected.id).forEach((elementId) => {
+        setInstantVisualOverride({
+          elementId,
+          pagePath,
+          elementTag: selected.tag,
+          mediaUrl: preview.mediaUrl,
+          altText: preview.altText,
+        });
+      });
+    }
+
     if (typeof document !== "undefined") {
       const el = document.querySelector<HTMLElement>(`[data-visual-id="${CSS.escape(selected.id)}"]`);
       if (el && isTextTag && preview.contentText !== null && preview.contentText !== undefined) {
         applyTextContentToNode(el, preview.contentText);
+      }
+      if (el && preview.mediaUrl) {
+        const imgEl = el.tagName === "IMG" ? (el as HTMLImageElement) : el.querySelector<HTMLImageElement>("img");
+        if (imgEl && imgEl.src !== preview.mediaUrl) {
+          imgEl.src = preview.mediaUrl;
+        }
       }
     }
   }, [draft, pagePath, selected?.id, selected?.tag]);
@@ -1785,14 +1805,15 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
     const isTextTag = selected.tag === "text" || selected.tag === "button";
     const isMediaTag = selected.tag === "image" || selected.tag === "video";
+    const canHaveMedia = isMediaTag || isSelectedBackground || ["section", "section-block"].includes(selected.tag) || Boolean(draft.mediaUrl);
 
     const payload = {
       pagePath,
       elementId: selected.id as Parameters<typeof save.mutate>[0]["elementId"],
       elementTag: selected.tag,
       contentText: isTextTag ? (draft.contentText || null) : null,
-      mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
-      altText: isMediaTag ? (draft.altText || null) : null,
+      mediaUrl: canHaveMedia ? (draft.mediaUrl || null) : null,
+      altText: canHaveMedia ? (draft.altText || null) : null,
       linkUrl: draft.linkUrl || null,
       alignment: draft.alignment || null,
       textColor: isTextTag ? (draft.textColor || null) : null,
@@ -1950,13 +1971,14 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
 
       const isTextTag = selected.tag === "text" || selected.tag === "button";
       const isMediaTag = selected.tag === "image" || selected.tag === "video";
+      const canHaveMedia = isMediaTag || isSelectedBackground || ["section", "section-block"].includes(selected.tag) || Boolean(draft.mediaUrl);
 
       const currentItemPayload = {
         elementId: selected.id,
         elementTag: selected.tag,
         contentText: isTextTag ? (draft.contentText || null) : null,
-        mediaUrl: isMediaTag ? (draft.mediaUrl || null) : null,
-        altText: isMediaTag ? (draft.altText || null) : null,
+        mediaUrl: canHaveMedia ? (draft.mediaUrl || null) : null,
+        altText: canHaveMedia ? (draft.altText || null) : null,
         linkUrl: draft.linkUrl || null,
         alignment: draft.alignment || null,
         textColor: isTextTag ? (draft.textColor || null) : null,
@@ -2211,26 +2233,74 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
     if (!selected || !pagePath) return;
     draftPreviewEnabled.current = true;
     const current = currentOverride;
-    const next: VisualOverride = { id: current?.id ?? -1, pagePath, elementId: selected.id, elementTag: selected.tag, contentText: current?.contentText ?? null, mediaUrl: patch.mediaUrl ?? current?.mediaUrl ?? null, altText: patch.altText ?? current?.altText ?? null, linkUrl: current?.linkUrl ?? null, alignment: current?.alignment ?? "center", textColor: current?.textColor ?? null, bgColor: patch.bgColor ?? current?.bgColor ?? null, fontSize: current?.fontSize ?? null, padding: current?.padding ?? null, margin: current?.margin ?? null, borderRadius: current?.borderRadius ?? null, layerX: current?.layerX ?? draft.layerX, layerY: current?.layerY ?? draft.layerY, layerWidth: current?.layerWidth ?? draft.layerWidth, layerHeight: current?.layerHeight ?? draft.layerHeight, layerZIndex: current?.layerZIndex ?? draft.layerZIndex, layerOpacity: current?.layerOpacity ?? draft.layerOpacity, backgroundSize: patch.backgroundSize ?? current?.backgroundSize ?? draft.backgroundSize, backgroundPositionX: patch.backgroundPositionX ?? current?.backgroundPositionX ?? draft.backgroundPositionX, backgroundPositionY: patch.backgroundPositionY ?? current?.backgroundPositionY ?? draft.backgroundPositionY, backgroundOverlay: patch.backgroundOverlay ?? current?.backgroundOverlay ?? draft.backgroundOverlay, customCss: draft.customCss || current?.customCss || null, isLocked: current?.isLocked ?? draft.isLocked, isHidden: current?.isHidden ?? draft.isHidden, status: "draft" };
+    const effectiveMediaUrl = patch.mediaUrl !== undefined ? (patch.mediaUrl || null) : (current?.mediaUrl ?? null);
+    const next: VisualOverride = {
+      id: current?.id ?? -1,
+      pagePath,
+      elementId: selected.id,
+      elementTag: selected.tag,
+      contentText: current?.contentText ?? null,
+      mediaUrl: effectiveMediaUrl,
+      altText: patch.altText !== undefined ? (patch.altText || null) : (current?.altText ?? null),
+      linkUrl: current?.linkUrl ?? null,
+      alignment: current?.alignment ?? "center",
+      textColor: current?.textColor ?? null,
+      bgColor: patch.bgColor ?? current?.bgColor ?? null,
+      fontSize: current?.fontSize ?? null,
+      padding: current?.padding ?? null,
+      margin: current?.margin ?? null,
+      borderRadius: current?.borderRadius ?? null,
+      layerX: current?.layerX ?? draft.layerX,
+      layerY: current?.layerY ?? draft.layerY,
+      layerWidth: current?.layerWidth ?? draft.layerWidth,
+      layerHeight: current?.layerHeight ?? draft.layerHeight,
+      layerZIndex: current?.layerZIndex ?? draft.layerZIndex,
+      layerOpacity: current?.layerOpacity ?? draft.layerOpacity,
+      backgroundSize: patch.backgroundSize ?? current?.backgroundSize ?? draft.backgroundSize,
+      backgroundPositionX: patch.backgroundPositionX ?? current?.backgroundPositionX ?? draft.backgroundPositionX,
+      backgroundPositionY: patch.backgroundPositionY ?? current?.backgroundPositionY ?? draft.backgroundPositionY,
+      backgroundOverlay: patch.backgroundOverlay ?? current?.backgroundOverlay ?? draft.backgroundOverlay,
+      customCss: draft.customCss || current?.customCss || null,
+      isLocked: current?.isLocked ?? draft.isLocked,
+      isHidden: current?.isHidden ?? draft.isHidden,
+      status: "draft",
+    };
     setUndoStack((stack) => [...stack, localOverrides].slice(-40));
     setRedoStack([]);
     setLocalOverrides((overrides) => ({
       ...overrides,
       ...Object.fromEntries(sharedHeroBackgroundIds(selected.id).map((elementId) => [`${pagePath}::${elementId}`, { ...next, elementId }])),
     }));
-    setDraft((value) => ({ ...value, bgColor: patch.bgColor ?? value.bgColor, mediaUrl: patch.mediaUrl ?? value.mediaUrl, altText: patch.altText ?? value.altText, backgroundSize: patch.backgroundSize ?? value.backgroundSize, backgroundPositionX: patch.backgroundPositionX ?? value.backgroundPositionX, backgroundPositionY: patch.backgroundPositionY ?? value.backgroundPositionY, backgroundOverlay: patch.backgroundOverlay ?? value.backgroundOverlay }));
+    setDraft((value) => ({
+      ...value,
+      bgColor: patch.bgColor ?? value.bgColor,
+      mediaUrl: patch.mediaUrl !== undefined ? (patch.mediaUrl || "") : value.mediaUrl,
+      altText: patch.altText !== undefined ? (patch.altText || "") : value.altText,
+      backgroundSize: patch.backgroundSize ?? value.backgroundSize,
+      backgroundPositionX: patch.backgroundPositionX ?? value.backgroundPositionX,
+      backgroundPositionY: patch.backgroundPositionY ?? value.backgroundPositionY,
+      backgroundOverlay: patch.backgroundOverlay ?? value.backgroundOverlay,
+    }));
 
-    if (patch.mediaUrl) {
-      sharedHeroBackgroundIds(selected.id).forEach((elementId) => {
-        setInstantVisualOverride({
-          elementId,
-          pagePath,
-          elementTag: selected.tag,
-          mediaUrl: patch.mediaUrl,
-          altText: patch.altText,
-        });
-      });
+    setPendingElementIds((prev) => {
+      const nextIds = new Set(prev);
+      sharedHeroBackgroundIds(selected.id).forEach((id) => nextIds.add(id));
+      return nextIds;
+    });
+
+    if (effectiveMediaUrl) {
+      preloadImage(effectiveMediaUrl);
     }
+
+    sharedHeroBackgroundIds(selected.id).forEach((elementId) => {
+      setInstantVisualOverride({
+        elementId,
+        pagePath,
+        elementTag: selected.tag,
+        mediaUrl: effectiveMediaUrl,
+        altText: patch.altText,
+      });
+    });
 
     // Immediate DOM update for instant visual feedback on canvas
     try {
@@ -2238,11 +2308,18 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
       if (targetNode) {
         if (patch.mediaUrl !== undefined) {
           if (targetNode.tagName === "IMG") {
+            const currentSrc = targetNode.getAttribute("src") || (targetNode as HTMLImageElement).src;
+            if (currentSrc && patch.mediaUrl) recordSrcReplacement(currentSrc, patch.mediaUrl);
             (targetNode as HTMLImageElement).src = patch.mediaUrl || "";
           } else {
             const innerImg = targetNode.querySelector<HTMLImageElement>("img");
-            if (innerImg) innerImg.src = patch.mediaUrl || "";
-            else targetNode.style.backgroundImage = patch.mediaUrl ? `url(${patch.mediaUrl})` : "";
+            if (innerImg) {
+              const currentSrc = innerImg.getAttribute("src") || innerImg.src;
+              if (currentSrc && patch.mediaUrl) recordSrcReplacement(currentSrc, patch.mediaUrl);
+              innerImg.src = patch.mediaUrl || "";
+            } else {
+              targetNode.style.backgroundImage = patch.mediaUrl ? `url(${patch.mediaUrl})` : "";
+            }
           }
         }
         if (patch.bgColor !== undefined) {
@@ -2687,19 +2764,68 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setMediaLibraryOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-300 px-3 py-1.5 text-xs font-black text-slate-950 transition hover:bg-amber-200"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-300 px-3 py-1.5 text-xs font-black text-slate-950 transition hover:bg-amber-200 cursor-pointer shadow-sm"
                 >
                   <ImageIcon size={14} />
                   رفع أو اختيار
                 </button>
               </div>
+
+              {/* Live Image Thumbnail Preview */}
+              {draft.mediaUrl ? (
+                <div className="relative group/thumb rounded-xl overflow-hidden border border-white/15 bg-black/60 p-1">
+                  <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-black/40 flex items-center justify-center">
+                    <img
+                      src={draft.mediaUrl}
+                      alt={draft.altText || "معاينة الصورة"}
+                      className="h-full w-full object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = "none";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/65 opacity-0 group-hover/thumb:opacity-100 transition flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMediaLibraryOpen(true)}
+                        className="px-3 py-1.5 rounded-xl bg-amber-300 text-slate-950 font-black text-xs hover:bg-amber-200 transition active:scale-95 cursor-pointer"
+                      >
+                        تغيير الصورة
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          draftPreviewEnabled.current = true;
+                          setDraft((value) => ({ ...value, mediaUrl: "" }));
+                          stageSelectedBackground({ mediaUrl: "" });
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-red-600/90 text-white font-bold text-xs hover:bg-red-500 transition active:scale-95 cursor-pointer"
+                      >
+                        مسح
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between px-2 pt-1.5 text-[10px]">
+                    <span className="truncate max-w-[200px] text-slate-400 font-mono" dir="ltr">{draft.mediaUrl}</span>
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      معاينة مباشرة
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+
               <TokenField
                 label="رابط الصورة أو الفيديو"
                 value={draft.mediaUrl}
                 placeholder="/uploads/... أو رابط Google Drive"
                 onChange={(mediaUrl) => {
                   draftPreviewEnabled.current = true;
-                  setDraft((value) => ({ ...value, mediaUrl }));
+                  const normalized = directDriveImage(mediaUrl) || mediaUrl;
+                  setDraft((value) => ({ ...value, mediaUrl: normalized }));
+                  stageSelectedBackground({ mediaUrl: normalized });
+                  if (normalized !== mediaUrl) {
+                    toast.success("تم تحويل رابط Google Drive إلى رابط صورة مباشر تلقائياً ✓");
+                  }
                 }}
               />
               {selected.tag === "image" ? (
@@ -2710,8 +2836,19 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
                   onChange={(altText) => {
                     draftPreviewEnabled.current = true;
                     setDraft((value) => ({ ...value, altText }));
+                    stageSelectedBackground({ altText });
                   }}
                 />
+              ) : null}
+
+              {pendingElementIds.has(selected.id) ? (
+                <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-[11px] font-bold text-emerald-300">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    المعاينة مطبقة مباشرة على الشاشة
+                  </span>
+                  <span className="text-xs text-[#f8ca14]">اضغط «حفظ ونشر» لحفظها</span>
+                </div>
               ) : null}
               
               <div className="grid grid-cols-2 gap-3 pt-1">
@@ -3080,12 +3217,70 @@ export function VisualEditorProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setMediaLibraryOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-300 px-3 py-1.5 text-xs font-black text-slate-950 transition hover:bg-amber-200"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-300 px-3 py-1.5 text-xs font-black text-slate-950 transition hover:bg-amber-200 cursor-pointer shadow-sm"
                 >
                   <ImageIcon size={14} />
                   اختيار صورة
                 </button>
               </div>
+
+              {/* Background Live Thumbnail Preview */}
+              {draft.mediaUrl ? (
+                <div className="relative group/thumb rounded-xl overflow-hidden border border-white/15 bg-black/60 p-1">
+                  <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-black/40 flex items-center justify-center">
+                    <img
+                      src={draft.mediaUrl}
+                      alt="معاينة خلفية القسم"
+                      className="h-full w-full object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = "none";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/65 opacity-0 group-hover/thumb:opacity-100 transition flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMediaLibraryOpen(true)}
+                        className="px-3 py-1.5 rounded-xl bg-amber-300 text-slate-950 font-black text-xs hover:bg-amber-200 transition active:scale-95 cursor-pointer"
+                      >
+                        تغيير الصورة
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          draftPreviewEnabled.current = true;
+                          setDraft((value) => ({ ...value, mediaUrl: "" }));
+                          stageSelectedBackground({ mediaUrl: "" });
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-red-600/90 text-white font-bold text-xs hover:bg-red-500 transition active:scale-95 cursor-pointer"
+                      >
+                        مسح
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between px-2 pt-1.5 text-[10px]">
+                    <span className="truncate max-w-[200px] text-slate-400 font-mono" dir="ltr">{draft.mediaUrl}</span>
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      معاينة مباشرة
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+
+              <TokenField
+                label="رابط صورة الخلفية"
+                value={draft.mediaUrl}
+                placeholder="/uploads/... أو رابط Google Drive"
+                onChange={(mediaUrl) => {
+                  draftPreviewEnabled.current = true;
+                  const normalized = directDriveImage(mediaUrl) || mediaUrl;
+                  setDraft((value) => ({ ...value, mediaUrl: normalized }));
+                  stageSelectedBackground({ mediaUrl: normalized });
+                  if (normalized !== mediaUrl) {
+                    toast.success("تم تحويل رابط Google Drive إلى رابط صورة مباشر تلقائياً ✓");
+                  }
+                }}
+              />
 
               <div className="grid grid-cols-4 gap-2 pt-1">
                 <button
@@ -3592,7 +3787,7 @@ export function VisualEditable({ id, htmlId, tag, label, defaultText, children, 
 }
 
 export function VisualImage({ id, label, src, alt, className = "", linkUrl, style, priority = false, loading }: { id: string; label: string; src: string; alt: string; className?: string; linkUrl?: string; style?: React.CSSProperties; priority?: boolean; loading?: "lazy" | "eager" }) {
-  const { getOverride } = useContext(VisualEditorContext);
+  const { getOverride, isEditing } = useContext(VisualEditorContext);
   const [pathname] = useLocation();
   const pagePath = normalizedPath(pathname);
   const override = getOverride(id);
@@ -3616,7 +3811,7 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
 
   const [isLoaded, setIsLoaded] = useState<boolean>(() => {
     if (typeof window === "undefined" || typeof Image === "undefined") return true;
-    if (isImagePreloaded(resolvedSrc)) return true;
+    if (isEditing || isImagePreloaded(resolvedSrc)) return true;
     const probe = new Image();
     probe.src = resolvedSrc;
     return probe.complete;
@@ -3624,7 +3819,7 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
 
   useEffect(() => {
     if (!resolvedSrc || typeof Image === "undefined") return;
-    if (isImagePreloaded(resolvedSrc)) {
+    if (isEditing || isImagePreloaded(resolvedSrc)) {
       setIsLoaded(true);
       return;
     }
@@ -3649,9 +3844,9 @@ export function VisualImage({ id, label, src, alt, className = "", linkUrl, styl
     return () => {
       active = false;
     };
-  }, [resolvedSrc]);
+  }, [resolvedSrc, isEditing]);
 
-  const isImmediatelyReady = priority || isImagePreloaded(resolvedSrc);
+  const isImmediatelyReady = priority || isEditing || isImagePreloaded(resolvedSrc);
   const opacityClasses = isImmediatelyReady
     ? "opacity-100"
     : `transition-opacity duration-200 ${isLoaded ? "opacity-100" : "opacity-0"}`;
