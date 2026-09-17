@@ -176,7 +176,7 @@ export function AqeeqWeeklyHighlightsSection({
                       id="studio-bento-card1-kicker"
                       tag="text"
                       label="شارة الحدث الأبرز"
-                      defaultText="الحدث التعليمي الأبرز"
+                      defaultText="تعليم رائد"
                       as="span"
                       className={`text-xs font-black ${dark ? "text-[#f8ca14]" : "text-[#08467d]"}`}
                     />
@@ -185,7 +185,7 @@ export function AqeeqWeeklyHighlightsSection({
                     id="studio-bento-card1-title"
                     tag="text"
                     label="عنوان الحدث الأبرز"
-                    defaultText={eventTitle}
+                    defaultText="تعليم بمقاييس عالمية.. وجذور راسخة"
                     as="h3"
                     className={`mt-2 text-xl sm:text-3xl font-black leading-snug font-cairo ${dark ? "text-white" : "text-black"}`}
                   />
@@ -193,7 +193,7 @@ export function AqeeqWeeklyHighlightsSection({
                     id="studio-bento-card1-desc"
                     tag="text"
                     label="وصف الحدث الأبرز"
-                    defaultText="تغطية شاملة للفعاليات، ورش العمل الإبداعية، ولحظات التميز والابتكار في ساحات ومختبرات مدارس العقيق الأهلية والدولية."
+                    defaultText="نُقدم تجربة تعليمية متكاملة تجمع بين جودة الاعتمادات الدولية والقيم الأصيلة. نُهيئ أبناءك لمستقبل مشرق، ونبني شخصياتهم علمياً ومهارياً ليكونوا قادة الغد بثقة وتميز."
                     as="p"
                     className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
                   />
@@ -331,7 +331,7 @@ export function AqeeqWeeklyHighlightsSection({
                     id="studio-bento-card2-desc"
                     tag="text"
                     label="وصف وسام التميز"
-                    defaultText="تحقيق المراكز الأولى في مسابقات الابتكار والذكاء الاصطناعي على مستوى المنطقة وتكريم الطلاب وأولياء أمورهم في حفل بهيج."
+                    defaultText="التعليم عندنا يتجاوز المناهج التقليدية إلى صناعة عقول تبتكر. من خلال برامج البرمجة والذكاء الاصطناعي، نُجهز طلابنا، ونؤهلهم لمستوى بحثي وابتكاري متقدم."
                     as="p"
                     className={`mt-3 text-xs sm:text-sm leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}
                   />

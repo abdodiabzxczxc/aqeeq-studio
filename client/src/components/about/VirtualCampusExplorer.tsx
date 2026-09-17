@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AqeeqSectionHeader } from "@/components/AqeeqSectionHeader";
-import { VisualImage } from "@/components/VisualEditor";
+import { VisualEditable, VisualImage } from "@/components/VisualEditor";
 import { preloadImage } from "@/lib/visualOverridesCache";
 import { useLocation } from "wouter";
 
@@ -33,22 +33,22 @@ export interface FacilityItem {
 
 const BOYS_FACILITIES: FacilityItem[] = [
   {
-    id: "pool",
-    name: "المسبح شبه الأولمبي المغطى",
-    tag: "رياضة ولياقة احترافية",
-    icon: Waves,
-    image: "/covers/student-lab-admissions.jpg",
-    badge: "معايير FINA الدولية",
-    desc: "مسبح صرحي مغطى ومكيف بمواصفات قياسية وتدفئة مياه شتوية ذكية 30°C، يشرف عليه كباتن سباحة وإنقاذ معتمدون، مخصص لتدريب طلاب المراحل الأولية وحتى الثانوية في بيئة صحية وآمنة 100%.",
+    id: "sports-arena",
+    name: "ملاعب وصالات مغطاة.. لتفريغ طاقاتهم",
+    tag: "لياقة ونشاط",
+    icon: Trophy,
+    image: "/covers/cover-about.jpg",
+    badge: "بيئة رياضية آمنة",
+    desc: "صحة طفلك البدنية جزء أساسي من يومه. وفرنا صالات رياضية وملاعب مغطاة وآمنة، تتيح لهم ممارسة ألعابهم المفضلة بعيداً عن حرارة الشمس، لتعزيز لياقتهم وروح الفريق تحت إشراف متخصصين.",
     giantMetrics: [
-      { num: "25m", label: "طول الحوض", sub: "نصف أولمبي 6 مسارات" },
-      { num: "30°C", label: "تدفئة شتوية", sub: "تحكم رقمي بالحرارة" },
-      { num: "100%", label: "تعقيم متواصل", sub: "فلاتر أوزون صديقة" },
-      { num: "4+", label: "مدربين معتمدين", sub: "إنقاذ وتدريب مائي" },
+      { num: "مساحات", label: "ملاعب واسعة", sub: "رياضات متنوعة" },
+      { num: "أجواء", label: "صالات مكيفة", sub: "لعب مريح" },
+      { num: "أمان", label: "حماية تامة", sub: "سلامة طفلك" },
+      { num: "إشراف", label: "مدربون خبراء", sub: "متابعة دقيقة" },
     ],
     hotspots: [
-      { id: "h1", title: "مستشعرات التعقيم", desc: "نظام ضخ فلترة ثلاثي بالأوزون للحفاظ على نقاء المياه على مدار الساعة.", top: "35%", left: "25%" },
-      { id: "h2", title: "مدرجات الجمهور الآمنة", desc: "مدرجات تسع 200 متفرج لحضور البطولات المدرسية والأولمبياد.", top: "60%", left: "70%" },
+      { id: "h1", title: "مستشعرات السلامة والأمان", desc: "أرضيات مطاطية وباركيه ممتص للصدمات لحماية الطلاب أثناء اللعب.", top: "35%", left: "25%" },
+      { id: "h2", title: "مدرجات الجمهور المجهزة", desc: "مدرجات مريحة لحضور المباريات والأنشطة الرياضية.", top: "60%", left: "70%" },
     ],
   },
   {
@@ -71,18 +71,22 @@ const BOYS_FACILITIES: FacilityItem[] = [
     ],
   },
   {
-    id: "sports-arena",
-    name: "الصالة الرياضية والملاعب المغطاة",
-    tag: "بناء بدني وروح رياضية",
-    icon: Trophy,
-    image: "/covers/cover-about.jpg",
-    badge: "أرضيات باركيه ومطاط معتمد",
-    desc: "صالات رياضية متعددة الأغراض مجهزة بملاعب كرة سلة وكرة طائرة وتنس طاولة، بالإضافة إلى ملاعب العشب الصناعي الخارجية المكيفة للمسابقات الرياضية اليومية.",
+    id: "pool",
+    name: "المسبح شبه الأولمبي المغطى",
+    tag: "رياضة ولياقة احترافية",
+    icon: Waves,
+    image: "/covers/student-excellence-about.jpg",
+    badge: "معايير FINA الدولية",
+    desc: "مسبح صرحي مغطى ومكيف بمواصفات قياسية وتدفئة مياه شتوية ذكية 30°C، يشرف عليه كباتن سباحة وإنقاذ معتمدون، مخصص لتدريب طلاب المراحل الأولية وحتى الثانوية في بيئة صحية وآمنة 100%.",
     giantMetrics: [
-      { num: "1200m²", label: "مساحة الصالة", sub: "صالات مغلقة ومكيفة" },
-      { num: "3", label: "ملاعب متنوعة", sub: "كرة قدم وسلة وطائرة" },
-      { num: "300", label: "سعة المدرجات", sub: "لحضور الأنشطة والبطولات" },
-      { num: "VIP", label: "تجهيزات احترافية", sub: "إضاءة LED استوديو" },
+      { num: "25m", label: "طول الحوض", sub: "نصف أولمبي 6 مسارات" },
+      { num: "30°C", label: "تدفئة شتوية", sub: "تحكم رقمي بالحرارة" },
+      { num: "100%", label: "تعقيم متواصل", sub: "فلاتر أوزون صديقة" },
+      { num: "4+", label: "مدربين معتمدين", sub: "إنقاذ وتدريب مائي" },
+    ],
+    hotspots: [
+      { id: "h5", title: "مستشعرات التعقيم", desc: "نظام ضخ فلترة ثلاثي بالأوزون للحفاظ على نقاء المياه على مدار الساعة.", top: "35%", left: "25%" },
+      { id: "h6", title: "مدرجات الجمهور الآمنة", desc: "مدرجات تسع 200 متفرج لحضور البطولات المدرسية والأولمبياد.", top: "60%", left: "70%" },
     ],
   },
   {
@@ -226,10 +230,10 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
         {/* 1. Unified Section Header */}
         <AqeeqSectionHeader
           id="about-campuses"
-          badge="الصروح والمجمعات التعليمية النموذجية · حي الرانوناء"
+          badge="بيئة تعليمية متكاملة"
           badgeIcon={<Building2 size={15} className="text-[#f8ca14]" />}
-          title="استكشف مجمعاتنا بالمدينة المنورة 🏫"
-          subtitle="مبانٍ مدرسية صرحية مستقلة بمحاذاة ممشى الهجرة، تضم تجهيزات أكاديمية ورياضية ومعملية بمعايير عالمية مستقلة تماماً للبنين والبنات."
+          title="بيئة دراسية صُممت لراحتهم وإبداعهم"
+          subtitle="في موقع مميز بمحاذاة ممشى الهجرة، صممنا مجمعات تعليمية مستقلة تماماً للبنين والبنات. بيئة متكاملة تجمع بين الفصول الذكية والمرافق الرياضية المتطورة، لنوفر لطفلك مساحة آمنة ومحفزة طوال يومه الدراسي."
           dark={dark}
           align="right"
         />
@@ -378,27 +382,53 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                     {/* Top Bar with Badges & Live Status */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="rounded-xl bg-[#08467d]/90 border border-[#f8ca14]/40 px-3.5 py-1 text-xs font-black text-[#f8ca14] shadow-lg backdrop-blur-md">
-                          {fac.tag} ✦
-                        </span>
-                        <span className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md">
-                          {fac.badge}
-                        </span>
+                        <VisualEditable
+                          id={`about-facility-${fac.id}-tag`}
+                          tag="text"
+                          label={`وسام مرفق ${fac.name}`}
+                          defaultText={`${fac.tag} ✦`}
+                          as="span"
+                          className="rounded-xl bg-[#08467d]/90 border border-[#f8ca14]/40 px-3.5 py-1 text-xs font-black text-[#f8ca14] shadow-lg backdrop-blur-md"
+                        />
+                        <VisualEditable
+                          id={`about-facility-${fac.id}-badge`}
+                          tag="text"
+                          label={`شارة مرفق ${fac.name}`}
+                          defaultText={fac.badge}
+                          as="span"
+                          className="rounded-xl bg-black/60 border border-white/20 px-3 py-1 text-xs font-bold text-slate-200 backdrop-blur-md"
+                        />
                       </div>
                       <div className="flex items-center gap-2 text-xs font-bold text-[#f8ca14] bg-black/60 px-3.5 py-1 rounded-full border border-[#f8ca14]/30 backdrop-blur-md">
                         <span className="h-2 w-2 rounded-full bg-[#f8ca14] animate-pulse" />
-                        <span>مرفق حي مجهز 100%</span>
+                        <VisualEditable
+                          id={`about-facility-${fac.id}-live-status`}
+                          tag="text"
+                          label={`حالة مرفق ${fac.name}`}
+                          defaultText="مرفق حي مجهز 100%"
+                          as="span"
+                        />
                       </div>
                     </div>
 
                     {/* Center Story */}
                     <div className="max-w-2xl my-auto py-4">
-                      <h3 className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white">
-                        {fac.name}
-                      </h3>
-                      <p className="text-sm sm:text-base leading-relaxed text-slate-200 font-medium mb-6 drop-shadow">
-                        {fac.desc}
-                      </p>
+                      <VisualEditable
+                        id={`about-facility-${fac.id}-name`}
+                        tag="text"
+                        label={`اسم مرفق ${fac.name}`}
+                        defaultText={fac.name}
+                        as="h3"
+                        className="text-3xl sm:text-4xl font-black mb-3 drop-shadow-md text-white"
+                      />
+                      <VisualEditable
+                        id={`about-facility-${fac.id}-desc`}
+                        tag="text"
+                        label={`وصف مرفق ${fac.name}`}
+                        defaultText={fac.desc}
+                        as="p"
+                        className="text-sm sm:text-base leading-relaxed text-slate-200 font-medium mb-6 drop-shadow"
+                      />
 
                       {/* 4 Giant Metrics Chips */}
                       <div className="grid grid-cols-4 gap-3">
@@ -411,15 +441,30 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                                 : "border-white/30 bg-white/20 backdrop-blur-xl shadow-md"
                             }`}
                           >
-                            <span className="block text-xl sm:text-2xl font-black text-[#f8ca14]">
-                              {gm.num}
-                            </span>
-                            <span className="block text-[11px] font-black text-white truncate mt-0.5">
-                              {gm.label}
-                            </span>
-                            <span className="block text-[10px] text-slate-200 truncate">
-                              {gm.sub}
-                            </span>
+                            <VisualEditable
+                              id={`about-facility-${fac.id}-metric-${gIdx}-num`}
+                              tag="text"
+                              label={`رقم معيار ${fac.name} (${gIdx + 1})`}
+                              defaultText={gm.num}
+                              as="span"
+                              className="block text-xl sm:text-2xl font-black text-[#f8ca14]"
+                            />
+                            <VisualEditable
+                              id={`about-facility-${fac.id}-metric-${gIdx}-label`}
+                              tag="text"
+                              label={`تسمية معيار ${fac.name} (${gIdx + 1})`}
+                              defaultText={gm.label}
+                              as="span"
+                              className="block text-[11px] font-black text-white truncate mt-0.5"
+                            />
+                            <VisualEditable
+                              id={`about-facility-${fac.id}-metric-${gIdx}-sub`}
+                              tag="text"
+                              label={`وصف فرعي معيار ${fac.name} (${gIdx + 1})`}
+                              defaultText={gm.sub}
+                              as="span"
+                              className="block text-[10px] text-slate-200 truncate"
+                            />
                           </div>
                         ))}
                       </div>
@@ -520,12 +565,26 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                       <FacIcon size={18} />
                     </div>
                     <div className="text-right">
-                      <span className={`text-[10px] font-bold block ${
-                        dark ? "text-[#f8ca14]" : "text-[#08467d]"
-                      }`}>{fac.tag}</span>
-                      <h4 className={`text-sm font-black ${
-                        dark ? "text-white" : "text-[#0a192f]"
-                      }`}>{fac.name}</h4>
+                      <VisualEditable
+                        id={`about-facility-${fac.id}-mobile-tag`}
+                        tag="text"
+                        label={`وسام مرفق ${fac.name} (جوال)`}
+                        defaultText={fac.tag}
+                        as="span"
+                        className={`text-[10px] font-bold block ${
+                          dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                        }`}
+                      />
+                      <VisualEditable
+                        id={`about-facility-${fac.id}-mobile-name`}
+                        tag="text"
+                        label={`اسم مرفق ${fac.name} (جوال)`}
+                        defaultText={fac.name}
+                        as="h4"
+                        className={`text-sm font-black ${
+                          dark ? "text-white" : "text-[#0a192f]"
+                        }`}
+                      />
                     </div>
                   </div>
                   <span className={`text-xs font-black transition-transform ${
@@ -557,9 +616,16 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                           className="h-full w-full object-cover"
                         />
                       </div>
-                      <p className={`text-xs leading-relaxed font-medium ${
-                        dark ? "text-slate-300" : "text-slate-600"
-                      }`}>{fac.desc}</p>
+                      <VisualEditable
+                        id={`about-facility-${fac.id}-mobile-desc`}
+                        tag="text"
+                        label={`وصف مرفق ${fac.name} (جوال)`}
+                        defaultText={fac.desc}
+                        as="p"
+                        className={`text-xs leading-relaxed font-medium ${
+                          dark ? "text-slate-300" : "text-slate-600"
+                        }`}
+                      />
                       <div className="grid grid-cols-2 gap-2">
                         {fac.giantMetrics.map((gm, gIdx) => (
                           <div key={gIdx} className={`p-2.5 rounded-xl border text-center ${
@@ -567,12 +633,26 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                               ? "border-white/10 bg-black/40"
                               : "border-slate-200 bg-white shadow-sm"
                           }`}>
-                            <span className={`block text-lg font-black ${
-                              dark ? "text-[#f8ca14]" : "text-[#08467d]"
-                            }`}>{gm.num}</span>
-                            <span className={`block text-[10px] font-bold ${
-                              dark ? "text-white" : "text-slate-900"
-                            }`}>{gm.label}</span>
+                            <VisualEditable
+                              id={`about-facility-${fac.id}-mobile-metric-${gIdx}-num`}
+                              tag="text"
+                              label={`رقم معيار ${fac.name} (${gIdx + 1})`}
+                              defaultText={gm.num}
+                              as="span"
+                              className={`block text-lg font-black ${
+                                dark ? "text-[#f8ca14]" : "text-[#08467d]"
+                              }`}
+                            />
+                            <VisualEditable
+                              id={`about-facility-${fac.id}-mobile-metric-${gIdx}-label`}
+                              tag="text"
+                              label={`تسمية معيار ${fac.name} (${gIdx + 1})`}
+                              defaultText={gm.label}
+                              as="span"
+                              className={`block text-[10px] font-bold ${
+                                dark ? "text-white" : "text-slate-900"
+                              }`}
+                            />
                           </div>
                         ))}
                       </div>
