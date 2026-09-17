@@ -207,19 +207,18 @@ interface VirtualCampusExplorerProps {
 export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProps) {
   const [, navigate] = useLocation();
   const { isEditing, select, getOverride } = useVisualEditorState();
-  const [campusTab, setCampusTab] = useState<"boys" | "girls">("boys");
   const [activeFacilityIndex, setActiveFacilityIndex] = useState<number>(0);
 
-  // Preload all facility images on mount so tab/card switching is 0ms
+  // Preload all facility images on mount so card switching is 0ms
   useEffect(() => {
-    [...BOYS_FACILITIES, ...GIRLS_FACILITIES].forEach((f) => {
+    BOYS_FACILITIES.forEach((f) => {
       if (f.image) {
         preloadImage(f.image);
       }
     });
   }, []);
 
-  const facilities = campusTab === "boys" ? BOYS_FACILITIES : GIRLS_FACILITIES;
+  const facilities = BOYS_FACILITIES;
   const activeFac = facilities[activeFacilityIndex] || facilities[0];
 
   const getFacilityName = (fac: FacilityItem) => {
@@ -239,14 +238,14 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           badge="بيئة تعليمية متكاملة"
           badgeIcon={<Building2 size={15} className="text-[#f8ca14]" />}
           title="بيئة دراسية صُممت لراحتهم وإبداعهم"
-          subtitle="في موقع مميز بمحاذاة ممشى الهجرة، صممنا مجمعات تعليمية مستقلة تماماً للبنين والبنات. بيئة متكاملة تجمع بين الفصول الذكية والمرافق الرياضية المتطورة، لنوفر لطفلك مساحة آمنة ومحفزة طوال يومه الدراسي."
+          subtitle="في موقع مميز بمحاذاة ممشى الهجرة، صممنا صرحاً تعليمياً متكاملاً يجمع بين الفصول الذكية والمرافق الرياضية المتطورة، لنوفر لطفلك مساحة آمنة ومحفزة طوال يومه الدراسي."
           dark={dark}
           align="right"
         />
 
         {/* ========================================================
             UNIFIED ARCHITECTURAL ACCORDION STUDIO SHELL
-            (Integrated Campus Switcher + Expanding Accordion)
+            (Unified Campus Facilities + Expanding Accordion)
         ======================================================== */}
         <div
           className={`rounded-[2.5rem] border p-3 sm:p-5 backdrop-blur-2xl shadow-2xl relative transition-all ${
@@ -259,67 +258,25 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
           <div className={`flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b ${
             dark ? "border-white/10" : "border-slate-200"
           }`}>
-            {/* Campus Switcher Pills - Embedded inside the shell */}
-            <div className={`inline-flex items-center rounded-2xl border p-1 sm:p-1.5 shadow-inner backdrop-blur-md ${
-              dark ? "border-white/15 bg-black/50" : "border-slate-200 bg-slate-100/90"
-            }`}>
-              <button
-                type="button"
-                onClick={() => {
-                  setCampusTab("boys");
-                  setActiveFacilityIndex(0);
-                }}
-                className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
-                  campusTab === "boys"
-                    ? "text-[#f8ca14]"
-                    : dark
-                    ? "text-slate-300 hover:text-white"
-                    : "text-slate-600 hover:text-[#08467d]"
-                }`}
-              >
-                {campusTab === "boys" && (
-                  <motion.div
-                    layoutId="campusActiveTab"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center gap-2">
-                  <span>مجمع البنين (الأهلي والدولي)</span>
-                  <span>🦅</span>
+            {/* Title / Badge for the facilities */}
+            <div className="flex items-center gap-2.5">
+              <div className={`grid h-9 w-9 place-items-center rounded-xl border ${
+                dark ? "bg-white/5 border-white/10 text-[#f8ca14]" : "bg-[#08467d]/10 border-[#08467d]/20 text-[#08467d]"
+              }`}>
+                <Building2 size={18} />
+              </div>
+              <div>
+                <span className={`text-sm font-black block ${dark ? "text-white" : "text-[#08467d]"}`}>
+                  مرافق وتجهيزات الصرح التعليمي
                 </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setCampusTab("girls");
-                  setActiveFacilityIndex(0);
-                }}
-                className={`relative z-10 rounded-xl px-4 sm:px-7 py-2 text-xs sm:text-sm font-black transition active:scale-95 ${
-                  campusTab === "girls"
-                    ? "text-[#f8ca14]"
-                    : dark
-                    ? "text-slate-300 hover:text-white"
-                    : "text-slate-600 hover:text-[#08467d]"
-                }`}
-              >
-                {campusTab === "girls" && (
-                  <motion.div
-                    layoutId="campusActiveTab"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#08467d] to-[#042442] shadow-md ring-1 ring-[#f8ca14]/40"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center gap-2">
-                  <span>مجمع البنات والطفولة المبكرة</span>
-                  <span>🌸</span>
+                <span className={`text-[11px] font-medium ${dark ? "text-slate-400" : "text-slate-500"}`}>
+                  استكشف بيئة التعلم والأنشطة والابتكار المتطورة
                 </span>
-              </button>
+              </div>
             </div>
 
             {/* Live Indicator & Quick Location Info */}
-            <div className={`hidden sm:flex items-center gap-3 text-xs font-bold ${
+            <div className={`flex items-center gap-3 text-xs font-bold ${
               dark ? "text-slate-300" : "text-slate-600"
             }`}>
               <span className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border backdrop-blur-md ${
@@ -517,7 +474,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                         <span>الموقع في Google Maps 📍</span>
                       </a>
                       <a
-                        href={campusTab === "boys" ? "tel:+966148131652" : "tel:+966148644466"}
+                        href="tel:+966148131652"
                         className={`inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-xs font-bold transition backdrop-blur-md ${
                           dark
                             ? "border-white/20 bg-white/10 hover:bg-white/20 text-white"
@@ -525,7 +482,7 @@ export function VirtualCampusExplorer({ dark = true }: VirtualCampusExplorerProp
                         }`}
                       >
                         <Phone size={14} />
-                        <span>{campusTab === "boys" ? "0148131652" : "0148644466"}</span>
+                        <span>0148131652</span>
                       </a>
                       <Button
                         onClick={() => navigate("/admissions")}

@@ -472,7 +472,7 @@ export default function AqeeqSchoolAboutPage() {
                         <GraduationCap size={20} />
                       </div>
                       <div>
-                        <h5 className={`text-xs font-black ${dark ? "text-white" : "text-[#08467d]"}`}>مجمع البنين ومجمع البنات بالمدينة</h5>
+                        <h5 className={`text-xs font-black ${dark ? "text-white" : "text-[#08467d]"}`}>مجمع مدارس العقيق بالمدينة المنورة</h5>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">حي الرانوناء (ممشى الهجرة) · بيئة نموذجية متكاملة</p>
                       </div>
                     </div>
